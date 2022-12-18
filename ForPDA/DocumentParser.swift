@@ -15,15 +15,18 @@ struct TextElement: ArticleElement {
     let isHeader: Bool
     let isQuote: Bool
     let inList: Bool
+    let countedListIndex: Int
     
     init(text: String,
          isHeader: Bool = false,
          isQuote: Bool = false,
-         inList: Bool = false) {
+         inList: Bool = false,
+         countedListIndex: Int = 0) {
         self.text = text
         self.isHeader = isHeader
         self.isQuote = isQuote
         self.inList = inList
+        self.countedListIndex = countedListIndex
     }
 }
 
@@ -54,11 +57,10 @@ final class DocumentParser {
         // print(document)
         var articleElements: [ArticleElement] = []
         
-        let elements = try! document.select("[class=content-box]").select("p, h2, li")
+        let elements = try! document.select("[class=content-box]").select("p, h2, li, ol")
 
         for element in elements {
             if try! element.iS("[style=text-align:justify]") || (try! element.iS("[style=text-align: justify;]")) {
-                print(try! element.html())
                 let text = try! element.html().converted()
                 
                 if let quote = try! element.parent()?.iS("blockquote"), quote {
@@ -73,6 +75,12 @@ final class DocumentParser {
                     articleElements.append(TextElement(text: text))
                 }
 
+            } else if try! element.iS("ol") {
+                let elements = try! element.select("li")
+                for (index, element) in elements.enumerated() {
+                    let text = try! element.html().converted()
+                    articleElements.append(TextElement(text: text, countedListIndex: index + 1))
+                }
             } else if try! element.iS("[style=text-align:center]") || (try! element.iS("[style=text-align: center;]")) {
 
                 var imageUrl = try! element.select("img").attr("src")

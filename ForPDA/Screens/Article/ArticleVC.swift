@@ -97,7 +97,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
                 addLabel(text: item.text,
                          isHeader: item.isHeader,
                          isQuote: item.isQuote,
-                         inList: item.inList)
+                         inList: item.inList,
+                         countedListIndex: item.countedListIndex)
             case let item as ImageElement:
                 addImage(url: item.url)
             case let item as VideoElement:
@@ -112,7 +113,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         unhide()
     }
     
-    private func addLabel(text: String, isHeader: Bool = false, isQuote: Bool = false, inList: Bool = false) {
+    private func addLabel(text: String, isHeader: Bool, isQuote: Bool, inList: Bool, countedListIndex: Int) {
         var newText = text
         if newText.contains("<!--more-->") {
             newText.removeLast(11)
@@ -124,6 +125,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         
         if newText.count == 0 { return }
         if inList { newText = "• \(newText)"}
+        if countedListIndex > 0 { newText = "\(countedListIndex). \(newText)" }
         // print(newText, "--------------------------------------------------------------------------------\n")
         
         let ranges = text.indicesOf(string: "href=\"//")
