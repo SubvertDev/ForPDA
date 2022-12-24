@@ -9,20 +9,24 @@ import UIKit
 
 final class PDAResizingImageView: UIImageView {
     
+    private var layoutedWidth: CGFloat = 0
+
     override var intrinsicContentSize: CGSize {
-
-        if let myImage = self.image {
-            let myImageWidth = myImage.size.width
-            let myImageHeight = myImage.size.height
-            let myViewWidth = self.frame.size.width
- 
-            let ratio = myViewWidth / myImageWidth
-            let scaledHeight = myImageHeight * ratio
-
-            return CGSize(width: myViewWidth, height: scaledHeight)
+        layoutedWidth = bounds.width
+        if let image = self.image {
+            let viewWidth = bounds.width
+            let ratio = viewWidth / image.size.width
+            return CGSize(width: viewWidth, height: image.size.height * ratio)
         }
-
-        return CGSize(width: -1.0, height: -1.0)
+        return super.intrinsicContentSize
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if layoutedWidth != bounds.width {
+            invalidateIntrinsicContentSize()
+        }
     }
 
 }
