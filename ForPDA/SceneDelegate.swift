@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import WebKit
+// import WebKit
 import Nuke
 import NukeAlamofirePlugin
 
@@ -14,7 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     
-    var webView: WKWebView!
+    // var webView: WKWebView!
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -31,13 +31,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         ImagePipeline.shared = pipeline
 
-        let config = WKWebViewConfiguration()
-        config.dataDetectorTypes = []
-        config.suppressesIncrementalRendering = true
-        webView = WKWebView(frame: .zero, configuration: config)
-        webView.tag = 666
-        webView.navigationDelegate = self
-        window.addSubview(webView)
+//        let config = WKWebViewConfiguration()
+//        config.dataDetectorTypes = []
+//        config.suppressesIncrementalRendering = true
+//        webView = WKWebView(frame: .zero, configuration: config)
+//        webView.tag = 666
+//        webView.navigationDelegate = self
+//        window.addSubview(webView)
         
         // webView.load(URLRequest(url: URL(string: "https://4pda.to/")!))
     }
@@ -54,8 +54,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 }
 
-extension SceneDelegate: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print(#function)
-    }
-}
+//extension SceneDelegate: WKNavigationDelegate {
+//    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+//        print(#function)
+//    }
+//}

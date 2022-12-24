@@ -12,7 +12,7 @@ final class ArticleVM {
     
     // let networkManager = NetworkManager.shared
     
-    weak var view: ArticleVC!
+    weak var view: ArticleVC?
     
     init(view: ArticleVC) {
         self.view = view
@@ -22,8 +22,9 @@ final class ArticleVM {
         Task {
             do {
                 let page = try await NetworkManager.shared.getArticlePage(url: url)
-                let elements = DocumentParser.shared.parseArticles(from: page)
-                await view.setupElements(elements)
+                let elements = DocumentParser.shared.parseArticle(from: page)
+                await view?.configureArticle(elements)
+                await view?.configureComments(from: page)
             } catch {
                 fatalError(error.localizedDescription)
             }

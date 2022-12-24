@@ -90,7 +90,7 @@ final class LoginVC: PDAViewController<LoginView> {
                 print(parsed)
                 let errors = try! parsed.select("[class=errors-list")
                 if !errors.isEmpty() {
-                    let error = try! errors.select("li").get(0).text().converted()
+                    let error = try! errors.select("li").get(0).text()
                     print(error)
                 } else {
                     print("login success")

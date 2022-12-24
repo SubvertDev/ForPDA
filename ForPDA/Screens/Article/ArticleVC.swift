@@ -10,7 +10,6 @@ import Nuke
 import NukeExtensions
 import SwiftyGif
 import SwiftSoup
-import WebKit
 import YouTubeiOSPlayerHelper
 import MarqueeLabel
 import SwiftRichString
@@ -23,6 +22,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private let article: Article
     private var texts = [String]()
     private var buttonUrl: String?
+    
+    var articleDocument: Document?
     
     private var viewModel: ArticleVM!
     
@@ -54,12 +55,12 @@ final class ArticleVC: PDAViewController<ArticleView> {
         NukeExtensions.loadImage(with: URL(string: article.imageUrl)!, into: myView.articleImage)
         
         myView.titleLabel.text = article.title
-        
         // getArticle()
         let url = URL(string: article.url)!
-// "https://4pda.to/2022/12/11/407333/xiaomi_pokazala_miui_14_bolshe_svobodnoj_pamyati_i_menshe_neudalyaemykh_programm/")!
         viewModel.loadArticle(url: url)
     }
+    
+    // MARK: - Actions
     
     @objc private func threeDotsTapped() {
         UIPasteboard.general.string = article.url
@@ -76,9 +77,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     // MARK: - Functions
     
-    private func addComments() {
+    private func addComments(from page: Document) {
         let vc = CommentsVC()
         vc.article = article
+        vc.articleDocument = page
         addChild(vc)
         myView.commentsContainer.addSubview(vc.view)
         vc.view.snp.makeConstraints { make in
@@ -87,9 +89,9 @@ final class ArticleVC: PDAViewController<ArticleView> {
         vc.didMove(toParent: self)
     }
     
-    func setupElements(_ elements: [ArticleElement]) {
+    func configureArticle(_ elements: [ArticleElement]) {
         myView.hideView.isHidden = true
-        addComments()
+        // addComments()
         
         for element in elements {
             switch element {
@@ -111,6 +113,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
             }
         }
         unhide()
+    }
+    
+    func configureComments(from page: Document) {
+        addComments(from: page)
     }
     
     private func addLabel(text: String, isHeader: Bool, isQuote: Bool, inList: Bool, countedListIndex: Int) {
