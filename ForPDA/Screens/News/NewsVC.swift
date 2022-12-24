@@ -24,6 +24,7 @@ final class NewsVC: PDAViewController<NewsView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        myView.delegate = self
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
         
@@ -59,6 +60,14 @@ final class NewsVC: PDAViewController<NewsView> {
                 }
             }
         }
+    }
+}
+
+// MARK: - View Delegate
+
+extension NewsVC: NewsViewDelegate {
+    func refresh() {
+        viewModel.loadArticles()
     }
 }
 

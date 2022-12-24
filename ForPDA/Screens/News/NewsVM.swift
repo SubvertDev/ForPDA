@@ -31,6 +31,7 @@ final class NewsVM {
         DispatchQueue.main.async {
             self.view?.articles = articles
             self.view?.myView.tableView.reloadData()
+            self.view?.myView.refreshControl.endRefreshing()
         }
     }
     

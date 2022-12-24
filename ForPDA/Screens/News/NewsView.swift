@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol NewsViewDelegate {
+    func refresh()
+}
+
 final class NewsView: UIView {
     
     // MARK: - Views
@@ -17,6 +21,16 @@ final class NewsView: UIView {
         tableView.register(ArticleCell.self, forCellReuseIdentifier: ArticleCell.reuseIdentifier)
         return tableView
     }()
+    
+    lazy var refreshControl: UIRefreshControl = {
+        let control = UIRefreshControl()
+        control.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        return control
+    }()
+    
+    // MARK: - Properties
+    
+    var delegate: NewsViewDelegate?
     
     // MARK: - View Lifecycle
     
@@ -31,10 +45,18 @@ final class NewsView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Actions
+    
+    @objc private func refresh(_ sender: UIRefreshControl) {
+        print(#function)
+        delegate?.refresh()
+    }
+    
     // MARK: - Layout
     
     private func addSubviews() {
         addSubview(tableView)
+        tableView.addSubview(refreshControl)
     }
     
     private func makeConstraints() {
