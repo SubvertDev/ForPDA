@@ -47,4 +47,24 @@ final class NetworkManager {
         
         return stringFinal
     }
+    
+    // Backup version
+    private func convertToUTF8(_ data: Data) -> String {
+        var data = data
+        data.removeAll { $0 == 0x98 }
+        
+        guard let cfstring = CFStringCreateFromExternalRepresentation(nil, data as CFData, CFStringEncoding(CFStringEncodings.windowsCyrillic.rawValue)) else { preconditionFailure() }
+        
+        let size = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfstring), CFStringBuiltInEncodings.UTF8.rawValue)
+        let buffer = malloc(size).bindMemory(to: CChar.self, capacity: size)
+        guard CFStringGetCString(cfstring, buffer, size, CFStringBuiltInEncodings.UTF8.rawValue) else {
+            free(buffer)
+            preconditionFailure()
+        }
+        
+        let string = String(cString: buffer)
+        free(buffer)
+        
+        return string
+    }
 }
