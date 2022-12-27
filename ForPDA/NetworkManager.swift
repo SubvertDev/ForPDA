@@ -21,8 +21,9 @@ final class NetworkManager {
     
     private init() {}
     
-    func getStartPage() async throws -> Document {
-        let data = try await AF.request(startPageURL).serializingData().value
+    func getArticles(atPage number: Int = 1) async throws -> Document {
+        let url = URL(string: "https://4pda.to/page/\(number)")!
+        let data = try await AF.request(url).serializingData().value
         let htmlString = convertDataToCyrillicString(data)
         let parsed = try SwiftSoup.parse(htmlString)
         return parsed
@@ -35,12 +36,14 @@ final class NetworkManager {
         return parsed
     }
     
+    // MARK: - Helpers
+    
     private func convertDataToCyrillicString(_ data: Data) -> String {
         let string = String(data: data, encoding: .isoLatin1)!
         
         let string2 = string.replacingOccurrences(of: "\u{98}", with: "")
-        let string3 = string2.replacingOccurrences(of: "\u{ad}", with: "")
-        let string4 = string3.replacingOccurrences(of: "\u{a0}", with: "")
+        let string3 = string2.replacingOccurrences(of: "\u{ad}", with: "") // optionally
+        let string4 = string3.replacingOccurrences(of: "\u{a0}", with: "") // optionally
         
         let data2 = string4.data(using: .isoLatin1)!
         let stringFinal = String(data: data2, encoding: .windowsCP1251)!

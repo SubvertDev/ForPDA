@@ -16,6 +16,7 @@ final class NewsVC: PDAViewController<NewsView> {
     
     private let host = "https://4pda.to/"
     var articles = [Article]()
+    var page = 1
     
     private var viewModel: NewsVM!
 
@@ -43,7 +44,7 @@ final class NewsVC: PDAViewController<NewsView> {
         myView.addGestureRecognizer(longPressGesture)
     }
 
-    @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         if gestureRecognizer.state == .began {
             let touchPoint = gestureRecognizer.location(in: myView.tableView)
             if let indexPath = myView.tableView.indexPathForRow(at: touchPoint) {
@@ -66,7 +67,13 @@ final class NewsVC: PDAViewController<NewsView> {
 // MARK: - View Delegate
 
 extension NewsVC: NewsViewDelegate {
-    func refresh() {
+    func refreshButtonTapped() {
+        page += 1
+        myView.refreshButton.setTitle("Загружаю...", for: .normal)
+        viewModel.loadArticles(atPage: page)
+    }
+    
+    func refreshControlCalled() {
         viewModel.loadArticles()
     }
 }
@@ -84,6 +91,10 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 350
+    }
+    
     func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0 {
           navigationController?.setNavigationBarHidden(true, animated: true)
@@ -95,8 +106,6 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let vc = ArticleVC(article: articles[indexPath.row])
-//        let vc = CommentsVC()
-//        vc.article = articles[indexPath.row]
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.pushViewController(vc, animated: false)
     }
