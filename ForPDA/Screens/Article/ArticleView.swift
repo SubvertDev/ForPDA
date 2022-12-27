@@ -60,7 +60,7 @@ final class ArticleView: UIView {
     
     let separator: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .label
         return view
     }()
     

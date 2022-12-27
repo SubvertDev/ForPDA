@@ -21,14 +21,14 @@ final class ArticleCommentCell: CommentCell {
         myView = view
         self.commentViewContent = view
         
-        rootCommentMarginColor = .systemBlue
+        rootCommentMarginColor = .label
         rootCommentMargin = 1
         
         indentationUnit = 12
         // indentationColor = .systemRed
         indentationIndicatorThickness = 0
         
-        commentMargin = 8
+        commentMargin = 0
         commentMarginColor = .systemBackground
     }
     
@@ -48,7 +48,7 @@ final class ArticleCommentCell: CommentCell {
             myView.backgroundColor = .systemBackground
             indentationColor = .systemBackground
         } else {
-            myView.backgroundColor = .systemGroupedBackground
+            myView.backgroundColor = .secondarySystemBackground
             indentationColor = .systemBackground
         }
     }
@@ -104,17 +104,20 @@ final class ArticleCommentView: UIView {
     
     private func makeConstraints() {
         authorLabel.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview().inset(4)
+            make.top.equalToSuperview().inset(6)
+            make.leading.equalToSuperview().inset(8)
+            make.trailing.greaterThanOrEqualTo(dateLabel).inset(8)
         }
         
         textLabel.snp.makeConstraints { make in
             make.top.equalTo(authorLabel.snp.bottom).offset(4)
-            make.leading.trailing.bottom.equalToSuperview().inset(4)
+            make.leading.trailing.equalToSuperview().inset(8)
+            make.bottom.equalToSuperview().inset(6)
         }
         
         dateLabel.snp.makeConstraints { make in
             make.centerY.equalTo(authorLabel)
-            make.trailing.equalToSuperview().offset(-4)
+            make.trailing.equalToSuperview().offset(-8)
         }
         
         likesLabel.snp.makeConstraints { make in

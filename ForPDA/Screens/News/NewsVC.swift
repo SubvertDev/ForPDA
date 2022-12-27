@@ -74,7 +74,7 @@ extension NewsVC: NewsViewDelegate {
     }
     
     func refreshControlCalled() {
-        viewModel.loadArticles()
+        viewModel.refreshArticles()
     }
 }
 

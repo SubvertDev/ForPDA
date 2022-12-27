@@ -55,6 +55,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         NukeExtensions.loadImage(with: URL(string: article.imageUrl)!, into: myView.articleImage)
         
         myView.titleLabel.text = article.title
+        myView.commentsLabel.text = "Комментарии (\(article.commentAmount)):"
         // getArticle()
         let url = URL(string: article.url)!
         viewModel.loadArticle(url: url)

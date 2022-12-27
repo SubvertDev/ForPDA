@@ -123,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				B8BD2D8C293E283E00E12E29 /* CommentsVC.swift */,
+				B8BD2D88293E26A900E12E29 /* ArticleCommentCell.swift */,
 			);
 			path = Comments;
 			sourceTree = "<group>";
@@ -219,7 +220,6 @@
 			children = (
 				B8C7ABAE293D0A0D00FB2F67 /* Article.swift */,
 				B8BD2D86293E257900E12E29 /* Comment.swift */,
-				B8BD2D88293E26A900E12E29 /* ArticleCommentCell.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -533,7 +533,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ForPDA/Info.plist;
@@ -565,7 +565,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ForPDA/Info.plist;

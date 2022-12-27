@@ -27,9 +27,25 @@ final class NewsVM {
         }
     }
     
-    private func updateArticles(with articles: [Article]) {
+    func refreshArticles() {
+        Task {
+            do {
+                let page = try await NetworkManager.shared.getArticles(atPage: 1)
+                let articles = DocumentParser.shared.parseArticles(from: page)
+                updateArticles(with: articles, forced: true)
+            } catch {
+                fatalError(error.localizedDescription)
+            }
+        }
+    }
+    
+    private func updateArticles(with articles: [Article], forced: Bool = false) {
         DispatchQueue.main.async {
-            self.view?.articles += articles
+            if forced {
+                self.view?.articles = articles
+            } else {
+                self.view?.articles += articles
+            }
             self.view?.myView.tableView.reloadData()
             self.view?.myView.refreshControl.endRefreshing()
             self.view?.myView.refreshButton.isHidden = false
