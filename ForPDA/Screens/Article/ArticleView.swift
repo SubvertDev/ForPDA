@@ -14,6 +14,7 @@ final class ArticleView: UIView {
     
     let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
+        scrollView.bounces = false
         scrollView.showsHorizontalScrollIndicator = false
         return scrollView
     }()

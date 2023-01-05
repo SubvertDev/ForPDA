@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
+		B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340351296789FE00C3CF37 /* PDACharterLabel.swift */; };
+		B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */; };
 		B83E8AC5294A75DA000D59E7 /* SwiftyGif in Frameworks */ = {isa = PBXBuildFile; productRef = B83E8AC4294A75DA000D59E7 /* SwiftyGif */; };
 		B83E8AC7294A8337000D59E7 /* UITextView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */; };
 		B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */; };
@@ -59,6 +61,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B8340351296789FE00C3CF37 /* PDACharterLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDACharterLabel.swift; sourceTree = "<group>"; };
+		B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAPaddingLabel.swift; sourceTree = "<group>"; };
 		B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Ext.swift"; sourceTree = "<group>"; };
 		B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAResizingTextView.swift; sourceTree = "<group>"; };
 		B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Ext.swift"; sourceTree = "<group>"; };
@@ -130,6 +134,19 @@
 				B8BD2D88293E26A900E12E29 /* ArticleCommentCell.swift */,
 			);
 			path = Comments;
+			sourceTree = "<group>";
+		};
+		B834034F296789D800C3CF37 /* Custom Views */ = {
+			isa = PBXGroup;
+			children = (
+				B8C7ABB7293D20DD00FB2F67 /* PDATabBarController.swift */,
+				B8C7ABB9293D20E400FB2F67 /* PDAViewController.swift */,
+				B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */,
+				B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */,
+				B8340351296789FE00C3CF37 /* PDACharterLabel.swift */,
+				B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */,
+			);
+			path = "Custom Views";
 			sourceTree = "<group>";
 		};
 		B87EB9CE293D2D8B0025C2A0 /* Article */ = {
@@ -207,10 +224,6 @@
 		B8C7ABB4293D208E00FB2F67 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				B8C7ABB7293D20DD00FB2F67 /* PDATabBarController.swift */,
-				B8C7ABB9293D20E400FB2F67 /* PDAViewController.swift */,
-				B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */,
-				B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */,
 				B8C7ABBB293D20EF00FB2F67 /* UITableViewCell+Ext.swift */,
 				B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */,
 				B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */,
@@ -260,6 +273,7 @@
 				B8C7ABB2293D207C00FB2F67 /* Screens */,
 				B8C7ABB5293D209B00FB2F67 /* Models */,
 				B8FEA1B929675AAC002DFAA4 /* Services */,
+				B834034F296789D800C3CF37 /* Custom Views */,
 				B8C7ABB4293D208E00FB2F67 /* Extensions */,
 				B8FEA1BA29675ABF002DFAA4 /* Support */,
 				B8D35206293CABB7008A84EA /* Info.plist */,
@@ -409,6 +423,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */,
 				B83E8ACB294A862A000D59E7 /* UIView+Ext.swift in Sources */,
 				B8FEA1BD29675F73002DFAA4 /* UITableView+Ext.swift in Sources */,
 				B8DDFA1C294A4D22008B0156 /* NetworkManager.swift in Sources */,
@@ -424,6 +439,7 @@
 				B8DDFA20294A56E4008B0156 /* DocumentParser.swift in Sources */,
 				B87EB9D0293D2DA30025C2A0 /* ArticleVC.swift in Sources */,
 				B87EB9CD293D21FB0025C2A0 /* NewsView.swift in Sources */,
+				B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */,
 				B8BD2D94293E2AF000E12E29 /* CommentsViewController.swift in Sources */,
 				B893011C2947E18300D14141 /* MenuVC.swift in Sources */,
 				B8DDFA1E294A5611008B0156 /* ArticleVM.swift in Sources */,

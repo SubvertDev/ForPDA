@@ -52,7 +52,7 @@ final class NewsVC: PDAViewController<NewsView> {
 
                 SwiftMessages.show {
                     let view = MessageView.viewFromNib(layout: .centeredView)
-                    view.configureTheme(.success)
+                    view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
                     view.configureDropShadow()
                     view.configureContent(title: "Скопировано", body: self.articles[indexPath.row].url)
                     (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10

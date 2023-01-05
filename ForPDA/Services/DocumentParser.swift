@@ -49,10 +49,19 @@ struct ButtonElement: ArticleElement {
     let url: String
 }
 
+struct CharacteristicsElement: ArticleElement {
+    let elements: [Charter]
+}
+
+struct Charter {
+    var title: String
+    var description: [String]
+}
+
 final class DocumentParser {
     
     static let shared = DocumentParser()
-        
+    
     private init() {}
     
     // MARK: - Articles
@@ -65,11 +74,9 @@ final class DocumentParser {
             // first three may be an advertisement
             // guard (3...).contains(index) else { continue }
             let type = try! article.attr("class")
-            // print("TTYPE \(type)")
-            if type.components(separatedBy: " ").count == 3 { continue } // paid post not supported yet
+            var isReview = false
+            if type.components(separatedBy: " ").count == 3 { isReview = true }
             
-            // print("\n\(index) ----------------------------------------------------------------------")
-            // print(article.description.converted())
             let title = try! article.select("[itemprop=name]").text()
             
             guard !title.isEmpty else { continue }
@@ -87,6 +94,7 @@ final class DocumentParser {
                                   imageUrl: imageUrl,
                                   author: author,
                                   date: date,
+                                  isReview: isReview,
                                   commentAmount: commentAmount)
             
             articles.append(article)
@@ -97,11 +105,23 @@ final class DocumentParser {
     // MARK: - Article
     
     func parseArticle(from document: Document) -> [ArticleElement] {
+        if try! !document.select("[class=content-box]").isEmpty() {
+            return parseArticleNormal(from: document)
+        } else if try! !document.select("[class=article]").isEmpty() {
+            return parseArticleFancy(from: document)
+        } else {
+            return []
+        }
+    }
+    
+    // MARK: - Article (normal)
+    
+    func parseArticleNormal(from document: Document) -> [ArticleElement] {
         // print(document)
         // let document = convert(document)
         var articleElements: [ArticleElement] = []
-        let elements = try! document.select("[class=content-box]").select("p, h2, li, ol")
-
+        let elements = try! document.select("[class=content-box]").select("p, h2, li, ol, dl")
+        
         for element in elements {
             if try! element.iS("[style=text-align:justify]") || (try! element.iS("[style=text-align: justify;]")) {
                 let text = try! element.html() //.converted()
@@ -117,7 +137,7 @@ final class DocumentParser {
                 } else {
                     articleElements.append(TextElement(text: text))
                 }
-
+                
             } else if try! element.iS("ol") {
                 let elements = try! element.select("li")
                 for (index, element) in elements.enumerated() {
@@ -125,7 +145,7 @@ final class DocumentParser {
                     articleElements.append(TextElement(text: text, countedListIndex: index + 1))
                 }
             } else if try! element.iS("[style=text-align:center]") || (try! element.iS("[style=text-align: center;]")) {
-
+                
                 var imageUrl = try! element.select("img").attr("src")
                 if !imageUrl.isEmpty {
                     let images = try! element.select("img[alt]") // a[title] for high res
@@ -160,11 +180,74 @@ final class DocumentParser {
             } else if try! element.iS("h2") {
                 let text = try! element.text() //.converted()
                 articleElements.append(TextElement(text: text, isHeader: true))
-            } else {
-                continue
+            } else if try! element.iS("dl") {
+                let charters = parseCharters(element)
+                articleElements.append(CharacteristicsElement(elements: charters))
             }
         }
         return articleElements
+    }
+    
+    // MARK: - Article (fancy)
+    
+    func parseArticleFancy(from document: Document) -> [ArticleElement] {
+        var articleElements: [ArticleElement] = []
+        let elements = try! document.select("[class=article]").select("p, h2, h3, figure, dl, a[class]")
+        
+        for element in elements {
+            if try! element.iS("p") {
+                let text = try! element.text()
+                articleElements.append(TextElement(text: text))
+            } else if try! element.iS("h2") || (try! element.iS("h3")) {
+                try! element.select("br").remove()
+                let text = try! element.html()
+                articleElements.append(TextElement(text: text, isHeader: true))
+            } else if try! element.iS("figure") {
+                let images = try! element.select("img[alt]")
+                for image in images {
+                    let url = "https:" + (try! image.attr("src"))
+                    if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
+                        articleElements.append(ImageElement(url: url))
+                    } else if url.suffix(3) == "gif" {
+                        articleElements.append(GifElement(url: url))
+                    }
+                }
+            } else if try! element.iS("dl") {
+                let charters = parseCharters(element)
+                articleElements.append(CharacteristicsElement(elements: charters))
+            } else if try! element.iS("a") {
+                let text = try! element.text()
+                let url = try! element.attr("href")
+                articleElements.append(ButtonElement(text: text, url: url))
+            }
+        }
+        return articleElements
+    }
+    
+    private func parseCharters(_ element: Element) -> [Charter] {
+        var charterElements: [Charter] = []
+        let elements = try! element.select("dd, dt")
+        
+        var charter = Charter(title: "", description: [])
+        
+        for element in elements {
+            if try! element.iS("dt") {
+                charter.title = try! element.text()
+            } else if try! element.iS("dd") {
+                let text = try! element.text()
+                if text.contains("<br>") {
+                    let splitted = text.components(separatedBy: "<br>")
+                    for split in splitted {
+                        charter.description.append(split)
+                    }
+                } else {
+                    charter.description.append(text)
+                }
+                charterElements.append(charter)
+                charter = Charter(title: "", description: [])
+            }
+        }
+        return charterElements
     }
     
     // MARK: - Comments
@@ -218,23 +301,5 @@ final class DocumentParser {
         
         return Comment(author: author, text: text, date: date, likes: likes, replies: replies, level: level)
     }
-    
-    // MARK: - Cyryllic Convert
-    
-//    private func convert(_ document: Document) -> Document {
-////        try! document.select("head").remove()
-////        let scripts = try! document.select("script")
-////        for script in scripts {
-////            try! script.remove()
-////        }
-//        let convertedDocument = document
-//        for element in try! convertedDocument.getAllElements() {
-//            for textNode in element.textNodes() {
-//                guard !textNode.text().trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
-//                textNode.text(textNode.text().converted())
-//            }
-//        }
-//        return convertedDocument
-//    }
     
 }

@@ -14,5 +14,6 @@ struct Article {
     let imageUrl: String
     let author: String
     let date: String
+    let isReview: Bool
     let commentAmount: String
 }

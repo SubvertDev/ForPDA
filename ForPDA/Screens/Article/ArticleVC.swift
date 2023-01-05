@@ -56,7 +56,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
         
         myView.titleLabel.text = article.title
         myView.commentsLabel.text = "Комментарии (\(article.commentAmount)):"
-        // getArticle()
         let url = URL(string: article.url)!
         viewModel.loadArticle(url: url)
     }
@@ -67,7 +66,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         UIPasteboard.general.string = article.url
         SwiftMessages.show {
             let view = MessageView.viewFromNib(layout: .centeredView)
-            view.configureTheme(.success)
+            view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
             view.configureDropShadow()
             view.configureContent(title: "Скопировано", body: self.article.url)
             (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
@@ -110,7 +109,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
                 addGif(url: item.url)
             case let item as ButtonElement:
                 addButton(text: item.text, url: item.url)
-            default: break
+            case let item as CharacteristicsElement:
+                addCharters(chars: item.elements)
+            default:
+                break
             }
         }
         unhide()
@@ -119,6 +121,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
     func configureComments(from page: Document) {
         addComments(from: page)
     }
+    
+    // MARK: - Labels
     
     private func addLabel(text: String, isHeader: Bool, isQuote: Bool, inList: Bool, countedListIndex: Int) {
         var newText = text
@@ -177,6 +181,39 @@ final class ArticleVC: PDAViewController<ArticleView> {
         }
     }
     
+    // MARK: - Characteristics
+    
+    private func addCharters(chars: [Charter]) {
+        let mainStackView = UIStackView()
+        mainStackView.axis = .vertical
+        mainStackView.distribution = .fill
+        mainStackView.isLayoutMarginsRelativeArrangement = true
+        mainStackView.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 12)
+        
+        for char in chars {
+            let stackView = UIStackView()
+            stackView.axis = .horizontal
+            stackView.distribution = .fill
+            
+            let leftLabel = PDACharterLabel(text: char.title, type: .left)
+            leftLabel.snp.makeConstraints { make in
+                make.width.equalTo(UIScreen.main.bounds.width / 3)
+            }
+            stackView.addArrangedSubview(leftLabel)
+            
+            var text = ""
+            for desc in char.description { text += desc + "\n" }
+            text.removeLast()
+            let rightLabel = PDACharterLabel(text: text, type: .right)
+            stackView.addArrangedSubview(rightLabel)
+            
+            mainStackView.addArrangedSubview(stackView)
+        }
+        DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(mainStackView) }
+    }
+    
+    // MARK: - Images
+    
     private func addImage(url: String) {
         let imageView = PDAResizingImageView()
         NukeExtensions.loadImage(with: URL(string: url)!, into: imageView)
@@ -185,6 +222,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
         }
     }
     
+    // MARK: - Gifs
+
     private func addGif(url: String) {
         let imageView = PDAResizingImageView()
         imageView.setGifFromURL(URL(string: url)!)
@@ -192,6 +231,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
             self.myView.stackView.addArrangedSubview(imageView)
         }
     }
+    
+    // MARK: - Videos
     
     private func addVideo(id: String) {
         let player = YTPlayerView(frame: .zero)
@@ -204,13 +245,15 @@ final class ArticleVC: PDAViewController<ArticleView> {
         }
     }
     
+    // MARK: - Buttons
+    
     private func addButton(text: String, url: String) {
         buttonUrl = url
         let button = UIButton(type: .system)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         button.setTitle(text, for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .systemGreen
+        button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
@@ -229,6 +272,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
             self.myView.stackView.addArrangedSubview(container)
         }
     }
+    
+    // MARK: - Actions
     
     @objc private func buttonTapped() {
         if let buttonUrl, let url = URL(string: buttonUrl) {
