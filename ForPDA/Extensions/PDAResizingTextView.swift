@@ -25,28 +25,4 @@ final class PDAResizingTextView: UITextView {
         return attributedText.attribute(.link, at: startIndex, effectiveRange: nil) != nil
     }
     
-//    override func layoutSubviews() {
-//        super.layoutSubviews()
-//        preferredMaxLayoutWidth = bounds.width
-//    }
-    
-//    private var preferredMaxLayoutWidth: CGFloat? {
-//        didSet {
-//            guard preferredMaxLayoutWidth != oldValue else { return }
-//            invalidateIntrinsicContentSize()
-//        }
-//    }
-    
-//    override var attributedText: NSAttributedString! {
-//        didSet {
-//            invalidateIntrinsicContentSize()
-//        }
-//    }
-    
-//    override var intrinsicContentSize: CGSize {
-//        guard let width = preferredMaxLayoutWidth else {
-//            return super.intrinsicContentSize
-//        }
-//        return CGSize(width: width, height: textHeightForWidth(width))
-//    }
 }

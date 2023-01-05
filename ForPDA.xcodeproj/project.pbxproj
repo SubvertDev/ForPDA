@@ -165,7 +165,7 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
-		B8BD2D8E293E2AE800E12E29 /* Comm */ = {
+		B8BD2D8E293E2AE800E12E29 /* Comments */ = {
 			isa = PBXGroup;
 			children = (
 				B8BD2D91293E2AEF00E12E29 /* AbstractComment.swift */,
@@ -173,7 +173,7 @@
 				B8BD2D90293E2AEF00E12E29 /* CommentsViewController.swift */,
 				B8BD2D92293E2AF000E12E29 /* CommentsViewDelegate.swift */,
 			);
-			path = Comm;
+			path = Comments;
 			sourceTree = "<group>";
 		};
 		B8C7ABB2293D207C00FB2F67 /* Screens */ = {
@@ -209,8 +209,8 @@
 				B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */,
 				B8C7ABBB293D20EF00FB2F67 /* UITableViewCell+Ext.swift */,
 				B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */,
-				B863357C293D218900F8D2E6 /* String+Ext.swift */,
 				B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */,
+				B863357C293D218900F8D2E6 /* String+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -218,6 +218,7 @@
 		B8C7ABB5293D209B00FB2F67 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				B8BD2D8E293E2AE800E12E29 /* Comments */,
 				B8C7ABAE293D0A0D00FB2F67 /* Article.swift */,
 				B8BD2D86293E257900E12E29 /* Comment.swift */,
 			);
@@ -253,17 +254,32 @@
 			children = (
 				B8C7ABB2293D207C00FB2F67 /* Screens */,
 				B8C7ABB5293D209B00FB2F67 /* Models */,
+				B8FEA1B929675AAC002DFAA4 /* Services */,
 				B8C7ABB4293D208E00FB2F67 /* Extensions */,
-				B8BD2D8E293E2AE800E12E29 /* Comm */,
-				B8D351F8293CABB6008A84EA /* AppDelegate.swift */,
-				B8D351FA293CABB6008A84EA /* SceneDelegate.swift */,
-				B8DDFA1B294A4D22008B0156 /* NetworkManager.swift */,
-				B8DDFA1F294A56E4008B0156 /* DocumentParser.swift */,
-				B8D35201293CABB7008A84EA /* Assets.xcassets */,
-				B8D35203293CABB7008A84EA /* LaunchScreen.storyboard */,
+				B8FEA1BA29675ABF002DFAA4 /* Support */,
 				B8D35206293CABB7008A84EA /* Info.plist */,
 			);
 			path = ForPDA;
+			sourceTree = "<group>";
+		};
+		B8FEA1B929675AAC002DFAA4 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				B8DDFA1B294A4D22008B0156 /* NetworkManager.swift */,
+				B8DDFA1F294A56E4008B0156 /* DocumentParser.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		B8FEA1BA29675ABF002DFAA4 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				B8D351F8293CABB6008A84EA /* AppDelegate.swift */,
+				B8D351FA293CABB6008A84EA /* SceneDelegate.swift */,
+				B8D35201293CABB7008A84EA /* Assets.xcassets */,
+				B8D35203293CABB7008A84EA /* LaunchScreen.storyboard */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -276,6 +292,7 @@
 				B8D351F1293CABB6008A84EA /* Sources */,
 				B8D351F2293CABB6008A84EA /* Frameworks */,
 				B8D351F3293CABB6008A84EA /* Resources */,
+				B8FEA1BB29675BCE002DFAA4 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -357,6 +374,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B8FEA1BB29675BCE002DFAA4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "
+";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B8D351F1293CABB6008A84EA /* Sources */ = {
