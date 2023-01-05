@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol NewsViewDelegate {
+protocol NewsViewDelegate: AnyObject {
     func refreshControlCalled()
     func refreshButtonTapped()
 }

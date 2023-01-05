@@ -4,6 +4,8 @@
 //
 //  Created by Subvert on 13.12.2022.
 //
+//  swiftlint:disable all
+//  todo disable disables
 
 import UIKit
 import Alamofire

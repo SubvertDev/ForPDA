@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol MenuViewDelegate {
+protocol MenuViewDelegate: AnyObject {
     func loginTapped()
     func logoutTapped()
 }

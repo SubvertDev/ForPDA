@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol LoginViewDelegate {
+protocol LoginViewDelegate: AnyObject {
     func loginTapped()
 }
 

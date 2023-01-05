@@ -28,7 +28,7 @@ final class ArticleCommentCell: CommentCell {
         // indentationColor = .systemRed
         indentationIndicatorThickness = 0
         
-        commentMargin = 0
+        commentMargin = 4
         commentMarginColor = .systemBackground
     }
     

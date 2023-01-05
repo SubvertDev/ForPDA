@@ -17,6 +17,8 @@ final class CommentsVC: CommentsViewController {
     private var allComments: [Comment] = []
     var articleDocument: Document!
     var article: Article!
+    
+    var contentSizeObserver: NSKeyValueObservation!
             
     // MARK: - Lifecycle
     
@@ -45,7 +47,13 @@ final class CommentsVC: CommentsViewController {
         fullyExpanded = true
         tableView.reloadData()
         
-        tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+        contentSizeObserver = tableView.observe(\.contentSize, options: .new) { tableView, change in
+            if let size = change.newValue {
+                tableView.snp.updateConstraints { make in
+                    make.height.equalTo(size.height)
+                }
+            }
+        }
         
         tableView.snp.makeConstraints { make in
             make.height.equalTo(100)
@@ -59,29 +67,14 @@ final class CommentsVC: CommentsViewController {
         tableView.reloadData()
     }
     
-    // MARK: - Observers
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "contentSize" {
-            if let newvalue = change?[.newKey] {
-                let newsize = newvalue as! CGSize
-                // tableViewHeightConstraint.constant = newsize.height
-                tableView.snp.updateConstraints { make in
-                    make.height.equalTo(newsize.height)
-                }
-            }
-        }
-    }
-    
     // MARK: - TableView DataSource
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ArticleCommentCell.reuseIdentifier,
-                                                 for: indexPath) as! ArticleCommentCell
-        let comment = currentlyDisplayed[indexPath.row] as! Comment
-        cell.set(with: comment)
-        cell.level = comment.level
+        let cell = tableView.dequeueReusableCell(withClass: ArticleCommentCell.self, for: indexPath)
+        if let comment = currentlyDisplayed[indexPath.row] as? Comment {
+            cell.set(with: comment)
+            cell.level = comment.level
+        }
         return cell
     }
     

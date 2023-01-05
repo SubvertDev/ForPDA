@@ -4,6 +4,8 @@
 //
 //  Created by Subvert on 14.12.2022.
 //
+//  swiftlint:disable force_try cyclomatic_complexity function_body_length
+//  todo disable disables?
 
 import Foundation
 import SwiftSoup
@@ -59,15 +61,15 @@ final class DocumentParser {
         var articles = [Article]()
         
         let articleElements = try! document.select("article")
-        for (_, article) in articleElements.enumerated() {
+        for article in articleElements {
             // first three may be an advertisement
             // guard (3...).contains(index) else { continue }
             let type = try! article.attr("class")
-            //print("TTYPE \(type)")
+            // print("TTYPE \(type)")
             if type.components(separatedBy: " ").count == 3 { continue } // paid post not supported yet
             
-            //print("\n\(index) ----------------------------------------------------------------------")
-            //print(article.description.converted())
+            // print("\n\(index) ----------------------------------------------------------------------")
+            // print(article.description.converted())
             let title = try! article.select("[itemprop=name]").text()
             
             guard !title.isEmpty else { continue }

@@ -86,7 +86,7 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ArticleCell.reuseIdentifier, for: indexPath) as! ArticleCell
+        let cell = tableView.dequeueReusableCell(withClass: ArticleCell.self, for: indexPath)
         cell.set(article: articles[indexPath.row])
         return cell
     }
@@ -105,8 +105,8 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let vc = ArticleVC(article: articles[indexPath.row])
+        let articleVC = ArticleVC(article: articles[indexPath.row])
         navigationController?.setNavigationBarHidden(false, animated: false)
-        navigationController?.pushViewController(vc, animated: false)
+        navigationController?.pushViewController(articleVC, animated: false)
     }
 }

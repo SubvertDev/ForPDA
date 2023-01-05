@@ -79,15 +79,15 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Functions
     
     private func addComments(from page: Document) {
-        let vc = CommentsVC()
-        vc.article = article
-        vc.articleDocument = page
-        addChild(vc)
-        myView.commentsContainer.addSubview(vc.view)
-        vc.view.snp.makeConstraints { make in
+        let commentsVC = CommentsVC()
+        commentsVC.article = article
+        commentsVC.articleDocument = page
+        addChild(commentsVC)
+        myView.commentsContainer.addSubview(commentsVC.view)
+        commentsVC.view.snp.makeConstraints { make in
             make.top.bottom.leading.trailing.equalToSuperview()
         }
-        vc.didMove(toParent: self)
+        commentsVC.didMove(toParent: self)
     }
     
     func configureArticle(_ elements: [ArticleElement]) {
@@ -122,18 +122,13 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     private func addLabel(text: String, isHeader: Bool, isQuote: Bool, inList: Bool, countedListIndex: Int) {
         var newText = text
-        if newText.contains("<!--more-->") {
-            newText.removeLast(11)
-        }
-        if newText.contains("&nbsp;") {
-            newText = newText.replacingOccurrences(of: "&nbsp;", with: " ")
-        }
+        if newText.contains("<!--more-->") { newText.removeLast(11) }
+        if newText.contains("&nbsp;") { newText = newText.replacingOccurrences(of: "&nbsp;", with: " ") }
         newText = newText.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if newText.count == 0 { return }
         if inList { newText = "• \(newText)"}
         if countedListIndex > 0 { newText = "\(countedListIndex). \(newText)" }
-        // print(newText, "--------------------------------------------------------------------------------\n")
         
         let ranges = text.indicesOf(string: "href=\"//")
         for range in ranges.reversed() {
@@ -147,7 +142,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
         }
         let style = StyleXML(base: baseStyle, [:])
         let attrText = newText.set(style: style)
-        
         let textView = PDAResizingTextView()
         let insets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
         textView.textContainerInset = insets
@@ -168,9 +162,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
             stack.addArrangedSubview(view)
             stack.addArrangedSubview(textView)
             
-            DispatchQueue.main.async {
-                self.myView.stackView.addArrangedSubview(stack)
-            }
+            DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(stack) }
         } else if isHeader {
             let baseStyle = Style {
                 $0.font = SystemFonts.HelveticaNeue_Medium.font(size: 20)
@@ -179,13 +171,9 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let style = StyleXML(base: baseStyle, [:])
             let attrText = newText.set(style: style)
             textView.attributedText = attrText
-            DispatchQueue.main.async {
-                self.myView.stackView.addArrangedSubview(textView)
-            }
+            DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(textView) }
         } else {
-            DispatchQueue.main.async {
-                self.myView.stackView.addArrangedSubview(textView)
-            }
+            DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(textView) }
         }
     }
     

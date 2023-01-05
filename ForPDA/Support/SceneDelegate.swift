@@ -31,13 +31,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         ImagePipeline.shared = pipeline
 
-//        let config = WKWebViewConfiguration()
-//        config.dataDetectorTypes = []
-//        config.suppressesIncrementalRendering = true
-//        webView = WKWebView(frame: .zero, configuration: config)
-//        webView.tag = 666
-//        webView.navigationDelegate = self
-//        window.addSubview(webView)
+        // let config = WKWebViewConfiguration()
+        // config.dataDetectorTypes = []
+        // config.suppressesIncrementalRendering = true
+        // webView = WKWebView(frame: .zero, configuration: config)
+        // webView.tag = 666
+        // webView.navigationDelegate = self
+        // window.addSubview(webView)
         
         // webView.load(URLRequest(url: URL(string: "https://4pda.to/")!))
     }

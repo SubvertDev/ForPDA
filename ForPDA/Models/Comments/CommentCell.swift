@@ -5,6 +5,7 @@
 //  Created by Stéphane Sercu on 24/04/17.
 //  Copyright © 2017 Stéphane Sercu. All rights reserved.
 //
+//  swiftlint:disable all
 
 import UIKit
 import SwipeCellKit

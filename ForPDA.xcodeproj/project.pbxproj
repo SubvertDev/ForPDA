@@ -54,6 +54,7 @@
 		B8DDFA1C294A4D22008B0156 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1B294A4D22008B0156 /* NetworkManager.swift */; };
 		B8DDFA1E294A5611008B0156 /* ArticleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1D294A5611008B0156 /* ArticleVM.swift */; };
 		B8DDFA20294A56E4008B0156 /* DocumentParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1F294A56E4008B0156 /* DocumentParser.swift */; };
+		B8FEA1BD29675F73002DFAA4 /* UITableView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -94,6 +95,7 @@
 		B8DDFA1B294A4D22008B0156 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		B8DDFA1D294A5611008B0156 /* ArticleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVM.swift; sourceTree = "<group>"; };
 		B8DDFA1F294A56E4008B0156 /* DocumentParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentParser.swift; sourceTree = "<group>"; };
+		B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Ext.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +212,7 @@
 				B8C7ABBB293D20EF00FB2F67 /* UITableViewCell+Ext.swift */,
 				B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */,
 				B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */,
+				B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */,
 				B863357C293D218900F8D2E6 /* String+Ext.swift */,
 			);
 			path = Extensions;
@@ -378,7 +381,8 @@
 /* Begin PBXShellScriptBuildPhase section */
 		B8FEA1BB29675BCE002DFAA4 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			alwaysOutOfDate = 1;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -391,8 +395,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "
-";
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -402,6 +405,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B83E8ACB294A862A000D59E7 /* UIView+Ext.swift in Sources */,
+				B8FEA1BD29675F73002DFAA4 /* UITableView+Ext.swift in Sources */,
 				B8DDFA1C294A4D22008B0156 /* NetworkManager.swift in Sources */,
 				B863357D293D218900F8D2E6 /* String+Ext.swift in Sources */,
 				B8C7ABBA293D20E400FB2F67 /* PDAViewController.swift in Sources */,
