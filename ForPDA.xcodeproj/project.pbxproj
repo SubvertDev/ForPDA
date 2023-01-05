@@ -55,6 +55,7 @@
 		B8DDFA1E294A5611008B0156 /* ArticleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1D294A5611008B0156 /* ArticleVM.swift */; };
 		B8DDFA20294A56E4008B0156 /* DocumentParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1F294A56E4008B0156 /* DocumentParser.swift */; };
 		B8FEA1BD29675F73002DFAA4 /* UITableView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */; };
+		B8FEA1C229676FC3002DFAA4 /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -106,6 +107,7 @@
 				B84CCC49294A67BB0001EB24 /* NukeAlamofirePlugin in Frameworks */,
 				B809925B293CBF5C0053202C /* SnapKit in Frameworks */,
 				B8D35213293CAEF6008A84EA /* Alamofire in Frameworks */,
+				B8FEA1C229676FC3002DFAA4 /* RswiftLibrary in Frameworks */,
 				B84CCC54294A6EDA0001EB24 /* NukeExtensions in Frameworks */,
 				B8D3521B293CBE46008A84EA /* SwiftSoup in Frameworks */,
 				B83E8AC5294A75DA000D59E7 /* SwiftyGif in Frameworks */,
@@ -181,12 +183,12 @@
 		B8C7ABB2293D207C00FB2F67 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
-				B8AC57702947FC8E00435CF3 /* Profile */,
-				B893011F2947E2A700D14141 /* Login */,
-				B893011A2947E17C00D14141 /* Menu */,
 				B8C7ABB3293D208400FB2F67 /* News */,
 				B87EB9CE293D2D8B0025C2A0 /* Article */,
 				B81BE1472944054100E2AAF9 /* Comments */,
+				B893011A2947E17C00D14141 /* Menu */,
+				B8AC57702947FC8E00435CF3 /* Profile */,
+				B893011F2947E2A700D14141 /* Login */,
 			);
 			path = Screens;
 			sourceTree = "<group>";
@@ -210,9 +212,9 @@
 				B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */,
 				B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */,
 				B8C7ABBB293D20EF00FB2F67 /* UITableViewCell+Ext.swift */,
+				B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */,
 				B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */,
 				B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */,
-				B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */,
 				B863357C293D218900F8D2E6 /* String+Ext.swift */,
 			);
 			path = Extensions;
@@ -300,6 +302,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				B834034D296770C300C3CF37 /* PBXTargetDependency */,
 			);
 			name = ForPDA;
 			packageProductDependencies = (
@@ -315,6 +318,7 @@
 				B84CCC53294A6EDA0001EB24 /* NukeExtensions */,
 				B83E8AC4294A75DA000D59E7 /* SwiftyGif */,
 				B8495D41294CCE1E00F60171 /* SwiftMessages */,
+				B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -356,6 +360,7 @@
 				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */,
 				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */,
 				B8495D40294CCE1E00F60171 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
+				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */,
 			);
 			productRefGroup = B8D351F6293CABB6008A84EA /* Products */;
 			projectDirPath = "";
@@ -442,6 +447,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B834034D296770C300C3CF37 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		B8D35203293CABB7008A84EA /* LaunchScreen.storyboard */ = {
@@ -745,6 +757,14 @@
 				minimumVersion = 2.0.0;
 			};
 		};
+		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mac-cain13/R.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -752,6 +772,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		B83E8AC4294A75DA000D59E7 /* SwiftyGif */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -807,6 +831,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
+		};
+		B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */;
+			productName = RswiftLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

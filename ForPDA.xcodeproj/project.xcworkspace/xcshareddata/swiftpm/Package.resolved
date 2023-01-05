@@ -24,7 +24,7 @@
       "location" : "https://github.com/kean/Nuke.git",
       "state" : {
         "branch" : "master",
-        "revision" : "83e82ea65f7f23554f7755c4391243011fa20176"
+        "revision" : "b187456fffa045e7dfc03fec1db86164ae0c0dc1"
       }
     },
     {
@@ -37,12 +37,30 @@
       }
     },
     {
+      "identity" : "r.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mac-cain13/R.swift",
+      "state" : {
+        "revision" : "cffbe4aa55ab5f012590b38ad114079c407e6937",
+        "version" : "7.2.4"
+      }
+    },
+    {
       "identity" : "snapkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SnapKit/SnapKit.git",
       "state" : {
         "revision" : "f222cbdf325885926566172f6f5f06af95473158",
         "version" : "5.6.0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "fddd1c00396eed152c45a46bea9f47b98e59301d",
+        "version" : "1.2.0"
       }
     },
     {
@@ -78,7 +96,7 @@
       "location" : "https://github.com/kirualex/SwiftyGif.git",
       "state" : {
         "branch" : "master",
-        "revision" : "4a6f5bad863c5365b192f8441f62c713ecff62bd"
+        "revision" : "5e8619335d394901379c9add5c4c1c2f420b3800"
       }
     },
     {
@@ -88,6 +106,15 @@
       "state" : {
         "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
         "version" : "2.7.1"
+      }
+    },
+    {
+      "identity" : "xcodeedit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tomlokhorst/XcodeEdit",
+      "state" : {
+        "revision" : "cd466d6e8c5ffd2f2b61165d37b0646f09068e1e",
+        "version" : "2.9.0"
       }
     },
     {
