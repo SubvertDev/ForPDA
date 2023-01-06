@@ -29,37 +29,23 @@ final class NewsVC: PDAViewController<NewsView> {
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
         
-        setupLongPressGesture()
-        
         viewModel = NewsVM(view: self)
         viewModel.loadArticles()
     }
     
-    // MARK: - Long Press Logic
+    // MARK: - Actions
     
-    private func setupLongPressGesture() {
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        longPressGesture.minimumPressDuration = 1.0
-        // longPressGesture.delegate = self
-        myView.addGestureRecognizer(longPressGesture)
-    }
+    private func copyLinkTapped(at row: Int) {
+        UIPasteboard.general.string = articles[row].url
 
-    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        if gestureRecognizer.state == .began {
-            let touchPoint = gestureRecognizer.location(in: myView.tableView)
-            if let indexPath = myView.tableView.indexPathForRow(at: touchPoint) {
-                UIPasteboard.general.string = articles[indexPath.row].url
-
-                SwiftMessages.show {
-                    let view = MessageView.viewFromNib(layout: .centeredView)
-                    view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
-                    view.configureDropShadow()
-                    view.configureContent(title: "Скопировано", body: self.articles[indexPath.row].url)
-                    (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
-                    view.button?.isHidden = true
-                    return view
-                }
-            }
+        SwiftMessages.show {
+            let view = MessageView.viewFromNib(layout: .centeredView)
+            view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
+            view.configureDropShadow()
+            view.configureContent(title: "Скопировано", body: self.articles[row].url)
+            (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
+            view.button?.isHidden = true
+            return view
         }
     }
 }
@@ -93,6 +79,22 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return 350
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
+            let clipboardImage = UIImage(systemName: "clipboard")
+            let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
+                self.copyLinkTapped(at: indexPath.row)
+            }
+            let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
+            let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
+                let items = [self.articles[indexPath.row].url]
+                let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
+                self.present(activity, animated: true)
+            }
+            return UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem])
+        }
     }
     
     func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
