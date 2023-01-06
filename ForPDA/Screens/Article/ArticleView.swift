@@ -87,6 +87,12 @@ final class ArticleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func removeComments() {
+        separator.removeFromSuperview()
+        commentsLabel.removeFromSuperview()
+        commentsContainer.removeFromSuperview()
+    }
+    
     // MARK: - Layout
     
     private func addSubviews() {

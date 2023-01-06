@@ -49,20 +49,51 @@ final class ArticleVC: PDAViewController<ArticleView> {
         label.fadeLength = 30
         navigationItem.titleView = label
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain,
-                                                            target: self, action: #selector(threeDotsTapped))
+        configureMenu()
         
         NukeExtensions.loadImage(with: URL(string: article.imageUrl)!, into: myView.articleImage)
         
         myView.titleLabel.text = article.title
         myView.commentsLabel.text = "Комментарии (\(article.commentAmount)):"
         let url = URL(string: article.url)!
-        viewModel.loadArticle(url: url)
+        
+        if article.url.contains("to/20") {
+            viewModel.loadArticle(url: url)
+        } else {
+            makeDefaultArticle()
+        }
+    }
+    
+    // MARK: - Configure
+    
+    private func configureMenu() {
+        let clipboardImage = UIImage(systemName: "clipboard")
+        let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
+            self.copyLinkTapped()
+        }
+        
+        let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
+        let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
+            let items = [self.article.url]
+            let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            self.present(activity, animated: true)
+        }
+        
+        let menu = UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem])
+        
+        if #available(iOS 14.0, *) {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"),
+                                                                primaryAction: nil, menu: menu)
+        } else {
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
+                                                                style: .plain, target: self,
+                                                                action: #selector(copyLinkTapped))
+        }
     }
     
     // MARK: - Actions
     
-    @objc private func threeDotsTapped() {
+    @objc private func copyLinkTapped() {
         UIPasteboard.general.string = article.url
         SwiftMessages.show {
             let view = MessageView.viewFromNib(layout: .centeredView)
@@ -77,21 +108,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     // MARK: - Functions
     
-    private func addComments(from page: Document) {
-        let commentsVC = CommentsVC()
-        commentsVC.article = article
-        commentsVC.articleDocument = page
-        addChild(commentsVC)
-        myView.commentsContainer.addSubview(commentsVC.view)
-        commentsVC.view.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
-        }
-        commentsVC.didMove(toParent: self)
-    }
-    
     func configureArticle(_ elements: [ArticleElement]) {
         myView.hideView.isHidden = true
-        // addComments()
         
         for element in elements {
             switch element {
@@ -122,11 +140,33 @@ final class ArticleVC: PDAViewController<ArticleView> {
         addComments(from: page)
     }
     
+    // MARK: - Privates
+    
+    private func makeDefaultArticle() {
+        var description = article.description
+        if description.contains("Узнать подробнее") { description.removeLast(16) }
+        configureArticle([TextElement(text: description), ButtonElement(text: "Узнать подробнее", url: article.url)])
+        myView.removeComments()
+    }
+    
+    private func addComments(from page: Document) {
+        let commentsVC = CommentsVC()
+        commentsVC.article = article
+        commentsVC.articleDocument = page
+        addChild(commentsVC)
+        myView.commentsContainer.addSubview(commentsVC.view)
+        commentsVC.view.snp.makeConstraints { make in
+            make.top.bottom.leading.trailing.equalToSuperview()
+        }
+        commentsVC.didMove(toParent: self)
+    }
+    
     // MARK: - Labels
     
     private func addLabel(text: String, isHeader: Bool, isQuote: Bool, inList: Bool, countedListIndex: Int) {
         var newText = text
-        if newText.contains("<!--more-->") { newText.removeLast(11) }
+        if newText.contains("<!--more-->") { newText = newText.replacingOccurrences(of: "<!--more-->", with: "") }
+        if newText.contains("<br>") { newText = newText.replacingOccurrences(of: "<br>", with: "") }
         if newText.contains("&nbsp;") { newText = newText.replacingOccurrences(of: "&nbsp;", with: " ") }
         newText = newText.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -141,9 +181,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
         
         let baseStyle = Style {
             $0.font = SystemFonts.HelveticaNeue.font(size: 17)
-            // $0.hyphenationFactor = 0 // not working anymore?
+            $0.hyphenationFactor = 1
             $0.alignment = .justified
         }
+        
         let style = StyleXML(base: baseStyle, [:])
         let attrText = newText.set(style: style)
         let textView = PDAResizingTextView()
@@ -151,7 +192,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
         textView.textContainerInset = insets
         textView.attributedText = attrText
         textView.textColor = .label
-        // textView.textContainer.lineFragmentPadding = 0
                 
         if isQuote {
             let stack = UIStackView()
@@ -262,7 +302,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
         button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-        button.addTarget(self, action: #selector(self.buttonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
         
         let container = UIView()
         container.addSubview(button)
@@ -277,8 +317,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
             self.myView.stackView.addArrangedSubview(container)
         }
     }
-    
-    // MARK: - Actions
     
     @objc private func buttonTapped() {
         if let buttonUrl, let url = URL(string: buttonUrl) {
