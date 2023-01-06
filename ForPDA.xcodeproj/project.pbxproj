@@ -10,6 +10,7 @@
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
 		B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340351296789FE00C3CF37 /* PDACharterLabel.swift */; };
 		B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */; };
+		B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83403562967AFCA00C3CF37 /* PDATableView.swift */; };
 		B83E8AC5294A75DA000D59E7 /* SwiftyGif in Frameworks */ = {isa = PBXBuildFile; productRef = B83E8AC4294A75DA000D59E7 /* SwiftyGif */; };
 		B83E8AC7294A8337000D59E7 /* UITextView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */; };
 		B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */; };
@@ -63,6 +64,7 @@
 /* Begin PBXFileReference section */
 		B8340351296789FE00C3CF37 /* PDACharterLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDACharterLabel.swift; sourceTree = "<group>"; };
 		B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAPaddingLabel.swift; sourceTree = "<group>"; };
+		B83403562967AFCA00C3CF37 /* PDATableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATableView.swift; sourceTree = "<group>"; };
 		B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Ext.swift"; sourceTree = "<group>"; };
 		B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAResizingTextView.swift; sourceTree = "<group>"; };
 		B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Ext.swift"; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 			children = (
 				B8C7ABB7293D20DD00FB2F67 /* PDATabBarController.swift */,
 				B8C7ABB9293D20E400FB2F67 /* PDAViewController.swift */,
+				B83403562967AFCA00C3CF37 /* PDATableView.swift */,
 				B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */,
 				B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */,
 				B8340351296789FE00C3CF37 /* PDACharterLabel.swift */,
@@ -458,6 +461,7 @@
 				B8C7ABB8293D20DD00FB2F67 /* PDATabBarController.swift in Sources */,
 				B893011E2947E19800D14141 /* MenuView.swift in Sources */,
 				B8BD2D95293E2AF000E12E29 /* AbstractComment.swift in Sources */,
+				B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */,
 				B89301212947E2AE00D14141 /* LoginVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -16,10 +16,10 @@ final class NewsView: UIView {
     
     // MARK: - Views
     
-    let tableView: UITableView = {
-        let tableView = UITableView()
+    let tableView: PDATableView = {
+        let tableView = PDATableView()
         tableView.tableHeaderView = UIView()
-        tableView.register(ArticleCell.self, forCellReuseIdentifier: ArticleCell.reuseIdentifier)
+        tableView.register(cellWithClass: ArticleCell.self)
         return tableView
     }()
     

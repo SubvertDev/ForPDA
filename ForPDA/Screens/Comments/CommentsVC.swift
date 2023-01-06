@@ -24,19 +24,19 @@ final class CommentsVC: CommentsViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(ArticleCommentCell.self, forCellReuseIdentifier: ArticleCommentCell.reuseIdentifier)
+        tableView.register(cellWithClass: ArticleCommentCell.self)
         getComments()
-        setupWebView()
+        // setupWebView()
     }
     
     // MARK: - Setup
-    private func setupWebView() {
-//        webView = UIApplication.shared.windows.first!.viewWithTag(666)! as? WKWebView
-//        webView.navigationDelegate = self
-//        let url = URL(string: article.url)!
-//        let request = URLRequest(url: url)
-//        webView.load(request)
-    }
+    // private func setupWebView() {
+    //     webView = UIApplication.shared.windows.first!.viewWithTag(666)! as? WKWebView
+    //     webView.navigationDelegate = self
+    //     let url = URL(string: article.url)!
+    //     let request = URLRequest(url: url)
+    //     webView.load(request)
+    // }
     
     // MARK: - Functions
     
@@ -45,7 +45,11 @@ final class CommentsVC: CommentsViewController {
         
         currentlyDisplayed = allComments
         fullyExpanded = true
-        tableView.reloadData()
+        // tableView.reloadData()
+        
+        tableView.snp.makeConstraints { make in
+            make.height.equalTo(100)
+        }
         
         contentSizeObserver = tableView.observe(\.contentSize, options: .new) { tableView, change in
             if let size = change.newValue {
@@ -53,10 +57,6 @@ final class CommentsVC: CommentsViewController {
                     make.height.equalTo(size.height)
                 }
             }
-        }
-        
-        tableView.snp.makeConstraints { make in
-            make.height.equalTo(100)
         }
     }
     
