@@ -102,7 +102,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
                          inList: item.inList,
                          countedListIndex: item.countedListIndex)
             case let item as ImageElement:
-                addImage(url: item.url)
+                addImage(url: item.url, description: item.description)
             case let item as VideoElement:
                 addVideo(id: item.url)
             case let item as GifElement:
@@ -214,11 +214,16 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     // MARK: - Images
     
-    private func addImage(url: String) {
-        let imageView = PDAResizingImageView()
-        NukeExtensions.loadImage(with: URL(string: url)!, into: imageView)
-        DispatchQueue.main.async {
-            self.myView.stackView.addArrangedSubview(imageView)
+    private func addImage(url: String, description: String?) {
+        // todo make one view?
+        if let description {
+            let view = PDAResizingImageViewWithText(description)
+            NukeExtensions.loadImage(with: URL(string: url)!, into: view.imageView)
+            DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(view) }
+        } else {
+            let view = PDAResizingImageView()
+            NukeExtensions.loadImage(with: URL(string: url)!, into: view)
+            DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(view) }
         }
     }
     

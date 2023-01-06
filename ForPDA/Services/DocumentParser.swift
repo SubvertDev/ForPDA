@@ -34,6 +34,7 @@ struct TextElement: ArticleElement {
 
 struct ImageElement: ArticleElement {
     let url: String
+    let description: String?
 }
 
 struct VideoElement: ArticleElement {
@@ -73,8 +74,9 @@ final class DocumentParser {
         for article in articleElements {
             // first three may be an advertisement
             // guard (3...).contains(index) else { continue }
-            let type = try! article.attr("class")
+            
             var isReview = false
+            let type = try! article.attr("class")
             if type.components(separatedBy: " ").count == 3 { isReview = true }
             
             let title = try! article.select("[itemprop=name]").text()
@@ -117,20 +119,18 @@ final class DocumentParser {
     // MARK: - Article (normal)
     
     func parseArticleNormal(from document: Document) -> [ArticleElement] {
-        // print(document)
-        // let document = convert(document)
         var articleElements: [ArticleElement] = []
-        let elements = try! document.select("[class=content-box]").select("p, h2, li, ol, dl")
+        let elements = try! document.select("[class=content-box]").select("p, h2, li, ol, dl, ul")
         
         for element in elements {
             if try! element.iS("[style=text-align:justify]") || (try! element.iS("[style=text-align: justify;]")) {
-                let text = try! element.html() //.converted()
+                let text = try! element.html()
                 
                 if let quote = try! element.parent()?.iS("blockquote"), quote {
                     articleElements.append(TextElement(text: text, isQuote: true))
                 } else if try! element.iS("h2") {
                     try! element.select("br").remove()
-                    let text = try! element.html() //.converted()
+                    let text = try! element.html()
                     articleElements.append(TextElement(text: text, isHeader: true))
                 } else if let inList = try! element.parent()?.iS("ul"), inList {
                     articleElements.append(TextElement(text: text, inList: true))
@@ -141,7 +141,7 @@ final class DocumentParser {
             } else if try! element.iS("ol") {
                 let elements = try! element.select("li")
                 for (index, element) in elements.enumerated() {
-                    let text = try! element.html() //.converted()
+                    let text = try! element.html()
                     articleElements.append(TextElement(text: text, countedListIndex: index + 1))
                 }
             } else if try! element.iS("[style=text-align:center]") || (try! element.iS("[style=text-align: center;]")) {
@@ -153,7 +153,9 @@ final class DocumentParser {
                         var url = try! image.attr("src")
                         url = "https:" + url
                         if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
-                            articleElements.append(ImageElement(url: url))
+                            let text = try! element.select("[class=wp-caption-dd]").text()
+                            let description = text.isEmpty ? nil : text
+                            articleElements.append(ImageElement(url: url, description: description))
                         } else if url.suffix(3) == "gif" {
                             articleElements.append(GifElement(url: url))
                         }
@@ -178,11 +180,17 @@ final class DocumentParser {
                     }
                 }
             } else if try! element.iS("h2") {
-                let text = try! element.text() //.converted()
+                let text = try! element.text()
                 articleElements.append(TextElement(text: text, isHeader: true))
             } else if try! element.iS("dl") {
                 let charters = parseCharters(element)
                 articleElements.append(CharacteristicsElement(elements: charters))
+            } else if try! element.iS("ul") {
+                let galCont = try! element.select("a[data-lightbox]")
+                for gal in galCont {
+                    let url = "https:" + (try! gal.attr("href"))
+                    articleElements.append(ImageElement(url: url, description: nil))
+                }
             }
         }
         return articleElements
@@ -207,7 +215,9 @@ final class DocumentParser {
                 for image in images {
                     let url = "https:" + (try! image.attr("src"))
                     if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
-                        articleElements.append(ImageElement(url: url))
+                        let text = try! element.select("[class=wp-caption-dd]").text()
+                        let description = text.isEmpty ? nil : text
+                        articleElements.append(ImageElement(url: url, description: description))
                     } else if url.suffix(3) == "gif" {
                         articleElements.append(GifElement(url: url))
                     }
