@@ -151,7 +151,7 @@ final class DocumentParser {
                     let images = try! element.select("img[alt]") // a[title] for high res
                     for image in images {
                         var url = try! image.attr("src")
-                        url = "https:" + url
+                        if !url.contains("https:") { url = "https:" + url }
                         if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
                             let text = try! element.select("[class=wp-caption-dd]").text()
                             let description = text.isEmpty ? nil : text
@@ -169,7 +169,7 @@ final class DocumentParser {
                         } else {
                             let text = try! element.select("a[class]").text() //.converted()
                             var url = try! element.select("a[class]").attr("href")
-                            url = "https:" + url
+                            if !url.contains("https:") { url = "https:" + url }
                             articleElements.append(ButtonElement(text: text, url: url))
                         }
                         
@@ -188,7 +188,8 @@ final class DocumentParser {
             } else if try! element.iS("ul") {
                 let galCont = try! element.select("a[data-lightbox]")
                 for gal in galCont {
-                    let url = "https:" + (try! gal.attr("href"))
+                    var url = try! gal.attr("href")
+                    if !url.contains("https:") { url = "https:" + url }
                     articleElements.append(ImageElement(url: url, description: nil))
                 }
             }
@@ -213,7 +214,8 @@ final class DocumentParser {
             } else if try! element.iS("figure") {
                 let images = try! element.select("img[alt]")
                 for image in images {
-                    let url = "https:" + (try! image.attr("src"))
+                    var url = try! image.attr("src")
+                    if !url.contains("https:") { url = "https:" + url }
                     if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
                         let text = try! element.select("[class=wp-caption-dd]").text()
                         let description = text.isEmpty ? nil : text
