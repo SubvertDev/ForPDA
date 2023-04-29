@@ -25,7 +25,7 @@
 		B87EB9D0293D2DA30025C2A0 /* ArticleVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9CF293D2DA30025C2A0 /* ArticleVC.swift */; };
 		B87EB9D2293D2DB90025C2A0 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9D1293D2DB90025C2A0 /* ArticleView.swift */; };
 		B87EB9D4293D50DB0025C2A0 /* PDAResizingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */; };
-		B87EB9DB293D606C0025C2A0 /* YouTubeiOSPlayerHelper in Frameworks */ = {isa = PBXBuildFile; productRef = B87EB9DA293D606C0025C2A0 /* YouTubeiOSPlayerHelper */; };
+		B884AFF829FD9D6F00BC1AA1 /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */; };
 		B89301192947CF5500D14141 /* SwiftRichString in Frameworks */ = {isa = PBXBuildFile; productRef = B89301182947CF5500D14141 /* SwiftRichString */; };
 		B893011C2947E18300D14141 /* MenuVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B893011B2947E18300D14141 /* MenuVC.swift */; };
 		B893011E2947E19800D14141 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B893011D2947E19800D14141 /* MenuView.swift */; };
@@ -112,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B884AFF829FD9D6F00BC1AA1 /* YouTubePlayerKit in Frameworks */,
 				B84CCC49294A67BB0001EB24 /* NukeAlamofirePlugin in Frameworks */,
 				B809925B293CBF5C0053202C /* SnapKit in Frameworks */,
 				B8D35213293CAEF6008A84EA /* Alamofire in Frameworks */,
@@ -122,7 +123,6 @@
 				B8BD2D79293E1C3F00E12E29 /* MarqueeLabel in Frameworks */,
 				B8BD2D85293E242200E12E29 /* SwipeCellKit in Frameworks */,
 				B89301192947CF5500D14141 /* SwiftRichString in Frameworks */,
-				B87EB9DB293D606C0025C2A0 /* YouTubeiOSPlayerHelper in Frameworks */,
 				B8495D42294CCE1E00F60171 /* SwiftMessages in Frameworks */,
 				B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */,
 			);
@@ -329,7 +329,6 @@
 				B8D35212293CAEF6008A84EA /* Alamofire */,
 				B8D3521A293CBE46008A84EA /* SwiftSoup */,
 				B809925A293CBF5C0053202C /* SnapKit */,
-				B87EB9DA293D606C0025C2A0 /* YouTubeiOSPlayerHelper */,
 				B8BD2D78293E1C3F00E12E29 /* MarqueeLabel */,
 				B8BD2D84293E242200E12E29 /* SwipeCellKit */,
 				B89301182947CF5500D14141 /* SwiftRichString */,
@@ -339,6 +338,7 @@
 				B83E8AC4294A75DA000D59E7 /* SwiftyGif */,
 				B8495D41294CCE1E00F60171 /* SwiftMessages */,
 				B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */,
+				B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -372,7 +372,6 @@
 				B8D35211293CAEF6008A84EA /* XCRemoteSwiftPackageReference "Alamofire" */,
 				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */,
-				B87EB9D9293D606C0025C2A0 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */,
 				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
 				B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
 				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */,
@@ -381,6 +380,7 @@
 				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */,
 				B8495D40294CCE1E00F60171 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
 				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */,
+				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 			);
 			productRefGroup = B8D351F6293CABB6008A84EA /* Products */;
 			projectDirPath = "";
@@ -733,9 +733,9 @@
 				kind = branch;
 			};
 		};
-		B87EB9D9293D606C0025C2A0 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */ = {
+		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/youtube/youtube-ios-player-helper.git";
+			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit.git";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.0;
@@ -826,10 +826,10 @@
 			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeExtensions;
 		};
-		B87EB9DA293D606C0025C2A0 /* YouTubeiOSPlayerHelper */ = {
+		B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B87EB9D9293D606C0025C2A0 /* XCRemoteSwiftPackageReference "youtube-ios-player-helper" */;
-			productName = YouTubeiOSPlayerHelper;
+			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
+			productName = YouTubePlayerKit;
 		};
 		B89301182947CF5500D14141 /* SwiftRichString */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -118,12 +118,12 @@
       }
     },
     {
-      "identity" : "youtube-ios-player-helper",
+      "identity" : "youtubeplayerkit",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/youtube/youtube-ios-player-helper.git",
+      "location" : "https://github.com/SvenTiigi/YouTubePlayerKit.git",
       "state" : {
-        "revision" : "f57129cd4380ec0a74dd3a59da3270a1d653d59b",
-        "version" : "1.0.4"
+        "revision" : "b81f962b87105fd5e6b2b02aecebe482b84d749b",
+        "version" : "1.4.0"
       }
     }
   ],

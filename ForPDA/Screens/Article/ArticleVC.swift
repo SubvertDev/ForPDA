@@ -10,7 +10,7 @@ import Nuke
 import NukeExtensions
 import SwiftyGif
 import SwiftSoup
-import YouTubeiOSPlayerHelper
+import YouTubePlayerKit
 import MarqueeLabel
 import SwiftRichString
 import SwiftMessages
@@ -215,6 +215,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let style = StyleXML(base: baseStyle, [:])
             let attrText = newText.set(style: style)
             textView.attributedText = attrText
+            textView.textColor = .label
             DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(textView) }
         } else {
             DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(textView) }
@@ -258,11 +259,13 @@ final class ArticleVC: PDAViewController<ArticleView> {
         // todo make one view?
         if let description {
             let view = PDAResizingImageViewWithText(description)
-            NukeExtensions.loadImage(with: URL(string: url)!, into: view.imageView)
+            let imageOptions = ImageLoadingOptions(placeholder: UIImage(named: "placeholder"))
+            NukeExtensions.loadImage(with: URL(string: url), options: imageOptions, into: view.imageView) { _ in }
             DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(view) }
         } else {
             let view = PDAResizingImageView()
-            NukeExtensions.loadImage(with: URL(string: url)!, into: view)
+            let imageOptions = ImageLoadingOptions(placeholder: UIImage(named: "placeholder"))
+            NukeExtensions.loadImage(with: URL(string: url), options: imageOptions, into: view) { _ in }
             DispatchQueue.main.async { self.myView.stackView.addArrangedSubview(view) }
         }
     }
@@ -280,13 +283,12 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Videos
     
     private func addVideo(id: String) {
-        let player = YTPlayerView(frame: .zero)
-        player.load(withVideoId: id)
-        player.snp.makeConstraints { make in
-            make.height.equalTo(player.snp.width).multipliedBy(0.5625)
+        let player = YouTubePlayerViewController(source: .video(id: id))
+        player.view.snp.makeConstraints { make in
+            make.height.equalTo(player.view.snp.width).multipliedBy(Double(9)/16)
         }
         DispatchQueue.main.async {
-            self.myView.stackView.addArrangedSubview(player)
+            self.myView.stackView.addArrangedSubview(player.view)
         }
     }
     
@@ -325,9 +327,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
     }
     
     private func unhide() {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//            self.myView.hideView.isHidden = true
-//            self.addComments()
-//        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.myView.stopLoading()
+        }
     }
 }

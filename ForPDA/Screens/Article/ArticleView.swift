@@ -51,6 +51,15 @@ final class ArticleView: UIView {
         return view
     }()
     
+    let loadingIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.style = .large
+        indicator.tintColor = .black
+        indicator.startAnimating()
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
     let stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -87,6 +96,11 @@ final class ArticleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func stopLoading() {
+        hideView.isHidden = true
+        loadingIndicator.stopAnimating()
+    }
+    
     func removeComments() {
         separator.removeFromSuperview()
         commentsLabel.removeFromSuperview()
@@ -97,11 +111,12 @@ final class ArticleView: UIView {
     
     private func addSubviews() {
         addSubview(scrollView)
+        addSubview(hideView)
+        hideView.addSubview(loadingIndicator)
         scrollView.addSubview(contentView)
         contentView.addSubview(articleImage)
         contentView.addSubview(titleLabel)
         contentView.addSubview(stackView)
-        contentView.addSubview(hideView)
         contentView.addSubview(separator)
         contentView.addSubview(commentsLabel)
         contentView.addSubview(commentsContainer)
@@ -111,6 +126,16 @@ final class ArticleView: UIView {
         scrollView.snp.makeConstraints { make in
             make.top.bottom.leading.trailing.equalToSuperview()
             make.width.equalToSuperview()
+        }
+        
+        let hideViewTopInset = UIScreen.main.bounds.width * 0.6
+        hideView.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).inset(hideViewTopInset)
+            make.bottom.leading.trailing.equalTo(scrollView)
+        }
+        
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
         
         contentView.snp.makeConstraints { make in
@@ -134,10 +159,6 @@ final class ArticleView: UIView {
             make.top.equalTo(articleImage.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview()
             make.centerX.equalToSuperview()
-        }
-        
-        hideView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalTo(stackView)
         }
         
         separator.snp.makeConstraints { make in
