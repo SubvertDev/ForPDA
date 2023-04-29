@@ -20,7 +20,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = PDATabBarController()
+        // window.rootViewController = PDATabBarController()
+        
+        let newsVC = NewsVC()
+        newsVC.title = "Новости"
+        let navController = UINavigationController(rootViewController: newsVC)
+        window.rootViewController = navController
+        
         self.window = window
         window.makeKeyAndVisible()
         

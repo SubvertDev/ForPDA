@@ -78,7 +78,8 @@ final class NewsView: UIView {
     
     private func makeConstraints() {
         tableView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalTo(safeAreaLayoutGuide)
+            make.top.equalTo(safeAreaLayoutGuide)
+            make.leading.trailing.bottom.equalToSuperview()
         }
         
         refreshButton.snp.makeConstraints { make in

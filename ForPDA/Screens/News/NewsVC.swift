@@ -109,6 +109,6 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         let articleVC = ArticleVC(article: articles[indexPath.row])
         navigationController?.setNavigationBarHidden(false, animated: false)
-        navigationController?.pushViewController(articleVC, animated: false)
+        navigationController?.pushViewController(articleVC, animated: true)
     }
 }
