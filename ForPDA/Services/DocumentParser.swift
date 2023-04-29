@@ -298,11 +298,17 @@ final class DocumentParser {
         try! element.select("ul[class*=comment-list]").remove()
         let commentType = try! element.select("div[id]").attr("class")
         guard commentType != "deleted" else {
-            return Comment(author: "Неизвестно", text: "(Комментарий удален)", date: "", likes: 0, replies: replies, level: level)
+            return Comment(author: "", text: "(Комментарий удален)", date: "", likes: 0, replies: replies, level: level)
         }
-        let author = try! element.select("[class=nickname]").first()?.text() ?? "Error"
-        let text = try! element.select("[class=content]").first()?.text() ?? "Error"
-        let date = try! element.select("[class=date").first()?.text() ?? "0.0.0"
+        let author = try! element.select("[class=nickname]").first()?.text() ?? ""
+        var text: String
+        if #available(iOS 16.0, *) {
+            text = try! element.select("[class=content]").first()?.html() ?? ""
+            text = stripHtmlFromComment(from: text)
+        } else {
+            text = try! element.select("[class=content]").first()?.text() ?? ""
+        }
+        let date = try! element.select("[class=date").first()?.text() ?? ""
         
         let likes: Int
         if let likesAmount = try! element.select("[class=num]").first()?.text() {
@@ -314,4 +320,11 @@ final class DocumentParser {
         return Comment(author: author, text: text, date: date, likes: likes, replies: replies, level: level)
     }
     
+    @available(iOS 16.0, *)
+    private func stripHtmlFromComment(from comment: String) -> String {
+        let htmlRegex = /<(?!br)[^>]*>/
+        let strippedHTMLExceptBr = comment.replacing(htmlRegex, with: "")
+        let brRegex = /\s*<br>\s*/
+        return strippedHTMLExceptBr.replacing(brRegex, with: "\n")
+    }
 }

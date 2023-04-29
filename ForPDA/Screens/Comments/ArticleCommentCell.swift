@@ -65,6 +65,8 @@ final class ArticleCommentView: UIView {
     
     let authorLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: UIFont.systemFontSize, weight: .semibold)
+        label.textColor = .systemGray
         return label
     }()
     
@@ -76,6 +78,8 @@ final class ArticleCommentView: UIView {
     
     let dateLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: UIFont.systemFontSize, weight: .light)
+        label.textColor = .systemGray
         return label
     }()
     

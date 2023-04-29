@@ -10,11 +10,13 @@ import UIKit
 final class PDAResizingImageViewWithText: UIView {
     
     let imageView = PDAResizingImageView()
+    
     let textLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
         label.font = UIFont.systemFont(ofSize: 15)
         label.textAlignment = .center
+        label.numberOfLines = 0
         return label
     }()
     
@@ -37,8 +39,9 @@ final class PDAResizingImageViewWithText: UIView {
         }
         
         textLabel.snp.makeConstraints { make in
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(16)
             make.top.equalTo(imageView.snp.bottom).offset(4)
+            make.bottom.equalToSuperview()
         }
     }
 }
