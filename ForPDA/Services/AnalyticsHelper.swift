@@ -13,58 +13,65 @@ final class AnalyticsHelper {
         Analytics.logEvent(type.name, parameters: parameters)
     }
     
-    private static func analyticsArticle(_ articleEvent: ArticleEvent) -> [String: Any] {
+    private static func analyticsArticle(_ url: String) -> [String: Any] {
+        let url = removeLastComponentAndHttps(url)
         let parameters: [String: Any] = [
-            AnalyticsParameterKey.Article.link.name: articleEvent.link
+            AnalyticsParameterKey.Article.link.name: url
         ]
         return parameters
     }
     
-    private static func analyticsOpenLink(_ articleEvent: ArticleEvent) -> [String: Any] {
+    private static func analyticsOpenLink(currentUrl: String, targetUrl: String) -> [String: Any] {
+        let currentUrl = removeLastComponentAndHttps(currentUrl)
         let parameters: [String: Any] = [
-            AnalyticsParameterKey.Article.link.name: articleEvent.link,
-            AnalyticsParameterKey.Article.linkTo.name: articleEvent.linkTo ?? "BAD LINK"
+            AnalyticsParameterKey.Article.link.name: currentUrl,
+            AnalyticsParameterKey.Article.linkTo.name: targetUrl
         ]
         return parameters
     }
-}
-
-struct ArticleEvent {
-    let link: String
-    let linkTo: String?
     
-    init(link: String, linkTo: String? = nil) {
-        self.link = link
-        self.linkTo = linkTo
+    private static func removeLastComponentAndHttps(_ url: String) -> String {
+        var url = URL(string: url) ?? URL(string: "https://4pda.to/")!
+        if url.pathComponents.count == 6 { url.deleteLastPathComponent() }
+        var urlString = url.absoluteString
+        urlString = urlString.replacingOccurrences(of: "https://", with: "")
+        return urlString
     }
 }
 
 extension AnalyticsHelper {
-    static func openArticleEvent(_ articleEvent: ArticleEvent) {
-        event(with: .openArticle, parameters: analyticsArticle(articleEvent))
+    static func openArticleEvent(_ url: String) {
+        event(with: .openArticle, parameters: analyticsArticle(url))
     }
     
-    static func copyArticleLink(_ articleEvent: ArticleEvent) {
-        event(with: .copyArticleLink, parameters: analyticsArticle(articleEvent))
+    static func copyArticleLink(_ url: String) {
+        event(with: .copyArticleLink, parameters: analyticsArticle(url))
     }
     
-    static func shareArticleLink(_ articleEvent: ArticleEvent) {
-        event(with: .shareArticleLink, parameters: analyticsArticle(articleEvent))
+    static func shareArticleLink(_ url: String) {
+        event(with: .shareArticleLink, parameters: analyticsArticle(url))
     }
     
-    static func clickLinkInArticle(_ articleEvent: ArticleEvent) {
-        event(with: .clickLinkInArticle, parameters: analyticsOpenLink(articleEvent))
+    static func reportBrokenArticle(_ url: String) {
+        event(with: .reportBrokenArticle, parameters: analyticsArticle(url))
     }
     
-    static func clickButtonInArticle(_ articleEvent: ArticleEvent) {
-        event(with: .clickButtonInArticle, parameters: analyticsOpenLink(articleEvent))
+    static func clickLinkInArticle(currentUrl: String, targetUrl: String) { //
+        event(with: .clickLinkInArticle, parameters: analyticsOpenLink(currentUrl: currentUrl, targetUrl: targetUrl))
+    }
+    
+    static func clickButtonInArticle(currentUrl: String, targetUrl: String) { //
+        event(with: .clickButtonInArticle, parameters: analyticsOpenLink(currentUrl: currentUrl, targetUrl: targetUrl))
     }
 }
 
 enum AnalyticsEvent {
     case openArticle
+    
     case copyArticleLink
     case shareArticleLink
+    case reportBrokenArticle
+    
     case clickLinkInArticle
     case clickButtonInArticle
     
@@ -77,6 +84,7 @@ enum AnalyticsEvent {
             return AnalyticsEventShare
             
         case .copyArticleLink,
+             .reportBrokenArticle,
              .clickLinkInArticle,
              .clickButtonInArticle:
             return String(describing: self)

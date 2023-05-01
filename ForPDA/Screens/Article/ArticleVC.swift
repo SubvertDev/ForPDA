@@ -4,6 +4,7 @@
 //
 //  Created by Subvert on 04.12.2022.
 //
+//  swiftlint:disable type_body_length
 
 import UIKit
 import Nuke
@@ -68,6 +69,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         let clipboardImage = UIImage(systemName: "clipboard")
         let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
             self.copyLinkTapped()
+            AnalyticsHelper.copyArticleLink(article.url)
         }
         
         let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
@@ -75,11 +77,16 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let items = [self.article.url]
             let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
             self.present(activity, animated: true)
-            let event = ArticleEvent(link: article.url.stripLastURLComponent())
-            AnalyticsHelper.shareArticleLink(event)
+            AnalyticsHelper.shareArticleLink(article.url)
         }
         
-        let menu = UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem])
+        let questionImage = UIImage(systemName: "questionmark.circle")
+        let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
+            self.reportBrokenArticleTapped()
+            AnalyticsHelper.reportBrokenArticle(article.url)
+        }
+        
+        let menu = UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem, brokenArticleItem])
         
         if #available(iOS 14.0, *) {
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
@@ -101,9 +108,18 @@ final class ArticleVC: PDAViewController<ArticleView> {
             view.button?.isHidden = true
             return view
         }
-        
-        let event = ArticleEvent(link: article.url.stripLastURLComponent())
-        AnalyticsHelper.copyArticleLink(event)
+    }
+    
+    @objc private func reportBrokenArticleTapped() {
+        SwiftMessages.show {
+            let view = MessageView.viewFromNib(layout: .centeredView)
+            view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
+            view.configureDropShadow()
+            view.configureContent(title: "Спасибо!", body: "Починим в ближайшее время :)")
+            (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
+            view.button?.isHidden = true
+            return view
+        }
     }
     
     // MARK: - Functions
@@ -324,8 +340,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     @objc private func buttonTapped() {
         if let buttonUrl, let url = URL(string: buttonUrl), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
-            let event = ArticleEvent(link: article.url.stripLastURLComponent(), linkTo: buttonUrl)
-            AnalyticsHelper.clickButtonInArticle(event)
+            AnalyticsHelper.clickButtonInArticle(currentUrl: article.url, targetUrl: buttonUrl)
         }
     }
     
@@ -340,7 +355,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
 
 extension ArticleVC: PDAResizingTextViewDelegate {
     func willOpenURL(_ url: URL) {
-        let event = ArticleEvent(link: article.url.stripLastURLComponent(), linkTo: url.absoluteString)
-        AnalyticsHelper.clickLinkInArticle(event)
+        AnalyticsHelper.clickLinkInArticle(currentUrl: article.url, targetUrl: url.absoluteString)
     }
 }

@@ -47,9 +47,18 @@ final class NewsVC: PDAViewController<NewsView> {
             view.button?.isHidden = true
             return view
         }
-        
-        let event = ArticleEvent(link: articles[row].url.stripLastURLComponent())
-        AnalyticsHelper.copyArticleLink(event)
+    }
+    
+    @objc private func reportBrokenArticleTapped() {
+        SwiftMessages.show {
+            let view = MessageView.viewFromNib(layout: .centeredView)
+            view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
+            view.configureDropShadow()
+            view.configureContent(title: "Спасибо!", body: "Починим в ближайшее время :)")
+            (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
+            view.button?.isHidden = true
+            return view
+        }
     }
 }
 
@@ -89,14 +98,24 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
             let clipboardImage = UIImage(systemName: "clipboard")
             let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
                 self.copyLinkTapped(at: indexPath.row)
+                AnalyticsHelper.copyArticleLink(articles[indexPath.row].url)
             }
+            
             let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
             let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
                 let items = [self.articles[indexPath.row].url]
                 let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
                 self.present(activity, animated: true)
+                AnalyticsHelper.shareArticleLink(articles[indexPath.row].url)
             }
-            return UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem])
+            
+            let questionImage = UIImage(systemName: "questionmark.circle")
+            let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
+                self.reportBrokenArticleTapped()
+                AnalyticsHelper.reportBrokenArticle(articles[indexPath.row].url)
+            }
+            
+            return UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem, brokenArticleItem])
         }
     }
     
@@ -117,7 +136,6 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.pushViewController(articleVC, animated: true)
         
-        let event = ArticleEvent(link: article.url.stripLastURLComponent())
-        AnalyticsHelper.openArticleEvent(event)
+        AnalyticsHelper.openArticleEvent(article.url)
     }
 }
