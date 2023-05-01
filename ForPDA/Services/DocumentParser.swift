@@ -167,9 +167,13 @@ final class DocumentParser {
                         if try! element.text() == " " {
                             continue
                         } else {
-                            let text = try! element.select("a[class]").text() //.converted()
+                            var text = try! element.select("a[class]").text() //.converted()
                             var url = try! element.select("a[class]").attr("href")
                             if !url.contains("https:") { url = "https:" + url }
+                            if try! document.html().contains("form action=") {
+                                text = "Голосование на сайте"
+                                url = try! document.select("meta[property=og:url]").attr("content")
+                            }
                             articleElements.append(ButtonElement(text: text, url: url))
                         }
                         
@@ -230,6 +234,7 @@ final class DocumentParser {
             } else if try! element.iS("a") {
                 let text = try! element.text()
                 let url = try! element.attr("href")
+                print("ADDING BUTTON 2")
                 articleElements.append(ButtonElement(text: text, url: url))
             }
         }

@@ -100,7 +100,7 @@ enum AnalyticsParameterKey {
             case .title:
                 return AnalyticsParameterItemName
             case .linkTo:
-                return AnalyticsParameterSource
+                return "link_to"
             }
         }
     }

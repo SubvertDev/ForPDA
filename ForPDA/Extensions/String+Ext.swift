@@ -27,7 +27,6 @@ extension String {
     func stripLastURLComponent() -> String {
         guard var url = URL(string: self) else { return self }
         url.deleteLastPathComponent()
-        print(url.absoluteString)
         return url.absoluteString
     }
     
