@@ -8,6 +8,7 @@
 import Foundation
 
 extension String {
+    
     func indicesOf(string: String) -> [Int] {
         var indices = [Int]()
         var searchStartIndex = self.startIndex
@@ -22,4 +23,12 @@ extension String {
         
         return indices
     }
+    
+    func stripLastURLComponent() -> String {
+        guard var url = URL(string: self) else { return self }
+        url.deleteLastPathComponent()
+        print(url.absoluteString)
+        return url.absoluteString
+    }
+    
 }

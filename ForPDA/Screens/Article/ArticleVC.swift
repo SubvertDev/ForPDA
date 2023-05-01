@@ -35,9 +35,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         self.viewModel = ArticleVM(view: self)
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,17 +75,16 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let items = [self.article.url]
             let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
             self.present(activity, animated: true)
+            let event = ArticleEvent(link: article.url.stripLastURLComponent())
+            AnalyticsHelper.shareArticleLink(event)
         }
         
         let menu = UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem])
         
         if #available(iOS 14.0, *) {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"),
-                                                                primaryAction: nil, menu: menu)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
         } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                                                style: .plain, target: self,
-                                                                action: #selector(copyLinkTapped))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(copyLinkTapped))
         }
     }
     
@@ -104,6 +101,9 @@ final class ArticleVC: PDAViewController<ArticleView> {
             view.button?.isHidden = true
             return view
         }
+        
+        let event = ArticleEvent(link: article.url.stripLastURLComponent())
+        AnalyticsHelper.copyArticleLink(event)
     }
     
     // MARK: - Functions
@@ -188,6 +188,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         let style = StyleXML(base: baseStyle, [:])
         let attrText = newText.set(style: style)
         let textView = PDAResizingTextView()
+        textView.myDelegate = self
         let insets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
         textView.textContainerInset = insets
         textView.attributedText = attrText
@@ -321,8 +322,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
     }
     
     @objc private func buttonTapped() {
-        if let buttonUrl, let url = URL(string: buttonUrl) {
+        if let buttonUrl, let url = URL(string: buttonUrl), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
+            let event = ArticleEvent(link: article.url.stripLastURLComponent(), linkTo: buttonUrl)
+            AnalyticsHelper.clickButtonInArticle(event)
         }
     }
     
@@ -330,5 +333,14 @@ final class ArticleVC: PDAViewController<ArticleView> {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.myView.stopLoading()
         }
+    }
+}
+
+// MARK: - PDAResizingTextViewDelegate
+
+extension ArticleVC: PDAResizingTextViewDelegate {
+    func willOpenURL(_ url: URL) {
+        let event = ArticleEvent(link: article.url.stripLastURLComponent(), linkTo: url.absoluteString)
+        AnalyticsHelper.clickLinkInArticle(event)
     }
 }

@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol PDAResizingTextViewDelegate: AnyObject {
+    func willOpenURL(_ url: URL)
+}
+
 final class PDAResizingTextView: UITextView {
+    
+    weak var myDelegate: PDAResizingTextViewDelegate?
     
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
@@ -25,4 +31,14 @@ final class PDAResizingTextView: UITextView {
         return attributedText.attribute(.link, at: startIndex, effectiveRange: nil) != nil
     }
     
+}
+
+extension PDAResizingTextView: UITextViewDelegate {
+    func textView(_ textView: UITextView,
+                  shouldInteractWith URL: URL,
+                  in characterRange: NSRange,
+                  interaction: UITextItemInteraction) -> Bool {
+        myDelegate?.willOpenURL(URL)
+        return true
+    }
 }

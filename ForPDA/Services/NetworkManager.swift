@@ -23,14 +23,14 @@ final class NetworkManager {
     
     func getArticles(atPage number: Int = 1) async throws -> Document {
         let url = URL(string: "https://4pda.to/page/\(number)")!
-        let data = try await AF.request(url).serializingData().value
+        let (data, _) = try await URLSession.shared.data(from: url)
         let htmlString = convertDataToCyrillicString(data)
         let parsed = try SwiftSoup.parse(htmlString)
         return parsed
     }
     
     func getArticlePage(url: URL) async throws -> Document {
-        let data = try await AF.request(url).serializingData().value
+        let (data, _) = try await URLSession.shared.data(from: url)
         let htmlString = convertDataToCyrillicString(data)
         let parsed = try SwiftSoup.parse(htmlString)
         return parsed

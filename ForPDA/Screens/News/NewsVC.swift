@@ -107,8 +107,14 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        let article = articles[indexPath.row]
         let articleVC = ArticleVC(article: articles[indexPath.row])
+        
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.pushViewController(articleVC, animated: true)
+        
+        let event = ArticleEvent(link: article.url.stripLastURLComponent())
+        AnalyticsHelper.openArticleEvent(event)
     }
 }
