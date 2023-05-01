@@ -42,11 +42,14 @@ final class NewsVC: PDAViewController<NewsView> {
             let view = MessageView.viewFromNib(layout: .centeredView)
             view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
             view.configureDropShadow()
-            view.configureContent(title: "Скопировано", body: self.articles[row].url)
+            view.configureContent(title: "Скопировано", body: "")
             (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
             view.button?.isHidden = true
             return view
         }
+        
+        let event = ArticleEvent(link: articles[row].url.stripLastURLComponent())
+        AnalyticsHelper.copyArticleLink(event)
     }
 }
 

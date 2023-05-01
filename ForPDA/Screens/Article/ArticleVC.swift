@@ -96,7 +96,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let view = MessageView.viewFromNib(layout: .centeredView)
             view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
             view.configureDropShadow()
-            view.configureContent(title: "Скопировано", body: self.article.url)
+            view.configureContent(title: "Скопировано", body: "")
             (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
             view.button?.isHidden = true
             return view
