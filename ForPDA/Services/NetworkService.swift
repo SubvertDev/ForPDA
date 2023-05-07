@@ -14,11 +14,7 @@ enum NetworkError {
 
 final class NetworkManager {
     
-    static let shared = NetworkManager()
-    
     private let startPageURL = URL(string: "https://4pda.to/")!
-    
-    private init() {}
     
     func getArticles(atPage number: Int = 1) async throws -> Document {
         let url = URL(string: "https://4pda.to/page/\(number)")!

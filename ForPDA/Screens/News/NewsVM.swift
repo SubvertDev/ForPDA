@@ -6,8 +6,12 @@
 //
 
 import Foundation
+import Factory
 
 final class NewsVM {
+    
+    @Injected(\.networkService) private var networkService
+    @Injected(\.parsingService) private var parsingService
     
     weak var view: NewsVC?
     
@@ -18,8 +22,8 @@ final class NewsVM {
     func loadArticles(atPage number: Int = 1) {
         Task {
             do {
-                let page = try await NetworkManager.shared.getArticles(atPage: number)
-                let articles = DocumentParser.shared.parseArticles(from: page)
+                let page = try await networkService.getArticles(atPage: number)
+                let articles = parsingService.parseArticles(from: page)
                 updateArticles(with: articles)
             } catch {
                 fatalError(error.localizedDescription)
@@ -30,8 +34,8 @@ final class NewsVM {
     func refreshArticles() {
         Task {
             do {
-                let page = try await NetworkManager.shared.getArticles(atPage: 1)
-                let articles = DocumentParser.shared.parseArticles(from: page)
+                let page = try await networkService.getArticles(atPage: 1)
+                let articles = parsingService.parseArticles(from: page)
                 updateArticles(with: articles, forced: true)
             } catch {
                 fatalError(error.localizedDescription)

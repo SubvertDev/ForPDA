@@ -1,5 +1,5 @@
 //
-//  DocumentParser.swift
+//  ParsingService.swift
 //  ForPDA
 //
 //  Created by Subvert on 14.12.2022.
@@ -59,11 +59,7 @@ struct Charter {
     var description: [String]
 }
 
-final class DocumentParser {
-    
-    static let shared = DocumentParser()
-    
-    private init() {}
+final class ParsingService {
     
     // MARK: - Articles
     

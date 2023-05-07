@@ -9,10 +9,13 @@ import UIKit
 import SwiftSoup
 import Nuke
 import SwiftMessages
+import Factory
 
 final class NewsVC: PDAViewController<NewsView> {
     
     // MARK: - Properties
+    
+    @Injected(\.analyticsService) var analyticsService
     
     private let host = "https://4pda.to/"
     var articles = [Article]()
@@ -98,7 +101,7 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
             let clipboardImage = UIImage(systemName: "clipboard")
             let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
                 self.copyLinkTapped(at: indexPath.row)
-                AnalyticsHelper.copyArticleLink(articles[indexPath.row].url)
+                analyticsService.copyArticleLink(articles[indexPath.row].url)
             }
             
             let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
@@ -106,13 +109,13 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
                 let items = [self.articles[indexPath.row].url]
                 let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
                 self.present(activity, animated: true)
-                AnalyticsHelper.shareArticleLink(articles[indexPath.row].url)
+                analyticsService.shareArticleLink(articles[indexPath.row].url)
             }
             
             let questionImage = UIImage(systemName: "questionmark.circle")
             let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
                 self.reportBrokenArticleTapped()
-                AnalyticsHelper.reportBrokenArticle(articles[indexPath.row].url)
+                analyticsService.reportBrokenArticle(articles[indexPath.row].url)
             }
             
             return UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem, brokenArticleItem])
@@ -136,6 +139,6 @@ extension NewsVC: UITableViewDelegate, UITableViewDataSource {
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.pushViewController(articleVC, animated: true)
         
-        AnalyticsHelper.openArticleEvent(article.url)
+        analyticsService.openArticleEvent(article.url)
     }
 }

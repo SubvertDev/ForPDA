@@ -9,10 +9,12 @@ import UIKit
 import SwiftSoup
 // import WebKit
 import SafariServices
+import Factory
 
 final class CommentsVC: CommentsViewController {
     
     // private var webView: WKWebView!
+    @Injected(\.parsingService) private var parsingService
     
     private var allComments: [Comment] = []
     var articleDocument: Document!
@@ -41,7 +43,7 @@ final class CommentsVC: CommentsViewController {
     // MARK: - Functions
     
     private func getComments() {
-        allComments = DocumentParser.shared.parseComments(from: articleDocument)
+        allComments = parsingService.parseComments(from: articleDocument)
         
         currentlyDisplayed = allComments
         fullyExpanded = true
@@ -62,7 +64,7 @@ final class CommentsVC: CommentsViewController {
     
     private func updateComments(with document: Document) {
         _currentlyDisplayed.removeAll()
-        allComments = DocumentParser.shared.parseComments(from: document)
+        allComments = parsingService.parseComments(from: document)
         currentlyDisplayed = allComments
         tableView.reloadData()
     }

@@ -6,11 +6,12 @@
 //
 
 import Foundation
-import SwiftSoup
+import Factory
 
 final class ArticleVM {
     
-    // let networkManager = NetworkManager.shared
+    @Injected(\.networkService) private var networkService
+    @Injected(\.parsingService) private var parsingService
     
     weak var view: ArticleVC?
     
@@ -21,8 +22,8 @@ final class ArticleVM {
     func loadArticle(url: URL) {
         Task {
             do {
-                let page = try await NetworkManager.shared.getArticlePage(url: url)
-                let elements = DocumentParser.shared.parseArticle(from: page)
+                let page = try await networkService.getArticlePage(url: url)
+                let elements = parsingService.parseArticle(from: page)
                 await view?.configureArticle(elements)
                 await view?.configureComments(from: page)
             } catch {
