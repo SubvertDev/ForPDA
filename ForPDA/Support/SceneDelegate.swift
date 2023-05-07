@@ -8,7 +8,6 @@
 import UIKit
 // import WebKit
 import Nuke
-import NukeAlamofirePlugin
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -29,13 +28,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         self.window = window
         window.makeKeyAndVisible()
-        
-        let pipeline = ImagePipeline {
-            $0.dataLoader = NukeAlamofirePlugin.AlamofireDataLoader()
-            $0.imageCache = ImageCache.shared
-        }
 
-        ImagePipeline.shared = pipeline
+        ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
 
         // let config = WKWebViewConfiguration()
         // config.dataDetectorTypes = []

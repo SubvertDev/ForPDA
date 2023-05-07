@@ -10,12 +10,12 @@
       }
     },
     {
-      "identity" : "alamofire",
+      "identity" : "factory",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "location" : "https://github.com/hmlongco/Factory",
       "state" : {
-        "revision" : "78424be314842833c04bc3bef5b72e85fff99204",
-        "version" : "5.6.4"
+        "revision" : "bf4e0ab7cfc45a921856d9ca196d834b7abf15a0",
+        "version" : "2.1.5"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleDataTransport.git",
       "state" : {
-        "revision" : "cc7265b8e3906304e6e81f32c1662a94bbae2357",
-        "version" : "9.2.2"
+        "revision" : "7874c1b48cbffd086ce8a052c4be873a78613775",
+        "version" : "9.2.3"
       }
     },
     {
@@ -104,17 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke.git",
       "state" : {
-        "branch" : "master",
-        "revision" : "b187456fffa045e7dfc03fec1db86164ae0c0dc1"
-      }
-    },
-    {
-      "identity" : "nuke-alamofire-plugin",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kean/Nuke-Alamofire-Plugin.git",
-      "state" : {
-        "revision" : "1d210ec434cb3668014eb9949e08513b34ad28cf",
-        "version" : "7.0.0"
+        "revision" : "f4d9b95788679d0654c032961f73e7e9c16ca6b4",
+        "version" : "12.1.0"
       }
     },
     {
@@ -131,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mac-cain13/R.swift",
       "state" : {
-        "revision" : "cffbe4aa55ab5f012590b38ad114079c407e6937",
-        "version" : "7.2.4"
+        "revision" : "0e4ec17f329136b712d0a96128597b8ff2f31bdc",
+        "version" : "7.3.2"
       }
     },
     {
@@ -185,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scinfu/SwiftSoup.git",
       "state" : {
-        "revision" : "6778575285177365cbad3e5b8a72f2a20583cfec",
-        "version" : "2.4.3"
+        "revision" : "0e96a20ffd37a515c5c963952d4335c89bed50a6",
+        "version" : "2.6.0"
       }
     },
     {
@@ -194,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kirualex/SwiftyGif.git",
       "state" : {
-        "branch" : "master",
-        "revision" : "5e8619335d394901379c9add5c4c1c2f420b3800"
+        "revision" : "d6d26061d6553a493781ad3df4a8e275c43fc373",
+        "version" : "5.4.4"
       }
     },
     {

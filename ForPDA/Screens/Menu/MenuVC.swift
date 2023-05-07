@@ -8,7 +8,6 @@
 //  todo disable disables
 
 import UIKit
-import Alamofire
 import SwiftSoup
 
 enum Account {
@@ -28,31 +27,31 @@ final class MenuVC: PDAViewController<MenuView> {
     
     private func checkAuth() {
         loadCookies()
-        AF.request(URL(string: "https://4pda.to/forum/index.php?showuser=3640948")!).response { response in
-            switch response.result {
-            case .success(let data):
-                let htmlString = String(data: data!, encoding: .windowsCP1252)!
-                let parsed = try! SwiftSoup.parse(htmlString)
-                print(parsed)
-                let log = try! parsed.select("[id=moderator-log]")
-                if !log.isEmpty() {
-                    print("already logged")
-                    
-                    let id = try! parsed.select("[data-toggle=dropdown]").get(0).attr("href").components(separatedBy: "=").last!
-                    print("saving id \(id)")
-                    UserDefaults.standard.set(id, forKey: "userId")
-                    self.state = .logged
-                    self.myView.loginButton.setTitle("Зайти в профиль", for: .normal)
-                    self.myView.logoutButton.isHidden = false
-                } else {
-                    print("not logged yet")
-                    self.state = .unauthorized
-                    self.myView.loginButton.setTitle("Авторизироваться", for: .normal)
-                }
-            case .failure(let error):
-                print(error)
-            }
-        }
+//        AF.request(URL(string: "https://4pda.to/forum/index.php?showuser=3640948")!).response { response in
+//            switch response.result {
+//            case .success(let data):
+//                let htmlString = String(data: data!, encoding: .windowsCP1252)!
+//                let parsed = try! SwiftSoup.parse(htmlString)
+//                print(parsed)
+//                let log = try! parsed.select("[id=moderator-log]")
+//                if !log.isEmpty() {
+//                    print("already logged")
+//
+//                    let id = try! parsed.select("[data-toggle=dropdown]").get(0).attr("href").components(separatedBy: "=").last!
+//                    print("saving id \(id)")
+//                    UserDefaults.standard.set(id, forKey: "userId")
+//                    self.state = .logged
+//                    self.myView.loginButton.setTitle("Зайти в профиль", for: .normal)
+//                    self.myView.logoutButton.isHidden = false
+//                } else {
+//                    print("not logged yet")
+//                    self.state = .unauthorized
+//                    self.myView.loginButton.setTitle("Авторизироваться", for: .normal)
+//                }
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
     }
     
     func loadCookies() {
@@ -90,20 +89,20 @@ extension MenuVC: MenuViewDelegate {
     }
     
     func logoutTapped() {
-        let authKey = UserDefaults.standard.string(forKey: "authKey")!
-        AF.request(URL(string: "https://4pda.to/forum/index.php?act=logout&CODE=03&k=\(authKey)")!).response { response in
-            switch response.result {
-            case .success(let data):
-                let htmlString = String(data: data!, encoding: .windowsCP1252)!
-                let parsed = try! SwiftSoup.parse(htmlString)
-                print(parsed)
-                
-                HTTPCookieStorage.shared.cookies!.forEach(HTTPCookieStorage.shared.deleteCookie(_:))
-                UserDefaults.standard.removeObject(forKey: "savedCookies")
-                
-            case .failure(let error):
-                print(error)
-            }
-        }
+//        let authKey = UserDefaults.standard.string(forKey: "authKey")!
+//        AF.request(URL(string: "https://4pda.to/forum/index.php?act=logout&CODE=03&k=\(authKey)")!).response { response in
+//            switch response.result {
+//            case .success(let data):
+//                let htmlString = String(data: data!, encoding: .windowsCP1252)!
+//                let parsed = try! SwiftSoup.parse(htmlString)
+//                print(parsed)
+//                
+//                HTTPCookieStorage.shared.cookies!.forEach(HTTPCookieStorage.shared.deleteCookie(_:))
+//                UserDefaults.standard.removeObject(forKey: "savedCookies")
+//                
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
     }
 }
