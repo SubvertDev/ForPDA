@@ -9,8 +9,8 @@ import Foundation
 import Factory
 
 extension Container {
-    var networkService: Factory<NetworkManager> {
-        Factory(self) { NetworkManager() }
+    var networkService: Factory<NetworkService> {
+        Factory(self) { NetworkService() }
             .singleton
     }
     
@@ -21,6 +21,7 @@ extension Container {
     
     var analyticsService: Factory<AnalyticsService> {
         Factory(self) { AnalyticsService() }
+            .onDebug { AnalyticsService(isDebug: true) }
             .singleton
     }
 }

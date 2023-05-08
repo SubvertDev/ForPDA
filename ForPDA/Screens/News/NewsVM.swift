@@ -4,57 +4,69 @@
 //
 //  Created by Subvert on 24.12.2022.
 //
+//  swiftlint:disable unused_capture_list
 
 import Foundation
 import Factory
 
-final class NewsVM {
+protocol NewsVMProtocol {
+    func loadArticles()
+    func refreshArticles()
+    
+    func showArticle(_ article: Article)
+}
+
+final class NewsVM: NewsVMProtocol {
     
     @Injected(\.networkService) private var networkService
     @Injected(\.parsingService) private var parsingService
     
-    weak var view: NewsVC?
+    weak var coordinator: NewsCoordinator?
+    weak var view: NewsVCProtocol?
     
-    init(view: NewsVC) {
-        self.view = view
+    var articles: [Article] = []
+    var page = 0
+    
+    init(coordinator: NewsCoordinator) {
+        self.coordinator = coordinator
     }
     
-    func loadArticles(atPage number: Int = 1) {
-        Task {
-            do {
-                let page = try await networkService.getArticles(atPage: number)
-                let articles = parsingService.parseArticles(from: page)
-                updateArticles(with: articles)
-            } catch {
-                fatalError(error.localizedDescription)
+    func loadArticles() {
+        page += 1
+        
+        networkService.getArticles(page: page) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let response):
+                articles += parsingService.parseArticles(from: response)
+                view?.articlesUpdated()
+                
+            case .failure:
+                view?.showError()
             }
         }
     }
     
     func refreshArticles() {
-        Task {
-            do {
-                let page = try await networkService.getArticles(atPage: 1)
-                let articles = parsingService.parseArticles(from: page)
-                updateArticles(with: articles, forced: true)
-            } catch {
-                fatalError(error.localizedDescription)
+        page = 1
+        
+        networkService.getArticles(page: page) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let response):
+                articles = self.parsingService.parseArticles(from: response)
+                view?.articlesUpdated()
+                
+            case .failure:
+                view?.showError()
             }
         }
     }
     
-    private func updateArticles(with articles: [Article], forced: Bool = false) {
-        DispatchQueue.main.async {
-            if forced {
-                self.view?.articles = articles
-            } else {
-                self.view?.articles += articles
-            }
-            self.view?.myView.tableView.reloadData()
-            self.view?.myView.refreshControl.endRefreshing()
-            self.view?.myView.refreshButton.isHidden = false
-            self.view?.myView.refreshButton.setTitle("ЗАГРУЗИТЬ БОЛЬШЕ", for: .normal)
-        }
+    // MARK: - Navigation
+    
+    func showArticle(_ article: Article) {
+        coordinator?.showArticle(article)
     }
     
 }

@@ -47,6 +47,7 @@ final class LoginView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .systemBackground
         
         addSubviews()
         makeConstraints()

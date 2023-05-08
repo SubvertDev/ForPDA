@@ -63,7 +63,9 @@ final class ParsingService {
     
     // MARK: - Articles
     
-    func parseArticles(from document: Document) -> [Article] {
+    func parseArticles(from document: String) -> [Article] {
+        let document = try! SwiftSoup.parse(document)
+        
         var articles = [Article]()
         
         let articleElements = try! document.select("article")
@@ -321,6 +323,25 @@ final class ParsingService {
         return Comment(author: author, text: text, date: date, likes: likes, replies: replies, level: level)
     }
     
+    // MARK: - Captcha
+    
+    func parseCaptcha(from htmlString: String) -> CaptchaResponse? {
+        let document = try! SwiftSoup.parse(htmlString)
+        
+        if htmlString.contains("action=logout&k=") { return nil } // ?
+        
+        let captchaTime = try! document.select("[name=captcha-time]").get(0).attr("value")
+        let captchaSig = try! document.select("[name=captcha-sig]").get(0).attr("value")
+        print(captchaSig, captchaTime)
+        
+        var linkElement = try! document.select("img[src]").get(0).attr("src")
+        if !linkElement.contains("https:") { linkElement = "https:" + linkElement }
+        
+        return CaptchaResponse(url: linkElement, time: captchaTime, sig: captchaSig)
+    }
+    
+    // MARK: - Helper Methods
+    
     @available(iOS 16.0, *)
     private func stripHtmlFromComment(from comment: String) -> String {
         let htmlRegex = /<(?!br)[^>]*>/
@@ -328,4 +349,10 @@ final class ParsingService {
         let brRegex = /\s*<br>\s*/
         return strippedHTMLExceptBr.replacing(brRegex, with: "\n")
     }
+}
+
+struct CaptchaResponse {
+    let url: String
+    let time: String
+    let sig: String
 }

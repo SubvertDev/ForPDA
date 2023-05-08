@@ -13,9 +13,16 @@ final class AnalyticsService {
     
     typealias FADictionary = [String: Any]
     
+    let isDebug: Bool
+    
+    init(isDebug: Bool = false) {
+        self.isDebug = isDebug
+    }
+    
     // MARK: - Generic Event
     
     private func event(_ name: AnalyticsEvent, parameters: FADictionary?) {
+        guard !isDebug else { return }
         Analytics.logEvent(name.rawValue, parameters: parameters)
     }
     
@@ -109,4 +116,10 @@ extension AnalyticsService {
         urlString = urlString.replacingOccurrences(of: "https://", with: "")
         return urlString
     }
+}
+
+// MARK: - Debug Mock
+
+final class AnalyticsServiceMock {
+    
 }

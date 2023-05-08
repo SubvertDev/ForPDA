@@ -8,6 +8,9 @@
 import UIKit
 
 final class PDATabBarController: UITabBarController {
+    
+    let newsCoordinator = NewsCoordinator(navigationController: UINavigationController())
+    let menuCoordinator = MenuCoordinator(navigationController: UINavigationController())
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,10 +29,17 @@ final class PDATabBarController: UITabBarController {
     }
 
     private func setupVCs() {
+        newsCoordinator.start()
+        menuCoordinator.start()
+        
         viewControllers = [
-            createNavController(for: NewsVC(), title: "Новости", image: UIImage(systemName: "list.bullet")!),
-            createNavController(for: MenuVC(), title: "Профиль", image: UIImage(systemName: "person.fill")!)
+            newsCoordinator.navigationController,
+            menuCoordinator.navigationController
         ]
+//        viewControllers = [
+//            createNavController(for: NewsVC(), title: "Новости", image: UIImage(systemName: "list.bullet")!),
+//            createNavController(for: MenuVC(), title: "Профиль", image: UIImage(systemName: "person.fill")!)
+//        ]
     }
 
     private func createNavController(for rootVC: UIViewController, title: String,

@@ -8,6 +8,7 @@
 //  todo disable disables
 
 import UIKit
+import Factory
 import SwiftSoup
 import Nuke
 import NukeExtensions
@@ -23,6 +24,9 @@ struct LoginData {
 
 final class LoginVC: PDAViewController<LoginView> {
     
+    @Injected(\.networkService) var networkService
+    @Injected(\.parsingService) var parsingService
+    
     var loginData: LoginData!
     
     override func viewDidLoad() {
@@ -32,6 +36,29 @@ final class LoginVC: PDAViewController<LoginView> {
     }
     
     private func getCaptcha() {
+        networkService.getCaptcha { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let response):
+                guard let captchaResponse = parsingService.parseCaptcha(from: response) else {
+                    fatalError("what")
+                }
+                
+                loginData = LoginData(login: "",
+                                      password: "",
+                                      rememberer: 1,
+                                      captchaTime: captchaResponse.time,
+                                      captchaSig: captchaResponse.sig,
+                                      captcha: "")
+                
+                DispatchQueue.main.async {
+                    NukeExtensions.loadImage(with: URL(string: captchaResponse.url), into: self.myView.captchaImageView)
+                }
+                
+            case .failure(let failure):
+                fatalError(failure.localizedDescription)
+            }
+        }
 //        AF.request(URL(string: "https://4pda.to/forum/index.php?act=auth")!).response { response in
 //            switch response.result {
 //            case .success(let data):

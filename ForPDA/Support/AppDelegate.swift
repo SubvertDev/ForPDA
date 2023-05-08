@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Firebase
+import Nuke
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         FirebaseApp.configure()
         FirebaseConfiguration.shared.setLoggerLevel(.min)
+        
+        ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
         
         return true
     }

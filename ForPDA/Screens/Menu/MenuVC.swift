@@ -17,7 +17,13 @@ enum Account {
 
 final class MenuVC: PDAViewController<MenuView> {
     
+    let viewModel: MenuVMProtocol
     var state = Account.unauthorized
+    
+    init(viewModel: MenuVMProtocol) {
+        self.viewModel = viewModel
+        super.init()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,8 +31,14 @@ final class MenuVC: PDAViewController<MenuView> {
         myView.delegate = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        checkAuth()
+    }
+    
     private func checkAuth() {
         loadCookies()
+        
 //        AF.request(URL(string: "https://4pda.to/forum/index.php?showuser=3640948")!).response { response in
 //            switch response.result {
 //            case .success(let data):
@@ -69,23 +81,17 @@ final class MenuVC: PDAViewController<MenuView> {
             }
         }
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        checkAuth()
-    }
 }
 
 extension MenuVC: MenuViewDelegate {
     func loginTapped() {
-//        if state == .unauthorized {
-//            let loginVC = LoginVC()
-//            navigationController?.pushViewController(loginVC, animated: true)
-//        } else {
-//            myView.logoutButton.isHidden = false
+        if state == .unauthorized {
+            viewModel.showLoginScreen()
+        } else {
+            myView.logoutButton.isHidden = false
 //            let profileVC = ProfileVC()
 //            navigationController?.pushViewController(profileVC, animated: true)
-//        }
+        }
     }
     
     func logoutTapped() {
