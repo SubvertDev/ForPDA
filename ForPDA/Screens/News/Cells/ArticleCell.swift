@@ -8,6 +8,7 @@
 import UIKit
 import Nuke
 import NukeExtensions
+import SFSafeSymbols
 
 final class ArticleCell: UITableViewCell {
     
@@ -55,7 +56,7 @@ final class ArticleCell: UITableViewCell {
     
     private let pdaImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "4.circle.fill")
+        imageView.image = UIImage(systemSymbol: ._4CircleFill)
         imageView.tintColor = .systemGray
         return imageView
     }()
@@ -70,7 +71,7 @@ final class ArticleCell: UITableViewCell {
     
     private let commentsImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "message")
+        imageView.image = UIImage(systemSymbol: .message)
         imageView.tintColor = .systemGray
         return imageView
     }()

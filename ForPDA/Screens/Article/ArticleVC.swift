@@ -16,6 +16,7 @@ import MarqueeLabel
 import SwiftRichString
 import SwiftMessages
 import Factory
+import SFSafeSymbols
 
 final class ArticleVC: PDAViewController<ArticleView> {
     
@@ -23,20 +24,22 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     @Injected(\.analyticsService) var analyticsService
     
-    private let article: Article
+    private var article: Article!
     private var texts = [String]()
     private var buttonUrl: String?
     
     var articleDocument: Document?
     
-    private var viewModel: ArticleVM!
+    private let viewModel: ArticleVMProtocol
     
     // MARK: - Lifecycle
     
-    init(article: Article) {
-        self.article = article
+    init(viewModel: ArticleVMProtocol) {
+        self.viewModel = viewModel
         super.init()
-        self.viewModel = ArticleVM(view: self)
+        //self.article = article
+        //super.init()
+        //self.viewModel = ArticleVM(view: self)
     }
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -47,19 +50,19 @@ final class ArticleVC: PDAViewController<ArticleView> {
         view.backgroundColor = .systemBackground
         
         let label = MarqueeLabel(frame: .zero, rate: 30, fadeLength: 0)
-        label.text = article.title
+        label.text = viewModel.article.title
         label.fadeLength = 30
         navigationItem.titleView = label
         
         configureMenu()
         
-        NukeExtensions.loadImage(with: URL(string: article.imageUrl)!, into: myView.articleImage)
+        NukeExtensions.loadImage(with: URL(string: viewModel.article.imageUrl)!, into: myView.articleImage)
         
-        myView.titleLabel.text = article.title
-        myView.commentsLabel.text = "Комментарии (\(article.commentAmount)):"
-        let url = URL(string: article.url)!
+        myView.titleLabel.text = viewModel.article.title
+        myView.commentsLabel.text = "Комментарии (\(viewModel.article.commentAmount)):"
+        let url = URL(string: viewModel.article.url)!
         
-        if article.url.contains("to/20") {
+        if viewModel.article.url.contains("to/20") {
             viewModel.loadArticle(url: url)
         } else {
             makeDefaultArticle()
@@ -69,39 +72,41 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Configure
     
     private func configureMenu() {
-        let clipboardImage = UIImage(systemName: "clipboard")
+        let clipboardImage = UIImage(systemSymbol: .doc)
         let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
             self.copyLinkTapped()
-            analyticsService.copyArticleLink(article.url)
+            analyticsService.copyArticleLink(viewModel.article.url)
         }
         
-        let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
+        let shareImage = UIImage(systemSymbol: .arrowTurnUpRight)
         let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
-            let items = [self.article.url]
+            let items = [self.viewModel.article.url]
             let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
             self.present(activity, animated: true)
-            analyticsService.shareArticleLink(article.url)
+            analyticsService.shareArticleLink(viewModel.article.url)
         }
         
-        let questionImage = UIImage(systemName: "questionmark.circle")
+        let questionImage = UIImage(systemSymbol: .questionmarkCircle)
         let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
             self.reportBrokenArticleTapped()
-            analyticsService.reportBrokenArticle(article.url)
+            analyticsService.reportBrokenArticle(viewModel.article.url)
         }
         
         let menu = UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem, brokenArticleItem])
         
         if #available(iOS 14.0, *) {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"), primaryAction: nil, menu: menu)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemSymbol: .ellipsis),
+                                                                primaryAction: nil, menu: menu)
         } else {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(copyLinkTapped))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemSymbol: .ellipsis), style: .plain,
+                                                                target: self, action: #selector(copyLinkTapped))
         }
     }
     
     // MARK: - Actions
     
     @objc private func copyLinkTapped() {
-        UIPasteboard.general.string = article.url
+        UIPasteboard.general.string = viewModel.article.url
         SwiftMessages.show {
             let view = MessageView.viewFromNib(layout: .centeredView)
             view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
@@ -162,15 +167,15 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Privates
     
     private func makeDefaultArticle() {
-        var description = article.description
+        var description = viewModel.article.description
         if description.contains("Узнать подробнее") { description.removeLast(16) }
-        configureArticle([TextElement(text: description), ButtonElement(text: "Узнать подробнее", url: article.url)])
+        configureArticle([TextElement(text: description), ButtonElement(text: "Узнать подробнее", url: viewModel.article.url)])
         myView.removeComments()
     }
     
     private func addComments(from page: Document) {
         let commentsVC = CommentsVC()
-        commentsVC.article = article
+        commentsVC.article = viewModel.article
         commentsVC.articleDocument = page
         addChild(commentsVC)
         myView.commentsContainer.addSubview(commentsVC.view)
@@ -343,7 +348,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     @objc private func buttonTapped() {
         if let buttonUrl, let url = URL(string: buttonUrl), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
-            analyticsService.clickButtonInArticle(currentUrl: article.url, targetUrl: buttonUrl)
+            analyticsService.clickButtonInArticle(currentUrl: viewModel.article.url, targetUrl: buttonUrl)
         }
     }
     
@@ -358,6 +363,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
 
 extension ArticleVC: PDAResizingTextViewDelegate {
     func willOpenURL(_ url: URL) {
-        analyticsService.clickLinkInArticle(currentUrl: article.url, targetUrl: url.absoluteString)
+        analyticsService.clickLinkInArticle(currentUrl: viewModel.article.url, targetUrl: url.absoluteString)
     }
 }

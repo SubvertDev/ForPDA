@@ -4,8 +4,7 @@
 //
 //  Created by Subvert on 13.12.2022.
 //
-//  swiftlint:disable all
-//  todo disable disables
+//
 
 import UIKit
 import SwiftSoup
@@ -15,10 +14,16 @@ enum Account {
     case logged
 }
 
+protocol MenuVCProtocol: AnyObject {
+    
+}
+
 final class MenuVC: PDAViewController<MenuView> {
     
-    let viewModel: MenuVMProtocol
-    var state = Account.unauthorized
+    private let viewModel: MenuVMProtocol
+    private var state = Account.unauthorized
+    
+    // MARK: - Lifecycle
     
     init(viewModel: MenuVMProtocol) {
         self.viewModel = viewModel
@@ -28,16 +33,22 @@ final class MenuVC: PDAViewController<MenuView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        myView.delegate = self
+        myView.tableView.dataSource = self
+        myView.tableView.delegate = self
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         checkAuth()
     }
     
+    // MARK: - Private Functions
+    
     private func checkAuth() {
-        loadCookies()
+//        loadCookies()
         
 //        AF.request(URL(string: "https://4pda.to/forum/index.php?showuser=3640948")!).response { response in
 //            switch response.result {
@@ -74,41 +85,83 @@ final class MenuVC: PDAViewController<MenuView> {
             }
         }
         
-        for cookie in HTTPCookieStorage.shared.cookies! {
-            if cookie.value.count > 8 {
-                print("authkey \(cookie.value)")
-                UserDefaults.standard.set(cookie.value, forKey: "authKey")
-            }
+        for cookie in HTTPCookieStorage.shared.cookies! where cookie.value.count > 8 {
+            print("authkey \(cookie.value)")
+            UserDefaults.standard.set(cookie.value, forKey: "authKey")
         }
     }
 }
 
-extension MenuVC: MenuViewDelegate {
-    func loginTapped() {
-        if state == .unauthorized {
-            viewModel.showLoginScreen()
-        } else {
-            myView.logoutButton.isHidden = false
-//            let profileVC = ProfileVC()
-//            navigationController?.pushViewController(profileVC, animated: true)
+// MARK: - DataSource & Delegates
+
+extension MenuVC: UITableViewDataSource, UITableViewDelegate {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel.sections.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.sections[section].options.count
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return indexPath.section == 0 ? 60 : 40
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let model = viewModel.sections[indexPath.section].options[indexPath.row]
+        
+        switch model.self {
+        case .authCell:
+            let cell = tableView.dequeueReusableCell(withClass: MenuAuthCell.self)
+            return cell
+            
+        case .staticCell(model: let model):
+            let cell = tableView.dequeueReusableCell(withClass: MenuSettingsCell.self)
+            cell.set(with: model)
+            return cell
         }
     }
     
-    func logoutTapped() {
-//        let authKey = UserDefaults.standard.string(forKey: "authKey")!
-//        AF.request(URL(string: "https://4pda.to/forum/index.php?act=logout&CODE=03&k=\(authKey)")!).response { response in
-//            switch response.result {
-//            case .success(let data):
-//                let htmlString = String(data: data!, encoding: .windowsCP1252)!
-//                let parsed = try! SwiftSoup.parse(htmlString)
-//                print(parsed)
-//                
-//                HTTPCookieStorage.shared.cookies!.forEach(HTTPCookieStorage.shared.deleteCookie(_:))
-//                UserDefaults.standard.removeObject(forKey: "savedCookies")
-//                
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let model = viewModel.sections[indexPath.section].options[indexPath.row]
+        switch model.self {
+        case .authCell(model: let model):
+            model.handler()
+        case .staticCell(model: let model):
+            model.handler()
+        }
     }
 }
+
+//extension MenuVC: MenuViewDelegate {
+//    func loginTapped() {
+//        if state == .unauthorized {
+//            viewModel.showLoginScreen()
+//        } else {
+//            myView.logoutButton.isHidden = false
+////            let profileVC = ProfileVC()
+////            navigationController?.pushViewController(profileVC, animated: true)
+//        }
+//    }
+//
+//    func logoutTapped() {
+////        let authKey = UserDefaults.standard.string(forKey: "authKey")!
+////        AF.request(URL(string: "https://4pda.to/forum/index.php?act=logout&CODE=03&k=\(authKey)")!).response { response in
+////            switch response.result {
+////            case .success(let data):
+////                let htmlString = String(data: data!, encoding: .windowsCP1252)!
+////                let parsed = try! SwiftSoup.parse(htmlString)
+////                print(parsed)
+////
+////                HTTPCookieStorage.shared.cookies!.forEach(HTTPCookieStorage.shared.deleteCookie(_:))
+////                UserDefaults.standard.removeObject(forKey: "savedCookies")
+////
+////            case .failure(let error):
+////                print(error)
+////            }
+////        }
+//    }
+//}

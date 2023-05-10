@@ -6,12 +6,10 @@
 //
 
 import UIKit
+import SFSafeSymbols
 
 final class PDATabBarController: UITabBarController {
     
-    let newsCoordinator = NewsCoordinator(navigationController: UINavigationController())
-    let menuCoordinator = MenuCoordinator(navigationController: UINavigationController())
-
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -25,36 +23,17 @@ final class PDATabBarController: UITabBarController {
             UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         }
         
-        setupVCs()
     }
+    
+    // Small tap animation for tab bar
+    override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+        guard let barItemView = item.value(forKey: "view") as? UIView else { return }
 
-    private func setupVCs() {
-        newsCoordinator.start()
-        menuCoordinator.start()
-        
-        viewControllers = [
-            newsCoordinator.navigationController,
-            menuCoordinator.navigationController
-        ]
-//        viewControllers = [
-//            createNavController(for: NewsVC(), title: "Новости", image: UIImage(systemName: "list.bullet")!),
-//            createNavController(for: MenuVC(), title: "Профиль", image: UIImage(systemName: "person.fill")!)
-//        ]
-    }
-
-    private func createNavController(for rootVC: UIViewController, title: String,
-                                     image: UIImage, prefersLargeTitle: Bool = false) -> UIViewController {
-        let navController = UINavigationController(rootViewController: rootVC)
-        navController.tabBarItem.title = title
-        navController.tabBarItem.image = image
-        navController.navigationBar.prefersLargeTitles = prefersLargeTitle
-        rootVC.navigationItem.title = title
-        return navController
-    }
-
-    private func createController(for rootVC: UIViewController, title: String, image: UIImage) -> UIViewController {
-        rootVC.tabBarItem.title = title
-        rootVC.tabBarItem.image = image
-        return rootVC
+        let timeInterval: TimeInterval = 0.3
+        let propertyAnimator = UIViewPropertyAnimator(duration: timeInterval, dampingRatio: 0.5) {
+            barItemView.transform = CGAffineTransform.identity.scaledBy(x: 0.9, y: 0.9)
+        }
+        propertyAnimator.addAnimations({ barItemView.transform = .identity }, delayFactor: CGFloat(timeInterval))
+        propertyAnimator.startAnimation()
     }
 }

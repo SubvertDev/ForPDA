@@ -8,6 +8,7 @@
 import UIKit
 import Factory
 import SwiftMessages
+import SFSafeSymbols
 
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
@@ -31,7 +32,7 @@ final class NewsVC: PDAViewController<NewsView> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Новости"
+        navigationItem.title = "Новости"
         
         setDelegates()
         viewModel.loadArticles()
@@ -86,36 +87,37 @@ extension NewsVC: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let article = viewModel.articles[indexPath.row]
-        analyticsService.openArticleEvent(article.url)
-        viewModel.showArticle(article)
+        //let article = viewModel.articles[indexPath.row]
+        // viewModel.showArticle(article)
+        analyticsService.openArticleEvent(viewModel.articles[indexPath.row].url)
+        viewModel.showArticle(at: indexPath)
     }
     
     // Hiding navigation bar while scrolling
     func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-        let isDecelerating = scrollView.panGestureRecognizer.translation(in: scrollView).y < 0
-        navigationController?.setNavigationBarHidden(isDecelerating, animated: true)
+        //let isDecelerating = scrollView.panGestureRecognizer.translation(in: scrollView).y < 0
+        //navigationController?.setNavigationBarHidden(isDecelerating, animated: true)
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
         let article = viewModel.articles[indexPath.row]
         
         let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            let clipboardImage = UIImage(systemName: "clipboard")
+            let clipboardImage = UIImage(systemSymbol: .doc)
             let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
                 UIPasteboard.general.string = article.url
                 analyticsService.copyArticleLink(article.url)
                 SwiftMessages.showDefault(title: "Скопировано", body: "")
             }
             
-            let shareImage = UIImage(systemName: "arrowshape.turn.up.right")
+            let shareImage = UIImage(systemSymbol: .arrowTurnUpRight)
             let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
                 let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
                 analyticsService.shareArticleLink(article.url)
                 self.present(activity, animated: true)
             }
             
-            let questionImage = UIImage(systemName: "questionmark.circle")
+            let questionImage = UIImage(systemSymbol: .questionmarkCircle)
             let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
                 analyticsService.reportBrokenArticle(article.url)
                 SwiftMessages.showDefault(title: "Спасибо!", body: "Починим в ближайшее время :)")

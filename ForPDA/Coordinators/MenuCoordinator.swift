@@ -2,33 +2,33 @@
 //  MenuCoordinator.swift
 //  ForPDA
 //
-//  Created by Subvert on 08.05.2023.
+//  Created by Subvert on 10.05.2023.
 //
 
 import UIKit
+import XCoordinator
 
-protocol MenuCoordinatorProtocol {
-    func showLoginScreen()
+enum MenuRoute: Route {
+    case menu
+    case login
 }
 
-final class MenuCoordinator: Coordinator, MenuCoordinatorProtocol {
-    var childCoordinators: [Coordinator] = []
-    var navigationController: UINavigationController
+final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
+    init() {
+        super.init(initialRoute: .menu)
     }
     
-    func start() {
-        let menuVC = MenuFactory.create(with: self)
-        navigationController.tabBarItem.title = "Меню"
-        navigationController.tabBarItem.image = UIImage(systemName: "person.fill")
-        navigationController.pushViewController(menuVC, animated: false)
-    }
-    
-    func showLoginScreen() {
-        let loginVC = LoginVC()
-        navigationController.pushViewController(loginVC, animated: true)
+    override func prepareTransition(for route: MenuRoute) -> NavigationTransition {
+        switch route {
+        case .menu:
+            let viewController = MenuFactory.create(with: unownedRouter)
+            return .push(viewController)
+            
+        case .login:
+            let viewController = LoginFactory.create()
+            return .push(viewController)
+        }
     }
     
 }

@@ -7,16 +7,28 @@
 
 import Foundation
 import Factory
+import XCoordinator
 
-final class ArticleVM {
+protocol ArticleVMProtocol {
+    var article: Article { get }
+    
+    func loadArticle(url: URL)
+}
+
+final class ArticleVM: ArticleVMProtocol {
     
     @Injected(\.networkService) private var networkService
     @Injected(\.parsingService) private var parsingService
     
+    //private let router: UnownedRouter<NewsRoute>
+    var article: Article
     weak var view: ArticleVC?
     
-    init(view: ArticleVC) {
-        self.view = view
+//    init(router: UnownedRouter<NewsRoute>) {
+//        self.router = router
+//    }
+    init(article: Article) {
+        self.article = article
     }
     
     func loadArticle(url: URL) {

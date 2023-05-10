@@ -8,12 +8,13 @@
 
 import Foundation
 import Factory
+import XCoordinator
 
 protocol NewsVMProtocol {
     func loadArticles()
     func refreshArticles()
     
-    func showArticle(_ article: Article)
+    func showArticle(at indexPath: IndexPath)
 }
 
 final class NewsVM: NewsVMProtocol {
@@ -21,14 +22,14 @@ final class NewsVM: NewsVMProtocol {
     @Injected(\.networkService) private var networkService
     @Injected(\.parsingService) private var parsingService
     
-    weak var coordinator: NewsCoordinator?
+    private var router: UnownedRouter<NewsRoute>?
     weak var view: NewsVCProtocol?
     
     var articles: [Article] = []
     var page = 0
     
-    init(coordinator: NewsCoordinator) {
-        self.coordinator = coordinator
+    init(router: UnownedRouter<NewsRoute>?) {
+        self.router = router
     }
     
     func loadArticles() {
@@ -65,8 +66,9 @@ final class NewsVM: NewsVMProtocol {
     
     // MARK: - Navigation
     
-    func showArticle(_ article: Article) {
-        coordinator?.showArticle(article)
+    func showArticle(at indexPath: IndexPath) {
+        let article = articles[indexPath.row]
+        router?.trigger(.newsDetail(article))
     }
     
 }

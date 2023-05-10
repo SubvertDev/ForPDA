@@ -5,11 +5,11 @@
 //  Created by Subvert on 08.05.2023.
 //
 
-import Foundation
+import XCoordinator
 
 struct NewsFactory {
-    static func create(with coordinator: NewsCoordinator) -> NewsVC {
-        let viewModel = NewsVM(coordinator: coordinator)
+    static func create(with router: UnownedRouter<NewsRoute>?) -> NewsVC {
+        let viewModel = NewsVM(router: router)
         let viewController = NewsVC(viewModel: viewModel)
         
         viewModel.view = viewController
