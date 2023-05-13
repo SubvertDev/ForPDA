@@ -2,6 +2,7 @@ disabled_rules:
     - trailing_whitespace
     - line_length
     - comment_spacing
+    - unused_capture_list
 
 custom_rules:
   sf_safe_symbol:
