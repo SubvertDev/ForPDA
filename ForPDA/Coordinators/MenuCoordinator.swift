@@ -10,7 +10,7 @@ import XCoordinator
 
 enum MenuRoute: Route {
     case menu
-    case login
+    // case login
 }
 
 final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
@@ -25,9 +25,9 @@ final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
             let viewController = MenuFactory.create(with: unownedRouter)
             return .push(viewController)
             
-        case .login:
-            let viewController = LoginFactory.create()
-            return .push(viewController)
+//        case .login:
+//            let viewController = LoginFactory.create()
+//            return .push(viewController)
         }
     }
     

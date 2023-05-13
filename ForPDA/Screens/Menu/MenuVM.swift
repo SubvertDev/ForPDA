@@ -65,12 +65,8 @@ final class MenuVM: MenuVMProtocol {
         ])
     ]
     
-//    init(coordinator: MenuCoordinator) {
-//        self.coordinator = coordinator
-//    }
-    
     func showLoginScreen() {
-        router.trigger(.login)
+//        router.trigger(.login)
     }
     
 }

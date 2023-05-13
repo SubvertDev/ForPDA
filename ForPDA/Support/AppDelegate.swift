@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseConfiguration.shared.setLoggerLevel(.min)
         
         ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
+        ImagePipeline.shared.cache.removeAll()
         
         return true
     }

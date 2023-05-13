@@ -13,6 +13,4 @@ protocol LoginVMProtocol {
 
 final class LoginVM: LoginVMProtocol {
     
-    
-    
 }

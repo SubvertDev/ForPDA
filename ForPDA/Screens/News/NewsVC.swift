@@ -9,6 +9,7 @@ import UIKit
 import Factory
 import SwiftMessages
 import SFSafeSymbols
+import SkeletonView
 
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
@@ -44,25 +45,37 @@ final class NewsVC: PDAViewController<NewsView> {
         myView.delegate = self
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
+        
+        myView.tableView.isSkeletonable = true
+        myView.tableView.estimatedRowHeight = 370
+        myView.tableView.isUserInteractionDisabledWhenSkeletonIsActive = false
+        myView.tableView.showAnimatedSkeleton()
     }
-}
 
-// MARK: - View Delegate
-
-extension NewsVC: NewsViewDelegate {
-    func refreshButtonTapped() {
-        myView.refreshButton.setTitle("Загружаю...", for: .normal)
-        viewModel.loadArticles()
-    }
-    
-    func refreshControlCalled() {
-        viewModel.refreshArticles()
-    }
 }
 
 // MARK: - TableView DataSource
 
-extension NewsVC: UITableViewDataSource {
+extension NewsVC: SkeletonTableViewDataSource {
+    
+    // MARK: Skeleton Table View
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 64
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
+        let cell = skeletonView.dequeueReusableCell(withClass: ArticleCell.self, for: indexPath)
+        cell.selectionStyle = .none
+        return cell
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return String(describing: ArticleCell.self)
+    }
+    
+    // MARK: Normal Table View
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.articles.count
     }
@@ -72,23 +85,18 @@ extension NewsVC: UITableViewDataSource {
         cell.set(article: viewModel.articles[indexPath.row])
         return cell
     }
+    
 }
 
 // MARK: - TableView Delegate
 
 extension NewsVC: UITableViewDelegate {
     
-    // Estimated size for accurate scroll indicator movement
-    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 350
-    }
-    
-    // Opening next article
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        //let article = viewModel.articles[indexPath.row]
-        // viewModel.showArticle(article)
+        // Check if non-skeleton table is shown
+        guard viewModel.articles.count - 1 >= indexPath.row else { return }
         analyticsService.openArticleEvent(viewModel.articles[indexPath.row].url)
         viewModel.showArticle(at: indexPath)
     }
@@ -100,33 +108,36 @@ extension NewsVC: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard !viewModel.articles.isEmpty else { return nil }
+        
         let article = viewModel.articles[indexPath.row]
         
-        let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            let clipboardImage = UIImage(systemSymbol: .doc)
-            let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
+        let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+            let copyAction = makeUIAction(title: "Скопировать ссылку", symbol: .doc) { [unowned self] _ in
                 UIPasteboard.general.string = article.url
                 analyticsService.copyArticleLink(article.url)
                 SwiftMessages.showDefault(title: "Скопировано", body: "")
             }
             
-            let shareImage = UIImage(systemSymbol: .arrowTurnUpRight)
-            let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
+            let shareAction = makeUIAction(title: "Поделиться ссылкой", symbol: .arrowTurnUpRight) { [unowned self] _ in
                 let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
                 analyticsService.shareArticleLink(article.url)
-                self.present(activity, animated: true)
+                present(activity, animated: true)
             }
             
-            let questionImage = UIImage(systemSymbol: .questionmarkCircle)
-            let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
+            let brokenAction = makeUIAction(title: "Проблемы со статьей?", symbol: .questionmarkCircle) { [unowned self] _ in
                 analyticsService.reportBrokenArticle(article.url)
                 SwiftMessages.showDefault(title: "Спасибо!", body: "Починим в ближайшее время :)")
             }
             
-            return UIMenu(title: "", options: .displayInline, children: [copyLinkItem, shareLinkItem, brokenArticleItem])
+            return UIMenu(options: .displayInline, children: [copyAction, shareAction, brokenAction])
         }
         
         return configuration
+    }
+    
+    private func makeUIAction(title: String, symbol: SFSymbol, action: @escaping (UIAction) -> Void) -> UIAction {
+        return UIAction(title: title, image: UIImage(systemSymbol: symbol), handler: action)
     }
 }
 
@@ -137,6 +148,7 @@ extension NewsVC: NewsVCProtocol {
     func articlesUpdated() {
         DispatchQueue.main.async {
             self.myView.tableView.reloadData()
+            self.myView.tableView.hideSkeleton(reloadDataAfter: false)
             self.myView.refreshControl.endRefreshing()
             self.myView.refreshButton.isHidden = false
             self.myView.refreshButton.setTitle("ЗАГРУЗИТЬ БОЛЬШЕ", for: .normal)
@@ -150,5 +162,17 @@ extension NewsVC: NewsVCProtocol {
             self.present(alert, animated: true)
         }
     }
+}
+
+// MARK: - NewsView Delegate
+
+extension NewsVC: NewsViewDelegate {
+    func refreshButtonTapped() {
+        myView.refreshButton.setTitle("Загружаю...", for: .normal)
+        viewModel.loadArticles()
+    }
     
+    func refreshControlCalled() {
+        viewModel.refreshArticles()
+    }
 }

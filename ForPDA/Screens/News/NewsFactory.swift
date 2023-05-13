@@ -8,7 +8,7 @@
 import XCoordinator
 
 struct NewsFactory {
-    static func create(with router: UnownedRouter<NewsRoute>?) -> NewsVC {
+    static func create(with router: UnownedRouter<NewsRoute>) -> NewsVC {
         let viewModel = NewsVM(router: router)
         let viewController = NewsVC(viewModel: viewModel)
         

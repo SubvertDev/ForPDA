@@ -9,11 +9,10 @@ import UIKit
 import Nuke
 import NukeExtensions
 import SFSafeSymbols
+import SkeletonView
 
 final class ArticleCell: UITableViewCell {
-    
-    static let reuseIdentifier = "ArticleCell"
-    
+        
     // MARK: - Views
     
     private let articleImage: UIImageView = {
@@ -54,19 +53,21 @@ final class ArticleCell: UITableViewCell {
         return label
     }()
     
-    private let pdaImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(systemSymbol: ._4CircleFill)
-        imageView.tintColor = .systemGray
-        return imageView
-    }()
-    
     private let authorLabel: UILabel = {
         let label = UILabel()
-        label.text = "Автор"
+        label.text = "Автор Автор"
         label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
         label.textColor = .systemGray
         return label
+    }()
+    
+    private lazy var commentsStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [commentsImage, commentsLabel])
+        stackView.axis = .horizontal
+        stackView.distribution = .fillProportionally
+        stackView.alignment = .center
+        stackView.spacing = 4
+        return stackView
     }()
     
     private let commentsImage: UIImageView = {
@@ -97,13 +98,20 @@ final class ArticleCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         separatorInset = .zero
+        isSkeletonable = true
+        
         addSubviews()
         makeConstraints()
+        
+        commentsStackView.isHiddenWhenSkeletonIsActive = true
+        dateLabel.skeletonPaddingInsets = UIEdgeInsets(top: 0, left: -32, bottom: 0, right: -32)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Public
     
     func set(article: Article) {
         titleLabel.text = article.title
@@ -114,22 +122,36 @@ final class ArticleCell: UITableViewCell {
         reviewLabel.isHidden = !article.isReview
         
         if let url = URL(string: article.imageUrl) {
-            NukeExtensions.loadImage(with: url, into: articleImage)
+            if ImagePipeline.shared.cache.cachedImage(for: ImageRequest(url: url)) == nil {
+                articleImage.showAnimatedSkeleton()
+            }
+            
+            NukeExtensions.loadImage(with: url, into: articleImage) { result in
+                switch result {
+                case .success:
+                    self.articleImage.hideSkeleton()
+                case .failure:
+                    break
+                }
+            }
         }
     }
     
     // MARK: - Layout
     
     private func addSubviews() {
-        contentView.addSubview(articleImage)
-        contentView.addSubview(reviewLabel)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(descriptionLabel)
-        // contentView.addSubview(pdaImage)
-        contentView.addSubview(authorLabel)
-        contentView.addSubview(commentsImage)
-        contentView.addSubview(commentsLabel)
-        contentView.addSubview(dateLabel)
+        [articleImage,
+         reviewLabel,
+         titleLabel,
+         descriptionLabel,
+         authorLabel,
+         commentsStackView,
+         dateLabel
+        ].forEach {
+            contentView.addSubview($0)
+            $0.isSkeletonable = true
+        }
+        
     }
     
     private func makeConstraints() {
@@ -153,34 +175,20 @@ final class ArticleCell: UITableViewCell {
             make.leading.trailing.equalToSuperview().inset(20)
         }
         
-        // pdaImage.snp.makeConstraints { make in
-        //     make.top.equalTo(descriptionLabel.snp.bottom).offset(8)
-        //     make.bottom.equalToSuperview().inset(8)
-        //     make.leading.equalToSuperview().inset(20)
-        //     make.width.equalTo(pdaImage.snp.height)
-        //     make.height.equalTo(28)
-        // }
-        
         authorLabel.snp.makeConstraints { make in
             make.top.equalTo(descriptionLabel.snp.bottom).offset(8)
             make.leading.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().inset(12)
         }
         
-        commentsImage.snp.makeConstraints { make in
-            make.trailing.equalTo(commentsLabel.snp.leading).offset(-4)
-            make.centerY.equalTo(authorLabel)
-        }
-        
-        commentsLabel.snp.makeConstraints { make in
+        commentsStackView.snp.makeConstraints { make in
             make.trailing.equalTo(dateLabel.snp.leading).offset(-16)
             make.centerY.equalTo(authorLabel)
         }
-        
+
         dateLabel.snp.makeConstraints { make in
             make.trailing.equalToSuperview().inset(20)
             make.centerY.equalTo(authorLabel)
         }
     }
-    
 }
