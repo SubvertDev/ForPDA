@@ -168,7 +168,9 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
 
 extension MenuVC: MenuVCProtocol {
     func showDefaultError() {
-        let alert = UIAlertController(title: "Упс!", message: "Еще не сделано :)", preferredStyle: .alert)
+        let alert = UIAlertController(title: R.string.localizable.whoops(),
+                                      message: R.string.localizable.notDoneYet(),
+                                      preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default)
         alert.addAction(action)
         present(alert, animated: true)

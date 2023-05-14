@@ -11,7 +11,7 @@ final class SearchView: UIView {
     
     private let label: UILabel = {
         let label = UILabel()
-        label.text = "Находится в разработке"
+        label.text = R.string.localizable.inDevelopment()
         return label
     }()
     

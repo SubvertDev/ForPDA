@@ -19,13 +19,13 @@ final class MenuAuthCell: UITableViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Гость"
+        label.text = R.string.localizable.guest()
         return label
     }()
     
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Авторизоваться"
+        label.text = R.string.localizable.authorize()
         label.font = .systemFont(ofSize: UIFont.labelFontSize - 3, weight: .light)
         return label
     }()

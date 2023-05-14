@@ -1,0 +1,52 @@
+/* 
+  Localizable.strings
+  ForPDA
+
+  Created by Subvert on 14.05.2023.
+  
+*/
+
+// Tabs
+"news" = "Новости";
+"search" = "Поиск";
+"forum" = "Форум";
+"menu" = "Меню";
+
+// News/Article Options
+"copy.link" = "Скопировать ссылку";
+"share.link" = "Поделиться ссылкой";
+"something.wrong.with.article" = "Проблемы со статьей?";
+"copied" = "Скопировано";
+"thanks" = "Спасибо!";
+
+// News
+"load.more" = "Загрузить ещё";
+"loading.dots" = "Загружаю...";
+
+// Article
+"learn.more" = "Узнать подробнее";
+"comments" = "Комментарии (%d):";
+
+// In Development
+"will.fix.soon" = "Починим в ближайшее время :)";
+"in.development" = "Находится в разработке";
+
+// Menu
+"guest" = "Гость";
+"authorize" = "Авторизоваться";
+"history" = "История";
+"bookmarks" = "Закладки";
+"forum.rules" = "Правила форума";
+"settings" = "Настройки";
+"app.author" = "Автор приложения";
+"app.discussion.site" = "Обсуждение приложения";
+"telegram.news" = "Новости в Telegram";
+"telegram.chat" = "Чат в Telegram";
+"github" = "GitHub";
+
+// Alerts
+"error" = "Ошибка!";
+"something.went.wrong" = "Что-то пошло не так...";
+"whoops" = "Упс!";
+"not.done.yet" = "Еще не готово :)";
+"ok" = "ОК";

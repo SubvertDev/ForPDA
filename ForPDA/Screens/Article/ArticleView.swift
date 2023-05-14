@@ -76,7 +76,7 @@ final class ArticleView: UIView {
     
     let commentsLabel: UILabel = {
         let label = UILabel()
-        label.text = "Комментарии:"
+        label.text = R.string.localizable.comments(0)
         label.font = .systemFont(ofSize: 20, weight: .medium)
         return label
     }()

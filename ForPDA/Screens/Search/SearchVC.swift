@@ -22,7 +22,7 @@ final class SearchVC: PDAViewController<SearchView> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Поиск"
+        title = R.string.localizable.search()
     }
     
 }

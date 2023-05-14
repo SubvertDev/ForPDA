@@ -29,6 +29,8 @@
 		B874B4392A103EBA00A004FC /* ForumFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4352A103EB900A004FC /* ForumFactory.swift */; };
 		B874B43A2A103EBA00A004FC /* ForumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4362A103EBA00A004FC /* ForumView.swift */; };
 		B874B43B2A103EBA00A004FC /* ForumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4372A103EBA00A004FC /* ForumVC.swift */; };
+		B874B4472A1066F500A004FC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B874B4492A1066F500A004FC /* Localizable.strings */; };
+		B874B44C2A10706B00A004FC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B44B2A10706B00A004FC /* Constants.swift */; };
 		B87C32552A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B87C32542A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		B87C32572A0801EE00CFB7EF /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B87C32562A0801EE00CFB7EF /* FirebaseCrashlytics */; };
 		B87C32592A0801EE00CFB7EF /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = B87C32582A0801EE00CFB7EF /* FirebasePerformance */; };
@@ -113,6 +115,10 @@
 		B874B4352A103EB900A004FC /* ForumFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumFactory.swift; sourceTree = "<group>"; };
 		B874B4362A103EBA00A004FC /* ForumView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumView.swift; sourceTree = "<group>"; };
 		B874B4372A103EBA00A004FC /* ForumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumVC.swift; sourceTree = "<group>"; };
+		B874B43F2A1064FE00A004FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		B874B4482A1066F500A004FC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B874B44A2A1066F800A004FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B874B44B2A10706B00A004FC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		B87EB9CC293D21FB0025C2A0 /* NewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsView.swift; sourceTree = "<group>"; };
 		B87EB9CF293D2DA30025C2A0 /* ArticleVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVC.swift; sourceTree = "<group>"; };
 		B87EB9D1293D2DB90025C2A0 /* ArticleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
@@ -407,6 +413,7 @@
 				B8FEA1BA29675ABF002DFAA4 /* Support */,
 				B8D35206293CABB7008A84EA /* Info.plist */,
 				B8E4463A2A0044E000CE8745 /* GoogleService-Info.plist */,
+				B874B4492A1066F500A004FC /* Localizable.strings */,
 			);
 			path = ForPDA;
 			sourceTree = "<group>";
@@ -427,6 +434,7 @@
 			children = (
 				B8D351F8293CABB6008A84EA /* AppDelegate.swift */,
 				B8D351FA293CABB6008A84EA /* SceneDelegate.swift */,
+				B874B44B2A10706B00A004FC /* Constants.swift */,
 				B8D35201293CABB7008A84EA /* Assets.xcassets */,
 				B8D35203293CABB7008A84EA /* LaunchScreen.storyboard */,
 			);
@@ -498,6 +506,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = B8D351EC293CABB6008A84EA;
 			packageReferences = (
@@ -532,6 +541,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B8D35205293CABB7008A84EA /* LaunchScreen.storyboard in Resources */,
+				B874B4472A1066F500A004FC /* Localizable.strings in Resources */,
 				B8D35202293CABB7008A84EA /* Assets.xcassets in Resources */,
 				B8E4463B2A0044E000CE8745 /* GoogleService-Info.plist in Resources */,
 			);
@@ -610,6 +620,7 @@
 				B8BD2D87293E257900E12E29 /* Comment.swift in Sources */,
 				B898E4F92A0878E6002E978B /* SwiftMessages+Ext.swift in Sources */,
 				B8AC57722947FC9600435CF3 /* ProfileVC.swift in Sources */,
+				B874B44C2A10706B00A004FC /* Constants.swift in Sources */,
 				B874B4252A103C9100A004FC /* SearchVC.swift in Sources */,
 				B874B43B2A103EBA00A004FC /* ForumVC.swift in Sources */,
 				B8B86DB8295773950098D5E5 /* NewsVM.swift in Sources */,
@@ -665,10 +676,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		B874B4492A1066F500A004FC /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B874B4482A1066F500A004FC /* en */,
+				B874B44A2A1066F800A004FC /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		B8D35203293CABB7008A84EA /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				B8D35204293CABB7008A84EA /* Base */,
+				B874B43F2A1064FE00A004FC /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -680,6 +701,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -742,6 +764,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -799,7 +822,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -832,7 +855,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 12;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ForPDA/Info.plist;

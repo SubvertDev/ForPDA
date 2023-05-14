@@ -33,7 +33,7 @@ final class NewsVC: PDAViewController<NewsView> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = "Новости"
+        navigationItem.title = R.string.localizable.news()
         
         setDelegates()
         viewModel.loadArticles()
@@ -113,21 +113,21 @@ extension NewsVC: UITableViewDelegate {
         let article = viewModel.articles[indexPath.row]
         
         let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-            let copyAction = makeUIAction(title: "Скопировать ссылку", symbol: .doc) { [unowned self] _ in
+            let copyAction = makeUIAction(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
                 UIPasteboard.general.string = article.url
                 analyticsService.copyArticleLink(article.url)
-                SwiftMessages.showDefault(title: "Скопировано", body: "")
+                SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
             }
             
-            let shareAction = makeUIAction(title: "Поделиться ссылкой", symbol: .arrowTurnUpRight) { [unowned self] _ in
+            let shareAction = makeUIAction(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
                 let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
                 analyticsService.shareArticleLink(article.url)
                 present(activity, animated: true)
             }
             
-            let brokenAction = makeUIAction(title: "Проблемы со статьей?", symbol: .questionmarkCircle) { [unowned self] _ in
+            let brokenAction = makeUIAction(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
                 analyticsService.reportBrokenArticle(article.url)
-                SwiftMessages.showDefault(title: "Спасибо!", body: "Починим в ближайшее время :)")
+                SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
             }
             
             return UIMenu(options: .displayInline, children: [copyAction, shareAction, brokenAction])
@@ -151,13 +151,15 @@ extension NewsVC: NewsVCProtocol {
             self.myView.tableView.hideSkeleton(reloadDataAfter: false)
             self.myView.refreshControl.endRefreshing()
             self.myView.refreshButton.isHidden = false
-            self.myView.refreshButton.setTitle("ЗАГРУЗИТЬ БОЛЬШЕ", for: .normal)
+            self.myView.refreshButton.setTitle(R.string.localizable.loadMore(), for: .normal)
         }
     }
     
     func showError() {
         DispatchQueue.main.async {
-            let alert = UIAlertController(title: "Ошибка!", message: "Что-то пошло не так...", preferredStyle: .alert)
+            let alert = UIAlertController(title: R.string.localizable.error(),
+                                          message: R.string.localizable.somethingWentWrong(),
+                                          preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self.present(alert, animated: true)
         }
@@ -168,7 +170,7 @@ extension NewsVC: NewsVCProtocol {
 
 extension NewsVC: NewsViewDelegate {
     func refreshButtonTapped() {
-        myView.refreshButton.setTitle("Загружаю...", for: .normal)
+        myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
         viewModel.loadArticles()
     }
     

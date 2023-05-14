@@ -26,47 +26,68 @@ final class MenuVM: MenuVMProtocol {
     
     lazy var sections: [MenuSection] = [
         MenuSection(options: [
-            .authCell(model: MenuOption(title: "Гость", handler: showDefaultError))
+            .authCell(model: MenuOption(title: R.string.localizable.guest(), handler: showDefaultError))
         ]),
         
         MenuSection(options: [
-            .staticCell(model: MenuOption(title: "Новости", icon: .newspaperFill, handler: showNewsScreen)),
-            .staticCell(model: MenuOption(title: "Поиск", icon: .magnifyingglass, handler: showSearchScreen)),
-            .staticCell(model: MenuOption(title: "Форум", icon: .bubbleLeftAndBubbleRightFill, handler: showForumScreen)),
-            .staticCell(model: MenuOption(title: "История", icon: .clockArrowCirclepath, handler: showDefaultError)),
-            .staticCell(model: MenuOption(title: "Закладки", icon: .bookmarkFill, handler: showDefaultError))
-            //.staticCell(model: MenuOption(title: "Правила форума", icon: .bookFill, handler: {}))
+            .staticCell(model: MenuOption(title: R.string.localizable.news(),
+                                          icon: .newspaperFill, handler: showNewsScreen)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.search(),
+                                          icon: .magnifyingglass, handler: showSearchScreen)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.forum(),
+                                          icon: .bubbleLeftAndBubbleRightFill, handler: showForumScreen)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.history(),
+                                          icon: .clockArrowCirclepath, handler: showDefaultError)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.bookmarks(),
+                                          icon: .bookmarkFill, handler: showDefaultError))
+            
+//            .staticCell(model: MenuOption(title: R.string.localizable.forumRules(),
+//                                          icon: .bookFill, handler: {}))
         ]),
         
         MenuSection(options: [
-            .staticCell(model: MenuOption(title: "Настройки", icon: .gearshapeFill, handler: showDefaultError))
+            .staticCell(model: MenuOption(title: R.string.localizable.settings(),
+                                          icon: .gearshapeFill, handler: showDefaultError))
         ]),
         
         MenuSection(options: [
-            .staticCell(model: MenuOption(title: "Автор приложения", icon: .heartFill, handler: showAuthor)),
-            .staticCell(model: MenuOption(title: "Обсуждение приложения", image: R.image.forpdaSmall(), handler: showDefaultError)),
-            .staticCell(model: MenuOption(title: "Новости в Telegram", image: R.image.telegram(), handler: openTelegramChannel)),
-            .staticCell(model: MenuOption(title: "Чат в Telegram", image: R.image.telegram(), handler: openTelegramGroup)),
-            .staticCell(model: MenuOption(title: "GitHub", image: R.image.github(), handler: showDefaultError))
+            .staticCell(model: MenuOption(title: R.string.localizable.appAuthor(),
+                                          icon: .heartFill, handler: showAuthor)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.appDiscussionSite(),
+                                          image: R.image.forpdaSmall(), handler: showDefaultError)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.telegramNews(),
+                                          image: R.image.telegram(), handler: openTelegramNews)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.telegramChat(),
+                                          image: R.image.telegram(), handler: openTelegramChat)),
+            
+            .staticCell(model: MenuOption(title: R.string.localizable.github(),
+                                          image: R.image.github(), handler: showDefaultError))
         ])
     ]
     
     // MARK: - Actions
     
     private func showAuthor() {
-        guard let url = URL(string: "https://4pda.to/forum/index.php?showuser=3640948") else { return }
+        guard let url = URL(string: Constants.Links.authorPDA) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }
     
-    private func openTelegramChannel() {
-        guard let url = URL(string: "https://t.me/forpda_ios") else { return }
+    private func openTelegramNews() {
+        guard let url = URL(string: Constants.Links.telegramNews) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }
     
-    private func openTelegramGroup() {
-        guard let url = URL(string: "https://t.me/forpda_ios_discussions") else { return }
+    private func openTelegramChat() {
+        guard let url = URL(string: Constants.Links.telegramChat) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }

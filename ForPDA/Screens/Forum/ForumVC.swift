@@ -22,7 +22,7 @@ final class ForumVC: PDAViewController<ForumView> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Форум"
+        title = R.string.localizable.forum()
     }
     
 }

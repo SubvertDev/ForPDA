@@ -35,7 +35,7 @@ final class NewsView: UIView {
     lazy var refreshButton: UIButton = {
         let button = UIButton(type: .system)
         button.isHidden = true
-        button.setTitle("ЗАГРУЗИТЬ БОЛЬШЕ", for: .normal)
+        button.setTitle(R.string.localizable.loadMore(), for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.addTarget(self, action: #selector(refreshButtonTapped), for: .touchUpInside)
         return button

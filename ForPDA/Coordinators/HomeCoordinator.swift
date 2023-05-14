@@ -40,10 +40,10 @@ final class HomeCoordinator: TabBarCoordinator<HomeRoute> {
         
         menuCoordinator.tabBarRouter = strongRouter
         
-        configureNavigationCoordinator(newsCoordinator, title: "Новости", image: .newspaperFill)
-        configureNavigationCoordinator(searchCoordinator, title: "Поиск", image: .magnifyingglass)
-        configureNavigationCoordinator(forumCoordinator, title: "Форум", image: .bubbleLeftAndBubbleRightFill)
-        configureNavigationCoordinator(menuCoordinator, title: "Меню", image: .listDash)
+        configureNavigationCoordinator(newsCoordinator, title: R.string.localizable.news(), image: .newspaperFill)
+        configureNavigationCoordinator(searchCoordinator, title: R.string.localizable.search(), image: .magnifyingglass)
+        configureNavigationCoordinator(forumCoordinator, title: R.string.localizable.forum(), image: .bubbleLeftAndBubbleRightFill)
+        configureNavigationCoordinator(menuCoordinator, title: R.string.localizable.menu(), image: .listDash)
     }
     
     // MARK: - Init

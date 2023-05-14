@@ -59,7 +59,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         NukeExtensions.loadImage(with: URL(string: viewModel.article.imageUrl)!, into: myView.articleImage)
         
         myView.titleLabel.text = viewModel.article.title
-        myView.commentsLabel.text = "Комментарии (\(viewModel.article.commentAmount)):"
+        myView.commentsLabel.text = R.string.localizable.comments(Int(viewModel.article.commentAmount) ?? 0)
         let url = URL(string: viewModel.article.url)!
         
         if viewModel.article.url.contains("to/20") {
@@ -73,13 +73,13 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     private func configureMenu() {
         let clipboardImage = UIImage(systemSymbol: .doc)
-        let copyLinkItem = UIAction(title: "Скопировать ссылку", image: clipboardImage) { [unowned self] _ in
+        let copyLinkItem = UIAction(title: R.string.localizable.copyLink(), image: clipboardImage) { [unowned self] _ in
             self.copyLinkTapped()
             analyticsService.copyArticleLink(viewModel.article.url)
         }
         
         let shareImage = UIImage(systemSymbol: .arrowTurnUpRight)
-        let shareLinkItem = UIAction(title: "Поделиться ссылкой", image: shareImage) { [unowned self] _ in
+        let shareLinkItem = UIAction(title: R.string.localizable.shareLink(), image: shareImage) { [unowned self] _ in
             let items = [self.viewModel.article.url]
             let activity = UIActivityViewController(activityItems: items, applicationActivities: nil)
             self.present(activity, animated: true)
@@ -87,7 +87,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         }
         
         let questionImage = UIImage(systemSymbol: .questionmarkCircle)
-        let brokenArticleItem = UIAction(title: "Проблемы со статьей?", image: questionImage) { [unowned self] _ in
+        let brokenArticleItem = UIAction(title: R.string.localizable.somethingWrongWithArticle(), image: questionImage) { [unowned self] _ in
             self.reportBrokenArticleTapped()
             analyticsService.reportBrokenArticle(viewModel.article.url)
         }
@@ -111,7 +111,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let view = MessageView.viewFromNib(layout: .centeredView)
             view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
             view.configureDropShadow()
-            view.configureContent(title: "Скопировано", body: "")
+            view.configureContent(title: R.string.localizable.copied(), body: "")
             (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
             view.button?.isHidden = true
             return view
@@ -123,7 +123,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
             let view = MessageView.viewFromNib(layout: .centeredView)
             view.configureTheme(backgroundColor: .systemBlue, foregroundColor: .white)
             view.configureDropShadow()
-            view.configureContent(title: "Спасибо!", body: "Починим в ближайшее время :)")
+            view.configureContent(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
             (view.backgroundView as? CornerRoundingView)?.cornerRadius = 10
             view.button?.isHidden = true
             return view
@@ -169,7 +169,9 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func makeDefaultArticle() {
         var description = viewModel.article.description
         if description.contains("Узнать подробнее") { description.removeLast(16) }
-        configureArticle([TextElement(text: description), ButtonElement(text: "Узнать подробнее", url: viewModel.article.url)])
+        configureArticle([TextElement(text: description),
+                          ButtonElement(text: R.string.localizable.learnMore(),
+                                        url: viewModel.article.url)])
         myView.removeComments()
     }
     
