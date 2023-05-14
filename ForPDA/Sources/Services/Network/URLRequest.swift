@@ -10,8 +10,14 @@ import Foundation
 // MARK: - Requests
 
 extension URLRequest {
+    
     static func news(page: Int) -> Self {
         Self(components: .news(page: page))
+            .add(httpMethod: .get)
+    }
+    
+    static func article(path: [String]) -> Self {
+        Self(components: .article(path: path))
             .add(httpMethod: .get)
     }
     

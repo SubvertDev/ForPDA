@@ -35,30 +35,26 @@ final class NewsVC: PDAViewController<NewsView> {
         super.viewDidLoad()
         navigationItem.title = R.string.localizable.news()
         
-        setDelegates()
+        configureView()
         viewModel.loadArticles()
     }
     
-    // MARK: - Configure VC
+    // MARK: - Configuration
     
-    private func setDelegates() {
+    private func configureView() {
         myView.delegate = self
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
-        
         myView.tableView.isSkeletonable = true
-        myView.tableView.estimatedRowHeight = 370
-        myView.tableView.isUserInteractionDisabledWhenSkeletonIsActive = false
         myView.tableView.showAnimatedSkeleton()
     }
-
 }
 
 // MARK: - TableView DataSource
 
 extension NewsVC: SkeletonTableViewDataSource {
     
-    // MARK: Skeleton Table View
+    // MARK: - Skeleton Table View
     
     func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 64
@@ -74,7 +70,7 @@ extension NewsVC: SkeletonTableViewDataSource {
         return String(describing: ArticleCell.self)
     }
     
-    // MARK: Normal Table View
+    // MARK: - Normal Table View
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.articles.count
@@ -88,60 +84,7 @@ extension NewsVC: SkeletonTableViewDataSource {
     
 }
 
-// MARK: - TableView Delegate
-
-extension NewsVC: UITableViewDelegate {
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        // Check if non-skeleton table is shown
-        guard viewModel.articles.count - 1 >= indexPath.row else { return }
-        analyticsService.openArticleEvent(viewModel.articles[indexPath.row].url)
-        viewModel.showArticle(at: indexPath)
-    }
-    
-    // Hiding navigation bar while scrolling
-    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-        //let isDecelerating = scrollView.panGestureRecognizer.translation(in: scrollView).y < 0
-        //navigationController?.setNavigationBarHidden(isDecelerating, animated: true)
-    }
-    
-    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard !viewModel.articles.isEmpty else { return nil }
-        
-        let article = viewModel.articles[indexPath.row]
-        
-        let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-            let copyAction = makeUIAction(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
-                UIPasteboard.general.string = article.url
-                analyticsService.copyArticleLink(article.url)
-                SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
-            }
-            
-            let shareAction = makeUIAction(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
-                let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
-                analyticsService.shareArticleLink(article.url)
-                present(activity, animated: true)
-            }
-            
-            let brokenAction = makeUIAction(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-                analyticsService.reportBrokenArticle(article.url)
-                SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
-            }
-            
-            return UIMenu(options: .displayInline, children: [copyAction, shareAction, brokenAction])
-        }
-        
-        return configuration
-    }
-    
-    private func makeUIAction(title: String, symbol: SFSymbol, action: @escaping (UIAction) -> Void) -> UIAction {
-        return UIAction(title: title, image: UIImage(systemSymbol: symbol), handler: action)
-    }
-}
-
-// MARK: NewsVC Protocol
+// MARK: - NewsVC Protocol
 
 extension NewsVC: NewsVCProtocol {
     
@@ -160,7 +103,7 @@ extension NewsVC: NewsVCProtocol {
             let alert = UIAlertController(title: R.string.localizable.error(),
                                           message: R.string.localizable.somethingWentWrong(),
                                           preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
             self.present(alert, animated: true)
         }
     }
@@ -176,5 +119,52 @@ extension NewsVC: NewsViewDelegate {
     
     func refreshControlCalled() {
         viewModel.refreshArticles()
+    }
+}
+
+// MARK: - TableView Delegate
+
+extension NewsVC: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        // Check if non-skeleton table is shown
+        guard viewModel.articles.count - 1 >= indexPath.row else { return }
+        analyticsService.openArticleEvent(viewModel.articles[indexPath.row].url)
+        viewModel.showArticle(at: indexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        guard let article = viewModel.articles[safe: indexPath.row] else { return nil }
+        
+        return UIContextMenuConfiguration.make(actions: [
+            copyAction(article: article),
+            shareAction(article: article),
+            brokenAction(article: article)
+        ])
+    }
+    
+    private func copyAction(article: Article) -> UIAction {
+        UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
+            UIPasteboard.general.string = article.url
+            analyticsService.copyArticleLink(article.url)
+            SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
+        }
+    }
+    
+    private func shareAction(article: Article) -> UIAction {
+        UIAction.make(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
+            let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
+            analyticsService.shareArticleLink(article.url)
+            present(activity, animated: true)
+        }
+    }
+    
+    private func brokenAction(article: Article) -> UIAction {
+        UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
+            analyticsService.reportBrokenArticle(article.url)
+            SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
+        }
     }
 }

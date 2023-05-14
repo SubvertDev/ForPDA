@@ -17,14 +17,16 @@ final class NewsView: UIView {
     
     // MARK: - Views
     
-    let tableView: PDATableView = {
+    private(set) lazy var tableView: PDATableView = {
         let tableView = PDATableView()
         tableView.tableHeaderView = UIView()
+        tableView.estimatedRowHeight = 370
+        tableView.isUserInteractionDisabledWhenSkeletonIsActive = false
         tableView.register(cellWithClass: ArticleCell.self)
         return tableView
     }()
     
-    lazy var refreshControl: UIRefreshControl = {
+    private(set) lazy var refreshControl: UIRefreshControl = {
         let control = UIRefreshControl()
         control.addTarget(self, action: #selector(refreshControlCalled), for: .valueChanged)
         return control
@@ -32,7 +34,7 @@ final class NewsView: UIView {
     
     let footerView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 55))
     
-    lazy var refreshButton: UIButton = {
+    private(set) lazy var refreshButton: UIButton = {
         let button = UIButton(type: .system)
         button.isHidden = true
         button.setTitle(R.string.localizable.loadMore(), for: .normal)

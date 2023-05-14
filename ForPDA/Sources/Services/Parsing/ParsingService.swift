@@ -104,7 +104,9 @@ final class ParsingService {
     
     // MARK: - Article
     
-    func parseArticle(from document: Document) -> [ArticleElement] {
+    func parseArticle(from document: String) -> [ArticleElement] {
+        let document = try! SwiftSoup.parse(document)
+
         if try! !document.select("[class=content-box]").isEmpty() {
             return parseArticleNormal(from: document)
         } else if try! !document.select("[class=article]").isEmpty() {
@@ -116,7 +118,7 @@ final class ParsingService {
     
     // MARK: - Article (normal)
     
-    func parseArticleNormal(from document: Document) -> [ArticleElement] {
+    private func parseArticleNormal(from document: Document) -> [ArticleElement] {
         var articleElements: [ArticleElement] = []
         let elements = try! document.select("[class=content-box]").select("p, h2, li, ol, dl, ul")
         
@@ -201,7 +203,7 @@ final class ParsingService {
     
     // MARK: - Article (fancy)
     
-    func parseArticleFancy(from document: Document) -> [ArticleElement] {
+    private func parseArticleFancy(from document: Document) -> [ArticleElement] {
         var articleElements: [ArticleElement] = []
         let elements = try! document.select("[class=article]").select("p, h2, h3, figure, dl, a[class]")
         

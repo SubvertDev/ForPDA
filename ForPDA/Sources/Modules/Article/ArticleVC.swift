@@ -18,6 +18,11 @@ import SwiftMessages
 import Factory
 import SFSafeSymbols
 
+protocol ArticleVCProtocol: AnyObject {
+    func configureArticle(with elements: [ArticleElement])
+    func showError()
+}
+
 final class ArticleVC: PDAViewController<ArticleView> {
     
     // MARK: - Properties
@@ -37,36 +42,37 @@ final class ArticleVC: PDAViewController<ArticleView> {
     init(viewModel: ArticleVMProtocol) {
         self.viewModel = viewModel
         super.init()
-        //self.article = article
-        //super.init()
-        //self.viewModel = ArticleVM(view: self)
     }
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.backgroundColor = .systemBackground
         
+        makeNavigationTitle()
+        configureMenu()
+        configureView()
+        
+        viewModel.loadArticle()
+        if viewModel.article.url.contains("to/20") {
+//            viewModel.loadArticle(url: URL(string: viewModel.article.url)!)
+        } else {
+            makeDefaultArticle()
+        }
+    }
+    
+    private func makeNavigationTitle() {
         let label = MarqueeLabel(frame: .zero, rate: 30, fadeLength: 0)
         label.text = viewModel.article.title
         label.fadeLength = 30
         navigationItem.titleView = label
-        
-        configureMenu()
-        
+    }
+    
+    private func configureView() {
         NukeExtensions.loadImage(with: URL(string: viewModel.article.imageUrl)!, into: myView.articleImage)
-        
         myView.titleLabel.text = viewModel.article.title
         myView.commentsLabel.text = R.string.localizable.comments(Int(viewModel.article.commentAmount) ?? 0)
-        let url = URL(string: viewModel.article.url)!
-        
-        if viewModel.article.url.contains("to/20") {
-            viewModel.loadArticle(url: url)
-        } else {
-            makeDefaultArticle()
-        }
     }
     
     // MARK: - Configure
@@ -357,6 +363,26 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func unhide() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.myView.stopLoading()
+        }
+    }
+}
+
+// MARK: - ArticleVCProtocol
+
+extension ArticleVC: ArticleVCProtocol {
+    func configureArticle(with elements: [ArticleElement]) {
+        DispatchQueue.main.async {
+            self.configureArticle(elements)
+        }
+    }
+    
+    func showError() {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: R.string.localizable.error(),
+                                          message: R.string.localizable.somethingWentWrong(),
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
+            self.present(alert, animated: true)
         }
     }
 }

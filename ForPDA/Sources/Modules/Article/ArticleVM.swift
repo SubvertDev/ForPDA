@@ -12,36 +12,44 @@ import XCoordinator
 protocol ArticleVMProtocol {
     var article: Article { get }
     
-    func loadArticle(url: URL)
+    func loadArticle()
 }
 
 final class ArticleVM: ArticleVMProtocol {
     
+    // MARK: - Properties
+    
     @Injected(\.networkService) private var networkService
     @Injected(\.parsingService) private var parsingService
     
-    //private let router: UnownedRouter<NewsRoute>
-    var article: Article
-    weak var view: ArticleVC?
+    weak var view: ArticleVCProtocol?
     
-//    init(router: UnownedRouter<NewsRoute>) {
-//        self.router = router
-//    }
+    var article: Article
+    
+    // MARK: - Init
+    
     init(article: Article) {
         self.article = article
     }
     
-    func loadArticle(url: URL) {
-        Task {
-            do {
-                let page = try await networkService.getArticlePage(url: url)
-                let elements = parsingService.parseArticle(from: page)
-                await view?.configureArticle(elements)
-                await view?.configureComments(from: page)
-            } catch {
-                fatalError(error.localizedDescription)
+    // MARK: - Functions
+    
+    func loadArticle() {
+        guard let path = URL(string: article.url)?.pathComponents else {
+            view?.showError()
+            return
+        }
+        
+        networkService.getArticle(path: path) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let response):
+                let elements = parsingService.parseArticle(from: response)
+                view?.configureArticle(with: elements)
+                
+            case .failure:
+                view?.showError()
             }
         }
     }
-    
 }

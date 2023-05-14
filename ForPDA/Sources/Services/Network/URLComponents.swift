@@ -10,12 +10,13 @@ import Foundation
 // MARK: - Components
 
 extension URLComponents {
+    
     static func news(page: Int) -> Self {
         Self(path: "/page/\(page)/")
     }
     
-    static func article(path: String) -> Self {
-        Self(path: "\(path)")
+    static func article(path: [String]) -> Self {
+        Self(path: path.joined(separator: "/"))
     }
     
     static var captcha: Self {

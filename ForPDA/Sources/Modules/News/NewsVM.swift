@@ -21,6 +21,8 @@ protocol NewsVMProtocol {
 
 final class NewsVM: NewsVMProtocol {
     
+    // MARK: - Properties
+    
     @Injected(\.networkService) private var networkService
     @Injected(\.parsingService) private var parsingService
     
@@ -30,14 +32,18 @@ final class NewsVM: NewsVMProtocol {
     private var page = 0
     var articles: [Article] = []
     
+    // MARK: - Init
+    
     init(router: UnownedRouter<NewsRoute>) {
         self.router = router
     }
     
+    // MARK: - Functions
+    
     func loadArticles() {
         page += 1
         
-        networkService.getArticles(page: page) { [weak self] result in
+        networkService.getNews(page: page) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let response):
@@ -53,7 +59,7 @@ final class NewsVM: NewsVMProtocol {
     func refreshArticles() {
         page = 1
         
-        networkService.getArticles(page: page) { [weak self] result in
+        networkService.getNews(page: page) { [weak self] result in
             guard let self else { return }
             switch result {
             case .success(let response):
@@ -72,5 +78,4 @@ final class NewsVM: NewsVMProtocol {
         let article = articles[indexPath.row]
         router.trigger(.newsDetail(article))
     }
-    
 }

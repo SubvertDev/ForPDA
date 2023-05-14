@@ -20,19 +20,9 @@ enum NetworkError: Error {
 
 final class NetworkService {
     
-    private let startPageURL = URL(string: "https://4pda.to/")!
-    
-    // func getArticles(atPage number: Int = 1) async throws -> Document {
-    //     let url = URL(string: "https://4pda.to/page/\(number)")!
-    //     let (data, _) = try await URLSession.shared.data(from: url)
-    //     let htmlString = try convertDataToCyrillicString(data)
-    //     let parsed = try SwiftSoup.parse(htmlString)
-    //     return parsed
-    // }
-    
     // MARK: - News
     
-    func getArticles(page: Int = 1, completion: @escaping (Result<String, NetworkError>) -> Void) {
+    func getNews(page: Int = 1, completion: @escaping (Result<String, NetworkError>) -> Void) {
         makeRequest(request: .news(page: page), completion: completion)
     }
     
@@ -41,6 +31,10 @@ final class NetworkService {
         let htmlString = try convertDataToCyrillicString(data)
         let parsed = try SwiftSoup.parse(htmlString)
         return parsed
+    }
+    
+    func getArticle(path: [String], completion: @escaping (Result<String, NetworkError>) -> Void) {
+        makeRequest(request: .article(path: path), completion: completion)
     }
     
     // MARK: - Login
