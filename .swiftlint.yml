@@ -3,6 +3,7 @@ disabled_rules:
     - line_length
     - comment_spacing
     - unused_capture_list
+    - blanket_disable_command
 
 custom_rules:
   sf_safe_symbol:
