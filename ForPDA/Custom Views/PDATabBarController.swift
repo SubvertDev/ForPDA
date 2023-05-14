@@ -14,14 +14,16 @@ final class PDATabBarController: UITabBarController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         
-        let tabBarAppearance = UITabBarAppearance()
-        tabBarAppearance.configureWithDefaultBackground()
-        tabBarAppearance.backgroundColor = .systemGroupedBackground
-        UITabBar.appearance().standardAppearance = tabBarAppearance
-
-        if #available(iOS 15.0, *) {
-            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
-        }
+        tabBar.tintColor = .label
+        
+//        let tabBarAppearance = UITabBarAppearance()
+//        tabBarAppearance.configureWithDefaultBackground()
+//        tabBarAppearance.backgroundColor = .systemGroupedBackground
+//        UITabBar.appearance().standardAppearance = tabBarAppearance
+//
+//        if #available(iOS 15.0, *) {
+//            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+//        }
         
     }
     

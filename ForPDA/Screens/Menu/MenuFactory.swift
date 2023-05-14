@@ -9,10 +9,10 @@ import XCoordinator
 
 struct MenuFactory {
     static func create(with router: UnownedRouter<MenuRoute>) -> MenuVC {
-        let viewModel = MenuVM(router: router)//(coordinator: coordinator)
+        let viewModel = MenuVM(router: router)
         let viewController = MenuVC(viewModel: viewModel)
         
-        // viewModel.view = viewController
+        viewModel.view = viewController
         
         return viewController
     }

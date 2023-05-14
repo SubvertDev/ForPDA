@@ -10,10 +10,17 @@ import XCoordinator
 
 enum MenuRoute: Route {
     case menu
+    
     // case login
+    
+    case news
+    case search
+    case forum
 }
 
 final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
+    
+    var tabBarRouter: StrongRouter<HomeRoute>?
     
     init() {
         super.init(initialRoute: .menu)
@@ -28,6 +35,19 @@ final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
 //        case .login:
 //            let viewController = LoginFactory.create()
 //            return .push(viewController)
+            
+        case .news:
+            guard let tabBarRouter else { return .none() }
+            return .trigger(HomeRoute.news, on: tabBarRouter)
+            
+        case .search:
+            guard let tabBarRouter else { return .none() }
+            return .trigger(HomeRoute.search, on: tabBarRouter)
+
+        case .forum:
+            guard let tabBarRouter else { return .none() }
+            return .trigger(HomeRoute.forum, on: tabBarRouter)
+
         }
     }
     

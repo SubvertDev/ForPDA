@@ -38,10 +38,12 @@ final class HomeCoordinator: TabBarCoordinator<HomeRoute> {
                   forumRouter: forumCoordinator.strongRouter,
                   menuRouter: menuCoordinator.strongRouter)
         
-        configureNavigationCoordinator(newsCoordinator, image: .newspaperFill)
-        configureNavigationCoordinator(searchCoordinator, image: .magnifyingglass)
-        configureNavigationCoordinator(forumCoordinator, image: .bubbleLeftAndBubbleRightFill)
-        configureNavigationCoordinator(menuCoordinator, image: .listDash)
+        menuCoordinator.tabBarRouter = strongRouter
+        
+        configureNavigationCoordinator(newsCoordinator, title: "Новости", image: .newspaperFill)
+        configureNavigationCoordinator(searchCoordinator, title: "Поиск", image: .magnifyingglass)
+        configureNavigationCoordinator(forumCoordinator, title: "Форум", image: .bubbleLeftAndBubbleRightFill)
+        configureNavigationCoordinator(menuCoordinator, title: "Меню", image: .listDash)
     }
     
     // MARK: - Init
@@ -74,7 +76,8 @@ final class HomeCoordinator: TabBarCoordinator<HomeRoute> {
     
     // MARK: - Helpers
     
-    private func configureNavigationCoordinator(_ coordinator: any Coordinator, image: SFSymbol) {
+    private func configureNavigationCoordinator(_ coordinator: any Coordinator, title: String, image: SFSymbol) {
+        coordinator.rootViewController.tabBarItem.title = title
         coordinator.rootViewController.tabBarItem.image = UIImage(systemSymbol: image)
         coordinator.rootViewController.tabBarItem.selectedImage = UIImage(systemSymbol: image)
             .withTintColor(.label, renderingMode: .alwaysOriginal)

@@ -15,7 +15,7 @@ enum Account {
 }
 
 protocol MenuVCProtocol: AnyObject {
-    
+    func showDefaultError()
 }
 
 final class MenuVC: PDAViewController<MenuView> {
@@ -42,7 +42,7 @@ final class MenuVC: PDAViewController<MenuView> {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        checkAuth()
+//        checkAuth()
     }
     
     // MARK: - Private Functions
@@ -105,7 +105,7 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return indexPath.section == 0 ? 60 : 40
+        return indexPath.section == 0 ? 60 : 46
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -165,3 +165,12 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
 ////        }
 //    }
 //}
+
+extension MenuVC: MenuVCProtocol {
+    func showDefaultError() {
+        let alert = UIAlertController(title: "Упс!", message: "Еще не сделано :)", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default)
+        alert.addAction(action)
+        present(alert, animated: true)
+    }
+}

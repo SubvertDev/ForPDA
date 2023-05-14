@@ -9,9 +9,20 @@ import UIKit
 import XCoordinator
 
 enum ForumRoute: Route {
-    
+    case forum
 }
 
 final class ForumCoordinator: NavigationCoordinator<ForumRoute> {
     
+    init() {
+        super.init(initialRoute: .forum)
+    }
+    
+    override func prepareTransition(for route: ForumRoute) -> NavigationTransition {
+        switch route {
+        case .forum:
+            let viewController = ForumFactory.create(with: unownedRouter)
+            return .push(viewController)
+        }
+    }
 }

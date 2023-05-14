@@ -35,7 +35,12 @@ final class MenuSettingsCell: UITableViewCell {
     }
     
     func set(with model: MenuOption) {
-        iconImageView.image = model.icon.withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+        if let icon = model.icon {
+            let color: UIColor = icon == .heartFill ? .systemRed : .systemGray
+            iconImageView.image = UIImage(systemSymbol: icon).withTintColor(color, renderingMode: .alwaysOriginal)
+        } else if let image = model.image {
+            iconImageView.image = image
+        }
         titleLabel.text = model.title
     }
     
@@ -46,7 +51,7 @@ final class MenuSettingsCell: UITableViewCell {
     
     private func makeConstraints() {
         iconImageView.snp.makeConstraints { make in
-            make.top.bottom.equalToSuperview().inset(8)
+            make.top.bottom.equalToSuperview().inset(11)
             make.height.equalTo(24)
             make.width.equalTo(60)
             make.leading.equalToSuperview()

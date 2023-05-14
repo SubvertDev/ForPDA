@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SFSafeSymbols
 
 struct MenuSection {
 //    let title: String
@@ -20,8 +21,16 @@ enum MenuOptionType {
 
 struct MenuOption {
     let title: String
-    let icon: UIImage
+    let icon: SFSymbol?
+    let image: UIImage?
     let handler: (() -> Void)
+    
+    init(title: String, icon: SFSymbol? = nil, image: UIImage? = nil, handler: @escaping () -> Void) {
+        self.title = title
+        self.icon = icon
+        self.image = image
+        self.handler = handler
+    }
 }
 
 //struct SettingsSwitchOption {
