@@ -7,13 +7,14 @@
 
 import UIKit
 
-final class PDATabBarController: UITabBarController {
+final class PDATabBarController: UITabBarController, UITabBarControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        
         tabBar.tintColor = .label
+        
+        delegate = self
         
         // let tabBarAppearance = UITabBarAppearance()
         // tabBarAppearance.configureWithDefaultBackground()
@@ -23,6 +24,22 @@ final class PDATabBarController: UITabBarController {
         // if #available(iOS 15.0, *) {
         //     UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         // }
+    }
+    
+    // Tap on tabbar to scroll news to the top
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        guard let viewControllers, !viewControllers.isEmpty else { return true }
+        guard viewController == viewControllers[0] else { return true }
+        guard let navController = viewController as? UINavigationController else { return true }
+        guard let topController = navController.viewControllers.last else { return true }
+
+        if topController.isScrolledToTop {
+            navController.popViewController(animated: true)
+            return true
+        } else {
+            topController.scrollToTop()
+            return false
+        }
     }
     
     // Small tap animation for tab bar
