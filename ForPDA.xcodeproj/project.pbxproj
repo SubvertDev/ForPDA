@@ -99,6 +99,7 @@
 		B8FD82262A1174EA00EB7035 /* UIAction+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8FD82252A1174EA00EB7035 /* UIAction+Ext.swift */; };
 		B8FEA1BD29675F73002DFAA4 /* UITableView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */; };
 		B8FEA1C229676FC3002DFAA4 /* RswiftLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */; };
+		B957D4432A12CA120013F578 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B957D4422A12CA120013F578 /* UIViewController+Ext.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -180,6 +181,7 @@
 		B8FD82172A11690F00EB7035 /* URLRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLRequest.swift; sourceTree = "<group>"; };
 		B8FD82252A1174EA00EB7035 /* UIAction+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAction+Ext.swift"; sourceTree = "<group>"; };
 		B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableView+Ext.swift"; sourceTree = "<group>"; };
+		B957D4422A12CA120013F578 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -371,6 +373,7 @@
 				B874B41A2A101B5F00A004FC /* Array+Ext.swift */,
 				B8E4463E2A004CD600CE8745 /* URL+Ext.swift */,
 				B8FD82252A1174EA00EB7035 /* UIAction+Ext.swift */,
+				B957D4422A12CA120013F578 /* UIViewController+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -772,6 +775,7 @@
 				B893011E2947E19800D14141 /* MenuView.swift in Sources */,
 				B8BD2D95293E2AF000E12E29 /* AbstractComment.swift in Sources */,
 				B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */,
+				B957D4432A12CA120013F578 /* UIViewController+Ext.swift in Sources */,
 				B874B4392A103EBA00A004FC /* ForumFactory.swift in Sources */,
 				B89301212947E2AE00D14141 /* LoginVC.swift in Sources */,
 				B8E446312A002F7200CE8745 /* AnalyticsService.swift in Sources */,
