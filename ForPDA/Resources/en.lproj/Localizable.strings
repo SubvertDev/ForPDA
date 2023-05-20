@@ -46,7 +46,27 @@
 
 // Alerts
 "error" = "Error!";
+"warning" = "Warning!";
 "something.went.wrong" = "Something went wrong...";
+"warning.restart.app" = "You need to restart the application to apply the changes";
 "whoops" = "Whoops!";
 "not.done.yet" = "Not done yet :)";
 "ok" = "OK";
+"cancel" = "Cancel";
+
+// Settings
+"automatic" = "Automatic";
+"general" = "General";
+"language" = "Language";
+"language.choose" = "Choose Language";
+"language.russian" = "Russian";
+"language.english" = "English";
+"appearance" = "Appearance";
+"theme" = "Theme";
+"theme.choose" = "Choose Theme";
+"theme.light" = "Light";
+"theme.dark" = "Dark";
+"account" = "Account";
+"sign.out" = "Sign Out";
+"about.app" = "About App";
+"version" = "Version";

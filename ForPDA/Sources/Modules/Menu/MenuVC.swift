@@ -120,6 +120,9 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
             let cell = tableView.dequeueReusableCell(withClass: MenuSettingsCell.self)
             cell.set(with: model)
             return cell
+            
+        default:
+            return UITableViewCell()
         }
     }
     
@@ -130,8 +133,12 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
         switch model.self {
         case .authCell(model: let model):
             model.handler()
+            
         case .staticCell(model: let model):
             model.handler()
+            
+        default:
+            break
         }
     }
 }
@@ -167,6 +174,7 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
 //}
 
 extension MenuVC: MenuVCProtocol {
+    
     func showDefaultError() {
         let alert = UIAlertController(title: R.string.localizable.whoops(),
                                       message: R.string.localizable.notDoneYet(),

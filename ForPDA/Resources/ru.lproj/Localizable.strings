@@ -6,32 +6,32 @@
   
 */
 
-// Tabs
+// Табы
 "news" = "Новости";
 "search" = "Поиск";
 "forum" = "Форум";
 "menu" = "Меню";
 
-// News/Article Options
+// Новости/Статья Опции
 "copy.link" = "Скопировать ссылку";
 "share.link" = "Поделиться ссылкой";
 "something.wrong.with.article" = "Проблемы со статьей?";
 "copied" = "Скопировано";
 "thanks" = "Спасибо!";
 
-// News
+// Новости
 "load.more" = "Загрузить ещё";
 "loading.dots" = "Загружаю...";
 
-// Article
+// Статья
 "learn.more" = "Узнать подробнее";
 "comments" = "Комментарии (%d):";
 
-// In Development
+// В разработке
 "will.fix.soon" = "Починим в ближайшее время :)";
 "in.development" = "Находится в разработке";
 
-// Menu
+// Меню
 "guest" = "Гость";
 "authorize" = "Авторизоваться";
 "history" = "История";
@@ -44,9 +44,29 @@
 "telegram.chat" = "Чат в Telegram";
 "github" = "GitHub";
 
-// Alerts
+// Алерты
 "error" = "Ошибка!";
+"warning" = "Внимание!";
 "something.went.wrong" = "Что-то пошло не так...";
+"warning.restart.app" = "Для применения изменений необходимо перезагрузить приложение";
 "whoops" = "Упс!";
 "not.done.yet" = "Еще не готово :)";
 "ok" = "ОК";
+"cancel" = "Отмена";
+
+// Настройки
+"automatic" = "Автоматически";
+"general" = "Общие";
+"language" = "Язык";
+"language.choose" = "Выберите язык";
+"language.russian" = "Русский";
+"language.english" = "English";
+"appearance" = "Внешний вид";
+"theme" = "Тема";
+"theme.choose" = "Выберите тему";
+"theme.light" = "Светлая";
+"theme.dark" = "Темная";
+"account" = "Аккаунт";
+"sign.out" = "Выйти";
+"about.app" = "О приложении";
+"version" = "Версия";

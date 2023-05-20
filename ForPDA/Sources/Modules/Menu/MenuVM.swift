@@ -51,7 +51,7 @@ final class MenuVM: MenuVMProtocol {
         
         MenuSection(options: [
             .staticCell(model: MenuOption(title: R.string.localizable.settings(),
-                                          icon: .gearshapeFill, handler: showDefaultError))
+                                          icon: .gearshapeFill, handler: showSettingsScreen))
         ]),
         
         MenuSection(options: [
@@ -113,6 +113,10 @@ final class MenuVM: MenuVMProtocol {
     
     private func showForumScreen() {
         router.trigger(.forum)
+    }
+    
+    private func showSettingsScreen() {
+        router.trigger(.settings)
     }
     
 }

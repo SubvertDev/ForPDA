@@ -16,6 +16,8 @@ enum MenuRoute: Route {
     case news
     case search
     case forum
+    
+    case settings
 }
 
 final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
@@ -48,6 +50,9 @@ final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
             guard let tabBarRouter else { return .none() }
             return .trigger(HomeRoute.forum, on: tabBarRouter)
 
+        case .settings:
+            let viewController = SettingsFactory.create()
+            return .push(viewController)
         }
     }
     

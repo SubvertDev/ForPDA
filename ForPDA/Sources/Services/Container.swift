@@ -25,4 +25,9 @@ extension Container {
             .onDebug { AnalyticsService(isDebug: true) }
             .singleton
     }
+    
+    var settingsService: Factory<SettingsService> {
+        Factory(self) { SettingsService() }
+            .singleton
+    }
 }

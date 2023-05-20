@@ -6,9 +6,12 @@
 //
 
 import UIKit
+import Factory
 import XCoordinator
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    
+    @Injected(\.settingsService) private var settingsService
 
     private let coordinator = HomeCoordinator().strongRouter
     
@@ -18,17 +21,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         
-        coordinator.setRoot(for: window!)
-
-        // let config = WKWebViewConfiguration()
-        // config.dataDetectorTypes = []
-        // config.suppressesIncrementalRendering = true
-        // webView = WKWebView(frame: .zero, configuration: config)
-        // webView.tag = 666
-        // webView.navigationDelegate = self
-        // window.addSubview(webView)
+        overrideApplicationThemeStyle(with: settingsService.getAppTheme())
         
-        // webView.load(URLRequest(url: URL(string: "https://4pda.to/")!))
+        coordinator.setRoot(for: window!)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) { }
@@ -41,6 +36,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneDidEnterBackground(_ scene: UIScene) { }
 
+    private func configureWKWebView() {
+        // let config = WKWebViewConfiguration()
+        // config.dataDetectorTypes = []
+        // config.suppressesIncrementalRendering = true
+        // webView = WKWebView(frame: .zero, configuration: config)
+        // webView.tag = 666
+        // webView.navigationDelegate = self
+        // window.addSubview(webView)
+        
+        // webView.load(URLRequest(url: URL(string: "https://4pda.to/")!))
+    }
 }
 
 //extension SceneDelegate: WKNavigationDelegate {
@@ -48,3 +54,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        print(#function)
 //    }
 //}
+
+extension SceneDelegate {
+    func overrideApplicationThemeStyle(with theme: AppTheme) {
+       window?.overrideUserInterfaceStyle = UIUserInterfaceStyle(rawValue: theme.ordinal())!
+    }
+}

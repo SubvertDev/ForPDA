@@ -9,14 +9,20 @@ import UIKit
 import SFSafeSymbols
 
 struct MenuSection {
-//    let title: String
-    let options: [MenuOptionType]
+    let title: String?
+    var options: [MenuOptionType]
+    
+    init(title: String? = nil, options: [MenuOptionType]) {
+        self.title = title
+        self.options = options
+    }
 }
 
 enum MenuOptionType {
     case authCell(model: MenuOption)
     case staticCell(model: MenuOption)
-    //case switchCell(model: SettingsSwitchOption)
+    case descriptionCell(model: DescriptionOption)
+    case switchCell(model: SwitchOption)
 }
 
 struct MenuOption {
@@ -33,10 +39,14 @@ struct MenuOption {
     }
 }
 
-//struct SettingsSwitchOption {
-//    let title: String
-//    let icon: UIImage?
-//    let iconBackgroundColor: UIColor
-//    let handler: (() -> Void)
-//    var isOn: Bool
-//}
+struct DescriptionOption {
+    let title: String
+    let description: String
+    let handler: (() -> Void)
+}
+
+struct SwitchOption {
+    let title: String
+    var isOn: Bool
+    let handler: (() -> Void)
+}

@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B8001CAC2A19432C00E7A8A8 /* SettingsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CAB2A19432C00E7A8A8 /* SettingsFactory.swift */; };
+		B8001CAE2A19433600E7A8A8 /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CAD2A19433600E7A8A8 /* SettingsVC.swift */; };
+		B8001CB02A19433D00E7A8A8 /* SettingsVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CAF2A19433D00E7A8A8 /* SettingsVM.swift */; };
+		B8001CB22A19434600E7A8A8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CB12A19434600E7A8A8 /* SettingsView.swift */; };
+		B8001CB72A19511E00E7A8A8 /* SettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CB62A19511E00E7A8A8 /* SettingsService.swift */; };
+		B8001CB92A19529B00E7A8A8 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CB82A19529B00E7A8A8 /* AppLanguage.swift */; };
+		B8001CBB2A19529F00E7A8A8 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CBA2A19529F00E7A8A8 /* AppTheme.swift */; };
+		B8001CC02A196E1000E7A8A8 /* CaseIterable+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CBF2A196E1000E7A8A8 /* CaseIterable+Ext.swift */; };
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
 		B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340351296789FE00C3CF37 /* PDACharterLabel.swift */; };
 		B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */; };
@@ -103,6 +111,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B8001CAB2A19432C00E7A8A8 /* SettingsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsFactory.swift; sourceTree = "<group>"; };
+		B8001CAD2A19433600E7A8A8 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
+		B8001CAF2A19433D00E7A8A8 /* SettingsVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVM.swift; sourceTree = "<group>"; };
+		B8001CB12A19434600E7A8A8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B8001CB62A19511E00E7A8A8 /* SettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsService.swift; sourceTree = "<group>"; };
+		B8001CB82A19529B00E7A8A8 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		B8001CBA2A19529F00E7A8A8 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		B8001CBF2A196E1000E7A8A8 /* CaseIterable+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CaseIterable+Ext.swift"; sourceTree = "<group>"; };
 		B8340351296789FE00C3CF37 /* PDACharterLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDACharterLabel.swift; sourceTree = "<group>"; };
 		B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAPaddingLabel.swift; sourceTree = "<group>"; };
 		B83403562967AFCA00C3CF37 /* PDATableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATableView.swift; sourceTree = "<group>"; };
@@ -213,6 +229,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B8001CA92A19425100E7A8A8 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				B8001CAB2A19432C00E7A8A8 /* SettingsFactory.swift */,
+				B8001CAD2A19433600E7A8A8 /* SettingsVC.swift */,
+				B8001CAF2A19433D00E7A8A8 /* SettingsVM.swift */,
+				B8001CB12A19434600E7A8A8 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		B8001CB42A19510500E7A8A8 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				B8001CB62A19511E00E7A8A8 /* SettingsService.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
 		B81BE1472944054100E2AAF9 /* Comments */ = {
 			isa = PBXGroup;
 			children = (
@@ -273,7 +308,6 @@
 			children = (
 				B88D3F512A0900620061C6C4 /* MenuAuthCell.swift */,
 				B88D3F532A0900900061C6C4 /* MenuSettingsCell.swift */,
-				B88D3F552A0900DA0061C6C4 /* SettingsCellType.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -345,6 +379,7 @@
 				B893011A2947E17C00D14141 /* Menu */,
 				B893011F2947E2A700D14141 /* Login */,
 				B8AC57702947FC8E00435CF3 /* Profile */,
+				B8001CA92A19425100E7A8A8 /* Settings */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -374,6 +409,7 @@
 				B8E4463E2A004CD600CE8745 /* URL+Ext.swift */,
 				B8FD82252A1174EA00EB7035 /* UIAction+Ext.swift */,
 				B957D4422A12CA120013F578 /* UIViewController+Ext.swift */,
+				B8001CBF2A196E1000E7A8A8 /* CaseIterable+Ext.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -383,6 +419,9 @@
 			children = (
 				B8BD2D8E293E2AE800E12E29 /* Comments */,
 				B8C7ABAE293D0A0D00FB2F67 /* Article.swift */,
+				B88D3F552A0900DA0061C6C4 /* SettingsCellType.swift */,
+				B8001CB82A19529B00E7A8A8 /* AppLanguage.swift */,
+				B8001CBA2A19529F00E7A8A8 /* AppTheme.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -546,6 +585,7 @@
 			children = (
 				B8FD82102A1168A800EB7035 /* Network */,
 				B8FD82112A1168AC00EB7035 /* Parsing */,
+				B8001CB42A19510500E7A8A8 /* Storage */,
 				B8FD82122A1168AF00EB7035 /* Analytics */,
 				B898E4E92A0851A9002E978B /* Container.swift */,
 			);
@@ -713,6 +753,7 @@
 				B88D3FB02A0ADF8B0061C6C4 /* NewsCoordinator.swift in Sources */,
 				B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */,
 				B88D3FB42A0AE0D50061C6C4 /* ForumCoordinator.swift in Sources */,
+				B8001CBB2A19529F00E7A8A8 /* AppTheme.swift in Sources */,
 				B88D3F542A0900900061C6C4 /* MenuSettingsCell.swift in Sources */,
 				B83E8ACB294A862A000D59E7 /* UIView+Ext.swift in Sources */,
 				B88D3FB22A0AE0CD0061C6C4 /* SearchCoordinator.swift in Sources */,
@@ -725,6 +766,8 @@
 				B88D3F522A0900630061C6C4 /* MenuAuthCell.swift in Sources */,
 				B8C7ABBA293D20E400FB2F67 /* PDAViewController.swift in Sources */,
 				B874B43A2A103EBA00A004FC /* ForumView.swift in Sources */,
+				B8001CB22A19434600E7A8A8 /* SettingsView.swift in Sources */,
+				B8001CB72A19511E00E7A8A8 /* SettingsService.swift in Sources */,
 				B87EB9D4293D50DB0025C2A0 /* PDAResizingImageView.swift in Sources */,
 				B8E4463F2A004CD600CE8745 /* URL+Ext.swift in Sources */,
 				B88D3FBE2A0AFDB00061C6C4 /* LoginFactory.swift in Sources */,
@@ -735,23 +778,27 @@
 				B898E4F92A0878E6002E978B /* SwiftMessages+Ext.swift in Sources */,
 				B8AC57722947FC9600435CF3 /* ProfileVC.swift in Sources */,
 				B8FD82182A11690F00EB7035 /* URLRequest.swift in Sources */,
+				B8001CAC2A19432C00E7A8A8 /* SettingsFactory.swift in Sources */,
 				B874B44C2A10706B00A004FC /* Links.swift in Sources */,
 				B874B4252A103C9100A004FC /* SearchVC.swift in Sources */,
 				B874B43B2A103EBA00A004FC /* ForumVC.swift in Sources */,
 				B8B86DB8295773950098D5E5 /* NewsVM.swift in Sources */,
 				B874B4382A103EBA00A004FC /* ForumVM.swift in Sources */,
+				B8001CB02A19433D00E7A8A8 /* SettingsVM.swift in Sources */,
 				B8BD2D89293E26A900E12E29 /* ArticleCommentCell.swift in Sources */,
 				B89301262947E2BD00D14141 /* LoginView.swift in Sources */,
 				B8DDFA20294A56E4008B0156 /* ParsingService.swift in Sources */,
 				B87EB9D0293D2DA30025C2A0 /* ArticleVC.swift in Sources */,
 				B87EB9CD293D21FB0025C2A0 /* NewsView.swift in Sources */,
 				B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */,
+				B8001CAE2A19433600E7A8A8 /* SettingsVC.swift in Sources */,
 				B88D3FB82A0AE1BB0061C6C4 /* ArticleFactory.swift in Sources */,
 				B8BD2D94293E2AF000E12E29 /* CommentsViewController.swift in Sources */,
 				B88D3FC12A0AFDD70061C6C4 /* LoginVM.swift in Sources */,
 				B893011C2947E18300D14141 /* MenuVC.swift in Sources */,
 				B8DDFA1E294A5611008B0156 /* ArticleVM.swift in Sources */,
 				B8C7ABAF293D0A0D00FB2F67 /* Article.swift in Sources */,
+				B8001CC02A196E1000E7A8A8 /* CaseIterable+Ext.swift in Sources */,
 				B8BD2D93293E2AF000E12E29 /* CommentCell.swift in Sources */,
 				B8AC57742947FCA500435CF3 /* ProfileView.swift in Sources */,
 				B88D3FAE2A0ADC780061C6C4 /* HomeCoordinator.swift in Sources */,
@@ -766,6 +813,7 @@
 				B8D351F9293CABB6008A84EA /* AppDelegate.swift in Sources */,
 				B8C7ABB1293D12CB00FB2F67 /* ArticleCell.swift in Sources */,
 				B874B4222A103C8C00A004FC /* SearchFactory.swift in Sources */,
+				B8001CB92A19529B00E7A8A8 /* AppLanguage.swift in Sources */,
 				B8FD82142A1168E500EB7035 /* HTTPMethod.swift in Sources */,
 				B8FD82262A1174EA00EB7035 /* UIAction+Ext.swift in Sources */,
 				B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */,
