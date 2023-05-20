@@ -1,7 +1,7 @@
 git=`sh /etc/profile; which git`
 branchName=`"$git" rev-parse --abbrev-ref HEAD`
 buildNumber=$(expr $(git rev-list $branchName --count) - $(git rev-list HEAD..$branchName --count))
-if [ $CONFIGURATION = "Debug" ] || [ $branchName != "main" ] || [ $branchName != "develop" ];then
+if [ $CONFIGURATION = "Debug" ] || [ $branchName != "main" ] && [ $branchName != "develop" ];then
 build=$buildNumber-$branchName
 else
 build=$buildNumber

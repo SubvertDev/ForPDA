@@ -10,7 +10,7 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "cd $SOURCE_ROOT&#10;${SOURCE_ROOT}/swiftlint_helper.sh&#10;">
+               scriptText = "cd $SOURCE_ROOT&#10;${SOURCE_ROOT}/Scripts/swiftlint_helper.sh&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
                      BuildableIdentifier = "primary"
