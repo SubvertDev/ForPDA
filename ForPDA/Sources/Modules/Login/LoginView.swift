@@ -9,41 +9,78 @@ import UIKit
 
 protocol LoginViewDelegate: AnyObject {
     func loginTapped()
+    func captchaImageTapped()
 }
 
 final class LoginView: UIView {
     
-    let loginTextField: UITextField = {
+    // MARK: - Enums
+    
+    enum LoginTextFields {
+        case login
+        case password
+        case captcha
+    }
+    
+    // MARK: - UI
+    
+    private(set) var loginTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "login"
+        textField.placeholder = R.string.localizable.loginTextFieldPlaceholder()
+        textField.textContentType = .username
+        textField.tag = 0
         return textField
     }()
     
-    let passwordTextField: UITextField = {
+    private(set) var passwordTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "password"
+        textField.placeholder = R.string.localizable.passwordTextFieldPlaceholder()
+        textField.textContentType = .password
+        textField.isSecureTextEntry = true
+        textField.tag = 1
         return textField
     }()
     
-    let captchaImageView: UIImageView = {
+    private(set) var captchaImageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
     
-    let captchaTextField: UITextField = {
+    private(set) var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.style = .large
+        indicator.hidesWhenStopped = true
+        indicator.startAnimating()
+        return indicator
+    }()
+    
+    private(set) var captchaTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "captcha"
+        textField.placeholder = R.string.localizable.captchaTextFieldPlaceholder()
+        textField.keyboardType = .numberPad
+        textField.tag = 2
         return textField
     }()
     
-    lazy var loginButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Авторизироваться", for: .normal)
+    private(set) var errorMessageLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .systemRed
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    private(set) lazy var loginButton: LoadingButton = {
+        let button = LoadingButton(type: .system)
+        button.setTitle(R.string.localizable.login(), for: .normal)
         button.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
         return button
     }()
     
-    var delegate: LoginViewDelegate?
+    // MARK: - Properties
+    
+    weak var delegate: LoginViewDelegate?
+    
+    // MARK: - Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -51,22 +88,37 @@ final class LoginView: UIView {
         
         addSubviews()
         makeConstraints()
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(captchaImageTapped))
+        captchaImageView.addGestureRecognizer(tap)
+        captchaImageView.isUserInteractionEnabled = true
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func loginTapped() {
+    // MARK: - Actions
+    
+    @objc private func loginTapped() {
         delegate?.loginTapped()
     }
     
+    @objc private func captchaImageTapped() {
+        delegate?.captchaImageTapped()
+    }
+    
+    // MARK: - Layout
+    
     private func addSubviews() {
-        addSubview(loginTextField)
-        addSubview(passwordTextField)
-        addSubview(captchaImageView)
-        addSubview(captchaTextField)
-        addSubview(loginButton)
+        [loginTextField,
+         passwordTextField,
+         activityIndicator,
+         captchaImageView,
+         captchaTextField,
+         errorMessageLabel,
+         loginButton
+        ].forEach { view.addSubview($0) }
     }
     
     private func makeConstraints() {
@@ -86,15 +138,60 @@ final class LoginView: UIView {
             make.height.equalTo(100)
         }
         
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalTo(captchaImageView)
+        }
+        
         captchaTextField.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16)
             make.top.equalTo(captchaImageView.snp.bottom).offset(8)
         }
         
+        errorMessageLabel.snp.makeConstraints { make in
+            make.top.equalTo(captchaTextField.snp.bottom).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
         loginButton.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(captchaTextField.snp.bottom).offset(8)
+            make.top.equalTo(errorMessageLabel.snp.bottom).offset(16)
+            make.horizontalEdges.equalToSuperview().inset(16)
             make.height.equalTo(100)
+        }
+    }
+}
+
+final class LoadingButton: UIButton {
+    
+    private var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.style = .large
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
+    private var originalButtonText: String?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func showLoading(_ state: Bool) {
+        if state {
+            setTitle("", for: .normal)
+            activityIndicator.startAnimating()
+            originalButtonText = titleLabel?.text
+        } else {
+            setTitle(originalButtonText, for: .normal)
+            activityIndicator.stopAnimating()
         }
     }
 }

@@ -4,150 +4,142 @@
 //
 //  Created by Subvert on 13.12.2022.
 //
-//  swiftlint:disable all
-//  todo disable disables
 
 import UIKit
 import Factory
-import SwiftSoup
-import Nuke
 import NukeExtensions
 
-struct LoginData {
-    let login: String
-    let password: String
-    let rememberer: Int
-    let captchaTime: String
-    let captchaSig: String
-    let captcha: String
+protocol LoginVCProtocol: AnyObject {
+    func updateCaptcha(fromURL url: URL)
+    func clearCaptcha()
+    func showError(message: String)
+    func showLoading(_ state: Bool)
+    func dismissLogin()
 }
 
 final class LoginVC: PDAViewController<LoginView> {
     
-    @Injected(\.networkService) var networkService
-    @Injected(\.parsingService) var parsingService
+    // MARK: - Properties
     
-    var loginData: LoginData!
+    private let viewModel: LoginVMProtocol
+    
+    // MARK: - Lifecycle
+    
+    init(viewModel: LoginVMProtocol) {
+        self.viewModel = viewModel
+        super.init()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        myView.delegate = self
-        getCaptcha()
+        
+        configureDelegates()
+        configureActions()
+        configureNavBar()
+        
+        viewModel.getCaptcha()
     }
     
-    private func getCaptcha() {
-        networkService.getCaptcha { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                guard let captchaResponse = parsingService.parseCaptcha(from: response) else {
-                    fatalError("what")
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        invertImage()
+    }
+    
+    // MARK: - Configure
+    
+    private func configureDelegates() {
+        myView.delegate = self
+    }
+    
+    private func configureActions() {
+        myView.loginTextField.addTarget(self, action: #selector(textFieldEditingChanged(_:)), for: .editingChanged)
+        myView.passwordTextField.addTarget(self, action: #selector(textFieldEditingChanged(_:)), for: .editingChanged)
+        myView.captchaTextField.addTarget(self, action: #selector(textFieldEditingChanged(_:)), for: .editingChanged)
+    }
+    
+    private func configureNavBar() {
+        title = R.string.localizable.authorization()
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    private func invertImage() {
+        guard let originalImage = myView.captchaImageView.image else { return }
+        guard let currentFilter = CIFilter(name: "CIColorInvert") else { return }
+        currentFilter.setValue(CIImage(image: originalImage), forKey: kCIInputImageKey)
+        guard let output = currentFilter.outputImage else { return }
+        guard let cgImage = CIContext(options: nil).createCGImage(output, from: output.extent) else { return }
+        let (scale, imageOrientation) = (originalImage.scale, originalImage.imageOrientation)
+        myView.captchaImageView.image = UIImage(cgImage: cgImage, scale: scale, orientation: imageOrientation)
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func textFieldEditingChanged(_ textField: UITextField) {
+        switch textField.tag {
+        case 0: viewModel.textChanged(to: textField.text ?? "", in: .login)
+        case 1: viewModel.textChanged(to: textField.text ?? "", in: .password)
+        case 2: viewModel.textChanged(to: textField.text ?? "", in: .captcha)
+        default: break
+        }
+    }
+}
+
+// MARK: - LoginVCProtocol
+
+extension LoginVC: LoginVCProtocol {
+    
+    func updateCaptcha(fromURL url: URL) {
+        DispatchQueue.main.async {
+            NukeExtensions.loadImage(with: url, into: self.myView.captchaImageView) { [weak self] _ in
+                guard let self else { return }
+                if UIScreen.main.traitCollection.userInterfaceStyle.rawValue == 2 {
+                    invertImage()
                 }
-                
-                loginData = LoginData(login: "",
-                                      password: "",
-                                      rememberer: 1,
-                                      captchaTime: captchaResponse.time,
-                                      captchaSig: captchaResponse.sig,
-                                      captcha: "")
-                
-                DispatchQueue.main.async {
-                    NukeExtensions.loadImage(with: URL(string: captchaResponse.url), into: self.myView.captchaImageView)
-                }
-                
-            case .failure(let failure):
-                fatalError(failure.localizedDescription)
             }
         }
-//        AF.request(URL(string: "https://4pda.to/forum/index.php?act=auth")!).response { response in
-//            switch response.result {
-//            case .success(let data):
-//                let htmlString = String(data: data!, encoding: .windowsCP1252)!
-//                let parsed = try! SwiftSoup.parse(htmlString)
-//                print(parsed)
-//                
-//                if htmlString.contains("action=logout&k=") { return }
-//                
-//                let captchaTime = try! parsed.select("[name=captcha-time]").get(0).attr("value")
-//                let captchaSig = try! parsed.select("[name=captcha-sig]").get(0).attr("value")
-//                print(captchaSig, captchaTime)
-//                
-//                var linkElement = try! parsed.select("img[src]").get(0).attr("src")
-//                linkElement = "https:" + linkElement
-//                print(linkElement)
-//                
-//                DispatchQueue.main.async {
-//                    NukeExtensions.loadImage(with: URL(string: linkElement)!, into: self.myView.captchaImageView)
-//                }
-//                
-//                let data = LoginData(login: "",
-//                                     password: "",
-//                                     rememberer: 1,
-//                                     captchaTime: captchaTime,
-//                                     captchaSig: captchaSig,
-//                                     captcha: "")
-//                self.loginData = data
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
     }
     
-    private func login() {
-//        let parameters = [
-//            "login": loginData.login,
-//            "password": loginData.password,
-//            "remember": "1",
-//            "captcha-time": loginData.captchaTime,
-//            "captcha-sig": loginData.captchaSig,
-//            "captcha": myView.captchaTextField.text!
-//        ] as [String : String]
-//        print(myView.captchaTextField.text!)
-//        AF.upload(multipartFormData: { multipartFormData in
-//            for (key, value) in parameters {
-//                multipartFormData.append(value.data(using: .utf8)!, withName: key)
-//            }
-//            //let string = String(describing: self.myView.captchaTextField.text!)
-//            //multipartFormData.append(string.data(using: .utf8)!, withName: "captcha")
-//        }, to: URL(string: "https://4pda.to/forum/index.php?act=auth")!, method: .post)
-//        .response { result in
-//            switch result.result {
-//            case .success(let success):
-//                let htmlString = String(data: success!, encoding: .windowsCP1252)!
-//                let parsed = try! SwiftSoup.parse(htmlString)
-//                print(parsed)
-//                let errors = try! parsed.select("[class=errors-list")
-//                if !errors.isEmpty() {
-//                    let error = try! errors.select("li").get(0).text()
-//                    print(error)
-//                } else {
-//                    print("login success")
-//                    self.saveCookies(response: result)
-//                    self.navigationController?.popViewController(animated: true)
-//                }
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
+    func clearCaptcha() {
+        DispatchQueue.main.async {
+            self.myView.captchaTextField.text = nil
+        }
     }
     
-//    func saveCookies(response: AFDataResponse<Data?>) {
-//        let headerFields = response.response?.allHeaderFields as! [String: String]
-//        let url = response.response?.url
-//        let cookies = HTTPCookie.cookies(withResponseHeaderFields: headerFields, for: url!)
-//        var cookieArray = [[HTTPCookiePropertyKey: Any]]()
-//        for cookie in cookies {
-//            cookieArray.append(cookie.properties!)
-//        }
-//        UserDefaults.standard.set(cookieArray, forKey: "savedCookies")
-//        UserDefaults.standard.synchronize()
-//    }
+    func showError(message: String) {
+        DispatchQueue.main.async {
+            self.myView.errorMessageLabel.text = message
+            self.showLoading(false)
+        }
+    }
+    
+    func showLoading(_ state: Bool) {
+        DispatchQueue.main.async {
+            self.navigationController?.navigationBar.isUserInteractionEnabled = !state
+            self.navigationController?.navigationBar.tintColor = state ? .gray : .systemBlue
+            self.myView.loginButton.showLoading(state)
+        }
+    }
+    
+    func dismissLogin() {
+        DispatchQueue.main.async {
+            self.navigationController?.popViewController(animated: true)
+        }
+    }
 }
+
+// MARK: - LoginViewDelegate
 
 extension LoginVC: LoginViewDelegate {
     func loginTapped() {
-        login()
+        viewModel.login()
+    }
+    
+    func captchaImageTapped() {
+        viewModel.getCaptcha()
     }
 }
-
-// "https://4pda.to/forum/index.php?act=qms&code=no"

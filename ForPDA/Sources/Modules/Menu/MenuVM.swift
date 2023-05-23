@@ -6,27 +6,28 @@
 //
 
 import UIKit
+import Factory
 import SFSafeSymbols
 import XCoordinator
 
 protocol MenuVMProtocol {
     var sections: [MenuSection] { get }
-    
-    func showLoginScreen()
+    var user: User? { get }
 }
 
 final class MenuVM: MenuVMProtocol {
     
-    private let router: UnownedRouter<MenuRoute>
-    weak var view: MenuVCProtocol?
+    // MARK: - Properties
     
-    init(router: UnownedRouter<MenuRoute>) {
-        self.router = router
-    }
+    @LazyInjected(\.settingsService) private var settingsService
+    
+    private let router: UnownedRouter<MenuRoute>
+    
+    weak var view: MenuVCProtocol?
     
     lazy var sections: [MenuSection] = [
         MenuSection(options: [
-            .authCell(model: MenuOption(title: R.string.localizable.guest(), handler: showDefaultError))
+            .authCell(model: MenuOption(title: R.string.localizable.guest(), handler: showLoginOrProfileScreen))
         ]),
         
         MenuSection(options: [
@@ -72,6 +73,33 @@ final class MenuVM: MenuVMProtocol {
         ])
     ]
     
+    var user: User?
+    
+    // MARK: - Lifecycle
+    
+    init(router: UnownedRouter<MenuRoute>) {
+        self.router = router
+        
+        if let userData = settingsService.getUser() {
+            user = try? JSONDecoder().decode(User.self, from: userData)
+        }
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(userDidChange), name: .userDidChange, object: nil)
+    }
+    
+    // MARK: - Notifications
+    
+    @objc private func userDidChange() {
+        if let userData = settingsService.getUser() {
+            user = try? JSONDecoder().decode(User.self, from: userData)
+        } else {
+            user = nil
+        }
+        DispatchQueue.main.async {
+            self.view?.reloadData()
+        }
+    }
+    
     // MARK: - Actions
     
     private func showAuthor() {
@@ -98,9 +126,12 @@ final class MenuVM: MenuVMProtocol {
     
     // MARK: - Navigation
     
-    func showLoginScreen() {
-        view?.showDefaultError()
-//        router.trigger(.login)
+    func showLoginOrProfileScreen() {
+        if user != nil {
+            router.trigger(.profile)
+        } else {
+            router.trigger(.login)
+        }
     }
     
     private func showNewsScreen() {

@@ -11,6 +11,8 @@ import Foundation
 
 extension URLRequest {
     
+    // MARK: - News & Article
+    
     static func news(page: Int) -> Self {
         Self(components: .news(page: page))
             .add(httpMethod: .get)
@@ -21,8 +23,31 @@ extension URLRequest {
             .add(httpMethod: .get)
     }
     
+    // MARK: - Login
+    
     static var captcha: Self {
         Self(components: .captcha)
+            .add(httpMethod: .get)
+    }
+    
+    static func login(multipart: [String: String]) -> Self {
+        let components = Self(components: .login)
+        let multipartRequest = MultipartFormDataRequest(url: components.url!)
+        for (key, value) in multipart {
+            multipartRequest.addTextField(named: key, value: value)
+        }
+        return multipartRequest.asURLRequest()
+    }
+    
+    static func logout(key: String) -> Self {
+        Self(components: .logout(key: key))
+            .add(httpMethod: .post)
+    }
+    
+    // MARK: - User
+    
+    static func user(id: String) -> Self {
+        Self(components: .user(id: id))
             .add(httpMethod: .get)
     }
 }
@@ -30,6 +55,7 @@ extension URLRequest {
 // MARK: - Init
 
 extension URLRequest {
+    
     init(components: URLComponents) {
         guard let url = components.url else {
             preconditionFailure("Unable to get URL from URLComponents: \(components)")

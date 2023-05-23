@@ -20,30 +20,50 @@ enum NetworkError: Error {
 
 final class NetworkService {
     
+    // MARK: - Properties
+        
+    var baseURL = URL(string: "https://4pda.to/")!
+    var baseURLString = "https://4pda.to/"
+}
+
+// MARK: - Requests
+
+extension NetworkService {
+    
     // MARK: - News
     
     func getNews(page: Int = 1, completion: @escaping (Result<String, NetworkError>) -> Void) {
         makeRequest(request: .news(page: page), completion: completion)
     }
     
-    func getArticlePage(url: URL) async throws -> Document {
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let htmlString = try convertDataToCyrillicString(data)
-        let parsed = try SwiftSoup.parse(htmlString)
-        return parsed
-    }
-    
     func getArticle(path: [String], completion: @escaping (Result<String, NetworkError>) -> Void) {
         makeRequest(request: .article(path: path), completion: completion)
     }
     
-    // MARK: - Login
+    // MARK: - Auth
     
     func getCaptcha(completion: @escaping (Result<String, NetworkError>) -> Void) {
         makeRequest(request: .captcha, completion: completion)
     }
     
-    // MARK: - Generic
+    func login(with multipart: [String: String], completion: @escaping (Result<String, NetworkError>) -> Void) {
+        makeRequest(request: .login(multipart: multipart), completion: completion)
+    }
+    
+    func logout(key: String, completion: @escaping (Result<String, NetworkError>) -> Void) {
+        makeRequest(request: .logout(key: key), completion: completion)
+    }
+    
+    // MARK: - User
+    
+    func getUser(id: String, completion: @escaping (Result<String, NetworkError>) -> Void) {
+        makeRequest(request: .user(id: id), completion: completion)
+    }
+}
+
+// MARK: - Generic
+
+extension NetworkService {
     
     func makeRequest(request: URLRequest, completion: @escaping (Result<String, NetworkError>) -> Void) {
         URLSession.shared.dataTask(with: request) { data, response, error in
@@ -75,10 +95,13 @@ final class NetworkService {
             }
         }.resume()
     }
+}
+
+// MARK: - Helpers
+
+extension NetworkService {
     
-    // MARK: - Helpers
-    
-    private func convertDataToCyrillicString(_ data: Data) throws -> String {
+    func convertDataToCyrillicString(_ data: Data) throws -> String {
         guard let string = String(data: data, encoding: .isoLatin1) else { throw NetworkError.invalidDecoding }
         
         let string2 = string.replacingOccurrences(of: "\u{98}", with: "")

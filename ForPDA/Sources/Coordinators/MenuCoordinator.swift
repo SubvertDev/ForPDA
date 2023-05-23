@@ -11,7 +11,8 @@ import XCoordinator
 enum MenuRoute: Route {
     case menu
     
-    // case login
+    case login
+    case profile
     
     case news
     case search
@@ -34,9 +35,13 @@ final class MenuCoordinator: NavigationCoordinator<MenuRoute> {
             let viewController = MenuFactory.create(with: unownedRouter)
             return .push(viewController)
             
-//        case .login:
-//            let viewController = LoginFactory.create()
-//            return .push(viewController)
+        case .login:
+            let viewController = LoginFactory.create()
+            return .push(viewController)
+            
+        case .profile:
+            let viewController = ProfileFactory.create()
+            return .push(viewController)
             
         case .news:
             guard let tabBarRouter else { return .none() }

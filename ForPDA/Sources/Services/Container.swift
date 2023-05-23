@@ -17,7 +17,6 @@ extension Container {
     
     var parsingService: Factory<ParsingService> {
         Factory(self) { ParsingService() }
-            .singleton
     }
     
     var analyticsService: Factory<AnalyticsService> {
@@ -28,6 +27,9 @@ extension Container {
     
     var settingsService: Factory<SettingsService> {
         Factory(self) { SettingsService() }
-            .singleton
+    }
+    
+    var cookiesService: Factory<CookiesService> {
+        Factory(self) { CookiesService() }
     }
 }

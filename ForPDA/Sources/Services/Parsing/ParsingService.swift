@@ -4,8 +4,7 @@
 //
 //  Created by Subvert on 14.12.2022.
 //
-//  swiftlint:disable force_try cyclomatic_complexity function_body_length
-//  todo disable disables?
+//  swiftlint:disable force_try cyclomatic_complexity function_body_length type_body_length file_length
 
 import Foundation
 import SwiftSoup
@@ -327,19 +326,107 @@ final class ParsingService {
     
     // MARK: - Captcha
     
+    struct CaptchaResponse {
+        let url: String
+        let time: String
+        let sig: String
+    }
+    
     func parseCaptcha(from htmlString: String) -> CaptchaResponse? {
         let document = try! SwiftSoup.parse(htmlString)
         
-        if htmlString.contains("action=logout&k=") { return nil } // ?
+        if htmlString.contains("action=logout&k=") { return nil } // logged in
         
         let captchaTime = try! document.select("[name=captcha-time]").get(0).attr("value")
         let captchaSig = try! document.select("[name=captcha-sig]").get(0).attr("value")
-        print(captchaSig, captchaTime)
         
         var linkElement = try! document.select("img[src]").get(0).attr("src")
         if !linkElement.contains("https:") { linkElement = "https:" + linkElement }
         
         return CaptchaResponse(url: linkElement, time: captchaTime, sig: captchaSig)
+    }
+    
+    // MARK: - Login
+    
+    func parseLogin(from htmlString: String) -> (loggedIn: Bool, errorMessage: String?) {
+        let document = try! SwiftSoup.parse(htmlString)
+        
+        let errors = try! document.select("[class=errors-list")
+        let hasLogout = htmlString.contains("action=logout&k=")
+        
+        if !errors.isEmpty() {
+            let error = try! errors.select("li").get(0).text()
+            return (false, error)
+        } else {
+            if hasLogout {
+                return (true, nil)
+            } else {
+                return (false, nil)
+            }
+        }
+    }
+    
+    // MARK: - Is Logged In
+    
+    func parseIsLoggedIn(from htmlString: String) -> Bool {
+        return htmlString.contains("action=logout&k=")
+    }
+    
+    // MARK: - Auth Key
+    
+    func parseAuthKey(from htmlString: String) -> String? {
+        let document = try! SwiftSoup.parse(htmlString)
+                
+        let authLink = try! document.select("a").select("[title=Выход]").attr("href")
+        
+        if let range = authLink.range(of: "k=([^&]+)", options: .regularExpression) {
+            let authKey = String(authLink[range])
+                .replacingOccurrences(of: "k=", with: "")
+                .removingPercentEncoding
+            return authKey
+        } else {
+            return nil
+        }
+    }
+    
+    // MARK: - User Id
+    
+    func parseUserId(from htmlString: String) -> String {
+        let document = try! SwiftSoup.parse(htmlString)
+        
+        let showuserLink = try! document.select("a").select("[href*=showuser]").attr("href")
+        let id = showuserLink.split(separator: "=").last!
+        
+        return String(id)
+    }
+    
+    // MARK: - User
+    
+    func parseUser(from htmlString: String) -> User {
+        let document = try! SwiftSoup.parse(htmlString)
+        
+        let userIdElement = try! document.select("a").select("[href*=showuser]").attr("href")
+        let userId = String(userIdElement.removingPercentEncoding?.split(separator: "=").last ?? "2")
+        let avatarUrl = try! document.select("img").select("[alt=Аватар]").attr("src")
+        let nickname = try! document.select("h1").last()?.text() ?? "Ошибка"
+        let title = try! document.select("span").select("[class=title]").get(0).text()
+        let role = try! document.select("span").select("[style*=color]").text() // добавить цвет
+        let registrationDate = try! document.select("div").select("[class=area]").get(0).text() // какой?
+        let warningsAmount = try! document.select("div").select("[class=area]").get(1).text() //
+        let lastVisitDate = try! document.select("div").select("[class=area]").get(2).text() // какой?
+        let signature = try! document.select("div").select("[class=u-note]").text()
+        
+        return User(
+            id: userId,
+            avatarUrl: avatarUrl,
+            nickname: nickname,
+            title: title,
+            role: role,
+            registrationDate: registrationDate,
+            warningsAmount: warningsAmount,
+            lastVisitDate: lastVisitDate,
+            signature: signature
+        )
     }
     
     // MARK: - Helper Methods
@@ -351,10 +438,4 @@ final class ParsingService {
         let brRegex = /\s*<br>\s*/
         return strippedHTMLExceptBr.replacing(brRegex, with: "\n")
     }
-}
-
-struct CaptchaResponse {
-    let url: String
-    let time: String
-    let sig: String
 }

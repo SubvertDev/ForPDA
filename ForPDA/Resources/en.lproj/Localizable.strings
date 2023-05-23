@@ -34,6 +34,7 @@
 // Menu
 "guest" = "Guest";
 "authorize" = "Authorize";
+"go.to.profile" = "Go to profile";
 "history" = "History";
 "bookmarks" = "Bookmarks";
 "forum.rules" = "Forum Rules";
@@ -70,3 +71,15 @@
 "sign.out" = "Sign Out";
 "about.app" = "About App";
 "version" = "Version";
+
+// Login
+"authorization" = "Authorization";
+"login.text.field.placeholder" = "Enter your username";
+"password.text.field.placeholder" = "Enter your password";
+"captcha.text.field.placeholder" = "Enter captcha here";
+"remember" = "Remember";
+"hidden.login" = "Hidden login";
+"already.logged.in" = "You're already logged in!";
+"captcha.uploading.failed" = "Captcha uploading failed";
+"login.failed.unknown.reasons" = "Something went wrong, try again later";
+"login" = "Log In";

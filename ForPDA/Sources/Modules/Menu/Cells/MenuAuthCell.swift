@@ -9,26 +9,31 @@ import UIKit
 
 final class MenuAuthCell: UITableViewCell {
     
-    private let iconImageView: UIImageView = {
+    // MARK: - Views
+    
+    private(set) var iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = R.image.avatarPlaceholder()
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 22
+        // imageView.clipsToBounds = true
+        // imageView.layer.cornerRadius = 22
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
-    private let titleLabel: UILabel = {
+    private(set) var titleLabel: UILabel = {
         let label = UILabel()
         label.text = R.string.localizable.guest()
         return label
     }()
     
-    private let subtitleLabel: UILabel = {
+    private(set) var subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = R.string.localizable.authorize()
         label.font = .systemFont(ofSize: UIFont.labelFontSize - 3, weight: .light)
         return label
     }()
+    
+    // MARK: - Lifecycle
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -40,6 +45,15 @@ final class MenuAuthCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        iconImageView.image = R.image.avatarPlaceholder()
+        titleLabel.text = R.string.localizable.guest()
+        subtitleLabel.text = R.string.localizable.authorize()
+    }
+    
+    // MARK: - Layout
     
     private func addSubviews() {
         contentView.addSubview(iconImageView)
@@ -65,5 +79,4 @@ final class MenuAuthCell: UITableViewCell {
             make.leading.equalTo(iconImageView.snp.trailing).offset(16)
         }
     }
-    
 }

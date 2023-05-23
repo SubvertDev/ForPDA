@@ -7,11 +7,10 @@
 
 struct LoginFactory {
     static func create() -> LoginVC {
-        let viewModel = LoginVM() //(coordinator: coordinator)
-        let viewController = LoginVC()
+        let viewModel = LoginVM()
+        let viewController = LoginVC(viewModel: viewModel)
         
-        print(viewModel)
-        // viewModel.view = viewController
+        viewModel.view = viewController
         
         return viewController
     }

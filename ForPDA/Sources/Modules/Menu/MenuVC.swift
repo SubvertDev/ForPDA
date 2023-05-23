@@ -7,21 +7,18 @@
 //
 
 import UIKit
-import SwiftSoup
-
-enum Account {
-    case unauthorized
-    case logged
-}
+import NukeExtensions
 
 protocol MenuVCProtocol: AnyObject {
     func showDefaultError()
+    func reloadData()
 }
 
 final class MenuVC: PDAViewController<MenuView> {
     
+    // MARK: - Properties
+    
     private let viewModel: MenuVMProtocol
-    private var state = Account.unauthorized
     
     // MARK: - Lifecycle
     
@@ -33,62 +30,24 @@ final class MenuVC: PDAViewController<MenuView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setDelegates()
+        configureNavBar()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    // MARK: - Configure
+    
+    private func setDelegates() {
         myView.tableView.dataSource = self
         myView.tableView.delegate = self
-        
+    }
+    
+    private func configureNavBar() {
         navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-//        checkAuth()
-    }
-    
-    // MARK: - Private Functions
-    
-    private func checkAuth() {
-//        loadCookies()
-        
-//        AF.request(URL(string: "https://4pda.to/forum/index.php?showuser=3640948")!).response { response in
-//            switch response.result {
-//            case .success(let data):
-//                let htmlString = String(data: data!, encoding: .windowsCP1252)!
-//                let parsed = try! SwiftSoup.parse(htmlString)
-//                print(parsed)
-//                let log = try! parsed.select("[id=moderator-log]")
-//                if !log.isEmpty() {
-//                    print("already logged")
-//
-//                    let id = try! parsed.select("[data-toggle=dropdown]").get(0).attr("href").components(separatedBy: "=").last!
-//                    print("saving id \(id)")
-//                    UserDefaults.standard.set(id, forKey: "userId")
-//                    self.state = .logged
-//                    self.myView.loginButton.setTitle("Зайти в профиль", for: .normal)
-//                    self.myView.logoutButton.isHidden = false
-//                } else {
-//                    print("not logged yet")
-//                    self.state = .unauthorized
-//                    self.myView.loginButton.setTitle("Авторизироваться", for: .normal)
-//                }
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-    }
-    
-    func loadCookies() {
-        guard let cookieArray = UserDefaults.standard.array(forKey: "savedCookies") as? [[HTTPCookiePropertyKey: Any]] else { return }
-        for cookieProperties in cookieArray {
-            if let cookie = HTTPCookie(properties: cookieProperties) {
-                HTTPCookieStorage.shared.setCookie(cookie)
-            }
-        }
-        
-        for cookie in HTTPCookieStorage.shared.cookies! where cookie.value.count > 8 {
-            print("authkey \(cookie.value)")
-            UserDefaults.standard.set(cookie.value, forKey: "authKey")
-        }
     }
 }
 
@@ -114,6 +73,15 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
         switch model.self {
         case .authCell:
             let cell = tableView.dequeueReusableCell(withClass: MenuAuthCell.self)
+            if let user = viewModel.user {
+                let imageOptions = ImageLoadingOptions(placeholder: R.image.avatarPlaceholder(),
+                                                       failureImage: R.image.avatarPlaceholder())
+                NukeExtensions.loadImage(with: URL(string: viewModel.user?.avatarUrl),
+                                         options: imageOptions,
+                                         into: cell.iconImageView) { _ in }
+                cell.titleLabel.text = user.nickname
+                cell.subtitleLabel.text = R.string.localizable.goToProfile()
+            }
             return cell
             
         case .staticCell(model: let model):
@@ -143,35 +111,7 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-//extension MenuVC: MenuViewDelegate {
-//    func loginTapped() {
-//        if state == .unauthorized {
-//            viewModel.showLoginScreen()
-//        } else {
-//            myView.logoutButton.isHidden = false
-////            let profileVC = ProfileVC()
-////            navigationController?.pushViewController(profileVC, animated: true)
-//        }
-//    }
-//
-//    func logoutTapped() {
-////        let authKey = UserDefaults.standard.string(forKey: "authKey")!
-////        AF.request(URL(string: "https://4pda.to/forum/index.php?act=logout&CODE=03&k=\(authKey)")!).response { response in
-////            switch response.result {
-////            case .success(let data):
-////                let htmlString = String(data: data!, encoding: .windowsCP1252)!
-////                let parsed = try! SwiftSoup.parse(htmlString)
-////                print(parsed)
-////
-////                HTTPCookieStorage.shared.cookies!.forEach(HTTPCookieStorage.shared.deleteCookie(_:))
-////                UserDefaults.standard.removeObject(forKey: "savedCookies")
-////
-////            case .failure(let error):
-////                print(error)
-////            }
-////        }
-//    }
-//}
+// MARK: - MenuVCProtocol
 
 extension MenuVC: MenuVCProtocol {
     
@@ -179,8 +119,12 @@ extension MenuVC: MenuVCProtocol {
         let alert = UIAlertController(title: R.string.localizable.whoops(),
                                       message: R.string.localizable.notDoneYet(),
                                       preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default)
+        let action = UIAlertAction(title: R.string.localizable.ok(), style: .default)
         alert.addAction(action)
         present(alert, animated: true)
+    }
+    
+    func reloadData() {
+        myView.tableView.reloadData()
     }
 }

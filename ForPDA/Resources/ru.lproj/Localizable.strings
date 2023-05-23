@@ -34,6 +34,7 @@
 // Меню
 "guest" = "Гость";
 "authorize" = "Авторизоваться";
+"go.to.profile" = "Перейти в профиль";
 "history" = "История";
 "bookmarks" = "Закладки";
 "forum.rules" = "Правила форума";
@@ -70,3 +71,15 @@
 "sign.out" = "Выйти";
 "about.app" = "О приложении";
 "version" = "Версия";
+
+// Авторизация
+"authorization" = "Авторизация";
+"login.text.field.placeholder" = "Введите логин";
+"password.text.field.placeholder" = "Введите пароль";
+"captcha.text.field.placeholder" = "Введите число";
+"remember" = "Запомнить";
+"hidden.login" = "Скрытый вход";
+"already.logged.in" = "Вы уже авторизированы!";
+"captcha.uploading.failed" = "Не получилось отправить капчу";
+"login.failed.unknown.reasons" = "Что-то пошло не так, попробуйте позже";
+"login" = "Войти";
