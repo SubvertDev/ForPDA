@@ -268,7 +268,8 @@ final class ParsingService {
     
     // MARK: - Comments
     
-    func parseComments(from document: Document) -> [Comment] {
+    func parseComments(from document: String) -> [Comment] {
+        let document = try! SwiftSoup.parse(document)
         let commentList = try! document.select("ul[class=comment-list level-0").select("li[data-author-id]")
         return recurseComments(commentList: commentList, level: 0)
     }

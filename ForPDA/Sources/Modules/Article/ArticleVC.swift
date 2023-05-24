@@ -20,6 +20,7 @@ import SFSafeSymbols
 
 protocol ArticleVCProtocol: AnyObject {
     func configureArticle(with elements: [ArticleElement])
+    func configureComments(from page: String)
     func showError()
 }
 
@@ -55,6 +56,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         configureView()
         
         viewModel.loadArticle()
+        
         if viewModel.article.url.contains("to/20") {
 //            viewModel.loadArticle(url: URL(string: viewModel.article.url)!)
         } else {
@@ -166,8 +168,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
         unhide()
     }
     
-    func configureComments(from page: Document) {
-        addComments(from: page)
+    func configureComments(from page: String) {
+        DispatchQueue.main.async {
+            self.addComments(from: page)
+        }
     }
     
     // MARK: - Privates
@@ -181,12 +185,13 @@ final class ArticleVC: PDAViewController<ArticleView> {
         myView.removeComments()
     }
     
-    private func addComments(from page: Document) {
+    private func addComments(from page: String) {
         let commentsVC = CommentsVC()
         commentsVC.article = viewModel.article
         commentsVC.articleDocument = page
         addChild(commentsVC)
         myView.commentsContainer.addSubview(commentsVC.view)
+        myView.commentsContainer.isHidden = true
         commentsVC.view.snp.makeConstraints { make in
             make.top.bottom.leading.trailing.equalToSuperview()
         }
@@ -363,6 +368,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func unhide() {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.myView.stopLoading()
+            self.myView.commentsContainer.isHidden = false
         }
     }
 }

@@ -6,10 +6,10 @@
 //
 
 import UIKit
-import SwiftSoup
-// import WebKit
-import SafariServices
 import Factory
+import SwiftSoup
+//import SafariServices
+// import WebKit
 
 final class CommentsVC: CommentsViewController {
     
@@ -17,7 +17,7 @@ final class CommentsVC: CommentsViewController {
     @Injected(\.parsingService) private var parsingService
     
     private var allComments: [Comment] = []
-    var articleDocument: Document!
+    var articleDocument: String!
     var article: Article!
     
     var contentSizeObserver: NSKeyValueObservation!
@@ -62,7 +62,7 @@ final class CommentsVC: CommentsViewController {
         }
     }
     
-    private func updateComments(with document: Document) {
+    private func updateComments(with document: String) {
         _currentlyDisplayed.removeAll()
         allComments = parsingService.parseComments(from: document)
         currentlyDisplayed = allComments

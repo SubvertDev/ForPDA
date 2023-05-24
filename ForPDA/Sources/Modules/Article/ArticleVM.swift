@@ -46,6 +46,7 @@ final class ArticleVM: ArticleVMProtocol {
             case .success(let response):
                 let elements = parsingService.parseArticle(from: response)
                 view?.configureArticle(with: elements)
+                view?.configureComments(from: response)
                 
             case .failure:
                 view?.showError()
