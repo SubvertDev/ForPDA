@@ -14,9 +14,10 @@ final class MenuAuthCell: UITableViewCell {
     private(set) var iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = R.image.avatarPlaceholder()
-        // imageView.clipsToBounds = true
-        // imageView.layer.cornerRadius = 22
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 22
         imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .black
         return imageView
     }()
     
