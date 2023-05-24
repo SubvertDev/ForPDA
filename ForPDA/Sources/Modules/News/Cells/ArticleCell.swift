@@ -173,12 +173,12 @@ final class ArticleCell: UITableViewCell {
         }
         
         descriptionLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(16)
+            make.top.equalTo(titleLabel.snp.bottom).offset(12)
             make.leading.trailing.equalToSuperview().inset(20)
         }
         
         authorLabel.snp.makeConstraints { make in
-            make.top.equalTo(descriptionLabel.snp.bottom).offset(8)
+            make.top.equalTo(descriptionLabel.snp.bottom).offset(12)
             make.leading.equalToSuperview().inset(20)
             make.bottom.equalToSuperview().inset(12)
         }
