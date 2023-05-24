@@ -135,6 +135,8 @@ final class ArticleCell: UITableViewCell {
                 }
             }
         }
+        
+        commentsStackView.isHidden = article.url.contains("special")
     }
     
     // MARK: - Layout
