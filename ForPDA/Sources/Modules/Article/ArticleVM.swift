@@ -45,8 +45,10 @@ final class ArticleVM: ArticleVMProtocol {
             switch result {
             case .success(let response):
                 let elements = parsingService.parseArticle(from: response)
-                view?.configureArticle(with: elements)
-                view?.configureComments(from: response)
+                DispatchQueue.main.async {
+                    self.view?.configureArticle(with: elements)
+                    self.view?.makeComments(from: response)
+                }
                 
             case .failure:
                 view?.showError()

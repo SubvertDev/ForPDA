@@ -49,11 +49,11 @@ struct ButtonElement: ArticleElement {
     let url: String
 }
 
-struct CharacteristicsElement: ArticleElement {
-    let elements: [Charter]
+struct BulletListParentElement: ArticleElement {
+    let elements: [BulletListElement]
 }
 
-struct Charter {
+struct BulletListElement {
     var title: String
     var description: [String]
 }
@@ -187,7 +187,7 @@ final class ParsingService {
                 articleElements.append(TextElement(text: text, isHeader: true))
             } else if try! element.iS("dl") {
                 let charters = parseCharters(element)
-                articleElements.append(CharacteristicsElement(elements: charters))
+                articleElements.append(BulletListParentElement(elements: charters))
             } else if try! element.iS("ul") {
                 let galCont = try! element.select("a[data-lightbox]")
                 for gal in galCont {
@@ -229,7 +229,7 @@ final class ParsingService {
                 }
             } else if try! element.iS("dl") {
                 let charters = parseCharters(element)
-                articleElements.append(CharacteristicsElement(elements: charters))
+                articleElements.append(BulletListParentElement(elements: charters))
             } else if try! element.iS("a") {
                 let text = try! element.text()
                 let url = try! element.attr("href")
@@ -240,11 +240,11 @@ final class ParsingService {
         return articleElements
     }
     
-    private func parseCharters(_ element: Element) -> [Charter] {
-        var charterElements: [Charter] = []
+    private func parseCharters(_ element: Element) -> [BulletListElement] {
+        var charterElements: [BulletListElement] = []
         let elements = try! element.select("dd, dt")
         
-        var charter = Charter(title: "", description: [])
+        var charter = BulletListElement(title: "", description: [])
         
         for element in elements {
             if try! element.iS("dt") {
@@ -260,7 +260,7 @@ final class ParsingService {
                     charter.description.append(text)
                 }
                 charterElements.append(charter)
-                charter = Charter(title: "", description: [])
+                charter = BulletListElement(title: "", description: [])
             }
         }
         return charterElements
@@ -301,11 +301,14 @@ final class ParsingService {
     
     private func getCommentFromElement(_ element: Element, replies: [AbstractComment] = [], level: Int) -> Comment {
         try! element.select("ul[class*=comment-list]").remove()
+        
         let commentType = try! element.select("div[id]").attr("class")
         guard commentType != "deleted" else {
             return Comment(author: "", text: "(Комментарий удален)", date: "", likes: 0, replies: replies, level: level)
         }
+        
         let author = try! element.select("[class=nickname]").first()?.text() ?? ""
+        
         var text: String
         if #available(iOS 16.0, *) {
             text = try! element.select("[class=content]").first()?.html() ?? ""
@@ -313,6 +316,8 @@ final class ParsingService {
         } else {
             text = try! element.select("[class=content]").first()?.text() ?? ""
         }
+        text = text.replacingOccurrences(of: "&gt;", with: ">")
+        
         let date = try! element.select("[class=date").first()?.text() ?? ""
         
         let likes: Int

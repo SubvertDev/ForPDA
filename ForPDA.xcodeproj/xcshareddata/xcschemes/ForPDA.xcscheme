@@ -90,7 +90,7 @@
          <EnvironmentVariable
             key = "OS_ACTIVITY_MODE"
             value = "${DEBUG_ACTIVITY_MODE}"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>

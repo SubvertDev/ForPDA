@@ -19,7 +19,7 @@
 		B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */; };
 		B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDE2A1B01D000E7A8A8 /* User.swift */; };
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
-		B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340351296789FE00C3CF37 /* PDACharterLabel.swift */; };
+		B8340352296789FE00C3CF37 /* PDABulletLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340351296789FE00C3CF37 /* PDABulletLabel.swift */; };
 		B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */; };
 		B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83403562967AFCA00C3CF37 /* PDATableView.swift */; };
 		B834035B2967B14C00C3CF37 /* PDAResizingImageViewWithText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B834035A2967B14C00C3CF37 /* PDAResizingImageViewWithText.swift */; };
@@ -55,6 +55,7 @@
 		B87EB9D2293D2DB90025C2A0 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9D1293D2DB90025C2A0 /* ArticleView.swift */; };
 		B87EB9D4293D50DB0025C2A0 /* PDAResizingImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */; };
 		B884AFF829FD9D6F00BC1AA1 /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */; };
+		B887245F2A1E9A0900DFB47F /* ArticleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B887245E2A1E9A0900DFB47F /* ArticleBuilder.swift */; };
 		B88D3F4A2A088FEF0061C6C4 /* MenuVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88D3F492A088FEF0061C6C4 /* MenuVM.swift */; };
 		B88D3F4D2A08908D0061C6C4 /* MenuFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88D3F4C2A08908D0061C6C4 /* MenuFactory.swift */; };
 		B88D3F522A0900630061C6C4 /* MenuAuthCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88D3F512A0900620061C6C4 /* MenuAuthCell.swift */; };
@@ -130,7 +131,7 @@
 		B8001CD92A1AA0FE00E7A8A8 /* CookiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiesService.swift; sourceTree = "<group>"; };
 		B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cookie.swift; sourceTree = "<group>"; };
 		B8001CDE2A1B01D000E7A8A8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		B8340351296789FE00C3CF37 /* PDACharterLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDACharterLabel.swift; sourceTree = "<group>"; };
+		B8340351296789FE00C3CF37 /* PDABulletLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDABulletLabel.swift; sourceTree = "<group>"; };
 		B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAPaddingLabel.swift; sourceTree = "<group>"; };
 		B83403562967AFCA00C3CF37 /* PDATableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATableView.swift; sourceTree = "<group>"; };
 		B834035A2967B14C00C3CF37 /* PDAResizingImageViewWithText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAResizingImageViewWithText.swift; sourceTree = "<group>"; };
@@ -160,6 +161,7 @@
 		B87EB9CF293D2DA30025C2A0 /* ArticleVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVC.swift; sourceTree = "<group>"; };
 		B87EB9D1293D2DB90025C2A0 /* ArticleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleView.swift; sourceTree = "<group>"; };
 		B87EB9D3293D50DB0025C2A0 /* PDAResizingImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAResizingImageView.swift; sourceTree = "<group>"; };
+		B887245E2A1E9A0900DFB47F /* ArticleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleBuilder.swift; sourceTree = "<group>"; };
 		B88D3F492A088FEF0061C6C4 /* MenuVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuVM.swift; sourceTree = "<group>"; };
 		B88D3F4C2A08908D0061C6C4 /* MenuFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuFactory.swift; sourceTree = "<group>"; };
 		B88D3F512A0900620061C6C4 /* MenuAuthCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuAuthCell.swift; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 				B87EB9CF293D2DA30025C2A0 /* ArticleVC.swift */,
 				B8DDFA1D294A5611008B0156 /* ArticleVM.swift */,
 				B87EB9D1293D2DB90025C2A0 /* ArticleView.swift */,
+				B887245E2A1E9A0900DFB47F /* ArticleBuilder.swift */,
 			);
 			path = Article;
 			sourceTree = "<group>";
@@ -541,7 +544,7 @@
 			isa = PBXGroup;
 			children = (
 				B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */,
-				B8340351296789FE00C3CF37 /* PDACharterLabel.swift */,
+				B8340351296789FE00C3CF37 /* PDABulletLabel.swift */,
 			);
 			path = Labels;
 			sourceTree = "<group>";
@@ -812,6 +815,7 @@
 				B874B43A2A103EBA00A004FC /* ForumView.swift in Sources */,
 				B8001CB22A19434600E7A8A8 /* SettingsView.swift in Sources */,
 				B8001CB72A19511E00E7A8A8 /* SettingsService.swift in Sources */,
+				B887245F2A1E9A0900DFB47F /* ArticleBuilder.swift in Sources */,
 				B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */,
 				B87EB9D4293D50DB0025C2A0 /* PDAResizingImageView.swift in Sources */,
 				B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */,
@@ -838,7 +842,7 @@
 				B8DDFA20294A56E4008B0156 /* ParsingService.swift in Sources */,
 				B87EB9D0293D2DA30025C2A0 /* ArticleVC.swift in Sources */,
 				B87EB9CD293D21FB0025C2A0 /* NewsView.swift in Sources */,
-				B8340352296789FE00C3CF37 /* PDACharterLabel.swift in Sources */,
+				B8340352296789FE00C3CF37 /* PDABulletLabel.swift in Sources */,
 				B8001CAE2A19433600E7A8A8 /* SettingsVC.swift in Sources */,
 				B88D3FB82A0AE1BB0061C6C4 /* ArticleFactory.swift in Sources */,
 				B8BD2D94293E2AF000E12E29 /* CommentsViewController.swift in Sources */,

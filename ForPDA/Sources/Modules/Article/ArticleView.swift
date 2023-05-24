@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Nuke
 
 final class ArticleView: UIView {
     

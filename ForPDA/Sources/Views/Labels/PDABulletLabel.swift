@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class PDACharterLabel: PDAPaddingLabel {
+final class PDABulletLabel: PDAPaddingLabel {
     
     enum PaddingType {
         case left, right
