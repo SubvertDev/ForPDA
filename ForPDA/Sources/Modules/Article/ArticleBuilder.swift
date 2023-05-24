@@ -162,8 +162,8 @@ final class ArticleBuilder {
     // MARK: - Buttons
     
     /// Returns UIView container with UIButton inside
-    static func addButton(text: String, url: String, completion: @escaping () -> Void) -> UIView {
-        let action = UIAction { _ in completion() }
+    static func addButton(text: String, url: String, completion: @escaping (String) -> Void) -> UIView {
+        let action = UIAction { _ in completion(url) }
         let button = UIButton(type: .system, primaryAction: action)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         button.setTitle(text, for: .normal)

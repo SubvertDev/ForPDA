@@ -24,8 +24,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
     @Injected(\.analyticsService) var analyticsService
     
     private let viewModel: ArticleVMProtocol
-
-    private var externalLinkUrl: String?
     
     // MARK: - Lifecycle
     
@@ -98,10 +96,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
         }
     }
     
-    private func externalLinkButtonTapped() {
-        if let externalLinkUrl, let url = URL(string: externalLinkUrl), UIApplication.shared.canOpenURL(url) {
+    private func externalLinkButtonTapped(_ link: String) {
+        if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
-            analyticsService.clickButtonInArticle(currentUrl: viewModel.article.url, targetUrl: externalLinkUrl)
+            analyticsService.clickButtonInArticle(currentUrl: viewModel.article.url, targetUrl: url.absoluteString)
         }
     }
     
@@ -133,9 +131,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
                 articleElement = ArticleBuilder.addGif(url: item.url)
                 
             case let item as ButtonElement:
-                externalLinkUrl = item.url
-                articleElement = ArticleBuilder.addButton(text: item.text, url: item.url) {
-                    self.externalLinkButtonTapped()
+                articleElement = ArticleBuilder.addButton(text: item.text, url: item.url) { [weak self] link in
+                    self?.externalLinkButtonTapped(link)
                 }
                 
             case let item as BulletListParentElement:

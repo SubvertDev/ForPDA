@@ -186,8 +186,8 @@ final class ParsingService {
                 let text = try! element.text()
                 articleElements.append(TextElement(text: text, isHeader: true))
             } else if try! element.iS("dl") {
-                let charters = parseCharters(element)
-                articleElements.append(BulletListParentElement(elements: charters))
+                let bulletList = parseBulletList(element)
+                articleElements.append(BulletListParentElement(elements: bulletList))
             } else if try! element.iS("ul") {
                 let galCont = try! element.select("a[data-lightbox]")
                 for gal in galCont {
@@ -228,19 +228,18 @@ final class ParsingService {
                     }
                 }
             } else if try! element.iS("dl") {
-                let charters = parseCharters(element)
+                let charters = parseBulletList(element)
                 articleElements.append(BulletListParentElement(elements: charters))
             } else if try! element.iS("a") {
                 let text = try! element.text()
                 let url = try! element.attr("href")
-                print("ADDING BUTTON 2")
                 articleElements.append(ButtonElement(text: text, url: url))
             }
         }
         return articleElements
     }
     
-    private func parseCharters(_ element: Element) -> [BulletListElement] {
+    private func parseBulletList(_ element: Element) -> [BulletListElement] {
         var charterElements: [BulletListElement] = []
         let elements = try! element.select("dd, dt")
         
