@@ -29,7 +29,7 @@ final class PDATabBarController: UITabBarController, UITabBarControllerDelegate 
     // Tap on tabbar to scroll news to the top
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         guard let viewControllers, !viewControllers.isEmpty else { return true }
-        guard viewController == viewControllers[0] else { return true }
+        guard viewController == viewControllers[0] && selectedIndex == 0 else { return true }
         guard let navController = viewController as? UINavigationController else { return true }
         guard let topController = navController.viewControllers.last else { return true }
 
