@@ -13,6 +13,7 @@ protocol SettingsVMProtocol {
     
     func changeLanguage(to language: AppLanguage)
     func changeTheme(to theme: AppTheme)
+    func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor)
 }
 
 final class SettingsVM: SettingsVMProtocol {
@@ -39,6 +40,13 @@ final class SettingsVM: SettingsVMProtocol {
         }
     }
     
+    private var currentAppDarkThemeBackgroundColor: String {
+        switch settingsService.getAppBackgroundColor() {
+        case .dark:  return R.string.localizable.backgroundDark()
+        case .black: return R.string.localizable.backgroundBlack()
+        }
+    }
+    
     private let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
     private let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
     
@@ -52,7 +60,10 @@ final class SettingsVM: SettingsVMProtocol {
         MenuSection(title: R.string.localizable.appearance(), options: [
             .descriptionCell(model: DescriptionOption(title: R.string.localizable.theme(),
                                                       description: currentTheme,
-                                                      handler: changeTheme))
+                                                      handler: changeTheme)),
+            .descriptionCell(model: DescriptionOption(title: R.string.localizable.backgroundNight(),
+                                                      description: currentAppDarkThemeBackgroundColor,
+                                                      handler: changeDarkThemeBackgroundColor))
         ]),
         
         //MenuSection(title: "Просмотр тем", options: []),
@@ -97,6 +108,17 @@ final class SettingsVM: SettingsVMProtocol {
         view?.reloadData()
     }
     
+    func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor) {
+        settingsService.setAppBackgroundColor(to: color)
+        
+        let model = DescriptionOption(title: R.string.localizable.backgroundNight(),
+                                      description: currentAppDarkThemeBackgroundColor,
+                                      handler: changeDarkThemeBackgroundColor)
+        sections[1].options[1] = .descriptionCell(model: model)
+        
+        view?.reloadData()
+    }
+    
     // MARK: - Private Actions
     
     private func changeLanguage() {
@@ -105,6 +127,10 @@ final class SettingsVM: SettingsVMProtocol {
     
     private func changeTheme() {
         view?.showChangeThemeSheet()
+    }
+    
+    private func changeDarkThemeBackgroundColor() {
+        view?.showChangeDarkThemeBackgroundColorSheet()
     }
     
     private func showDefaultError() {

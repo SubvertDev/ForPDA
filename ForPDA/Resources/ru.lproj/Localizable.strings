@@ -67,6 +67,10 @@
 "theme.choose" = "Выберите тему";
 "theme.light" = "Светлая";
 "theme.dark" = "Темная";
+"background.night" = "Цвет ночного режима";
+"background.choose" = "Выберите цвет ночного фона";
+"background.dark" = "Темный";
+"background.black" = "Черный";
 "account" = "Аккаунт";
 "sign.out" = "Выйти";
 "about.app" = "О приложении";

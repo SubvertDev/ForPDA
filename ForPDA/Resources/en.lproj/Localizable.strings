@@ -67,6 +67,10 @@
 "theme.choose" = "Choose Theme";
 "theme.light" = "Light";
 "theme.dark" = "Dark";
+"background.night" = "Night theme color";
+"background.choose" = "Choose night theme background color";
+"background.dark" = "Dark";
+"background.black" = "Black";
 "account" = "Account";
 "sign.out" = "Sign Out";
 "about.app" = "About App";

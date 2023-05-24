@@ -11,6 +11,7 @@ import Factory
 protocol SettingsVCProtocol: AnyObject {
     func showChangeLanguageSheet()
     func showChangeThemeSheet()
+    func showChangeDarkThemeBackgroundColorSheet()
     func showReloadingAlert()
     func reloadData()
     
@@ -166,8 +167,27 @@ extension SettingsVC: SettingsVCProtocol {
         present(alert, animated: true)
     }
     
+    func showChangeDarkThemeBackgroundColorSheet() {
+        let alert = UIAlertController(title: R.string.localizable.backgroundChoose(), message: nil, preferredStyle: .actionSheet)
+        
+        let darkAction = UIAlertAction(title: R.string.localizable.backgroundDark(), style: .default) { _ in
+            guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.dark else { return }
+            self.viewModel.changeDarkThemeBackgroundColor(to: .dark)
+        }
+        let blackAction = UIAlertAction(title: R.string.localizable.backgroundBlack(), style: .default) { _ in
+            guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.black else { return }
+            self.viewModel.changeDarkThemeBackgroundColor(to: .black)
+        }
+        let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
+        
+        alert.addAction(darkAction)
+        alert.addAction(blackAction)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true)
+    }
+    
     func showReloadingAlert() {
-        print(#function)
         let alert = UIAlertController(title: R.string.localizable.warning(),
                                       message: R.string.localizable.warningRestartApp(),
                                       preferredStyle: .alert)

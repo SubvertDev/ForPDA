@@ -9,4 +9,5 @@ import Foundation
 
 extension NSNotification.Name {
     static let userDidChange = Self(rawValue: "userDidChange")
+    static let darkThemeBackgroundColorDidChange = Self(rawValue: "darkThemeBackgroundColorDidChange")
 }

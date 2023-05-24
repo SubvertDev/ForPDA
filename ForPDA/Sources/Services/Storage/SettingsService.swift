@@ -20,6 +20,7 @@ final class SettingsService {
         static let appLanguage = "AppleLanguage"
         static let appLanguages = "AppleLanguages"
         static let appTheme = "appTheme"
+        static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
     }
     
     // MARK: - Cookies
@@ -100,6 +101,18 @@ final class SettingsService {
     func getAppTheme() -> AppTheme {
         let theme = defaults.string(forKey: Keys.appTheme)
         return AppTheme(rawValue: theme ?? AppTheme.auto.rawValue) ?? .auto
+    }
+    
+    // MARK: - App Background Color
+    
+    func setAppBackgroundColor(to color: AppDarkThemeBackgroundColor) {
+        defaults.set(color.rawValue, forKey: Keys.appDarkThemeBackgroundColor)
+        NotificationCenter.default.post(name: .darkThemeBackgroundColorDidChange, object: color)
+    }
+    
+    func getAppBackgroundColor() -> AppDarkThemeBackgroundColor {
+        let backgroundColor = defaults.string(forKey: Keys.appDarkThemeBackgroundColor)
+        return AppDarkThemeBackgroundColor(rawValue: backgroundColor ?? AppDarkThemeBackgroundColor.black.rawValue) ?? .black
     }
     
     // MARK: - New Settings
