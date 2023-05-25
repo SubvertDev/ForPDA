@@ -1,0 +1,89 @@
+/* 
+  Localizable.strings
+  ForPDA
+
+  Created by Subvert on 14.05.2023.
+  
+*/
+
+// Табы
+"news" = "Новости";
+"search" = "Поиск";
+"forum" = "Форум";
+"menu" = "Меню";
+
+// Новости/Статья Опции
+"copy.link" = "Скопировать ссылку";
+"share.link" = "Поделиться ссылкой";
+"something.wrong.with.article" = "Проблемы со статьей?";
+"copied" = "Скопировано";
+"thanks" = "Спасибо!";
+
+// Новости
+"load.more" = "Загрузить ещё";
+"loading.dots" = "Загружаю...";
+
+// Статья
+"learn.more" = "Узнать подробнее";
+"comments" = "Комментарии (%d):";
+
+// В разработке
+"will.fix.soon" = "Починим в ближайшее время :)";
+"in.development" = "Находится в разработке";
+
+// Меню
+"guest" = "Гость";
+"authorize" = "Авторизоваться";
+"go.to.profile" = "Перейти в профиль";
+"history" = "История";
+"bookmarks" = "Закладки";
+"forum.rules" = "Правила форума";
+"settings" = "Настройки";
+"app.author" = "Автор приложения";
+"app.discussion.site" = "Обсуждение приложения";
+"telegram.news" = "Новости в Telegram";
+"telegram.chat" = "Чат в Telegram";
+"github" = "GitHub";
+
+// Алерты
+"error" = "Ошибка!";
+"warning" = "Внимание!";
+"something.went.wrong" = "Что-то пошло не так...";
+"warning.restart.app" = "Для применения изменений необходимо перезагрузить приложение";
+"whoops" = "Упс!";
+"not.done.yet" = "Еще не готово :)";
+"ok" = "ОК";
+"cancel" = "Отмена";
+
+// Настройки
+"automatic" = "Автоматически";
+"general" = "Общие";
+"language" = "Язык";
+"language.choose" = "Выберите язык";
+"language.russian" = "Русский";
+"language.english" = "English";
+"appearance" = "Внешний вид";
+"theme" = "Тема";
+"theme.choose" = "Выберите тему";
+"theme.light" = "Светлая";
+"theme.dark" = "Темная";
+"background.night" = "Цвет ночного режима";
+"background.choose" = "Выберите цвет ночного фона";
+"background.dark" = "Темный";
+"background.black" = "Черный";
+"account" = "Аккаунт";
+"sign.out" = "Выйти";
+"about.app" = "О приложении";
+"version" = "Версия";
+
+// Авторизация
+"authorization" = "Авторизация";
+"login.text.field.placeholder" = "Введите логин";
+"password.text.field.placeholder" = "Введите пароль";
+"captcha.text.field.placeholder" = "Введите число";
+"remember" = "Запомнить";
+"hidden.login" = "Скрытый вход";
+"already.logged.in" = "Вы уже авторизированы!";
+"captcha.uploading.failed" = "Не получилось отправить капчу";
+"login.failed.unknown.reasons" = "Что-то пошло не так, попробуйте позже";
+"login" = "Войти";

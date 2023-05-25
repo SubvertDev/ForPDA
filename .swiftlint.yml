@@ -1,0 +1,13 @@
+disabled_rules:
+    - trailing_whitespace
+    - line_length
+    - comment_spacing
+    - unused_capture_list
+    - blanket_disable_command
+
+custom_rules:
+  sf_safe_symbol:
+    name: "Safe SFSymbol"
+    message: "Use `SFSafeSymbols` via `systemSymbol` parameters for type safety."
+    regex: "(Image\\(systemName:)|(NSImage\\(symbolName:)|(Label[^,]+?,\\s*systemImage:)|(UIApplicationShortcutIcon\\(systemImageName:)"
+    severity: warning

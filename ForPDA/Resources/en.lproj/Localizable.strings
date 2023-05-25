@@ -1,0 +1,89 @@
+/* 
+  Localizable.strings
+  ForPDA
+
+  Created by Subvert on 14.05.2023.
+  
+*/
+
+// Tabs
+"news" = "News";
+"search" = "Search";
+"forum" = "Forum";
+"menu" = "Menu";
+
+// News/Article Options
+"copy.link" = "Copy Link";
+"share.link" = "Share Link";
+"something.wrong.with.article" = "Something wrong?";
+"copied" = "Copied";
+"thanks" = "Thanks!";
+
+// News
+"load.more" = "Load More";
+"loading.dots" = "Loading...";
+
+// Article
+"learn.more" = "Learn More";
+"comments" = "Comments (%d):";
+
+// In Development
+"will.fix.soon" = "We'll try to fix it soon :)";
+"in.development" = "Currently in development";
+
+// Menu
+"guest" = "Guest";
+"authorize" = "Authorize";
+"go.to.profile" = "Go to profile";
+"history" = "History";
+"bookmarks" = "Bookmarks";
+"forum.rules" = "Forum Rules";
+"settings" = "Settings";
+"app.author" = "App author";
+"app.discussion.site" = "App discussion";
+"telegram.news" = "News in Telegram";
+"telegram.chat" = "Chat in Telegram";
+"github" = "GitHub";
+
+// Alerts
+"error" = "Error!";
+"warning" = "Warning!";
+"something.went.wrong" = "Something went wrong...";
+"warning.restart.app" = "You need to restart the application to apply the changes";
+"whoops" = "Whoops!";
+"not.done.yet" = "Not done yet :)";
+"ok" = "OK";
+"cancel" = "Cancel";
+
+// Settings
+"automatic" = "Automatic";
+"general" = "General";
+"language" = "Language";
+"language.choose" = "Choose Language";
+"language.russian" = "Russian";
+"language.english" = "English";
+"appearance" = "Appearance";
+"theme" = "Theme";
+"theme.choose" = "Choose Theme";
+"theme.light" = "Light";
+"theme.dark" = "Dark";
+"background.night" = "Night theme color";
+"background.choose" = "Choose night theme background color";
+"background.dark" = "Dark";
+"background.black" = "Black";
+"account" = "Account";
+"sign.out" = "Sign Out";
+"about.app" = "About App";
+"version" = "Version";
+
+// Login
+"authorization" = "Authorization";
+"login.text.field.placeholder" = "Enter your username";
+"password.text.field.placeholder" = "Enter your password";
+"captcha.text.field.placeholder" = "Enter captcha here";
+"remember" = "Remember";
+"hidden.login" = "Hidden login";
+"already.logged.in" = "You're already logged in!";
+"captcha.uploading.failed" = "Captcha uploading failed";
+"login.failed.unknown.reasons" = "Something went wrong, try again later";
+"login" = "Log In";
