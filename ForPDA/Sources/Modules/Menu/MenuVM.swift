@@ -69,7 +69,7 @@ final class MenuVM: MenuVMProtocol {
                                           image: R.image.telegram(), handler: openTelegramChat)),
             
             .staticCell(model: MenuOption(title: R.string.localizable.github(),
-                                          image: R.image.github(), handler: showDefaultError))
+                                          image: R.image.github(), handler: openGithub))
         ])
     ]
     
@@ -116,6 +116,12 @@ final class MenuVM: MenuVMProtocol {
     
     private func openTelegramChat() {
         guard let url = URL(string: Links.telegramChat) else { return }
+        guard UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url)
+    }
+    
+    private func openGithub() {
+        guard let url = URL(string: Links.github) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
         UIApplication.shared.open(url)
     }
