@@ -42,7 +42,11 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
         view.backgroundColor = color == .dark ? R.color.nearBlack() : .systemBackground
         for subview in view.subviews {
             if let tableView = subview as? UITableView {
-                tableView.backgroundColor = color == .dark ? R.color.nearBlack() : .systemBackground
+                if tableView.style == .plain {
+                    tableView.backgroundColor = color == .dark ? R.color.nearBlack() : .systemBackground
+                } else {
+                    tableView.backgroundColor = color == .dark ? R.color.nearBlackGrouped() : .systemGroupedBackground
+                }
             }
             if let collectionView = subview as? UICollectionView {
                 collectionView.backgroundColor = color == .dark ? R.color.nearBlack() : .systemBackground
