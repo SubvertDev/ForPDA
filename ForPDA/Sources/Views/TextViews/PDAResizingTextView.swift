@@ -18,6 +18,7 @@ final class PDAResizingTextView: UITextView {
     override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         isScrollEnabled = false
+        backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {
