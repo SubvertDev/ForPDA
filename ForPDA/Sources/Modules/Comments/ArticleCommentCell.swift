@@ -9,8 +9,6 @@ import UIKit
 
 final class ArticleCommentCell: CommentCell {
     
-    static let reuseIdentifier = "ArticleCommentCell"
-    
     var myView: ArticleCommentView!
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -129,5 +127,4 @@ final class ArticleCommentView: UIView {
             make.trailing.equalTo(dateLabel.snp.leading).offset(-8)
         }
     }
-    
 }
