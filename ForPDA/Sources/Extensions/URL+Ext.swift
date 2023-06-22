@@ -9,6 +9,12 @@ import Foundation
 
 extension URL {
     
+    static let fourpda = URL(string: "https://4pda.to/")!
+    
+    static func fourpda(page: Int) -> URL {
+        return URL(string: "https://4pda.to/page/\(page)/")!
+    }
+    
     func stripLastURLComponent() -> URL {
         var newUrl = self
         newUrl.deleteLastPathComponent()

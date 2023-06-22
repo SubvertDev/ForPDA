@@ -8,8 +8,6 @@
 import Foundation
 import Factory
 
-import SwiftSoup // -----
-
 enum NetworkError: Error {
     case unableToComplete(Error?)
     case invalidResponse
@@ -18,13 +16,7 @@ enum NetworkError: Error {
     case invalidDecoding
 }
 
-final class NetworkService {
-    
-    // MARK: - Properties
-        
-    var baseURL = URL(string: "https://4pda.to/")!
-    var baseURLString = "https://4pda.to/"
-}
+final class NetworkService {}
 
 // MARK: - Requests
 

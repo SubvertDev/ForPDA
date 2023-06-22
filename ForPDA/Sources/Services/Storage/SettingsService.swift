@@ -6,12 +6,11 @@
 //
 
 import Foundation
+import WebKit
 
 final class SettingsService {
     
     private let defaults = UserDefaults.standard
-    private let decoder = JSONDecoder()
-    private let encoder = JSONEncoder()
     
     private enum Keys {
         static let savedCookies = "savedCookies"
@@ -21,6 +20,8 @@ final class SettingsService {
         static let appLanguages = "AppleLanguages"
         static let appTheme = "appTheme"
         static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
+        static let fastLoadingSystem = "fastLoadingSystem"
+        static let showLikesInComments = "showLikesInComments"
     }
     
     // MARK: - Cookies
@@ -35,7 +36,18 @@ final class SettingsService {
     
     func removeCookies() {
         defaults.removeObject(forKey: Keys.savedCookies)
+        
         HTTPCookieStorage.shared.removeCookies(since: .distantPast)
+        
+        DispatchQueue.main.async {
+            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                WKWebsiteDataStore.default().removeData(
+                    ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                    for: records.filter { $0.displayName.contains("4pda") },
+                    completionHandler: {  }
+                )
+            }
+        }
     }
     
     // MARK: - Auth Key
@@ -58,11 +70,11 @@ final class SettingsService {
         defaults.set(user, forKey: Keys.userId)
         NotificationCenter.default.post(name: .userDidChange, object: nil)
     }
-
+    
     func getUser() -> Data? {
         return defaults.data(forKey: Keys.userId)
     }
-
+    
     func removeUser() {
         defaults.removeObject(forKey: Keys.userId)
         NotificationCenter.default.post(name: .userDidChange, object: nil)
@@ -115,53 +127,31 @@ final class SettingsService {
         return AppDarkThemeBackgroundColor(rawValue: backgroundColor ?? AppDarkThemeBackgroundColor.black.rawValue) ?? .black
     }
     
-    // MARK: - New Settings
+    // MARK: - Fast Loading System
     
-//    enum UserDefaultKeys: String, CaseIterable {
-//        case cookies
-//        case authKey
-//        case user
-//        case appLanguage
-//        case appLanguages
-//        case appTheme
-//    }
-//    
-//    func set<T>(value: T, key: UserDefaultKeys) {
-//        defaults.set(value, forKey: key.rawValue)
-//    }
-//    
-//    func get<T>(type: T.Type, forKey: UserDefaultKeys) -> T? {
-//        return defaults.object(forKey: forKey.rawValue) as? T
-//    }
-//    
-//    func remove(key: UserDefaultKeys) {
-//        defaults.removeObject(forKey: key.rawValue)
-//    }
-//    
-//    func removeAll() {
-//        _ = UserDefaultKeys.allCases.map({ remove(key: $0) })
-//    }
-//    
-//    // Codable
-//    
-//    func setCodable<T: Codable>(_ object: T, key: UserDefaultKeys) {
-//        do {
-//            let encodedObject = try encoder.encode(object)
-//            defaults.set(encodedObject, forKey: key.rawValue)
-//        } catch {
-//            print("[ERROR] Encoding of \(T.self) failed")
-//        }
-//    }
-//    
-//    func getCodable<T: Codable>(forKey key: UserDefaultKeys) -> T? {
-//        do {
-//            guard let data = defaults.data(forKey: key.rawValue) else {
-//                return nil
-//            }
-//            return try decoder.decode(T.self, from: data)
-//        } catch {
-//            print("[ERROR] Decoding of \(T.self) failed")
-//            return nil
-//        }
-//    }
+    func setFastLoadingSystem(to state: Bool) {
+        defaults.set(state, forKey: Keys.fastLoadingSystem)
+    }
+    
+    func getFastLoadingSystem() -> Bool {
+        if let show = defaults.value(forKey: Keys.fastLoadingSystem) as? Bool {
+            return show
+        } else {
+            return false
+        }
+    }
+    
+    // MARK: - Show Likes In Comments
+    
+    func setShowLikesInComments(to state: Bool) {
+        defaults.set(state, forKey: Keys.showLikesInComments)
+    }
+    
+    func getShowLikesInComments() -> Bool {
+        if let show = defaults.value(forKey: Keys.showLikesInComments) as? Bool {
+            return show
+        } else {
+            return true
+        }
+    }
 }

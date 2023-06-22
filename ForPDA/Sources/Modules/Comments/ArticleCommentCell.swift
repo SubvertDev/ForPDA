@@ -81,8 +81,16 @@ final class ArticleCommentView: UIView {
         return label
     }()
     
+    let likesContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray5
+        return view
+    }()
+    
     let likesLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: UIFont.systemFontSize, weight: .regular)
+        label.textAlignment = .center
         return label
     }()
     
@@ -101,7 +109,8 @@ final class ArticleCommentView: UIView {
         addSubview(authorLabel)
         addSubview(textLabel)
         addSubview(dateLabel)
-        addSubview(likesLabel)
+        addSubview(likesContainerView)
+        likesContainerView.addSubview(likesLabel)
     }
     
     private func makeConstraints() {
@@ -122,9 +131,15 @@ final class ArticleCommentView: UIView {
             make.trailing.equalToSuperview().offset(-8)
         }
         
-        likesLabel.snp.makeConstraints { make in
+        likesContainerView.snp.makeConstraints { make in
             make.centerY.equalTo(authorLabel)
             make.trailing.equalTo(dateLabel.snp.leading).offset(-8)
+            make.width.greaterThanOrEqualTo(16)
+        }
+        
+        likesLabel.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(2)
         }
     }
 }

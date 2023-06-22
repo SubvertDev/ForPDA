@@ -8,6 +8,7 @@
 import UIKit
 import Factory
 import XCoordinator
+import WebKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -17,15 +18,28 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
+    var webView: WKWebView!
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         
         overrideApplicationThemeStyle(with: settingsService.getAppTheme())
-        
+        configureWKWebView()
         coordinator.setRoot(for: window!)
     }
-
+    
+    private func configureWKWebView() {
+        let config = WKWebViewConfiguration()
+        webView = WKWebView(frame: .zero, configuration: config)
+        webView.tag = 666
+        window?.addSubview(webView)
+        
+        for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+            WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie)
+        }
+    }
+    
     func sceneDidDisconnect(_ scene: UIScene) { }
 
     func sceneDidBecomeActive(_ scene: UIScene) { }
@@ -35,25 +49,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) { }
 
     func sceneDidEnterBackground(_ scene: UIScene) { }
-
-    private func configureWKWebView() {
-        // let config = WKWebViewConfiguration()
-        // config.dataDetectorTypes = []
-        // config.suppressesIncrementalRendering = true
-        // webView = WKWebView(frame: .zero, configuration: config)
-        // webView.tag = 666
-        // webView.navigationDelegate = self
-        // window.addSubview(webView)
-        
-        // webView.load(URLRequest(url: URL(string: "https://4pda.to/")!))
-    }
 }
-
-//extension SceneDelegate: WKNavigationDelegate {
-//    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-//        print(#function)
-//    }
-//}
 
 extension SceneDelegate {
     func overrideApplicationThemeStyle(with theme: AppTheme) {

@@ -78,6 +78,8 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
         return 46
     }
     
+    // Refactor this
+    // swiftlint:disable cyclomatic_complexity function_body_length
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = viewModel.sections[indexPath.section].options[indexPath.row]
         
@@ -93,10 +95,64 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
             cell.set(with: model)
             return cell
             
+        case .switchCell(model: let model):
+            let cell = tableView.dequeueReusableCell(withClass: SettingsSwitchCell.self)
+            cell.set(with: model)
+            cell.switchTapped = { [weak self] isOn in
+                guard let self else { return }
+                
+                if !isOn {
+                    if indexPath.row == 0 {
+                        self.viewModel.showFastLoadingSystemSwitchTapped(isOn: isOn)
+                    } else {
+                        self.viewModel.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    }
+                    return
+                }
+                
+                var message = ""
+                if model.title.contains("Быстрая") {
+                    message = R.string.localizable.fastLoadingSystemWarning()
+                } else {
+                    message = R.string.localizable.commentsShowLikesWarning()
+                }
+                
+                let alert = UIAlertController(
+                    title: R.string.localizable.warning(),
+                    message: message,
+                    preferredStyle: .alert
+                )
+                
+                let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { _ in
+                    if indexPath.row == 0 {
+                        self.viewModel.showFastLoadingSystemSwitchTapped(isOn: isOn)
+                    } else {
+                        self.viewModel.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    }
+                }
+                let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { _ in
+                    cell.set(with: model)
+                    if indexPath.row == 0 {
+                        self.viewModel.showFastLoadingSystemSwitchTapped(isOn: !isOn)
+                    } else {
+                        self.viewModel.showLikesInCommentsSwitchTapped(isOn: !isOn)
+                    }
+                }
+                
+                alert.addAction(okAction)
+                alert.addAction(cancelAction)
+                
+                if isOn {
+                    present(alert, animated: true)
+                }
+            }
+            return cell
+            
         default:
             return UITableViewCell()
         }
     }
+    // swiftlint:enable cyclomatic_complexity function_body_length
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)

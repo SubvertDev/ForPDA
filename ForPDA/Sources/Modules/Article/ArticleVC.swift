@@ -9,6 +9,7 @@ import UIKit
 import Factory
 import MarqueeLabel
 import SwiftMessages
+import SFSafeSymbols
 import NukeExtensions
 
 protocol ArticleVCProtocol: AnyObject {
@@ -21,9 +22,11 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) var analyticsService
+    @Injected(\.analyticsService) private var analyticsService
+    @Injected(\.settingsService) private var settingsService
     
     private let viewModel: ArticleVMProtocol
+    private var commentsVC: CommentsVC?
     
     // MARK: - Lifecycle
     
@@ -39,6 +42,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         configureNavigationTitle()
         configureMenu()
         configureView()
+        myView.delegate = self
         
         viewModel.loadArticle()
         
@@ -152,14 +156,14 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Making Comments
     
     func makeComments(from page: String) {
-        let commentsVC = CommentsVC()
-        commentsVC.article = viewModel.article
-        commentsVC.articleDocument = page
+        commentsVC = CommentsVC(article: viewModel.article, document: page)
+        guard let commentsVC else { return }
+        commentsVC.updateDelegate = self
         addChild(commentsVC)
         myView.commentsContainer.addSubview(commentsVC.view)
         myView.commentsContainer.isHidden = true
         commentsVC.view.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
+            make.edges.equalToSuperview()
         }
         commentsVC.didMove(toParent: self)
     }
@@ -192,6 +196,35 @@ extension ArticleVC: ArticleVCProtocol {
             alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
             self.present(alert, animated: true)
         }
+    }
+}
+
+// MARK: - ArticleViewDelegate
+
+extension ArticleVC: ArticleViewDelegate {
+    func updateCommentsButtonTapped() {
+        commentsVC?.updateAll()
+    }
+}
+
+// MARK: - CommentsVCProtocol
+
+extension ArticleVC: CommentsVCProtocol {
+    func updateStarted() {
+        let image = UIImage(
+            systemSymbol: .arrowTriangle2Circlepath,
+            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
+        )
+        myView.updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
+    }
+    
+    func updateFinished(_ state: Bool) {
+        let image = UIImage(
+            systemSymbol: state ? .arrowTriangle2Circlepath : .exclamationmarkArrowTriangle2Circlepath,
+            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
+        )
+        myView.updateCommentsButton.setImage(image, for: .normal)
+        myView.updateCommentsButton.stopButtonRotation()
     }
 }
 

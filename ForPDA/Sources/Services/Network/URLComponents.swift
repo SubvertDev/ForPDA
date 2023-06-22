@@ -14,7 +14,11 @@ extension URLComponents {
     // MARK: - News & Article
     
     static func news(page: Int) -> Self {
-        Self(path: "/page/\(page)/")
+        if page == 1 {
+            return Self(path: "")
+        } else {
+            return Self(path: "/page/\(page)/")
+        }
     }
     
     static func article(path: [String]) -> Self {

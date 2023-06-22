@@ -6,24 +6,29 @@
 //
 
 import UIKit
+import SFSafeSymbols
+
+protocol ArticleViewDelegate: AnyObject {
+    func updateCommentsButtonTapped()
+}
 
 final class ArticleView: UIView {
     
     // MARK: - Views
     
-    let scrollView: UIScrollView = {
+    private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.bounces = false
         scrollView.showsHorizontalScrollIndicator = false
         return scrollView
     }()
     
-    let contentView: UIView = {
+    private let contentView: UIView = {
         let view = UIView()
         return view
     }()
     
-    let articleImage: PDAResizingImageView = {
+    private(set) var articleImage: PDAResizingImageView = {
         let imageView = PDAResizingImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -31,7 +36,7 @@ final class ArticleView: UIView {
         return imageView
     }()
     
-    let titleLabel: UILabel = {
+    private(set) var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 25, weight: .semibold)
         label.textColor = .white
@@ -44,13 +49,13 @@ final class ArticleView: UIView {
         return label
     }()
     
-    let hideView: UIView = {
+    private(set) var hideView: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBackground
         return view
     }()
     
-    let loadingIndicator: UIActivityIndicatorView = {
+    private let loadingIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView()
         indicator.style = .large
         indicator.tintColor = .black
@@ -59,7 +64,7 @@ final class ArticleView: UIView {
         return indicator
     }()
     
-    let stackView: UIStackView = {
+    private(set) var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.distribution = .fill
@@ -67,20 +72,33 @@ final class ArticleView: UIView {
         return stackView
     }()
     
-    let separator: UIView = {
+    private let separator: UIView = {
         let view = UIView()
         view.backgroundColor = .label
         return view
     }()
     
-    let commentsLabel: UILabel = {
+    private(set) var commentsLabel: UILabel = {
         let label = UILabel()
         label.text = R.string.localizable.comments(0)
         label.font = .systemFont(ofSize: 20, weight: .medium)
         return label
     }()
     
-    let commentsContainer = UIView()
+    private(set) lazy var updateCommentsButton: UIButton = {
+        let button = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(weight: .bold)
+        let image = UIImage(systemSymbol: .arrowTriangle2Circlepath, withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(updateCommentsButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private(set) var commentsContainer = UIView()
+    
+    // MARK: - Properties
+    
+    weak var delegate: ArticleViewDelegate?
     
     // MARK: - View Lifecycle
     
@@ -94,6 +112,17 @@ final class ArticleView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Actions
+    
+    @objc private func updateCommentsButtonTapped() {
+        if !updateCommentsButton.isButtonAnimatingNow {
+            delegate?.updateCommentsButtonTapped()
+            updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
+        }
+    }
+    
+    // MARK: - Public Functions
     
     func stopLoading() {
         hideView.isHidden = true
@@ -118,6 +147,7 @@ final class ArticleView: UIView {
         contentView.addSubview(stackView)
         contentView.addSubview(separator)
         contentView.addSubview(commentsLabel)
+        contentView.addSubview(updateCommentsButton)
         contentView.addSubview(commentsContainer)
     }
     
@@ -169,6 +199,11 @@ final class ArticleView: UIView {
         commentsLabel.snp.makeConstraints { make in
             make.top.equalTo(separator.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(12)
+        }
+        
+        updateCommentsButton.snp.makeConstraints { make in
+            make.centerY.equalTo(commentsLabel)
+            make.trailing.equalToSuperview().inset(16)
         }
         
         commentsContainer.snp.makeConstraints { make in

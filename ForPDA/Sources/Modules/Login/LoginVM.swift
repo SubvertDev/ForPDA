@@ -7,6 +7,7 @@
 
 import Foundation
 import Factory
+import WebKit
 
 protocol LoginVMProtocol {
     func textChanged(to value: String, in textField: LoginView.LoginTextFields)
@@ -25,7 +26,7 @@ final class LoginVM: LoginVMProtocol {
     weak var view: LoginVCProtocol?
     
     lazy var loginData: [String: String] = [
-        "return": networkService.baseURLString,
+        "return": URL.fourpda.absoluteString,
         "login": "",
         "password": "",
         "captcha-time": "",
@@ -49,8 +50,8 @@ final class LoginVM: LoginVMProtocol {
         let cookies = (notification.object as! HTTPCookieStorage).cookies ?? []
         // swiftlint:enable force_cast
         
-        // Saving cookies when we've got three of them, for explanation look into AppDelegate
-        if cookies.count == 3 {
+        // Saving cookies when we've got three or more of them, for explanation look into AppDelegate
+        if cookies.count >= 3 {
             var cookiesArray: [Cookie] = []
             for cookie in cookies {
                 cookiesArray.append(Cookie(cookie))
@@ -61,6 +62,12 @@ final class LoginVM: LoginVMProtocol {
                 settingsService.setCookiesAsData(encodedCookies)
             } catch {
                 print("[ERROR] Failed to encode cookies in LoginVM")
+            }
+            
+            for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                DispatchQueue.main.async {
+                    WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie)
+                }
             }
         } else if cookies.count != 0 {
             settingsService.removeCookies()

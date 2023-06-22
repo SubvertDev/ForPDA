@@ -30,6 +30,8 @@
 		B8495D42294CCE1E00F60171 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = B8495D41294CCE1E00F60171 /* SwiftMessages */; };
 		B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = B84CCC51294A6EDA0001EB24 /* Nuke */; };
 		B84CCC54294A6EDA0001EB24 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = B84CCC53294A6EDA0001EB24 /* NukeExtensions */; };
+		B85849FA2A446BB200BF915D /* UIButton+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85849F92A446BB200BF915D /* UIButton+Ext.swift */; };
+		B85849FD2A44733300BF915D /* SettingsSwitchCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85849FC2A44733300BF915D /* SettingsSwitchCell.swift */; };
 		B863357D293D218900F8D2E6 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B863357C293D218900F8D2E6 /* String+Ext.swift */; };
 		B874B41B2A101B5F00A004FC /* Array+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B41A2A101B5F00A004FC /* Array+Ext.swift */; };
 		B874B4222A103C8C00A004FC /* SearchFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4212A103C8C00A004FC /* SearchFactory.swift */; };
@@ -139,6 +141,8 @@
 		B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Ext.swift"; sourceTree = "<group>"; };
 		B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAResizingTextView.swift; sourceTree = "<group>"; };
 		B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Ext.swift"; sourceTree = "<group>"; };
+		B85849F92A446BB200BF915D /* UIButton+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Ext.swift"; sourceTree = "<group>"; };
+		B85849FC2A44733300BF915D /* SettingsSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSwitchCell.swift; sourceTree = "<group>"; };
 		B863357C293D218900F8D2E6 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		B874B41A2A101B5F00A004FC /* Array+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Ext.swift"; sourceTree = "<group>"; };
 		B874B4212A103C8C00A004FC /* SearchFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFactory.swift; sourceTree = "<group>"; };
@@ -252,6 +256,7 @@
 		B8001CA92A19425100E7A8A8 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				B85849FF2A4473D900BF915D /* Cells */,
 				B8001CAB2A19432C00E7A8A8 /* SettingsFactory.swift */,
 				B8001CAD2A19433600E7A8A8 /* SettingsVC.swift */,
 				B8001CAF2A19433D00E7A8A8 /* SettingsVM.swift */,
@@ -289,6 +294,14 @@
 				B8FD821B2A1169B500EB7035 /* Labels */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		B85849FF2A4473D900BF915D /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				B85849FC2A44733300BF915D /* SettingsSwitchCell.swift */,
+			);
+			path = Cells;
 			sourceTree = "<group>";
 		};
 		B874B4202A103C7E00A004FC /* Search */ = {
@@ -349,11 +362,11 @@
 		B893011A2947E17C00D14141 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
+				B88D3F502A09005A0061C6C4 /* Cells */,
 				B88D3F4C2A08908D0061C6C4 /* MenuFactory.swift */,
 				B893011B2947E18300D14141 /* MenuVC.swift */,
 				B88D3F492A088FEF0061C6C4 /* MenuVM.swift */,
 				B893011D2947E19800D14141 /* MenuView.swift */,
-				B88D3F502A09005A0061C6C4 /* Cells */,
 			);
 			path = Menu;
 			sourceTree = "<group>";
@@ -429,6 +442,7 @@
 				B8C7ABBB293D20EF00FB2F67 /* UITableViewCell+Ext.swift */,
 				B8FEA1BC29675F73002DFAA4 /* UITableView+Ext.swift */,
 				B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */,
+				B85849F92A446BB200BF915D /* UIButton+Ext.swift */,
 				B8FD82252A1174EA00EB7035 /* UIAction+Ext.swift */,
 				B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */,
 				B863357C293D218900F8D2E6 /* String+Ext.swift */,
@@ -865,8 +879,10 @@
 				B8D351FD293CABB6008A84EA /* NewsVC.swift in Sources */,
 				B83E8AC7294A8337000D59E7 /* UITextView+Ext.swift in Sources */,
 				B8BD2D8D293E283E00E12E29 /* CommentsVC.swift in Sources */,
+				B85849FA2A446BB200BF915D /* UIButton+Ext.swift in Sources */,
 				B834035B2967B14C00C3CF37 /* PDAResizingImageViewWithText.swift in Sources */,
 				B87EB9D2293D2DB90025C2A0 /* ArticleView.swift in Sources */,
+				B85849FD2A44733300BF915D /* SettingsSwitchCell.swift in Sources */,
 				B8D351F9293CABB6008A84EA /* AppDelegate.swift in Sources */,
 				B8C7ABB1293D12CB00FB2F67 /* ArticleCell.swift in Sources */,
 				B874B4222A103C8C00A004FC /* SearchFactory.swift in Sources */,

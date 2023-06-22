@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-// MARK: - Extension
+// MARK: - Cookies
 
 extension AppDelegate {
     
@@ -51,14 +51,17 @@ extension AppDelegate {
                 if let cookies = try? JSONDecoder().decode([Cookie].self, from: cookiesData) {
                     // Force-casting Cookie to HTTPCookie and setting them for 4pda.to domain
                     let mappedCookies = cookies.map { $0.httpCookie! }
-                    HTTPCookieStorage.shared.setCookies(mappedCookies, for: networkService.baseURL, mainDocumentURL: nil)
+                    HTTPCookieStorage.shared.setCookies(mappedCookies, for: URL.fourpda, mainDocumentURL: nil)
+                    // WKWebView cookies are added in SceneDelegate
                 } else {
-                    // Deleting saved cookies in defaults if we can't decode them
+                    // Deleting saved cookies in defaults if we can't decode them and logout
                     settingsService.removeCookies()
+                    settingsService.removeUser()
                 }
             } else {
-                // Deleting all cookies in case we don't have them saved to prevent different sources of truth
-                HTTPCookieStorage.shared.removeCookies(since: .distantPast)
+                // Deleting all cookies in case we don't have them saved to prevent different sources of truth and logout
+                settingsService.removeCookies()
+                settingsService.removeUser()
             }
         }
     }
