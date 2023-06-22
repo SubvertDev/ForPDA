@@ -110,8 +110,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Making Article
     
     func makeArticle(from elements: [ArticleElement]) {
-        myView.hideView.isHidden = true
-
         for element in elements {
             var articleElement: UIView?
             switch element {
@@ -150,7 +148,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
             myView.stackView.addArrangedSubview(articleElement)
         }
         
-        unhide()
+        myView.commentsContainer.isHidden = false
+        myView.stopLoading()
     }
     
     // MARK: - Making Comments
@@ -166,15 +165,6 @@ final class ArticleVC: PDAViewController<ArticleView> {
             make.edges.equalToSuperview()
         }
         commentsVC.didMove(toParent: self)
-    }
-    
-    // MARK: - Helpers
-    
-    private func unhide() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.myView.stopLoading()
-            self.myView.commentsContainer.isHidden = false
-        }
     }
 }
 

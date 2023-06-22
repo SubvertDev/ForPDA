@@ -51,7 +51,6 @@ final class ArticleView: UIView {
     
     private(set) var hideView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
         return view
     }()
     
@@ -104,7 +103,6 @@ final class ArticleView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .systemBackground
         addSubviews()
         makeConstraints()
     }
@@ -153,8 +151,7 @@ final class ArticleView: UIView {
     
     private func makeConstraints() {
         scrollView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
-            make.width.equalToSuperview()
+            make.edges.width.equalToSuperview()
         }
         
         let hideViewTopInset = UIScreen.main.bounds.width * 0.6
@@ -164,7 +161,8 @@ final class ArticleView: UIView {
         }
         
         loadingIndicator.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-64)
         }
         
         contentView.snp.makeConstraints { make in
@@ -174,31 +172,31 @@ final class ArticleView: UIView {
         }
         
         articleImage.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
+            make.top.horizontalEdges.width.equalToSuperview()
             make.height.equalTo(articleImage.snp.width).multipliedBy(0.6)
-            make.width.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
             make.bottom.equalTo(articleImage).inset(8)
-            make.leading.trailing.equalToSuperview().inset(16)
+            make.horizontalEdges.equalToSuperview().inset(16)
         }
         
         stackView.snp.makeConstraints { make in
             make.top.equalTo(articleImage.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.centerX.equalToSuperview()
+            make.height.equalTo(1000).priority(701)
         }
         
         separator.snp.makeConstraints { make in
             make.top.equalTo(stackView.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.height.equalTo(1)
         }
         
         commentsLabel.snp.makeConstraints { make in
             make.top.equalTo(separator.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(12)
         }
         
         updateCommentsButton.snp.makeConstraints { make in
@@ -208,7 +206,7 @@ final class ArticleView: UIView {
         
         commentsContainer.snp.makeConstraints { make in
             make.top.equalTo(commentsLabel.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview().inset(16)
         }
     }

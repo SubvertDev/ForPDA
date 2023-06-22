@@ -28,6 +28,7 @@ final class CommentsVC: CommentsViewController {
     
     private var contentSizeObserver: NSKeyValueObservation!
     private var webView: WKWebView?
+    private lazy var themeColor = settingsService.getAppBackgroundColor()
     
     weak var updateDelegate: CommentsVCProtocol?
             
@@ -48,6 +49,7 @@ final class CommentsVC: CommentsViewController {
         tableView.register(cellWithClass: ArticleCommentCell.self)
         getComments()
         setupWebView()
+        setupNotifications()
     }
     
     // MARK: - Setup
@@ -64,6 +66,22 @@ final class CommentsVC: CommentsViewController {
                 webView.load(request)
             }
         }
+    }
+        
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(changeDarkThemeBackgroundColor(_:)),
+            name: .darkThemeBackgroundColorDidChange, object: nil
+        )
+    }
+    
+    @objc private func changeDarkThemeBackgroundColor(_ notification: Notification) {
+        if let object = notification.object as? AppDarkThemeBackgroundColor {
+            themeColor = object
+        } else {
+            themeColor = settingsService.getAppBackgroundColor()
+        }
+        tableView.reloadData()
     }
     
     // MARK: - Public Functions
@@ -120,6 +138,17 @@ final class CommentsVC: CommentsViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let cell = cell as? ArticleCommentCell {
+            if currentlyDisplayed[indexPath.row].level % 2 == 0 {
+                cell.myView.backgroundColor = themeColor == .dark ? R.color.nearBlack() : .systemBackground
+            } else {
+                cell.myView.backgroundColor = themeColor == .dark ? R.color.nearBlack() : .systemBackground
+            }
+            cell.indentationColor = .tertiarySystemGroupedBackground
+            cell.commentMarginColor = .tertiarySystemGroupedBackground
+        }
+    }
 }
 
 // MARK: - WKNavigationDelegate

@@ -303,8 +303,18 @@ final class ParsingService {
         
         let commentType = try! element.select("div[id]").attr("class")
         guard commentType != "deleted" else {
-            return Comment(author: "", text: "(Комментарий удален)", date: "", likes: 0, replies: replies, level: level)
+            return Comment(
+                avatarUrl: "",
+                author: "",
+                text: "(Комментарий удален)",
+                date: "",
+                likes: 0,
+                replies: replies,
+                level: level
+            )
         }
+        
+        let avatarUrl = try! element.select("[class=comment-avatar]").first()?.select("img[src]").attr("src") ?? ""
         
         let author = try! element.select("[class=nickname]").first()?.text() ?? ""
         
@@ -326,7 +336,15 @@ final class ParsingService {
             likes = 0
         }
         
-        return Comment(author: author, text: text, date: date, likes: likes, replies: replies, level: level)
+        return Comment(
+            avatarUrl: avatarUrl,
+            author: author,
+            text: text,
+            date: date,
+            likes: likes,
+            replies: replies,
+            level: level
+        )
     }
     
     // MARK: - Captcha
