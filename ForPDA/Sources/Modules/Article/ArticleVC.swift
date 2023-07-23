@@ -205,6 +205,7 @@ extension ArticleVC: CommentsVCProtocol {
             systemSymbol: .arrowTriangle2Circlepath,
             withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
         )
+        myView.updateCommentsButton.setImage(image, for: .normal)
         myView.updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
     }
     
