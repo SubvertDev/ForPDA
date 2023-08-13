@@ -7,11 +7,11 @@
 
 import UIKit
 
-final class PDAResizingImageViewWithText: UIView {
+final class PDAResizingImageViewWithText: UIStackView {
     
-    let imageView = PDAResizingImageView()
+    private(set) var imageView = PDAResizingImageView()
     
-    let textLabel: UILabel = {
+    private let textLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
         label.font = UIFont.systemFont(ofSize: 15)
@@ -22,26 +22,22 @@ final class PDAResizingImageViewWithText: UIView {
     
     init(_ text: String) {
         super.init(frame: .zero)
-        setupView()
-        textLabel.text = text
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupView() {
-        addSubview(imageView)
-        addSubview(textLabel)
         
-        imageView.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
-        }
+        distribution = .fillProportionally
+        axis = .vertical
+        spacing = 4
+        
+        textLabel.text = text
+        
+        addArrangedSubview(imageView)
+        addArrangedSubview(textLabel)
         
         textLabel.snp.makeConstraints { make in
-            make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(imageView.snp.bottom).offset(4)
-            make.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(16)
         }
+    }
+    
+    required init(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

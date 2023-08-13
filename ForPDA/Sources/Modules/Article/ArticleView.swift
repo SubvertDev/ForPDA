@@ -66,7 +66,7 @@ final class ArticleView: UIView {
     private(set) var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.distribution = .fill
+        stackView.distribution = .fillProportionally
         stackView.spacing = 16
         return stackView
     }()
