@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
                 
         SentrySDK.start { options in
-            options.dsn = Secrets.sentry
+            options.dsn = Secrets.for(key: .SENTRY_DSN)
             options.debug = AppScheme.isDebug
             options.tracesSampleRate = 1.0
             options.diagnosticLevel = .warning

@@ -136,6 +136,8 @@
 		B8001CDE2A1B01D000E7A8A8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B82B2EBD2A89016300CB067C /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		B82B2EC02A89059C00CB067C /* AppScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScheme.swift; sourceTree = "<group>"; };
+		B82B2EC62A89306000CB067C /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		B82B2EFE2A8942E900CB067C /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8340351296789FE00C3CF37 /* PDABulletLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDABulletLabel.swift; sourceTree = "<group>"; };
 		B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAPaddingLabel.swift; sourceTree = "<group>"; };
 		B83403562967AFCA00C3CF37 /* PDATableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATableView.swift; sourceTree = "<group>"; };
@@ -211,7 +213,6 @@
 		B8D351FC293CABB6008A84EA /* NewsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsVC.swift; sourceTree = "<group>"; };
 		B8D35201293CABB7008A84EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B8D35204293CABB7008A84EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		B8D35206293CABB7008A84EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8DDFA1B294A4D22008B0156 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		B8DDFA1D294A5611008B0156 /* ArticleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVM.swift; sourceTree = "<group>"; };
 		B8DDFA1F294A56E4008B0156 /* ParsingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingService.swift; sourceTree = "<group>"; };
@@ -499,7 +500,8 @@
 			children = (
 				B8FD82092A1163EE00EB7035 /* Sources */,
 				B8FD820E2A11681500EB7035 /* Resources */,
-				B8D35206293CABB7008A84EA /* Info.plist */,
+				B82B2EC62A89306000CB067C /* Secrets.xcconfig */,
+				B82B2EFE2A8942E900CB067C /* Info.plist */,
 			);
 			path = ForPDA;
 			sourceTree = "<group>";
@@ -783,7 +785,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which sentry-cli >/dev/null; then\nexport SENTRY_ORG=forpda\nexport SENTRY_PROJECT=apple-ios\nexport SENTRY_AUTH_TOKEN=5d97c30a6b9949187a351342d789754ff3d03d23e2ebd5f27c9290d804e8d44a\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" --force-foreground 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"error: sentry-cli - $ERROR\"\nfi\nelse\necho \"error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+			shellScript = "source \"${PROJECT_DIR}/ForPDA/Secrets.xcconfig\"\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=forpda\nexport SENTRY_PROJECT=apple-ios\nexport SENTRY_AUTH_TOKEN=$SENTRY_DSYM_TOKEN\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
 		};
 		B8FEA1BB29675BCE002DFAA4 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -942,6 +944,7 @@
 /* Begin XCBuildConfiguration section */
 		B8D35207293CABB7008A84EA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B82B2EC62A89306000CB067C /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -1005,6 +1008,7 @@
 		};
 		B8D35208293CABB7008A84EA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B82B2EC62A89306000CB067C /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;

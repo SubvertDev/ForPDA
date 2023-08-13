@@ -14,7 +14,7 @@ final class AnalyticsService {
     typealias EventDictionary = [String: String]
     
     private let amplitude = Amplitude(configuration: Configuration(
-        apiKey: Secrets.amplitude,
+        apiKey: Secrets.for(key: .AMPLITUDE_TOKEN),
         logLevel: .WARN,
         serverZone: .EU
     ))
@@ -132,7 +132,7 @@ extension AnalyticsService {
     }
     
     func reportArticle(_ reportUrl: String) {
-        guard let url = URL(string: "https://api.telegram.org/bot\(Secrets.telegramToken)/sendMessage") else { return }
+        guard let url = URL(string: "https://api.telegram.org/bot\(Secrets.for(key: .TELEGRAM_TOKEN))/sendMessage") else { return }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -145,7 +145,7 @@ extension AnalyticsService {
         
         let jsonBody = """
         {
-            "chat_id": \(Secrets.telegramChatID),
+            "chat_id": \(Secrets.for(key: .TELEGRAM_CHAT_ID)),
             "text": "[\(user?.id ?? "-"):\(user?.nickname ?? "-")]\n\(reportUrl)"
         }
         """
