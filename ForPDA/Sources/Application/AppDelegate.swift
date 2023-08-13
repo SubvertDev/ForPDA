@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 import Factory
-import Firebase
+import Sentry
 import Nuke
 
 @main
@@ -18,9 +18,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     @Injected(\.settingsService) private var settingsService
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
-        FirebaseApp.configure()
-        FirebaseConfiguration.shared.setLoggerLevel(.min)
+                
+        SentrySDK.start { options in
+            options.dsn = Secrets.sentry
+            options.debug = AppScheme.isDebug
+            options.tracesSampleRate = 1.0
+            options.diagnosticLevel = .warning
+            options.attachScreenshot = true
+        }
         
         ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
         

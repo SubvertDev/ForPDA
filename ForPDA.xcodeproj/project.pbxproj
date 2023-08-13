@@ -19,6 +19,10 @@
 		B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */; };
 		B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDE2A1B01D000E7A8A8 /* User.swift */; };
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
+		B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = B82B2EB22A87D58D00CB067C /* Sentry */; };
+		B82B2EB62A87D5F200CB067C /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B82B2EB52A87D5F200CB067C /* AmplitudeSwift */; };
+		B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B2EBD2A89016300CB067C /* Secrets.swift */; };
+		B82B2EC12A89059C00CB067C /* AppScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B2EC02A89059C00CB067C /* AppScheme.swift */; };
 		B8340352296789FE00C3CF37 /* PDABulletLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340351296789FE00C3CF37 /* PDABulletLabel.swift */; };
 		B8340355296796F600C3CF37 /* PDAPaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */; };
 		B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83403562967AFCA00C3CF37 /* PDATableView.swift */; };
@@ -49,9 +53,6 @@
 		B875D20E2A1C2E1D00F8AB6A /* NSNotificationName+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B875D20D2A1C2E1D00F8AB6A /* NSNotificationName+Ext.swift */; };
 		B875D2112A1C343000F8AB6A /* LoginData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B875D2102A1C343000F8AB6A /* LoginData.swift */; };
 		B875D2142A1C513100F8AB6A /* MultipartFormDataRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B875D2132A1C513100F8AB6A /* MultipartFormDataRequest.swift */; };
-		B87C32552A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = B87C32542A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport */; };
-		B87C32572A0801EE00CFB7EF /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B87C32562A0801EE00CFB7EF /* FirebaseCrashlytics */; };
-		B87C32592A0801EE00CFB7EF /* FirebasePerformance in Frameworks */ = {isa = PBXBuildFile; productRef = B87C32582A0801EE00CFB7EF /* FirebasePerformance */; };
 		B87EB9CD293D21FB0025C2A0 /* NewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9CC293D21FB0025C2A0 /* NewsView.swift */; };
 		B87EB9D0293D2DA30025C2A0 /* ArticleVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9CF293D2DA30025C2A0 /* ArticleVC.swift */; };
 		B87EB9D2293D2DB90025C2A0 /* ArticleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87EB9D1293D2DB90025C2A0 /* ArticleView.swift */; };
@@ -111,7 +112,6 @@
 		B8DDFA1E294A5611008B0156 /* ArticleVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1D294A5611008B0156 /* ArticleVM.swift */; };
 		B8DDFA20294A56E4008B0156 /* ParsingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDFA1F294A56E4008B0156 /* ParsingService.swift */; };
 		B8E446312A002F7200CE8745 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E446302A002F7200CE8745 /* AnalyticsService.swift */; };
-		B8E4463B2A0044E000CE8745 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B8E4463A2A0044E000CE8745 /* GoogleService-Info.plist */; };
 		B8E4463F2A004CD600CE8745 /* URL+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E4463E2A004CD600CE8745 /* URL+Ext.swift */; };
 		B8FD82142A1168E500EB7035 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8FD82132A1168E500EB7035 /* HTTPMethod.swift */; };
 		B8FD82162A1168F400EB7035 /* URLComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8FD82152A1168F400EB7035 /* URLComponents.swift */; };
@@ -134,6 +134,8 @@
 		B8001CD92A1AA0FE00E7A8A8 /* CookiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiesService.swift; sourceTree = "<group>"; };
 		B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cookie.swift; sourceTree = "<group>"; };
 		B8001CDE2A1B01D000E7A8A8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		B82B2EBD2A89016300CB067C /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		B82B2EC02A89059C00CB067C /* AppScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScheme.swift; sourceTree = "<group>"; };
 		B8340351296789FE00C3CF37 /* PDABulletLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDABulletLabel.swift; sourceTree = "<group>"; };
 		B8340354296796F600C3CF37 /* PDAPaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAPaddingLabel.swift; sourceTree = "<group>"; };
 		B83403562967AFCA00C3CF37 /* PDATableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATableView.swift; sourceTree = "<group>"; };
@@ -214,7 +216,6 @@
 		B8DDFA1D294A5611008B0156 /* ArticleVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleVM.swift; sourceTree = "<group>"; };
 		B8DDFA1F294A56E4008B0156 /* ParsingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingService.swift; sourceTree = "<group>"; };
 		B8E446302A002F7200CE8745 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
-		B8E4463A2A0044E000CE8745 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B8E4463E2A004CD600CE8745 /* URL+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Ext.swift"; sourceTree = "<group>"; };
 		B8FD82132A1168E500EB7035 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
 		B8FD82152A1168F400EB7035 /* URLComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLComponents.swift; sourceTree = "<group>"; };
@@ -229,20 +230,19 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B87C32552A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				B884AFF829FD9D6F00BC1AA1 /* YouTubePlayerKit in Frameworks */,
-				B87C32592A0801EE00CFB7EF /* FirebasePerformance in Frameworks */,
 				B809925B293CBF5C0053202C /* SnapKit in Frameworks */,
-				B87C32572A0801EE00CFB7EF /* FirebaseCrashlytics in Frameworks */,
 				B8FEA1C229676FC3002DFAA4 /* RswiftLibrary in Frameworks */,
 				B84CCC54294A6EDA0001EB24 /* NukeExtensions in Frameworks */,
 				B8D3521B293CBE46008A84EA /* SwiftSoup in Frameworks */,
 				B83E8AC5294A75DA000D59E7 /* SwiftyGif in Frameworks */,
 				B8BD2D79293E1C3F00E12E29 /* MarqueeLabel in Frameworks */,
+				B82B2EB62A87D5F200CB067C /* AmplitudeSwift in Frameworks */,
 				B8BD2D85293E242200E12E29 /* SwipeCellKit in Frameworks */,
 				B8951CFA2A0C5D09001597AF /* XCoordinator in Frameworks */,
 				B89301192947CF5500D14141 /* SwiftRichString in Frameworks */,
 				B8495D42294CCE1E00F60171 /* SwiftMessages in Frameworks */,
+				B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */,
 				B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */,
 				B88D3F592A098C600061C6C4 /* SFSafeSymbols in Frameworks */,
 				B8951CFF2A0C6180001597AF /* SkeletonView in Frameworks */,
@@ -523,7 +523,6 @@
 			isa = PBXGroup;
 			children = (
 				B8D35201293CABB7008A84EA /* Assets.xcassets */,
-				B8E4463A2A0044E000CE8745 /* GoogleService-Info.plist */,
 				B8D35203293CABB7008A84EA /* LaunchScreen.storyboard */,
 				B874B4492A1066F500A004FC /* Localizable.strings */,
 			);
@@ -620,6 +619,8 @@
 			isa = PBXGroup;
 			children = (
 				B874B44B2A10706B00A004FC /* Links.swift */,
+				B82B2EBD2A89016300CB067C /* Secrets.swift */,
+				B82B2EC02A89059C00CB067C /* AppScheme.swift */,
 			);
 			path = Constants;
 			sourceTree = "<group>";
@@ -643,12 +644,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B8D35209293CABB7008A84EA /* Build configuration list for PBXNativeTarget "ForPDA" */;
 			buildPhases = (
+				B8FEA1BB29675BCE002DFAA4 /* SwiftLint */,
 				B8D351F1293CABB6008A84EA /* Sources */,
 				B8D351F2293CABB6008A84EA /* Frameworks */,
 				B8D351F3293CABB6008A84EA /* Resources */,
-				B8FEA1BB29675BCE002DFAA4 /* SwiftLint */,
-				B85021EA2A0807C0000AD3B0 /* Firebase Crashlytics */,
 				B8001CC22A197F0500E7A8A8 /* Set Build Number */,
+				B82B2EB72A87FFE700CB067C /* Sentry */,
 			);
 			buildRules = (
 			);
@@ -669,12 +670,11 @@
 				B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */,
 				B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */,
 				B8B55B012A07C948008C93D3 /* Factory */,
-				B87C32542A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport */,
-				B87C32562A0801EE00CFB7EF /* FirebaseCrashlytics */,
-				B87C32582A0801EE00CFB7EF /* FirebasePerformance */,
 				B88D3F582A098C600061C6C4 /* SFSafeSymbols */,
 				B8951CF92A0C5D09001597AF /* XCoordinator */,
 				B8951CFE2A0C6180001597AF /* SkeletonView */,
+				B82B2EB22A87D58D00CB067C /* Sentry */,
+				B82B2EB52A87D5F200CB067C /* AmplitudeSwift */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -717,10 +717,11 @@
 				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */,
 				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 				B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */,
-				B87C32532A0801EE00CFB7EF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				B8951CF82A0C5D09001597AF /* XCRemoteSwiftPackageReference "XCoordinator" */,
 				B8951CFD2A0C6180001597AF /* XCRemoteSwiftPackageReference "SkeletonView" */,
+				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
 			);
 			productRefGroup = B8D351F6293CABB6008A84EA /* Products */;
 			projectDirPath = "";
@@ -739,7 +740,6 @@
 				B8D35205293CABB7008A84EA /* LaunchScreen.storyboard in Resources */,
 				B874B4472A1066F500A004FC /* Localizable.strings in Resources */,
 				B8D35202293CABB7008A84EA /* Assets.xcassets in Resources */,
-				B8E4463B2A0044E000CE8745 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -765,7 +765,7 @@
 			shellPath = /bin/sh;
 			shellScript = "$SRCROOT/Scripts/set_build_number.sh\n";
 		};
-		B85021EA2A0807C0000AD3B0 /* Firebase Crashlytics */ = {
+		B82B2EB72A87FFE700CB067C /* Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -775,16 +775,15 @@
 			);
 			inputPaths = (
 				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-				"$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)\n",
 			);
-			name = "Firebase Crashlytics";
+			name = Sentry;
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+			shellScript = "if which sentry-cli >/dev/null; then\nexport SENTRY_ORG=forpda\nexport SENTRY_PROJECT=apple-ios\nexport SENTRY_AUTH_TOKEN=5d97c30a6b9949187a351342d789754ff3d03d23e2ebd5f27c9290d804e8d44a\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" --force-foreground 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"error: sentry-cli - $ERROR\"\nfi\nelse\necho \"error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
 		};
 		B8FEA1BB29675BCE002DFAA4 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -889,6 +888,7 @@
 				B8001CB92A19529B00E7A8A8 /* AppLanguage.swift in Sources */,
 				B8FD82142A1168E500EB7035 /* HTTPMethod.swift in Sources */,
 				B8FD82262A1174EA00EB7035 /* UIAction+Ext.swift in Sources */,
+				B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */,
 				B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */,
 				B8D351FB293CABB6008A84EA /* SceneDelegate.swift in Sources */,
 				B8BD2D96293E2AF000E12E29 /* CommentsViewDelegate.swift in Sources */,
@@ -896,6 +896,7 @@
 				B875D2092A1C0FBB00F8AB6A /* ProfileFactory.swift in Sources */,
 				B893011E2947E19800D14141 /* MenuView.swift in Sources */,
 				B8BD2D95293E2AF000E12E29 /* AbstractComment.swift in Sources */,
+				B82B2EC12A89059C00CB067C /* AppScheme.swift in Sources */,
 				B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */,
 				B957D4432A12CA120013F578 /* UIViewController+Ext.swift in Sources */,
 				B874B4392A103EBA00A004FC /* ForumFactory.swift in Sources */,
@@ -1157,6 +1158,22 @@
 				minimumVersion = 5.6.0;
 			};
 		};
+		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.9.4;
+			};
+		};
+		B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amplitude/Amplitude-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.11;
+			};
+		};
 		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kirualex/SwiftyGif.git";
@@ -1179,14 +1196,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.1.0;
-			};
-		};
-		B87C32532A0801EE00CFB7EF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 10.10.0;
 			};
 		};
 		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
@@ -1277,6 +1286,16 @@
 			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
+		B82B2EB22A87D58D00CB067C /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+		B82B2EB52A87D5F200CB067C /* AmplitudeSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
+			productName = AmplitudeSwift;
+		};
 		B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:RswiftGenerateInternalResources";
@@ -1300,21 +1319,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeExtensions;
-		};
-		B87C32542A0801EE00CFB7EF /* FirebaseAnalyticsWithoutAdIdSupport */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B87C32532A0801EE00CFB7EF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAnalyticsWithoutAdIdSupport;
-		};
-		B87C32562A0801EE00CFB7EF /* FirebaseCrashlytics */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B87C32532A0801EE00CFB7EF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseCrashlytics;
-		};
-		B87C32582A0801EE00CFB7EF /* FirebasePerformance */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B87C32532A0801EE00CFB7EF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebasePerformance;
 		};
 		B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;

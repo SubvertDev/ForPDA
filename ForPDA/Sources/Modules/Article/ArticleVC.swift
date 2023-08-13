@@ -44,13 +44,14 @@ final class ArticleVC: PDAViewController<ArticleView> {
         configureView()
         myView.delegate = self
         
-        viewModel.loadArticle()
-        
-        if viewModel.article.url.contains("to/20") { // ---- ????
-//            viewModel.loadArticle(url: URL(string: viewModel.article.url)!)
+        if viewModel.article.url.contains("to/20") {
+            viewModel.loadArticle()
         } else {
             myView.removeComments()
-            let elements = ArticleBuilder.makeDefaultArticle(description: viewModel.article.description, url: viewModel.article.url)
+            let elements = ArticleBuilder.makeDefaultArticle(
+                description: viewModel.article.description,
+                url: viewModel.article.url
+            )
             makeArticle(from: elements)
         }
     }

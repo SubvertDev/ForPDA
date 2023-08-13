@@ -20,7 +20,7 @@ final class NewsVC: PDAViewController<NewsView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) var analyticsService
+    @Injected(\.analyticsService) private var analyticsService
     
     private let viewModel: NewsVM
 
@@ -141,7 +141,7 @@ extension NewsVC: UITableViewDelegate {
         return UIContextMenuConfiguration.make(actions: [
             copyAction(article: article),
             shareAction(article: article),
-            brokenAction(article: article)
+            reportAction(article: article)
         ])
     }
     
@@ -161,7 +161,7 @@ extension NewsVC: UITableViewDelegate {
         }
     }
     
-    private func brokenAction(article: Article) -> UIAction {
+    private func reportAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
             analyticsService.reportBrokenArticle(article.url)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
