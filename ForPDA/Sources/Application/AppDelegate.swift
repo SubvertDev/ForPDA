@@ -10,6 +10,7 @@ import SnapKit
 import Factory
 import Sentry
 import Nuke
+import RouteComposer
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -22,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SentrySDK.start { options in
             options.dsn = Secrets.for(key: .SENTRY_DSN)
             options.debug = AppScheme.isDebug
+            options.enabled = !AppScheme.isDebug
             options.tracesSampleRate = 1.0
             options.diagnosticLevel = .warning
             options.attachScreenshot = true

@@ -1,5 +1,5 @@
 //
-//  SettingsVM.swift
+//  SettingsPresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 20.05.2023.
@@ -8,7 +8,7 @@
 import UIKit
 import Factory
 
-protocol SettingsVMProtocol {
+protocol SettingsPresenterProtocol {
     var sections: [MenuSection] { get }
     
     func changeLanguage(to language: AppLanguage)
@@ -18,7 +18,7 @@ protocol SettingsVMProtocol {
     func showLikesInCommentsSwitchTapped(isOn: Bool)
 }
 
-final class SettingsVM: SettingsVMProtocol {
+final class SettingsPresenter: SettingsPresenterProtocol {
     
     // MARK: - Properties
     

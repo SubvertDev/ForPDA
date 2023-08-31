@@ -18,12 +18,12 @@ final class MenuVC: PDAViewController<MenuView> {
     
     // MARK: - Properties
     
-    private let viewModel: MenuVMProtocol
+    private let presenter: MenuPresenterProtocol
     
     // MARK: - Lifecycle
     
-    init(viewModel: MenuVMProtocol) {
-        self.viewModel = viewModel
+    init(presenter: MenuPresenterProtocol) {
+        self.presenter = presenter
         super.init()
     }
     
@@ -61,11 +61,11 @@ final class MenuVC: PDAViewController<MenuView> {
 extension MenuVC: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.sections.count
+        return presenter.sections.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.sections[section].options.count
+        return presenter.sections[section].options.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -73,15 +73,15 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = viewModel.sections[indexPath.section].options[indexPath.row]
+        let model = presenter.sections[indexPath.section].options[indexPath.row]
         
         switch model.self {
         case .authCell:
             let cell = tableView.dequeueReusableCell(withClass: MenuAuthCell.self)
-            if let user = viewModel.user {
+            if let user = presenter.user {
                 let imageOptions = ImageLoadingOptions(placeholder: R.image.avatarPlaceholder(),
                                                        failureImage: R.image.avatarPlaceholder())
-                NukeExtensions.loadImage(with: URL(string: viewModel.user?.avatarUrl),
+                NukeExtensions.loadImage(with: URL(string: presenter.user?.avatarUrl),
                                          options: imageOptions,
                                          into: cell.iconImageView) { _ in }
                 cell.titleLabel.text = user.nickname
@@ -102,7 +102,7 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let model = viewModel.sections[indexPath.section].options[indexPath.row]
+        let model = presenter.sections[indexPath.section].options[indexPath.row]
         switch model.self {
         case .authCell(model: let model):
             model.handler()

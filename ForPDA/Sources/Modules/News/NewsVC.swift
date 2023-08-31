@@ -22,21 +22,20 @@ final class NewsVC: PDAViewController<NewsView> {
     
     @Injected(\.analyticsService) private var analyticsService
     
-    private let viewModel: NewsVM
+    private let presenter: NewsPresenterProtocol
 
     // MARK: - Lifecycle
     
-    init(viewModel: NewsVM) {
-        self.viewModel = viewModel
+    init(presenter: NewsPresenter) {
+        self.presenter = presenter
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = R.string.localizable.news()
         
         configureView()
-        viewModel.loadArticles()
+        presenter.loadArticles()
     }
     
     // MARK: - Configuration
@@ -57,7 +56,7 @@ extension NewsVC: SkeletonTableViewDataSource {
     // MARK: - Skeleton Table View
     
     func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 64
+        return 3
     }
     
     func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
@@ -73,12 +72,12 @@ extension NewsVC: SkeletonTableViewDataSource {
     // MARK: - Normal Table View
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.articles.count
+        return presenter.articles.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withClass: ArticleCell.self, for: indexPath)
-        cell.set(article: viewModel.articles[indexPath.row])
+        cell.set(article: presenter.articles[indexPath.row])
         return cell
     }
     
@@ -114,11 +113,11 @@ extension NewsVC: NewsVCProtocol {
 extension NewsVC: NewsViewDelegate {
     func refreshButtonTapped() {
         myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
-        viewModel.loadArticles()
+        presenter.loadArticles()
     }
     
     func refreshControlCalled() {
-        viewModel.refreshArticles()
+        presenter.refreshArticles()
     }
 }
 
@@ -130,13 +129,13 @@ extension NewsVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         // Check if non-skeleton table is shown
-        guard viewModel.articles.count - 1 >= indexPath.row else { return }
-        analyticsService.openArticleEvent(viewModel.articles[indexPath.row].url)
-        viewModel.showArticle(at: indexPath)
+        guard presenter.articles.count - 1 >= indexPath.row else { return }
+        analyticsService.openArticleEvent(presenter.articles[indexPath.row].url)
+        presenter.showArticle(at: indexPath)
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let article = viewModel.articles[safe: indexPath.row] else { return nil }
+        guard let article = presenter.articles[safe: indexPath.row] else { return nil }
         
         return UIContextMenuConfiguration.make(actions: [
             copyAction(article: article),

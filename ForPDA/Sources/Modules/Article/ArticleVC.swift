@@ -25,13 +25,13 @@ final class ArticleVC: PDAViewController<ArticleView> {
     @Injected(\.analyticsService) private var analyticsService
     @Injected(\.settingsService) private var settingsService
     
-    private let viewModel: ArticleVMProtocol
+    private let presenter: ArticlePresenterProtocol
     private var commentsVC: CommentsVC?
     
     // MARK: - Lifecycle
     
-    init(viewModel: ArticleVMProtocol) {
-        self.viewModel = viewModel
+    init(presenter: ArticlePresenterProtocol) {
+        self.presenter = presenter
         super.init()
     }
     
@@ -44,13 +44,13 @@ final class ArticleVC: PDAViewController<ArticleView> {
         configureView()
         myView.delegate = self
         
-        if viewModel.article.url.contains("to/20") {
-            viewModel.loadArticle()
+        if presenter.article.url.contains("to/20") {
+            presenter.loadArticle()
         } else {
             myView.removeComments()
             let elements = ArticleBuilder.makeDefaultArticle(
-                description: viewModel.article.description,
-                url: viewModel.article.url
+                description: presenter.article.description,
+                url: presenter.article.url
             )
             makeArticle(from: elements)
         }
@@ -60,15 +60,15 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     private func configureNavigationTitle() {
         let label = MarqueeLabel(frame: .zero, rate: 30, fadeLength: 0)
-        label.text = viewModel.article.title
+        label.text = presenter.article.title
         label.fadeLength = 30
         navigationItem.titleView = label
     }
     
     private func configureView() {
-        NukeExtensions.loadImage(with: URL(string: viewModel.article.imageUrl)!, into: myView.articleImage)
-        myView.titleLabel.text = viewModel.article.title
-        myView.commentsLabel.text = R.string.localizable.comments(Int(viewModel.article.commentAmount) ?? 0)
+        NukeExtensions.loadImage(with: URL(string: presenter.article.imageUrl)!, into: myView.articleImage)
+        myView.titleLabel.text = presenter.article.title
+        myView.commentsLabel.text = R.string.localizable.comments(Int(presenter.article.commentAmount) ?? 0)
     }
     
     private func configureMenu() {
@@ -80,23 +80,23 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     private func copyAction() -> UIAction {
         UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
-            UIPasteboard.general.string = viewModel.article.url
-            analyticsService.copyArticleLink(viewModel.article.url)
+            UIPasteboard.general.string = presenter.article.url
+            analyticsService.copyArticleLink(presenter.article.url)
             SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
         }
     }
     
     private func shareAction() -> UIAction {
         UIAction.make(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
-            let activity = UIActivityViewController(activityItems: [viewModel.article.url], applicationActivities: nil)
-            analyticsService.shareArticleLink(viewModel.article.url)
+            let activity = UIActivityViewController(activityItems: [presenter.article.url], applicationActivities: nil)
+            analyticsService.shareArticleLink(presenter.article.url)
             present(activity, animated: true)
         }
     }
     
     private func brokenAction() -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-            analyticsService.reportBrokenArticle(viewModel.article.url)
+            analyticsService.reportBrokenArticle(presenter.article.url)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
         }
     }
@@ -104,7 +104,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func externalLinkButtonTapped(_ link: String) {
         if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
-            analyticsService.clickButtonInArticle(currentUrl: viewModel.article.url, targetUrl: url.absoluteString)
+            analyticsService.clickButtonInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
         }
     }
     
@@ -156,7 +156,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     // MARK: - Making Comments
     
     func makeComments(from page: String) {
-        commentsVC = CommentsVC(article: viewModel.article, document: page)
+        commentsVC = CommentsVC(article: presenter.article, document: page)
         guard let commentsVC else { return }
         commentsVC.updateDelegate = self
         addChild(commentsVC)
@@ -224,6 +224,6 @@ extension ArticleVC: CommentsVCProtocol {
 
 extension ArticleVC: PDAResizingTextViewDelegate {
     func willOpenURL(_ url: URL) {
-        analyticsService.clickLinkInArticle(currentUrl: viewModel.article.url, targetUrl: url.absoluteString)
+        analyticsService.clickLinkInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
     }
 }

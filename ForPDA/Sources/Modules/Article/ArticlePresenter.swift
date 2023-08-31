@@ -1,5 +1,5 @@
 //
-//  ArticleVM.swift
+//  ArticlePresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 14.12.2022.
@@ -7,15 +7,14 @@
 
 import Foundation
 import Factory
-import XCoordinator
 
-protocol ArticleVMProtocol {
+protocol ArticlePresenterProtocol {
     var article: Article { get }
     
     func loadArticle()
 }
 
-final class ArticleVM: ArticleVMProtocol {
+final class ArticlePresenter: ArticlePresenterProtocol {
     
     // MARK: - Properties
     

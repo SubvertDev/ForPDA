@@ -24,6 +24,12 @@ final class PDATabBarController: UITabBarController, UITabBarControllerDelegate 
         // if #available(iOS 15.0, *) {
         //     UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         // }
+        
+        if let viewControllers {
+            for controller in viewControllers {
+                controller.tabBarItem.title = "\(Int.random(in: 0...1))"
+            }
+        }
     }
     
     // Tap on tabbar to scroll news to the top

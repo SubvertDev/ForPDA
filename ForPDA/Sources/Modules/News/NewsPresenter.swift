@@ -1,5 +1,5 @@
 //
-//  NewsVM.swift
+//  NewsPresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 24.12.2022.
@@ -8,19 +8,17 @@
 
 import Foundation
 import Factory
-import XCoordinator
 import WebKit
+import RouteComposer
 
-protocol NewsVMProtocol {
+protocol NewsPresenterProtocol {
     var articles: [Article] { get }
-    
     func loadArticles()
     func refreshArticles()
-    
     func showArticle(at indexPath: IndexPath)
 }
 
-final class NewsVM: NSObject, NewsVMProtocol {
+final class NewsPresenter: NSObject, NewsPresenterProtocol {
     
     // MARK: - Properties
     
@@ -28,8 +26,9 @@ final class NewsVM: NSObject, NewsVMProtocol {
     @Injected(\.parsingService) private var parsingService
     @Injected(\.settingsService) private var settingsService
     
-    private var router: UnownedRouter<NewsRoute>
     weak var view: NewsVCProtocol?
+    
+    private let router = DefaultRouter()
     
     private var page = 0
     var articles: [Article] = []
@@ -42,9 +41,9 @@ final class NewsVM: NSObject, NewsVMProtocol {
     
     // MARK: - Init
     
-    init(router: UnownedRouter<NewsRoute>) {
-        self.router = router
-    }
+//    init() {
+//
+//    }
     
     // MARK: - Public Functions
     
@@ -109,13 +108,13 @@ final class NewsVM: NSObject, NewsVMProtocol {
     
     func showArticle(at indexPath: IndexPath) {
         let article = articles[indexPath.row]
-        router.trigger(.newsDetail(article))
+        try? router.navigate(to: RouteMap.articleScreen, with: article, animated: true) {_ in }
     }
 }
 
 // MARK: - WKNavigationDelegate
 
-extension NewsVM: WKNavigationDelegate {
+extension NewsPresenter: WKNavigationDelegate {
     
     private func configureWebView() {
         if let webView = UIApplication.shared.windows.first?.viewWithTag(666) as? WKWebView {

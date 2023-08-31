@@ -24,12 +24,12 @@ final class SettingsVC: PDAViewController<SettingsView> {
     
     @LazyInjected(\.settingsService) private var settingsService
 
-    private let viewModel: SettingsVMProtocol
+    private let presenter: SettingsPresenterProtocol
     
     // MARK: - Lifecycle
     
-    init(viewModel: SettingsVMProtocol) {
-        self.viewModel = viewModel
+    init(presenter: SettingsPresenterProtocol) {
+        self.presenter = presenter
         super.init()
     }
     
@@ -68,15 +68,15 @@ final class SettingsVC: PDAViewController<SettingsView> {
 extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.sections.count
+        return presenter.sections.count
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return viewModel.sections[section].title
+        return presenter.sections[section].title
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.sections[section].options.count
+        return presenter.sections[section].options.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -86,7 +86,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
     // Refactor this
     // swiftlint:disable cyclomatic_complexity function_body_length
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let model = viewModel.sections[indexPath.section].options[indexPath.row]
+        let model = presenter.sections[indexPath.section].options[indexPath.row]
         
         switch model.self {
         case .staticCell(model: let model):
@@ -108,9 +108,9 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 
                 if !isOn {
                     if indexPath.row == 0 {
-                        self.viewModel.showFastLoadingSystemSwitchTapped(isOn: isOn)
+                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: isOn)
                     } else {
-                        self.viewModel.showLikesInCommentsSwitchTapped(isOn: isOn)
+                        self.presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     }
                     return
                 }
@@ -130,17 +130,17 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 
                 let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { _ in
                     if indexPath.row == 0 {
-                        self.viewModel.showFastLoadingSystemSwitchTapped(isOn: isOn)
+                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: isOn)
                     } else {
-                        self.viewModel.showLikesInCommentsSwitchTapped(isOn: isOn)
+                        self.presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     }
                 }
                 let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { _ in
                     cell.set(with: model)
                     if indexPath.row == 0 {
-                        self.viewModel.showFastLoadingSystemSwitchTapped(isOn: !isOn)
+                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: !isOn)
                     } else {
-                        self.viewModel.showLikesInCommentsSwitchTapped(isOn: !isOn)
+                        self.presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)
                     }
                 }
                 
@@ -162,7 +162,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let model = viewModel.sections[indexPath.section].options[indexPath.row]
+        let model = presenter.sections[indexPath.section].options[indexPath.row]
         switch model.self {
         case .staticCell(model: let model):
             model.handler()
@@ -183,15 +183,15 @@ extension SettingsVC: SettingsVCProtocol {
         
         let automaticAction = UIAlertAction(title: R.string.localizable.automatic(), style: .default) { _ in
             guard self.settingsService.getAppLanguage() != AppLanguage.auto else { return }
-            self.viewModel.changeLanguage(to: .auto)
+            self.presenter.changeLanguage(to: .auto)
         }
         let russianAction = UIAlertAction(title: R.string.localizable.languageRussian(), style: .default) { _ in
             guard self.settingsService.getAppLanguage() != AppLanguage.ru else { return }
-            self.viewModel.changeLanguage(to: .ru)
+            self.presenter.changeLanguage(to: .ru)
         }
         let englishAction = UIAlertAction(title: R.string.localizable.languageEnglish(), style: .default) { _ in
             guard self.settingsService.getAppLanguage() != AppLanguage.en else { return }
-            self.viewModel.changeLanguage(to: .en)
+            self.presenter.changeLanguage(to: .en)
         }
         let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
         
@@ -208,15 +208,15 @@ extension SettingsVC: SettingsVCProtocol {
         
         let automaticAction = UIAlertAction(title: R.string.localizable.automatic(), style: .default) { _ in
             guard self.settingsService.getAppTheme() != AppTheme.auto else { return }
-            self.viewModel.changeTheme(to: .auto)
+            self.presenter.changeTheme(to: .auto)
         }
         let lightAction = UIAlertAction(title: R.string.localizable.themeLight(), style: .default) { _ in
             guard self.settingsService.getAppTheme() != AppTheme.light else { return }
-            self.viewModel.changeTheme(to: .light)
+            self.presenter.changeTheme(to: .light)
         }
         let darkAction = UIAlertAction(title: R.string.localizable.themeDark(), style: .default) { _ in
             guard self.settingsService.getAppTheme() != AppTheme.dark else { return }
-            self.viewModel.changeTheme(to: .dark)
+            self.presenter.changeTheme(to: .dark)
         }
         let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
         
@@ -233,11 +233,11 @@ extension SettingsVC: SettingsVCProtocol {
         
         let darkAction = UIAlertAction(title: R.string.localizable.backgroundDark(), style: .default) { _ in
             guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.dark else { return }
-            self.viewModel.changeDarkThemeBackgroundColor(to: .dark)
+            self.presenter.changeDarkThemeBackgroundColor(to: .dark)
         }
         let blackAction = UIAlertAction(title: R.string.localizable.backgroundBlack(), style: .default) { _ in
             guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.black else { return }
-            self.viewModel.changeDarkThemeBackgroundColor(to: .black)
+            self.presenter.changeDarkThemeBackgroundColor(to: .black)
         }
         let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
         

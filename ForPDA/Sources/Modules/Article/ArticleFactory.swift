@@ -5,14 +5,17 @@
 //  Created by Subvert on 10.05.2023.
 //
 
-import XCoordinator
+import RouteComposer
 
-struct ArticleFactory {
-    static func create(with article: Article) -> ArticleVC {
-        let viewModel = ArticleVM(article: article)
-        let viewController = ArticleVC(viewModel: viewModel)
-        
-        viewModel.view = viewController
+final class ArticleFactory: Factory {
+  
+  typealias ViewController = ArticleVC
+  typealias Context = Article
+  
+    func build(with context: Context) throws -> ViewController {
+        let presenter = ArticlePresenter(article: context)
+        let viewController = ViewController(presenter: presenter)
+        presenter.view = viewController
         
         return viewController
     }

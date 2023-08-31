@@ -7,14 +7,12 @@
 
 import UIKit
 import Factory
-import XCoordinator
+import RouteComposer
 import WebKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     @Injected(\.settingsService) private var settingsService
-
-    private let coordinator = HomeCoordinator().strongRouter
     
     var window: UIWindow?
     
@@ -24,9 +22,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         
+        window?.rootViewController = UIViewController()
+        window?.makeKeyAndVisible()
+        
         overrideApplicationThemeStyle(with: settingsService.getAppTheme())
         configureWKWebView()
-        coordinator.setRoot(for: window!)
+
+        try? DefaultRouter().navigate(to: RouteMap.tabBarScreen, with: nil)
     }
     
     private func configureWKWebView() {

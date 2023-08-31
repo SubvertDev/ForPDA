@@ -13,16 +13,16 @@ protocol ForumVCProtocol: AnyObject {
 
 final class ForumVC: PDAViewController<ForumView> {
     
-    private let viewModel: ForumVMProtocol
+    private let presenter: ForumPresenterProtocol
     
-    init(viewModel: ForumVMProtocol) {
-        self.viewModel = viewModel
+    init(presenter: ForumPresenterProtocol) {
+        self.presenter = presenter
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = R.string.localizable.forum()
+        
     }
     
 }

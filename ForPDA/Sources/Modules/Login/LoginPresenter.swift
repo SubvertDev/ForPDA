@@ -1,5 +1,5 @@
 //
-//  LoginVM.swift
+//  LoginPresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 10.05.2023.
@@ -9,13 +9,13 @@ import Foundation
 import Factory
 import WebKit
 
-protocol LoginVMProtocol {
+protocol LoginPresenterProtocol {
     func textChanged(to value: String, in textField: LoginView.LoginTextFields)
     func getCaptcha()
     func login()
 }
 
-final class LoginVM: LoginVMProtocol {
+final class LoginPresenter: LoginPresenterProtocol {
     
     // MARK: - Proeprties
     
@@ -61,7 +61,7 @@ final class LoginVM: LoginVMProtocol {
                 let encodedCookies = try JSONEncoder().encode(cookiesArray)
                 settingsService.setCookiesAsData(encodedCookies)
             } catch {
-                print("[ERROR] Failed to encode cookies in LoginVM")
+                print("[ERROR] Failed to encode cookies in LoginPresenter")
             }
             
             for cookie in HTTPCookieStorage.shared.cookies ?? [] {
