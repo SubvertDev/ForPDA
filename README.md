@@ -11,7 +11,7 @@
 - Скачать и запустить проект, зависимости загрузятся автоматически через SPM
 - Создать Secrets.xcconfig и ввести значения для ключей SENTRY_DSN, SENTRY_DSYM_TOKEN, AMPLITUDE_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
 
-## Используемые иблиотеки
+## Используемые библиотеки
 - [Amplitude](https://github.com/amplitude/Amplitude-Swift) - аналитика
 - [Sentry](https://github.com/getsentry/sentry-cocoa) - мониторинг ошибок
 - [SwiftSoup](https://github.com/scinfu/SwiftSoup) - парсинг HTML страниц
