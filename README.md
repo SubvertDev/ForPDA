@@ -2,7 +2,7 @@
 ![Лого](logo.png)  
 Альтернативный клиент [4pda.to](https://4pda.to/)
 
-![Скриншоты](screenshots/5-screenshots.png)
+![Скриншоты](screenshots.png)
 
 ## Требования и установка
 - iOS 14.0+ / macOS 13.0+
