@@ -9,7 +9,6 @@ import UIKit
 import Factory
 import SwiftMessages
 import SFSafeSymbols
-import SkeletonView
 
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
@@ -20,68 +19,68 @@ final class NewsVC: PDAViewController<NewsView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) var analyticsService
+    @Injected(\.analyticsService) private var analyticsService
     
-    private let viewModel: NewsVM
+    private let presenter: NewsPresenterProtocol
 
     // MARK: - Lifecycle
     
-    init(viewModel: NewsVM) {
-        self.viewModel = viewModel
+    init(presenter: NewsPresenter) {
+        self.presenter = presenter
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.title = R.string.localizable.news()
         
-        configureView()
-        viewModel.loadArticles()
-    }
-    
-    // MARK: - Configuration
-    
-    private func configureView() {
         myView.delegate = self
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
-        myView.tableView.isSkeletonable = true
-        myView.tableView.showAnimatedSkeleton()
+        
+        presenter.loadArticles()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showVersion03UpdateInfo()
+    }
+    
+    // todo Удалить после релиза 0.4
+    private func showVersion03UpdateInfo() {
+        let updateHasShown = "hasShownVersion03UpdateInfo"
+        if !UserDefaults.standard.bool(forKey: updateHasShown) {
+            UserDefaults.standard.set(true, forKey: updateHasShown)
+            let alert = UIAlertController(
+                title: R.string.localizable.update03(),
+                message: R.string.localizable.update03Text(),
+                preferredStyle: .alert
+            )
+            let enableAction = UIAlertAction(title: R.string.localizable.update03EnableExtension(), style: .cancel) { _ in
+                if let url = URL(string: "App-Prefs:SAFARI&path=WEB_EXTENSIONS/") {
+                    UIApplication.shared.open(url)
+                }
+            }
+            let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default)
+            alert.addAction(enableAction)
+            alert.addAction(okAction)
+            present(alert, animated: true)
+        }
     }
 }
 
 // MARK: - TableView DataSource
 
-extension NewsVC: SkeletonTableViewDataSource {
-    
-    // MARK: - Skeleton Table View
-    
-    func collectionSkeletonView(_ skeletonView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 64
-    }
-    
-    func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
-        let cell = skeletonView.dequeueReusableCell(withClass: ArticleCell.self, for: indexPath)
-        cell.selectionStyle = .none
-        return cell
-    }
-    
-    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
-        return String(describing: ArticleCell.self)
-    }
-    
-    // MARK: - Normal Table View
-    
+extension NewsVC: UITableViewDataSource {
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.articles.count
+        return presenter.articles.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withClass: ArticleCell.self, for: indexPath)
-        cell.set(article: viewModel.articles[indexPath.row])
+        cell.set(article: presenter.articles[indexPath.row])
         return cell
     }
-    
 }
 
 // MARK: - NewsVC Protocol
@@ -89,23 +88,22 @@ extension NewsVC: SkeletonTableViewDataSource {
 extension NewsVC: NewsVCProtocol {
     
     func articlesUpdated() {
-        DispatchQueue.main.async {
-            self.myView.tableView.reloadData()
-            self.myView.tableView.hideSkeleton(reloadDataAfter: false)
-            self.myView.refreshControl.endRefreshing()
-            self.myView.refreshButton.isHidden = false
-            self.myView.refreshButton.setTitle(R.string.localizable.loadMore(), for: .normal)
-        }
+        myView.tableView.reloadData()
+        myView.refreshControl.endRefreshing()
+        myView.refreshButton.isHidden = false
+        myView.refreshButton.setTitle(R.string.localizable.loadMore(), for: .normal)
+        myView.loadingIndicator.isHidden = true
     }
     
     func showError() {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(title: R.string.localizable.error(),
-                                          message: R.string.localizable.somethingWentWrong(),
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
-            self.present(alert, animated: true)
-        }
+        myView.loadingIndicator.isHidden = true
+        let alert = UIAlertController(
+            title: R.string.localizable.error(),
+            message: R.string.localizable.somethingWentWrong(),
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -114,11 +112,11 @@ extension NewsVC: NewsVCProtocol {
 extension NewsVC: NewsViewDelegate {
     func refreshButtonTapped() {
         myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
-        viewModel.loadArticles()
+        presenter.loadArticles()
     }
     
     func refreshControlCalled() {
-        viewModel.refreshArticles()
+        presenter.refreshArticles()
     }
 }
 
@@ -130,18 +128,18 @@ extension NewsVC: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         // Check if non-skeleton table is shown
-        guard viewModel.articles.count - 1 >= indexPath.row else { return }
-        analyticsService.openArticleEvent(viewModel.articles[indexPath.row].url)
-        viewModel.showArticle(at: indexPath)
+        guard presenter.articles.count - 1 >= indexPath.row else { return }
+        analyticsService.openArticleEvent(presenter.articles[indexPath.row].url)
+        presenter.showArticle(at: indexPath)
     }
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let article = viewModel.articles[safe: indexPath.row] else { return nil }
+        guard let article = presenter.articles[safe: indexPath.row] else { return nil }
         
         return UIContextMenuConfiguration.make(actions: [
             copyAction(article: article),
             shareAction(article: article),
-            brokenAction(article: article)
+            reportAction(article: article)
         ])
     }
     
@@ -161,7 +159,7 @@ extension NewsVC: UITableViewDelegate {
         }
     }
     
-    private func brokenAction(article: Article) -> UIAction {
+    private func reportAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
             analyticsService.reportBrokenArticle(article.url)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())

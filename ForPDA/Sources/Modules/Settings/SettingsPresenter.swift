@@ -1,5 +1,5 @@
 //
-//  SettingsVM.swift
+//  SettingsPresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 20.05.2023.
@@ -8,15 +8,17 @@
 import UIKit
 import Factory
 
-protocol SettingsVMProtocol {
+protocol SettingsPresenterProtocol {
     var sections: [MenuSection] { get }
     
     func changeLanguage(to language: AppLanguage)
     func changeTheme(to theme: AppTheme)
     func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor)
+    func showFastLoadingSystemSwitchTapped(isOn: Bool)
+    func showLikesInCommentsSwitchTapped(isOn: Bool)
 }
 
-final class SettingsVM: SettingsVMProtocol {
+final class SettingsPresenter: SettingsPresenterProtocol {
     
     // MARK: - Properties
     
@@ -47,16 +49,26 @@ final class SettingsVM: SettingsVMProtocol {
         }
     }
     
+    private var currentShowLikesInComments: Bool {
+        settingsService.getShowLikesInComments()
+    }
+    
+    private var currentLoadingSystemIsFast: Bool {
+        settingsService.getFastLoadingSystem()
+    }
+    
     private let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
     private let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
     
     lazy var sections: [MenuSection] = [
+        // Language
         MenuSection(title: R.string.localizable.general(), options: [
             .descriptionCell(model: DescriptionOption(title: R.string.localizable.language(),
                                                       description: currentLanguage,
                                                       handler: changeLanguage))
         ]),
         
+        // Theme
         MenuSection(title: R.string.localizable.appearance(), options: [
             .descriptionCell(model: DescriptionOption(title: R.string.localizable.theme(),
                                                       description: currentTheme,
@@ -66,14 +78,22 @@ final class SettingsVM: SettingsVMProtocol {
                                                       handler: changeDarkThemeBackgroundColor))
         ]),
         
-        //MenuSection(title: "Просмотр тем", options: []),
+        // Comments
+        MenuSection(title: R.string.localizable.advanced(), options: [
+            .switchCell(model: SwitchOption(title: R.string.localizable.fastLoadingSystem(),
+                                            isOn: currentLoadingSystemIsFast,
+                                            handler: {})),
+            .switchCell(model: SwitchOption(title: R.string.localizable.commentsShowLikes(),
+                                            isOn: currentShowLikesInComments,
+                                            handler: {}))
+        ]),
         
-        //MenuSection(title: "Списки", options: []),
-        
+        // Account
         MenuSection(title: R.string.localizable.account(), options: [
             .staticCell(model: MenuOption(title: R.string.localizable.signOut(), handler: showDefaultError))
         ]),
         
+        // About App
         MenuSection(title: R.string.localizable.aboutApp(), options: [
             // .staticCell(model: MenuOption(title: "Проверить обновления", handler: {})),
             .staticCell(model: MenuOption(title: "\(R.string.localizable.version()) \(version) (\(build))", handler: {}))
@@ -84,39 +104,30 @@ final class SettingsVM: SettingsVMProtocol {
     
     func changeLanguage(to language: AppLanguage) {
         settingsService.setAppLanguage(to: language)
-        
-        let model = DescriptionOption(title: R.string.localizable.language(),
-                                      description: currentLanguage,
-                                      handler: changeLanguage)
-        sections[0].options[0] = .descriptionCell(model: model)
-        
         view?.showReloadingAlert()
-        view?.reloadData()
+        reloadData()
     }
     
     func changeTheme(to theme: AppTheme) {
         settingsService.setAppTheme(to: theme)
-        
         (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?
             .overrideApplicationThemeStyle(with: theme)
-        
-        let model = DescriptionOption(title: R.string.localizable.theme(),
-                                      description: currentTheme,
-                                      handler: changeTheme)
-        sections[1].options[0] = .descriptionCell(model: model)
-        
-        view?.reloadData()
+        reloadData()
     }
     
     func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor) {
         settingsService.setAppBackgroundColor(to: color)
-        
-        let model = DescriptionOption(title: R.string.localizable.backgroundNight(),
-                                      description: currentAppDarkThemeBackgroundColor,
-                                      handler: changeDarkThemeBackgroundColor)
-        sections[1].options[1] = .descriptionCell(model: model)
-        
-        view?.reloadData()
+        reloadData()
+    }
+    
+    func showFastLoadingSystemSwitchTapped(isOn: Bool) {
+        settingsService.setFastLoadingSystem(to: isOn)
+        reloadData(forceUpdate: false)
+    }
+    
+    func showLikesInCommentsSwitchTapped(isOn: Bool) {
+        settingsService.setShowLikesInComments(to: isOn)
+        reloadData(forceUpdate: false)
     }
     
     // MARK: - Private Actions
@@ -135,5 +146,43 @@ final class SettingsVM: SettingsVMProtocol {
     
     private func showDefaultError() {
         view?.showDefaultError()
+    }
+    
+    // Refactor this
+    
+    private func reloadData(forceUpdate: Bool = true) {
+        let model = DescriptionOption(
+            title: R.string.localizable.language(),
+            description: currentLanguage,
+            handler: changeLanguage)
+        sections[0].options[0] = .descriptionCell(model: model)
+        
+        let model1 = DescriptionOption(
+            title: R.string.localizable.theme(),
+            description: currentTheme,
+            handler: changeTheme)
+        sections[1].options[0] = .descriptionCell(model: model1)
+        
+        let model2 = DescriptionOption(
+            title: R.string.localizable.backgroundNight(),
+            description: currentAppDarkThemeBackgroundColor,
+            handler: changeDarkThemeBackgroundColor)
+        sections[1].options[1] = .descriptionCell(model: model2)
+        
+        let model3 = SwitchOption(
+            title: R.string.localizable.fastLoadingSystem(),
+            isOn: settingsService.getFastLoadingSystem(),
+            handler: {})
+        sections[2].options[0] = .switchCell(model: model3)
+        
+        let model4 = SwitchOption(
+            title: R.string.localizable.commentsShowLikes(),
+            isOn: settingsService.getShowLikesInComments(),
+            handler: {})
+        sections[2].options[1] = .switchCell(model: model4)
+        
+        if forceUpdate {
+            view?.reloadData()
+        }
     }
 }

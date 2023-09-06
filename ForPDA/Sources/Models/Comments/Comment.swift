@@ -8,6 +8,7 @@
 import Foundation
 
 class Comment: AbstractComment, ReflectedStringConvertible {
+    let avatarUrl: String
     let author: String
     let text: String
     let date: String
@@ -17,13 +18,17 @@ class Comment: AbstractComment, ReflectedStringConvertible {
     var level: Int!
     var replyTo: AbstractComment?
     
-    init(author: String,
-         text: String,
-         date: String,
-         likes: Int,
-         replies: [AbstractComment]!,
-         level: Int!,
-         replyTo: AbstractComment? = nil) {
+    init(
+        avatarUrl: String,
+        author: String,
+        text: String,
+        date: String,
+        likes: Int,
+        replies: [AbstractComment]!,
+        level: Int!,
+        replyTo: AbstractComment? = nil
+    ) {
+        self.avatarUrl = avatarUrl
         self.author = author
         self.text = text
         self.date = date

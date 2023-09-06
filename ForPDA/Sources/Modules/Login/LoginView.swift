@@ -118,7 +118,7 @@ final class LoginView: UIView {
          captchaTextField,
          errorMessageLabel,
          loginButton
-        ].forEach { view.addSubview($0) }
+        ].forEach { addSubview($0) }
     }
     
     private func makeConstraints() {

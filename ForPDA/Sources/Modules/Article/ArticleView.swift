@@ -6,32 +6,37 @@
 //
 
 import UIKit
+import SFSafeSymbols
+
+protocol ArticleViewDelegate: AnyObject {
+    func updateCommentsButtonTapped()
+}
 
 final class ArticleView: UIView {
     
     // MARK: - Views
     
-    let scrollView: UIScrollView = {
+    private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.bounces = false
         scrollView.showsHorizontalScrollIndicator = false
         return scrollView
     }()
     
-    let contentView: UIView = {
+    private let contentView: UIView = {
         let view = UIView()
         return view
     }()
     
-    let articleImage: PDAResizingImageView = {
+    private(set) var articleImage: PDAResizingImageView = {
         let imageView = PDAResizingImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.addoverlay()
+//        imageView.addoverlay()
         return imageView
     }()
     
-    let titleLabel: UILabel = {
+    private(set) var titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 25, weight: .semibold)
         label.textColor = .white
@@ -44,49 +49,57 @@ final class ArticleView: UIView {
         return label
     }()
     
-    let hideView: UIView = {
+    private(set) var hideView: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBackground
         return view
     }()
     
-    let loadingIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView()
-        indicator.style = .large
-        indicator.tintColor = .black
-        indicator.startAnimating()
-        indicator.hidesWhenStopped = true
-        return indicator
+    private(set) var loadingIndicator: ProgressView = {
+        let progress = ProgressView(colors: [.label], lineWidth: 4)
+        progress.isAnimating = true
+        return progress
     }()
     
-    let stackView: UIStackView = {
+    private(set) var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
-        stackView.distribution = .fill
+        stackView.distribution = .fillProportionally
         stackView.spacing = 16
         return stackView
     }()
     
-    let separator: UIView = {
+    private let separator: UIView = {
         let view = UIView()
         view.backgroundColor = .label
         return view
     }()
     
-    let commentsLabel: UILabel = {
+    private(set) var commentsLabel: UILabel = {
         let label = UILabel()
         label.text = R.string.localizable.comments(0)
         label.font = .systemFont(ofSize: 20, weight: .medium)
         return label
     }()
     
-    let commentsContainer = UIView()
+    private(set) lazy var updateCommentsButton: UIButton = {
+        let button = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(weight: .bold)
+        let image = UIImage(systemSymbol: .arrowTriangle2Circlepath, withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.addTarget(self, action: #selector(updateCommentsButtonTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    private(set) var commentsContainer = UIView()
+    
+    // MARK: - Properties
+    
+    weak var delegate: ArticleViewDelegate?
     
     // MARK: - View Lifecycle
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .systemBackground
         addSubviews()
         makeConstraints()
     }
@@ -95,9 +108,20 @@ final class ArticleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Actions
+    
+    @objc private func updateCommentsButtonTapped() {
+        if !updateCommentsButton.isButtonAnimatingNow {
+            delegate?.updateCommentsButtonTapped()
+            updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
+        }
+    }
+    
+    // MARK: - Public Functions
+    
     func stopLoading() {
         hideView.isHidden = true
-        loadingIndicator.stopAnimating()
+        loadingIndicator.isHidden = true
     }
     
     func removeComments() {
@@ -118,13 +142,13 @@ final class ArticleView: UIView {
         contentView.addSubview(stackView)
         contentView.addSubview(separator)
         contentView.addSubview(commentsLabel)
+        contentView.addSubview(updateCommentsButton)
         contentView.addSubview(commentsContainer)
     }
     
     private func makeConstraints() {
         scrollView.snp.makeConstraints { make in
-            make.top.bottom.leading.trailing.equalToSuperview()
-            make.width.equalToSuperview()
+            make.edges.width.equalToSuperview()
         }
         
         let hideViewTopInset = UIScreen.main.bounds.width * 0.6
@@ -134,7 +158,9 @@ final class ArticleView: UIView {
         }
         
         loadingIndicator.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-64)
+            make.size.equalTo(44)
         }
         
         contentView.snp.makeConstraints { make in
@@ -144,36 +170,41 @@ final class ArticleView: UIView {
         }
         
         articleImage.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
+            make.top.horizontalEdges.width.equalToSuperview()
             make.height.equalTo(articleImage.snp.width).multipliedBy(0.6)
-            make.width.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
             make.bottom.equalTo(articleImage).inset(8)
-            make.leading.trailing.equalToSuperview().inset(16)
+            make.horizontalEdges.equalToSuperview().inset(16)
         }
         
         stackView.snp.makeConstraints { make in
             make.top.equalTo(articleImage.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.centerX.equalToSuperview()
+            make.height.equalTo(1000).priority(701)
         }
         
         separator.snp.makeConstraints { make in
             make.top.equalTo(stackView.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.height.equalTo(1)
         }
         
         commentsLabel.snp.makeConstraints { make in
             make.top.equalTo(separator.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview().inset(12)
+            make.horizontalEdges.equalToSuperview().inset(12)
+        }
+        
+        updateCommentsButton.snp.makeConstraints { make in
+            make.centerY.equalTo(commentsLabel)
+            make.trailing.equalToSuperview().inset(16)
         }
         
         commentsContainer.snp.makeConstraints { make in
             make.top.equalTo(commentsLabel.snp.bottom).offset(16)
-            make.leading.trailing.equalToSuperview()
+            make.horizontalEdges.equalToSuperview()
             make.bottom.equalToSuperview().inset(16)
         }
     }

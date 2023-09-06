@@ -5,14 +5,18 @@
 //  Created by Subvert on 23.05.2023.
 //
 
-import XCoordinator
+import RouteComposer
 
-struct ProfileFactory {
-    static func create() -> ProfileVC {
-        let viewModel = ProfileVM()
-        let viewController = ProfileVC(viewModel: viewModel)
-        
-        viewModel.view = viewController
+final class ProfileFactory: Factory {
+  
+  typealias ViewController = ProfileVC
+  typealias Context = Any?
+  
+    func build(with context: Context) throws -> ViewController {
+        let presenter = ProfilePresenter()
+        let viewController = ViewController(presenter: presenter)
+        presenter.view = viewController
+        // presenter.context = context
         
         return viewController
     }

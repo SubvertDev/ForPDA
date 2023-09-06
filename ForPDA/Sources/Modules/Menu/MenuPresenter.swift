@@ -1,5 +1,5 @@
 //
-//  MenuVM.swift
+//  MenuPresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 08.05.2023.
@@ -8,21 +8,19 @@
 import UIKit
 import Factory
 import SFSafeSymbols
-import XCoordinator
+import RouteComposer
 
-protocol MenuVMProtocol {
+protocol MenuPresenterProtocol {
     var sections: [MenuSection] { get }
     var user: User? { get }
 }
 
-final class MenuVM: MenuVMProtocol {
+final class MenuPresenter: MenuPresenterProtocol {
     
     // MARK: - Properties
     
     @LazyInjected(\.settingsService) private var settingsService
-    
-    private let router: UnownedRouter<MenuRoute>
-    
+        
     weak var view: MenuVCProtocol?
     
     lazy var sections: [MenuSection] = [
@@ -34,8 +32,8 @@ final class MenuVM: MenuVMProtocol {
             .staticCell(model: MenuOption(title: R.string.localizable.news(),
                                           icon: .newspaperFill, handler: showNewsScreen)),
             
-            .staticCell(model: MenuOption(title: R.string.localizable.search(),
-                                          icon: .magnifyingglass, handler: showSearchScreen)),
+//            .staticCell(model: MenuOption(title: R.string.localizable.search(),
+//                                          icon: .magnifyingglass, handler: showSearchScreen)),
             
             .staticCell(model: MenuOption(title: R.string.localizable.forum(),
                                           icon: .bubbleLeftAndBubbleRightFill, handler: showForumScreen)),
@@ -57,7 +55,7 @@ final class MenuVM: MenuVMProtocol {
         
         MenuSection(options: [
             .staticCell(model: MenuOption(title: R.string.localizable.appAuthor(),
-                                          icon: .heartFill, handler: showAuthor)),
+                                          image: R.image.forpda(), handler: showAuthor)),
             
             .staticCell(model: MenuOption(title: R.string.localizable.appDiscussionSite(),
                                           image: R.image.forpda(), handler: showDefaultError)),
@@ -69,7 +67,7 @@ final class MenuVM: MenuVMProtocol {
                                           image: R.image.telegram(), handler: openTelegramChat)),
             
             .staticCell(model: MenuOption(title: R.string.localizable.github(),
-                                          image: R.image.github(), handler: showDefaultError))
+                                          image: R.image.github(), handler: openGithub))
         ])
     ]
     
@@ -77,9 +75,7 @@ final class MenuVM: MenuVMProtocol {
     
     // MARK: - Lifecycle
     
-    init(router: UnownedRouter<MenuRoute>) {
-        self.router = router
-        
+    init() {
         if let userData = settingsService.getUser() {
             user = try? JSONDecoder().decode(User.self, from: userData)
         }
@@ -120,6 +116,12 @@ final class MenuVM: MenuVMProtocol {
         UIApplication.shared.open(url)
     }
     
+    private func openGithub() {
+        guard let url = URL(string: Links.github) else { return }
+        guard UIApplication.shared.canOpenURL(url) else { return }
+        UIApplication.shared.open(url)
+    }
+    
     private func showDefaultError() {
         view?.showDefaultError()
     }
@@ -127,27 +129,19 @@ final class MenuVM: MenuVMProtocol {
     // MARK: - Navigation
     
     func showLoginOrProfileScreen() {
-        if user != nil {
-            router.trigger(.profile)
-        } else {
-            router.trigger(.login)
-        }
+        try? DefaultRouter().navigate(to: RouteMap.profileScreen, with: nil)
     }
     
     private func showNewsScreen() {
-        router.trigger(.news)
-    }
-    
-    private func showSearchScreen() {
-        router.trigger(.search)
+        try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
     }
     
     private func showForumScreen() {
-        router.trigger(.forum)
+        try? DefaultRouter().navigate(to: RouteMap.forumScreen, with: nil)
     }
     
     private func showSettingsScreen() {
-        router.trigger(.settings)
+        try? DefaultRouter().navigate(to: RouteMap.settingsScreen, with: nil)
     }
     
 }

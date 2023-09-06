@@ -16,6 +16,7 @@ final class SettingsView: UIView {
         tableView.alwaysBounceVertical = false
         tableView.register(cellWithClass: MenuAuthCell.self)
         tableView.register(cellWithClass: MenuSettingsCell.self)
+        tableView.register(cellWithClass: SettingsSwitchCell.self)
         return tableView
     }()
     

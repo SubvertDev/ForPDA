@@ -1,5 +1,5 @@
 //
-//  LoginVM.swift
+//  LoginPresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 10.05.2023.
@@ -7,14 +7,15 @@
 
 import Foundation
 import Factory
+import WebKit
 
-protocol LoginVMProtocol {
+protocol LoginPresenterProtocol {
     func textChanged(to value: String, in textField: LoginView.LoginTextFields)
     func getCaptcha()
     func login()
 }
 
-final class LoginVM: LoginVMProtocol {
+final class LoginPresenter: LoginPresenterProtocol {
     
     // MARK: - Proeprties
     
@@ -25,7 +26,7 @@ final class LoginVM: LoginVMProtocol {
     weak var view: LoginVCProtocol?
     
     lazy var loginData: [String: String] = [
-        "return": networkService.baseURLString,
+        "return": URL.fourpda.absoluteString,
         "login": "",
         "password": "",
         "captcha-time": "",
@@ -49,8 +50,8 @@ final class LoginVM: LoginVMProtocol {
         let cookies = (notification.object as! HTTPCookieStorage).cookies ?? []
         // swiftlint:enable force_cast
         
-        // Saving cookies when we've got three of them, for explanation look into AppDelegate
-        if cookies.count == 3 {
+        // Saving cookies when we've got three or more of them, for explanation look into AppDelegate
+        if cookies.count >= 3 {
             var cookiesArray: [Cookie] = []
             for cookie in cookies {
                 cookiesArray.append(Cookie(cookie))
@@ -60,7 +61,13 @@ final class LoginVM: LoginVMProtocol {
                 let encodedCookies = try JSONEncoder().encode(cookiesArray)
                 settingsService.setCookiesAsData(encodedCookies)
             } catch {
-                print("[ERROR] Failed to encode cookies in LoginVM")
+                print("[ERROR] Failed to encode cookies in LoginPresenter")
+            }
+            
+            for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                DispatchQueue.main.async {
+                    WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie)
+                }
             }
         } else if cookies.count != 0 {
             settingsService.removeCookies()

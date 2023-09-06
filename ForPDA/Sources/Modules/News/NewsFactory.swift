@@ -5,14 +5,25 @@
 //  Created by Subvert on 08.05.2023.
 //
 
-import XCoordinator
+import RouteComposer
 
-struct NewsFactory {
-    static func create(with router: UnownedRouter<NewsRoute>) -> NewsVC {
-        let viewModel = NewsVM(router: router)
-        let viewController = NewsVC(viewModel: viewModel)
+final class NewsFactory: Factory {
+  
+  typealias ViewController = NewsVC
+  typealias Context = Any?
+  
+    func build(with context: Context) throws -> ViewController {
+        let presenter = NewsPresenter()
+        let viewController = ViewController(presenter: presenter)
+        presenter.view = viewController
+        // presenter.context = context
+
+        viewController.title = R.string.localizable.news()
         
-        viewModel.view = viewController
+        viewController.setTabBarItemWith(
+            title: R.string.localizable.news(),
+            sfSymbol: .newspaperFill
+        )
         
         return viewController
     }

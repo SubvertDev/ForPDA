@@ -2,8 +2,34 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.subvert.forpda</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>forpda</string>
+			</array>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>SECRET_KEYS</key>
+	<dict>
+		<key>AMPLITUDE_TOKEN</key>
+		<string>$(AMPLITUDE_TOKEN)</string>
+		<key>SENTRY_DSN</key>
+		<string>$(SENTRY_DSN)</string>
+		<key>SENTRY_DSYM_TOKEN</key>
+		<string>$(SENTRY_DSYM_TOKEN)</string>
+		<key>TELEGRAM_CHAT_ID</key>
+		<string>$(TELEGRAM_CHAT_ID)</string>
+		<key>TELEGRAM_TOKEN</key>
+		<string>$(TELEGRAM_TOKEN)</string>
+	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

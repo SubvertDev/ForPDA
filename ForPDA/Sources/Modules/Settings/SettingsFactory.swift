@@ -5,14 +5,18 @@
 //  Created by Subvert on 20.05.2023.
 //
 
-import XCoordinator
+import RouteComposer
 
-struct SettingsFactory {
-    static func create() -> SettingsVC {
-        let viewModel = SettingsVM()
-        let viewController = SettingsVC(viewModel: viewModel)
-        
-        viewModel.view = viewController
+final class SettingsFactory: Factory {
+  
+  typealias ViewController = SettingsVC
+  typealias Context = Any?
+  
+    func build(with context: Context) throws -> ViewController {
+        let presenter = SettingsPresenter()
+        let viewController = ViewController(presenter: presenter)
+        presenter.view = viewController
+        // presenter.context = context
         
         return viewController
     }

@@ -1,5 +1,5 @@
 //
-//  ProfileVM.swift
+//  ProfilePresenter.swift
 //  ForPDA
 //
 //  Created by Subvert on 23.05.2023.
@@ -9,14 +9,14 @@
 import Foundation
 import Factory
 
-protocol ProfileVMProtocol {
+protocol ProfilePresenterProtocol {
     var user: User? { get }
     
     func getUser()
     func logout()
 }
 
-final class ProfileVM: ProfileVMProtocol {
+final class ProfilePresenter: ProfilePresenterProtocol {
     
     // MARK: - Properties
     

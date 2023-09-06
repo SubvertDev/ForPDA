@@ -33,6 +33,7 @@ final class ArticleBuilder {
         if newText.contains("<!--more-->") { newText = newText.replacingOccurrences(of: "<!--more-->", with: "") }
         if newText.contains("<br>") { newText = newText.replacingOccurrences(of: "<br>", with: "") }
         if newText.contains("&nbsp;") { newText = newText.replacingOccurrences(of: "&nbsp;", with: " ") }
+        if newText.contains("<span></span>") { newText = newText.replacingOccurrences(of: "<span></span>", with: "")}
         newText = newText.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if newText.count == 0 { return nil }

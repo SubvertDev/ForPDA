@@ -8,6 +8,7 @@
 import UIKit
 import Factory
 import NukeExtensions
+import RouteComposer
 
 protocol LoginVCProtocol: AnyObject {
     func updateCaptcha(fromURL url: URL)
@@ -21,12 +22,20 @@ final class LoginVC: PDAViewController<LoginView> {
     
     // MARK: - Properties
     
-    private let viewModel: LoginVMProtocol
+    private let presenter: LoginPresenterProtocol
+    
+    var interceptorCompletionBlock: ((_: RoutingResult) -> Void)? {
+        willSet {
+            guard let completion = interceptorCompletionBlock else { return }
+            completion(.failure(RoutingError.generic(.init("New completion block was set. " +
+                    "Previous navigation process should be halted."))))
+        }
+    }
     
     // MARK: - Lifecycle
     
-    init(viewModel: LoginVMProtocol) {
-        self.viewModel = viewModel
+    init(presenter: LoginPresenterProtocol) {
+        self.presenter = presenter
         super.init()
     }
     
@@ -37,12 +46,16 @@ final class LoginVC: PDAViewController<LoginView> {
         configureActions()
         configureNavBar()
         
-        viewModel.getCaptcha()
+        presenter.getCaptcha()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.setNavigationBarHidden(true, animated: true)
+        if isMovingFromParent {
+            interceptorCompletionBlock?(.failure(FailingRouterIgnoreError(
+                underlyingError: RoutingError.generic(.init("User tapped back button")))))
+        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -81,9 +94,9 @@ final class LoginVC: PDAViewController<LoginView> {
     
     @objc private func textFieldEditingChanged(_ textField: UITextField) {
         switch textField.tag {
-        case 0: viewModel.textChanged(to: textField.text ?? "", in: .login)
-        case 1: viewModel.textChanged(to: textField.text ?? "", in: .password)
-        case 2: viewModel.textChanged(to: textField.text ?? "", in: .captcha)
+        case 0: presenter.textChanged(to: textField.text ?? "", in: .login)
+        case 1: presenter.textChanged(to: textField.text ?? "", in: .password)
+        case 2: presenter.textChanged(to: textField.text ?? "", in: .captcha)
         default: break
         }
     }
@@ -127,7 +140,7 @@ extension LoginVC: LoginVCProtocol {
     
     func dismissLogin() {
         DispatchQueue.main.async {
-            self.navigationController?.popViewController(animated: true)
+            self.interceptorCompletionBlock?(.success)
         }
     }
 }
@@ -136,10 +149,10 @@ extension LoginVC: LoginVCProtocol {
 
 extension LoginVC: LoginViewDelegate {
     func loginTapped() {
-        viewModel.login()
+        presenter.login()
     }
     
     func captchaImageTapped() {
-        viewModel.getCaptcha()
+        presenter.getCaptcha()
     }
 }

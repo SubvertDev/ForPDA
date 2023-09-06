@@ -6,8 +6,37 @@
 //
 
 import UIKit
+import RouteComposer
+import SFSafeSymbols
 
 extension UIViewController {
+    
+    // MARK: - Route Composer
+    
+    var router: Router {
+        UIViewController.router
+    }
+    
+    static let router: Router = {
+        return DefaultRouter()
+    }()
+    
+    // MARK: - Setting TabBar Title & Name
+    
+    func setTabBarItemWith(title: String, image: UIImage, selectedImage: UIImage) {
+        tabBarItem.title = title
+        tabBarItem.image = image
+        tabBarItem.selectedImage = selectedImage
+    }
+    
+    func setTabBarItemWith(title: String, sfSymbol: SFSymbol) {
+        tabBarItem.title = title
+        tabBarItem.image = UIImage(systemSymbol: sfSymbol)
+        tabBarItem.selectedImage = UIImage(systemSymbol: sfSymbol)
+            .withTintColor(.label, renderingMode: .alwaysOriginal)
+    }
+
+    // MARK: - Scroll To Top functionality
     
     func scrollToTop() {
         func scrollToTop(view: UIView?) {

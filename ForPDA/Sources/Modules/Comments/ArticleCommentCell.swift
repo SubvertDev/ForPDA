@@ -6,10 +6,9 @@
 //
 
 import UIKit
+import NukeExtensions
 
 final class ArticleCommentCell: CommentCell {
-    
-    static let reuseIdentifier = "ArticleCommentCell"
     
     var myView: ArticleCommentView!
     
@@ -29,7 +28,7 @@ final class ArticleCommentCell: CommentCell {
         indentationIndicatorThickness = 0
         
         commentMargin = 4
-        commentMarginColor = .systemBackground
+        commentMarginColor = .tertiarySystemBackground
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -37,6 +36,7 @@ final class ArticleCommentCell: CommentCell {
     }
     
     func set(with comment: Comment) {
+        NukeExtensions.loadImage(with: URL(string: comment.avatarUrl), into: myView.avatarImageView) { _ in }
         myView.authorLabel.text = comment.author
         myView.textLabel.text = comment.text
         myView.dateLabel.text = comment.date
@@ -63,6 +63,11 @@ final class ArticleCommentCell: CommentCell {
 
 final class ArticleCommentView: UIView {
     
+    let avatarImageView: UIImageView = {
+        let imageView = UIImageView()
+        return imageView
+    }()
+    
     let authorLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: UIFont.systemFontSize, weight: .semibold)
@@ -83,8 +88,16 @@ final class ArticleCommentView: UIView {
         return label
     }()
     
+    let likesContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemGray5
+        return view
+    }()
+    
     let likesLabel: UILabel = {
         let label = UILabel()
+        label.font = .systemFont(ofSize: UIFont.systemFontSize, weight: .regular)
+        label.textAlignment = .center
         return label
     }()
     
@@ -100,16 +113,23 @@ final class ArticleCommentView: UIView {
     }
     
     private func addSubviews() {
+        addSubview(avatarImageView)
         addSubview(authorLabel)
         addSubview(textLabel)
         addSubview(dateLabel)
-        addSubview(likesLabel)
+        addSubview(likesContainerView)
+        likesContainerView.addSubview(likesLabel)
     }
     
     private func makeConstraints() {
+        avatarImageView.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview().inset(8)
+            make.width.height.equalTo(20)
+        }
+        
         authorLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(6)
-            make.leading.equalToSuperview().inset(8)
+            make.centerY.equalTo(avatarImageView)
+            make.leading.equalTo(avatarImageView.snp.trailing).offset(8)
             make.trailing.greaterThanOrEqualTo(dateLabel).inset(8)
         }
         
@@ -124,10 +144,15 @@ final class ArticleCommentView: UIView {
             make.trailing.equalToSuperview().offset(-8)
         }
         
-        likesLabel.snp.makeConstraints { make in
+        likesContainerView.snp.makeConstraints { make in
             make.centerY.equalTo(authorLabel)
             make.trailing.equalTo(dateLabel.snp.leading).offset(-8)
+            make.width.greaterThanOrEqualTo(16)
+        }
+        
+        likesLabel.snp.makeConstraints { make in
+            make.top.bottom.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(2)
         }
     }
-    
 }

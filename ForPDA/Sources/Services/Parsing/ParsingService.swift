@@ -87,14 +87,18 @@ final class ParsingService {
             let date = try! article.select("[class=date]").text()
             let commentAmount = try! article.select("[class=v-count]").text()
             
-            let article = Article(url: url,
-                                  title: title,
-                                  description: description,
-                                  imageUrl: imageUrl,
-                                  author: author,
-                                  date: date,
-                                  isReview: isReview,
-                                  commentAmount: commentAmount)
+            let article = Article(
+                url: url,
+                info: ArticleInfo(
+                    title: title,
+                    description: description,
+                    imageUrl: imageUrl,
+                    author: author,
+                    date: date,
+                    isReview: isReview,
+                    commentAmount: commentAmount
+                )
+            )
             
             articles.append(article)
         }
@@ -115,6 +119,42 @@ final class ParsingService {
         }
     }
     
+    // MARK: - Article Info (deeplink case)
+    
+    func parseArticleInfo(from document: String) -> ArticleInfo {
+        let document = try! SwiftSoup.parse(document)
+        
+        let author = try! document.select("[class=name]").text()
+        let date = try! document.select("[class=date]").get(0).text()
+        let commentAmount = try! document.select("[class=number]").text()
+        
+        var title = ""
+        var imageUrl = ""
+        if try! !document.select("[class=content-box]").isEmpty() {
+            title = try! document.select("[itemprop=headline]").get(0).text()
+            for element in try! document.select("[itemprop=image") where element.hasAttr("sizes") {
+                imageUrl = try! element.attr("src")
+                break
+            }
+        } else if try! !document.select("[class=article]").isEmpty() {
+            title = try! document.select("[class=article-header]").select("h1").text()
+            imageUrl = try! document.select("img").get(1).attr("src")
+            imageUrl = "https:" + imageUrl
+        }
+        
+        let articleInfo = ArticleInfo(
+            title: title,
+            description: "",
+            imageUrl: imageUrl,
+            author: author,
+            date: date,
+            isReview: false,
+            commentAmount: commentAmount
+        )
+        
+        return articleInfo
+    }
+    
     // MARK: - Article (normal)
     
     private func parseArticleNormal(from document: Document) -> [ArticleElement] {
@@ -124,7 +164,6 @@ final class ParsingService {
         for element in elements {
             if try! element.iS("[style=text-align:justify]") || (try! element.iS("[style=text-align: justify;]")) {
                 let text = try! element.html()
-                
                 if let quote = try! element.parent()?.iS("blockquote"), quote {
                     articleElements.append(TextElement(text: text, isQuote: true))
                 } else if try! element.iS("h2") {
@@ -133,6 +172,8 @@ final class ParsingService {
                     articleElements.append(TextElement(text: text, isHeader: true))
                 } else if let inList = try! element.parent()?.iS("ul"), inList {
                     articleElements.append(TextElement(text: text, inList: true))
+                } else if let insideList = try! element.parent()?.iS("ol"), insideList {
+                    continue
                 } else {
                     articleElements.append(TextElement(text: text))
                 }
@@ -303,8 +344,18 @@ final class ParsingService {
         
         let commentType = try! element.select("div[id]").attr("class")
         guard commentType != "deleted" else {
-            return Comment(author: "", text: "(Комментарий удален)", date: "", likes: 0, replies: replies, level: level)
+            return Comment(
+                avatarUrl: "",
+                author: "",
+                text: "(Комментарий удален)",
+                date: "",
+                likes: 0,
+                replies: replies,
+                level: level
+            )
         }
+        
+        let avatarUrl = try! element.select("[class=comment-avatar]").first()?.select("img[src]").attr("src") ?? ""
         
         let author = try! element.select("[class=nickname]").first()?.text() ?? ""
         
@@ -326,7 +377,15 @@ final class ParsingService {
             likes = 0
         }
         
-        return Comment(author: author, text: text, date: date, likes: likes, replies: replies, level: level)
+        return Comment(
+            avatarUrl: avatarUrl,
+            author: author,
+            text: text,
+            date: date,
+            likes: likes,
+            replies: replies,
+            level: level
+        )
     }
     
     // MARK: - Captcha

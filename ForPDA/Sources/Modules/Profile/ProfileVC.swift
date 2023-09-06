@@ -20,19 +20,24 @@ final class ProfileVC: PDAViewController<ProfileView> {
     
     // MARK: - Properties
     
-    private let viewModel: ProfileVMProtocol
+    private let presenter: ProfilePresenterProtocol
     
     // MARK: - Lifecycle
     
-    init(viewModel: ProfileVMProtocol) {
-        self.viewModel = viewModel
+    init(presenter: ProfilePresenterProtocol) {
+        self.presenter = presenter
         super.init()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         myView.delegate = self
-        viewModel.getUser()
+        presenter.getUser()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -78,6 +83,6 @@ extension ProfileVC: ProfileVCProtocol {
 
 extension ProfileVC: ProfileViewDelegate {
     func logoutButtonTapped() {
-        viewModel.logout()
+        presenter.logout()
     }
 }
