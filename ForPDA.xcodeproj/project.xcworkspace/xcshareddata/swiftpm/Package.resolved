@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/amplitude/Amplitude-Swift.git",
       "state" : {
-        "revision" : "903429a123aa039514720fbca9202275fccfb9fd",
-        "version" : "0.4.11"
+        "revision" : "8293ca0b09aac19b7c87f51ad0386590a066e71f",
+        "version" : "0.4.14"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "04bee4ad86d74d4cb4d7101ff826d6e355301ba9",
-        "version" : "8.9.4"
+        "revision" : "12998398eb51e2e8ff7098163fa97d305eee6d87",
+        "version" : "8.11.0"
       }
     },
     {
