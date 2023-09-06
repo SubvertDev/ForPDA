@@ -21,7 +21,7 @@ extension Container {
     
     var analyticsService: Factory<AnalyticsService> {
         Factory(self) { AnalyticsService() }
-            .onDebug { AnalyticsService(isDebug: true) }
+            .onDebug { AnalyticsService(isDebug: AppScheme.isDebug) }
             .singleton
     }
     
