@@ -84,13 +84,13 @@
 		B8A51BB82A91292000FDB599 /* LoginInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BB72A91292000FDB599 /* LoginInterceptor.swift */; };
 		B8A51BBB2A913BE400FDB599 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BBA2A913BE400FDB599 /* Errors.swift */; };
 		B8A85A8B2AA10CF400EDFE58 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */; };
-		B8A85A922AA10CF500EDFE58 /* ShareForPDA.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B8A85A922AA10CF500EDFE58 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B8AB63C02AA49F6100F2CEFF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */; };
 		B8AB63C32AA49F6100F2CEFF /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C22AA49F6100F2CEFF /* _locales */; };
 		B8AB63C52AA49F6100F2CEFF /* images in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C42AA49F6100F2CEFF /* images */; };
 		B8AB63C72AA49F6100F2CEFF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C62AA49F6100F2CEFF /* manifest.json */; };
 		B8AB63CB2AA49F6100F2CEFF /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63CA2AA49F6100F2CEFF /* content.js */; };
-		B8AB63D52AA49F6100F2CEFF /* OpenInForPDA.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B8AB63D52AA49F6100F2CEFF /* OpenInAppExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B8AC57722947FC9600435CF3 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AC57712947FC9600435CF3 /* ProfileVC.swift */; };
 		B8AC57742947FCA500435CF3 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AC57732947FCA500435CF3 /* ProfileView.swift */; };
 		B8B55B022A07C948008C93D3 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = B8B55B012A07C948008C93D3 /* Factory */; };
@@ -153,8 +153,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				B8A85A922AA10CF500EDFE58 /* ShareForPDA.appex in Embed Foundation Extensions */,
-				B8AB63D52AA49F6100F2CEFF /* OpenInForPDA.appex in Embed Foundation Extensions */,
+				B8A85A922AA10CF500EDFE58 /* ShareExtension.appex in Embed Foundation Extensions */,
+				B8AB63D52AA49F6100F2CEFF /* OpenInAppExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -231,10 +231,10 @@
 		B8A51BA92A90FDEF00FDB599 /* PDATabBarControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATabBarControllerFactory.swift; sourceTree = "<group>"; };
 		B8A51BB72A91292000FDB599 /* LoginInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInterceptor.swift; sourceTree = "<group>"; };
 		B8A51BBA2A913BE400FDB599 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
-		B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareForPDA.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		B8A85A8F2AA10CF500EDFE58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenInForPDA.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenInAppExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		B8AB63C22AA49F6100F2CEFF /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; path = _locales; sourceTree = "<group>"; };
 		B8AB63C42AA49F6100F2CEFF /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
@@ -453,23 +453,23 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
-		B8A85A892AA10CF400EDFE58 /* ShareForPDA */ = {
+		B8A85A892AA10CF400EDFE58 /* ShareExtension */ = {
 			isa = PBXGroup;
 			children = (
 				B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */,
 				B8A85A8F2AA10CF500EDFE58 /* Info.plist */,
 			);
-			path = ShareForPDA;
+			path = ShareExtension;
 			sourceTree = "<group>";
 		};
-		B8AB63BE2AA49F6100F2CEFF /* OpenInForPDA */ = {
+		B8AB63BE2AA49F6100F2CEFF /* OpenInAppExtension */ = {
 			isa = PBXGroup;
 			children = (
 				B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */,
 				B8AB63D22AA49F6100F2CEFF /* Info.plist */,
 				B8AB63C12AA49F6100F2CEFF /* Resources */,
 			);
-			path = OpenInForPDA;
+			path = OpenInAppExtension;
 			sourceTree = "<group>";
 		};
 		B8AB63C12AA49F6100F2CEFF /* Resources */ = {
@@ -582,8 +582,8 @@
 			isa = PBXGroup;
 			children = (
 				B8D351F7293CABB6008A84EA /* ForPDA */,
-				B8A85A892AA10CF400EDFE58 /* ShareForPDA */,
-				B8AB63BE2AA49F6100F2CEFF /* OpenInForPDA */,
+				B8A85A892AA10CF400EDFE58 /* ShareExtension */,
+				B8AB63BE2AA49F6100F2CEFF /* OpenInAppExtension */,
 				B8D351F6293CABB6008A84EA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -592,8 +592,8 @@
 			isa = PBXGroup;
 			children = (
 				B8D351F5293CABB6008A84EA /* ForPDA.app */,
-				B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */,
-				B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */,
+				B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */,
+				B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -746,9 +746,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B8A85A872AA10CF400EDFE58 /* ShareForPDA */ = {
+		B8A85A872AA10CF400EDFE58 /* ShareExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B8A85A932AA10CF500EDFE58 /* Build configuration list for PBXNativeTarget "ShareForPDA" */;
+			buildConfigurationList = B8A85A932AA10CF500EDFE58 /* Build configuration list for PBXNativeTarget "ShareExtension" */;
 			buildPhases = (
 				B8A85A842AA10CF400EDFE58 /* Sources */,
 				B8A85A852AA10CF400EDFE58 /* Frameworks */,
@@ -758,14 +758,14 @@
 			);
 			dependencies = (
 			);
-			name = ShareForPDA;
+			name = ShareExtension;
 			productName = ShareExtension;
-			productReference = B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */;
+			productReference = B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		B8AB63BC2AA49F6100F2CEFF /* OpenInForPDA */ = {
+		B8AB63BC2AA49F6100F2CEFF /* OpenInAppExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B8AB63D62AA49F6100F2CEFF /* Build configuration list for PBXNativeTarget "OpenInForPDA" */;
+			buildConfigurationList = B8AB63D62AA49F6100F2CEFF /* Build configuration list for PBXNativeTarget "OpenInAppExtension" */;
 			buildPhases = (
 				B8AB63B92AA49F6100F2CEFF /* Sources */,
 				B8AB63BA2AA49F6100F2CEFF /* Frameworks */,
@@ -775,9 +775,9 @@
 			);
 			dependencies = (
 			);
-			name = OpenInForPDA;
+			name = OpenInAppExtension;
 			productName = OpenInAppExtension;
-			productReference = B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */;
+			productReference = B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		B8D351F4293CABB6008A84EA /* ForPDA */ = {
@@ -875,8 +875,8 @@
 			projectRoot = "";
 			targets = (
 				B8D351F4293CABB6008A84EA /* ForPDA */,
-				B8A85A872AA10CF400EDFE58 /* ShareForPDA */,
-				B8AB63BC2AA49F6100F2CEFF /* OpenInForPDA */,
+				B8A85A872AA10CF400EDFE58 /* ShareExtension */,
+				B8AB63BC2AA49F6100F2CEFF /* OpenInAppExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -1101,12 +1101,12 @@
 		};
 		B8A85A912AA10CF500EDFE58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B8A85A872AA10CF400EDFE58 /* ShareForPDA */;
+			target = B8A85A872AA10CF400EDFE58 /* ShareExtension */;
 			targetProxy = B8A85A902AA10CF500EDFE58 /* PBXContainerItemProxy */;
 		};
 		B8AB63D42AA49F6100F2CEFF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B8AB63BC2AA49F6100F2CEFF /* OpenInForPDA */;
+			target = B8AB63BC2AA49F6100F2CEFF /* OpenInAppExtension */;
 			targetProxy = B8AB63D32AA49F6100F2CEFF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1137,11 +1137,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 75;
+				CURRENT_PROJECT_VERSION = 83;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ShareForPDA/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ShareForPDA;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1149,8 +1149,8 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareForPDA;
+				MARKETING_VERSION = 0.3.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1163,11 +1163,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 75;
+				CURRENT_PROJECT_VERSION = 83;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = ShareForPDA/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ShareForPDA;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1175,8 +1175,8 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareForPDA;
+				MARKETING_VERSION = 0.3.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1189,11 +1189,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 75;
+				CURRENT_PROJECT_VERSION = 83;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = OpenInForPDA/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Open in ForPDA";
+				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenInAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1201,12 +1201,12 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.3.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInForPDA;
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInAppExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1219,11 +1219,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 75;
+				CURRENT_PROJECT_VERSION = 83;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = OpenInForPDA/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Open in ForPDA";
+				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenInAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1231,12 +1231,12 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.3.1;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInForPDA;
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInAppExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1438,7 +1438,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B8A85A932AA10CF500EDFE58 /* Build configuration list for PBXNativeTarget "ShareForPDA" */ = {
+		B8A85A932AA10CF500EDFE58 /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B8A85A942AA10CF500EDFE58 /* Debug */,
@@ -1447,7 +1447,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B8AB63D62AA49F6100F2CEFF /* Build configuration list for PBXNativeTarget "OpenInForPDA" */ = {
+		B8AB63D62AA49F6100F2CEFF /* Build configuration list for PBXNativeTarget "OpenInAppExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B8AB63D72AA49F6100F2CEFF /* Debug */,
