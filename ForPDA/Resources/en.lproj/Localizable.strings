@@ -99,7 +99,7 @@
 "This update introduces two new options for opening articles in the app through Safari:
                                                 
 1) Press the Share button and select ForPDA from the list
-2) Go to Settings > Safari > Extensions > Open in ForPDA > On, after that Safari will offer to open articles in the app
+2) Go to Settings > Safari > Extensions > Open in ForPDA > On (Ask > Allow), after that Safari will offer to open articles in the app
                                                 
 P.S. Any issues with article rendering can be reported through a long tap on the news / menu in the upper right corner of the article / linked chat in the settings";
 "update03.enable.extension" = "Enable extension";
