@@ -9,7 +9,6 @@ import UIKit
 import Nuke
 import NukeExtensions
 import SFSafeSymbols
-import SkeletonView
 
 final class ArticleCell: UITableViewCell {
         
@@ -20,6 +19,7 @@ final class ArticleCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 10
         imageView.clipsToBounds = true
+        imageView.backgroundColor = .systemGray6
         return imageView
     }()
     
@@ -99,13 +99,9 @@ final class ArticleCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         separatorInset = .zero
         backgroundColor = .clear
-        isSkeletonable = true
         
         addSubviews()
         makeConstraints()
-        
-        commentsStackView.isHiddenWhenSkeletonIsActive = true
-        dateLabel.skeletonPaddingInsets = UIEdgeInsets(top: 0, left: -32, bottom: 0, right: -32)
     }
     
     required init?(coder: NSCoder) {
@@ -115,6 +111,11 @@ final class ArticleCell: UITableViewCell {
     // MARK: - Public
     
     func set(article: Article) {
+        commentsStackView.isHidden = article.url.contains("special")
+
+        // Инфо отсутствует при открытии через deeplink
+        guard let article = article.info else { return }
+        
         titleLabel.text = article.title
         descriptionLabel.text = article.description
         authorLabel.text = article.author
@@ -122,22 +123,7 @@ final class ArticleCell: UITableViewCell {
         dateLabel.text = article.date
         reviewLabel.isHidden = !article.isReview
         
-        if let url = URL(string: article.imageUrl) {
-            if ImagePipeline.shared.cache.cachedImage(for: ImageRequest(url: url)) == nil {
-                articleImage.showAnimatedSkeleton()
-            }
-            
-            NukeExtensions.loadImage(with: url, into: articleImage) { result in
-                switch result {
-                case .success:
-                    self.articleImage.hideSkeleton()
-                case .failure:
-                    break
-                }
-            }
-        }
-        
-        commentsStackView.isHidden = article.url.contains("special")
+        NukeExtensions.loadImage(with: URL(string: article.imageUrl), into: articleImage, completion: { _ in })
     }
     
     // MARK: - Layout
@@ -152,9 +138,7 @@ final class ArticleCell: UITableViewCell {
          dateLabel
         ].forEach {
             contentView.addSubview($0)
-            $0.isSkeletonable = true
-        }
-        
+        }   
     }
     
     private func makeConstraints() {

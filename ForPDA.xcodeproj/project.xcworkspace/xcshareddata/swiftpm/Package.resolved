@@ -55,15 +55,6 @@
       }
     },
     {
-      "identity" : "rxswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactiveX/RxSwift.git",
-      "state" : {
-        "revision" : "9dcaa4b333db437b0fbfaf453fad29069044a8b4",
-        "version" : "6.6.0"
-      }
-    },
-    {
       "identity" : "sentry-cocoa",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
@@ -79,15 +70,6 @@
       "state" : {
         "revision" : "7cca2d60925876b5953a2cf7341cd80fbeac983c",
         "version" : "4.1.1"
-      }
-    },
-    {
-      "identity" : "skeletonview",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Juanpe/SkeletonView.git",
-      "state" : {
-        "revision" : "739a4f5d78731bebc48811c75fa9e1f4c4cef23e",
-        "version" : "1.30.4"
       }
     },
     {
@@ -160,15 +142,6 @@
       "state" : {
         "revision" : "cd466d6e8c5ffd2f2b61165d37b0646f09068e1e",
         "version" : "2.9.0"
-      }
-    },
-    {
-      "identity" : "xcoordinator",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/QuickBirdEng/XCoordinator",
-      "state" : {
-        "revision" : "00b066139ed0bf2f68549a7d87434ed36dfa6dea",
-        "version" : "2.2.1"
       }
     },
     {

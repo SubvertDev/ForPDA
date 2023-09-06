@@ -14,6 +14,7 @@ import NukeExtensions
 
 protocol ArticleVCProtocol: AnyObject {
     func configureArticle(with elements: [ArticleElement])
+    func reconfigureHeader()
     func makeComments(from page: String)
     func showError()
 }
@@ -49,7 +50,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
         } else {
             myView.removeComments()
             let elements = ArticleBuilder.makeDefaultArticle(
-                description: presenter.article.description,
+                description: presenter.article.info?.description ?? "Ошибка",
                 url: presenter.article.url
             )
             makeArticle(from: elements)
@@ -60,15 +61,18 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     private func configureNavigationTitle() {
         let label = MarqueeLabel(frame: .zero, rate: 30, fadeLength: 0)
-        label.text = presenter.article.title
+        label.text = presenter.article.info?.title
         label.fadeLength = 30
         navigationItem.titleView = label
     }
     
     private func configureView() {
-        NukeExtensions.loadImage(with: URL(string: presenter.article.imageUrl)!, into: myView.articleImage)
-        myView.titleLabel.text = presenter.article.title
-        myView.commentsLabel.text = R.string.localizable.comments(Int(presenter.article.commentAmount) ?? 0)
+        NukeExtensions.loadImage(with: URL(string: presenter.article.info?.imageUrl), into: myView.articleImage) { result in
+            // Добавляем оверлей если открываем не через deeplink (?)
+            if (try? result.get()) != nil { self.myView.articleImage.addoverlay() }
+        }
+        myView.titleLabel.text = presenter.article.info?.title
+        myView.commentsLabel.text = R.string.localizable.comments(Int(presenter.article.info?.commentAmount ?? "0") ?? 0)
     }
     
     private func configureMenu() {
@@ -149,7 +153,10 @@ final class ArticleVC: PDAViewController<ArticleView> {
             myView.stackView.addArrangedSubview(articleElement)
         }
         
-        myView.commentsContainer.isHidden = false
+        // todo Почему без mainactor не работает?
+        Task { @MainActor in
+            myView.commentsContainer.isHidden = false
+        }
         myView.stopLoading()
     }
     
@@ -173,20 +180,23 @@ final class ArticleVC: PDAViewController<ArticleView> {
 
 extension ArticleVC: ArticleVCProtocol {
     
+    func reconfigureHeader() {
+        configureNavigationTitle()
+        configureView()
+    }
+    
     func configureArticle(with elements: [ArticleElement]) {
-        DispatchQueue.main.async {
-            self.makeArticle(from: elements)
-        }
+        makeArticle(from: elements)
     }
     
     func showError() {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(title: R.string.localizable.error(),
-                                          message: R.string.localizable.somethingWentWrong(),
-                                          preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
-            self.present(alert, animated: true)
-        }
+        let alert = UIAlertController(
+            title: R.string.localizable.error(),
+            message: R.string.localizable.somethingWentWrong(),
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
+        present(alert, animated: true)
     }
 }
 

@@ -13,6 +13,7 @@ import RouteComposer
 
 protocol NewsPresenterProtocol {
     var articles: [Article] { get }
+    
     func loadArticles()
     func refreshArticles()
     func showArticle(at indexPath: IndexPath)
@@ -57,10 +58,14 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
                 switch result {
                 case .success(let response):
                     articles += parsingService.parseArticles(from: response)
-                    view?.articlesUpdated()
+                    Task { @MainActor in
+                        self.view?.articlesUpdated()
+                    }
                     
                 case .failure:
-                    view?.showError()
+                    DispatchQueue.main.async {
+                        self.view?.showError()
+                    }
                 }
             }
             
@@ -79,10 +84,14 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
                 switch result {
                 case .success(let response):
                     articles = self.parsingService.parseArticles(from: response)
-                    view?.articlesUpdated()
+                    DispatchQueue.main.async {
+                        self.view?.articlesUpdated()
+                    }
                     
                 case .failure:
-                    view?.showError()
+                    DispatchQueue.main.async {
+                        self.view?.showError()
+                    }
                 }
             }
             
@@ -135,10 +144,14 @@ extension NewsPresenter: WKNavigationDelegate {
                         self.isSlowRefreshing = false
                     }
                     self.articles += self.parsingService.parseArticles(from: document)
-                    self.view?.articlesUpdated()
+                    DispatchQueue.main.async {
+                        self.view?.articlesUpdated()
+                    }
                 } else {
                     print(err as Any)
-                    self.view?.showError()
+                    DispatchQueue.main.async {
+                        self.view?.showError()
+                    }
                 }
             }
         }

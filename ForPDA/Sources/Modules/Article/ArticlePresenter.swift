@@ -43,6 +43,15 @@ final class ArticlePresenter: ArticlePresenterProtocol {
             guard let self else { return }
             switch result {
             case .success(let response):
+                // Deeplink case
+                if article.info == nil {
+                    let articleInfo = parsingService.parseArticleInfo(from: response)
+                    article.info = articleInfo
+                    DispatchQueue.main.async {
+                        self.view?.reconfigureHeader()
+                    }
+                }
+                
                 let elements = parsingService.parseArticle(from: response)
                 DispatchQueue.main.async {
                     self.view?.configureArticle(with: elements)

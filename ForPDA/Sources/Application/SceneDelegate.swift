@@ -27,8 +27,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         overrideApplicationThemeStyle(with: settingsService.getAppTheme())
         configureWKWebView()
-
-        try? DefaultRouter().navigate(to: RouteMap.tabBarScreen, with: nil)
+        
+        if let url = connectionOptions.urlContexts.first?.url {
+            // Cold start deeplink
+            handleDeeplinkUrl(url)
+        } else {
+            try? DefaultRouter().navigate(to: RouteMap.tabBarScreen, with: nil)
+        }
+    }
+    
+    private func handleDeeplinkUrl(_ url: URL) {
+        if url.absoluteString == "forpda://article//" {
+            // Если share в браузере не сработал, то открываем новости
+            // todo обработать нормально
+            try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
+        } else {
+            let id = url.absoluteString.components(separatedBy: "article/")[1]
+            let url = "https://4pda.to/\(id)"
+            let article = Article(url: url, info: nil)
+            try? DefaultRouter().navigate(to: RouteMap.articleScreen, with: article)
+        }
     }
     
     private func configureWKWebView() {
@@ -39,6 +57,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         for cookie in HTTPCookieStorage.shared.cookies ?? [] {
             WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie)
+        }
+    }
+    
+    // Opens on existing scene
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let url = URLContexts.first?.url {
+            handleDeeplinkUrl(url)
         }
     }
     

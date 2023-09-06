@@ -33,6 +33,11 @@
 		B83E8AC7294A8337000D59E7 /* UITextView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */; };
 		B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */; };
 		B83E8ACB294A862A000D59E7 /* UIView+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */; };
+		B8487CA32AA698600018501C /* ProgressShapeLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487C9E2AA698600018501C /* ProgressShapeLayer.swift */; };
+		B8487CA42AA698600018501C /* RotationAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487C9F2AA698600018501C /* RotationAnimation.swift */; };
+		B8487CA52AA698600018501C /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487CA02AA698600018501C /* ProgressView.swift */; };
+		B8487CA62AA698600018501C /* StrokeAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487CA12AA698600018501C /* StrokeAnimation.swift */; };
+		B8487CA72AA698600018501C /* StrokeColorAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487CA22AA698600018501C /* StrokeColorAnimation.swift */; };
 		B8495D42294CCE1E00F60171 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = B8495D41294CCE1E00F60171 /* SwiftMessages */; };
 		B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = B84CCC51294A6EDA0001EB24 /* Nuke */; };
 		B84CCC54294A6EDA0001EB24 /* NukeExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = B84CCC53294A6EDA0001EB24 /* NukeExtensions */; };
@@ -72,14 +77,20 @@
 		B893011E2947E19800D14141 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B893011D2947E19800D14141 /* MenuView.swift */; };
 		B89301212947E2AE00D14141 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89301202947E2AE00D14141 /* LoginVC.swift */; };
 		B89301262947E2BD00D14141 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89301252947E2BD00D14141 /* LoginView.swift */; };
-		B8951CFA2A0C5D09001597AF /* XCoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = B8951CF92A0C5D09001597AF /* XCoordinator */; };
-		B8951CFF2A0C6180001597AF /* SkeletonView in Frameworks */ = {isa = PBXBuildFile; productRef = B8951CFE2A0C6180001597AF /* SkeletonView */; };
 		B898E4EA2A0851A9002E978B /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = B898E4E92A0851A9002E978B /* Container.swift */; };
 		B898E4F92A0878E6002E978B /* SwiftMessages+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B898E4F82A0878E6002E978B /* SwiftMessages+Ext.swift */; };
 		B898E4FC2A087C9A002E978B /* NewsFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B898E4FB2A087C9A002E978B /* NewsFactory.swift */; };
 		B8A51BAA2A90FDEF00FDB599 /* PDATabBarControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BA92A90FDEF00FDB599 /* PDATabBarControllerFactory.swift */; };
 		B8A51BB82A91292000FDB599 /* LoginInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BB72A91292000FDB599 /* LoginInterceptor.swift */; };
 		B8A51BBB2A913BE400FDB599 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BBA2A913BE400FDB599 /* Errors.swift */; };
+		B8A85A8B2AA10CF400EDFE58 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */; };
+		B8A85A922AA10CF500EDFE58 /* ShareForPDA.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B8AB63C02AA49F6100F2CEFF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */; };
+		B8AB63C32AA49F6100F2CEFF /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C22AA49F6100F2CEFF /* _locales */; };
+		B8AB63C52AA49F6100F2CEFF /* images in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C42AA49F6100F2CEFF /* images */; };
+		B8AB63C72AA49F6100F2CEFF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C62AA49F6100F2CEFF /* manifest.json */; };
+		B8AB63CB2AA49F6100F2CEFF /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63CA2AA49F6100F2CEFF /* content.js */; };
+		B8AB63D52AA49F6100F2CEFF /* OpenInForPDA.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B8AC57722947FC9600435CF3 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AC57712947FC9600435CF3 /* ProfileVC.swift */; };
 		B8AC57742947FCA500435CF3 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AC57732947FCA500435CF3 /* ProfileView.swift */; };
 		B8B55B022A07C948008C93D3 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = B8B55B012A07C948008C93D3 /* Factory */; };
@@ -118,6 +129,38 @@
 		B957D4432A12CA120013F578 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B957D4422A12CA120013F578 /* UIViewController+Ext.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B8A85A902AA10CF500EDFE58 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B8D351ED293CABB6008A84EA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8A85A872AA10CF400EDFE58;
+			remoteInfo = ShareExtension;
+		};
+		B8AB63D32AA49F6100F2CEFF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B8D351ED293CABB6008A84EA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8AB63BC2AA49F6100F2CEFF;
+			remoteInfo = OpenInAppExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B8A85A962AA10CF500EDFE58 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B8A85A922AA10CF500EDFE58 /* ShareForPDA.appex in Embed Foundation Extensions */,
+				B8AB63D52AA49F6100F2CEFF /* OpenInForPDA.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		B8001CAB2A19432C00E7A8A8 /* SettingsFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsFactory.swift; sourceTree = "<group>"; };
 		B8001CAD2A19433600E7A8A8 /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
@@ -142,6 +185,11 @@
 		B83E8AC6294A8337000D59E7 /* UITextView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Ext.swift"; sourceTree = "<group>"; };
 		B83E8AC8294A836D000D59E7 /* PDAResizingTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAResizingTextView.swift; sourceTree = "<group>"; };
 		B83E8ACA294A862A000D59E7 /* UIView+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Ext.swift"; sourceTree = "<group>"; };
+		B8487C9E2AA698600018501C /* ProgressShapeLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressShapeLayer.swift; sourceTree = "<group>"; };
+		B8487C9F2AA698600018501C /* RotationAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RotationAnimation.swift; sourceTree = "<group>"; };
+		B8487CA02AA698600018501C /* ProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		B8487CA12AA698600018501C /* StrokeAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrokeAnimation.swift; sourceTree = "<group>"; };
+		B8487CA22AA698600018501C /* StrokeColorAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StrokeColorAnimation.swift; sourceTree = "<group>"; };
 		B85849F92A446BB200BF915D /* UIButton+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Ext.swift"; sourceTree = "<group>"; };
 		B85849FC2A44733300BF915D /* SettingsSwitchCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSwitchCell.swift; sourceTree = "<group>"; };
 		B863357C293D218900F8D2E6 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
@@ -183,6 +231,16 @@
 		B8A51BA92A90FDEF00FDB599 /* PDATabBarControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATabBarControllerFactory.swift; sourceTree = "<group>"; };
 		B8A51BB72A91292000FDB599 /* LoginInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInterceptor.swift; sourceTree = "<group>"; };
 		B8A51BBA2A913BE400FDB599 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareForPDA.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		B8A85A8F2AA10CF500EDFE58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenInForPDA.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		B8AB63C22AA49F6100F2CEFF /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; path = _locales; sourceTree = "<group>"; };
+		B8AB63C42AA49F6100F2CEFF /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
+		B8AB63C62AA49F6100F2CEFF /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
+		B8AB63CA2AA49F6100F2CEFF /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		B8AB63D22AA49F6100F2CEFF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B8AC57712947FC9600435CF3 /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
 		B8AC57732947FCA500435CF3 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		B8B86DB7295773950098D5E5 /* NewsPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsPresenter.swift; sourceTree = "<group>"; };
@@ -218,6 +276,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B8A85A852AA10CF400EDFE58 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8AB63BA2AA49F6100F2CEFF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8D351F2293CABB6008A84EA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -231,14 +303,12 @@
 				B8BD2D79293E1C3F00E12E29 /* MarqueeLabel in Frameworks */,
 				B82B2EB62A87D5F200CB067C /* AmplitudeSwift in Frameworks */,
 				B8BD2D85293E242200E12E29 /* SwipeCellKit in Frameworks */,
-				B8951CFA2A0C5D09001597AF /* XCoordinator in Frameworks */,
 				B82EFA252A896CBD00C8B2AC /* RouteComposer in Frameworks */,
 				B89301192947CF5500D14141 /* SwiftRichString in Frameworks */,
 				B8495D42294CCE1E00F60171 /* SwiftMessages in Frameworks */,
 				B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */,
 				B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */,
 				B88D3F592A098C600061C6C4 /* SFSafeSymbols in Frameworks */,
-				B8951CFF2A0C6180001597AF /* SkeletonView in Frameworks */,
 				B8B55B022A07C948008C93D3 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -285,8 +355,29 @@
 				B8FD821D2A1169C100EB7035 /* ImageViews */,
 				B8FD821C2A1169BC00EB7035 /* TextViews */,
 				B8FD821B2A1169B500EB7035 /* Labels */,
+				B8487C9C2AA6950C0018501C /* Custom */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		B8487C9C2AA6950C0018501C /* Custom */ = {
+			isa = PBXGroup;
+			children = (
+				B8487C9D2AA698550018501C /* CircularLoadingIndicator */,
+			);
+			path = Custom;
+			sourceTree = "<group>";
+		};
+		B8487C9D2AA698550018501C /* CircularLoadingIndicator */ = {
+			isa = PBXGroup;
+			children = (
+				B8487CA02AA698600018501C /* ProgressView.swift */,
+				B8487C9E2AA698600018501C /* ProgressShapeLayer.swift */,
+				B8487C9F2AA698600018501C /* RotationAnimation.swift */,
+				B8487CA12AA698600018501C /* StrokeAnimation.swift */,
+				B8487CA22AA698600018501C /* StrokeColorAnimation.swift */,
+			);
+			path = CircularLoadingIndicator;
 			sourceTree = "<group>";
 		};
 		B85849FF2A4473D900BF915D /* Cells */ = {
@@ -360,6 +451,36 @@
 				B88D3FC02A0AFDD70061C6C4 /* LoginPresenter.swift */,
 			);
 			path = Login;
+			sourceTree = "<group>";
+		};
+		B8A85A892AA10CF400EDFE58 /* ShareForPDA */ = {
+			isa = PBXGroup;
+			children = (
+				B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */,
+				B8A85A8F2AA10CF500EDFE58 /* Info.plist */,
+			);
+			path = ShareForPDA;
+			sourceTree = "<group>";
+		};
+		B8AB63BE2AA49F6100F2CEFF /* OpenInForPDA */ = {
+			isa = PBXGroup;
+			children = (
+				B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */,
+				B8AB63D22AA49F6100F2CEFF /* Info.plist */,
+				B8AB63C12AA49F6100F2CEFF /* Resources */,
+			);
+			path = OpenInForPDA;
+			sourceTree = "<group>";
+		};
+		B8AB63C12AA49F6100F2CEFF /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B8AB63C22AA49F6100F2CEFF /* _locales */,
+				B8AB63C42AA49F6100F2CEFF /* images */,
+				B8AB63C62AA49F6100F2CEFF /* manifest.json */,
+				B8AB63CA2AA49F6100F2CEFF /* content.js */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		B8AC57702947FC8E00435CF3 /* Profile */ = {
@@ -461,6 +582,8 @@
 			isa = PBXGroup;
 			children = (
 				B8D351F7293CABB6008A84EA /* ForPDA */,
+				B8A85A892AA10CF400EDFE58 /* ShareForPDA */,
+				B8AB63BE2AA49F6100F2CEFF /* OpenInForPDA */,
 				B8D351F6293CABB6008A84EA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -469,6 +592,8 @@
 			isa = PBXGroup;
 			children = (
 				B8D351F5293CABB6008A84EA /* ForPDA.app */,
+				B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */,
+				B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -621,6 +746,40 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B8A85A872AA10CF400EDFE58 /* ShareForPDA */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8A85A932AA10CF500EDFE58 /* Build configuration list for PBXNativeTarget "ShareForPDA" */;
+			buildPhases = (
+				B8A85A842AA10CF400EDFE58 /* Sources */,
+				B8A85A852AA10CF400EDFE58 /* Frameworks */,
+				B8A85A862AA10CF400EDFE58 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ShareForPDA;
+			productName = ShareExtension;
+			productReference = B8A85A882AA10CF400EDFE58 /* ShareForPDA.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B8AB63BC2AA49F6100F2CEFF /* OpenInForPDA */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8AB63D62AA49F6100F2CEFF /* Build configuration list for PBXNativeTarget "OpenInForPDA" */;
+			buildPhases = (
+				B8AB63B92AA49F6100F2CEFF /* Sources */,
+				B8AB63BA2AA49F6100F2CEFF /* Frameworks */,
+				B8AB63BB2AA49F6100F2CEFF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenInForPDA;
+			productName = OpenInAppExtension;
+			productReference = B8AB63BD2AA49F6100F2CEFF /* OpenInForPDA.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		B8D351F4293CABB6008A84EA /* ForPDA */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B8D35209293CABB7008A84EA /* Build configuration list for PBXNativeTarget "ForPDA" */;
@@ -631,11 +790,14 @@
 				B8D351F3293CABB6008A84EA /* Resources */,
 				B8001CC22A197F0500E7A8A8 /* Set Build Number */,
 				B82B2EB72A87FFE700CB067C /* Sentry */,
+				B8A85A962AA10CF500EDFE58 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				B834034D296770C300C3CF37 /* PBXTargetDependency */,
+				B8A85A912AA10CF500EDFE58 /* PBXTargetDependency */,
+				B8AB63D42AA49F6100F2CEFF /* PBXTargetDependency */,
 			);
 			name = ForPDA;
 			packageProductDependencies = (
@@ -652,8 +814,6 @@
 				B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */,
 				B8B55B012A07C948008C93D3 /* Factory */,
 				B88D3F582A098C600061C6C4 /* SFSafeSymbols */,
-				B8951CF92A0C5D09001597AF /* XCoordinator */,
-				B8951CFE2A0C6180001597AF /* SkeletonView */,
 				B82B2EB22A87D58D00CB067C /* Sentry */,
 				B82B2EB52A87D5F200CB067C /* AmplitudeSwift */,
 				B82EFA242A896CBD00C8B2AC /* RouteComposer */,
@@ -669,9 +829,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1410;
+				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1410;
 				TargetAttributes = {
+					B8A85A872AA10CF400EDFE58 = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+					B8AB63BC2AA49F6100F2CEFF = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
 					B8D351F4293CABB6008A84EA = {
 						CreatedOnToolsVersion = 14.1;
 					};
@@ -700,8 +866,6 @@
 				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 				B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */,
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
-				B8951CF82A0C5D09001597AF /* XCRemoteSwiftPackageReference "XCoordinator" */,
-				B8951CFD2A0C6180001597AF /* XCRemoteSwiftPackageReference "SkeletonView" */,
 				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
 				B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */,
@@ -711,11 +875,31 @@
 			projectRoot = "";
 			targets = (
 				B8D351F4293CABB6008A84EA /* ForPDA */,
+				B8A85A872AA10CF400EDFE58 /* ShareForPDA */,
+				B8AB63BC2AA49F6100F2CEFF /* OpenInForPDA */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B8A85A862AA10CF400EDFE58 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8AB63BB2AA49F6100F2CEFF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8AB63C52AA49F6100F2CEFF /* images in Resources */,
+				B8AB63C72AA49F6100F2CEFF /* manifest.json in Resources */,
+				B8AB63C32AA49F6100F2CEFF /* _locales in Resources */,
+				B8AB63CB2AA49F6100F2CEFF /* content.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8D351F3293CABB6008A84EA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -766,7 +950,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "source \"${PROJECT_DIR}/ForPDA/Secrets.xcconfig\"\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=forpda\nexport SENTRY_PROJECT=apple-ios\nexport SENTRY_AUTH_TOKEN=$SENTRY_DSYM_TOKEN\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
+			shellScript = "#source \"${PROJECT_DIR}/ForPDA/Secrets.xcconfig\"\n#if which sentry-cli >/dev/null; then\n#export SENTRY_ORG=forpda\n#export SENTRY_PROJECT=apple-ios\n#export SENTRY_AUTH_TOKEN=$SENTRY_DSYM_TOKEN\n#ERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\n#if [ ! $? -eq 0 ]; then\n#echo \"warning: sentry-cli - $ERROR\"\n#fi\n#else\n#echo \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\n#fi\n";
 		};
 		B8FEA1BB29675BCE002DFAA4 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -792,6 +976,22 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B8A85A842AA10CF400EDFE58 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8A85A8B2AA10CF400EDFE58 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8AB63B92AA49F6100F2CEFF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8AB63C02AA49F6100F2CEFF /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B8D351F1293CABB6008A84EA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -817,6 +1017,8 @@
 				B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */,
 				B8E4463F2A004CD600CE8745 /* URL+Ext.swift in Sources */,
 				B88D3FBE2A0AFDB00061C6C4 /* LoginFactory.swift in Sources */,
+				B8487CA52AA698600018501C /* ProgressView.swift in Sources */,
+				B8487CA72AA698600018501C /* StrokeColorAnimation.swift in Sources */,
 				B8FD82162A1168F400EB7035 /* URLComponents.swift in Sources */,
 				B875D2112A1C343000F8AB6A /* LoginData.swift in Sources */,
 				B8C7ABBC293D20EF00FB2F67 /* UITableViewCell+Ext.swift in Sources */,
@@ -849,6 +1051,7 @@
 				B8C7ABAF293D0A0D00FB2F67 /* Article.swift in Sources */,
 				B8001CC02A196E1000E7A8A8 /* CaseIterable+Ext.swift in Sources */,
 				B8BD2D93293E2AF000E12E29 /* CommentCell.swift in Sources */,
+				B8487CA62AA698600018501C /* StrokeAnimation.swift in Sources */,
 				B8AC57742947FCA500435CF3 /* ProfileView.swift in Sources */,
 				B88D3F562A0900DA0061C6C4 /* SettingsCellType.swift in Sources */,
 				B898E4FC2A087C9A002E978B /* NewsFactory.swift in Sources */,
@@ -867,11 +1070,13 @@
 				B8FD82262A1174EA00EB7035 /* UIAction+Ext.swift in Sources */,
 				B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */,
 				B82EFA282A896D6A00C8B2AC /* RouteMap.swift in Sources */,
+				B8487CA32AA698600018501C /* ProgressShapeLayer.swift in Sources */,
 				B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */,
 				B8D351FB293CABB6008A84EA /* SceneDelegate.swift in Sources */,
 				B8BD2D96293E2AF000E12E29 /* CommentsViewDelegate.swift in Sources */,
 				B8C7ABB8293D20DD00FB2F67 /* PDATabBarController.swift in Sources */,
 				B875D2092A1C0FBB00F8AB6A /* ProfileFactory.swift in Sources */,
+				B8487CA42AA698600018501C /* RotationAnimation.swift in Sources */,
 				B893011E2947E19800D14141 /* MenuView.swift in Sources */,
 				B8BD2D95293E2AF000E12E29 /* AbstractComment.swift in Sources */,
 				B82B2EC12A89059C00CB067C /* AppScheme.swift in Sources */,
@@ -893,6 +1098,16 @@
 		B834034D296770C300C3CF37 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */;
+		};
+		B8A85A912AA10CF500EDFE58 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8A85A872AA10CF400EDFE58 /* ShareForPDA */;
+			targetProxy = B8A85A902AA10CF500EDFE58 /* PBXContainerItemProxy */;
+		};
+		B8AB63D42AA49F6100F2CEFF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8AB63BC2AA49F6100F2CEFF /* OpenInForPDA */;
+			targetProxy = B8AB63D32AA49F6100F2CEFF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -918,6 +1133,118 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		B8A85A942AA10CF500EDFE58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 75;
+				DEVELOPMENT_TEAM = 7353CQCGQC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShareForPDA/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShareForPDA;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareForPDA;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B8A85A952AA10CF500EDFE58 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 75;
+				DEVELOPMENT_TEAM = 7353CQCGQC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ShareForPDA/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ShareForPDA;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareForPDA;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		B8AB63D72AA49F6100F2CEFF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 75;
+				DEVELOPMENT_TEAM = 7353CQCGQC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpenInForPDA/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in ForPDA";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.3;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInForPDA;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B8AB63D82AA49F6100F2CEFF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 75;
+				DEVELOPMENT_TEAM = 7353CQCGQC;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OpenInForPDA/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Open in ForPDA";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.3;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInForPDA;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		B8D35207293CABB7008A84EA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B82B2EC62A89306000CB067C /* Secrets.xcconfig */;
@@ -1042,6 +1369,7 @@
 		B8D3520A293CABB7008A84EA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -1061,7 +1389,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1076,6 +1404,7 @@
 		B8D3520B293CABB7008A84EA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -1094,7 +1423,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1109,6 +1438,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B8A85A932AA10CF500EDFE58 /* Build configuration list for PBXNativeTarget "ShareForPDA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8A85A942AA10CF500EDFE58 /* Debug */,
+				B8A85A952AA10CF500EDFE58 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B8AB63D62AA49F6100F2CEFF /* Build configuration list for PBXNativeTarget "OpenInForPDA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8AB63D72AA49F6100F2CEFF /* Debug */,
+				B8AB63D82AA49F6100F2CEFF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B8D351F0293CABB6008A84EA /* Build configuration list for PBXProject "ForPDA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1208,22 +1555,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.7.2;
-			};
-		};
-		B8951CF82A0C5D09001597AF /* XCRemoteSwiftPackageReference "XCoordinator" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/QuickBirdEng/XCoordinator";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.2.1;
-			};
-		};
-		B8951CFD2A0C6180001597AF /* XCRemoteSwiftPackageReference "SkeletonView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Juanpe/SkeletonView.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.30.4;
 			};
 		};
 		B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */ = {
@@ -1327,16 +1658,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */;
 			productName = SwiftRichString;
-		};
-		B8951CF92A0C5D09001597AF /* XCoordinator */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B8951CF82A0C5D09001597AF /* XCRemoteSwiftPackageReference "XCoordinator" */;
-			productName = XCoordinator;
-		};
-		B8951CFE2A0C6180001597AF /* SkeletonView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B8951CFD2A0C6180001597AF /* XCRemoteSwiftPackageReference "SkeletonView" */;
-			productName = SkeletonView;
 		};
 		B8B55B012A07C948008C93D3 /* Factory */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -9,6 +9,10 @@ import Foundation
 
 struct Article {
     let url: String
+    var info: ArticleInfo?
+}
+
+struct ArticleInfo {
     let title: String
     let description: String
     let imageUrl: String

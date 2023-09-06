@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import SkeletonView
 
 protocol NewsViewDelegate: AnyObject {
     func refreshControlCalled()
@@ -21,9 +20,14 @@ final class NewsView: UIView {
         let tableView = PDATableView()
         tableView.tableHeaderView = UIView()
         tableView.estimatedRowHeight = 370
-        tableView.isUserInteractionDisabledWhenSkeletonIsActive = false
         tableView.register(cellWithClass: ArticleCell.self)
         return tableView
+    }()
+    
+    private(set) var loadingIndicator: ProgressView = {
+        let progress = ProgressView(colors: [.label], lineWidth: 4)
+        progress.isAnimating = true
+        return progress
     }()
     
     private(set) lazy var refreshControl: UIRefreshControl = {
@@ -74,6 +78,7 @@ final class NewsView: UIView {
     
     private func addSubviews() {
         addSubview(tableView)
+        addSubview(loadingIndicator)
         tableView.addSubview(refreshControl)
         tableView.tableFooterView = footerView
         footerView.addSubview(refreshButton)
@@ -89,6 +94,11 @@ final class NewsView: UIView {
             make.top.bottom.equalToSuperview().inset(5.5)
             make.centerX.equalToSuperview()
             make.width.greaterThanOrEqualTo(160)
+        }
+        
+        loadingIndicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(44)
         }
     }
 }

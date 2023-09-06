@@ -32,7 +32,7 @@ final class ArticleView: UIView {
         let imageView = PDAResizingImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.addoverlay()
+//        imageView.addoverlay()
         return imageView
     }()
     
@@ -54,13 +54,10 @@ final class ArticleView: UIView {
         return view
     }()
     
-    private let loadingIndicator: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView()
-        indicator.style = .large
-        indicator.tintColor = .black
-        indicator.startAnimating()
-        indicator.hidesWhenStopped = true
-        return indicator
+    private(set) var loadingIndicator: ProgressView = {
+        let progress = ProgressView(colors: [.label], lineWidth: 4)
+        progress.isAnimating = true
+        return progress
     }()
     
     private(set) var stackView: UIStackView = {
@@ -124,7 +121,7 @@ final class ArticleView: UIView {
     
     func stopLoading() {
         hideView.isHidden = true
-        loadingIndicator.stopAnimating()
+        loadingIndicator.isHidden = true
     }
     
     func removeComments() {
@@ -163,6 +160,7 @@ final class ArticleView: UIView {
         loadingIndicator.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.centerY.equalToSuperview().offset(-64)
+            make.size.equalTo(44)
         }
         
         contentView.snp.makeConstraints { make in
