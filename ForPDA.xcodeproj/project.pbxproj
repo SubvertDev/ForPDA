@@ -916,7 +916,7 @@
 		B8001CC22A197F0500E7A8A8 /* Set Build Number */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -930,7 +930,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "$SRCROOT/Scripts/set_build_number.sh\n";
+			shellScript = "$SRCROOT/scripts/set_build_number.sh\n";
 		};
 		B82B2EB72A87FFE700CB067C /* Sentry */ = {
 			isa = PBXShellScriptBuildPhase;
