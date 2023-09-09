@@ -18,9 +18,9 @@
 		B8001CDA2A1AA0FE00E7A8A8 /* CookiesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CD92A1AA0FE00E7A8A8 /* CookiesService.swift */; };
 		B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */; };
 		B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDE2A1B01D000E7A8A8 /* User.swift */; };
+		B802964F2AACE50C00D5B413 /* Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = B802964E2AACE50C00D5B413 /* Amplitude */; };
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
 		B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = B82B2EB22A87D58D00CB067C /* Sentry */; };
-		B82B2EB62A87D5F200CB067C /* AmplitudeSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B82B2EB52A87D5F200CB067C /* AmplitudeSwift */; };
 		B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B2EBD2A89016300CB067C /* Secrets.swift */; };
 		B82B2EC12A89059C00CB067C /* AppScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B2EC02A89059C00CB067C /* AppScheme.swift */; };
 		B82EFA252A896CBD00C8B2AC /* RouteComposer in Frameworks */ = {isa = PBXBuildFile; productRef = B82EFA242A896CBD00C8B2AC /* RouteComposer */; };
@@ -301,7 +301,6 @@
 				B8D3521B293CBE46008A84EA /* SwiftSoup in Frameworks */,
 				B83E8AC5294A75DA000D59E7 /* SwiftyGif in Frameworks */,
 				B8BD2D79293E1C3F00E12E29 /* MarqueeLabel in Frameworks */,
-				B82B2EB62A87D5F200CB067C /* AmplitudeSwift in Frameworks */,
 				B8BD2D85293E242200E12E29 /* SwipeCellKit in Frameworks */,
 				B82EFA252A896CBD00C8B2AC /* RouteComposer in Frameworks */,
 				B89301192947CF5500D14141 /* SwiftRichString in Frameworks */,
@@ -309,6 +308,7 @@
 				B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */,
 				B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */,
 				B88D3F592A098C600061C6C4 /* SFSafeSymbols in Frameworks */,
+				B802964F2AACE50C00D5B413 /* Amplitude in Frameworks */,
 				B8B55B022A07C948008C93D3 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -815,8 +815,8 @@
 				B8B55B012A07C948008C93D3 /* Factory */,
 				B88D3F582A098C600061C6C4 /* SFSafeSymbols */,
 				B82B2EB22A87D58D00CB067C /* Sentry */,
-				B82B2EB52A87D5F200CB067C /* AmplitudeSwift */,
 				B82EFA242A896CBD00C8B2AC /* RouteComposer */,
+				B802964E2AACE50C00D5B413 /* Amplitude */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -867,8 +867,8 @@
 				B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */,
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
-				B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */,
 				B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */,
+				B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */,
 			);
 			productRefGroup = B8D351F6293CABB6008A84EA /* Products */;
 			projectDirPath = "";
@@ -1477,6 +1477,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/amplitude/Amplitude-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.17.1;
+			};
+		};
 		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -1491,14 +1499,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 8.9.4;
-			};
-		};
-		B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/amplitude/Amplitude-Swift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.4.11;
 			};
 		};
 		B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */ = {
@@ -1600,6 +1600,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B802964E2AACE50C00D5B413 /* Amplitude */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */;
+			productName = Amplitude;
+		};
 		B809925A293CBF5C0053202C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
@@ -1609,11 +1614,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
 			productName = Sentry;
-		};
-		B82B2EB52A87D5F200CB067C /* AmplitudeSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B82B2EB42A87D5F200CB067C /* XCRemoteSwiftPackageReference "Amplitude-Swift" */;
-			productName = AmplitudeSwift;
 		};
 		B82EFA242A896CBD00C8B2AC /* RouteComposer */ = {
 			isa = XCSwiftPackageProductDependency;

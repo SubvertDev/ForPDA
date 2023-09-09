@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Factory
+import Amplitude
 import Sentry
 import Nuke
 import RouteComposer
@@ -15,22 +16,13 @@ import RouteComposer
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    @Injected(\.networkService) private var networkService
     @Injected(\.settingsService) private var settingsService
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-                
-        SentrySDK.start { options in
-            options.dsn = Secrets.for(key: .SENTRY_DSN)
-            options.debug = AppScheme.isDebug
-            options.enabled = !AppScheme.isDebug
-            options.tracesSampleRate = 1.0
-            options.diagnosticLevel = .warning
-            options.attachScreenshot = true
-        }
         
-        ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
-        
+        configureAmplitude()
+        configureSentry()
+        configureNuke()
         configureCookies()
         
         return true
@@ -44,9 +36,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
-// MARK: - Cookies
+// MARK: - Configuration
 
 extension AppDelegate {
+    
+    // MARK: Amplitude
+    
+    private func configureAmplitude() {
+        Amplitude.instance().defaultTracking.sessions = true
+        Amplitude.instance().initializeApiKey(Secrets.for(key: .AMPLITUDE_TOKEN))
+    }
+    
+    // MARK: Sentry
+    
+    private func configureSentry() {
+        SentrySDK.start { options in
+            options.dsn = Secrets.for(key: .SENTRY_DSN)
+            options.debug = AppScheme.isDebug
+            options.enabled = !AppScheme.isDebug
+            options.tracesSampleRate = 1.0
+            options.diagnosticLevel = .warning
+            options.attachScreenshot = true
+        }
+    }
+    
+    // MARK: Nuke
+
+    private func configureNuke() {
+        ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
+    }
+    
+    // MARK: Cookies
     
     func configureCookies() {
         // We need 3 cookies to authorize: anonymous, member_id, pass_hash
