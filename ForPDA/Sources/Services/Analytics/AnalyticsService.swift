@@ -7,35 +7,27 @@
 //  swiftlint:disable nesting
 
 import Foundation
-import AmplitudeSwift
+import Amplitude
 
 final class AnalyticsService {
     
     typealias EventDictionary = [String: String]
     
-    private let amplitude = Amplitude(configuration: Configuration(
-        apiKey: Secrets.for(key: .AMPLITUDE_TOKEN),
-        logLevel: .WARN,
-        serverZone: .EU
-    ))
-    
     let isDebug: Bool
     
     init(isDebug: Bool = false) {
         self.isDebug = isDebug
-        amplitude.configuration.optOut = isDebug
     }
     
     // MARK: - Generic Event
     
     private func event(_ name: AnalyticsEvent, parameters: EventDictionary?) {
         guard !isDebug else { return }
-        let event = BaseEvent(
-            eventType: name.rawValue,
-            eventProperties: parameters
-        )
         
-        amplitude.track(event: event)
+        Amplitude.instance().logEvent(
+            name.rawValue,
+            withEventProperties: parameters
+        )
     }
     
     // MARK: - Parameters Cases

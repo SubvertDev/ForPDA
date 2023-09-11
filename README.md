@@ -1,18 +1,20 @@
 # ForPDA
-![Лого](logo.png)  
+![Лого](images/logo.png)  
 Альтернативный клиент [4pda.to](https://4pda.to/)
 
 ## Скриншоты
-![Скриншоты](screenshots.png)
+![Скриншоты](images/screenshots.png)
 
 ## Требования и установка
 - iOS 14.0+ / macOS 13.0+
 - Xcode 14.3+ / Swift 5.8+
 - Скачать и запустить проект, зависимости загрузятся автоматически через SPM
-- Создать Secrets.xcconfig и ввести значения для ключей SENTRY_DSN, SENTRY_DSYM_TOKEN, AMPLITUDE_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
+- Открыть SecretsExample.xcconfig и заменить все значения на свои
+- Для сборки в .ipa или загрузки на свой TestFlight использовать Fastlane
 
-## Используемые иблиотеки
-- [Amplitude](https://github.com/amplitude/Amplitude-Swift) - аналитика
+## Используемые библиотеки
+- [Fastlane](https://github.com/fastlane/fastlane) - автоматизация сборки и выгрузки на TestFlight
+- [Amplitude](https://github.com/amplitude/Amplitude-iOS) - аналитика
 - [Sentry](https://github.com/getsentry/sentry-cocoa) - мониторинг ошибок
 - [SwiftSoup](https://github.com/scinfu/SwiftSoup) - парсинг HTML страниц
 - [SwitchRichString](https://github.com/malcommac/SwiftRichString) - преобразование HTML строк в TextView

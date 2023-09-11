@@ -7,10 +7,10 @@
 SRC_ROOT=$(git rev-parse --show-toplevel)
 
 # Create a directory where we store the input/output files. This should be a folder that is ignored by git.
-mkdir -p "$SRC_ROOT/build/build_phases"
+mkdir -p "$SRC_ROOT/swiftlint/build_phases"
 
 # Path to this new folder where we generate the input & output files
-BUILD_FOLDER="$SRC_ROOT/build/build_phases"
+BUILD_FOLDER="$SRC_ROOT/swiftlint/build_phases"
 
 # The path of the result file where we save the current git diff
 RESULT_FILE=$BUILD_FOLDER/git_diff_result
