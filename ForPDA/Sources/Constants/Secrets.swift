@@ -12,7 +12,6 @@ struct Secrets {
     
     enum Keys: String {
         case SENTRY_DSN
-        case SENTRY_DSYM_TOKEN
         case AMPLITUDE_TOKEN
         case TELEGRAM_TOKEN
         case TELEGRAM_CHAT_ID

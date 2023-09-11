@@ -19,6 +19,7 @@
 		B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */; };
 		B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDE2A1B01D000E7A8A8 /* User.swift */; };
 		B802964F2AACE50C00D5B413 /* Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = B802964E2AACE50C00D5B413 /* Amplitude */; };
+		B802965F2AAE87D100D5B413 /* SecretsExample.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */; };
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
 		B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = B82B2EB22A87D58D00CB067C /* Sentry */; };
 		B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B2EBD2A89016300CB067C /* Secrets.swift */; };
@@ -173,6 +174,7 @@
 		B8001CD92A1AA0FE00E7A8A8 /* CookiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiesService.swift; sourceTree = "<group>"; };
 		B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cookie.swift; sourceTree = "<group>"; };
 		B8001CDE2A1B01D000E7A8A8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SecretsExample.xcconfig; sourceTree = "<group>"; };
 		B82B2EBD2A89016300CB067C /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		B82B2EC02A89059C00CB067C /* AppScheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScheme.swift; sourceTree = "<group>"; };
 		B82B2EC62A89306000CB067C /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
@@ -604,6 +606,7 @@
 				B8FD82092A1163EE00EB7035 /* Sources */,
 				B8FD820E2A11681500EB7035 /* Resources */,
 				B82B2EC62A89306000CB067C /* Secrets.xcconfig */,
+				B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */,
 				B82B2EFE2A8942E900CB067C /* Info.plist */,
 			);
 			path = ForPDA;
@@ -784,12 +787,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B8D35209293CABB7008A84EA /* Build configuration list for PBXNativeTarget "ForPDA" */;
 			buildPhases = (
-				B8FEA1BB29675BCE002DFAA4 /* SwiftLint */,
 				B8D351F1293CABB6008A84EA /* Sources */,
 				B8D351F2293CABB6008A84EA /* Frameworks */,
 				B8D351F3293CABB6008A84EA /* Resources */,
-				B8001CC22A197F0500E7A8A8 /* Set Build Number */,
-				B82B2EB72A87FFE700CB067C /* Sentry */,
 				B8A85A962AA10CF500EDFE58 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -854,19 +854,19 @@
 			);
 			mainGroup = B8D351EC293CABB6008A84EA;
 			packageReferences = (
-				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */,
-				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */,
-				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
-				B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
-				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */,
-				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */,
-				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */,
+				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */,
+				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */,
+				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */,
+				B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit.git" */,
+				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */,
+				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */,
+				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */,
 				B8495D40294CCE1E00F60171 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
-				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */,
-				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
+				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */,
+				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */,
 				B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */,
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
-				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */,
 				B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */,
 				B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */,
 			);
@@ -907,73 +907,11 @@
 				B8D35205293CABB7008A84EA /* LaunchScreen.storyboard in Resources */,
 				B874B4472A1066F500A004FC /* Localizable.strings in Resources */,
 				B8D35202293CABB7008A84EA /* Assets.xcassets in Resources */,
+				B802965F2AAE87D100D5B413 /* SecretsExample.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		B8001CC22A197F0500E7A8A8 /* Set Build Number */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 12;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Set Build Number";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "$SRCROOT/scripts/set_build_number.sh\n";
-		};
-		B82B2EB72A87FFE700CB067C /* Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-			);
-			name = Sentry;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "source \"${PROJECT_DIR}/ForPDA/Secrets.xcconfig\"\nif which sentry-cli >/dev/null; then\nexport SENTRY_ORG=forpda\nexport SENTRY_PROJECT=apple-ios\nexport SENTRY_AUTH_TOKEN=$SENTRY_DSYM_TOKEN\nERROR=$(sentry-cli debug-files upload --include-sources \"$DWARF_DSYM_FOLDER_PATH\" 2>&1 >/dev/null)\nif [ ! $? -eq 0 ]; then\necho \"warning: sentry-cli - $ERROR\"\nfi\nelse\necho \"warning: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases\"\nfi\n";
-		};
-		B8FEA1BB29675BCE002DFAA4 /* SwiftLint */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 12;
-			files = (
-			);
-			inputFileListPaths = (
-				"$(SRCROOT)/build/build_phases/ForPDA_swiftlint.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = SwiftLint;
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(SRCROOT)/build/build_phases/ForPDA_swiftlint_static_output",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B8A85A842AA10CF400EDFE58 /* Sources */ = {
@@ -1097,7 +1035,7 @@
 /* Begin PBXTargetDependency section */
 		B834034D296770C300C3CF37 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */;
+			productRef = B834034C296770C300C3CF37 /* plugin:RswiftGenerateInternalResources */;
 		};
 		B8A85A912AA10CF500EDFE58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1137,7 +1075,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 84;
+				CURRENT_PROJECT_VERSION = 114;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -1149,7 +1087,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1163,7 +1101,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 84;
+				CURRENT_PROJECT_VERSION = 114;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ShareExtension/Info.plist;
@@ -1175,7 +1113,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1189,7 +1127,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 84;
+				CURRENT_PROJECT_VERSION = 114;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -1201,7 +1139,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.4.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -1219,7 +1157,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 84;
+				CURRENT_PROJECT_VERSION = 114;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -1231,7 +1169,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.4.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -1373,7 +1311,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 114;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1389,7 +1327,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1408,7 +1346,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 114;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ForPDA/Info.plist;
@@ -1423,7 +1361,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1485,7 +1423,7 @@
 				minimumVersion = 8.17.1;
 			};
 		};
-		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
@@ -1493,7 +1431,7 @@
 				minimumVersion = 5.6.0;
 			};
 		};
-		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
 			requirement = {
@@ -1509,7 +1447,7 @@
 				minimumVersion = 2.10.4;
 			};
 		};
-		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */ = {
+		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kirualex/SwiftyGif.git";
 			requirement = {
@@ -1525,7 +1463,7 @@
 				minimumVersion = 9.0.6;
 			};
 		};
-		B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+		B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke.git";
 			requirement = {
@@ -1533,7 +1471,7 @@
 				minimumVersion = 12.1.0;
 			};
 		};
-		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
+		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit.git";
 			requirement = {
@@ -1549,7 +1487,7 @@
 				minimumVersion = 4.1.1;
 			};
 		};
-		B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */ = {
+		B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/malcommac/SwiftRichString.git";
 			requirement = {
@@ -1565,7 +1503,7 @@
 				minimumVersion = 2.1.5;
 			};
 		};
-		B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
+		B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cbpowell/MarqueeLabel.git";
 			requirement = {
@@ -1573,7 +1511,7 @@
 				minimumVersion = 4.3.0;
 			};
 		};
-		B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
+		B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit.git";
 			requirement = {
@@ -1581,7 +1519,7 @@
 				minimumVersion = 2.7.1;
 			};
 		};
-		B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+		B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
 			requirement = {
@@ -1589,7 +1527,7 @@
 				minimumVersion = 2.6.0;
 			};
 		};
-		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */ = {
+		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mac-cain13/R.swift";
 			requirement = {
@@ -1607,12 +1545,12 @@
 		};
 		B809925A293CBF5C0053202C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
+			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */;
 			productName = SnapKit;
 		};
 		B82B2EB22A87D58D00CB067C /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */;
 			productName = Sentry;
 		};
 		B82EFA242A896CBD00C8B2AC /* RouteComposer */ = {
@@ -1620,13 +1558,13 @@
 			package = B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */;
 			productName = RouteComposer;
 		};
-		B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */ = {
+		B834034C296770C300C3CF37 /* plugin:RswiftGenerateInternalResources */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		B83E8AC4294A75DA000D59E7 /* SwiftyGif */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */;
+			package = B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */;
 			productName = SwiftyGif;
 		};
 		B8495D41294CCE1E00F60171 /* SwiftMessages */ = {
@@ -1636,17 +1574,17 @@
 		};
 		B84CCC51294A6EDA0001EB24 /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
+			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */;
 			productName = Nuke;
 		};
 		B84CCC53294A6EDA0001EB24 /* NukeExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
+			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */;
 			productName = NukeExtensions;
 		};
 		B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
+			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */;
 			productName = YouTubePlayerKit;
 		};
 		B88D3F582A098C600061C6C4 /* SFSafeSymbols */ = {
@@ -1656,7 +1594,7 @@
 		};
 		B89301182947CF5500D14141 /* SwiftRichString */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */;
+			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */;
 			productName = SwiftRichString;
 		};
 		B8B55B012A07C948008C93D3 /* Factory */ = {
@@ -1666,22 +1604,22 @@
 		};
 		B8BD2D78293E1C3F00E12E29 /* MarqueeLabel */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
+			package = B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */;
 			productName = MarqueeLabel;
 		};
 		B8BD2D84293E242200E12E29 /* SwipeCellKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
+			package = B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit.git" */;
 			productName = SwipeCellKit;
 		};
 		B8D3521A293CBE46008A84EA /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */;
 			productName = SwiftSoup;
 		};
 		B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */;
+			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */;
 			productName = RswiftLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
