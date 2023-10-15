@@ -19,7 +19,6 @@
 		B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */; };
 		B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDE2A1B01D000E7A8A8 /* User.swift */; };
 		B802964F2AACE50C00D5B413 /* Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = B802964E2AACE50C00D5B413 /* Amplitude */; };
-		B802965F2AAE87D100D5B413 /* SecretsExample.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */; };
 		B809925B293CBF5C0053202C /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = B809925A293CBF5C0053202C /* SnapKit */; };
 		B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = B82B2EB22A87D58D00CB067C /* Sentry */; };
 		B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B2EBD2A89016300CB067C /* Secrets.swift */; };
@@ -84,6 +83,7 @@
 		B8A51BAA2A90FDEF00FDB599 /* PDATabBarControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BA92A90FDEF00FDB599 /* PDATabBarControllerFactory.swift */; };
 		B8A51BB82A91292000FDB599 /* LoginInterceptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BB72A91292000FDB599 /* LoginInterceptor.swift */; };
 		B8A51BBB2A913BE400FDB599 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A51BBA2A913BE400FDB599 /* Errors.swift */; };
+		B8A5569D2ADC7F9F001291B2 /* PDANavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A5569C2ADC7F9F001291B2 /* PDANavigationController.swift */; };
 		B8A85A8B2AA10CF400EDFE58 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */; };
 		B8A85A922AA10CF500EDFE58 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B8AB63C02AA49F6100F2CEFF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */; };
@@ -233,6 +233,7 @@
 		B8A51BA92A90FDEF00FDB599 /* PDATabBarControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDATabBarControllerFactory.swift; sourceTree = "<group>"; };
 		B8A51BB72A91292000FDB599 /* LoginInterceptor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginInterceptor.swift; sourceTree = "<group>"; };
 		B8A51BBA2A913BE400FDB599 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
+		B8A5569C2ADC7F9F001291B2 /* PDANavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDANavigationController.swift; sourceTree = "<group>"; };
 		B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		B8A85A8F2AA10CF500EDFE58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -351,6 +352,7 @@
 		B834034F296789D800C3CF37 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B8A5569B2ADC7F93001291B2 /* NavigationControllers */,
 				B8FD82202A1169CD00EB7035 /* TabBarControllers */,
 				B8FD821F2A1169CA00EB7035 /* ViewControllers */,
 				B8FD821E2A1169C600EB7035 /* TableViews */,
@@ -453,6 +455,14 @@
 				B88D3FC02A0AFDD70061C6C4 /* LoginPresenter.swift */,
 			);
 			path = Login;
+			sourceTree = "<group>";
+		};
+		B8A5569B2ADC7F93001291B2 /* NavigationControllers */ = {
+			isa = PBXGroup;
+			children = (
+				B8A5569C2ADC7F9F001291B2 /* PDANavigationController.swift */,
+			);
+			path = NavigationControllers;
 			sourceTree = "<group>";
 		};
 		B8A85A892AA10CF400EDFE58 /* ShareExtension */ = {
@@ -830,7 +840,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1410;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					B8A85A872AA10CF400EDFE58 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -854,19 +864,19 @@
 			);
 			mainGroup = B8D351EC293CABB6008A84EA;
 			packageReferences = (
-				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */,
-				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */,
-				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */,
-				B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit.git" */,
-				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */,
-				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */,
-				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */,
+				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */,
+				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
+				B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */,
+				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */,
+				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */,
+				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */,
 				B8495D40294CCE1E00F60171 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
-				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */,
-				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */,
+				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */,
+				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 				B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */,
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
-				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */,
+				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */,
 				B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */,
 			);
@@ -907,7 +917,6 @@
 				B8D35205293CABB7008A84EA /* LaunchScreen.storyboard in Resources */,
 				B874B4472A1066F500A004FC /* Localizable.strings in Resources */,
 				B8D35202293CABB7008A84EA /* Assets.xcassets in Resources */,
-				B802965F2AAE87D100D5B413 /* SecretsExample.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1009,6 +1018,7 @@
 				B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */,
 				B82EFA282A896D6A00C8B2AC /* RouteMap.swift in Sources */,
 				B8487CA32AA698600018501C /* ProgressShapeLayer.swift in Sources */,
+				B8A5569D2ADC7F9F001291B2 /* PDANavigationController.swift in Sources */,
 				B83E8AC9294A836D000D59E7 /* PDAResizingTextView.swift in Sources */,
 				B8D351FB293CABB6008A84EA /* SceneDelegate.swift in Sources */,
 				B8BD2D96293E2AF000E12E29 /* CommentsViewDelegate.swift in Sources */,
@@ -1035,7 +1045,7 @@
 /* Begin PBXTargetDependency section */
 		B834034D296770C300C3CF37 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B834034C296770C300C3CF37 /* plugin:RswiftGenerateInternalResources */;
+			productRef = B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */;
 		};
 		B8A85A912AA10CF500EDFE58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1223,6 +1233,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1286,6 +1297,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1423,7 +1435,7 @@
 				minimumVersion = 8.17.1;
 			};
 		};
-		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */ = {
+		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
@@ -1431,7 +1443,7 @@
 				minimumVersion = 5.6.0;
 			};
 		};
-		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */ = {
+		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
 			requirement = {
@@ -1447,7 +1459,7 @@
 				minimumVersion = 2.10.4;
 			};
 		};
-		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */ = {
+		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kirualex/SwiftyGif.git";
 			requirement = {
@@ -1463,7 +1475,7 @@
 				minimumVersion = 9.0.6;
 			};
 		};
-		B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */ = {
+		B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke.git";
 			requirement = {
@@ -1471,7 +1483,7 @@
 				minimumVersion = 12.1.0;
 			};
 		};
-		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */ = {
+		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit.git";
 			requirement = {
@@ -1487,7 +1499,7 @@
 				minimumVersion = 4.1.1;
 			};
 		};
-		B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */ = {
+		B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/malcommac/SwiftRichString.git";
 			requirement = {
@@ -1503,7 +1515,7 @@
 				minimumVersion = 2.1.5;
 			};
 		};
-		B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */ = {
+		B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cbpowell/MarqueeLabel.git";
 			requirement = {
@@ -1511,7 +1523,7 @@
 				minimumVersion = 4.3.0;
 			};
 		};
-		B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit.git" */ = {
+		B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SwipeCellKit/SwipeCellKit.git";
 			requirement = {
@@ -1519,7 +1531,7 @@
 				minimumVersion = 2.7.1;
 			};
 		};
-		B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */ = {
+		B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
 			requirement = {
@@ -1527,7 +1539,7 @@
 				minimumVersion = 2.6.0;
 			};
 		};
-		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */ = {
+		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mac-cain13/R.swift";
 			requirement = {
@@ -1545,12 +1557,12 @@
 		};
 		B809925A293CBF5C0053202C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */;
+			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 		B82B2EB22A87D58D00CB067C /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */;
+			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
 			productName = Sentry;
 		};
 		B82EFA242A896CBD00C8B2AC /* RouteComposer */ = {
@@ -1558,13 +1570,13 @@
 			package = B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */;
 			productName = RouteComposer;
 		};
-		B834034C296770C300C3CF37 /* plugin:RswiftGenerateInternalResources */ = {
+		B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		B83E8AC4294A75DA000D59E7 /* SwiftyGif */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */;
+			package = B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */;
 			productName = SwiftyGif;
 		};
 		B8495D41294CCE1E00F60171 /* SwiftMessages */ = {
@@ -1574,17 +1586,17 @@
 		};
 		B84CCC51294A6EDA0001EB24 /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */;
+			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = Nuke;
 		};
 		B84CCC53294A6EDA0001EB24 /* NukeExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */;
+			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeExtensions;
 		};
 		B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */;
+			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
 			productName = YouTubePlayerKit;
 		};
 		B88D3F582A098C600061C6C4 /* SFSafeSymbols */ = {
@@ -1594,7 +1606,7 @@
 		};
 		B89301182947CF5500D14141 /* SwiftRichString */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */;
+			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */;
 			productName = SwiftRichString;
 		};
 		B8B55B012A07C948008C93D3 /* Factory */ = {
@@ -1604,22 +1616,22 @@
 		};
 		B8BD2D78293E1C3F00E12E29 /* MarqueeLabel */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */;
+			package = B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
 			productName = MarqueeLabel;
 		};
 		B8BD2D84293E242200E12E29 /* SwipeCellKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit.git" */;
+			package = B8BD2D83293E242200E12E29 /* XCRemoteSwiftPackageReference "SwipeCellKit" */;
 			productName = SwipeCellKit;
 		};
 		B8D3521A293CBE46008A84EA /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */;
+			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
 		};
 		B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */;
+			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */;
 			productName = RswiftLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */

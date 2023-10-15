@@ -29,23 +29,11 @@ final class MenuPresenter: MenuPresenterProtocol {
         ]),
         
         MenuSection(options: [
-            .staticCell(model: MenuOption(title: R.string.localizable.news(),
-                                          icon: .newspaperFill, handler: showNewsScreen)),
-            
-//            .staticCell(model: MenuOption(title: R.string.localizable.search(),
-//                                          icon: .magnifyingglass, handler: showSearchScreen)),
-            
-            .staticCell(model: MenuOption(title: R.string.localizable.forum(),
-                                          icon: .bubbleLeftAndBubbleRightFill, handler: showForumScreen)),
-            
             .staticCell(model: MenuOption(title: R.string.localizable.history(),
                                           icon: .clockArrowCirclepath, handler: showDefaultError)),
             
             .staticCell(model: MenuOption(title: R.string.localizable.bookmarks(),
                                           icon: .bookmarkFill, handler: showDefaultError))
-            
-//            .staticCell(model: MenuOption(title: R.string.localizable.forumRules(),
-//                                          icon: .bookFill, handler: {}))
         ]),
         
         MenuSection(options: [
@@ -130,14 +118,6 @@ final class MenuPresenter: MenuPresenterProtocol {
     
     func showLoginOrProfileScreen() {
         try? DefaultRouter().navigate(to: RouteMap.profileScreen, with: nil)
-    }
-    
-    private func showNewsScreen() {
-        try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
-    }
-    
-    private func showForumScreen() {
-        try? DefaultRouter().navigate(to: RouteMap.forumScreen, with: nil)
     }
     
     private func showSettingsScreen() {

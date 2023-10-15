@@ -10,6 +10,8 @@ import Factory
 import SwiftMessages
 import SFSafeSymbols
 
+import RouteComposer
+
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
     func showError()
@@ -33,38 +35,33 @@ final class NewsVC: PDAViewController<NewsView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        myView.delegate = self
-        myView.tableView.delegate = self
-        myView.tableView.dataSource = self
+        setDelegates()
+        configureNavBar()
         
         presenter.loadArticles()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        showVersion03UpdateInfo()
+    // MARK: - Configuration
+    
+    private func setDelegates() {
+        myView.delegate = self
+        myView.tableView.delegate = self
+        myView.tableView.dataSource = self
     }
     
-    // todo Удалить после релиза 0.4
-    private func showVersion03UpdateInfo() {
-        let updateHasShown = "hasShownVersion03UpdateInfo"
-        if !UserDefaults.standard.bool(forKey: updateHasShown) {
-            UserDefaults.standard.set(true, forKey: updateHasShown)
-            let alert = UIAlertController(
-                title: R.string.localizable.update03(),
-                message: R.string.localizable.update03Text(),
-                preferredStyle: .alert
-            )
-            let enableAction = UIAlertAction(title: R.string.localizable.update03EnableExtension(), style: .cancel) { _ in
-                if let url = URL(string: "App-Prefs:SAFARI&path=WEB_EXTENSIONS/") {
-                    UIApplication.shared.open(url)
-                }
-            }
-            let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default)
-            alert.addAction(enableAction)
-            alert.addAction(okAction)
-            present(alert, animated: true)
-        }
+    private func configureNavBar() {
+        let button = UIBarButtonItem(
+            image: UIImage(systemSymbol: .listDash)
+                .withTintColor(.label, renderingMode: .alwaysOriginal),
+            style: .plain,
+            target: self,
+            action: #selector(menuButtonTapped)
+        )
+        navigationItem.rightBarButtonItem = button
+    }
+    
+    @objc private func menuButtonTapped() {
+        presenter.menuButtonTapped()
     }
 }
 

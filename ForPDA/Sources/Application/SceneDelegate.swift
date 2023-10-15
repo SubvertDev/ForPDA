@@ -32,7 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // Cold start deeplink
             handleDeeplinkUrl(url)
         } else {
-            try? DefaultRouter().navigate(to: RouteMap.tabBarScreen, with: nil)
+            try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
         }
     }
     

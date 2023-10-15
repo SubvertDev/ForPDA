@@ -16,14 +16,8 @@ final class NewsFactory: Factory {
         let presenter = NewsPresenter()
         let viewController = ViewController(presenter: presenter)
         presenter.view = viewController
-        // presenter.context = context
 
         viewController.title = R.string.localizable.news()
-        
-        viewController.setTabBarItemWith(
-            title: R.string.localizable.news(),
-            sfSymbol: .newspaperFill
-        )
         
         return viewController
     }

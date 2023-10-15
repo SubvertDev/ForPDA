@@ -16,8 +16,6 @@ final class SettingsService {
         static let savedCookies = "savedCookies"
         static let authKey = "authKey"
         static let userId = "userId"
-        static let appLanguage = "AppleLanguage"
-        static let appLanguages = "AppleLanguages"
         static let appTheme = "appTheme"
         static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
         static let fastLoadingSystem = "fastLoadingSystem"
@@ -82,26 +80,9 @@ final class SettingsService {
     
     // MARK: - App Language
     
-    // Refactor to have multilanguage support
-    func setAppLanguage(to language: AppLanguage) {
-        switch language {
-        case .auto:
-            defaults.removeObject(forKey: Keys.appLanguage)
-            defaults.removeObject(forKey: Keys.appLanguages)
-            
-        case .ru:
-            defaults.set("ru", forKey: Keys.appLanguage)
-            defaults.set(["ru", "en"], forKey: Keys.appLanguages)
-            
-        case .en:
-            defaults.set("en", forKey: Keys.appLanguage)
-            defaults.set(["en", "ru"], forKey: Keys.appLanguages)
-        }
-    }
-    
     func getAppLanguage() -> AppLanguage {
-        let language = defaults.string(forKey: Keys.appLanguage)
-        return AppLanguage(rawValue: language ?? AppLanguage.auto.rawValue) ?? .auto
+        let language = Locale.autoupdatingCurrent.languageCode
+        return AppLanguage(rawValue: language ?? AppLanguage.ru.rawValue) ?? .ru
     }
     
     // MARK: - App Theme

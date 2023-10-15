@@ -15,28 +15,20 @@ protocol RouteMapProtocol {
 
 struct RouteMap: RouteMapProtocol {
     
-    // MARK: - [TabBar]
-        
-    static var tabBarScreen: DestinationStep<PDATabBarController, Any?> {
-        StepAssembly(
-            finder: ClassFinder(), // В чем разница с <PDATabBarController, Any?>(options: .current, startingPoint: .root)?
-            factory: CompleteFactoryAssembly(factory: PDATabBarControllerFactory<PDATabBarController, Any?>())
-                .with(createNewsWithNavigationFactory(), using: PDATabBarController.add())
-                .with(createForumWithNavigationFactory(), using: PDATabBarController.add())
-                .with(createMenuWithNavigationFactory(), using: PDATabBarController.add())
-                .assemble())
-        .using(GeneralAction.replaceRoot())
-        .from(GeneralStep.root())
-        .assemble()
-    }
-    
     // MARK: - [News]
     
     static var newsScreen: DestinationStep<NewsVC, Any?> {
         StepAssembly(
-            finder: ClassFinder<NewsVC, Any?>(),
-            factory: NilFactory())
-        .from(tabBarScreen)
+            finder: ClassFinder(),
+            factory: NewsFactory()
+        )
+        .using(PDANavigationController.push())
+        .from(SingleContainerStep(
+            finder: NilFinder(),
+            factory: NavigationControllerFactory<PDANavigationController, Any?>())
+        )
+        .using(GeneralAction.replaceRoot())
+        .from(GeneralStep.root())
         .assemble()
     }
     
@@ -51,22 +43,14 @@ struct RouteMap: RouteMapProtocol {
         .assemble()
     }
     
-    // MARK: - [Forum]
-    
-    static var forumScreen: DestinationStep<ForumVC, Any?> {
-        StepAssembly(finder: ClassFinder<ForumVC, Any?>(),
-                     factory: NilFactory())
-        .from(tabBarScreen)
-        .assemble()
-    }
-    
     // MARK: - [Menu]
     
     static var menuScreen: DestinationStep<MenuVC, Any?> {
         StepAssembly(
-            finder: ClassFinder<MenuVC, Any?>(),
-            factory: NilFactory())
-        .from(tabBarScreen)
+            finder: ClassFinder(),
+            factory: MenuFactory())
+        .using(UINavigationController.push())
+        .from(newsScreen.expectingContainer())
         .assemble()
     }
     
@@ -79,7 +63,6 @@ struct RouteMap: RouteMapProtocol {
         .adding(LoginInterceptor())
         .using(UINavigationController.push())
         .from(menuScreen.expectingContainer())
-//        .from(GeneralStep.custom(using: ClassFinder<UINavigationController, Any?>()))
         .assemble()
     }
     
@@ -114,30 +97,4 @@ struct LoginConfiguration {
 //        .with(LoginFactory(), using: UINavigationController.pushAsRoot())
 //        .assemble()
 //    }
-}
-
-// MARK: - NavCon Factories
-
-extension RouteMap {
-    
-    static func createNewsWithNavigationFactory() -> CompleteFactory<NavigationControllerFactory<UINavigationController, Any?>> {
-        return CompleteFactoryAssembly(
-            factory: NavigationControllerFactory())
-        .with(NewsFactory(), using: UINavigationController.pushAsRoot())
-        .assemble()
-    }
-    
-    static func createForumWithNavigationFactory() -> CompleteFactory<NavigationControllerFactory<UINavigationController, Any?>> {
-        return CompleteFactoryAssembly(
-            factory: NavigationControllerFactory())
-        .with(ForumFactory(), using: UINavigationController.pushAsRoot())
-        .assemble()
-    }
-    
-    static func createMenuWithNavigationFactory() -> CompleteFactory<NavigationControllerFactory<UINavigationController, Any?>> {
-        return CompleteFactoryAssembly(
-            factory: NavigationControllerFactory())
-        .with(MenuFactory(), using: UINavigationController.pushAsRoot())
-        .assemble()
-    }
 }

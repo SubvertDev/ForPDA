@@ -17,6 +17,8 @@ protocol NewsPresenterProtocol {
     func loadArticles()
     func refreshArticles()
     func showArticle(at indexPath: IndexPath)
+    
+    func menuButtonTapped()
 }
 
 final class NewsPresenter: NSObject, NewsPresenterProtocol {
@@ -28,8 +30,6 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
     @Injected(\.settingsService) private var settingsService
     
     weak var view: NewsVCProtocol?
-    
-    private let router = DefaultRouter()
     
     private var page = 0
     var articles: [Article] = []
@@ -117,7 +117,11 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
     
     func showArticle(at indexPath: IndexPath) {
         let article = articles[indexPath.row]
-        try? router.navigate(to: RouteMap.articleScreen, with: article, animated: true) {_ in }
+        try? DefaultRouter().navigate(to: RouteMap.articleScreen, with: article)
+    }
+    
+    func menuButtonTapped() {
+        try? DefaultRouter().navigate(to: RouteMap.menuScreen, with: nil)
     }
 }
 

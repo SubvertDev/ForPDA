@@ -51,7 +51,6 @@ final class LoginVC: PDAViewController<LoginView> {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
         if isMovingFromParent {
             interceptorCompletionBlock?(.failure(FailingRouterIgnoreError(
                 underlyingError: RoutingError.generic(.init("User tapped back button")))))

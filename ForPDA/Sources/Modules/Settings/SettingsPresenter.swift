@@ -11,7 +11,6 @@ import Factory
 protocol SettingsPresenterProtocol {
     var sections: [MenuSection] { get }
     
-    func changeLanguage(to language: AppLanguage)
     func changeTheme(to theme: AppTheme)
     func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor)
     func showFastLoadingSystemSwitchTapped(isOn: Bool)
@@ -28,7 +27,6 @@ final class SettingsPresenter: SettingsPresenterProtocol {
     
     private var currentLanguage: String {
         switch settingsService.getAppLanguage() {
-        case .auto: return R.string.localizable.automatic()
         case .ru:   return R.string.localizable.languageRussian()
         case .en:   return R.string.localizable.languageEnglish()
         }
@@ -101,12 +99,6 @@ final class SettingsPresenter: SettingsPresenterProtocol {
     ]
     
     // MARK: - Public Functions
-    
-    func changeLanguage(to language: AppLanguage) {
-        settingsService.setAppLanguage(to: language)
-        view?.showReloadingAlert()
-        reloadData()
-    }
     
     func changeTheme(to theme: AppTheme) {
         settingsService.setAppTheme(to: theme)

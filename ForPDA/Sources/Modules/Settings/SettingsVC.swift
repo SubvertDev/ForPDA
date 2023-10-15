@@ -36,30 +36,15 @@ final class SettingsVC: PDAViewController<SettingsView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setDelegates()
-        configureNavigationBar()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
+        configureController()
     }
     
     // MARK: - Configuration
     
-    private func setDelegates() {
+    private func configureController() {
+        title = R.string.localizable.settings()
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
-    }
-    
-    private func configureNavigationBar() {
-        title = R.string.localizable.settings()
-        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }
 
@@ -179,28 +164,9 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
 extension SettingsVC: SettingsVCProtocol {
     
     func showChangeLanguageSheet() {
-        let alert = UIAlertController(title: R.string.localizable.themeChoose(), message: nil, preferredStyle: .actionSheet)
-        
-        let automaticAction = UIAlertAction(title: R.string.localizable.automatic(), style: .default) { _ in
-            guard self.settingsService.getAppLanguage() != AppLanguage.auto else { return }
-            self.presenter.changeLanguage(to: .auto)
+        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsURL)
         }
-        let russianAction = UIAlertAction(title: R.string.localizable.languageRussian(), style: .default) { _ in
-            guard self.settingsService.getAppLanguage() != AppLanguage.ru else { return }
-            self.presenter.changeLanguage(to: .ru)
-        }
-        let englishAction = UIAlertAction(title: R.string.localizable.languageEnglish(), style: .default) { _ in
-            guard self.settingsService.getAppLanguage() != AppLanguage.en else { return }
-            self.presenter.changeLanguage(to: .en)
-        }
-        let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
-        
-        alert.addAction(automaticAction)
-        alert.addAction(russianAction)
-        alert.addAction(englishAction)
-        alert.addAction(cancelAction)
-        
-        present(alert, animated: true)
     }
     
     func showChangeThemeSheet() {
