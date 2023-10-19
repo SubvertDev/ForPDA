@@ -51,8 +51,12 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
     func loadArticles() {
         page += 1
         
-        switch fastLoadingSystem {
-        case true:
+        // Если происходит диплинк не на быстрой загрузке, то используем быструю загрузку
+        // todo переделать
+        let isDeeplinking = settingsService.getIsDeeplinking()
+
+        switch (fastLoadingSystem, isDeeplinking) {
+        case (true, _), (_, true):
             networkService.getNews(page: page) { [weak self] result in
                 guard let self else { return }
                 switch result {
@@ -68,8 +72,9 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
                     }
                 }
             }
+            settingsService.setIsDeeplinking(to: false)
             
-        case false:
+        case (false, _):
             slowLoad(url: URL.fourpda(page: page))
         }
     }

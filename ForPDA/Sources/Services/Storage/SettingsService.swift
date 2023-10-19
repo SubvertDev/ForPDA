@@ -20,6 +20,7 @@ final class SettingsService {
         static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
         static let fastLoadingSystem = "fastLoadingSystem"
         static let showLikesInComments = "showLikesInComments"
+        static let isDeeplinking = "isDeeplinking"
     }
     
     // MARK: - Cookies
@@ -133,6 +134,20 @@ final class SettingsService {
             return show
         } else {
             return true
+        }
+    }
+    
+    // MARK: - Is Deeplinking
+    
+    func setIsDeeplinking(to state: Bool) {
+        defaults.set(state, forKey: Keys.isDeeplinking)
+    }
+    
+    func getIsDeeplinking() -> Bool {
+        if let isDeeplinking = defaults.value(forKey: Keys.isDeeplinking) as? Bool {
+            return isDeeplinking
+        } else {
+            return false
         }
     }
 }

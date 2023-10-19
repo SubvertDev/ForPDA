@@ -42,8 +42,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             // todo обработать нормально
             try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
         } else {
+            settingsService.setIsDeeplinking(to: true)
             let id = url.absoluteString.components(separatedBy: "article/")[1]
-            let url = "https://4pda.to/\(id)"
+            let url = URL.fourpda.absoluteString + id
             let article = Article(url: url, info: nil)
             try? DefaultRouter().navigate(to: RouteMap.articleScreen, with: article)
         }
