@@ -25,9 +25,11 @@ class HTTPClient: NSObject, HTTPClientProtocol {
     @Injected(\.settingsService) private var settingsService
     
     private lazy var webView: WKWebView = {
+        // swiftlint:disable force_cast
         let webView = UIApplication.shared.keyWindow?.viewWithTag(666) as! WKWebView
         webView.navigationDelegate = self
         return webView
+        // swiftlint:enable force_cast
     }()
     
     private var continuation: CheckedContinuation<String, Error>?

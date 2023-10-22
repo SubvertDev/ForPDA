@@ -27,7 +27,7 @@ extension UserEndpoint: Endpoint {
         return nil
     }
     
-    var body: [String : Any]? {
+    var body: [String: Any]? {
         return nil
     }
     
@@ -35,7 +35,7 @@ extension UserEndpoint: Endpoint {
         return nil
     }
     
-    var query: [String : String]? {
+    var query: [String: String]? {
         switch self {
         case .user(let id):
             return ["showuser": id]

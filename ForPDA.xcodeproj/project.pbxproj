@@ -57,10 +57,6 @@
 		B858E89A2AE1DED300F147A6 /* UIApplication+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */; };
 		B863357D293D218900F8D2E6 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B863357C293D218900F8D2E6 /* String+Ext.swift */; };
 		B874B41B2A101B5F00A004FC /* Array+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B41A2A101B5F00A004FC /* Array+Ext.swift */; };
-		B874B4382A103EBA00A004FC /* ForumPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4342A103EB900A004FC /* ForumPresenter.swift */; };
-		B874B4392A103EBA00A004FC /* ForumFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4352A103EB900A004FC /* ForumFactory.swift */; };
-		B874B43A2A103EBA00A004FC /* ForumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4362A103EBA00A004FC /* ForumView.swift */; };
-		B874B43B2A103EBA00A004FC /* ForumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B4372A103EBA00A004FC /* ForumVC.swift */; };
 		B874B4472A1066F500A004FC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B874B4492A1066F500A004FC /* Localizable.strings */; };
 		B874B44C2A10706B00A004FC /* Links.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B44B2A10706B00A004FC /* Links.swift */; };
 		B875D2092A1C0FBB00F8AB6A /* ProfileFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B875D2082A1C0FBB00F8AB6A /* ProfileFactory.swift */; };
@@ -216,10 +212,6 @@
 		B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Ext.swift"; sourceTree = "<group>"; };
 		B863357C293D218900F8D2E6 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		B874B41A2A101B5F00A004FC /* Array+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Ext.swift"; sourceTree = "<group>"; };
-		B874B4342A103EB900A004FC /* ForumPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumPresenter.swift; sourceTree = "<group>"; };
-		B874B4352A103EB900A004FC /* ForumFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumFactory.swift; sourceTree = "<group>"; };
-		B874B4362A103EBA00A004FC /* ForumView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumView.swift; sourceTree = "<group>"; };
-		B874B4372A103EBA00A004FC /* ForumVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForumVC.swift; sourceTree = "<group>"; };
 		B874B43F2A1064FE00A004FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		B874B4482A1066F500A004FC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		B874B44A2A1066F800A004FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -465,17 +457,6 @@
 			path = News;
 			sourceTree = "<group>";
 		};
-		B874B42A2A103E0000A004FC /* Forum */ = {
-			isa = PBXGroup;
-			children = (
-				B874B4352A103EB900A004FC /* ForumFactory.swift */,
-				B874B4372A103EBA00A004FC /* ForumVC.swift */,
-				B874B4362A103EBA00A004FC /* ForumView.swift */,
-				B874B4342A103EB900A004FC /* ForumPresenter.swift */,
-			);
-			path = Forum;
-			sourceTree = "<group>";
-		};
 		B87EB9CE293D2D8B0025C2A0 /* Article */ = {
 			isa = PBXGroup;
 			children = (
@@ -597,7 +578,6 @@
 				B8C7ABB3293D208400FB2F67 /* News */,
 				B87EB9CE293D2D8B0025C2A0 /* Article */,
 				B81BE1472944054100E2AAF9 /* Comments */,
-				B874B42A2A103E0000A004FC /* Forum */,
 				B893011A2947E17C00D14141 /* Menu */,
 				B893011F2947E2A700D14141 /* Login */,
 				B8AC57702947FC8E00435CF3 /* Profile */,
@@ -865,6 +845,7 @@
 				B8D351F2293CABB6008A84EA /* Frameworks */,
 				B8D351F3293CABB6008A84EA /* Resources */,
 				B8A85A962AA10CF500EDFE58 /* Embed Foundation Extensions */,
+				B869B55B2AE4AFA6008A4B7E /* Swiftlint */,
 			);
 			buildRules = (
 			);
@@ -986,6 +967,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		B869B55B2AE4AFA6008A4B7E /* Swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"$(SRCROOT)/swiftlint/build_phases/ForPDA_swiftlint.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = Swiftlint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/swiftlint/build_phases/ForPDA_swiftlint_static_output\n",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		B8A85A842AA10CF400EDFE58 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -1019,7 +1023,6 @@
 				B8A51BB82A91292000FDB599 /* LoginInterceptor.swift in Sources */,
 				B88D3F522A0900630061C6C4 /* MenuAuthCell.swift in Sources */,
 				B8C7ABBA293D20E400FB2F67 /* PDAViewController.swift in Sources */,
-				B874B43A2A103EBA00A004FC /* ForumView.swift in Sources */,
 				B8001CB22A19434600E7A8A8 /* SettingsView.swift in Sources */,
 				B8001CB72A19511E00E7A8A8 /* SettingsService.swift in Sources */,
 				B887245F2A1E9A0900DFB47F /* ArticleBuilder.swift in Sources */,
@@ -1044,9 +1047,7 @@
 				B8001CDA2A1AA0FE00E7A8A8 /* CookiesService.swift in Sources */,
 				B858E8802AE1CFDE00F147A6 /* RequestError.swift in Sources */,
 				B874B44C2A10706B00A004FC /* Links.swift in Sources */,
-				B874B43B2A103EBA00A004FC /* ForumVC.swift in Sources */,
 				B8B86DB8295773950098D5E5 /* NewsPresenter.swift in Sources */,
-				B874B4382A103EBA00A004FC /* ForumPresenter.swift in Sources */,
 				B8001CB02A19433D00E7A8A8 /* SettingsPresenter.swift in Sources */,
 				B8BD2D89293E26A900E12E29 /* ArticleCommentCell.swift in Sources */,
 				B89301262947E2BD00D14141 /* LoginView.swift in Sources */,
@@ -1102,7 +1103,6 @@
 				B82B2EC12A89059C00CB067C /* AppScheme.swift in Sources */,
 				B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */,
 				B957D4432A12CA120013F578 /* UIViewController+Ext.swift in Sources */,
-				B874B4392A103EBA00A004FC /* ForumFactory.swift in Sources */,
 				B89301212947E2AE00D14141 /* LoginVC.swift in Sources */,
 				B8E446312A002F7200CE8745 /* AnalyticsService.swift in Sources */,
 				B875D2142A1C513100F8AB6A /* MultipartFormDataRequest.swift in Sources */,
@@ -1398,6 +1398,7 @@
 				CURRENT_PROJECT_VERSION = 114;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7353CQCGQC;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ForPDA/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ForPDA;
@@ -1432,6 +1433,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 114;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ForPDA/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ForPDA;
