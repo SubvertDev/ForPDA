@@ -11,56 +11,58 @@ import Factory
 protocol ArticlePresenterProtocol {
     var article: Article { get }
     
-    func loadArticle()
+    func loadArticle() async
+    func updateComments() async
 }
 
 final class ArticlePresenter: ArticlePresenterProtocol {
     
     // MARK: - Properties
     
-    @Injected(\.networkService) private var networkService
+    @Injected(\.newsService) private var newsService
     @Injected(\.parsingService) private var parsingService
     
     weak var view: ArticleVCProtocol?
     
     var article: Article
+    private var path: [String] = []
     
     // MARK: - Init
     
     init(article: Article) {
         self.article = article
+        self.path = URL(string: article.url)?.pathComponents ?? []
     }
     
-    // MARK: - Functions
+    // MARK: - Public Functions
     
-    func loadArticle() {
-        guard let path = URL(string: article.url)?.pathComponents else {
-            view?.showError()
-            return
-        }
-        
-        networkService.getArticle(path: path) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                // Deeplink case
-                if article.info == nil {
-                    let articleInfo = parsingService.parseArticleInfo(from: response)
-                    article.info = articleInfo
-                    DispatchQueue.main.async {
-                        self.view?.reconfigureHeader()
-                    }
-                }
-                
-                let elements = parsingService.parseArticle(from: response)
-                DispatchQueue.main.async {
-                    self.view?.configureArticle(with: elements)
-                    self.view?.makeComments(from: response)
-                }
-                
-            case .failure:
-                view?.showError()
+    @MainActor
+    func loadArticle() async {
+        do {
+            let response = try await newsService.article(path: path)
+            
+            // Deeplink case
+            if article.info == nil {
+                let articleInfo = parsingService.parseArticleInfo(from: response)
+                article.info = articleInfo
+                view?.reconfigureHeader()
             }
+            
+            let elements = parsingService.parseArticle(from: response)
+            view?.configureArticle(with: elements)
+            view?.makeComments(from: response)
+        } catch {
+            view?.showError()
+        }
+    }
+    
+    @MainActor
+    func updateComments() async {
+        do {
+            let response = try await newsService.article(path: path)
+            view?.updateComments(with: response)
+        } catch {
+            view?.showError()
         }
     }
 }

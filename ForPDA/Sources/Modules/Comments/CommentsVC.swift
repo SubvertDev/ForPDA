@@ -11,9 +11,10 @@ import SwiftSoup
 import WebKit
 
 protocol CommentsVCProtocol: AnyObject {
-    func updateStarted()
     func updateFinished(_ state: Bool)
 }
+
+// Refactor this controller (todo)
 
 final class CommentsVC: CommentsViewController {
     
@@ -27,7 +28,6 @@ final class CommentsVC: CommentsViewController {
     private let document: String
     
     private var contentSizeObserver: NSKeyValueObservation!
-    private var webView: WKWebView?
     private lazy var themeColor = settingsService.getAppBackgroundColor()
     
     weak var updateDelegate: CommentsVCProtocol?
@@ -46,50 +46,30 @@ final class CommentsVC: CommentsViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(cellWithClass: ArticleCommentCell.self)
-        getComments()
-        setupWebView()
-        setupNotifications()
-    }
-    
-    // MARK: - Setup
-    
-    private func setupWebView() {
-        if let webView = UIApplication.shared.windows.first?.viewWithTag(666) as? WKWebView {
-            self.webView = webView
-            webView.navigationDelegate = self
-            let url = URL(string: article.url)!
-            let request = URLRequest(url: url)
-            
-            if settingsService.getShowLikesInComments() {
-                updateDelegate?.updateStarted()
-                webView.load(request)
-            }
-        }
-    }
         
-    private func setupNotifications() {
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(changeDarkThemeBackgroundColor(_:)),
-            name: .darkThemeBackgroundColorDidChange, object: nil
-        )
-    }
-    
-    @objc private func changeDarkThemeBackgroundColor(_ notification: Notification) {
-        if let object = notification.object as? AppDarkThemeBackgroundColor {
-            themeColor = object
-        } else {
-            themeColor = settingsService.getAppBackgroundColor()
-        }
-        tableView.reloadData()
+        tableView.register(cellWithClass: ArticleCommentCell.self)
+        
+        getComments()
+        setupNotifications()
     }
     
     // MARK: - Public Functions
     
-    func updateAll() {
-        guard let url = URL(string: article.url) else { return }
-        let request = URLRequest(url: url)
-        webView?.load(request)
+    func updateComments(with document: String) {
+        tableView.isUserInteractionEnabled = false
+        _currentlyDisplayed.removeAll()
+        
+        DispatchQueue.global().async {
+            let newComments = self.parsingService.parseComments(from: document)
+            self.allComments = newComments
+            self.currentlyDisplayed = self.allComments
+            
+            DispatchQueue.main.async {
+                self.updateDelegate?.updateFinished(true)
+                self.tableView.reloadData()
+                self.tableView.isUserInteractionEnabled = true
+            }
+        }
     }
     
     // MARK: - Private Functions
@@ -113,18 +93,20 @@ final class CommentsVC: CommentsViewController {
         }
     }
     
-    private func updateComments(with document: String) {
-        _currentlyDisplayed.removeAll()
-        DispatchQueue.global().async {
-            let newComments = self.parsingService.parseComments(from: document)
-            self.allComments = newComments
-            self.currentlyDisplayed = self.allComments
-            
-            DispatchQueue.main.async {
-                self.updateDelegate?.updateFinished(true)
-                self.tableView.reloadData()
-            }
+    private func setupNotifications() {
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(changeDarkThemeBackgroundColor(_:)),
+            name: .darkThemeBackgroundColorDidChange, object: nil
+        )
+    }
+    
+    @objc private func changeDarkThemeBackgroundColor(_ notification: Notification) {
+        if let object = notification.object as? AppDarkThemeBackgroundColor {
+            themeColor = object
+        } else {
+            themeColor = settingsService.getAppBackgroundColor()
         }
+        tableView.reloadData()
     }
     
     // MARK: - TableView DataSource
@@ -147,23 +129,6 @@ final class CommentsVC: CommentsViewController {
             }
             cell.indentationColor = .tertiarySystemGroupedBackground
             cell.commentMarginColor = .tertiarySystemGroupedBackground
-        }
-    }
-}
-
-// MARK: - WKNavigationDelegate
-
-extension CommentsVC: WKNavigationDelegate {
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            webView.evaluateJavaScript("document.documentElement.outerHTML") { (doc, err) in
-                if let document = doc as? String {
-                    self.updateComments(with: document)
-                } else {
-                    print(err as Any)
-                    self.updateDelegate?.updateFinished(false)
-                }
-            }
         }
     }
 }

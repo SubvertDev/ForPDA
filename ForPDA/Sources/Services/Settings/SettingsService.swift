@@ -23,6 +23,14 @@ final class SettingsService {
         static let isDeeplinking = "isDeeplinking"
     }
     
+    // MARK: - Logout
+    
+    func logout() {
+        removeCookies()
+        removeUser()
+        removeAuthKey()
+    }
+    
     // MARK: - Cookies
     
     func setCookiesAsData(_ cookies: Data) {
@@ -33,7 +41,7 @@ final class SettingsService {
         return defaults.data(forKey: Keys.savedCookies)
     }
     
-    func removeCookies() {
+    private func removeCookies() {
         defaults.removeObject(forKey: Keys.savedCookies)
         
         HTTPCookieStorage.shared.removeCookies(since: .distantPast)
@@ -59,7 +67,7 @@ final class SettingsService {
         return defaults.string(forKey: Keys.authKey)
     }
     
-    func removeAuthKey() {
+    private func removeAuthKey() {
         defaults.removeObject(forKey: Keys.authKey)
     }
     
@@ -74,7 +82,7 @@ final class SettingsService {
         return defaults.data(forKey: Keys.userId)
     }
     
-    func removeUser() {
+    private func removeUser() {
         defaults.removeObject(forKey: Keys.userId)
         NotificationCenter.default.post(name: .userDidChange, object: nil)
     }

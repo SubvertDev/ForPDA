@@ -16,6 +16,7 @@ protocol ArticleVCProtocol: AnyObject {
     func configureArticle(with elements: [ArticleElement])
     func reconfigureHeader()
     func makeComments(from page: String)
+    func updateComments(with document: String)
     func showError()
 }
 
@@ -45,8 +46,11 @@ final class ArticleVC: PDAViewController<ArticleView> {
         configureView()
         myView.delegate = self
         
+        // What's this if/else for? (todo)
         if presenter.article.url.contains("to/20") {
-            presenter.loadArticle()
+            Task {
+                await presenter.loadArticle()
+            }
         } else {
             myView.removeComments()
             let elements = ArticleBuilder.makeDefaultArticle(
@@ -198,27 +202,26 @@ extension ArticleVC: ArticleVCProtocol {
         alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
         present(alert, animated: true)
     }
+    
+    func updateComments(with document: String) {
+        commentsVC?.updateComments(with: document)
+    }
 }
 
 // MARK: - ArticleViewDelegate
 
 extension ArticleVC: ArticleViewDelegate {
+    
     func updateCommentsButtonTapped() {
-        commentsVC?.updateAll()
+        Task {
+            await presenter.updateComments()
+        }
     }
 }
 
 // MARK: - CommentsVCProtocol
 
 extension ArticleVC: CommentsVCProtocol {
-    func updateStarted() {
-        let image = UIImage(
-            systemSymbol: .arrowTriangle2Circlepath,
-            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
-        )
-        myView.updateCommentsButton.setImage(image, for: .normal)
-        myView.updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
-    }
     
     func updateFinished(_ state: Bool) {
         let image = UIImage(
@@ -233,6 +236,7 @@ extension ArticleVC: CommentsVCProtocol {
 // MARK: - PDAResizingTextViewDelegate
 
 extension ArticleVC: PDAResizingTextViewDelegate {
+    
     func willOpenURL(_ url: URL) {
         analyticsService.clickLinkInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
     }

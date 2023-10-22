@@ -108,15 +108,6 @@ final class ArticleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: - Actions
-    
-    @objc private func updateCommentsButtonTapped() {
-        if !updateCommentsButton.isButtonAnimatingNow {
-            delegate?.updateCommentsButtonTapped()
-            updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
-        }
-    }
-    
     // MARK: - Public Functions
     
     func stopLoading() {
@@ -128,6 +119,15 @@ final class ArticleView: UIView {
         separator.removeFromSuperview()
         commentsLabel.removeFromSuperview()
         commentsContainer.removeFromSuperview()
+    }
+    
+    // MARK: - Actions
+    
+    @objc private func updateCommentsButtonTapped() {
+        if !updateCommentsButton.isButtonAnimatingNow {
+            delegate?.updateCommentsButtonTapped()
+            updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
+        }
     }
     
     // MARK: - Layout

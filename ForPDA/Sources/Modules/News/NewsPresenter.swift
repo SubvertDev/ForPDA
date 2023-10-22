@@ -14,18 +14,23 @@ import RouteComposer
 protocol NewsPresenterProtocol {
     var articles: [Article] { get }
     
-    func loadArticles()
-    func refreshArticles()
+//    func loadArticles()
+//    func refreshArticles()
+    
+    //
+    func loadArticles() async
+    func refreshArticles() async
+    //
     func showArticle(at indexPath: IndexPath)
     
     func menuButtonTapped()
 }
 
-final class NewsPresenter: NSObject, NewsPresenterProtocol {
+final class NewsPresenter: NewsPresenterProtocol {
     
     // MARK: - Properties
     
-    @Injected(\.networkService) private var networkService
+    @Injected(\.newsService) private var newsService
     @Injected(\.parsingService) private var parsingService
     @Injected(\.settingsService) private var settingsService
     
@@ -34,88 +39,65 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
     private var page = 0
     var articles: [Article] = []
     
-    private var webView: WKWebView?
-    private var fastLoadingSystem: Bool {
-        settingsService.getFastLoadingSystem()
-    }
-    private var isSlowRefreshing = false
-    
-    // MARK: - Init
-    
-//    init() {
-//
-//    }
-    
     // MARK: - Public Functions
     
-    func loadArticles() {
+//    func loadArticles() {
+//        page += 1
+//        
+//        // Если происходит диплинк не на быстрой загрузке, то используем быструю загрузку
+//        // todo переделать
+//        let isDeeplinking = settingsService.getIsDeeplinking()
+//
+//        switch (fastLoadingSystem, isDeeplinking) {
+//        case (true, _), (_, true):
+//            networkService.getNews(page: page) { [weak self] result in
+//                guard let self else { return }
+//                switch result {
+//                case .success(let response):
+//                    articles += parsingService.parseArticles(from: response)
+//                    Task { @MainActor in
+//                        self.view?.articlesUpdated()
+//                    }
+//                    
+//                case .failure:
+//                    DispatchQueue.main.async {
+//                        self.view?.showError()
+//                    }
+//                }
+//            }
+//            settingsService.setIsDeeplinking(to: false)
+//            
+//        case (false, _):
+//            slowLoad(url: URL.fourpda(page: page))
+//        }
+//    }
+    
+    @MainActor
+    func loadArticles() async {
         page += 1
         
-        // Если происходит диплинк не на быстрой загрузке, то используем быструю загрузку
-        // todo переделать
-        let isDeeplinking = settingsService.getIsDeeplinking()
-
-        switch (fastLoadingSystem, isDeeplinking) {
-        case (true, _), (_, true):
-            networkService.getNews(page: page) { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let response):
-                    articles += parsingService.parseArticles(from: response)
-                    Task { @MainActor in
-                        self.view?.articlesUpdated()
-                    }
-                    
-                case .failure:
-                    DispatchQueue.main.async {
-                        self.view?.showError()
-                    }
-                }
-            }
-            settingsService.setIsDeeplinking(to: false)
-            
-        case (false, _):
-            slowLoad(url: URL.fourpda(page: page))
+        do {
+            let response = try await newsService.news(page: page)
+            articles += parsingService.parseArticles(from: response)
+            view?.articlesUpdated()
+        } catch {
+            view?.showError()
         }
+        
+        settingsService.setIsDeeplinking(to: false)
     }
     
-    func refreshArticles() {
+    @MainActor
+    func refreshArticles() async {
         page = 1
         
-        switch fastLoadingSystem {
-        case true:
-            networkService.getNews(page: page) { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let response):
-                    articles = self.parsingService.parseArticles(from: response)
-                    DispatchQueue.main.async {
-                        self.view?.articlesUpdated()
-                    }
-                    
-                case .failure:
-                    DispatchQueue.main.async {
-                        self.view?.showError()
-                    }
-                }
-            }
-            
-        case false:
-            isSlowRefreshing = true
-            slowLoad(url: URL.fourpda)
+        do {
+            let response = try await newsService.news(page: page)
+            articles = parsingService.parseArticles(from: response)
+            view?.articlesUpdated()
+        } catch {
+            view?.showError()
         }
-    }
-    
-    private func slowLoad(url: URL) {
-        if webView == nil {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                self.configureWebView()
-            }
-            return
-        }
-        
-        let request = URLRequest(url: url)
-        webView?.load(request)
     }
     
     // MARK: - Navigation
@@ -127,42 +109,5 @@ final class NewsPresenter: NSObject, NewsPresenterProtocol {
     
     func menuButtonTapped() {
         try? DefaultRouter().navigate(to: RouteMap.menuScreen, with: nil)
-    }
-}
-
-// MARK: - WKNavigationDelegate
-
-extension NewsPresenter: WKNavigationDelegate {
-    
-    private func configureWebView() {
-        if let webView = UIApplication.shared.windows.first?.viewWithTag(666) as? WKWebView {
-            self.webView = webView
-            webView.navigationDelegate = self
-            let request = URLRequest(url: URL.fourpda)
-            webView.load(request)
-        }
-    }
-    
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            webView.evaluateJavaScript("document.documentElement.outerHTML") { (doc, err) in
-                if let document = doc as? String {
-                    if self.isSlowRefreshing {
-                        self.page = 1
-                        self.articles = []
-                        self.isSlowRefreshing = false
-                    }
-                    self.articles += self.parsingService.parseArticles(from: document)
-                    DispatchQueue.main.async {
-                        self.view?.articlesUpdated()
-                    }
-                } else {
-                    print(err as Any)
-                    DispatchQueue.main.async {
-                        self.view?.showError()
-                    }
-                }
-            }
-        }
     }
 }

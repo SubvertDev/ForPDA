@@ -7,9 +7,7 @@
 
 import Foundation
 
-protocol UserDefaultsSerializable: Codable {}
-
-struct User: UserDefaultsSerializable {
+struct User: Codable {
     let id: String
     let avatarUrl: String
     let nickname: String

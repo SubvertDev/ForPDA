@@ -172,7 +172,8 @@ final class ArticleBuilder {
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+        // Remake with configuration (todo)
+        // button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
                 
         let container = UIView()
         container.addSubview(button)

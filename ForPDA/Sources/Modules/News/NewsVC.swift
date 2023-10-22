@@ -38,7 +38,9 @@ final class NewsVC: PDAViewController<NewsView> {
         setDelegates()
         configureNavBar()
         
-        presenter.loadArticles()
+        Task {
+            await presenter.loadArticles()
+        }
     }
     
     // MARK: - Configuration
@@ -107,13 +109,18 @@ extension NewsVC: NewsVCProtocol {
 // MARK: - NewsView Delegate
 
 extension NewsVC: NewsViewDelegate {
+    
     func refreshButtonTapped() {
         myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
-        presenter.loadArticles()
+        Task {
+            await presenter.loadArticles()
+        }
     }
     
     func refreshControlCalled() {
-        presenter.refreshArticles()
+        Task {
+            await presenter.refreshArticles()
+        }
     }
 }
 

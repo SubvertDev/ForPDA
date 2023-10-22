@@ -2,10 +2,8 @@
 //  HTTPMethod.swift
 //  ForPDA
 //
-//  Created by Subvert on 14.05.2023.
+//  Created by Subvert on 19.10.2023.
 //
-
-import Foundation
 
 enum HTTPMethod: String {
     case get = "GET"
