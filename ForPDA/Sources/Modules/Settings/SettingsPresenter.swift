@@ -13,7 +13,8 @@ protocol SettingsPresenterProtocol {
     
     func changeTheme(to theme: AppTheme)
     func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor)
-    func showFastLoadingSystemSwitchTapped(isOn: Bool)
+    func showNewsFLSSwitchTapped(isOn: Bool)
+    func showArticleFLSSwitchTapped(isOn: Bool)
     func showLikesInCommentsSwitchTapped(isOn: Bool)
 }
 
@@ -51,8 +52,12 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         settingsService.getShowLikesInComments()
     }
     
-    private var currentLoadingSystemIsFast: Bool {
-        settingsService.getFastLoadingSystem()
+    private var newsUsesFLS: Bool {
+        settingsService.getNewsFLS()
+    }
+    
+    private var articleUsesFLS: Bool {
+        settingsService.getArticleFLS()
     }
     
     private let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
@@ -76,15 +81,23 @@ final class SettingsPresenter: SettingsPresenterProtocol {
                                                       handler: changeDarkThemeBackgroundColor))
         ]),
         
-        // Comments
-        MenuSection(title: R.string.localizable.advanced(), options: [
-            .switchCell(model: SwitchOption(title: R.string.localizable.fastLoadingSystem(),
-                                            isOn: currentLoadingSystemIsFast,
-                                            handler: {})),
-            .switchCell(model: SwitchOption(title: R.string.localizable.commentsShowLikes(),
-                                            isOn: currentShowLikesInComments,
-                                            handler: {}))
-        ]),
+        // News & Comments
+        MenuSection(
+            title: R.string.localizable.advanced(),
+            options: [
+                .switchCell(model: SwitchOption(
+                    title: R.string.localizable.fastLoadingNews(),
+                    isOn: newsUsesFLS, handler: {})
+                ),
+                .switchCell(model: SwitchOption(
+                    title: R.string.localizable.fastLoadingArticle(),
+                    isOn: articleUsesFLS, handler: {})
+                ),
+                .switchCell(model: SwitchOption(
+                    title: R.string.localizable.commentsShowLikes(),
+                    isOn: currentShowLikesInComments, handler: {})
+                )
+            ]),
         
         // Account
         MenuSection(title: R.string.localizable.account(), options: [
@@ -112,8 +125,13 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         reloadData()
     }
     
-    func showFastLoadingSystemSwitchTapped(isOn: Bool) {
-        settingsService.setFastLoadingSystem(to: isOn)
+    func showNewsFLSSwitchTapped(isOn: Bool) {
+        settingsService.setNewsFLS(to: isOn)
+        reloadData(forceUpdate: false)
+    }
+    
+    func showArticleFLSSwitchTapped(isOn: Bool) {
+        settingsService.setArticleFLS(to: isOn)
         reloadData(forceUpdate: false)
     }
     
@@ -162,16 +180,22 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         sections[1].options[1] = .descriptionCell(model: model2)
         
         let model3 = SwitchOption(
-            title: R.string.localizable.fastLoadingSystem(),
-            isOn: settingsService.getFastLoadingSystem(),
+            title: R.string.localizable.fastLoadingNews(),
+            isOn: settingsService.getNewsFLS(),
             handler: {})
         sections[2].options[0] = .switchCell(model: model3)
         
         let model4 = SwitchOption(
+            title: R.string.localizable.fastLoadingArticle(),
+            isOn: settingsService.getArticleFLS(),
+            handler: {})
+        sections[2].options[1] = .switchCell(model: model4)
+        
+        let model5 = SwitchOption(
             title: R.string.localizable.commentsShowLikes(),
             isOn: settingsService.getShowLikesInComments(),
             handler: {})
-        sections[2].options[1] = .switchCell(model: model4)
+        sections[2].options[2] = .switchCell(model: model5)
         
         if forceUpdate {
             view?.reloadData()

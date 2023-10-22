@@ -10,6 +10,7 @@ import Foundation
 protocol NewsServicable {
     func news(page: Int) async throws -> String
     func article(path: [String]) async throws -> String
+    func comments(path: [String]) async throws -> String
 }
 
 final class NewsService: HTTPClient, NewsServicable {
@@ -20,5 +21,9 @@ final class NewsService: HTTPClient, NewsServicable {
     
     func article(path: [String]) async throws -> String {
         return try await request(endpoint: NewsEndpoint.article(path: path))
+    }
+    
+    func comments(path: [String]) async throws -> String {
+        return try await request(endpoint: NewsEndpoint.comments(path: path))
     }
 }

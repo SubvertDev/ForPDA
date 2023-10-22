@@ -10,6 +10,7 @@ import Foundation
 enum NewsEndpoint {
     case news(page: Int)
     case article(path: [String])
+    case comments(path: [String])
 }
 
 extension NewsEndpoint: Endpoint {
@@ -23,6 +24,9 @@ extension NewsEndpoint: Endpoint {
             return page == 1 ? "" : "/page/\(page)/"
             
         case .article(path: let path):
+            return path.joined(separator: "/").removing(prefix: "/")
+            
+        case .comments(path: let path):
             return path.joined(separator: "/").removing(prefix: "/")
         }
     }

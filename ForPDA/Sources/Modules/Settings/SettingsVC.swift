@@ -68,7 +68,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
         return 46
     }
     
-    // Refactor this
+    // Refactor this (todo)
     // swiftlint:disable cyclomatic_complexity function_body_length
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = presenter.sections[indexPath.section].options[indexPath.row]
@@ -91,18 +91,29 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
             cell.switchTapped = { [weak self] isOn in
                 guard let self else { return }
                 
+                // When switching off
                 if !isOn {
-                    if indexPath.row == 0 {
-                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: isOn)
-                    } else {
-                        self.presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    switch indexPath.row {
+                    case 0:
+                        presenter.showNewsFLSSwitchTapped(isOn: isOn)
+                    case 1:
+                        presenter.showArticleFLSSwitchTapped(isOn: isOn)
+                        // Workaround for always working comments on article sls
+                        if let cell = tableView.cellForRow(at: IndexPath(row: 2, section: 2)) as? SettingsSwitchCell {
+                            cell.forceSwitch(to: true)
+                            presenter.showLikesInCommentsSwitchTapped(isOn: true)
+                        }
+                    default:
+                        presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     }
                     return
                 }
                 
                 var message = ""
-                if model.title.contains("Быстрая") {
-                    message = R.string.localizable.fastLoadingSystemWarning()
+                if model.title.contains("новостей") {
+                    message = R.string.localizable.fastLoadingNewsWarning()
+                } else if model.title.contains("новости") {
+                    message = R.string.localizable.fastLoadingArticleWarning()
                 } else {
                     message = R.string.localizable.commentsShowLikesWarning()
                 }
@@ -113,19 +124,27 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                     preferredStyle: .alert
                 )
                 
-                let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { _ in
-                    if indexPath.row == 0 {
-                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: isOn)
-                    } else {
-                        self.presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { [weak self] _ in
+                    guard let self else { return }
+                    switch indexPath.row {
+                    case 0:
+                        presenter.showNewsFLSSwitchTapped(isOn: isOn)
+                    case 1:
+                        presenter.showArticleFLSSwitchTapped(isOn: isOn)
+                    default:
+                        presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     }
                 }
-                let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { _ in
+                let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { [weak self] _ in
+                    guard let self else { return }
                     cell.set(with: model)
-                    if indexPath.row == 0 {
-                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: !isOn)
-                    } else {
-                        self.presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)
+                    switch indexPath.row {
+                    case 0:
+                        presenter.showNewsFLSSwitchTapped(isOn: !isOn)
+                    case 1:
+                        presenter.showArticleFLSSwitchTapped(isOn: !isOn)
+                    default:
+                        presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)
                     }
                 }
                 

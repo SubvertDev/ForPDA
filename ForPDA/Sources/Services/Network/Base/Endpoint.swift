@@ -21,6 +21,7 @@ protocol Endpoint {
 
 extension Endpoint {
     /// Forces Fast Loading System if not stated otherwise (e.g. news)
+    /// Has sort of overriding in HTTPClient request function
     var forceFLS: Bool {
         return true
     }

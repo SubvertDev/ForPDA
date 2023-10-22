@@ -54,6 +54,10 @@ final class SettingsSwitchCell: UITableViewCell {
         mySwitch.isOn = model.isOn
     }
     
+    func forceSwitch(to state: Bool) {
+        mySwitch.isOn = state
+    }
+    
     // MARK: - Layout
     
     private func addSubviews() {

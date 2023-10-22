@@ -21,6 +21,7 @@ final class ArticlePresenter: ArticlePresenterProtocol {
     
     @Injected(\.newsService) private var newsService
     @Injected(\.parsingService) private var parsingService
+    @Injected(\.settingsService) private var settingsService
     
     weak var view: ArticleVCProtocol?
     
@@ -51,6 +52,8 @@ final class ArticlePresenter: ArticlePresenterProtocol {
             let elements = parsingService.parseArticle(from: response)
             view?.configureArticle(with: elements)
             view?.makeComments(from: response)
+            
+            await showLikesIfNeeded()
         } catch {
             view?.showError()
         }
@@ -59,10 +62,21 @@ final class ArticlePresenter: ArticlePresenterProtocol {
     @MainActor
     func updateComments() async {
         do {
-            let response = try await newsService.article(path: path)
+            let response = try await newsService.comments(path: path)
             view?.updateComments(with: response)
         } catch {
             view?.showError()
+        }
+    }
+    
+    // MARK: - Private Functions
+    
+    private func showLikesIfNeeded() async {
+        let articleUsesFLS = settingsService.getArticleFLS()
+        let showLikes = settingsService.getShowLikesInComments()
+        
+        if articleUsesFLS && showLikes {
+            await updateComments()
         }
     }
 }

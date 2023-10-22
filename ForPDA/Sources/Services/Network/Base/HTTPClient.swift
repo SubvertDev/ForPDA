@@ -46,10 +46,40 @@ extension HTTPClient {
             return try await fastRequest(endpoint: endpoint)
         }
         
-        if settingsService.getFastLoadingSystem() || endpoint.forceFLS {
-            return try await fastRequest(endpoint: endpoint)
-        } else {
-            return try await slowRequest(endpoint: endpoint)
+        // Test later (todo)
+        // if (endpoint as? NewsEndpoint != nil) && settingsService.getIsDeeplinking() {
+        //     return try await fastRequest(endpoint: endpoint)
+        // }
+        
+        // Totally needs refactoring (todo)
+        switch endpoint {
+        case let newsEndpoint as NewsEndpoint:
+            switch newsEndpoint {
+            case .news:
+                if settingsService.getNewsFLS() {
+                    return try await fastRequest(endpoint: endpoint)
+                } else {
+                    return try await slowRequest(endpoint: endpoint)
+                }
+            case .article:
+                if settingsService.getArticleFLS() {
+                    return try await fastRequest(endpoint: endpoint)
+                } else {
+                    return try await slowRequest(endpoint: endpoint)
+                }
+            case .comments:
+                if settingsService.getShowLikesInComments() {
+                    return try await slowRequest(endpoint: endpoint)
+                } else {
+                    return try await fastRequest(endpoint: endpoint)
+                }
+            }
+        default:
+            if endpoint.forceFLS {
+                return try await fastRequest(endpoint: endpoint)
+            } else {
+                return try await slowRequest(endpoint: endpoint)
+            }
         }
     }
     
