@@ -17,7 +17,7 @@ final class SettingsService {
         static let authKey = "authKey"
         static let userId = "userId"
         static let appTheme = "appTheme"
-        static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
+        static let appNightModeBackgroundColor = "appDarkThemeBackgroundColor"
         static let fastLoadingSystem = "fastLoadingSystem"
         static let showLikesInComments = "showLikesInComments"
         static let isDeeplinking = "isDeeplinking"
@@ -107,14 +107,14 @@ final class SettingsService {
     
     // MARK: - App Background Color
     
-    func setAppBackgroundColor(to color: AppDarkThemeBackgroundColor) {
-        defaults.set(color.rawValue, forKey: Keys.appDarkThemeBackgroundColor)
-        NotificationCenter.default.post(name: .darkThemeBackgroundColorDidChange, object: color)
+    func setAppBackgroundColor(to color: AppNightModeBackgroundColor) {
+        defaults.set(color.rawValue, forKey: Keys.appNightModeBackgroundColor)
+        NotificationCenter.default.post(name: .nightModeBackgroundColorDidChange, object: color)
     }
     
-    func getAppBackgroundColor() -> AppDarkThemeBackgroundColor {
-        let backgroundColor = defaults.string(forKey: Keys.appDarkThemeBackgroundColor)
-        return AppDarkThemeBackgroundColor(rawValue: backgroundColor ?? AppDarkThemeBackgroundColor.black.rawValue) ?? .black
+    func getAppBackgroundColor() -> AppNightModeBackgroundColor {
+        let backgroundColor = defaults.string(forKey: Keys.appNightModeBackgroundColor)
+        return AppNightModeBackgroundColor(rawValue: backgroundColor ?? AppNightModeBackgroundColor.black.rawValue) ?? .black
     }
     
     // MARK: - Loading System

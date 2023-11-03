@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AppDarkThemeBackgroundColor: String {
+enum AppNightModeBackgroundColor: String {
     case dark
     case black
 }

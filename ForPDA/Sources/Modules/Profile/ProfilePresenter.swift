@@ -21,9 +21,10 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     
     @Injected(\.userService) private var userService
     @Injected(\.authService) private var authService
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
-    
+    @Injected(\.parsingService) private var parser
+    @Injected(\.settingsService) private var settings
+    @Injected(\.analyticsService) private var analytics
+
     weak var view: ProfileVCProtocol?
     
     var user: User?
@@ -31,7 +32,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     // MARK: - Lifecycle
     
     init() {
-        guard let userData = settingsService.getUser(),
+        guard let userData = settings.getUser(),
               let user = try? JSONDecoder().decode(User.self, from: userData) else {
             print("[ERROR] Tried to open profile without user data / failed decoding")
             view?.dismissProfile()
@@ -52,11 +53,11 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         
         do {
             let response = try await userService.user(id: user.id)
-            let user = parsingService.parseUser(from: response)
+            let user = parser.parseUser(from: response)
             self.user = user
             
             let userData = try JSONEncoder().encode(user)
-            settingsService.setUser(userData)
+            settings.setUser(userData)
             
             view?.updateUser(with: user)
         } catch {
@@ -67,7 +68,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     
     @MainActor
     func logout() async {
-        guard let key = settingsService.getAuthKey() else {
+        guard let key = settings.getAuthKey() else {
             print("[ERROR] Failed to retrieve key for profile")
             view?.showError(message: R.string.localizable.somethingWentWrong())
             return
@@ -77,13 +78,14 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         
         do {
             let response = try await authService.logout(key: key)
-            let isLoggedIn = parsingService.parseIsLoggedIn(from: response)
+            let isLoggedIn = parser.parseIsLoggedIn(from: response)
             
             if isLoggedIn {
                 view?.showError(message: R.string.localizable.somethingWentWrong())
             } else {
-                settingsService.logout()
+                settings.logout()
                 view?.dismissProfile()
+                analytics.event(Event.Profile.profileLogout.rawValue)
             }
             
         } catch {

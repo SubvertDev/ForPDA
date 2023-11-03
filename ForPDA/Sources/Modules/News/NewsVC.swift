@@ -21,7 +21,7 @@ final class NewsVC: PDAViewController<NewsView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) private var analyticsService
+    @Injected(\.analyticsService) private var analytics
     
     private let presenter: NewsPresenterProtocol
 
@@ -64,6 +64,7 @@ final class NewsVC: PDAViewController<NewsView> {
     
     @objc private func menuButtonTapped() {
         presenter.menuButtonTapped()
+        analytics.event(Event.News.menuOpen.rawValue)
     }
 }
 
@@ -130,10 +131,7 @@ extension NewsVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        // Check if non-skeleton table is shown
-        guard presenter.articles.count - 1 >= indexPath.row else { return }
-        analyticsService.openArticleEvent(presenter.articles[indexPath.row].url)
+        analytics.event(Event.News.articleOpen.rawValue)
         presenter.showArticle(at: indexPath)
     }
     
@@ -150,23 +148,23 @@ extension NewsVC: UITableViewDelegate {
     private func copyAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
             UIPasteboard.general.string = article.url
-            analyticsService.copyArticleLink(article.url)
             SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
+            analytics.event(Event.News.newsLinkCopied.rawValue)
         }
     }
     
     private func shareAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
             let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
-            analyticsService.shareArticleLink(article.url)
             present(activity, animated: true)
+            analytics.event(Event.News.newsLinkShared.rawValue)
         }
     }
     
     private func reportAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-            analyticsService.reportBrokenArticle(article.url)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
+            analytics.event(Event.News.newsReport.rawValue)
         }
     }
 }

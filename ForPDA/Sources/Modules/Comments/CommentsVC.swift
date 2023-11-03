@@ -95,13 +95,13 @@ final class CommentsVC: CommentsViewController {
     
     private func setupNotifications() {
         NotificationCenter.default.addObserver(
-            self, selector: #selector(changeDarkThemeBackgroundColor(_:)),
-            name: .darkThemeBackgroundColorDidChange, object: nil
+            self, selector: #selector(changeNightModeBackgroundColor(_:)),
+            name: .nightModeBackgroundColorDidChange, object: nil
         )
     }
     
-    @objc private func changeDarkThemeBackgroundColor(_ notification: Notification) {
-        if let object = notification.object as? AppDarkThemeBackgroundColor {
+    @objc private func changeNightModeBackgroundColor(_ notification: Notification) {
+        if let object = notification.object as? AppNightModeBackgroundColor {
             themeColor = object
         } else {
             themeColor = settingsService.getAppBackgroundColor()

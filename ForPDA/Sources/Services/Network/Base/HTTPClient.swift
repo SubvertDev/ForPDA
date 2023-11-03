@@ -42,7 +42,7 @@ extension HTTPClient {
         }
         
         // Test later (todo)
-        // if (endpoint as? NewsEndpoint != nil) && settingsService.getIsDeeplinking() {
+        // if (endpoint as? NewsEndpoint != nil) && settings.getIsDeeplinking() {
         //     return try await fastRequest(endpoint: endpoint)
         // }
         

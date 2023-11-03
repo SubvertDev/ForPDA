@@ -24,16 +24,18 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        changeDarkThemeBackgroundColor()
+        changeNightModeBackgroundColor()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(changeDarkThemeBackgroundColor(_:)),
-                                               name: .darkThemeBackgroundColorDidChange, object: nil)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(changeNightModeBackgroundColor(_:)),
+            name: .nightModeBackgroundColorDidChange, object: nil
+        )
     }
     
-    @objc private func changeDarkThemeBackgroundColor(_ notification: Notification = .init(name: .darkThemeBackgroundColorDidChange)) {
+    @objc private func changeNightModeBackgroundColor(_ notification: Notification = .init(name: .nightModeBackgroundColorDidChange)) {
         
-        var color: AppDarkThemeBackgroundColor
-        if let object = notification.object as? AppDarkThemeBackgroundColor {
+        var color: AppNightModeBackgroundColor
+        if let object = notification.object as? AppNightModeBackgroundColor {
             color = object
         } else {
             color = settingsService.getAppBackgroundColor()

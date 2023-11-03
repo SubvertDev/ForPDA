@@ -46,7 +46,7 @@ final class NewsPresenter: NewsPresenterProtocol {
 //        
 //        // Если происходит диплинк не на быстрой загрузке, то используем быструю загрузку
 //        // todo переделать
-//        let isDeeplinking = settingsService.getIsDeeplinking()
+//        let isDeeplinking = settings.getIsDeeplinking()
 //
 //        switch (fastLoadingSystem, isDeeplinking) {
 //        case (true, _), (_, true):
@@ -65,7 +65,7 @@ final class NewsPresenter: NewsPresenterProtocol {
 //                    }
 //                }
 //            }
-//            settingsService.setIsDeeplinking(to: false)
+//            settings.setIsDeeplinking(to: false)
 //            
 //        case (false, _):
 //            slowLoad(url: URL.fourpda(page: page))

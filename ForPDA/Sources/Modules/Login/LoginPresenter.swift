@@ -21,8 +21,9 @@ final class LoginPresenter: LoginPresenterProtocol {
     
     @Injected(\.authService) private var authService
     @Injected(\.userService) private var userService
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
+    @Injected(\.parsingService) private var parser
+    @Injected(\.settingsService) private var settings
+    @Injected(\.analyticsService) private var analytics
     
     weak var view: LoginVCProtocol?
     
@@ -40,8 +41,10 @@ final class LoginPresenter: LoginPresenterProtocol {
     // MARK: - Lifecycle
     
     init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(cookiesChanged(_:)),
-                                               name: .NSHTTPCookieManagerCookiesChanged, object: nil)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(cookiesChanged(_:)),
+            name: .NSHTTPCookieManagerCookiesChanged, object: nil
+        )
     }
     
     // MARK: - Notifications
@@ -60,7 +63,7 @@ final class LoginPresenter: LoginPresenterProtocol {
             
             do {
                 let encodedCookies = try JSONEncoder().encode(cookiesArray)
-                settingsService.setCookiesAsData(encodedCookies)
+                settings.setCookiesAsData(encodedCookies)
             } catch {
                 print("[ERROR] Failed to encode cookies in LoginPresenter")
             }
@@ -71,7 +74,7 @@ final class LoginPresenter: LoginPresenterProtocol {
                 }
             }
         } else if cookies.count != 0 {
-            settingsService.logout()
+            settings.logout()
         }
     }
     
@@ -90,7 +93,7 @@ final class LoginPresenter: LoginPresenterProtocol {
         do {
             let response = try await authService.captcha()
             
-            guard let captchaResponse = parsingService.parseCaptcha(from: response) else {
+            guard let captchaResponse = parser.parseCaptcha(from: response) else {
                 view?.showError(message: R.string.localizable.alreadyLoggedIn())
                 return
             }
@@ -115,19 +118,21 @@ final class LoginPresenter: LoginPresenterProtocol {
         
         do {
             let response = try await authService.login(multipart: loginData)
-            let parsed = parsingService.parseLogin(from: response)
+            let parsed = parser.parseLogin(from: response)
             
             if parsed.loggedIn {
-                let userId = parsingService.parseUserId(from: response)
+                analytics.event(Event.Login.loginSuccess.rawValue)
+                let userId = parser.parseUserId(from: response)
                 await getUser(id: userId)
                 
-                if let authKey = parsingService.parseAuthKey(from: response) {
-                    settingsService.setAuthKey(authKey)
+                if let authKey = parser.parseAuthKey(from: response) {
+                    settings.setAuthKey(authKey)
                 } else {
                     print("[ERROR] Failed to retrieve auth key after successful login")
                 }
                 
             } else {
+                analytics.event(Event.Login.loginFailed.rawValue)
                 guard let message = parsed.errorMessage else {
                     // view?.showError(message: "Попробуйте ввести капчу еще раз")
                     view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
@@ -152,10 +157,10 @@ final class LoginPresenter: LoginPresenterProtocol {
     private func getUser(id: String) async {
         do {
             let response = try await userService.user(id: id)
-            let user = parsingService.parseUser(from: response)
+            let user = parser.parseUser(from: response)
             
             if let userData = try? JSONEncoder().encode(user) {
-                settingsService.setUser(userData)
+                settings.setUser(userData)
             } else {
                 print("[ERROR] Failed to encode user data after successful login")
             }
@@ -172,7 +177,7 @@ final class LoginPresenter: LoginPresenterProtocol {
     // MARK: - Private Functions
     
     private func updateCaptcha(from htmlString: String) {
-        if let captchaResponse = parsingService.parseCaptcha(from: htmlString) {
+        if let captchaResponse = parser.parseCaptcha(from: htmlString) {
             loginData["captcha-time"] = captchaResponse.time
             loginData["captcha-sig"] = captchaResponse.sig
             view?.updateCaptcha(fromURL: URL(string: captchaResponse.url)!)

@@ -204,12 +204,12 @@ extension SettingsVC: SettingsVCProtocol {
         let alert = UIAlertController(title: R.string.localizable.backgroundChoose(), message: nil, preferredStyle: .actionSheet)
         
         let darkAction = UIAlertAction(title: R.string.localizable.backgroundDark(), style: .default) { _ in
-            guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.dark else { return }
-            self.presenter.changeDarkThemeBackgroundColor(to: .dark)
+            guard self.settingsService.getAppBackgroundColor() != AppNightModeBackgroundColor.dark else { return }
+            self.presenter.changeNightModeBackgroundColor(to: .dark)
         }
         let blackAction = UIAlertAction(title: R.string.localizable.backgroundBlack(), style: .default) { _ in
-            guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.black else { return }
-            self.presenter.changeDarkThemeBackgroundColor(to: .black)
+            guard self.settingsService.getAppBackgroundColor() != AppNightModeBackgroundColor.black else { return }
+            self.presenter.changeNightModeBackgroundColor(to: .black)
         }
         let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
         

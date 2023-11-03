@@ -24,8 +24,8 @@ final class ArticleVC: PDAViewController<ArticleView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) private var analyticsService
-    @Injected(\.settingsService) private var settingsService
+    @Injected(\.analyticsService) private var analytics
+    @Injected(\.settingsService) private var settings
     
     private let presenter: ArticlePresenterProtocol
     private var commentsVC: CommentsVC?
@@ -89,22 +89,22 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func copyAction() -> UIAction {
         UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
             UIPasteboard.general.string = presenter.article.url
-            analyticsService.copyArticleLink(presenter.article.url)
             SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
+            analytics.event(Event.Article.articleLinkCopied.rawValue)
         }
     }
     
     private func shareAction() -> UIAction {
         UIAction.make(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
             let activity = UIActivityViewController(activityItems: [presenter.article.url], applicationActivities: nil)
-            analyticsService.shareArticleLink(presenter.article.url)
             present(activity, animated: true)
+            analytics.event(Event.Article.articleLinkShared.rawValue)
         }
     }
     
     private func brokenAction() -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-            analyticsService.reportBrokenArticle(presenter.article.url)
+            analytics.event(Event.Article.articleLinkShared.rawValue)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
         }
     }
@@ -112,7 +112,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func externalLinkButtonTapped(_ link: String) {
         if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
-            analyticsService.clickButtonInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
+            analytics.event(Event.Article.articleButtonClicked.rawValue)
         }
     }
     
@@ -238,6 +238,6 @@ extension ArticleVC: CommentsVCProtocol {
 extension ArticleVC: PDAResizingTextViewDelegate {
     
     func willOpenURL(_ url: URL) {
-        analyticsService.clickLinkInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
+        analytics.event(Event.Article.articleLinkClicked.rawValue)
     }
 }
