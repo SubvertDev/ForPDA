@@ -72,12 +72,10 @@
 "background.dark" = "Dark";
 "background.black" = "Black";
 "advanced" = "Advanced";
-"fast.loading.news" = "Fast loading news";
-"fast.loading.news.warning" = "After activiting this option some of the last news may not load and/or show wrong amount of comments";
-"fast.loading.article" = "Fast loading article";
-"fast.loading.article.warning" = "After activiting this option you won't see likes on the comments automatically";
+"fast.loading.system" = "Fast loading news";
+"fast.loading.system.warning" = "After activiting this option latest news may not load and show wrong amount of comments, and likes may not appear in articles";
 "comments.show.likes" = "Show likes";
-"comments.show.likes.warning" = "After activiting this option and \"Fast loading article\" you may see increase of traffic usage";
+"comments.show.likes.warning" = "After activiting this option with \"Fast loading article\" you may see increase in traffic usage";
 "account" = "Account";
 "sign.out" = "Sign Out";
 "about.app" = "About App";

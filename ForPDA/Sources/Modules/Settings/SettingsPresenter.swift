@@ -13,7 +13,7 @@ protocol SettingsPresenterProtocol {
     
     func changeTheme(to theme: AppTheme)
     func changeDarkThemeBackgroundColor(to color: AppDarkThemeBackgroundColor)
-    func showNewsFLSSwitchTapped(isOn: Bool)
+    func fastLoadingSystemSwitchTapped(isOn: Bool)
     func showArticleFLSSwitchTapped(isOn: Bool)
     func showLikesInCommentsSwitchTapped(isOn: Bool)
 }
@@ -48,16 +48,12 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         }
     }
     
+    private var isFLSEnabled: Bool {
+        settingsService.getFastLoadingSystem()
+    }
+    
     private var currentShowLikesInComments: Bool {
         settingsService.getShowLikesInComments()
-    }
-    
-    private var newsUsesFLS: Bool {
-        settingsService.getNewsFLS()
-    }
-    
-    private var articleUsesFLS: Bool {
-        settingsService.getArticleFLS()
     }
     
     private let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
@@ -86,12 +82,8 @@ final class SettingsPresenter: SettingsPresenterProtocol {
             title: R.string.localizable.advanced(),
             options: [
                 .switchCell(model: SwitchOption(
-                    title: R.string.localizable.fastLoadingNews(),
-                    isOn: newsUsesFLS, handler: {})
-                ),
-                .switchCell(model: SwitchOption(
-                    title: R.string.localizable.fastLoadingArticle(),
-                    isOn: articleUsesFLS, handler: {})
+                    title: R.string.localizable.fastLoadingSystem(),
+                    isOn: isFLSEnabled, handler: {})
                 ),
                 .switchCell(model: SwitchOption(
                     title: R.string.localizable.commentsShowLikes(),
@@ -125,13 +117,13 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         reloadData()
     }
     
-    func showNewsFLSSwitchTapped(isOn: Bool) {
-        settingsService.setNewsFLS(to: isOn)
+    func fastLoadingSystemSwitchTapped(isOn: Bool) {
+        settingsService.setFastLoadingSystem(to: isOn)
         reloadData(forceUpdate: false)
     }
     
     func showArticleFLSSwitchTapped(isOn: Bool) {
-        settingsService.setArticleFLS(to: isOn)
+        settingsService.setFastLoadingSystem(to: isOn)
         reloadData(forceUpdate: false)
     }
     
@@ -180,22 +172,16 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         sections[1].options[1] = .descriptionCell(model: model2)
         
         let model3 = SwitchOption(
-            title: R.string.localizable.fastLoadingNews(),
-            isOn: settingsService.getNewsFLS(),
+            title: R.string.localizable.fastLoadingSystem(),
+            isOn: settingsService.getFastLoadingSystem(),
             handler: {})
         sections[2].options[0] = .switchCell(model: model3)
-        
-        let model4 = SwitchOption(
-            title: R.string.localizable.fastLoadingArticle(),
-            isOn: settingsService.getArticleFLS(),
-            handler: {})
-        sections[2].options[1] = .switchCell(model: model4)
         
         let model5 = SwitchOption(
             title: R.string.localizable.commentsShowLikes(),
             isOn: settingsService.getShowLikesInComments(),
             handler: {})
-        sections[2].options[2] = .switchCell(model: model5)
+        sections[2].options[1] = .switchCell(model: model5)
         
         if forceUpdate {
             view?.reloadData()

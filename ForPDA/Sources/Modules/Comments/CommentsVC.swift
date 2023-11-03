@@ -59,15 +59,15 @@ final class CommentsVC: CommentsViewController {
         tableView.isUserInteractionEnabled = false
         _currentlyDisplayed.removeAll()
         
-        DispatchQueue.global().async {
+        Task(priority: .background) {
             let newComments = self.parsingService.parseComments(from: document)
-            self.allComments = newComments
-            self.currentlyDisplayed = self.allComments
+            allComments = newComments
+            currentlyDisplayed = self.allComments
             
-            DispatchQueue.main.async {
-                self.updateDelegate?.updateFinished(true)
-                self.tableView.reloadData()
-                self.tableView.isUserInteractionEnabled = true
+            Task(priority: .userInitiated) {
+                updateDelegate?.updateFinished(true)
+                tableView.reloadData()
+                tableView.isUserInteractionEnabled = true
             }
         }
     }

@@ -18,8 +18,7 @@ final class SettingsService {
         static let userId = "userId"
         static let appTheme = "appTheme"
         static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
-        static let newsFLS = "newsFLS"
-        static let articleFLS = "articleFLS"
+        static let fastLoadingSystem = "fastLoadingSystem"
         static let showLikesInComments = "showLikesInComments"
         static let isDeeplinking = "isDeeplinking"
     }
@@ -120,24 +119,12 @@ final class SettingsService {
     
     // MARK: - Loading System
     
-    func setNewsFLS(to state: Bool) {
-        defaults.set(state, forKey: Keys.newsFLS)
+    func setFastLoadingSystem(to state: Bool) {
+        defaults.set(state, forKey: Keys.fastLoadingSystem)
     }
     
-    func getNewsFLS() -> Bool {
-        if let show = defaults.value(forKey: Keys.newsFLS) as? Bool {
-            return show
-        } else {
-            return true // Enabled by default
-        }
-    }
-    
-    func setArticleFLS(to state: Bool) {
-        defaults.set(state, forKey: Keys.articleFLS)
-    }
-    
-    func getArticleFLS() -> Bool {
-        if let show = defaults.value(forKey: Keys.articleFLS) as? Bool {
+    func getFastLoadingSystem() -> Bool {
+        if let show = defaults.value(forKey: Keys.fastLoadingSystem) as? Bool {
             return show
         } else {
             return true // Enabled by default

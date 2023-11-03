@@ -9,11 +9,6 @@ import UIKit
 import WebKit
 import Factory
 
-enum LoadingSystem {
-    case fast // aka FLS
-    case slow // aka SLS
-}
-
 protocol HTTPClientProtocol {
     func request(endpoint: Endpoint) async throws -> String
 }
@@ -55,14 +50,8 @@ extension HTTPClient {
         switch endpoint {
         case let newsEndpoint as NewsEndpoint:
             switch newsEndpoint {
-            case .news:
-                if settingsService.getNewsFLS() {
-                    return try await fastRequest(endpoint: endpoint)
-                } else {
-                    return try await slowRequest(endpoint: endpoint)
-                }
-            case .article:
-                if settingsService.getArticleFLS() {
+            case .news, .article:
+                if settingsService.getFastLoadingSystem() {
                     return try await fastRequest(endpoint: endpoint)
                 } else {
                     return try await slowRequest(endpoint: endpoint)
@@ -117,7 +106,7 @@ extension HTTPClient {
         return try await withCheckedThrowingContinuation { continuation in
             if self.continuation != nil {
                 // Workaround for case when previous article is still loading,
-                // so continuation doesn't leak, object for testing
+                // so continuation doesn't leak, need testing
                 self.continuation?.resume(returning: "")
             }
             self.continuation = continuation

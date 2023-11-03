@@ -72,10 +72,10 @@ final class ArticlePresenter: ArticlePresenterProtocol {
     // MARK: - Private Functions
     
     private func showLikesIfNeeded() async {
-        let articleUsesFLS = settingsService.getArticleFLS()
+        let isFLSEnabled = settingsService.getFastLoadingSystem()
         let showLikes = settingsService.getShowLikesInComments()
         
-        if articleUsesFLS && showLikes {
+        if isFLSEnabled && showLikes {
             await updateComments()
         }
     }

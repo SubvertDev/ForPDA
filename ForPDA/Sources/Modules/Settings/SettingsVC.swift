@@ -95,25 +95,18 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 if !isOn {
                     switch indexPath.row {
                     case 0:
-                        presenter.showNewsFLSSwitchTapped(isOn: isOn)
+                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
                     case 1:
-                        presenter.showArticleFLSSwitchTapped(isOn: isOn)
-                        // Workaround for always working comments on article sls
-                        if let cell = tableView.cellForRow(at: IndexPath(row: 2, section: 2)) as? SettingsSwitchCell {
-                            cell.forceSwitch(to: true)
-                            presenter.showLikesInCommentsSwitchTapped(isOn: true)
-                        }
-                    default:
                         presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    default:
+                        break
                     }
                     return
                 }
                 
                 var message = ""
-                if model.title.contains("новостей") {
-                    message = R.string.localizable.fastLoadingNewsWarning()
-                } else if model.title.contains("новости") {
-                    message = R.string.localizable.fastLoadingArticleWarning()
+                if model.title.contains("новостей") || model.title.contains("news") {
+                    message = R.string.localizable.fastLoadingSystemWarning()
                 } else {
                     message = R.string.localizable.commentsShowLikesWarning()
                 }
@@ -126,24 +119,18 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 
                 let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { [weak self] _ in
                     guard let self else { return }
-                    switch indexPath.row {
-                    case 0:
-                        presenter.showNewsFLSSwitchTapped(isOn: isOn)
-                    case 1:
-                        presenter.showArticleFLSSwitchTapped(isOn: isOn)
-                    default:
+                    if indexPath.row == 0 {
+                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
+                    } else {
                         presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     }
                 }
                 let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { [weak self] _ in
                     guard let self else { return }
                     cell.set(with: model)
-                    switch indexPath.row {
-                    case 0:
-                        presenter.showNewsFLSSwitchTapped(isOn: !isOn)
-                    case 1:
-                        presenter.showArticleFLSSwitchTapped(isOn: !isOn)
-                    default:
+                    if indexPath.row == 0 {
+                        presenter.fastLoadingSystemSwitchTapped(isOn: !isOn)
+                    } else {
                         presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)
                     }
                 }
