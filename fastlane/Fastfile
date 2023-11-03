@@ -2,53 +2,77 @@ default_platform(:ios)
 
 platform :ios do
 
-  desc "Push new build to TestFlight Options: -increment:(build/patch/minor/major)"
+    desc "Push new build to TestFlight (has version option to update marketing version)"
 
-  lane :beta do |options|
+    lane :beta do |options|
 
-    bump_type = options.fetch(:increment, "build")
-    case bump_type
-    when "patch", "minor", "major"
-      increment_version_number_in_xcodeproj(bump_type: bump_type)
-    else
-      increment_build_number_in_xcodeproj
+        # Setting build number to amount of all commits in repo
+        build = sh("git rev-list --all --count")
+        
+        # Updating build number in all targets
+        increment_build_number_in_xcodeproj(
+            build_number: build,
+            target: 'ForPDA'
+        )
+        increment_build_number_in_xcodeproj(
+            build_number: build,
+            target: 'ShareExtension'
+        )
+        increment_build_number_in_xcodeproj(
+            build_number: build,
+            target: 'OpenInAppExtension'
+        )
+        
+        # If version is not specified when calling this lane then use current one instead
+        version = options.fetch(:version, get_version_number_from_xcodeproj)
+        increment_version_number_in_xcodeproj(
+            version_number: version,
+            target: 'ForPDA'
+        )
+        increment_version_number_in_xcodeproj(
+            version_number: version,
+            target: 'ShareExtension'
+        )
+        increment_version_number_in_xcodeproj(
+            version_number: version,
+            target: 'OpenInAppExtension'
+        )
+
+        build_app(
+            scheme: "ForPDA",
+            output_directory: "build/",
+            cloned_source_packages_path: "SourcePackages"
+        )
+
+        sentry_auth_token = get_xcconfig_value(
+            path: 'ForPDA/Secrets.xcconfig',
+            name: 'SENTRY_DSYM_TOKEN'
+        )
+        sentry_upload_dif(
+            auth_token: sentry_auth_token,
+            org_slug: 'forpda',
+            project_slug: 'apple-ios',
+            include_sources: true
+        )
+
+        upload_to_testflight(
+            api_key_path: "fastlane/Credentials.json"
+        )
+
+        notification(
+            subtitle: "Uploading Finished!",
+            message: "Build is on TestFlight",
+            content_image: "images/logo.png"
+        )
+
     end
 
-    build_app(
-      scheme: "ForPDA",
-      output_directory: "build/",
-      cloned_source_packages_path: "SourcePackages"
-    )
-
-    sentry_auth_token = get_xcconfig_value(
-      path: 'ForPDA/Secrets.xcconfig',
-      name: 'SENTRY_DSYM_TOKEN'
-    )
-    sentry_upload_dif(
-      auth_token: sentry_auth_token,
-      org_slug: 'forpda',
-      project_slug: 'apple-ios',
-      include_sources: true
-    )
-
-    upload_to_testflight(
-      api_key_path: "fastlane/Credentials.json"
-    )
-
-    notification(
-      subtitle: "Uploading Finished!",
-      message: "Build is on TestFlight",
-      content_image: "images/logo.png"
-    )
-
-  end
-
-  error do |lane, exception, options|
-    notification(
-      subtitle: "Error while executing #{lane}!",
-      message: "#{exception}",
-      content_image: "images/logo.png"
-    )
-  end
+    error do |lane, exception, options|
+        notification(
+            subtitle: "Error while executing #{lane}!",
+            message: "#{exception}",
+            content_image: "images/logo.png"
+        )
+    end
 
 end

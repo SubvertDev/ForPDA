@@ -21,7 +21,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane ios beta
 ```
 
-Push new build to TestFlight Options: -increment:(build/patch/minor/major)
+Push new build to TestFlight (has version option to update marketing version)
 
 ----
 
