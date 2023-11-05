@@ -30,9 +30,9 @@ final class NewsPresenter: NewsPresenterProtocol {
     
     // MARK: - Properties
     
-    @Injected(\.newsService) private var newsService
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
+    @Injected(\.newsService) private var network
+    @Injected(\.parsingService) private var parser
+    @Injected(\.settingsService) private var settings
     
     weak var view: NewsVCProtocol?
     
@@ -41,50 +41,22 @@ final class NewsPresenter: NewsPresenterProtocol {
     
     // MARK: - Public Functions
     
-//    func loadArticles() {
-//        page += 1
-//        
-//        // Если происходит диплинк не на быстрой загрузке, то используем быструю загрузку
-//        // todo переделать
-//        let isDeeplinking = settings.getIsDeeplinking()
-//
-//        switch (fastLoadingSystem, isDeeplinking) {
-//        case (true, _), (_, true):
-//            networkService.getNews(page: page) { [weak self] result in
-//                guard let self else { return }
-//                switch result {
-//                case .success(let response):
-//                    articles += parsingService.parseArticles(from: response)
-//                    Task { @MainActor in
-//                        self.view?.articlesUpdated()
-//                    }
-//                    
-//                case .failure:
-//                    DispatchQueue.main.async {
-//                        self.view?.showError()
-//                    }
-//                }
-//            }
-//            settings.setIsDeeplinking(to: false)
-//            
-//        case (false, _):
-//            slowLoad(url: URL.fourpda(page: page))
-//        }
-//    }
-    
     @MainActor
     func loadArticles() async {
         page += 1
         
         do {
-            let response = try await newsService.news(page: page)
-            articles += parsingService.parseArticles(from: response)
+            let response = try await network.news(page: page)
+            articles += parser.parseArticles(from: response)
+            settings.setIsDeeplinking(to: false)
             view?.articlesUpdated()
         } catch {
             view?.showError()
         }
         
-        settingsService.setIsDeeplinking(to: false)
+        if ArticleChecker.isOn {
+            ArticleChecker.start(articles: articles)
+        }
     }
     
     @MainActor
@@ -92,8 +64,8 @@ final class NewsPresenter: NewsPresenterProtocol {
         page = 1
         
         do {
-            let response = try await newsService.news(page: page)
-            articles = parsingService.parseArticles(from: response)
+            let response = try await network.news(page: page)
+            articles = parser.parseArticles(from: response)
             view?.articlesUpdated()
         } catch {
             view?.showError()
@@ -104,7 +76,7 @@ final class NewsPresenter: NewsPresenterProtocol {
     
     func showArticle(at indexPath: IndexPath) {
         let article = articles[indexPath.row]
-        try? DefaultRouter().navigate(to: RouteMap.articleScreen, with: article)
+        try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
     }
     
     func menuButtonTapped() {

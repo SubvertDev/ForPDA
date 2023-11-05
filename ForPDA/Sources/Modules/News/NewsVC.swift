@@ -17,7 +17,7 @@ protocol NewsVCProtocol: AnyObject {
     func showError()
 }
 
-final class NewsVC: PDAViewController<NewsView> {
+final class NewsVC: PDAViewControllerWithView<NewsView> {
     
     // MARK: - Properties
     

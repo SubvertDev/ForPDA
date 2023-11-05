@@ -20,7 +20,7 @@ protocol ArticleVCProtocol: AnyObject {
     func showError()
 }
 
-final class ArticleVC: PDAViewController<ArticleView> {
+final class ArticleVC: PDAViewControllerWithView<ArticleView> {
     
     // MARK: - Properties
     
@@ -71,7 +71,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     }
     
     private func configureView() {
-        NukeExtensions.loadImage(with: URL(string: presenter.article.info?.imageUrl), into: myView.articleImage) { result in
+        NukeExtensions.loadImage(with: presenter.article.info?.imageUrl, into: myView.articleImage) { result in
             // Добавляем оверлей если открываем не через deeplink (?)
             if (try? result.get()) != nil { self.myView.articleImage.addoverlay() }
         }
@@ -133,16 +133,16 @@ final class ArticleVC: PDAViewController<ArticleView> {
                 )
                 
             case let item as ImageElement:
-                articleElement = ArticleBuilder.addImage(url: item.url, description: item.description)
+                articleElement = ArticleBuilder.addImage(url: item.url.absoluteString, description: item.description)
                 
             case let item as VideoElement:
                 articleElement = ArticleBuilder.addVideo(id: item.url)
                 
             case let item as GifElement:
-                articleElement = ArticleBuilder.addGif(url: item.url)
+                articleElement = ArticleBuilder.addGif(url: item.url.absoluteString)
                 
             case let item as ButtonElement:
-                articleElement = ArticleBuilder.addButton(text: item.text, url: item.url) { [weak self] link in
+                articleElement = ArticleBuilder.addButton(text: item.text, url: item.url.absoluteString) { [weak self] link in
                     self?.externalLinkButtonTapped(link)
                 }
                 

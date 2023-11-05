@@ -16,7 +16,7 @@ protocol ProfileVCProtocol: AnyObject {
     func dismissProfile()
 }
 
-final class ProfileVC: PDAViewController<ProfileView> {
+final class ProfileVC: PDAViewControllerWithView<ProfileView> {
     
     // MARK: - Properties
     

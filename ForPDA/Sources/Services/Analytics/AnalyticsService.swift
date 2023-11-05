@@ -32,7 +32,7 @@ final class AnalyticsService {
 extension AnalyticsService {
     
     private func removeLastComponentAndHttps(_ url: String) -> String {
-        var url = URL(string: url) ?? URL(string: "https://4pda.to/")!
+        var url = URL(string: url) ?? URL.fourpda
         if url.pathComponents.count == 6 { url.deleteLastPathComponent() }
         var urlString = url.absoluteString
         urlString = urlString.replacingOccurrences(of: "https://", with: "")

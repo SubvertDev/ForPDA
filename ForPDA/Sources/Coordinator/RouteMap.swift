@@ -43,6 +43,15 @@ struct RouteMap: RouteMapProtocol {
         .assemble()
     }
     
+    static var newArticleScreen: DestinationStep<NewArticleVC, Article> {
+        StepAssembly(
+            finder: ClassFinder<NewArticleVC, Article>(),
+            factory: NewArticleFactory())
+        .using(UINavigationController.push())
+        .from(newsScreen.expectingContainer())
+        .assemble()
+    }
+    
     // MARK: - [Menu]
     
     static var menuScreen: DestinationStep<MenuVC, Any?> {

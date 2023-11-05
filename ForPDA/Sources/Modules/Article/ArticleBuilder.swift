@@ -21,7 +21,7 @@ final class ArticleBuilder {
         if description.contains("Узнать подробнее") { description.removeLast(16) }
         return [
             TextElement(text: description),
-            ButtonElement(text: R.string.localizable.learnMore(), url: url)
+            ButtonElement(text: R.string.localizable.learnMore(), url: URL(string: url)!)
         ]
     }
     

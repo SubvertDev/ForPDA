@@ -47,9 +47,15 @@ extension SceneDelegate {
             // Cold start deeplink
             handleDeeplinkUrl(url)
         } else {
-            // Handle 'try?' later (todo)
-//            handleDeeplinkUrl(URL(string: "forpda://article/2023/10/21/419630/")!)
-            try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
+            // Handle all 'try?' on routers? (todo)
+            // Wrong link is not showing anything (todo)
+            let testLink = "" // format starts/ends with slash: /2023/../../....../
+            if testLink.isEmpty {
+                try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
+            } else {
+                // Testing purposes only
+                handleDeeplinkUrl(URL(string: "forpda://article\(testLink)")!)
+            }
         }
     }
     
@@ -62,7 +68,7 @@ extension SceneDelegate {
             let id = url.absoluteString.components(separatedBy: "article/")[1]
             let url = URL.fourpda.absoluteString + id
             let article = Article(url: url, info: nil)
-            try? DefaultRouter().navigate(to: RouteMap.articleScreen, with: article)
+            try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
         }
     }
     

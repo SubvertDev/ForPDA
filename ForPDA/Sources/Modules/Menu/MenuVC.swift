@@ -14,7 +14,7 @@ protocol MenuVCProtocol: AnyObject {
     func reloadData()
 }
 
-final class MenuVC: PDAViewController<MenuView> {
+final class MenuVC: PDAViewControllerWithView<MenuView> {
     
     // MARK: - Properties
     

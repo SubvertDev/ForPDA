@@ -123,7 +123,7 @@ final class ArticleCell: UITableViewCell {
         dateLabel.text = article.date
         reviewLabel.isHidden = !article.isReview
         
-        NukeExtensions.loadImage(with: URL(string: article.imageUrl), into: articleImage, completion: { _ in })
+        NukeExtensions.loadImage(with: article.imageUrl, into: articleImage, completion: { _ in })
     }
     
     // MARK: - Layout

@@ -18,7 +18,7 @@ protocol SettingsVCProtocol: AnyObject {
     func showDefaultError()
 }
 
-final class SettingsVC: PDAViewController<SettingsView> {
+final class SettingsVC: PDAViewControllerWithView<SettingsView> {
     
     // MARK: - Properties
     

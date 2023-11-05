@@ -32,8 +32,10 @@ struct TextElement: ArticleElement {
 }
 
 struct ImageElement: ArticleElement {
-    let url: String
+    let url: URL
     let description: String?
+    let width: Int
+    let height: Int
 }
 
 struct VideoElement: ArticleElement {
@@ -41,19 +43,21 @@ struct VideoElement: ArticleElement {
 }
 
 struct GifElement: ArticleElement {
-    let url: String
+    let url: URL
+    let width: Int
+    let height: Int
 }
 
 struct ButtonElement: ArticleElement {
     let text: String
-    let url: String
+    let url: URL
 }
 
 struct BulletListParentElement: ArticleElement {
     let elements: [BulletListElement]
 }
 
-struct BulletListElement {
+struct BulletListElement: Hashable {
     var title: String
     var description: [String]
 }
@@ -92,7 +96,7 @@ final class ParsingService {
                 info: ArticleInfo(
                     title: title,
                     description: description,
-                    imageUrl: imageUrl,
+                    imageUrl: URL(string: imageUrl)!,
                     author: author,
                     date: date,
                     isReview: isReview,
@@ -138,14 +142,14 @@ final class ParsingService {
             }
         } else if try! !document.select("[class=article]").isEmpty() {
             title = try! document.select("[class=article-header]").select("h1").text()
-            imageUrl = try! document.select("img").get(1).attr("src")
-            imageUrl = "https:" + imageUrl
+            imageUrl = try! document.select("[class*=article]").attr("src")
+            if !imageUrl.contains("https:") { imageUrl = "https:" + imageUrl }
         }
         
         let articleInfo = ArticleInfo(
             title: title,
             description: "",
-            imageUrl: imageUrl,
+            imageUrl: URL(string: imageUrl)!,
             author: author,
             date: date,
             isReview: false,
@@ -169,12 +173,15 @@ final class ParsingService {
                 } else if try! element.iS("h2") {
                     try! element.select("br").remove()
                     let text = try! element.html()
+                    guard text != "&nbsp;" else { continue }
                     articleElements.append(TextElement(text: text, isHeader: true))
                 } else if let inList = try! element.parent()?.iS("ul"), inList {
                     articleElements.append(TextElement(text: text, inList: true))
                 } else if let insideList = try! element.parent()?.iS("ol"), insideList {
                     continue
                 } else {
+                    guard text != "<!--more-->" else { continue }
+                    guard text != "&nbsp;" else { continue }
                     articleElements.append(TextElement(text: text))
                 }
                 
@@ -191,20 +198,35 @@ final class ParsingService {
                     let images = try! element.select("img[alt]") // a[title] for high res
                     for image in images {
                         var url = try! image.attr("src")
+                        let width = try! image.attr("width")
+                        let height = try! image.attr("height")
                         if !url.contains("https:") { url = "https:" + url }
                         if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
                             let text = try! element.select("[class=wp-caption-dd]").text()
                             let description = text.isEmpty ? nil : text
-                            articleElements.append(ImageElement(url: url, description: description))
+                            let imageElement = ImageElement(
+                                url: URL(string: url)!,
+                                description: description,
+                                width: Int(width.trimmingCharacters(in: .letters))!,
+                                height: Int(height.trimmingCharacters(in: .letters))!
+                            )
+                            articleElements.append(imageElement)
                         } else if url.suffix(3) == "gif" {
-                            articleElements.append(GifElement(url: url))
+                            // Some gifs are not working when inside a[title] with working href inside it
+                            // couldn't figure out how to get them and not kill .jpg parsing
+                            let gifElement = GifElement(
+                                url: URL(string: url)!,
+                                width: Int(width.trimmingCharacters(in: .letters))!,
+                                height: Int(height.trimmingCharacters(in: .letters))!
+                            )
+                            articleElements.append(gifElement)
                         }
                     }
                     
                 } else {
                     imageUrl = try! element.select("iframe").attr("src")
                     if imageUrl.isEmpty {
-                        if try! element.text() == " " {
+                        if try! element.text() == " " || (try! element.text() == "") {
                             continue
                         } else {
                             var text = try! element.select("a[class]").text() //.converted()
@@ -214,7 +236,11 @@ final class ParsingService {
                                 text = "Голосование на сайте"
                                 url = try! document.select("meta[property=og:url]").attr("content")
                             }
-                            articleElements.append(ButtonElement(text: text, url: url))
+                            let buttonElement = ButtonElement(
+                                text: text,
+                                url: URL(string: url)!
+                            )
+                            articleElements.append(buttonElement)
                         }
                         
                     } else {
@@ -234,7 +260,16 @@ final class ParsingService {
                 for gal in galCont {
                     var url = try! gal.attr("href")
                     if !url.contains("https:") { url = "https:" + url }
-                    articleElements.append(ImageElement(url: url, description: nil))
+                    let galInfo = try! gal.select("img[src]")
+                    let width = try! galInfo.attr("width")
+                    let height = try! galInfo.attr("height")
+                    let imageElement = ImageElement(
+                        url: URL(string: url)!,
+                        description: nil,
+                        width: Int(width.trimmingCharacters(in: .letters))!,
+                        height: Int(height.trimmingCharacters(in: .letters))!
+                    )
+                    articleElements.append(imageElement)
                 }
             }
         }
@@ -250,7 +285,37 @@ final class ParsingService {
         for element in elements {
             if try! element.iS("p") {
                 let text = try! element.text()
-                articleElements.append(TextElement(text: text))
+                if !text.isEmpty {
+                    if try! !element.html().contains("btn") {
+                        articleElements.append(TextElement(text: text))
+                    } else {
+                        continue
+                    }
+                } else if try! element.iS("[style=text-align:center]") || (try! element.iS("[style=text-align: center;]")) {
+                    var imageUrl = try! element.select("iframe").attr("src")
+                    if imageUrl.isEmpty {
+                        if (try! element.text() == " ") || (try! element.text() == "") {
+                            continue
+                        } else {
+                            var text = try! element.select("a[class]").text() //.converted()
+                            var url = try! element.select("a[class]").attr("href")
+                            if !url.contains("https:") { url = "https:" + url }
+                            if try! document.html().contains("form action=") {
+                                text = "Голосование на сайте"
+                                url = try! document.select("meta[property=og:url]").attr("content")
+                            }
+                            let buttonElement = ButtonElement(
+                                text: text,
+                                url: URL(string: url)!
+                            )
+                            articleElements.append(buttonElement)
+                        }
+                    } else {
+                        imageUrl.removeFirst(24)
+                        imageUrl.removeLast(7)
+                        articleElements.append(VideoElement(url: imageUrl))
+                    }
+                }
             } else if try! element.iS("h2") || (try! element.iS("h3")) {
                 try! element.select("br").remove()
                 let text = try! element.html()
@@ -258,23 +323,52 @@ final class ParsingService {
             } else if try! element.iS("figure") {
                 let images = try! element.select("img[alt]")
                 for image in images {
+                    // (todo) switch to srcset?
                     var url = try! image.attr("src")
+                    let width = try! image.attr("width")
+                    let height = try! image.attr("height")
                     if !url.contains("https:") { url = "https:" + url }
                     if url.suffix(3) == "jpg" || url.suffix(3) == "png" {
+                        //
+                        let srcset = try! image.attr("srcset")
+                        url = srcset.components(separatedBy: ", ")[0].components(separatedBy: " ")[0]
+                        //
                         let text = try! element.select("[class=wp-caption-dd]").text()
                         let description = text.isEmpty ? nil : text
-                        articleElements.append(ImageElement(url: url, description: description))
+                        let imageElement = ImageElement(
+                            url: URL(string: url)!,
+                            description: description,
+                            width: Int(width.trimmingCharacters(in: .letters))!,
+                            height: Int(height.trimmingCharacters(in: .letters))!
+                        )
+                        articleElements.append(imageElement)
                     } else if url.suffix(3) == "gif" {
-                        articleElements.append(GifElement(url: url))
+                        let gifElement = GifElement(
+                            url: URL(string: url)!,
+                            width: Int(width.trimmingCharacters(in: .letters))!,
+                            height: Int(height.trimmingCharacters(in: .letters))!
+                        )
+                        articleElements.append(gifElement)
                     }
                 }
             } else if try! element.iS("dl") {
                 let charters = parseBulletList(element)
                 articleElements.append(BulletListParentElement(elements: charters))
             } else if try! element.iS("a") {
-                let text = try! element.text()
+                var text = ""
+                if element.children().count > 1 {
+                    for textElement in element.children() {
+                        text += try! textElement.text() + "\n"
+                    }
+                } else {
+                    text = try! element.text()
+                }
                 let url = try! element.attr("href")
-                articleElements.append(ButtonElement(text: text, url: url))
+                let buttonElement = ButtonElement(
+                    text: text.trimmingCharacters(in: .whitespacesAndNewlines),
+                    url: URL(string: url)!
+                )
+                articleElements.append(buttonElement)
             }
         }
         return articleElements
@@ -290,14 +384,14 @@ final class ParsingService {
             if try! element.iS("dt") {
                 charter.title = try! element.text()
             } else if try! element.iS("dd") {
-                let text = try! element.text()
+                let text = try! element.html()
                 if text.contains("<br>") {
                     let splitted = text.components(separatedBy: "<br>")
                     for split in splitted {
-                        charter.description.append(split)
+                        charter.description.append(split.trimmingCharacters(in: .whitespaces))
                     }
                 } else {
-                    charter.description.append(text)
+                    charter.description.append(text.trimmingCharacters(in: .whitespaces))
                 }
                 charterElements.append(charter)
                 charter = BulletListElement(title: "", description: [])

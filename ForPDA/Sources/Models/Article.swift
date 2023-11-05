@@ -15,7 +15,7 @@ struct Article {
 struct ArticleInfo {
     let title: String
     let description: String
-    let imageUrl: String
+    let imageUrl: URL
     let author: String
     let date: String
     let isReview: Bool

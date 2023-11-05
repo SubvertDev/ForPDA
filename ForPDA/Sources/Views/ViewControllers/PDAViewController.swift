@@ -9,9 +9,7 @@
 import UIKit
 import Factory
 
-internal class PDAViewController<CustomView: UIView>: UIViewController {
-
-    @Injected(\.settingsService) private var settingsService
+class PDAViewControllerWithView<CustomView: UIView>: PDAViewController {
     
     var myView: CustomView {
         return view as! CustomView
@@ -20,6 +18,12 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
     override func loadView() {
         view = CustomView()
     }
+    
+}
+
+class PDAViewController: UIViewController {
+
+    @LazyInjected(\.settingsService) private var settings
 
     init() {
         super.init(nibName: nil, bundle: nil)
@@ -38,7 +42,7 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
         if let object = notification.object as? AppNightModeBackgroundColor {
             color = object
         } else {
-            color = settingsService.getAppBackgroundColor()
+            color = settings.getAppBackgroundColor()
         }
         
         view.backgroundColor = color == .dark ? R.color.nearBlack() : .systemBackground
@@ -65,4 +69,5 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }

@@ -18,7 +18,7 @@ protocol LoginVCProtocol: AnyObject {
     func dismissLogin()
 }
 
-final class LoginVC: PDAViewController<LoginView> {
+final class LoginVC: PDAViewControllerWithView<LoginView> {
     
     // MARK: - Properties
     
