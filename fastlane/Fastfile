@@ -38,10 +38,24 @@ platform :ios do
             target: 'OpenInAppExtension'
         )
 
+	# get_certificates
+
+	# get_provisioning_profile
+
         build_app(
             scheme: "ForPDA",
             output_directory: "build/",
-            cloned_source_packages_path: "SourcePackages"
+            cloned_source_packages_path: "SourcePackages",
+	    silent: true,
+	    suppress_xcode_output: true,
+	    export_method: "app-store",
+	    export_options: {
+	    provisioningProfiles: { 
+		"com.subvert.forpda" => "com.subvert.forpda AppStore",
+		"com.subvert.forpda.OpenInAppExtension" => "com.subvert.forpda.OpenInAppExtension AppStore",
+		"com.subvert.forpda.ShareExtension" => "com.subvert.forpda.ShareExtension AppStore"
+      	        }
+	    }
         )
 
         sentry_auth_token = get_xcconfig_value(
