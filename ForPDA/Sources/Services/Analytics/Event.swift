@@ -53,6 +53,7 @@ enum Event {
         case nightModeChanged
         case fastLoadingSystemChanged
         case showLikesChanged
+        case openGithubRelease
     }
     
 }

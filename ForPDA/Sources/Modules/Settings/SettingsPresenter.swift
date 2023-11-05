@@ -99,7 +99,7 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         // About App
         MenuSection(title: R.string.localizable.aboutApp(), options: [
             // .staticCell(model: MenuOption(title: "Проверить обновления", handler: {})),
-            .staticCell(model: MenuOption(title: "\(R.string.localizable.version()) \(version) (\(build.trimmingCharacters(in: .whitespacesAndNewlines)))", handler: {}))
+            .staticCell(model: MenuOption(title: "\(R.string.localizable.version()) \(version) (\(build.trimmingCharacters(in: .whitespacesAndNewlines)))", handler: showReleaseOnGithub))
         ])
     ]
     
@@ -180,6 +180,11 @@ final class SettingsPresenter: SettingsPresenterProtocol {
     private func changeNightModeBackgroundColor() {
         analytics.event(Event.Settings.nightModeOpen.rawValue)
         view?.showChangeDarkThemeBackgroundColorSheet()
+    }
+    
+    private func showReleaseOnGithub() {
+        analytics.event(Event.Settings.openGithubRelease.rawValue)
+        UIApplication.shared.open(URL.githubRelease())
     }
     
     private func showDefaultError() {
