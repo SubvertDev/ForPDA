@@ -11,7 +11,7 @@ final class PDAResizingImageViewWithText: UIStackView {
     
     private(set) var imageView = PDAResizingImageView()
     
-    private let textLabel: UILabel = {
+    private(set) var textLabel: UILabel = {
         let label = UILabel()
         label.textColor = .systemGray
         label.font = UIFont.systemFont(ofSize: 15)
@@ -31,10 +31,6 @@ final class PDAResizingImageViewWithText: UIStackView {
         
         addArrangedSubview(imageView)
         addArrangedSubview(textLabel)
-        
-        textLabel.snp.makeConstraints { make in
-            make.horizontalEdges.equalToSuperview().inset(16)
-        }
     }
     
     required init(coder: NSCoder) {

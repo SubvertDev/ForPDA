@@ -14,146 +14,72 @@ import RouteComposer
 protocol NewsPresenterProtocol {
     var articles: [Article] { get }
     
-    func loadArticles()
-    func refreshArticles()
+//    func loadArticles()
+//    func refreshArticles()
+    
+    //
+    func loadArticles() async
+    func refreshArticles() async
+    //
     func showArticle(at indexPath: IndexPath)
+    
+    func menuButtonTapped()
 }
 
-final class NewsPresenter: NSObject, NewsPresenterProtocol {
+final class NewsPresenter: NewsPresenterProtocol {
     
     // MARK: - Properties
     
-    @Injected(\.networkService) private var networkService
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
+    @Injected(\.newsService) private var network
+    @Injected(\.parsingService) private var parser
+    @Injected(\.settingsService) private var settings
     
     weak var view: NewsVCProtocol?
-    
-    private let router = DefaultRouter()
     
     private var page = 0
     var articles: [Article] = []
     
-    private var webView: WKWebView?
-    private var fastLoadingSystem: Bool {
-        settingsService.getFastLoadingSystem()
-    }
-    private var isSlowRefreshing = false
-    
-    // MARK: - Init
-    
-//    init() {
-//
-//    }
-    
     // MARK: - Public Functions
     
-    func loadArticles() {
+    @MainActor
+    func loadArticles() async {
         page += 1
         
-        switch fastLoadingSystem {
-        case true:
-            networkService.getNews(page: page) { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let response):
-                    articles += parsingService.parseArticles(from: response)
-                    Task { @MainActor in
-                        self.view?.articlesUpdated()
-                    }
-                    
-                case .failure:
-                    DispatchQueue.main.async {
-                        self.view?.showError()
-                    }
-                }
-            }
-            
-        case false:
-            slowLoad(url: URL.fourpda(page: page))
+        do {
+            let response = try await network.news(page: page)
+            articles += parser.parseArticles(from: response)
+            settings.setIsDeeplinking(to: false)
+            view?.articlesUpdated()
+        } catch {
+            view?.showError()
+        }
+        
+        if ArticleChecker.isOn {
+            ArticleChecker.start(articles: articles)
         }
     }
     
-    func refreshArticles() {
+    @MainActor
+    func refreshArticles() async {
         page = 1
         
-        switch fastLoadingSystem {
-        case true:
-            networkService.getNews(page: page) { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case .success(let response):
-                    articles = self.parsingService.parseArticles(from: response)
-                    DispatchQueue.main.async {
-                        self.view?.articlesUpdated()
-                    }
-                    
-                case .failure:
-                    DispatchQueue.main.async {
-                        self.view?.showError()
-                    }
-                }
-            }
-            
-        case false:
-            isSlowRefreshing = true
-            slowLoad(url: URL.fourpda)
+        do {
+            let response = try await network.news(page: page)
+            articles = parser.parseArticles(from: response)
+            view?.articlesUpdated()
+        } catch {
+            view?.showError()
         }
-    }
-    
-    private func slowLoad(url: URL) {
-        if webView == nil {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                self.configureWebView()
-            }
-            return
-        }
-        
-        let request = URLRequest(url: url)
-        webView?.load(request)
     }
     
     // MARK: - Navigation
     
     func showArticle(at indexPath: IndexPath) {
         let article = articles[indexPath.row]
-        try? router.navigate(to: RouteMap.articleScreen, with: article, animated: true) {_ in }
-    }
-}
-
-// MARK: - WKNavigationDelegate
-
-extension NewsPresenter: WKNavigationDelegate {
-    
-    private func configureWebView() {
-        if let webView = UIApplication.shared.windows.first?.viewWithTag(666) as? WKWebView {
-            self.webView = webView
-            webView.navigationDelegate = self
-            let request = URLRequest(url: URL.fourpda)
-            webView.load(request)
-        }
+        try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
     }
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-            webView.evaluateJavaScript("document.documentElement.outerHTML") { (doc, err) in
-                if let document = doc as? String {
-                    if self.isSlowRefreshing {
-                        self.page = 1
-                        self.articles = []
-                        self.isSlowRefreshing = false
-                    }
-                    self.articles += self.parsingService.parseArticles(from: document)
-                    DispatchQueue.main.async {
-                        self.view?.articlesUpdated()
-                    }
-                } else {
-                    print(err as Any)
-                    DispatchQueue.main.async {
-                        self.view?.showError()
-                    }
-                }
-            }
-        }
+    func menuButtonTapped() {
+        try? DefaultRouter().navigate(to: RouteMap.menuScreen, with: nil)
     }
 }

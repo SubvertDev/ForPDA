@@ -14,7 +14,7 @@ protocol MenuVCProtocol: AnyObject {
     func reloadData()
 }
 
-final class MenuVC: PDAViewController<MenuView> {
+final class MenuVC: PDAViewControllerWithView<MenuView> {
     
     // MARK: - Properties
     
@@ -30,29 +30,15 @@ final class MenuVC: PDAViewController<MenuView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setDelegates()
-        configureNavBar()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: true)
+        configureController()
     }
     
     // MARK: - Configure
     
-    private func setDelegates() {
+    private func configureController() {
+        title = R.string.localizable.menu()
         myView.tableView.dataSource = self
         myView.tableView.delegate = self
-    }
-    
-    private func configureNavBar() {
-        navigationController?.setNavigationBarHidden(true, animated: false)
     }
 }
 
@@ -72,6 +58,10 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
         return indexPath.section == 0 ? 60 : 46
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == 0 ? 16 : 0
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = presenter.sections[indexPath.section].options[indexPath.row]
         
@@ -79,11 +69,15 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
         case .authCell:
             let cell = tableView.dequeueReusableCell(withClass: MenuAuthCell.self)
             if let user = presenter.user {
-                let imageOptions = ImageLoadingOptions(placeholder: R.image.avatarPlaceholder(),
-                                                       failureImage: R.image.avatarPlaceholder())
-                NukeExtensions.loadImage(with: URL(string: presenter.user?.avatarUrl),
-                                         options: imageOptions,
-                                         into: cell.iconImageView) { _ in }
+                let imageOptions = ImageLoadingOptions(
+                    placeholder: R.image.avatarPlaceholder(),
+                    failureImage: R.image.avatarPlaceholder()
+                )
+                NukeExtensions.loadImage(
+                    with: URL(string: presenter.user?.avatarUrl),
+                    options: imageOptions,
+                    into: cell.iconImageView
+                ) { _ in }
                 cell.titleLabel.text = user.nickname
                 cell.subtitleLabel.text = R.string.localizable.goToProfile()
             }
@@ -121,9 +115,11 @@ extension MenuVC: UITableViewDataSource, UITableViewDelegate {
 extension MenuVC: MenuVCProtocol {
     
     func showDefaultError() {
-        let alert = UIAlertController(title: R.string.localizable.whoops(),
-                                      message: R.string.localizable.notDoneYet(),
-                                      preferredStyle: .alert)
+        let alert = UIAlertController(
+            title: R.string.localizable.whoops(),
+            message: R.string.localizable.notDoneYet(),
+            preferredStyle: .alert
+        )
         let action = UIAlertAction(title: R.string.localizable.ok(), style: .default)
         alert.addAction(action)
         present(alert, animated: true)

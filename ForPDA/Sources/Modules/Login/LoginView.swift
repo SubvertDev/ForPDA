@@ -28,6 +28,7 @@ final class LoginView: UIView {
         let textField = UITextField()
         textField.placeholder = R.string.localizable.loginTextFieldPlaceholder()
         textField.textContentType = .username
+        textField.borderStyle = .roundedRect
         textField.tag = 0
         return textField
     }()
@@ -37,6 +38,7 @@ final class LoginView: UIView {
         textField.placeholder = R.string.localizable.passwordTextFieldPlaceholder()
         textField.textContentType = .password
         textField.isSecureTextEntry = true
+        textField.borderStyle = .roundedRect
         textField.tag = 1
         return textField
     }()
@@ -58,6 +60,7 @@ final class LoginView: UIView {
         let textField = UITextField()
         textField.placeholder = R.string.localizable.captchaTextFieldPlaceholder()
         textField.keyboardType = .numberPad
+        textField.borderStyle = .roundedRect
         textField.tag = 2
         return textField
     }()

@@ -25,6 +25,8 @@ final class PDABulletLabel: PDAPaddingLabel {
         case .left:
             textAlignment = .right
             font = UIFont.systemFont(ofSize: 16, weight: .medium)
+            numberOfLines = 2
+            adjustsFontSizeToFitWidth = true
         case .right:
             font = UIFont.systemFont(ofSize: 15, weight: .light)
         }

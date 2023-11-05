@@ -16,12 +16,19 @@ final class SettingsService {
         static let savedCookies = "savedCookies"
         static let authKey = "authKey"
         static let userId = "userId"
-        static let appLanguage = "AppleLanguage"
-        static let appLanguages = "AppleLanguages"
         static let appTheme = "appTheme"
-        static let appDarkThemeBackgroundColor = "appDarkThemeBackgroundColor"
+        static let appNightModeBackgroundColor = "appDarkThemeBackgroundColor"
         static let fastLoadingSystem = "fastLoadingSystem"
         static let showLikesInComments = "showLikesInComments"
+        static let isDeeplinking = "isDeeplinking"
+    }
+    
+    // MARK: - Logout
+    
+    func logout() {
+        removeCookies()
+        removeUser()
+        removeAuthKey()
     }
     
     // MARK: - Cookies
@@ -34,7 +41,7 @@ final class SettingsService {
         return defaults.data(forKey: Keys.savedCookies)
     }
     
-    func removeCookies() {
+    private func removeCookies() {
         defaults.removeObject(forKey: Keys.savedCookies)
         
         HTTPCookieStorage.shared.removeCookies(since: .distantPast)
@@ -60,7 +67,7 @@ final class SettingsService {
         return defaults.string(forKey: Keys.authKey)
     }
     
-    func removeAuthKey() {
+    private func removeAuthKey() {
         defaults.removeObject(forKey: Keys.authKey)
     }
     
@@ -75,33 +82,16 @@ final class SettingsService {
         return defaults.data(forKey: Keys.userId)
     }
     
-    func removeUser() {
+    private func removeUser() {
         defaults.removeObject(forKey: Keys.userId)
         NotificationCenter.default.post(name: .userDidChange, object: nil)
     }
     
     // MARK: - App Language
     
-    // Refactor to have multilanguage support
-    func setAppLanguage(to language: AppLanguage) {
-        switch language {
-        case .auto:
-            defaults.removeObject(forKey: Keys.appLanguage)
-            defaults.removeObject(forKey: Keys.appLanguages)
-            
-        case .ru:
-            defaults.set("ru", forKey: Keys.appLanguage)
-            defaults.set(["ru", "en"], forKey: Keys.appLanguages)
-            
-        case .en:
-            defaults.set("en", forKey: Keys.appLanguage)
-            defaults.set(["en", "ru"], forKey: Keys.appLanguages)
-        }
-    }
-    
     func getAppLanguage() -> AppLanguage {
-        let language = defaults.string(forKey: Keys.appLanguage)
-        return AppLanguage(rawValue: language ?? AppLanguage.auto.rawValue) ?? .auto
+        let language = Locale.autoupdatingCurrent.languageCode
+        return AppLanguage(rawValue: language ?? AppLanguage.ru.rawValue) ?? .ru
     }
     
     // MARK: - App Theme
@@ -117,17 +107,17 @@ final class SettingsService {
     
     // MARK: - App Background Color
     
-    func setAppBackgroundColor(to color: AppDarkThemeBackgroundColor) {
-        defaults.set(color.rawValue, forKey: Keys.appDarkThemeBackgroundColor)
-        NotificationCenter.default.post(name: .darkThemeBackgroundColorDidChange, object: color)
+    func setAppBackgroundColor(to color: AppNightModeBackgroundColor) {
+        defaults.set(color.rawValue, forKey: Keys.appNightModeBackgroundColor)
+        NotificationCenter.default.post(name: .nightModeBackgroundColorDidChange, object: color)
     }
     
-    func getAppBackgroundColor() -> AppDarkThemeBackgroundColor {
-        let backgroundColor = defaults.string(forKey: Keys.appDarkThemeBackgroundColor)
-        return AppDarkThemeBackgroundColor(rawValue: backgroundColor ?? AppDarkThemeBackgroundColor.black.rawValue) ?? .black
+    func getAppBackgroundColor() -> AppNightModeBackgroundColor {
+        let backgroundColor = defaults.string(forKey: Keys.appNightModeBackgroundColor)
+        return AppNightModeBackgroundColor(rawValue: backgroundColor ?? AppNightModeBackgroundColor.black.rawValue) ?? .black
     }
     
-    // MARK: - Fast Loading System
+    // MARK: - Loading System
     
     func setFastLoadingSystem(to state: Bool) {
         defaults.set(state, forKey: Keys.fastLoadingSystem)
@@ -137,7 +127,7 @@ final class SettingsService {
         if let show = defaults.value(forKey: Keys.fastLoadingSystem) as? Bool {
             return show
         } else {
-            return false
+            return true // Enabled by default
         }
     }
     
@@ -151,7 +141,21 @@ final class SettingsService {
         if let show = defaults.value(forKey: Keys.showLikesInComments) as? Bool {
             return show
         } else {
-            return true
+            return false // Disabled by default
+        }
+    }
+    
+    // MARK: - Is Deeplinking
+    
+    func setIsDeeplinking(to state: Bool) {
+        defaults.set(state, forKey: Keys.isDeeplinking)
+    }
+    
+    func getIsDeeplinking() -> Bool {
+        if let isDeeplinking = defaults.value(forKey: Keys.isDeeplinking) as? Bool {
+            return isDeeplinking
+        } else {
+            return false
         }
     }
 }

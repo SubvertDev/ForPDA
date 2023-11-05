@@ -16,7 +16,7 @@ protocol ProfileVCProtocol: AnyObject {
     func dismissProfile()
 }
 
-final class ProfileVC: PDAViewController<ProfileView> {
+final class ProfileVC: PDAViewControllerWithView<ProfileView> {
     
     // MARK: - Properties
     
@@ -32,17 +32,10 @@ final class ProfileVC: PDAViewController<ProfileView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         myView.delegate = self
-        presenter.getUser()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: true)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
+        
+        Task {
+            await presenter.getUser()
+        }
     }
 }
 
@@ -51,38 +44,33 @@ final class ProfileVC: PDAViewController<ProfileView> {
 extension ProfileVC: ProfileVCProtocol {
     
     func updateUser(with user: User) {
-        DispatchQueue.main.async {
-            NukeExtensions.loadImage(with: URL(string: user.avatarUrl), into: self.myView.profileImageView) { _ in }
-            self.myView.nameLabel.text = user.nickname
-        }
+        NukeExtensions.loadImage(with: URL(string: user.avatarUrl), into: myView.profileImageView) { _ in }
+        myView.nameLabel.text = user.nickname
     }
     
     func showError(message: String) {
-        DispatchQueue.main.async {
-            self.myView.errorMessageLabel.text = message
-            self.showLoading(false)
-        }
+        myView.errorMessageLabel.text = message
+        showLoading(false)
     }
     
     func showLoading(_ state: Bool) {
-        DispatchQueue.main.async {
-            self.navigationController?.navigationBar.isUserInteractionEnabled = !state
-            self.navigationController?.navigationBar.tintColor = state ? .gray : .systemBlue
-            self.myView.logoutButton.showLoading(state)
-        }
+        navigationController?.navigationBar.isUserInteractionEnabled = !state
+        navigationController?.navigationBar.tintColor = state ? .gray : .label
+        myView.logoutButton.showLoading(state)
     }
     
     func dismissProfile() {
-        DispatchQueue.main.async {
-            self.navigationController?.popViewController(animated: true)
-        }
+        navigationController?.popViewController(animated: true)
     }
 }
 
 // MARK: - ProfileViewDelegate
 
 extension ProfileVC: ProfileViewDelegate {
+    
     func logoutButtonTapped() {
-        presenter.logout()
+        Task {
+            await presenter.logout()
+        }
     }
 }

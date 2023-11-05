@@ -9,9 +9,7 @@
 import UIKit
 import Factory
 
-internal class PDAViewController<CustomView: UIView>: UIViewController {
-
-    @Injected(\.settingsService) private var settingsService
+class PDAViewControllerWithView<CustomView: UIView>: PDAViewController {
     
     var myView: CustomView {
         return view as! CustomView
@@ -20,23 +18,31 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
     override func loadView() {
         view = CustomView()
     }
+    
+}
+
+class PDAViewController: UIViewController {
+
+    @LazyInjected(\.settingsService) private var settings
 
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        changeDarkThemeBackgroundColor()
+        changeNightModeBackgroundColor()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(changeDarkThemeBackgroundColor(_:)),
-                                               name: .darkThemeBackgroundColorDidChange, object: nil)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(changeNightModeBackgroundColor(_:)),
+            name: .nightModeBackgroundColorDidChange, object: nil
+        )
     }
     
-    @objc private func changeDarkThemeBackgroundColor(_ notification: Notification = .init(name: .darkThemeBackgroundColorDidChange)) {
+    @objc private func changeNightModeBackgroundColor(_ notification: Notification = .init(name: .nightModeBackgroundColorDidChange)) {
         
-        var color: AppDarkThemeBackgroundColor
-        if let object = notification.object as? AppDarkThemeBackgroundColor {
+        var color: AppNightModeBackgroundColor
+        if let object = notification.object as? AppNightModeBackgroundColor {
             color = object
         } else {
-            color = settingsService.getAppBackgroundColor()
+            color = settings.getAppBackgroundColor()
         }
         
         view.backgroundColor = color == .dark ? R.color.nearBlack() : .systemBackground
@@ -63,4 +69,5 @@ internal class PDAViewController<CustomView: UIView>: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
 }

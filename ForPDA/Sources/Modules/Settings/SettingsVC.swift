@@ -18,7 +18,7 @@ protocol SettingsVCProtocol: AnyObject {
     func showDefaultError()
 }
 
-final class SettingsVC: PDAViewController<SettingsView> {
+final class SettingsVC: PDAViewControllerWithView<SettingsView> {
     
     // MARK: - Properties
     
@@ -36,30 +36,15 @@ final class SettingsVC: PDAViewController<SettingsView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setDelegates()
-        configureNavigationBar()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(false, animated: false)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
+        configureController()
     }
     
     // MARK: - Configuration
     
-    private func setDelegates() {
+    private func configureController() {
+        title = R.string.localizable.settings()
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
-    }
-    
-    private func configureNavigationBar() {
-        title = R.string.localizable.settings()
-        navigationController?.setNavigationBarHidden(false, animated: true)
     }
 }
 
@@ -83,7 +68,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
         return 46
     }
     
-    // Refactor this
+    // Refactor this (todo)
     // swiftlint:disable cyclomatic_complexity function_body_length
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let model = presenter.sections[indexPath.section].options[indexPath.row]
@@ -106,17 +91,21 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
             cell.switchTapped = { [weak self] isOn in
                 guard let self else { return }
                 
+                // When switching off
                 if !isOn {
-                    if indexPath.row == 0 {
-                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: isOn)
-                    } else {
-                        self.presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    switch indexPath.row {
+                    case 0:
+                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
+                    case 1:
+                        presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    default:
+                        break
                     }
                     return
                 }
                 
                 var message = ""
-                if model.title.contains("Быстрая") {
+                if model.title.contains("новостей") || model.title.contains("news") {
                     message = R.string.localizable.fastLoadingSystemWarning()
                 } else {
                     message = R.string.localizable.commentsShowLikesWarning()
@@ -128,19 +117,21 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                     preferredStyle: .alert
                 )
                 
-                let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { _ in
+                let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { [weak self] _ in
+                    guard let self else { return }
                     if indexPath.row == 0 {
-                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: isOn)
+                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
                     } else {
-                        self.presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                        presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     }
                 }
-                let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { _ in
+                let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { [weak self] _ in
+                    guard let self else { return }
                     cell.set(with: model)
                     if indexPath.row == 0 {
-                        self.presenter.showFastLoadingSystemSwitchTapped(isOn: !isOn)
+                        presenter.fastLoadingSystemSwitchTapped(isOn: !isOn)
                     } else {
-                        self.presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)
+                        presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)
                     }
                 }
                 
@@ -179,28 +170,9 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
 extension SettingsVC: SettingsVCProtocol {
     
     func showChangeLanguageSheet() {
-        let alert = UIAlertController(title: R.string.localizable.themeChoose(), message: nil, preferredStyle: .actionSheet)
-        
-        let automaticAction = UIAlertAction(title: R.string.localizable.automatic(), style: .default) { _ in
-            guard self.settingsService.getAppLanguage() != AppLanguage.auto else { return }
-            self.presenter.changeLanguage(to: .auto)
+        if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsURL)
         }
-        let russianAction = UIAlertAction(title: R.string.localizable.languageRussian(), style: .default) { _ in
-            guard self.settingsService.getAppLanguage() != AppLanguage.ru else { return }
-            self.presenter.changeLanguage(to: .ru)
-        }
-        let englishAction = UIAlertAction(title: R.string.localizable.languageEnglish(), style: .default) { _ in
-            guard self.settingsService.getAppLanguage() != AppLanguage.en else { return }
-            self.presenter.changeLanguage(to: .en)
-        }
-        let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
-        
-        alert.addAction(automaticAction)
-        alert.addAction(russianAction)
-        alert.addAction(englishAction)
-        alert.addAction(cancelAction)
-        
-        present(alert, animated: true)
     }
     
     func showChangeThemeSheet() {
@@ -232,12 +204,12 @@ extension SettingsVC: SettingsVCProtocol {
         let alert = UIAlertController(title: R.string.localizable.backgroundChoose(), message: nil, preferredStyle: .actionSheet)
         
         let darkAction = UIAlertAction(title: R.string.localizable.backgroundDark(), style: .default) { _ in
-            guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.dark else { return }
-            self.presenter.changeDarkThemeBackgroundColor(to: .dark)
+            guard self.settingsService.getAppBackgroundColor() != AppNightModeBackgroundColor.dark else { return }
+            self.presenter.changeNightModeBackgroundColor(to: .dark)
         }
         let blackAction = UIAlertAction(title: R.string.localizable.backgroundBlack(), style: .default) { _ in
-            guard self.settingsService.getAppBackgroundColor() != AppDarkThemeBackgroundColor.black else { return }
-            self.presenter.changeDarkThemeBackgroundColor(to: .black)
+            guard self.settingsService.getAppBackgroundColor() != AppNightModeBackgroundColor.black else { return }
+            self.presenter.changeNightModeBackgroundColor(to: .black)
         }
         let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .cancel)
         

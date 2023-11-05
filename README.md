@@ -6,18 +6,17 @@
 ![Скриншоты](images/screenshots.png)
 
 ## Требования и установка
-- iOS 14.0+ / macOS 13.0+
-- Xcode 14.3+ / Swift 5.8+
+- iOS 15.0+ / macOS 14.0+
+- Xcode 15.0+ / Swift 5.9+
 - Скачать и запустить проект, зависимости загрузятся автоматически через SPM
-- Открыть SecretsExample.xcconfig и заменить все значения на свои
-- Для сборки в .ipa или загрузки на свой TestFlight использовать Fastlane
+- (Опционально) Для запуска сервисов Amplitude/Sentry/Telegram переименовать SecretsExample в Secrets и заменить все значения на свои
 
 ## Используемые библиотеки
 - [Fastlane](https://github.com/fastlane/fastlane) - автоматизация сборки и выгрузки на TestFlight
 - [Amplitude](https://github.com/amplitude/Amplitude-iOS) - аналитика
 - [Sentry](https://github.com/getsentry/sentry-cocoa) - мониторинг ошибок
 - [SwiftSoup](https://github.com/scinfu/SwiftSoup) - парсинг HTML страниц
-- [SwitchRichString](https://github.com/malcommac/SwiftRichString) - преобразование HTML строк в TextView
+- [SwitchRichString](https://github.com/malcommac/SwiftRichString) - преобразование HTML в TextView
 - [RouteComposer](https://github.com/ekazaev/route-composer) - навигация
 - [Rswift](https://github.com/mac-cain13/R.swift) - кодогенерация текста/картинок/шрифтов/цветов
 - [Factory](https://github.com/hmlongco/Factory) - инъекция зависимостей
@@ -27,7 +26,7 @@
 - [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit) - отображение комментариев
 - [SwiftyGif](https://github.com/kirualex/SwiftyGif) - отображение гифок
 - [YouTubePlayerKit](https://github.com/SvenTiigi/YouTubePlayerKit) - отображение видео с YouTube
-- [SFSafeSymbols](https://github.com/SFSafeSymbols/SFSafeSymbols) - type safe SF символы
+- [SFSafeSymbols](https://github.com/SFSafeSymbols/SFSafeSymbols) - типобезопасные SF символы
 
 ## Благодарности
 - [Tatiana](https://github.com/tikh-hehe) - за помощь с доработкой функционала

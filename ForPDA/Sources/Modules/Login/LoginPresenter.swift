@@ -11,17 +11,19 @@ import WebKit
 
 protocol LoginPresenterProtocol {
     func textChanged(to value: String, in textField: LoginView.LoginTextFields)
-    func getCaptcha()
-    func login()
+    func getCaptcha() async
+    func login() async
 }
 
 final class LoginPresenter: LoginPresenterProtocol {
     
     // MARK: - Proeprties
     
-    @Injected(\.networkService) var networkService
-    @Injected(\.parsingService) var parsingService
-    @Injected(\.settingsService) var settingsService
+    @Injected(\.authService) private var authService
+    @Injected(\.userService) private var userService
+    @Injected(\.parsingService) private var parser
+    @Injected(\.settingsService) private var settings
+    @Injected(\.analyticsService) private var analytics
     
     weak var view: LoginVCProtocol?
     
@@ -39,8 +41,10 @@ final class LoginPresenter: LoginPresenterProtocol {
     // MARK: - Lifecycle
     
     init() {
-        NotificationCenter.default.addObserver(self, selector: #selector(cookiesChanged(_:)),
-                                               name: .NSHTTPCookieManagerCookiesChanged, object: nil)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(cookiesChanged(_:)),
+            name: .NSHTTPCookieManagerCookiesChanged, object: nil
+        )
     }
     
     // MARK: - Notifications
@@ -59,7 +63,7 @@ final class LoginPresenter: LoginPresenterProtocol {
             
             do {
                 let encodedCookies = try JSONEncoder().encode(cookiesArray)
-                settingsService.setCookiesAsData(encodedCookies)
+                settings.setCookiesAsData(encodedCookies)
             } catch {
                 print("[ERROR] Failed to encode cookies in LoginPresenter")
             }
@@ -70,7 +74,7 @@ final class LoginPresenter: LoginPresenterProtocol {
                 }
             }
         } else if cookies.count != 0 {
-            settingsService.removeCookies()
+            settings.logout()
         }
     }
     
@@ -84,100 +88,96 @@ final class LoginPresenter: LoginPresenterProtocol {
         }
     }
     
-    func getCaptcha() {
-        networkService.getCaptcha { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                guard let captchaResponse = parsingService.parseCaptcha(from: response) else {
-                    view?.showError(message: R.string.localizable.alreadyLoggedIn())
-                    return
-                }
-                
-                self.loginData["captcha-time"] = captchaResponse.time
-                self.loginData["captcha-sig"] = captchaResponse.sig
-                
-                guard let url = URL(string: captchaResponse.url) else {
-                    view?.showError(message: R.string.localizable.captchaUploadingFailed())
-                    return
-                }
-                view?.updateCaptcha(fromURL: url)
-                
-            case .failure:
-                view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
-                
+    @MainActor
+    func getCaptcha() async {
+        do {
+            let response = try await authService.captcha()
+            
+            guard let captchaResponse = parser.parseCaptcha(from: response) else {
+                view?.showError(message: R.string.localizable.alreadyLoggedIn())
+                return
             }
+            
+            self.loginData["captcha-time"] = captchaResponse.time
+            self.loginData["captcha-sig"] = captchaResponse.sig
+            
+            guard let url = URL(string: captchaResponse.url) else {
+                view?.showError(message: R.string.localizable.captchaUploadingFailed())
+                return
+            }
+            view?.updateCaptcha(fromURL: url)
+            
+        } catch {
+            view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
         }
     }
     
-    func login() {
+    @MainActor
+    func login() async {
         view?.showLoading(true)
-        networkService.login(with: loginData) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                let parsed = parsingService.parseLogin(from: response)
+        
+        do {
+            let response = try await authService.login(multipart: loginData)
+            let parsed = parser.parseLogin(from: response)
+            
+            if parsed.loggedIn {
+                analytics.event(Event.Login.loginSuccess.rawValue)
+                let userId = parser.parseUserId(from: response)
+                await getUser(id: userId)
                 
-                if parsed.loggedIn {
-                    let userId = parsingService.parseUserId(from: response)
-                    getUser(id: userId)
-                    
-                    if let authKey = parsingService.parseAuthKey(from: response) {
-                        settingsService.setAuthKey(authKey)
-                    } else {
-                        print("[ERROR] Failed to retrieve auth key after successful login")
-                    }
-                    
+                if let authKey = parser.parseAuthKey(from: response) {
+                    settings.setAuthKey(authKey)
                 } else {
-                    guard let message = parsed.errorMessage else {
-                        // view?.showError(message: "Попробуйте ввести капчу еще раз")
-                        view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
-                        view?.clearCaptcha()
-                        getCaptcha()
-                        return
-                    }
-                    
-                    if message == "Введено неверное число с картинки. Попробуйте ещё раз." {
-                        view?.clearCaptcha()
-                        updateCaptcha(from: response)
-                    }
-                    view?.showError(message: message)
+                    print("[ERROR] Failed to retrieve auth key after successful login")
                 }
                 
-            case .failure:
-                getCaptcha()
-                view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
+            } else {
+                analytics.event(Event.Login.loginFailed.rawValue)
+                guard let message = parsed.errorMessage else {
+                    // view?.showError(message: "Попробуйте ввести капчу еще раз")
+                    view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
+                    view?.clearCaptcha()
+                    await getCaptcha()
+                    return
+                }
+                
+                if message == "Введено неверное число с картинки. Попробуйте ещё раз." {
+                    view?.clearCaptcha()
+                    updateCaptcha(from: response)
+                }
+                view?.showError(message: message)
             }
+        } catch {
+            view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
+            await getCaptcha()
         }
     }
     
-    private func getUser(id: String) {
-        networkService.getUser(id: id) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                let user = parsingService.parseUser(from: response)
-                
-                if let userData = try? JSONEncoder().encode(user) {
-                    settingsService.setUser(userData)
-                } else {
-                    print("[ERROR] Failed to encode user data after successful login")
-                }
-                
-                view?.showLoading(false)
-                view?.dismissLogin()
-                
-            case .failure:
-                getCaptcha()
-                view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
+    @MainActor
+    private func getUser(id: String) async {
+        do {
+            let response = try await userService.user(id: id)
+            let user = parser.parseUser(from: response)
+            
+            if let userData = try? JSONEncoder().encode(user) {
+                settings.setUser(userData)
+            } else {
+                print("[ERROR] Failed to encode user data after successful login")
             }
+            
+            view?.showLoading(false)
+            view?.dismissLogin()
+            
+        } catch {
+            view?.showError(message: R.string.localizable.loginFailedUnknownReasons())
+            await getCaptcha()
         }
     }
     
     // MARK: - Private Functions
     
     private func updateCaptcha(from htmlString: String) {
-        if let captchaResponse = parsingService.parseCaptcha(from: htmlString) {
+        if let captchaResponse = parser.parseCaptcha(from: htmlString) {
             loginData["captcha-time"] = captchaResponse.time
             loginData["captcha-sig"] = captchaResponse.sig
             view?.updateCaptcha(fromURL: URL(string: captchaResponse.url)!)

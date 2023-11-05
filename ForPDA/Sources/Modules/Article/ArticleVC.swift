@@ -16,15 +16,16 @@ protocol ArticleVCProtocol: AnyObject {
     func configureArticle(with elements: [ArticleElement])
     func reconfigureHeader()
     func makeComments(from page: String)
+    func updateComments(with document: String)
     func showError()
 }
 
-final class ArticleVC: PDAViewController<ArticleView> {
+final class ArticleVC: PDAViewControllerWithView<ArticleView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) private var analyticsService
-    @Injected(\.settingsService) private var settingsService
+    @Injected(\.analyticsService) private var analytics
+    @Injected(\.settingsService) private var settings
     
     private let presenter: ArticlePresenterProtocol
     private var commentsVC: CommentsVC?
@@ -45,8 +46,11 @@ final class ArticleVC: PDAViewController<ArticleView> {
         configureView()
         myView.delegate = self
         
+        // What's this if/else for? (todo)
         if presenter.article.url.contains("to/20") {
-            presenter.loadArticle()
+            Task {
+                await presenter.loadArticle()
+            }
         } else {
             myView.removeComments()
             let elements = ArticleBuilder.makeDefaultArticle(
@@ -67,7 +71,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     }
     
     private func configureView() {
-        NukeExtensions.loadImage(with: URL(string: presenter.article.info?.imageUrl), into: myView.articleImage) { result in
+        NukeExtensions.loadImage(with: presenter.article.info?.imageUrl, into: myView.articleImage) { result in
             // Добавляем оверлей если открываем не через deeplink (?)
             if (try? result.get()) != nil { self.myView.articleImage.addoverlay() }
         }
@@ -85,22 +89,22 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func copyAction() -> UIAction {
         UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
             UIPasteboard.general.string = presenter.article.url
-            analyticsService.copyArticleLink(presenter.article.url)
             SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
+            analytics.event(Event.Article.articleLinkCopied.rawValue)
         }
     }
     
     private func shareAction() -> UIAction {
         UIAction.make(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
             let activity = UIActivityViewController(activityItems: [presenter.article.url], applicationActivities: nil)
-            analyticsService.shareArticleLink(presenter.article.url)
             present(activity, animated: true)
+            analytics.event(Event.Article.articleLinkShared.rawValue)
         }
     }
     
     private func brokenAction() -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-            analyticsService.reportBrokenArticle(presenter.article.url)
+            analytics.event(Event.Article.articleLinkShared.rawValue)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
         }
     }
@@ -108,7 +112,7 @@ final class ArticleVC: PDAViewController<ArticleView> {
     private func externalLinkButtonTapped(_ link: String) {
         if let url = URL(string: link), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url)
-            analyticsService.clickButtonInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
+            analytics.event(Event.Article.articleButtonClicked.rawValue)
         }
     }
     
@@ -129,16 +133,16 @@ final class ArticleVC: PDAViewController<ArticleView> {
                 )
                 
             case let item as ImageElement:
-                articleElement = ArticleBuilder.addImage(url: item.url, description: item.description)
+                articleElement = ArticleBuilder.addImage(url: item.url.absoluteString, description: item.description)
                 
             case let item as VideoElement:
                 articleElement = ArticleBuilder.addVideo(id: item.url)
                 
             case let item as GifElement:
-                articleElement = ArticleBuilder.addGif(url: item.url)
+                articleElement = ArticleBuilder.addGif(url: item.url.absoluteString)
                 
             case let item as ButtonElement:
-                articleElement = ArticleBuilder.addButton(text: item.text, url: item.url) { [weak self] link in
+                articleElement = ArticleBuilder.addButton(text: item.text, url: item.url.absoluteString) { [weak self] link in
                     self?.externalLinkButtonTapped(link)
                 }
                 
@@ -198,27 +202,26 @@ extension ArticleVC: ArticleVCProtocol {
         alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
         present(alert, animated: true)
     }
+    
+    func updateComments(with document: String) {
+        commentsVC?.updateComments(with: document)
+    }
 }
 
 // MARK: - ArticleViewDelegate
 
 extension ArticleVC: ArticleViewDelegate {
+    
     func updateCommentsButtonTapped() {
-        commentsVC?.updateAll()
+        Task {
+            await presenter.updateComments()
+        }
     }
 }
 
 // MARK: - CommentsVCProtocol
 
 extension ArticleVC: CommentsVCProtocol {
-    func updateStarted() {
-        let image = UIImage(
-            systemSymbol: .arrowTriangle2Circlepath,
-            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
-        )
-        myView.updateCommentsButton.setImage(image, for: .normal)
-        myView.updateCommentsButton.rotate360Degrees(duration: 1, repeatCount: .infinity)
-    }
     
     func updateFinished(_ state: Bool) {
         let image = UIImage(
@@ -233,7 +236,8 @@ extension ArticleVC: CommentsVCProtocol {
 // MARK: - PDAResizingTextViewDelegate
 
 extension ArticleVC: PDAResizingTextViewDelegate {
+    
     func willOpenURL(_ url: URL) {
-        analyticsService.clickLinkInArticle(currentUrl: presenter.article.url, targetUrl: url.absoluteString)
+        analytics.event(Event.Article.articleLinkClicked.rawValue)
     }
 }

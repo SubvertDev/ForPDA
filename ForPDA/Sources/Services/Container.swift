@@ -10,21 +10,35 @@ import Factory
 
 extension Container {
     
-    var networkService: Factory<NetworkService> {
-        Factory(self) { NetworkService() }
+    // MARK: Network
+    
+    var newsService: Factory<NewsServicable> {
+        Factory(self) { NewsService() }
             .singleton
     }
+    
+    var authService: Factory<AuthServicable> {
+        Factory(self) { AuthService() }
+            .singleton
+    }
+    
+    var userService: Factory<UserServicable> {
+        Factory(self) { UserService() }
+            .singleton
+    }
+    
+    // MARK: Common
     
     var parsingService: Factory<ParsingService> {
         Factory(self) { ParsingService() }
     }
     
-    var analyticsService: Factory<AnalyticsService> {
-        Factory(self) { AnalyticsService(isDebug: AppScheme.isDebug) }
-    }
-    
     var settingsService: Factory<SettingsService> {
         Factory(self) { SettingsService() }
+    }
+    
+    var analyticsService: Factory<AnalyticsService> {
+        Factory(self) { AnalyticsService(isDebug: AppScheme.isDebug) }
     }
     
     var cookiesService: Factory<CookiesService> {

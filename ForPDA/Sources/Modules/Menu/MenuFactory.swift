@@ -16,12 +16,8 @@ final class MenuFactory: Factory {
         let presenter = MenuPresenter()
         let viewController = ViewController(presenter: presenter)
         presenter.view = viewController
-        // presenter.context = context
         
-        viewController.setTabBarItemWith(
-            title: R.string.localizable.menu(),
-            sfSymbol: .listDash
-        )
+        viewController.title = R.string.localizable.menu()
         
         return viewController
     }

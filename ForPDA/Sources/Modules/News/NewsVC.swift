@@ -10,16 +10,18 @@ import Factory
 import SwiftMessages
 import SFSafeSymbols
 
+import RouteComposer
+
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
     func showError()
 }
 
-final class NewsVC: PDAViewController<NewsView> {
+final class NewsVC: PDAViewControllerWithView<NewsView> {
     
     // MARK: - Properties
     
-    @Injected(\.analyticsService) private var analyticsService
+    @Injected(\.analyticsService) private var analytics
     
     private let presenter: NewsPresenterProtocol
 
@@ -33,38 +35,36 @@ final class NewsVC: PDAViewController<NewsView> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setDelegates()
+        configureNavBar()
+        
+        Task {
+            await presenter.loadArticles()
+        }
+    }
+    
+    // MARK: - Configuration
+    
+    private func setDelegates() {
         myView.delegate = self
         myView.tableView.delegate = self
         myView.tableView.dataSource = self
-        
-        presenter.loadArticles()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        showVersion03UpdateInfo()
+    private func configureNavBar() {
+        let button = UIBarButtonItem(
+            image: UIImage(systemSymbol: .listDash)
+                .withTintColor(.label, renderingMode: .alwaysOriginal),
+            style: .plain,
+            target: self,
+            action: #selector(menuButtonTapped)
+        )
+        navigationItem.rightBarButtonItem = button
     }
     
-    // todo Удалить после релиза 0.4
-    private func showVersion03UpdateInfo() {
-        let updateHasShown = "hasShownVersion03UpdateInfo"
-        if !UserDefaults.standard.bool(forKey: updateHasShown) {
-            UserDefaults.standard.set(true, forKey: updateHasShown)
-            let alert = UIAlertController(
-                title: R.string.localizable.update03(),
-                message: R.string.localizable.update03Text(),
-                preferredStyle: .alert
-            )
-            let enableAction = UIAlertAction(title: R.string.localizable.update03EnableExtension(), style: .cancel) { _ in
-                if let url = URL(string: "App-Prefs:SAFARI&path=WEB_EXTENSIONS/") {
-                    UIApplication.shared.open(url)
-                }
-            }
-            let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default)
-            alert.addAction(enableAction)
-            alert.addAction(okAction)
-            present(alert, animated: true)
-        }
+    @objc private func menuButtonTapped() {
+        presenter.menuButtonTapped()
+        analytics.event(Event.News.menuOpen.rawValue)
     }
 }
 
@@ -110,13 +110,18 @@ extension NewsVC: NewsVCProtocol {
 // MARK: - NewsView Delegate
 
 extension NewsVC: NewsViewDelegate {
+    
     func refreshButtonTapped() {
         myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
-        presenter.loadArticles()
+        Task {
+            await presenter.loadArticles()
+        }
     }
     
     func refreshControlCalled() {
-        presenter.refreshArticles()
+        Task {
+            await presenter.refreshArticles()
+        }
     }
 }
 
@@ -126,10 +131,7 @@ extension NewsVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        // Check if non-skeleton table is shown
-        guard presenter.articles.count - 1 >= indexPath.row else { return }
-        analyticsService.openArticleEvent(presenter.articles[indexPath.row].url)
+        analytics.event(Event.News.articleOpen.rawValue)
         presenter.showArticle(at: indexPath)
     }
     
@@ -146,23 +148,23 @@ extension NewsVC: UITableViewDelegate {
     private func copyAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
             UIPasteboard.general.string = article.url
-            analyticsService.copyArticleLink(article.url)
             SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
+            analytics.event(Event.News.newsLinkCopied.rawValue)
         }
     }
     
     private func shareAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.shareLink(), symbol: .arrowTurnUpRight) { [unowned self] _ in
             let activity = UIActivityViewController(activityItems: [article.url], applicationActivities: nil)
-            analyticsService.shareArticleLink(article.url)
             present(activity, animated: true)
+            analytics.event(Event.News.newsLinkShared.rawValue)
         }
     }
     
     private func reportAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-            analyticsService.reportBrokenArticle(article.url)
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
+            analytics.event(Event.News.newsReport.rawValue)
         }
     }
 }

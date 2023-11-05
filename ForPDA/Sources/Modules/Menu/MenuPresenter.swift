@@ -19,7 +19,8 @@ final class MenuPresenter: MenuPresenterProtocol {
     
     // MARK: - Properties
     
-    @LazyInjected(\.settingsService) private var settingsService
+    @Injected(\.analyticsService) private var analytics
+    @LazyInjected(\.settingsService) private var settings
         
     weak var view: MenuVCProtocol?
     
@@ -29,23 +30,11 @@ final class MenuPresenter: MenuPresenterProtocol {
         ]),
         
         MenuSection(options: [
-            .staticCell(model: MenuOption(title: R.string.localizable.news(),
-                                          icon: .newspaperFill, handler: showNewsScreen)),
-            
-//            .staticCell(model: MenuOption(title: R.string.localizable.search(),
-//                                          icon: .magnifyingglass, handler: showSearchScreen)),
-            
-            .staticCell(model: MenuOption(title: R.string.localizable.forum(),
-                                          icon: .bubbleLeftAndBubbleRightFill, handler: showForumScreen)),
-            
             .staticCell(model: MenuOption(title: R.string.localizable.history(),
                                           icon: .clockArrowCirclepath, handler: showDefaultError)),
             
             .staticCell(model: MenuOption(title: R.string.localizable.bookmarks(),
                                           icon: .bookmarkFill, handler: showDefaultError))
-            
-//            .staticCell(model: MenuOption(title: R.string.localizable.forumRules(),
-//                                          icon: .bookFill, handler: {}))
         ]),
         
         MenuSection(options: [
@@ -76,7 +65,7 @@ final class MenuPresenter: MenuPresenterProtocol {
     // MARK: - Lifecycle
     
     init() {
-        if let userData = settingsService.getUser() {
+        if let userData = settings.getUser() {
             user = try? JSONDecoder().decode(User.self, from: userData)
         }
         
@@ -86,7 +75,7 @@ final class MenuPresenter: MenuPresenterProtocol {
     // MARK: - Notifications
     
     @objc private func userDidChange() {
-        if let userData = settingsService.getUser() {
+        if let userData = settings.getUser() {
             user = try? JSONDecoder().decode(User.self, from: userData)
         } else {
             user = nil
@@ -101,24 +90,28 @@ final class MenuPresenter: MenuPresenterProtocol {
     private func showAuthor() {
         guard let url = URL(string: Links.authorPDA) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
+        analytics.event(Event.Menu.author4PDAOpen.rawValue)
         UIApplication.shared.open(url)
     }
     
     private func openTelegramNews() {
         guard let url = URL(string: Links.telegramNews) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
+        analytics.event(Event.Menu.newsTelegramOpen.rawValue)
         UIApplication.shared.open(url)
     }
     
     private func openTelegramChat() {
         guard let url = URL(string: Links.telegramChat) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
+        analytics.event(Event.Menu.chatTelegramOpen.rawValue)
         UIApplication.shared.open(url)
     }
     
     private func openGithub() {
         guard let url = URL(string: Links.github) else { return }
         guard UIApplication.shared.canOpenURL(url) else { return }
+        analytics.event(Event.Menu.githubOpen.rawValue)
         UIApplication.shared.open(url)
     }
     
@@ -129,18 +122,12 @@ final class MenuPresenter: MenuPresenterProtocol {
     // MARK: - Navigation
     
     func showLoginOrProfileScreen() {
+        // Analytics for this one are inside LoginInterceptor
         try? DefaultRouter().navigate(to: RouteMap.profileScreen, with: nil)
     }
     
-    private func showNewsScreen() {
-        try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
-    }
-    
-    private func showForumScreen() {
-        try? DefaultRouter().navigate(to: RouteMap.forumScreen, with: nil)
-    }
-    
     private func showSettingsScreen() {
+        analytics.event(Event.Menu.settingsOpen.rawValue)
         try? DefaultRouter().navigate(to: RouteMap.settingsScreen, with: nil)
     }
     

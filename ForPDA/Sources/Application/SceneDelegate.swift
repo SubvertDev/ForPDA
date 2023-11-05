@@ -13,50 +13,62 @@ import WebKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     @Injected(\.settingsService) private var settingsService
+    @Injected(\.cookiesService) private var cookiesService
     
     var window: UIWindow?
     
-    var webView: WKWebView!
+    var webView: WKWebView = {
+        let config = WKWebViewConfiguration()
+        let webView = WKWebView(frame: .zero, configuration: config)
+        webView.tag = 666
+        return webView
+    }()
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         self.window = UIWindow(windowScene: windowScene)
         
         window?.rootViewController = UIViewController()
+        window?.addSubview(webView)
         window?.makeKeyAndVisible()
         
         overrideApplicationThemeStyle(with: settingsService.getAppTheme())
-        configureWKWebView()
-        
-        if let url = connectionOptions.urlContexts.first?.url {
+        cookiesService.syncCookies()
+        handleNavigation(to: connectionOptions.urlContexts.first?.url)
+    }
+}
+
+extension SceneDelegate {
+    
+    // MARK: - Navigation
+    
+    private func handleNavigation(to url: URL?) {
+        if let url {
             // Cold start deeplink
             handleDeeplinkUrl(url)
         } else {
-            try? DefaultRouter().navigate(to: RouteMap.tabBarScreen, with: nil)
+            // Handle all 'try?' on routers? (todo)
+            // Wrong link is not showing anything (todo)
+            let testLink = "" // format starts/ends with slash: /2023/../../....../
+            if testLink.isEmpty {
+                try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
+            } else {
+                // Testing purposes only
+                handleDeeplinkUrl(URL(string: "forpda://article\(testLink)")!)
+            }
         }
     }
     
     private func handleDeeplinkUrl(_ url: URL) {
         if url.absoluteString == "forpda://article//" {
-            // Если share в браузере не сработал, то открываем новости
-            // todo обработать нормально
+            // If share didn't work in browser, fallback to news (also bug with share inside app) (todo)
             try? DefaultRouter().navigate(to: RouteMap.newsScreen, with: nil)
         } else {
+            settingsService.setIsDeeplinking(to: true)
             let id = url.absoluteString.components(separatedBy: "article/")[1]
-            let url = "https://4pda.to/\(id)"
+            let url = URL.fourpda.absoluteString + id
             let article = Article(url: url, info: nil)
-            try? DefaultRouter().navigate(to: RouteMap.articleScreen, with: article)
-        }
-    }
-    
-    private func configureWKWebView() {
-        let config = WKWebViewConfiguration()
-        webView = WKWebView(frame: .zero, configuration: config)
-        webView.tag = 666
-        window?.addSubview(webView)
-        
-        for cookie in HTTPCookieStorage.shared.cookies ?? [] {
-            WKWebsiteDataStore.default().httpCookieStore.setCookie(cookie)
+            try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
         }
     }
     
@@ -67,18 +79,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
     
-    func sceneDidDisconnect(_ scene: UIScene) { }
-
-    func sceneDidBecomeActive(_ scene: UIScene) { }
-
-    func sceneWillResignActive(_ scene: UIScene) { }
-
-    func sceneWillEnterForeground(_ scene: UIScene) { }
-
-    func sceneDidEnterBackground(_ scene: UIScene) { }
-}
-
-extension SceneDelegate {
+    // MARK: - Themes
+    
     func overrideApplicationThemeStyle(with theme: AppTheme) {
        window?.overrideUserInterfaceStyle = UIUserInterfaceStyle(rawValue: theme.ordinal())!
     }

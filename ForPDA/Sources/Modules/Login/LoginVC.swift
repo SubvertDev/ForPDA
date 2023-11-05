@@ -18,7 +18,7 @@ protocol LoginVCProtocol: AnyObject {
     func dismissLogin()
 }
 
-final class LoginVC: PDAViewController<LoginView> {
+final class LoginVC: PDAViewControllerWithView<LoginView> {
     
     // MARK: - Properties
     
@@ -27,8 +27,8 @@ final class LoginVC: PDAViewController<LoginView> {
     var interceptorCompletionBlock: ((_: RoutingResult) -> Void)? {
         willSet {
             guard let completion = interceptorCompletionBlock else { return }
-            completion(.failure(RoutingError.generic(.init("New completion block was set. " +
-                    "Previous navigation process should be halted."))))
+            let description = "New completion block was set. Previous navigation process should be halted."
+            completion(.failure(RoutingError.generic(.init(description))))
         }
     }
     
@@ -46,12 +46,13 @@ final class LoginVC: PDAViewController<LoginView> {
         configureActions()
         configureNavBar()
         
-        presenter.getCaptcha()
+        Task {
+            await presenter.getCaptcha()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: true)
         if isMovingFromParent {
             interceptorCompletionBlock?(.failure(FailingRouterIgnoreError(
                 underlyingError: RoutingError.generic(.init("User tapped back button")))))
@@ -107,52 +108,47 @@ final class LoginVC: PDAViewController<LoginView> {
 extension LoginVC: LoginVCProtocol {
     
     func updateCaptcha(fromURL url: URL) {
-        DispatchQueue.main.async {
-            NukeExtensions.loadImage(with: url, into: self.myView.captchaImageView) { [weak self] _ in
-                guard let self else { return }
-                if UIScreen.main.traitCollection.userInterfaceStyle.rawValue == 2 {
-                    invertImage()
-                }
+        NukeExtensions.loadImage(with: url, into: myView.captchaImageView) { [weak self] _ in
+            guard let self else { return }
+            if UIScreen.main.traitCollection.userInterfaceStyle.rawValue == 2 {
+                invertImage()
             }
         }
     }
     
     func clearCaptcha() {
-        DispatchQueue.main.async {
-            self.myView.captchaTextField.text = nil
-        }
+        myView.captchaTextField.text = nil
     }
     
     func showError(message: String) {
-        DispatchQueue.main.async {
-            self.myView.errorMessageLabel.text = message
-            self.showLoading(false)
-        }
+        myView.errorMessageLabel.text = message
+        showLoading(false)
     }
     
     func showLoading(_ state: Bool) {
-        DispatchQueue.main.async {
-            self.navigationController?.navigationBar.isUserInteractionEnabled = !state
-            self.navigationController?.navigationBar.tintColor = state ? .gray : .systemBlue
-            self.myView.loginButton.showLoading(state)
-        }
+        navigationController?.navigationBar.isUserInteractionEnabled = !state
+        navigationController?.navigationBar.tintColor = state ? .gray : .label
+        myView.loginButton.showLoading(state)
     }
     
     func dismissLogin() {
-        DispatchQueue.main.async {
-            self.interceptorCompletionBlock?(.success)
-        }
+        interceptorCompletionBlock?(.success)
     }
 }
 
 // MARK: - LoginViewDelegate
 
 extension LoginVC: LoginViewDelegate {
+    
     func loginTapped() {
-        presenter.login()
+        Task {
+            await presenter.login()
+        }
     }
     
     func captchaImageTapped() {
-        presenter.getCaptcha()
+        Task {
+            await presenter.getCaptcha()
+        }
     }
 }

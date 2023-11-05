@@ -7,7 +7,5 @@
 //  swiftlint:disable identifier_name
 
 enum AppLanguage: String {
-    case auto
-    case ru
-    case en
+    case en, ru
 }

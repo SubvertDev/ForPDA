@@ -7,12 +7,14 @@
 
 import Foundation
 
+// Refactor this struct (todo)
+
 struct MultipartFormDataRequest {
     private let boundary: String = UUID().uuidString
     private var httpBody = NSMutableData()
-    let url: URL
+    let url: URL?
     
-    init(url: URL) {
+    init(url: URL? = nil) {
         self.url = url
     }
     
@@ -51,7 +53,7 @@ struct MultipartFormDataRequest {
     }
     
     func asURLRequest() -> URLRequest {
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: url!)
         
         request.httpMethod = "POST"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -59,6 +61,16 @@ struct MultipartFormDataRequest {
         httpBody.append("--\(boundary)--")
         request.httpBody = httpBody as Data
         return request
+    }
+    
+    func modifyRequest(_ request: inout URLRequest, with multipart: [String: String]) {
+        for (key, value) in multipart {
+            addTextField(named: key, value: value)
+        }
+        
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        httpBody.append("--\(boundary)--")
+        request.httpBody = httpBody as Data
     }
 }
 

@@ -15,6 +15,14 @@ extension URL {
         return URL(string: "https://4pda.to/page/\(page)/")!
     }
     
+    static func githubRelease() -> URL {
+        if let marketingVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+            return URL(string: "https://github.com/SubvertDev/ForPDA/releases/tag/v\(marketingVersion)/")!
+        } else {
+            return URL(string: "https://github.com/SubvertDev/ForPDA/")!
+        }
+    }
+    
     func stripLastURLComponent() -> URL {
         var newUrl = self
         newUrl.deleteLastPathComponent()

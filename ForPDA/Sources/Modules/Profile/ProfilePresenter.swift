@@ -4,7 +4,6 @@
 //
 //  Created by Subvert on 23.05.2023.
 //
-// swiftlint:disable force_try
 
 import Foundation
 import Factory
@@ -12,18 +11,20 @@ import Factory
 protocol ProfilePresenterProtocol {
     var user: User? { get }
     
-    func getUser()
-    func logout()
+    func getUser() async
+    func logout() async
 }
 
 final class ProfilePresenter: ProfilePresenterProtocol {
     
     // MARK: - Properties
     
-    @Injected(\.networkService) private var networkService
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
-    
+    @Injected(\.userService) private var userService
+    @Injected(\.authService) private var authService
+    @Injected(\.parsingService) private var parser
+    @Injected(\.settingsService) private var settings
+    @Injected(\.analyticsService) private var analytics
+
     weak var view: ProfileVCProtocol?
     
     var user: User?
@@ -31,7 +32,7 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     // MARK: - Lifecycle
     
     init() {
-        guard let userData = settingsService.getUser(),
+        guard let userData = settings.getUser(),
               let user = try? JSONDecoder().decode(User.self, from: userData) else {
             print("[ERROR] Tried to open profile without user data / failed decoding")
             view?.dismissProfile()
@@ -42,58 +43,56 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     
     // MARK: - Public Functions
     
-    func getUser() {
+    @MainActor
+    func getUser() async {
         guard let user else {
             print("[ERROR] Tried to get user without user data")
             view?.dismissProfile()
             return
         }
-        networkService.getUser(id: user.id) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                let user = parsingService.parseUser(from: response)
-                self.user = user
-                
-                let userData = try! JSONEncoder().encode(user)
-                settingsService.setUser(userData)
-                
-                view?.updateUser(with: user)
-                
-            case .failure(let failure):
-                print("[ERROR] Failed to get user \(failure.localizedDescription)")
-                view?.dismissProfile()
-            }
+        
+        do {
+            let response = try await userService.user(id: user.id)
+            let user = parser.parseUser(from: response)
+            self.user = user
+            
+            let userData = try JSONEncoder().encode(user)
+            settings.setUser(userData)
+            
+            view?.updateUser(with: user)
+        } catch {
+            print("[ERROR] Failed to get user \(error)")
+            view?.dismissProfile()
         }
     }
     
-    func logout() {
-        guard let key = settingsService.getAuthKey() else {
+    @MainActor
+    func logout() async {
+        guard let key = settings.getAuthKey() else {
             print("[ERROR] Failed to retrieve key for profile")
             view?.showError(message: R.string.localizable.somethingWentWrong())
             return
         }
+        
         view?.showLoading(true)
-        networkService.logout(key: key) { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .success(let response):
-                let isLoggedIn = parsingService.parseIsLoggedIn(from: response)
-                
-                if isLoggedIn {
-                    view?.showError(message: R.string.localizable.somethingWentWrong())
-                } else {
-                    settingsService.removeCookies()
-                    settingsService.removeAuthKey()
-                    settingsService.removeUser()
-                    view?.dismissProfile()
-                }
-                
-            case .failure(let failure):
-                print("[ERROR] Failed to get user \(failure.localizedDescription)")
+        
+        do {
+            let response = try await authService.logout(key: key)
+            let isLoggedIn = parser.parseIsLoggedIn(from: response)
+            
+            if isLoggedIn {
                 view?.showError(message: R.string.localizable.somethingWentWrong())
+            } else {
+                settings.logout()
+                view?.dismissProfile()
+                analytics.event(Event.Profile.profileLogout.rawValue)
             }
-            view?.showLoading(false)
+            
+        } catch {
+            print("[ERROR] Failed to get user \(error)")
+            view?.showError(message: R.string.localizable.somethingWentWrong())
         }
+        
+        view?.showLoading(false)
     }
 }

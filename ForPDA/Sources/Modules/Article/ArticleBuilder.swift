@@ -21,7 +21,7 @@ final class ArticleBuilder {
         if description.contains("Узнать подробнее") { description.removeLast(16) }
         return [
             TextElement(text: description),
-            ButtonElement(text: R.string.localizable.learnMore(), url: url)
+            ButtonElement(text: R.string.localizable.learnMore(), url: URL(string: url)!)
         ]
     }
     
@@ -172,7 +172,8 @@ final class ArticleBuilder {
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 10
         button.clipsToBounds = true
-        button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
+        // Remake with configuration (todo)
+        // button.contentEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
                 
         let container = UIView()
         container.addSubview(button)

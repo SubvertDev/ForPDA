@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1420"
+   LastUpgradeVersion = "1500"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -9,7 +9,7 @@
          <ExecutionAction
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
-               title = "Run Script"
+               title = "Generate build phase file lists"
                scriptText = "cd $SOURCE_ROOT&#10;${SOURCE_ROOT}/swiftlint/swiftlint_helper.sh&#10;">
                <EnvironmentBuildable>
                   <BuildableReference
