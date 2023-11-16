@@ -15,6 +15,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
+### ios ipa
+
+```sh
+[bundle exec] fastlane ios ipa
+```
+
+Make unsigned IPA
+
 ### ios beta
 
 ```sh

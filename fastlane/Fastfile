@@ -38,10 +38,6 @@ platform :ios do
             target: 'OpenInAppExtension'
         )
 
-	# get_certificates
-
-	# get_provisioning_profile
-
         build_app(
             scheme: "ForPDA",
             output_directory: "build/",
