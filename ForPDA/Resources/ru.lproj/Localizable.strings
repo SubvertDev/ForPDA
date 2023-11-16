@@ -72,6 +72,8 @@
 "background.dark" = "Темный";
 "background.black" = "Черный";
 "advanced" = "Продвинутые";
+"safari.extension" = "Расширение для Safari";
+"safari.extension.enable" = "Включить";
 "fast.loading.system" = "Быстрая загрузка новостей";
 "fast.loading.system.warning" = "При активации этой функции статьи могут обновляться с задержкой, отображать неверное количество комментариев, а лайки в статьях не отображаться";
 "comments.show.likes" = "Отображать лайки";

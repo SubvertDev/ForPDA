@@ -51,6 +51,7 @@ enum Event {
         case themeChanged
         case nightModeOpen
         case nightModeChanged
+        case showSafariExtensions
         case fastLoadingSystemChanged
         case showLikesChanged
         case openGithubRelease

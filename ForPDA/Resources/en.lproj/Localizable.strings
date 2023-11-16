@@ -72,6 +72,8 @@
 "background.dark" = "Dark";
 "background.black" = "Black";
 "advanced" = "Advanced";
+"safari.extension" = "Safari Extension";
+"safari.extension.enable" = "Enable";
 "fast.loading.system" = "Fast loading news";
 "fast.loading.system.warning" = "After activiting this option latest news may not load and show wrong amount of comments, and likes may not appear in articles";
 "comments.show.likes" = "Show likes";
