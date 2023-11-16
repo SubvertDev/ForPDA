@@ -27,6 +27,7 @@ extension NewArticleVC {
         case button(ArticleButtonCellModel)
         case bulletList(ArticleBulletListCellModel)
         // case quiz?
+        case comments(ArticleCommentsCellModel)
     }
     
     // MARK: - Make
@@ -34,7 +35,8 @@ extension NewArticleVC {
     func makeDataSource() -> DataSource {
         let dataSource = DataSource(
             collectionView: collectionView
-        ) { collectionView, indexPath, itemIdentifier in
+        ) { [weak self] collectionView, indexPath, itemIdentifier in
+            guard let self else { return UICollectionViewCell() }
             switch itemIdentifier {
             case .text(let model):
                 let cell = collectionView.reuse(ArticleTextCell.self, indexPath)
@@ -64,26 +66,57 @@ extension NewArticleVC {
                 let cell = collectionView.reuse(ArticleBulletListCell.self, indexPath)
                 cell.configure(model: model)
                 return cell
+            case .comments(let model):
+                let cell = collectionView.reuse(ArticleCommentsCell.self, indexPath)
+                cell.configure(model: model)
+                cell.delegate = self
+                return cell
             }
         }
         
         dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
             guard let self, kind == UICollectionView.elementKindSectionHeader else { return nil }
             
-            let view = collectionView.dequeueReusableSupplementaryView(
-                ofKind: kind,
-                withReuseIdentifier: ArticleHeaderReusableView.reuseIdentifier,
-                for: indexPath
-            ) as? ArticleHeaderReusableView
-            
-            let model = ArticleHeaderViewModel(
-                imageUrl: presenter.article.info?.imageUrl,
-                title: presenter.article.info?.title
-            )
-            
-            view?.configure(model: model)
-            
-            return view
+            switch indexPath.section {
+            // Article Header
+            case 0:
+                let view = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: ArticleHeaderReusableView.identifier,
+                    for: indexPath
+                ) as? ArticleHeaderReusableView
+                
+                let model = ArticleHeaderViewModel(
+                    imageUrl: presenter.article.info?.imageUrl,
+                    title: presenter.article.info?.title
+                )
+                
+                view?.configure(model: model)
+                
+                return view
+                
+            // Comments Header
+            case 1:
+                let view = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: kind,
+                    withReuseIdentifier: ArticleCommentsReusableView.identifier,
+                    for: indexPath
+                ) as? ArticleCommentsReusableView
+                
+                let model = ArticleCommentsReusableViewModel(
+                    amount: Int(presenter.article.info?.commentAmount ?? "0") ?? 0
+                )
+                
+                view?.configure(model: model)
+                view?.delegate = self
+                commentsHeaderInput = view
+                
+                return view
+                
+            default:
+                return nil
+            }
+
         }
         
         return dataSource
@@ -91,10 +124,18 @@ extension NewArticleVC {
     
     // MARK: - Update
     
-    func update(elements: [ArticleElement] = [], animated: Bool = true) {
+    func update(elements: [ArticleElement] = [], comments: [Comment] = [], animated: Bool = true) {
         var snapshot = Snapshot()
-//        snapshot.appendSections(Section.allCases)
-        snapshot.appendSections([Section.article])
+        
+        if !comments.isEmpty {
+            snapshot.appendSections(Section.allCases)
+
+            let model = ArticleCommentsCellModel(comments: comments)
+            let commentsItem = Item.comments(model)
+            snapshot.appendItems([commentsItem], toSection: .comments)
+        } else {
+            snapshot.appendSections([.article])
+        }
         
         for element in elements {
             switch element {

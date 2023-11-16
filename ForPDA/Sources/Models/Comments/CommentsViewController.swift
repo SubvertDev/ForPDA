@@ -53,6 +53,8 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     
     open var swipeActionAppearance = SwipeActionAppearance()
     
+    open var showOrHideOnTap: Bool = true
+    
     open var fullyExpanded: Bool = false {
         didSet {
             if fullyExpanded {
@@ -119,6 +121,8 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     }
     
     override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard showOrHideOnTap else { return }
+        
         let selectedCom: AbstractComment = _currentlyDisplayed[indexPath.row]
         let selectedIndex = indexPath.row
         

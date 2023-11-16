@@ -13,6 +13,7 @@ extension NewArticleVC {
         
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
             
+            // Cells sizes
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
@@ -34,18 +35,29 @@ extension NewArticleVC {
             
             let section = NSCollectionLayoutSection(group: containerGroup)
             
+            // Headers sizes
+            let headerSize: NSCollectionLayoutSize
+            
             if sectionIndex == 0 {
-                let headerFooterSize = NSCollectionLayoutSize(
+                headerSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1.0),
                     heightDimension: .fractionalWidth(0.6)
                 )
-                let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-                    layoutSize: headerFooterSize,
-                    elementKind: UICollectionView.elementKindSectionHeader,
-                    alignment: .top
+            } else if sectionIndex == 1 {
+                headerSize = NSCollectionLayoutSize(
+                    widthDimension: .fractionalWidth(1.0),
+                    heightDimension: .estimated(42)
                 )
-                section.boundarySupplementaryItems = [sectionHeader]
+            } else {
+                headerSize = NSCollectionLayoutSize(widthDimension: .absolute(0), heightDimension: .absolute(0))
             }
+            
+            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: headerSize,
+                elementKind: UICollectionView.elementKindSectionHeader,
+                alignment: .top
+            )
+            section.boundarySupplementaryItems = [sectionHeader]
             
             return section
             

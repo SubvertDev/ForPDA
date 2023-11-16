@@ -7,91 +7,65 @@
 
 import UIKit
 import Factory
-import SwiftSoup
-import WebKit
 
 protocol CommentsVCProtocol: AnyObject {
-    func updateFinished(_ state: Bool)
+    func tableViewHeightChanged(_ height: CGFloat)
 }
-
-// Refactor this controller (todo)
 
 final class CommentsVC: CommentsViewController {
     
     // MARK: - Properties
     
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
+    @Injected(\.settingsService) private var settings
     
     private var allComments: [Comment] = []
-    private let article: Article
-    private let document: String
-    
+    private var previousHeight: CGFloat = 0
     private var contentSizeObserver: NSKeyValueObservation!
-    private lazy var themeColor = settingsService.getAppBackgroundColor()
+    private var throttleTimer: Timer?
+    private var gotComments = false
+    private lazy var themeColor = settings.getAppBackgroundColor()
     
     weak var updateDelegate: CommentsVCProtocol?
-            
+    
     // MARK: - Lifecycle
-    
-    init(article: Article, document: String) {
-        self.article = article
-        self.document = document
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.register(cellWithClass: ArticleCommentCell.self)
         
-        getComments()
+        showOrHideOnTap = false
+        
         setupNotifications()
+        
+        contentSizeObserver = tableView.observe(\.contentSize, options: .new) { [weak self] tableView, change in
+            guard let self else { return }
+            if let size = change.newValue, size.height != 0, size.height > previousHeight {
+                previousHeight = size.height
+                startThrottler()
+            }
+        }
     }
     
     // MARK: - Public Functions
     
-    func updateComments(with document: String) {
-        tableView.isUserInteractionEnabled = false
-        _currentlyDisplayed.removeAll()
+    func getComments(_ comments: [Comment]) {
+        guard !gotComments else { return }
+        gotComments = true
         
-        Task(priority: .background) {
-            let newComments = self.parsingService.parseComments(from: document)
-            allComments = newComments
-            currentlyDisplayed = self.allComments
-            
-            Task(priority: .userInitiated) {
-                updateDelegate?.updateFinished(true)
-                tableView.reloadData()
-                tableView.isUserInteractionEnabled = true
-            }
-        }
+        allComments = comments
+        currentlyDisplayed = allComments
+        fullyExpanded = true
+        tableView.reloadData()
+        
+        // Initial calculation based on smallest cell to minimize amount of size guessing
+        let commentsAmount = Comment.countTotalComments(comments)
+        let initialHeight = CGFloat(commentsAmount * 57)
+        previousHeight = initialHeight
+        tableView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: initialHeight)
     }
     
     // MARK: - Private Functions
-    
-    private func getComments() {
-        allComments = parsingService.parseComments(from: document)
-        
-        currentlyDisplayed = allComments
-        fullyExpanded = true
-        
-        tableView.snp.makeConstraints { make in
-            make.height.equalTo(100)
-        }
-        
-        contentSizeObserver = tableView.observe(\.contentSize, options: .new) { tableView, change in
-            if let size = change.newValue {
-                tableView.snp.updateConstraints { make in
-                    make.height.equalTo(size.height)
-                }
-            }
-        }
-    }
     
     private func setupNotifications() {
         NotificationCenter.default.addObserver(
@@ -104,9 +78,20 @@ final class CommentsVC: CommentsViewController {
         if let object = notification.object as? AppNightModeBackgroundColor {
             themeColor = object
         } else {
-            themeColor = settingsService.getAppBackgroundColor()
+            themeColor = settings.getAppBackgroundColor()
         }
         tableView.reloadData()
+    }
+    
+    private func startThrottler() {
+        let throttleTime = settings.getShowLikesInComments() ? 0.5 : 0.1
+        throttleTimer?.invalidate()
+        throttleTimer = nil
+        throttleTimer = Timer.scheduledTimer(withTimeInterval: throttleTime, repeats: false) { [weak self] _ in
+            guard let self else { return }
+            updateDelegate?.tableViewHeightChanged(previousHeight)
+        }
+        RunLoop.main.add(throttleTimer!, forMode: .common)
     }
     
     // MARK: - TableView DataSource
@@ -131,4 +116,5 @@ final class CommentsVC: CommentsViewController {
             cell.commentMarginColor = .tertiarySystemGroupedBackground
         }
     }
+    
 }

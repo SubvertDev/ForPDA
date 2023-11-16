@@ -9,6 +9,13 @@ import UIKit
 
 extension UIView {
     
+    static var identifier: String {
+        String(describing: self)
+    }
+}
+
+extension UIView {
+    
     func addoverlay(color: UIColor = .black, alpha: CGFloat = 0.3) {
         let overlay = UIView()
         overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]

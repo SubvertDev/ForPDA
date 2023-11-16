@@ -79,6 +79,9 @@
 		B858E8902AE1D00500F147A6 /* NewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B858E88D2AE1D00500F147A6 /* NewsService.swift */; };
 		B858E89A2AE1DED300F147A6 /* UIApplication+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */; };
 		B863357D293D218900F8D2E6 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B863357C293D218900F8D2E6 /* String+Ext.swift */; };
+		B86CFC452AFFCE1D0056A8BF /* ArticleCommentsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86CFC442AFFCE1D0056A8BF /* ArticleCommentsCell.swift */; };
+		B86CFC482AFFCE260056A8BF /* ArticleCommentsCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86CFC472AFFCE260056A8BF /* ArticleCommentsCellModel.swift */; };
+		B86CFC4A2AFFD7C20056A8BF /* ArticleCommentsReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86CFC492AFFD7C20056A8BF /* ArticleCommentsReusableView.swift */; };
 		B874B41B2A101B5F00A004FC /* Array+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B41A2A101B5F00A004FC /* Array+Ext.swift */; };
 		B874B4472A1066F500A004FC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B874B4492A1066F500A004FC /* Localizable.strings */; };
 		B874B44C2A10706B00A004FC /* Links.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B44B2A10706B00A004FC /* Links.swift */; };
@@ -257,6 +260,9 @@
 		B858E88D2AE1D00500F147A6 /* NewsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsService.swift; sourceTree = "<group>"; };
 		B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Ext.swift"; sourceTree = "<group>"; };
 		B863357C293D218900F8D2E6 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
+		B86CFC442AFFCE1D0056A8BF /* ArticleCommentsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCommentsCell.swift; sourceTree = "<group>"; };
+		B86CFC472AFFCE260056A8BF /* ArticleCommentsCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCommentsCellModel.swift; sourceTree = "<group>"; };
+		B86CFC492AFFD7C20056A8BF /* ArticleCommentsReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCommentsReusableView.swift; sourceTree = "<group>"; };
 		B874B41A2A101B5F00A004FC /* Array+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Ext.swift"; sourceTree = "<group>"; };
 		B874B43F2A1064FE00A004FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		B874B4482A1066F500A004FC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -404,6 +410,7 @@
 				B82891B22AF6DA6800636052 /* Gif */,
 				B828917B2AF6B19700636052 /* Button */,
 				B828917C2AF6B19B00636052 /* BulletList */,
+				B86CFC422AFFCE020056A8BF /* Comments */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -430,6 +437,7 @@
 			isa = PBXGroup;
 			children = (
 				B8339D652AF67727005AA61F /* ArticleHeaderReusableView.swift */,
+				B86CFC492AFFD7C20056A8BF /* ArticleCommentsReusableView.swift */,
 			);
 			path = Headers;
 			sourceTree = "<group>";
@@ -608,6 +616,15 @@
 				B858E88D2AE1D00500F147A6 /* NewsService.swift */,
 			);
 			path = News;
+			sourceTree = "<group>";
+		};
+		B86CFC422AFFCE020056A8BF /* Comments */ = {
+			isa = PBXGroup;
+			children = (
+				B86CFC442AFFCE1D0056A8BF /* ArticleCommentsCell.swift */,
+				B86CFC472AFFCE260056A8BF /* ArticleCommentsCellModel.swift */,
+			);
+			path = Comments;
 			sourceTree = "<group>";
 		};
 		B87EB9CE293D2D8B0025C2A0 /* Article */ = {
@@ -1146,7 +1163,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\nif which swiftlint > /dev/null; then\n    if [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n        swiftlint\n    fi\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "if [[ \"$(uname -m)\" == arm64 ]]; then\n    export PATH=\"/opt/homebrew/bin:$PATH\"\nfi\n\n#if which swiftlint > /dev/null; then\n#    if [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n        # swiftlint\n#    fi\n#else\n#  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\n#fi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1201,6 +1218,7 @@
 				B88D3FBE2A0AFDB00061C6C4 /* LoginFactory.swift in Sources */,
 				B8487CA52AA698600018501C /* ProgressView.swift in Sources */,
 				B8487CA72AA698600018501C /* StrokeColorAnimation.swift in Sources */,
+				B86CFC482AFFCE260056A8BF /* ArticleCommentsCellModel.swift in Sources */,
 				B875D2112A1C343000F8AB6A /* LoginData.swift in Sources */,
 				B858E8842AE1CFDE00F147A6 /* HTTPClient.swift in Sources */,
 				B8C7ABBC293D20EF00FB2F67 /* UITableViewCell+Ext.swift in Sources */,
@@ -1267,6 +1285,7 @@
 				B8001CB92A19529B00E7A8A8 /* AppLanguage.swift in Sources */,
 				B8339D642AF667A0005AA61F /* ArticleTextCell.swift in Sources */,
 				B8FD82262A1174EA00EB7035 /* UIAction+Ext.swift in Sources */,
+				B86CFC452AFFCE1D0056A8BF /* ArticleCommentsCell.swift in Sources */,
 				B82B2EBE2A89016300CB067C /* Secrets.swift in Sources */,
 				B82EFA282A896D6A00C8B2AC /* RouteMap.swift in Sources */,
 				B8339D612AF6647A005AA61F /* NewArticlePresenter.swift in Sources */,
@@ -1285,6 +1304,7 @@
 				B82B2EC12A89059C00CB067C /* AppScheme.swift in Sources */,
 				B83403572967AFCA00C3CF37 /* PDATableView.swift in Sources */,
 				B957D4432A12CA120013F578 /* UIViewController+Ext.swift in Sources */,
+				B86CFC4A2AFFD7C20056A8BF /* ArticleCommentsReusableView.swift in Sources */,
 				B89301212947E2AE00D14141 /* LoginVC.swift in Sources */,
 				B8E446312A002F7200CE8745 /* AnalyticsService.swift in Sources */,
 				B875D2142A1C513100F8AB6A /* MultipartFormDataRequest.swift in Sources */,

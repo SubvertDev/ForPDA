@@ -23,7 +23,14 @@ extension UIButton {
         layer.add(rotateAnimation, forKey: nil)
     }
     
-    func stopButtonRotation() {
-        layer.removeAllAnimations()
+    func stopButtonRotation(delay: Bool = true) {
+        if delay {
+            Task {
+                try await Task.sleep(nanoseconds: 0_450_000_000)
+                layer.removeAllAnimations()
+            }
+        } else {
+            layer.removeAllAnimations()
+        }
     }
 }

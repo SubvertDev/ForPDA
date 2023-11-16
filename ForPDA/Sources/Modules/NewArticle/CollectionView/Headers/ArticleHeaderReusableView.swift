@@ -15,10 +15,6 @@ struct ArticleHeaderViewModel {
 
 final class ArticleHeaderReusableView: UICollectionReusableView {
     
-    static var reuseIdentifier: String {
-        return String(describing: ArticleHeaderReusableView.self)
-    }
-    
     // MARK: - Views
     
     private let imageView: UIImageView = {

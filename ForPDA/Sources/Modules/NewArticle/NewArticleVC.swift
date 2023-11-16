@@ -13,10 +13,8 @@ import SwiftMessages
 import NukeExtensions
 
 protocol NewArticleVCProtocol: AnyObject {
-    func configureArticle(with elements: [ArticleElement])
+    func configureArticle(elements: [ArticleElement], comments: [Comment], commentsRefresh: Bool)
     func reconfigureHeader(model: ArticleHeaderViewModel)
-//    func makeComments(from page: String)
-//    func updateComments(with document: String)
     func showError()
 }
 
@@ -26,6 +24,8 @@ final class NewArticleVC: PDAViewController {
     
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        
+        collectionView.registerHeader(ArticleHeaderReusableView.self)
         collectionView.register(ArticleTextCell.self)
         collectionView.register(ArticleImageCell.self)
         collectionView.register(ArticleImageWithTextCell.self)
@@ -33,11 +33,10 @@ final class NewArticleVC: PDAViewController {
         collectionView.register(ArticleGifCell.self)
         collectionView.register(ArticleButtonCell.self)
         collectionView.register(ArticleBulletListCell.self)
-        collectionView.register(
-            ArticleHeaderReusableView.self,
-            forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
-            withReuseIdentifier: ArticleHeaderReusableView.reuseIdentifier
-        )
+        
+        collectionView.registerHeader(ArticleCommentsReusableView.self)
+        collectionView.register(ArticleCommentsCell.self)
+        
         return collectionView
     }()
     
@@ -48,8 +47,7 @@ final class NewArticleVC: PDAViewController {
     
     let presenter: NewArticlePresenterProtocol
     lazy var dataSource = makeDataSource()
-    
-    //    private var commentsVC: CommentsVC?
+    weak var commentsHeaderInput: ArticleCommentsReusableViewInputDelegate?
     
     // MARK: - Init
     
@@ -74,18 +72,8 @@ final class NewArticleVC: PDAViewController {
         collectionView.dataSource = dataSource
         update()
         
-        // What is this check for? (todo)
-        if presenter.article.url.contains("to/20") {
-            Task {
-                await presenter.loadArticle()
-            }
-        } else {
-//            myView.removeComments()
-//            let elements = ArticleBuilder.makeDefaultArticle(
-//                description: presenter.article.info?.description ?? "Ошибка",
-//                url: presenter.article.url
-//            )
-//            makeArticle(from: elements)
+        Task {
+            await presenter.loadArticle()
         }
     }
     
@@ -97,7 +85,7 @@ final class NewArticleVC: PDAViewController {
         label.fadeLength = 30
         navigationItem.titleView = label
     }
-    
+
     private func configureMenu() {
         let menu = UIMenu(title: "", options: .displayInline, children: [copyAction(), shareAction(), brokenAction()])
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemSymbol: .ellipsis), menu: menu)
@@ -134,13 +122,40 @@ final class NewArticleVC: PDAViewController {
     
 }
 
+// MARK: - ArticleCommentsReusableViewDelegate
+
+extension NewArticleVC: ArticleCommentsReusableViewOutputDelegate {
+    
+    func updateCommentsButtonTapped() {
+        Task {
+            await presenter.updateComments()
+        }
+    }
+    
+}
+
+// MARK: - ArticleCommentsCellDelegate
+
+extension NewArticleVC: ArticleCommentsCellDelegate {
+    
+    func updateLayout() {
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
+}
+
 // MARK: - NewArticleVCProtocol
 
 extension NewArticleVC: NewArticleVCProtocol {
-    
-    func configureArticle(with elements: [ArticleElement]) {
+
+    func configureArticle(elements: [ArticleElement], comments: [Comment], commentsRefresh: Bool) {
         Task { @MainActor in
-            update(elements: elements)
+            update(elements: elements, comments: comments)
+            
+            if commentsRefresh {
+                commentsHeaderInput?.stopAnimating()
+                collectionView.collectionViewLayout.invalidateLayout()
+            }
         }
     }
     

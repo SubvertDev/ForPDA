@@ -167,7 +167,7 @@ final class ArticleVC: PDAViewControllerWithView<ArticleView> {
     // MARK: - Making Comments
     
     func makeComments(from page: String) {
-        commentsVC = CommentsVC(article: presenter.article, document: page)
+        commentsVC = CommentsVC()
         guard let commentsVC else { return }
         commentsVC.updateDelegate = self
         addChild(commentsVC)
@@ -204,7 +204,7 @@ extension ArticleVC: ArticleVCProtocol {
     }
     
     func updateComments(with document: String) {
-        commentsVC?.updateComments(with: document)
+//        commentsVC?.updateComments(with: document)
     }
 }
 
@@ -222,6 +222,10 @@ extension ArticleVC: ArticleViewDelegate {
 // MARK: - CommentsVCProtocol
 
 extension ArticleVC: CommentsVCProtocol {
+    
+    func tableViewHeightChanged(_ height: CGFloat) {
+        
+    }
     
     func updateFinished(_ state: Bool) {
         let image = UIImage(
