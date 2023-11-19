@@ -81,6 +81,7 @@
 		B858E8902AE1D00500F147A6 /* NewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B858E88D2AE1D00500F147A6 /* NewsService.swift */; };
 		B858E89A2AE1DED300F147A6 /* UIApplication+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */; };
 		B85EC4152B0AAFDF00659A04 /* NewsBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85EC4142B0AAFDF00659A04 /* NewsBackgroundView.swift */; };
+		B85EC41B2B0AC39200659A04 /* SentryCustomError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85EC41A2B0AC39200659A04 /* SentryCustomError.swift */; };
 		B863357D293D218900F8D2E6 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B863357C293D218900F8D2E6 /* String+Ext.swift */; };
 		B86B9DD52B06AEF30015FC82 /* ArticleCommentsFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86B9DD42B06AEF30015FC82 /* ArticleCommentsFooterView.swift */; };
 		B874B41B2A101B5F00A004FC /* Array+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B41A2A101B5F00A004FC /* Array+Ext.swift */; };
@@ -268,6 +269,7 @@
 		B858E88D2AE1D00500F147A6 /* NewsService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewsService.swift; sourceTree = "<group>"; };
 		B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Ext.swift"; sourceTree = "<group>"; };
 		B85EC4142B0AAFDF00659A04 /* NewsBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsBackgroundView.swift; sourceTree = "<group>"; };
+		B85EC41A2B0AC39200659A04 /* SentryCustomError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SentryCustomError.swift; sourceTree = "<group>"; };
 		B863357C293D218900F8D2E6 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
 		B86B9DD42B06AEF30015FC82 /* ArticleCommentsFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCommentsFooterView.swift; sourceTree = "<group>"; };
 		B874B41A2A101B5F00A004FC /* Array+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Ext.swift"; sourceTree = "<group>"; };
@@ -846,6 +848,7 @@
 			children = (
 				B8BD2D8E293E2AE800E12E29 /* Comments */,
 				B8C7ABAE293D0A0D00FB2F67 /* Article.swift */,
+				B85EC41A2B0AC39200659A04 /* SentryCustomError.swift */,
 				B88D3F552A0900DA0061C6C4 /* SettingsCellType.swift */,
 				B8001CB82A19529B00E7A8A8 /* AppLanguage.swift */,
 				B8001CBA2A19529F00E7A8A8 /* AppTheme.swift */,
@@ -1273,6 +1276,7 @@
 				B858E8812AE1CFDE00F147A6 /* Endpoint.swift in Sources */,
 				B87EB9D4293D50DB0025C2A0 /* PDAResizingImageView.swift in Sources */,
 				B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */,
+				B85EC41B2B0AC39200659A04 /* SentryCustomError.swift in Sources */,
 				B8E4463F2A004CD600CE8745 /* URL+Ext.swift in Sources */,
 				B88D3FBE2A0AFDB00061C6C4 /* LoginFactory.swift in Sources */,
 				B8487CA52AA698600018501C /* ProgressView.swift in Sources */,

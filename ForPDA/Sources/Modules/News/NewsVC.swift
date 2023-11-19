@@ -10,7 +10,7 @@ import Factory
 import SwiftMessages
 import SFSafeSymbols
 import RouteComposer
-import WebKit
+import Sentry
 
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
@@ -216,6 +216,7 @@ extension NewsVC: UITableViewDelegate {
     private func reportAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
+            SentrySDK.capture(error: SentryCustomError.badArticle(url: article.url))
             analytics.event(Event.News.newsReport.rawValue)
         }
     }

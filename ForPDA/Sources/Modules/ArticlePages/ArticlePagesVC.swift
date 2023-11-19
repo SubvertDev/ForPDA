@@ -10,6 +10,7 @@ import SnapKit
 import Factory
 import MarqueeLabel
 import SwiftMessages
+import Sentry
 
 protocol ArticlePagesVCProtocol: AnyObject {
     func configureArticle(elements: [ArticleElement], comments: [Comment])
@@ -305,15 +306,15 @@ extension ArticlePagesVC {
     }
     
     private func configureMenu() {
-        let menu = UIMenu(title: "", options: .displayInline, children: [copyAction(), shareAction(), brokenAction()])
+        let menu = UIMenu(title: "", options: .displayInline, children: [copyAction(), shareAction(), reportAction()])
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemSymbol: .ellipsis), menu: menu)
     }
     
     private func copyAction() -> UIAction {
         UIAction.make(title: R.string.localizable.copyLink(), symbol: .doc) { [unowned self] _ in
+            analytics.event(Event.Article.articleLinkCopied.rawValue)
             UIPasteboard.general.string = presenter.article.url
             SwiftMessages.showDefault(title: R.string.localizable.copied(), body: "")
-            analytics.event(Event.Article.articleLinkCopied.rawValue)
         }
     }
     
@@ -325,9 +326,10 @@ extension ArticlePagesVC {
         }
     }
     
-    private func brokenAction() -> UIAction {
+    private func reportAction() -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
-            analytics.event(Event.Article.articleLinkShared.rawValue)
+            analytics.event(Event.Article.articleReport.rawValue)
+            SentrySDK.capture(error: SentryCustomError.badArticle(url: presenter.article.url))
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
         }
     }

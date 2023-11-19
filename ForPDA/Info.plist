@@ -25,10 +25,6 @@
 		<string>$(SENTRY_DSN)</string>
 		<key>SENTRY_DSYM_TOKEN</key>
 		<string>$(SENTRY_DSYM_TOKEN)</string>
-		<key>TELEGRAM_CHAT_ID</key>
-		<string>$(TELEGRAM_CHAT_ID)</string>
-		<key>TELEGRAM_TOKEN</key>
-		<string>$(TELEGRAM_TOKEN)</string>
 	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
