@@ -94,9 +94,9 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 // When switching off
                 if !isOn {
                     switch indexPath.row {
-                    case 0:
-                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
                     case 1:
+                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
+                    case 2:
                         presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
                     default:
                         break

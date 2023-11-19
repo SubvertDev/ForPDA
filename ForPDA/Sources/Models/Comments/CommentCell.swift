@@ -8,7 +8,6 @@
 //  swiftlint:disable all
 
 import UIKit
-import SwipeCellKit
 
 struct DefaultValues {
     static let rootCommentMarginColor = UIColor(red: 247/255, green: 247/255, blue: 245/255, alpha: 1)
@@ -26,7 +25,7 @@ struct DefaultValues {
  This class manages everything relating to the level of the
  comment: identations, background colors, spacings, etc...
  */
-open class CommentCell: SwipeTableViewCell {
+open class CommentCell: UITableViewCell {
     /// Color of the separation between 2 root comments
     open var rootCommentMarginColor: UIColor! = DefaultValues.rootCommentMarginColor {
         didSet {

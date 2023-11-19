@@ -9,9 +9,7 @@
 import UIKit
 import RouteComposer
 
-protocol RouteMapProtocol {
-    
-}
+protocol RouteMapProtocol { }
 
 struct RouteMap: RouteMapProtocol {
     
@@ -34,19 +32,10 @@ struct RouteMap: RouteMapProtocol {
     
     // MARK: Article
     
-    static var articleScreen: DestinationStep<ArticleVC, Article> {
+    static var articlePagesScreen: DestinationStep<ArticlePagesVC, Article> {
         StepAssembly(
-            finder: ClassFinder<ArticleVC, Article>(),
-            factory: ArticleFactory())
-        .using(UINavigationController.push())
-        .from(newsScreen.expectingContainer())
-        .assemble()
-    }
-    
-    static var newArticleScreen: DestinationStep<NewArticleVC, Article> {
-        StepAssembly(
-            finder: ClassFinder<NewArticleVC, Article>(),
-            factory: NewArticleFactory())
+            finder: ClassFinder<ArticlePagesVC, Article>(),
+            factory: ArticlePagesFactory())
         .using(UINavigationController.push())
         .from(newsScreen.expectingContainer())
         .assemble()

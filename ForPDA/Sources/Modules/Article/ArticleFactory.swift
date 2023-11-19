@@ -15,7 +15,7 @@ final class ArticleFactory: Factory {
     func build(with context: Context) throws -> ViewController {
         let presenter = ArticlePresenter(article: context)
         let viewController = ViewController(presenter: presenter)
-        presenter.view = viewController
+//        presenter.view = viewController
         
         return viewController
     }

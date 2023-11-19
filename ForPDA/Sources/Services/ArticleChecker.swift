@@ -20,7 +20,7 @@ final class ArticleChecker {
                 // let articles = articles[0...]
                 for (index, article) in articles.enumerated() {
                     print("[\(index)] Opening \(article.url)")
-                    try DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
+                    try DefaultRouter().navigate(to: RouteMap.articlePagesScreen, with: article)
                     try await Task.sleep(for: .seconds(1))
                     let controller = ClassFinder<NewArticleVC, Any?>().getViewController()!
                     let item = controller.collectionView.numberOfItems(inSection: 0) - 1

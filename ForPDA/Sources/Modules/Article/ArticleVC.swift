@@ -166,47 +166,47 @@ final class ArticleVC: PDAViewControllerWithView<ArticleView> {
     
     // MARK: - Making Comments
     
-    func makeComments(from page: String) {
-        commentsVC = CommentsVC()
-        guard let commentsVC else { return }
-        commentsVC.updateDelegate = self
-        addChild(commentsVC)
-        myView.commentsContainer.addSubview(commentsVC.view)
-        myView.commentsContainer.isHidden = true
-        commentsVC.view.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-        commentsVC.didMove(toParent: self)
-    }
+//    func makeComments(from page: String) {
+//        commentsVC = CommentsVC(article: presenter.article)
+//        guard let commentsVC else { return }
+//        commentsVC.updateDelegate = self
+//        addChild(commentsVC)
+//        myView.commentsContainer.addSubview(commentsVC.view)
+//        myView.commentsContainer.isHidden = true
+//        commentsVC.view.snp.makeConstraints { make in
+//            make.edges.equalToSuperview()
+//        }
+//        commentsVC.didMove(toParent: self)
+//    }
 }
 
 // MARK: - ArticleVCProtocol
 
-extension ArticleVC: ArticleVCProtocol {
-    
-    func reconfigureHeader() {
-        configureNavigationTitle()
-        configureView()
-    }
-    
-    func configureArticle(with elements: [ArticleElement]) {
-        makeArticle(from: elements)
-    }
-    
-    func showError() {
-        let alert = UIAlertController(
-            title: R.string.localizable.error(),
-            message: R.string.localizable.somethingWentWrong(),
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
-        present(alert, animated: true)
-    }
-    
-    func updateComments(with document: String) {
-//        commentsVC?.updateComments(with: document)
-    }
-}
+//extension ArticleVC: ArticleVCProtocol {
+//    
+//    func reconfigureHeader() {
+//        configureNavigationTitle()
+//        configureView()
+//    }
+//    
+//    func configureArticle(with elements: [ArticleElement]) {
+//        makeArticle(from: elements)
+//    }
+//    
+//    func showError() {
+//        let alert = UIAlertController(
+//            title: R.string.localizable.error(),
+//            message: R.string.localizable.somethingWentWrong(),
+//            preferredStyle: .alert
+//        )
+//        alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
+//        present(alert, animated: true)
+//    }
+//    
+////    func updateComments(with document: String) {
+//////        commentsVC?.updateComments(with: document)
+////    }
+//}
 
 // MARK: - ArticleViewDelegate
 
@@ -221,21 +221,14 @@ extension ArticleVC: ArticleViewDelegate {
 
 // MARK: - CommentsVCProtocol
 
-extension ArticleVC: CommentsVCProtocol {
-    
-    func tableViewHeightChanged(_ height: CGFloat) {
-        
-    }
-    
-    func updateFinished(_ state: Bool) {
-        let image = UIImage(
-            systemSymbol: state ? .arrowTriangle2Circlepath : .exclamationmarkArrowTriangle2Circlepath,
-            withConfiguration: UIImage.SymbolConfiguration(weight: .bold)
-        )
-        myView.updateCommentsButton.setImage(image, for: .normal)
-        myView.updateCommentsButton.stopButtonRotation()
-    }
-}
+//extension ArticleVC: CommentsVCProtocol {
+//    
+//    func tableViewHeightChanged(_ height: CGFloat) {
+//        
+//    }
+//    
+
+//}
 
 // MARK: - PDAResizingTextViewDelegate
 

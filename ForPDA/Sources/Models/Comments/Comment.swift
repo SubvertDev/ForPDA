@@ -12,7 +12,7 @@ class Comment: AbstractComment, ReflectedStringConvertible, Hashable {
     // MARK: - Properties
     
     let id = UUID().uuidString
-    let avatarUrl: String
+    let avatarUrl: URL
     let author: String
     let text: String
     let date: String
@@ -25,7 +25,7 @@ class Comment: AbstractComment, ReflectedStringConvertible, Hashable {
     // MARK: - Init
     
     init(
-        avatarUrl: String,
+        avatarUrl: URL,
         author: String,
         text: String,
         date: String,

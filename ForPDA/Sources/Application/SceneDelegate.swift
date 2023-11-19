@@ -68,7 +68,7 @@ extension SceneDelegate {
             let id = url.absoluteString.components(separatedBy: "article/")[1]
             let url = URL.fourpda.absoluteString + id
             let article = Article(url: url, info: nil)
-            try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
+            try? DefaultRouter().navigate(to: RouteMap.articlePagesScreen, with: article)
         }
     }
     

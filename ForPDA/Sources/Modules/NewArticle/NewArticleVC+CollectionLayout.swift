@@ -10,13 +10,12 @@ import UIKit
 extension NewArticleVC {
     
     func createLayout() -> UICollectionViewLayout {
-        
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
             
             // Cells sizes
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
+                    widthDimension: .fractionalWidth(1),
                     heightDimension: .estimated(150)
                 )
             )
@@ -35,34 +34,20 @@ extension NewArticleVC {
             
             let section = NSCollectionLayoutSection(group: containerGroup)
             
-            // Headers sizes
-            let headerSize: NSCollectionLayoutSize
-            
-            if sectionIndex == 0 {
-                headerSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalWidth(0.6)
-                )
-            } else if sectionIndex == 1 {
-                headerSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .estimated(42)
-                )
-            } else {
-                headerSize = NSCollectionLayoutSize(widthDimension: .absolute(0), heightDimension: .absolute(0))
-            }
-            
-            let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-                layoutSize: headerSize,
-                elementKind: UICollectionView.elementKindSectionHeader,
-                alignment: .top
+            let footerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .estimated(1)
             )
-            section.boundarySupplementaryItems = [sectionHeader]
+            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: footerSize,
+                elementKind: UICollectionView.elementKindSectionFooter,
+                alignment: .bottom
+            )
+            section.boundarySupplementaryItems = [sectionFooter]
             
             return section
             
         }
         return layout
     }
-    
 }

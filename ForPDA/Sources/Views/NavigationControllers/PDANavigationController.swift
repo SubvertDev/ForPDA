@@ -13,5 +13,6 @@ final class PDANavigationController: UINavigationController {
         super.viewDidLoad()
         
         navigationBar.tintColor = .label
+        navigationBar.topItem?.backButtonDisplayMode = .minimal
     }
 }

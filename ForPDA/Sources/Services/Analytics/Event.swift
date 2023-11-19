@@ -21,6 +21,8 @@ enum Event {
         case articleReport
         case articleLinkClicked
         case articleButtonClicked
+        case articleCommentsOpened
+        case articleCommentsClosed
     }
     
     enum Menu: String {

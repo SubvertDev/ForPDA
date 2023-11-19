@@ -1,67 +1,15 @@
 //
-//  ArticleCommentCell.swift
+//  ArticleCommentView.swift
 //  ForPDA
 //
-//  Created by Subvert on 05.12.2022.
+//  Created by Ilia Lubianoi on 17.11.2023.
 //
 
 import UIKit
-import NukeExtensions
-
-final class ArticleCommentCell: CommentCell {
-    
-    var myView: ArticleCommentView!
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        let view = ArticleCommentView()
-        view.backgroundColor = .systemBackground
-        myView = view
-        self.commentViewContent = view
-        
-        rootCommentMarginColor = .label
-        rootCommentMargin = 1
-        
-        indentationUnit = 12
-        // indentationColor = .systemRed
-        indentationIndicatorThickness = 0
-        
-        commentMargin = 4
-        commentMarginColor = .tertiarySystemBackground
-    }
-    
-    required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func set(with comment: Comment) {
-        NukeExtensions.loadImage(with: URL(string: comment.avatarUrl), into: myView.avatarImageView) { _ in }
-        myView.authorLabel.text = comment.author
-        myView.textLabel.text = comment.text
-        myView.dateLabel.text = comment.date
-        if comment.likes > 0 {
-            myView.likesLabel.text = String(comment.likes)
-        }
-        
-        if comment.level % 2 == 0 {
-            myView.backgroundColor = .systemBackground
-            indentationColor = .systemBackground
-        } else {
-            myView.backgroundColor = .secondarySystemBackground
-            indentationColor = .systemBackground
-        }
-    }
-    
-    override func prepareForReuse() {
-        myView.authorLabel.text = ""
-        myView.textLabel.text = ""
-        myView.dateLabel.text = ""
-        myView.likesLabel.text = ""
-    }
-}
 
 final class ArticleCommentView: UIView {
+    
+    // MARK: - Views
     
     let avatarImageView: UIImageView = {
         let imageView = UIImageView()
@@ -101,6 +49,8 @@ final class ArticleCommentView: UIView {
         return label
     }()
     
+    // MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -111,6 +61,8 @@ final class ArticleCommentView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - Layout
     
     private func addSubviews() {
         addSubview(avatarImageView)

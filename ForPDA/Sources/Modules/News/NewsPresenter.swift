@@ -76,7 +76,7 @@ final class NewsPresenter: NewsPresenterProtocol {
     
     func showArticle(at indexPath: IndexPath) {
         let article = articles[indexPath.row]
-        try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
+        try? DefaultRouter().navigate(to: RouteMap.articlePagesScreen, with: article)
     }
     
     func menuButtonTapped() {

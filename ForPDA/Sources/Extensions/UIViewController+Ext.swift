@@ -9,17 +9,12 @@ import UIKit
 import RouteComposer
 import SFSafeSymbols
 
-extension UIViewController {
-    
-    // MARK: - Route Composer
-    
-    var router: Router {
-        UIViewController.router
-    }
-    
-    static let router: Router = {
-        return DefaultRouter()
-    }()
+
+protocol Alertable: AnyObject {
+    func showAlert(title: String, message: String)
+}
+
+extension UIViewController: Alertable {
     
     // MARK: - Setting TabBar Title & Name
     
@@ -80,5 +75,13 @@ extension UIViewController {
             }
         }
         return true
+    }
+    
+    @MainActor
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default)
+        alert.addAction(okAction)
+        present(alert, animated: true)
     }
 }

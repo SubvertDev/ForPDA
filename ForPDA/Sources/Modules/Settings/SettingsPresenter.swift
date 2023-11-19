@@ -92,11 +92,13 @@ final class SettingsPresenter: SettingsPresenterProtocol {
                 ),
                 .switchCell(model: SwitchOption(
                     title: R.string.localizable.fastLoadingSystem(),
-                    isOn: isFLSEnabled, handler: {})
+                    isOn: isFLSEnabled, 
+                    handler: {})
                 ),
                 .switchCell(model: SwitchOption(
                     title: R.string.localizable.commentsShowLikes(),
-                    isOn: currentShowLikesInComments, handler: {})
+                    isOn: currentShowLikesInComments, 
+                    handler: {})
                 )
             ]),
         

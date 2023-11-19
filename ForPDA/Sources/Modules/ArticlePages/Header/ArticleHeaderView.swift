@@ -1,19 +1,14 @@
 //
-//  ArticleHeaderReusableView.swift
+//  ArticleHeaderView.swift
 //  ForPDA
 //
-//  Created by Ilia Lubianoi on 04.11.2023.
+//  Created by Ilia Lubianoi on 16.11.2023.
 //
 
 import UIKit
 import NukeExtensions
 
-struct ArticleHeaderViewModel {
-    let imageUrl: URL?
-    let title: String?
-}
-
-final class ArticleHeaderReusableView: UICollectionReusableView {
+final class ArticleHeaderView: UIView {
     
     // MARK: - Views
     
@@ -62,12 +57,11 @@ final class ArticleHeaderReusableView: UICollectionReusableView {
         }
         titleLabel.text = model.title
     }
-    
 }
 
 // MARK: - Layout
 
-extension ArticleHeaderReusableView {
+extension ArticleHeaderView {
     
     private func addSubviews() {
         addSubview(imageView)
@@ -76,13 +70,14 @@ extension ArticleHeaderReusableView {
     
     private func makeConstraints() {
         imageView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.width.equalTo(UIScreen.main.bounds.width)
+            make.height.equalTo(UIScreen.main.bounds.width * 0.6)
+            make.center.equalToSuperview()
         }
         
         titleLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(imageView).inset(8)
             make.horizontalEdges.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().inset(8)
         }
     }
-    
 }

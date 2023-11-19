@@ -6,26 +6,34 @@
 //
 
 import UIKit
-import Factory
 
 protocol CommentsVCProtocol: AnyObject {
-    func tableViewHeightChanged(_ height: CGFloat)
+    func updateComments(with comments: [Comment])
 }
 
-final class CommentsVC: CommentsViewController {
+final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
     
     // MARK: - Properties
-    
-    @Injected(\.settingsService) private var settings
+        
+    private let presenter: CommentsPresenterProtocol
     
     private var allComments: [Comment] = []
-    private var previousHeight: CGFloat = 0
-    private var contentSizeObserver: NSKeyValueObservation!
-    private var throttleTimer: Timer?
-    private var gotComments = false
-    private lazy var themeColor = settings.getAppBackgroundColor()
+    private lazy var themeColor = presenter.themeColor
     
-    weak var updateDelegate: CommentsVCProtocol?
+    weak var collectionViewScrollDelegate: ArticleInnerScrollViewDelegate?
+    var dragDirection: DragDirection = .up
+    var oldContentOffset: CGPoint = .zero
+    
+    // MARK: - Init
+    
+    init(presenter: CommentsPresenterProtocol) {
+        self.presenter = presenter
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     
@@ -34,35 +42,29 @@ final class CommentsVC: CommentsViewController {
         
         tableView.register(cellWithClass: ArticleCommentCell.self)
         
+        swipeToHide = false
         showOrHideOnTap = false
+        fullyExpanded = true
         
         setupNotifications()
         
-        contentSizeObserver = tableView.observe(\.contentSize, options: .new) { [weak self] tableView, change in
-            guard let self else { return }
-            if let size = change.newValue, size.height != 0, size.height > previousHeight {
-                previousHeight = size.height
-                startThrottler()
-            }
-        }
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshControlCalled), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
     
     // MARK: - Public Functions
     
-    func getComments(_ comments: [Comment]) {
-        guard !gotComments else { return }
-        gotComments = true
-        
+    func showComments(_ comments: [Comment]) {
         allComments = comments
+        _currentlyDisplayed.removeAll()
         currentlyDisplayed = allComments
-        fullyExpanded = true
         tableView.reloadData()
-        
-        // Initial calculation based on smallest cell to minimize amount of size guessing
-        let commentsAmount = Comment.countTotalComments(comments)
-        let initialHeight = CGFloat(commentsAmount * 57)
-        previousHeight = initialHeight
-        tableView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: initialHeight)
+        presenter.commentsHasUpdated()
+        Task {
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            tableView.refreshControl?.endRefreshing()
+        }
     }
     
     // MARK: - Private Functions
@@ -78,24 +80,22 @@ final class CommentsVC: CommentsViewController {
         if let object = notification.object as? AppNightModeBackgroundColor {
             themeColor = object
         } else {
-            themeColor = settings.getAppBackgroundColor()
+            themeColor = presenter.themeColor
         }
         tableView.reloadData()
     }
     
-    private func startThrottler() {
-        let throttleTime = settings.getShowLikesInComments() ? 0.5 : 0.1
-        throttleTimer?.invalidate()
-        throttleTimer = nil
-        throttleTimer = Timer.scheduledTimer(withTimeInterval: throttleTime, repeats: false) { [weak self] _ in
-            guard let self else { return }
-            updateDelegate?.tableViewHeightChanged(previousHeight)
-        }
-        RunLoop.main.add(throttleTimer!, forMode: .common)
+    // MARK: - Actions
+    
+    @objc private func refreshControlCalled() {
+        presenter.updateComments()
     }
-    
-    // MARK: - TableView DataSource
-    
+}
+
+// MARK: - TableView DataSource
+
+extension CommentsVC {
+        
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withClass: ArticleCommentCell.self, for: indexPath)
         if let comment = currentlyDisplayed[indexPath.row] as? Comment {
@@ -116,5 +116,15 @@ final class CommentsVC: CommentsViewController {
             cell.commentMarginColor = .tertiarySystemGroupedBackground
         }
     }
+}
+
+// MARK: - CommentsVCProtocol
+
+extension CommentsVC: CommentsVCProtocol {
     
+    func updateComments(with comments: [Comment]) {
+        Task { @MainActor in
+            showComments(comments)
+        }
+    }
 }

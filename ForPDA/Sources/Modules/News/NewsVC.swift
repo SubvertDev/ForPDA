@@ -89,10 +89,13 @@ extension NewsVC: NewsVCProtocol {
     
     func articlesUpdated() {
         myView.tableView.reloadData()
-        myView.refreshControl.endRefreshing()
         myView.refreshButton.isHidden = false
         myView.refreshButton.setTitle(R.string.localizable.loadMore(), for: .normal)
         myView.loadingIndicator.isHidden = true
+        Task {
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            myView.refreshControl.endRefreshing()
+        }
     }
     
     func showError() {
