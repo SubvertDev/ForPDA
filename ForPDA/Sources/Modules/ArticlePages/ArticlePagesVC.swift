@@ -267,12 +267,13 @@ extension ArticlePagesVC: UIPageViewControllerDelegate, UIPageViewControllerData
         transitionCompleted completed: Bool
     ) {
         guard completed else { return }
-        guard let newIndex = viewControllers.firstIndex(where: { $0 == pageVC.viewControllers?.first }) else {
-            analytics.event(Event.Article.articleCommentsClosed.rawValue)
-            return
-        }
+        guard let newIndex = viewControllers.firstIndex(where: { $0 == pageVC.viewControllers?.first }) else { return }
         currentIndex = newIndex
-        analytics.event(Event.Article.articleCommentsOpened.rawValue)
+        if currentIndex == 0 {
+            analytics.event(Event.Article.articleCommentsClosed.rawValue)
+        } else {
+            analytics.event(Event.Article.articleCommentsOpened.rawValue)
+        }
     }
 }
 

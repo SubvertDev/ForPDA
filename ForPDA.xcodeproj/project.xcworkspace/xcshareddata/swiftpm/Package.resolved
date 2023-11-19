@@ -1,24 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "amplitude-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/amplitude/Amplitude-iOS",
-      "state" : {
-        "revision" : "94160a550835e6f0a1df9fa76ab3902ac4648a9c",
-        "version" : "8.17.1"
-      }
-    },
-    {
-      "identity" : "analytics-connector-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/amplitude/analytics-connector-ios.git",
-      "state" : {
-        "revision" : "d2f3ec4b022211a67d5d4509135d84359f7f8b8d",
-        "version" : "1.0.2"
-      }
-    },
-    {
       "identity" : "factory",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hmlongco/Factory",
@@ -34,6 +16,15 @@
       "state" : {
         "revision" : "bc00d4cbff7f6c416035e3d16c21885452cd159e",
         "version" : "4.3.1"
+      }
+    },
+    {
+      "identity" : "mixpanel-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mixpanel/mixpanel-swift",
+      "state" : {
+        "revision" : "ecd44ed6af66d45a50e62401228430c54c60dd26",
+        "version" : "4.2.0"
       }
     },
     {

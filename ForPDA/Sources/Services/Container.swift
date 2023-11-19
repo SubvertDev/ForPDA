@@ -38,7 +38,7 @@ extension Container {
     }
     
     var analyticsService: Factory<AnalyticsService> {
-        Factory(self) { AnalyticsService(isDebug: AppScheme.isDebug) }
+        Factory(self) { AnalyticsService() }
     }
     
     var cookiesService: Factory<CookiesService> {

@@ -9,6 +9,7 @@ enum Event {
 
     enum News: String {
         case articleOpen
+        case updateTriggered
         case newsLinkCopied
         case newsLinkShared
         case newsReport

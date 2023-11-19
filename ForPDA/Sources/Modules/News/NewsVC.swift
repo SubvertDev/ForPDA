@@ -164,6 +164,7 @@ extension NewsVC: NewsVCProtocol {
 extension NewsVC: NewsViewDelegate {
     
     func refreshButtonTapped() {
+        analytics.event(Event.News.updateTriggered.rawValue)
         myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
         Task {
             await presenter.loadArticles()
@@ -171,6 +172,7 @@ extension NewsVC: NewsViewDelegate {
     }
     
     func refreshControlCalled() {
+        analytics.event(Event.News.updateTriggered.rawValue)
         Task {
             await presenter.refreshArticles()
         }

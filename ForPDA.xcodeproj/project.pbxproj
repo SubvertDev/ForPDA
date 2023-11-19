@@ -18,7 +18,6 @@
 		B8001CDA2A1AA0FE00E7A8A8 /* CookiesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CD92A1AA0FE00E7A8A8 /* CookiesService.swift */; };
 		B8001CDC2A1ADD4000E7A8A8 /* Cookie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */; };
 		B8001CDF2A1B01D000E7A8A8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8001CDE2A1B01D000E7A8A8 /* User.swift */; };
-		B802964F2AACE50C00D5B413 /* Amplitude in Frameworks */ = {isa = PBXBuildFile; productRef = B802964E2AACE50C00D5B413 /* Amplitude */; };
 		B8086F682B066081003A7D57 /* ArticlePagesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8086F672B066081003A7D57 /* ArticlePagesFactory.swift */; };
 		B8086F6A2B066086003A7D57 /* ArticlePagesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8086F692B066086003A7D57 /* ArticlePagesVC.swift */; };
 		B8086F6C2B0677E7003A7D57 /* ArticleHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8086F6B2B0677E7003A7D57 /* ArticleHeaderView.swift */; };
@@ -82,6 +81,7 @@
 		B858E89A2AE1DED300F147A6 /* UIApplication+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B858E8992AE1DED300F147A6 /* UIApplication+Ext.swift */; };
 		B85EC4152B0AAFDF00659A04 /* NewsBackgroundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85EC4142B0AAFDF00659A04 /* NewsBackgroundView.swift */; };
 		B85EC41B2B0AC39200659A04 /* SentryCustomError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85EC41A2B0AC39200659A04 /* SentryCustomError.swift */; };
+		B85EC41F2B0AC6D000659A04 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = B85EC41E2B0AC6D000659A04 /* Mixpanel */; };
 		B863357D293D218900F8D2E6 /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B863357C293D218900F8D2E6 /* String+Ext.swift */; };
 		B86B9DD52B06AEF30015FC82 /* ArticleCommentsFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B86B9DD42B06AEF30015FC82 /* ArticleCommentsFooterView.swift */; };
 		B874B41B2A101B5F00A004FC /* Array+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874B41A2A101B5F00A004FC /* Array+Ext.swift */; };
@@ -378,6 +378,7 @@
 				B84CCC54294A6EDA0001EB24 /* NukeExtensions in Frameworks */,
 				B8D3521B293CBE46008A84EA /* SwiftSoup in Frameworks */,
 				B83E8AC5294A75DA000D59E7 /* SwiftyGif in Frameworks */,
+				B85EC41F2B0AC6D000659A04 /* Mixpanel in Frameworks */,
 				B8BD2D79293E1C3F00E12E29 /* MarqueeLabel in Frameworks */,
 				B82EFA252A896CBD00C8B2AC /* RouteComposer in Frameworks */,
 				B89301192947CF5500D14141 /* SwiftRichString in Frameworks */,
@@ -385,7 +386,6 @@
 				B82B2EB32A87D58D00CB067C /* Sentry in Frameworks */,
 				B84CCC52294A6EDA0001EB24 /* Nuke in Frameworks */,
 				B88D3F592A098C600061C6C4 /* SFSafeSymbols in Frameworks */,
-				B802964F2AACE50C00D5B413 /* Amplitude in Frameworks */,
 				B8B55B022A07C948008C93D3 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1106,7 +1106,7 @@
 				B88D3F582A098C600061C6C4 /* SFSafeSymbols */,
 				B82B2EB22A87D58D00CB067C /* Sentry */,
 				B82EFA242A896CBD00C8B2AC /* RouteComposer */,
-				B802964E2AACE50C00D5B413 /* Amplitude */,
+				B85EC41E2B0AC6D000659A04 /* Mixpanel */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -1160,7 +1160,7 @@
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
 				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */,
-				B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */,
+				B85EC41D2B0AC6D000659A04 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 			);
 			productRefGroup = B8D351F6293CABB6008A84EA /* Products */;
 			projectDirPath = "";
@@ -1776,14 +1776,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/amplitude/Amplitude-iOS";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 8.17.1;
-			};
-		};
 		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -1830,6 +1822,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 12.1.0;
+			};
+		};
+		B85EC41D2B0AC6D000659A04 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mixpanel/mixpanel-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.0;
 			};
 		};
 		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
@@ -1891,11 +1891,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B802964E2AACE50C00D5B413 /* Amplitude */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B802964D2AACE50C00D5B413 /* XCRemoteSwiftPackageReference "Amplitude-iOS" */;
-			productName = Amplitude;
-		};
 		B809925A293CBF5C0053202C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
@@ -1934,6 +1929,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeExtensions;
+		};
+		B85EC41E2B0AC6D000659A04 /* Mixpanel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B85EC41D2B0AC6D000659A04 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
+			productName = Mixpanel;
 		};
 		B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;

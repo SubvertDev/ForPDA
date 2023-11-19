@@ -19,8 +19,8 @@
 	<false/>
 	<key>SECRET_KEYS</key>
 	<dict>
-		<key>AMPLITUDE_TOKEN</key>
-		<string>$(AMPLITUDE_TOKEN)</string>
+		<key>MIXPANEL_TOKEN</key>
+		<string>$(MIXPANEL_TOKEN)</string>
 		<key>SENTRY_DSN</key>
 		<string>$(SENTRY_DSN)</string>
 		<key>SENTRY_DSYM_TOKEN</key>

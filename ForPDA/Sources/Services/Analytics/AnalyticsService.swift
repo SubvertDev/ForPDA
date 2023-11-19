@@ -5,24 +5,15 @@
 //  Created by Subvert on 01.05.2023.
 //
 
-import Amplitude
+import Foundation
+import Mixpanel
 
 final class AnalyticsService {
     
-    typealias EventDictionary = [String: Any]
-    
-    private let isDebug: Bool
-    
-    init(isDebug: Bool = false) {
-        self.isDebug = isDebug
-    }
-    
-    // MARK: - Public Functions
-    
     /// Pass `Event` enum to event parameter
-    func event(_ event: String, parameters: EventDictionary? = nil) {
-        guard !isDebug else { return }
-        Amplitude.instance().logEvent(event, withEventProperties: parameters)
+    func event(_ event: String, parameters: Properties? = nil) {
+        guard !AppScheme.isDebug else { return }
+        Mixpanel.mainInstance().track(event: event, properties: parameters)
     }
 }
 

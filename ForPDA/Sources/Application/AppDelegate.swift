@@ -8,10 +8,9 @@
 import UIKit
 import SnapKit
 import Factory
-import Amplitude
+import Mixpanel
 import Sentry
 import Nuke
-import RouteComposer
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -21,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        configureAmplitude()
+        configureMixpanel()
         configureSentry()
         configureNuke()
         configureCookies()
@@ -34,11 +33,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate {
     
-    // MARK: Amplitude
+    // MARK: Mixpanel
     
-    private func configureAmplitude() {
-        Amplitude.instance().defaultTracking.sessions = true
-        Amplitude.instance().initializeApiKey(Secrets.for(key: .AMPLITUDE_TOKEN))
+    private func configureMixpanel() {
+        Mixpanel.initialize(
+            token: Secrets.for(key: .MIXPANEL_TOKEN),
+            trackAutomaticEvents: true
+        )
     }
     
     // MARK: Sentry
