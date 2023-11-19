@@ -119,7 +119,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 
                 let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default) { [weak self] _ in
                     guard let self else { return }
-                    if indexPath.row == 0 {
+                    if indexPath.row == 1 {
                         presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
                     } else {
                         presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
@@ -128,7 +128,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 let cancelAction = UIAlertAction(title: R.string.localizable.cancel(), style: .default) { [weak self] _ in
                     guard let self else { return }
                     cell.set(with: model)
-                    if indexPath.row == 0 {
+                    if indexPath.row == 1 {
                         presenter.fastLoadingSystemSwitchTapped(isOn: !isOn)
                     } else {
                         presenter.showLikesInCommentsSwitchTapped(isOn: !isOn)

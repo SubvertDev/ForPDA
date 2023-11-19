@@ -21,7 +21,8 @@ class HTTPClient: NSObject, HTTPClientProtocol {
     
     private lazy var webView: WKWebView = {
         // swiftlint:disable force_cast
-        let webView = UIApplication.shared.keyWindow?.viewWithTag(666) as! WKWebView
+        let sceneDelegate = UIApplication.shared.connectedScenes.first!.delegate as! SceneDelegate
+        let webView = sceneDelegate.webView
         webView.navigationDelegate = self
         return webView
         // swiftlint:enable force_cast
@@ -54,6 +55,8 @@ extension HTTPClient {
                 if settingsService.getFastLoadingSystem() {
                     return try await fastRequest(endpoint: endpoint)
                 } else {
+                    // Redelegation after use of WebVC
+                    await MainActor.run { webView.navigationDelegate = self }
                     return try await slowRequest(endpoint: endpoint)
                 }
             case .comments:
@@ -123,10 +126,14 @@ extension HTTPClient: WKNavigationDelegate {
         Task { @MainActor in
             if settingsService.getShowLikesInComments() {
                 // 0.3 sec delay to load comments, make tweakable (todo)
-                try await Task.sleep(nanoseconds: 0_300_000_000)
+                try await Task.sleep(nanoseconds: 0_500_000_000)
             }
             if let document = try await webView.evaluateJavaScript("document.documentElement.outerHTML") as? String {
-                continuation?.resume(returning: document)
+                if document.contains("Всё в порядке, но") {
+                    continuation?.resume(throwing: RequestError.unexpectedStatusCode(403))
+                } else {
+                    continuation?.resume(returning: document)
+                }
             } else {
                 continuation?.resume(throwing: RequestError.jsEvaluationFailed)
             }

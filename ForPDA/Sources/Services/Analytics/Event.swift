@@ -13,6 +13,9 @@ enum Event {
         case newsLinkShared
         case newsReport
         case menuOpen
+        case vpnWarningShown
+        case vpnDisableOptionChosen
+        case vpnCaptchaOptionChosen
     }
     
     enum Article: String {
@@ -58,5 +61,4 @@ enum Event {
         case showLikesChanged
         case openGithubRelease
     }
-    
 }

@@ -18,6 +18,11 @@
 "something.wrong.with.article" = "Something wrong?";
 "copied" = "Copied";
 "thanks" = "Thanks!";
+"vpn.warning" = "Looks like you have VPN running or you're not located in Russia, at this moment captcha bypass is in beta and might not work correctly, it is highly recommended to turn off VPN instead";
+"vpn.turn.off" = "Turn off VPN";
+"vpn.show.captcha" = "Show captcha";
+"vpn.fls.incompatible" = "Fast loading news are incompatible with VPN, you can enable it later in settings";
+"vpn.warning.background" = "Whoops! Looks like you have VPN running, turn it off and refresh this page";
 
 // News
 "load.more" = "Load More";
@@ -26,6 +31,7 @@
 // Article
 "learn.more" = "Learn More";
 "comments" = "Comments (%d):";
+"swipe.left.to.show.comments" = "Swipe left to show comments";
 
 // In Development
 "will.fix.soon" = "We'll try to fix it soon :)";
@@ -72,8 +78,8 @@
 "background.dark" = "Dark";
 "background.black" = "Black";
 "advanced" = "Advanced";
-"safari.extension" = "Safari Extension";
-"safari.extension.enable" = "Enable";
+"safari.extension" = "Safari extension";
+"safari.extension.enable" = "Open settings";
 "fast.loading.system" = "Fast loading news";
 "fast.loading.system.warning" = "After activiting this option latest news may not load and show wrong amount of comments, and likes may not appear in articles";
 "comments.show.likes" = "Show likes";

@@ -14,7 +14,6 @@ import NukeExtensions
 
 protocol NewArticleVCProtocol: AnyObject {
     func configureArticle(with elements: [ArticleElement])
-    func showError()
 }
 
 final class NewArticleVC: PDAViewController {
@@ -87,23 +86,6 @@ extension NewArticleVC: NewArticleVCProtocol {
         Task { @MainActor in
             update(elements: elements)
         }
-    }
-    
-    func reconfigureHeader(model: ArticleHeaderViewModel) {
-        Task { @MainActor in
-            pageControllerDelegate?.reconfigureHeader(model: model)
-        }
-    }
-    
-    func showError() {
-        // (todo) (important) vpn dies on this point FIX!
-        let alert = UIAlertController(
-            title: R.string.localizable.error(),
-            message: R.string.localizable.somethingWentWrong(),
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
-        present(alert, animated: true)
     }
 }
 

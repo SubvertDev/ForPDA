@@ -34,7 +34,7 @@ final class ArticleCommentsFooterView: UICollectionReusableView {
     
     private let swipeToShowCommentsLabel: UILabel = {
         let label = UILabel()
-        label.text = "Свайпните влево чтобы открыть комментарии"
+        label.text = R.string.localizable.swipeLeftToShowComments()
         label.font = .systemFont(ofSize: 16, weight: .regular)
         label.adjustsFontSizeToFitWidth = true
         return label

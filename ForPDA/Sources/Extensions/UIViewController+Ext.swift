@@ -77,11 +77,12 @@ extension UIViewController: Alertable {
         return true
     }
     
-    @MainActor
     func showAlert(title: String, message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default)
-        alert.addAction(okAction)
-        present(alert, animated: true)
+        Task { @MainActor in
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            let okAction = UIAlertAction(title: R.string.localizable.ok(), style: .default)
+            alert.addAction(okAction)
+            present(alert, animated: true)
+        }
     }
 }
