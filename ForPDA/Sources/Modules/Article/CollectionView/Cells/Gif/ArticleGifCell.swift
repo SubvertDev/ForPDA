@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftyGif
 
 final class ArticleGifCell: UICollectionViewCell {
     

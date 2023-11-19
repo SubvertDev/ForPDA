@@ -1,5 +1,5 @@
 //
-//  NewArticle+HeaderScroll.swift
+//  Article+HeaderScroll.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 19.11.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension NewArticleVC: UICollectionViewDelegate {
+extension ArticleVC: UICollectionViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let delta = scrollView.contentOffset.y - oldContentOffset.y

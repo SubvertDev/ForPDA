@@ -1,5 +1,5 @@
 //
-//  NewArticleVC+CollectionLayout.swift
+//  ArticleVC+CollectionLayout.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 04.11.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-extension NewArticleVC {
+extension ArticleVC {
     
     func createLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in

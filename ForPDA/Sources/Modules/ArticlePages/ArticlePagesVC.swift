@@ -50,12 +50,12 @@ final class ArticlePagesVC: PDAViewController {
     private let presenter: ArticlePagesPresenterProtocol
     
     private lazy var viewControllers = [
-        try! NewArticleFactory().build(with: presenter.article),
+        try! ArticleFactory().build(with: presenter.article),
         try! CommentsFactory().build(with: presenter.article)
     ]
     
-    private var newArticleVC: NewArticleVCProtocol {
-        return viewControllers[0] as! NewArticleVC
+    private var newArticleVC: ArticleVCProtocol {
+        return viewControllers[0] as! ArticleVC
     }
     
     private var commentsVC: CommentsVCProtocol {
@@ -255,7 +255,7 @@ extension ArticlePagesVC: UIPageViewControllerDelegate, UIPageViewControllerData
         _ pageViewController: UIPageViewController,
         viewControllerAfter viewController: UIViewController
     ) -> UIViewController? {
-        guard viewController is NewArticleVC else { return nil }
+        guard viewController is ArticleVC else { return nil }
         return viewControllers[1]
     }
     
@@ -339,7 +339,7 @@ extension ArticlePagesVC {
     }
     
     private func configureDelegates() {
-        if let newArticleVC = viewControllers[0] as? NewArticleVC {
+        if let newArticleVC = viewControllers[0] as? ArticleVC {
             newArticleVC.collectionViewScrollDelegate = self
             newArticleVC.pageControllerDelegate = self
         }

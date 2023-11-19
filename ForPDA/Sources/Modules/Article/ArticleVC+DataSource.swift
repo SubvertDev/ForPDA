@@ -1,5 +1,5 @@
 //
-//  NewArticleVC+DataSource.swift
+//  ArticleVC+DataSource.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 04.11.2023.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-extension NewArticleVC {
+extension ArticleVC {
     
     typealias DataSource = UICollectionViewDiffableDataSource<Section, Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
