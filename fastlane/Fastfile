@@ -6,8 +6,8 @@ platform :ios do
 
     lane :update do |options|
         # Setting build number to amount of all commits in repo
-        build = sh("git rev-list --all --count")
-        
+	build = sh("git rev-list --all --count").chomp.strip
+
         # Updating build number in all targets
         increment_build_number_in_xcodeproj(
             build_number: build,
@@ -46,7 +46,7 @@ platform :ios do
     lane :beta do |options|
 
         # Setting build number to amount of all commits in repo
-        build = sh("git rev-list --all --count")
+        build = sh("git rev-list --all --count").chomp.strip
         
         # Updating build number in all targets
         increment_build_number_in_xcodeproj(
