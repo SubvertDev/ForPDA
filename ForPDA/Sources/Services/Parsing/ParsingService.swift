@@ -440,7 +440,7 @@ final class ParsingService {
         let commentType = try! element.select("div[id]").attr("class")
         guard commentType != "deleted" else {
             return Comment(
-                avatarUrl: URL.defaultAvatar,
+                avatarUrl: nil,
                 author: "",
                 text: "(Комментарий удален)",
                 date: "",
