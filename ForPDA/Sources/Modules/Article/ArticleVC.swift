@@ -32,6 +32,9 @@ final class ArticleVC: PDAViewController {
         collectionView.register(ArticleButtonCell.self)
         collectionView.register(ArticleBulletListCell.self)
         collectionView.registerFooter(ArticleCommentsFooterView.self)
+        
+        let backgroundView = ArticleBackgroundView(title: R.string.localizable.loadingTheArticle())
+        collectionView.backgroundView = backgroundView
                 
         return collectionView
     }()
@@ -84,6 +87,7 @@ extension ArticleVC: ArticleVCProtocol {
 
     func configureArticle(with elements: [ArticleElement]) {
         Task { @MainActor in
+            collectionView.backgroundView = nil
             update(elements: elements)
         }
     }

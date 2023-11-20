@@ -10,6 +10,7 @@ import Factory
 
 protocol ArticlePagesPresenterProtocol {
     var article: Article { get }
+    var isLoaded: Bool { get }
     
     func loadArticle() async
 }
@@ -25,6 +26,7 @@ final class ArticlePagesPresenter: ArticlePagesPresenterProtocol {
     weak var view: (ArticlePagesVCProtocol & Alertable)?
     
     var article: Article
+    var isLoaded = false
     
     // MARK: - Init
     
@@ -57,5 +59,7 @@ final class ArticlePagesPresenter: ArticlePagesPresenterProtocol {
         } catch {
             view?.showAlert(title: R.string.localizable.error(), message: error.localizedDescription)
         }
+        
+        isLoaded = true
     }
 }

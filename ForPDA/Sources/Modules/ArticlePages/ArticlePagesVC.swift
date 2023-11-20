@@ -221,6 +221,8 @@ extension ArticlePagesVC: UIScrollViewDelegate {
         if (currentIndex == 0 && scrollView.contentOffset.x < scrollView.bounds.size.width)
             ||
             (currentIndex == viewControllers.count - 1 && scrollView.contentOffset.x > scrollView.bounds.size.width)
+            ||
+            !presenter.isLoaded
         {
             scrollView.contentOffset = CGPoint(x: scrollView.bounds.size.width, y: 0)
         }
@@ -350,7 +352,7 @@ extension ArticlePagesVC {
         if let commentsVC = viewControllers[1] as? CommentsVC {
             commentsVC.collectionViewScrollDelegate = self
             // For some reason CommentsVC doesn't load without this line, investigate (todo)
-            commentsVC.view.backgroundColor = .tertiarySystemGroupedBackground
+            commentsVC.view.backgroundColor = .systemBackground
         }
     }
 }

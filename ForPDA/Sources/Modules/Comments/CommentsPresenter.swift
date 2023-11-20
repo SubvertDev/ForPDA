@@ -10,8 +10,9 @@ import Factory
 protocol CommentsPresenterProtocol {
     var themeColor: AppNightModeBackgroundColor { get }
     
-    func updateComments()
+    func updateComments() async
     func commentsHasUpdated()
+    func refreshControlCalled()
 }
 
 final class CommentsPresenter: CommentsPresenterProtocol {
@@ -39,24 +40,31 @@ final class CommentsPresenter: CommentsPresenterProtocol {
     
     // MARK: - Public Functions
     
-    func updateComments() {
-        Task {
-            do {
-                let response = try await news.comments(path: article.path)
-                let comments = parser.parseComments(from: response)
-                view?.updateComments(with: comments)
-            } catch {
-                view?.showAlert(title: R.string.localizable.error(), message: error.localizedDescription)
-            }
+    func updateComments() async {
+        do {
+            let response = try await news.comments(path: article.path)
+            let comments = parser.parseComments(from: response)
+            view?.updateComments(with: comments)
+        } catch {
+            view?.showAlert(title: R.string.localizable.error(), message: error.localizedDescription)
         }
     }
     
     // Case when we have Show Likes option and we need to reload
     // comments with likes after FLS comments are loaded
     func commentsHasUpdated() {
-        if !hasShownCommentsOnce {
-            updateComments()
-            hasShownCommentsOnce = true
+        Task {
+            if !hasShownCommentsOnce && settings.getFastLoadingSystem() {
+                await updateComments()
+                hasShownCommentsOnce = true
+            }
+        }
+    }
+    
+    func refreshControlCalled() {
+        guard hasShownCommentsOnce else { return }
+        Task {
+            await updateComments()
         }
     }
 }

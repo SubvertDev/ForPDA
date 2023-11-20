@@ -29,6 +29,7 @@
 "loading.dots" = "Loading...";
 
 // Article
+"loading.the.article" = "Loading the article...";
 "learn.more" = "Learn More";
 "comments" = "Comments (%d):";
 "swipe.left.to.show.comments" = "Swipe left to show comments";

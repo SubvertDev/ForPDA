@@ -29,6 +29,7 @@
 "loading.dots" = "Загружаю...";
 
 // Статья
+"loading.the.article" = "Загружаем статью...";
 "learn.more" = "Узнать подробнее";
 "comments" = "Комментарии (%d):";
 "swipe.left.to.show.comments" = "Свайпните влево чтобы открыть комментарии";

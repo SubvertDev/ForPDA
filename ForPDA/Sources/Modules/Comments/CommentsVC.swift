@@ -13,6 +13,15 @@ protocol CommentsVCProtocol: AnyObject {
 
 final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
     
+    // MARK: - Views
+    
+    private lazy var refresh: UIRefreshControl = {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(refreshControlCalled), for: .valueChanged)
+        tableView.refreshControl = refresh
+        return refresh
+    }()
+    
     // MARK: - Properties
         
     private let presenter: CommentsPresenterProtocol
@@ -47,10 +56,6 @@ final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
         fullyExpanded = true
         
         setupNotifications()
-        
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(refreshControlCalled), for: .valueChanged)
-        tableView.refreshControl = refreshControl
     }
     
     // MARK: - Public Functions
@@ -63,7 +68,7 @@ final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
         presenter.commentsHasUpdated()
         Task {
             try await Task.sleep(nanoseconds: 1_000_000_000)
-            tableView.refreshControl?.endRefreshing()
+            refresh.endRefreshing()
         }
     }
     
@@ -88,7 +93,7 @@ final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
     // MARK: - Actions
     
     @objc private func refreshControlCalled() {
-        presenter.updateComments()
+        presenter.refreshControlCalled()
     }
 }
 
@@ -123,6 +128,7 @@ extension CommentsVC {
 extension CommentsVC: CommentsVCProtocol {
     
     func updateComments(with comments: [Comment]) {
+        print("Updating em")
         Task { @MainActor in
             showComments(comments)
         }
