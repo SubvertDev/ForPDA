@@ -5,6 +5,9 @@
 ## Скриншоты
 ![Скриншоты](images/screenshots.png)
 
+## TestFlight
+Актуальная ссылка на [TestFlight](https://testflight.apple.com/join/CuI3nlN2)
+
 ## Требования и установка
 - iOS 15.0+ / macOS 14.0+
 - Xcode 15.0+ / Swift 5.9+
