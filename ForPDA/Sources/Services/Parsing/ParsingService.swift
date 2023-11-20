@@ -317,6 +317,7 @@ final class ParsingService {
                     }
                 }
             } else if try! element.iS("h2") || (try! element.iS("h3")) {
+                guard try! !element.text().isEmpty else { continue }
                 try! element.select("br").remove()
                 let text = try! element.html()
                 articleElements.append(TextElement(text: text, isHeader: true))
