@@ -1,45 +1,44 @@
 //
-//  NewArticlePresenter.swift
+//  ArticlePagesPresenter.swift
 //  ForPDA
 //
-//  Created by Ilia Lubianoi on 04.11.2023.
+//  Created by Ilia Lubianoi on 18.11.2023.
 //
 
 import Foundation
 import Factory
 
-protocol NewArticlePresenterProtocol {
+protocol ArticlePagesPresenterProtocol {
     var article: Article { get }
+    var isLoaded: Bool { get }
     
     func loadArticle() async
-    func updateComments() async
 }
 
-final class NewArticlePresenter: NewArticlePresenterProtocol {
+final class ArticlePagesPresenter: ArticlePagesPresenterProtocol {
     
     // MARK: - Properties
     
-    @Injected(\.newsService) private var newsService
+    @Injected(\.newsService) private var news
     @Injected(\.parsingService) private var parser
     @Injected(\.settingsService) private var settings
     
-    weak var view: NewArticleVCProtocol?
+    weak var view: (ArticlePagesVCProtocol & Alertable)?
     
     var article: Article
-    private var path: [String] = []
+    var isLoaded = false
     
     // MARK: - Init
     
     init(article: Article) {
         self.article = article
-        self.path = URL(string: article.url)?.pathComponents ?? []
     }
     
     // MARK: - Public Functions
     
     func loadArticle() async {
         do {
-            let response = try await newsService.article(path: path)
+            let response = try await news.article(path: article.path)
             
             // When opening through deeplink we don't have ArticleInfo
             // so we need to parse it first to show the header
@@ -53,18 +52,14 @@ final class NewArticlePresenter: NewArticlePresenterProtocol {
                 view?.reconfigureHeader(model: model)
             }
             
-            let elements = parser.parseArticle(from: response)
-            view?.configureArticle(with: elements)
-//            view?.makeComments(from: response)
+            async let elements = parser.parseArticle(from: response)
+            async let comments = parser.parseComments(from: response)
             
-//            await showLikesIfNeeded()
+            view?.configureArticle(elements: await elements, comments: await comments)
         } catch {
-            view?.showError()
+            view?.showAlert(title: R.string.localizable.error(), message: error.localizedDescription)
         }
-    }
-    
-    func updateComments() async {
         
+        isLoaded = true
     }
-    
 }

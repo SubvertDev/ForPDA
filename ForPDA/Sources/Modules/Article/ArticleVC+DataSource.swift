@@ -1,5 +1,5 @@
 //
-//  NewArticleVC+DataSource.swift
+//  ArticleVC+DataSource.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 04.11.2023.
@@ -8,14 +8,13 @@
 
 import UIKit
 
-extension NewArticleVC {
+extension ArticleVC {
     
     typealias DataSource = UICollectionViewDiffableDataSource<Section, Item>
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Item>
     
     enum Section: CaseIterable {
         case article
-        case comments
     }
 
     enum Item: Hashable {
@@ -26,7 +25,7 @@ extension NewArticleVC {
         case gif(ArticleGifCellModel)
         case button(ArticleButtonCellModel)
         case bulletList(ArticleBulletListCellModel)
-        // case quiz?
+        // (todo) case quiz?
     }
     
     // MARK: - Make
@@ -68,20 +67,20 @@ extension NewArticleVC {
         }
         
         dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
-            guard let self, kind == UICollectionView.elementKindSectionHeader else { return nil }
+            guard let self, kind == UICollectionView.elementKindSectionFooter else { return nil }
             
             let view = collectionView.dequeueReusableSupplementaryView(
                 ofKind: kind,
-                withReuseIdentifier: ArticleHeaderReusableView.reuseIdentifier,
+                withReuseIdentifier: ArticleCommentsFooterView.identifier,
                 for: indexPath
-            ) as? ArticleHeaderReusableView
+            ) as? ArticleCommentsFooterView
             
-            let model = ArticleHeaderViewModel(
-                imageUrl: presenter.article.info?.imageUrl,
-                title: presenter.article.info?.title
+            let model = ArticleCommentsFooterViewModel(
+                amountOfComments: Int(presenter.article.info?.commentAmount ?? "0") ?? 0
             )
             
             view?.configure(model: model)
+            view?.delegate = self
             
             return view
         }
@@ -93,9 +92,8 @@ extension NewArticleVC {
     
     func update(elements: [ArticleElement] = [], animated: Bool = true) {
         var snapshot = Snapshot()
-//        snapshot.appendSections(Section.allCases)
         snapshot.appendSections([Section.article])
-        
+
         for element in elements {
             switch element {
             case let item as TextElement:
@@ -167,5 +165,4 @@ extension NewArticleVC {
 
         dataSource.apply(snapshot, animatingDifferences: animated)
     }
-    
 }

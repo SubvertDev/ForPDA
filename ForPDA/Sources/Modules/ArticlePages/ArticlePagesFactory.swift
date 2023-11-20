@@ -1,19 +1,19 @@
 //
-//  NewArticleFactory.swift
+//  ArticlePagesFactory.swift
 //  ForPDA
 //
-//  Created by Ilia Lubianoi on 04.11.2023.
+//  Created by Ilia Lubianoi on 16.11.2023.
 //
 
 import RouteComposer
 
-final class NewArticleFactory: Factory {
+final class ArticlePagesFactory: Factory {
   
-  typealias ViewController = NewArticleVC
+  typealias ViewController = ArticlePagesVC
   typealias Context = Article
   
     func build(with context: Context) throws -> ViewController {
-        let presenter = NewArticlePresenter(article: context)
+        let presenter = ArticlePagesPresenter(article: context)
         let viewController = ViewController(presenter: presenter)
         presenter.view = viewController
         

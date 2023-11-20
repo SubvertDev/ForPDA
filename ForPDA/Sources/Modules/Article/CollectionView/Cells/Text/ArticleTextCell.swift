@@ -41,13 +41,6 @@ final class ArticleTextCell: UICollectionViewCell {
     
     // MARK: - Public Functions
     
-    // (todo) remove
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        contentView.backgroundColor = .clear
-    }
-    
     func configure(model: ArticleTextCellModel) {        
         text = model.text
         filterFromTags()

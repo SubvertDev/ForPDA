@@ -8,21 +8,15 @@
 
 import Foundation
 import Factory
-import WebKit
+import Sentry
 import RouteComposer
 
 protocol NewsPresenterProtocol {
     var articles: [Article] { get }
     
-//    func loadArticles()
-//    func refreshArticles()
-    
-    //
     func loadArticles() async
     func refreshArticles() async
-    //
     func showArticle(at indexPath: IndexPath)
-    
     func menuButtonTapped()
 }
 
@@ -50,7 +44,10 @@ final class NewsPresenter: NewsPresenterProtocol {
             articles += parser.parseArticles(from: response)
             settings.setIsDeeplinking(to: false)
             view?.articlesUpdated()
+        } catch RequestError.unexpectedStatusCode(403) {
+            view?.showCaptchaVerification()
         } catch {
+            SentrySDK.capture(error: error)
             view?.showError()
         }
         
@@ -67,7 +64,10 @@ final class NewsPresenter: NewsPresenterProtocol {
             let response = try await network.news(page: page)
             articles = parser.parseArticles(from: response)
             view?.articlesUpdated()
+        } catch RequestError.unexpectedStatusCode(403) {
+            view?.showCaptchaVerification()
         } catch {
+            SentrySDK.capture(error: error)
             view?.showError()
         }
     }
@@ -76,7 +76,7 @@ final class NewsPresenter: NewsPresenterProtocol {
     
     func showArticle(at indexPath: IndexPath) {
         let article = articles[indexPath.row]
-        try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
+        try? DefaultRouter().navigate(to: RouteMap.articlePagesScreen, with: article)
     }
     
     func menuButtonTapped() {

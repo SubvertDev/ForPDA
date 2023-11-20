@@ -7,8 +7,12 @@
 
 import Foundation
 
-class Comment: AbstractComment, ReflectedStringConvertible {
-    let avatarUrl: String
+class Comment: AbstractComment, ReflectedStringConvertible, Hashable {
+    
+    // MARK: - Properties
+    
+    let id = UUID().uuidString
+    let avatarUrl: URL?
     let author: String
     let text: String
     let date: String
@@ -18,8 +22,10 @@ class Comment: AbstractComment, ReflectedStringConvertible {
     var level: Int!
     var replyTo: AbstractComment?
     
+    // MARK: - Init
+    
     init(
-        avatarUrl: String,
+        avatarUrl: URL?,
         author: String,
         text: String,
         date: String,
@@ -37,9 +43,31 @@ class Comment: AbstractComment, ReflectedStringConvertible {
         self.level = level
         self.replyTo = replyTo
     }
+    
+    // MARK: - Static Functions
+    
+    static func countTotalComments(_ comments: [AbstractComment]) -> Int {
+        var totalCount = comments.count
+        for comment in comments {
+            totalCount += countTotalComments(comment.replies)
+        }
+        return totalCount
+    }
+    
+    // MARK: - Hashable & Equatable
+    
+    static func == (lhs: Comment, rhs: Comment) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        return hasher.combine(id)
+    }
 }
 
-public protocol ReflectedStringConvertible: CustomStringConvertible { }
+// MARK: - ReflectedStringConvertible
+
+protocol ReflectedStringConvertible: CustomStringConvertible { }
 
 extension ReflectedStringConvertible {
     public var description: String {

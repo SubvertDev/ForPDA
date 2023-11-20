@@ -12,9 +12,7 @@ struct Secrets {
     
     enum Keys: String {
         case SENTRY_DSN
-        case AMPLITUDE_TOKEN
-        case TELEGRAM_TOKEN
-        case TELEGRAM_CHAT_ID
+        case MIXPANEL_TOKEN
     }
     
     static func `for`(key: Keys) -> String {

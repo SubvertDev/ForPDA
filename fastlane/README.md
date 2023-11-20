@@ -15,6 +15,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
+### ios update
+
+```sh
+[bundle exec] fastlane ios update
+```
+
+Update version and build number (e.g. add `version:1.2.3` after lane name)
+
 ### ios beta
 
 ```sh

@@ -1,30 +1,12 @@
 {
   "pins" : [
     {
-      "identity" : "amplitude-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/amplitude/Amplitude-iOS",
-      "state" : {
-        "revision" : "94160a550835e6f0a1df9fa76ab3902ac4648a9c",
-        "version" : "8.17.1"
-      }
-    },
-    {
-      "identity" : "analytics-connector-ios",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/amplitude/analytics-connector-ios.git",
-      "state" : {
-        "revision" : "d2f3ec4b022211a67d5d4509135d84359f7f8b8d",
-        "version" : "1.0.2"
-      }
-    },
-    {
       "identity" : "factory",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hmlongco/Factory",
       "state" : {
-        "revision" : "061b3afe0358a0da7ce568f8272c847910be3dd7",
-        "version" : "2.2.0"
+        "revision" : "8ca11a7bd1ede031e8e6d7a912bb116e2e43961b",
+        "version" : "2.3.1"
       }
     },
     {
@@ -32,8 +14,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/cbpowell/MarqueeLabel.git",
       "state" : {
-        "revision" : "bc00d4cbff7f6c416035e3d16c21885452cd159e",
-        "version" : "4.3.1"
+        "revision" : "ae3cf7c647dd7f67f1946658285f5f0ce2476caf",
+        "version" : "4.4.0"
+      }
+    },
+    {
+      "identity" : "mixpanel-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mixpanel/mixpanel-swift",
+      "state" : {
+        "revision" : "ecd44ed6af66d45a50e62401228430c54c60dd26",
+        "version" : "4.2.0"
       }
     },
     {
@@ -41,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke.git",
       "state" : {
-        "revision" : "29d3a7e0c687f97fe35b584f60b93fc547d3dade",
-        "version" : "12.1.5"
+        "revision" : "3f666f120b63ea7de57d42e9a7c9b47f8e7a290b",
+        "version" : "12.1.6"
       }
     },
     {
@@ -50,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mac-cain13/R.swift",
       "state" : {
-        "revision" : "0e4ec17f329136b712d0a96128597b8ff2f31bdc",
-        "version" : "7.3.2"
+        "revision" : "a76220f2c4b73bdda670f4a318c6ec983399ac6d",
+        "version" : "7.4.0"
       }
     },
     {
@@ -59,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ekazaev/route-composer",
       "state" : {
-        "revision" : "4f3ab09d4589faa87e93c25e783fa6827721acfb",
-        "version" : "2.10.4"
+        "revision" : "54f23cdd9b56099a5c2e27b1a8b475a0ee702833",
+        "version" : "2.10.5"
       }
     },
     {
@@ -68,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "12998398eb51e2e8ff7098163fa97d305eee6d87",
-        "version" : "8.11.0"
+        "revision" : "c60f232c96264c3bea75bc0b81e6126b2f7475ee",
+        "version" : "8.15.2"
       }
     },
     {
@@ -104,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftKickMobile/SwiftMessages",
       "state" : {
-        "revision" : "b29dd21090b708aa0ae9ecbaf6e2d0487028dc3f",
-        "version" : "9.0.6"
+        "revision" : "62e12e138fc3eedf88c7553dd5d98712aa119f40",
+        "version" : "9.0.9"
       }
     },
     {
@@ -133,15 +124,6 @@
       "state" : {
         "revision" : "d6d26061d6553a493781ad3df4a8e275c43fc373",
         "version" : "5.4.4"
-      }
-    },
-    {
-      "identity" : "swipecellkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwipeCellKit/SwipeCellKit.git",
-      "state" : {
-        "revision" : "7219cad3098637176ace311510d11467dbfb9bb0",
-        "version" : "2.7.1"
       }
     },
     {

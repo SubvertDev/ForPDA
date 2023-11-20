@@ -9,10 +9,14 @@ enum Event {
 
     enum News: String {
         case articleOpen
+        case updateTriggered
         case newsLinkCopied
         case newsLinkShared
         case newsReport
         case menuOpen
+        case vpnWarningShown
+        case vpnDisableOptionChosen
+        case vpnCaptchaOptionChosen
     }
     
     enum Article: String {
@@ -21,6 +25,8 @@ enum Event {
         case articleReport
         case articleLinkClicked
         case articleButtonClicked
+        case articleCommentsOpened
+        case articleCommentsClosed
     }
     
     enum Menu: String {
@@ -51,9 +57,9 @@ enum Event {
         case themeChanged
         case nightModeOpen
         case nightModeChanged
+        case showSafariExtensions
         case fastLoadingSystemChanged
         case showLikesChanged
         case openGithubRelease
     }
-    
 }

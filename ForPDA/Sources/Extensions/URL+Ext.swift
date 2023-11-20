@@ -10,6 +10,7 @@ import Foundation
 extension URL {
     
     static let fourpda = URL(string: "https://4pda.to/")!
+    static let defaultAvatar = URL(string: "https://4pda.to/s/PXtijiHlTQLQuS20Pw2juZgaB7jch8eE.jpg")!
     
     static func fourpda(page: Int) -> URL {
         return URL(string: "https://4pda.to/page/\(page)/")!

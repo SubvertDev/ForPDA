@@ -1,5 +1,5 @@
 //
-//  NewArticleVC+CollectionLayout.swift
+//  ArticleVC+CollectionLayout.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 04.11.2023.
@@ -7,15 +7,15 @@
 
 import UIKit
 
-extension NewArticleVC {
+extension ArticleVC {
     
     func createLayout() -> UICollectionViewLayout {
-        
         let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
             
+            // Cells sizes
             let item = NSCollectionLayoutItem(
                 layoutSize: NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
+                    widthDimension: .fractionalWidth(1),
                     heightDimension: .estimated(150)
                 )
             )
@@ -34,23 +34,20 @@ extension NewArticleVC {
             
             let section = NSCollectionLayoutSection(group: containerGroup)
             
-            if sectionIndex == 0 {
-                let headerFooterSize = NSCollectionLayoutSize(
-                    widthDimension: .fractionalWidth(1.0),
-                    heightDimension: .fractionalWidth(0.6)
-                )
-                let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-                    layoutSize: headerFooterSize,
-                    elementKind: UICollectionView.elementKindSectionHeader,
-                    alignment: .top
-                )
-                section.boundarySupplementaryItems = [sectionHeader]
-            }
+            let footerSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .estimated(1)
+            )
+            let sectionFooter = NSCollectionLayoutBoundarySupplementaryItem(
+                layoutSize: footerSize,
+                elementKind: UICollectionView.elementKindSectionFooter,
+                alignment: .bottom
+            )
+            section.boundarySupplementaryItems = [sectionFooter]
             
             return section
             
         }
         return layout
     }
-    
 }

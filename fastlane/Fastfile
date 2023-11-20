@@ -2,13 +2,12 @@ default_platform(:ios)
 
 platform :ios do
 
-    desc "Push new build to TestFlight (has version option to update marketing version)"
+    desc "Update version and build number (e.g. add `version:1.2.3` after lane name)"
 
-    lane :beta do |options|
-
+    lane :update do |options|
         # Setting build number to amount of all commits in repo
-        build = sh("git rev-list --all --count")
-        
+	build = sh("git rev-list --all --count").chomp.strip
+
         # Updating build number in all targets
         increment_build_number_in_xcodeproj(
             build_number: build,
@@ -38,9 +37,45 @@ platform :ios do
             target: 'OpenInAppExtension'
         )
 
-	# get_certificates
+    end
 
-	# get_provisioning_profile
+    #----------------------------------------------------------------------------------
+
+    desc "Push new build to TestFlight (has version option to update marketing version)"
+
+    lane :beta do |options|
+
+        # Setting build number to amount of all commits in repo
+        build = sh("git rev-list --all --count").chomp.strip
+        
+        # Updating build number in all targets
+        increment_build_number_in_xcodeproj(
+            build_number: build,
+            target: 'ForPDA'
+        )
+        increment_build_number_in_xcodeproj(
+            build_number: build,
+            target: 'ShareExtension'
+        )
+        increment_build_number_in_xcodeproj(
+            build_number: build,
+            target: 'OpenInAppExtension'
+        )
+        
+        # If version is not specified when calling this lane then use current one instead
+        version = options.fetch(:version, get_version_number_from_xcodeproj)
+        increment_version_number_in_xcodeproj(
+            version_number: version,
+            target: 'ForPDA'
+        )
+        increment_version_number_in_xcodeproj(
+            version_number: version,
+            target: 'ShareExtension'
+        )
+        increment_version_number_in_xcodeproj(
+            version_number: version,
+            target: 'OpenInAppExtension'
+        )
 
         build_app(
             scheme: "ForPDA",

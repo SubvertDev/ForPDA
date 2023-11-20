@@ -5,6 +5,10 @@
 //  Created by Subvert on 20.05.2023.
 //
 
+// MARK: --
+// (todo) (important) !!!NEEDS FULL REFACTORING!!!
+// MARK: --
+
 import UIKit
 import Factory
 
@@ -81,13 +85,20 @@ final class SettingsPresenter: SettingsPresenterProtocol {
         MenuSection(
             title: R.string.localizable.advanced(),
             options: [
+                .descriptionCell(model: DescriptionOption(
+                    title: R.string.localizable.safariExtension(),
+                    description: R.string.localizable.safariExtensionEnable(),
+                    handler: openSafariExtensionPreferences)
+                ),
                 .switchCell(model: SwitchOption(
                     title: R.string.localizable.fastLoadingSystem(),
-                    isOn: isFLSEnabled, handler: {})
+                    isOn: isFLSEnabled, 
+                    handler: {})
                 ),
                 .switchCell(model: SwitchOption(
                     title: R.string.localizable.commentsShowLikes(),
-                    isOn: currentShowLikesInComments, handler: {})
+                    isOn: currentShowLikesInComments, 
+                    handler: {})
                 )
             ]),
         
@@ -124,6 +135,11 @@ final class SettingsPresenter: SettingsPresenterProtocol {
             )
         ],
         [ // Продвинутые
+            DescriptionOption(
+                title: R.string.localizable.safariExtension(),
+                description: R.string.localizable.safariExtensionEnable(),
+                handler: openSafariExtensionPreferences
+            ),
             SwitchOption(
                 title: R.string.localizable.fastLoadingSystem(),
                 isOn: settings.getFastLoadingSystem(),
@@ -180,6 +196,11 @@ final class SettingsPresenter: SettingsPresenterProtocol {
     private func changeNightModeBackgroundColor() {
         analytics.event(Event.Settings.nightModeOpen.rawValue)
         view?.showChangeDarkThemeBackgroundColorSheet()
+    }
+    
+    private func openSafariExtensionPreferences() {
+        analytics.event(Event.Settings.showSafariExtensions.rawValue)
+        UIApplication.shared.open(URL(string: "App-Prefs:SAFARI&path=WEB_EXTENSIONS")!)
     }
     
     private func showReleaseOnGithub() {

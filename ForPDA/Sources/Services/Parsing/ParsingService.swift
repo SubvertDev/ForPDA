@@ -317,6 +317,7 @@ final class ParsingService {
                     }
                 }
             } else if try! element.iS("h2") || (try! element.iS("h3")) {
+                guard try! !element.text().isEmpty else { continue }
                 try! element.select("br").remove()
                 let text = try! element.html()
                 articleElements.append(TextElement(text: text, isHeader: true))
@@ -439,7 +440,7 @@ final class ParsingService {
         let commentType = try! element.select("div[id]").attr("class")
         guard commentType != "deleted" else {
             return Comment(
-                avatarUrl: "",
+                avatarUrl: nil,
                 author: "",
                 text: "(Комментарий удален)",
                 date: "",
@@ -472,7 +473,7 @@ final class ParsingService {
         }
         
         return Comment(
-            avatarUrl: avatarUrl,
+            avatarUrl: URL(string: avatarUrl) ?? URL.defaultAvatar,
             author: author,
             text: text,
             date: date,

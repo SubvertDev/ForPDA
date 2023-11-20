@@ -8,28 +8,9 @@
 //  swiftlint:disable all
 
 import UIKit
-import SwipeCellKit
 
-/// Encapsulates all the visual properties of a SwipeCellKit's SwipeAction
-open class SwipeActionAppearance {
-    open var swipeActionColor: UIColor = #colorLiteral(red: 0.4147516489, green: 0.8618777394, blue: 0.8051461577, alpha: 1)
-    open var swipeActionHighlightedColor: UIColor = #colorLiteral(red: 0.7551190257, green: 0.8365258574, blue: 0.8273909688, alpha: 1)
-    
-    open var swipeActionText: String = "Collapse"
-    open var swipeActionTextColor: UIColor = .white
-    open var swipeActionHighlightedTextColor: UIColor = .white
-    open var swipeActionTextFont: UIFont = UIFont.systemFont(ofSize: 17.0, weight: .bold)
-    
-    open var swipeActionImage: UIImage = SwipeActionAppearance.getCollapseImage()
-    open var swipeActionHighlightedImage: UIImage = SwipeActionAppearance.getCollapseImage()
-    static func getCollapseImage() -> UIImage {
-        let bundle = Bundle(for: CommentsViewController.self)
-        return UIImage(named: "collapse", in: bundle, compatibleWith: nil)!
-    }
-    
-}
 /// ViewController displaying expandable comments.
-open class CommentsViewController: UITableViewController, SwipeTableViewCellDelegate {
+open class CommentsViewController: UITableViewController {
     
     /// The list of comments correctly displayed in the tableView (in linearized form)
     var _currentlyDisplayed: [AbstractComment] = []
@@ -50,8 +31,8 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     
     /// Enable/Disable the "swipe to hide" gesture
     open var swipeToHide: Bool = true
-    
-    open var swipeActionAppearance = SwipeActionAppearance()
+        
+    open var showOrHideOnTap: Bool = true
     
     open var fullyExpanded: Bool = false {
         didSet {
@@ -63,9 +44,6 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     
     open weak var delegate: CommentsViewDelegate? = nil
     
-    deinit {
-        //print("CommentsVC deinited!")
-    }
     override open func viewDidLoad() {
         super.viewDidLoad()
         
@@ -119,6 +97,8 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     }
     
     override open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard showOrHideOnTap else { return }
+        
         let selectedCom: AbstractComment = _currentlyDisplayed[indexPath.row]
         let selectedIndex = indexPath.row
         
@@ -163,9 +143,6 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     open override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let comment = currentlyDisplayed[indexPath.row]
         let commentCell = commentsView(tableView, commentCellForModel: comment, atIndexPath: indexPath)
-        if swipeToHide {
-            commentCell.delegate = self
-        }
         return commentCell
     }
     
@@ -181,35 +158,5 @@ open class CommentsViewController: UITableViewController, SwipeTableViewCellDele
     
     open func commentsView(_ tableView: UITableView, isCommentExpandable commentModel: AbstractComment, atIndexPath indexPath: IndexPath) -> Bool {
         return swipeToHide && isCellExpanded(indexPath: indexPath)
-    }
-    
-    public func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .right else { return nil }
-        guard commentsView(tableView, isCommentExpandable: _currentlyDisplayed[indexPath.row], atIndexPath: indexPath) else { return nil }
-        
-        let collapseAction = SwipeAction(style: .destructive,
-                                         title: swipeActionAppearance.swipeActionText)
-        { [weak self](action, indexPath) in
-            if self != nil {
-                self!.tableView(self!.tableView, didSelectRowAt: indexPath)
-                action.fulfill(with: .reset)
-            }
-        }
-        
-        // customize the action appearance
-        collapseAction.backgroundColor = swipeActionAppearance.swipeActionColor
-        collapseAction.highlightedBackgroundColor = swipeActionAppearance.swipeActionHighlightedColor
-        collapseAction.textColor = swipeActionAppearance.swipeActionTextColor
-        collapseAction.highlightedTextColor = swipeActionAppearance.swipeActionHighlightedTextColor
-        collapseAction.font = swipeActionAppearance.swipeActionTextFont
-        collapseAction.image = swipeActionAppearance.swipeActionImage
-        collapseAction.highlightedImage = swipeActionAppearance.swipeActionHighlightedImage
-        return [collapseAction]
-    }
-    
-    public func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeTableOptions {
-        var options = SwipeTableOptions()
-        options.expansionStyle = .destructive(automaticallyDelete: false)
-        return options
     }
 }

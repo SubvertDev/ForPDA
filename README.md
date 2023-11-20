@@ -5,15 +5,18 @@
 ## Скриншоты
 ![Скриншоты](images/screenshots.png)
 
+## TestFlight
+Актуальная ссылка на [TestFlight](https://testflight.apple.com/join/CuI3nlN2)
+
 ## Требования и установка
 - iOS 15.0+ / macOS 14.0+
 - Xcode 15.0+ / Swift 5.9+
 - Скачать и запустить проект, зависимости загрузятся автоматически через SPM
-- (Опционально) Для запуска сервисов Amplitude/Sentry/Telegram переименовать SecretsExample в Secrets и заменить все значения на свои
+- (Опционально) Для запуска сервисов Sentry/Mixpanel переименовать SecretsExample.xcconfig в Secrets.xcconfig и заменить все значения на свои
 
 ## Используемые библиотеки
 - [Fastlane](https://github.com/fastlane/fastlane) - автоматизация сборки и выгрузки на TestFlight
-- [Amplitude](https://github.com/amplitude/Amplitude-iOS) - аналитика
+- [Mixpanel](https://github.com/mixpanel/mixpanel-swift) - аналитика
 - [Sentry](https://github.com/getsentry/sentry-cocoa) - мониторинг ошибок
 - [SwiftSoup](https://github.com/scinfu/SwiftSoup) - парсинг HTML страниц
 - [SwitchRichString](https://github.com/malcommac/SwiftRichString) - преобразование HTML в TextView

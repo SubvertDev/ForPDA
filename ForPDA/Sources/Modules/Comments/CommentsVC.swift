@@ -6,37 +6,37 @@
 //
 
 import UIKit
-import Factory
-import SwiftSoup
-import WebKit
 
 protocol CommentsVCProtocol: AnyObject {
-    func updateFinished(_ state: Bool)
+    func updateComments(with comments: [Comment])
 }
 
-// Refactor this controller (todo)
-
-final class CommentsVC: CommentsViewController {
+final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
+    
+    // MARK: - Views
+    
+    private lazy var refresh: UIRefreshControl = {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(refreshControlCalled), for: .valueChanged)
+        tableView.refreshControl = refresh
+        return refresh
+    }()
     
     // MARK: - Properties
-    
-    @Injected(\.parsingService) private var parsingService
-    @Injected(\.settingsService) private var settingsService
+        
+    private let presenter: CommentsPresenterProtocol
     
     private var allComments: [Comment] = []
-    private let article: Article
-    private let document: String
+    private lazy var themeColor = presenter.themeColor
     
-    private var contentSizeObserver: NSKeyValueObservation!
-    private lazy var themeColor = settingsService.getAppBackgroundColor()
+    weak var collectionViewScrollDelegate: ArticleInnerScrollViewDelegate?
+    var dragDirection: DragDirection = .up
+    var oldContentOffset: CGPoint = .zero
     
-    weak var updateDelegate: CommentsVCProtocol?
-            
-    // MARK: - Lifecycle
+    // MARK: - Init
     
-    init(article: Article, document: String) {
-        self.article = article
-        self.document = document
+    init(presenter: CommentsPresenterProtocol) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -44,54 +44,46 @@ final class CommentsVC: CommentsViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.register(cellWithClass: ArticleCommentCell.self)
         
-        getComments()
+        swipeToHide = false
+        showOrHideOnTap = false
+        fullyExpanded = true
+        
         setupNotifications()
     }
     
     // MARK: - Public Functions
     
-    func updateComments(with document: String) {
-        tableView.isUserInteractionEnabled = false
+    func showComments(_ comments: [Comment]) {
+        allComments = comments
         _currentlyDisplayed.removeAll()
+        currentlyDisplayed = allComments
         
-        Task(priority: .background) {
-            let newComments = self.parsingService.parseComments(from: document)
-            allComments = newComments
-            currentlyDisplayed = self.allComments
-            
-            Task(priority: .userInitiated) {
-                updateDelegate?.updateFinished(true)
-                tableView.reloadData()
-                tableView.isUserInteractionEnabled = true
-            }
+        tableView.reloadData()
+        if comments.isEmpty {
+            tableView.backgroundView = NewsBackgroundView(
+                title: R.string.localizable.noCommentsYet(),
+                symbol: .exclamationmarkBubble
+            )
+        } else {
+            tableView.backgroundView = nil
+        }
+        
+        presenter.commentsHasUpdated()
+        
+        Task {
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            refresh.endRefreshing()
         }
     }
     
     // MARK: - Private Functions
-    
-    private func getComments() {
-        allComments = parsingService.parseComments(from: document)
-        
-        currentlyDisplayed = allComments
-        fullyExpanded = true
-        
-        tableView.snp.makeConstraints { make in
-            make.height.equalTo(100)
-        }
-        
-        contentSizeObserver = tableView.observe(\.contentSize, options: .new) { tableView, change in
-            if let size = change.newValue {
-                tableView.snp.updateConstraints { make in
-                    make.height.equalTo(size.height)
-                }
-            }
-        }
-    }
     
     private func setupNotifications() {
         NotificationCenter.default.addObserver(
@@ -104,13 +96,22 @@ final class CommentsVC: CommentsViewController {
         if let object = notification.object as? AppNightModeBackgroundColor {
             themeColor = object
         } else {
-            themeColor = settingsService.getAppBackgroundColor()
+            themeColor = presenter.themeColor
         }
         tableView.reloadData()
     }
     
-    // MARK: - TableView DataSource
+    // MARK: - Actions
     
+    @objc private func refreshControlCalled() {
+        presenter.refreshControlCalled()
+    }
+}
+
+// MARK: - TableView DataSource
+
+extension CommentsVC {
+        
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withClass: ArticleCommentCell.self, for: indexPath)
         if let comment = currentlyDisplayed[indexPath.row] as? Comment {
@@ -129,6 +130,17 @@ final class CommentsVC: CommentsViewController {
             }
             cell.indentationColor = .tertiarySystemGroupedBackground
             cell.commentMarginColor = .tertiarySystemGroupedBackground
+        }
+    }
+}
+
+// MARK: - CommentsVCProtocol
+
+extension CommentsVC: CommentsVCProtocol {
+    
+    func updateComments(with comments: [Comment]) {
+        Task { @MainActor in
+            showComments(comments)
         }
     }
 }

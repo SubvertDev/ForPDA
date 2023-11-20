@@ -20,7 +20,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var webView: WKWebView = {
         let config = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: config)
-        webView.tag = 666
         return webView
     }()
     
@@ -68,7 +67,7 @@ extension SceneDelegate {
             let id = url.absoluteString.components(separatedBy: "article/")[1]
             let url = URL.fourpda.absoluteString + id
             let article = Article(url: url, info: nil)
-            try? DefaultRouter().navigate(to: RouteMap.newArticleScreen, with: article)
+            try? DefaultRouter().navigate(to: RouteMap.articlePagesScreen, with: article)
         }
     }
     

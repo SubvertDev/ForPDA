@@ -9,11 +9,12 @@ import UIKit
 import Factory
 import SwiftMessages
 import SFSafeSymbols
-
 import RouteComposer
+import Sentry
 
 protocol NewsVCProtocol: AnyObject {
     func articlesUpdated()
+    func showCaptchaVerification()
     func showError()
 }
 
@@ -41,6 +42,10 @@ final class NewsVC: PDAViewControllerWithView<NewsView> {
         Task {
             await presenter.loadArticles()
         }
+//        Task { @MainActor in
+//            try await Task.sleep(nanoseconds: 0_500_000_000)
+//            showCaptchaVerification()
+//        }
     }
     
     // MARK: - Configuration
@@ -88,22 +93,69 @@ extension NewsVC: UITableViewDataSource {
 extension NewsVC: NewsVCProtocol {
     
     func articlesUpdated() {
+        myView.tableView.backgroundView = nil
         myView.tableView.reloadData()
-        myView.refreshControl.endRefreshing()
         myView.refreshButton.isHidden = false
         myView.refreshButton.setTitle(R.string.localizable.loadMore(), for: .normal)
         myView.loadingIndicator.isHidden = true
+        Task {
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            myView.refreshControl.endRefreshing()
+        }
+    }
+    
+    func showCaptchaVerification() {
+        analytics.event(Event.News.vpnWarningShown.rawValue)
+
+        let alert = UIAlertController(
+            title: R.string.localizable.whoops(),
+            message: R.string.localizable.vpnWarning(),
+            preferredStyle: .alert
+        )
+        
+        let okAction = UIAlertAction(title: R.string.localizable.vpnTurnOff(), style: .cancel) { [weak self] _ in
+            guard let self else { return }
+            analytics.event(Event.News.vpnDisableOptionChosen.rawValue)
+            UIApplication.shared.open(URL(string: "com.apple.preferences:")!)
+            showVPNBackgroundView()
+        }
+        let captchaAction = UIAlertAction(title: R.string.localizable.vpnShowCaptcha(), style: .default) { [weak self] _ in
+            guard let self else { return }
+            analytics.event(Event.News.vpnCaptchaOptionChosen.rawValue)
+            let request = URLRequest(url: URL.fourpda)
+            let webVC = WebVC(request: request) { [weak self] in
+                guard let self else { return }
+                Task { await self.presenter.loadArticles() }
+                showAlert(title: R.string.localizable.warning(), message: R.string.localizable.vpnFlsIncompatible())
+            }
+            webVC.modalPresentationStyle = .overCurrentContext
+            present(webVC, animated: true)
+        }
+        
+        alert.addAction(okAction)
+        alert.addAction(captchaAction)
+        
+        present(alert, animated: true)
     }
     
     func showError() {
-        myView.loadingIndicator.isHidden = true
-        let alert = UIAlertController(
-            title: R.string.localizable.error(),
-            message: R.string.localizable.somethingWentWrong(),
-            preferredStyle: .alert
+        let backgroundView = NewsBackgroundView(
+            title: R.string.localizable.whoops() + " " + R.string.localizable.somethingWentWrong(),
+            symbol: .questionmark
         )
-        alert.addAction(UIAlertAction(title: R.string.localizable.ok(), style: .default))
-        present(alert, animated: true)
+        myView.tableView.backgroundView = backgroundView
+        myView.loadingIndicator.isHidden = true
+        myView.refreshControl.endRefreshing()   
+    }
+    
+    private func showVPNBackgroundView() {
+        let backgroundView = NewsBackgroundView(
+            title: R.string.localizable.vpnWarningBackground(),
+            symbol: .wifiExclamationmark
+        )
+        myView.tableView.backgroundView = backgroundView
+        myView.refreshControl.endRefreshing()
+        myView.loadingIndicator.isHidden = true
     }
 }
 
@@ -112,6 +164,7 @@ extension NewsVC: NewsVCProtocol {
 extension NewsVC: NewsViewDelegate {
     
     func refreshButtonTapped() {
+        analytics.event(Event.News.updateTriggered.rawValue)
         myView.refreshButton.setTitle(R.string.localizable.loadingDots(), for: .normal)
         Task {
             await presenter.loadArticles()
@@ -119,6 +172,7 @@ extension NewsVC: NewsViewDelegate {
     }
     
     func refreshControlCalled() {
+        analytics.event(Event.News.updateTriggered.rawValue)
         Task {
             await presenter.refreshArticles()
         }
@@ -164,6 +218,7 @@ extension NewsVC: UITableViewDelegate {
     private func reportAction(article: Article) -> UIAction {
         UIAction.make(title: R.string.localizable.somethingWrongWithArticle(), symbol: .questionmarkCircle) { [unowned self] _ in
             SwiftMessages.showDefault(title: R.string.localizable.thanks(), body: R.string.localizable.willFixSoon())
+            SentrySDK.capture(error: SentryCustomError.badArticle(url: article.url))
             analytics.event(Event.News.newsReport.rawValue)
         }
     }

@@ -10,6 +10,10 @@ import Foundation
 struct Article {
     let url: String
     var info: ArticleInfo?
+    
+    var path: [String] {
+        return URL(string: url)?.pathComponents ?? []
+    }
 }
 
 struct ArticleInfo {
