@@ -15,13 +15,13 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios ipa
+### ios update
 
 ```sh
-[bundle exec] fastlane ios ipa
+[bundle exec] fastlane ios update
 ```
 
-Make unsigned IPA
+Update version and build number (e.g. add `version:1.2.3` after lane name)
 
 ### ios beta
 
