@@ -57,6 +57,8 @@ final class CommentsPresenter: CommentsPresenterProtocol {
             if !hasShownCommentsOnce && settings.getFastLoadingSystem() {
                 await updateComments()
                 hasShownCommentsOnce = true
+            } else if !hasShownCommentsOnce {
+                hasShownCommentsOnce = true
             }
         }
     }

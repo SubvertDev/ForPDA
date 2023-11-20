@@ -92,21 +92,17 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 guard let self else { return }
                 
                 // When switching off
-                if !isOn {
-                    switch indexPath.row {
-                    case 1:
-                        presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
-                    case 2:
-                        presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
-                    default:
-                        break
-                    }
+                if !isOn && indexPath.row == 2 {
+                    presenter.showLikesInCommentsSwitchTapped(isOn: isOn)
+                    return
+                } else if isOn && indexPath.row == 1 {
+                    presenter.fastLoadingSystemSwitchTapped(isOn: isOn)
                     return
                 }
                 
                 var message = ""
                 if model.title.contains("новостей") || model.title.contains("news") {
-                    message = R.string.localizable.fastLoadingSystemWarning()
+                    message = R.string.localizable.fastLoadingSystemTurnOffWarning()
                 } else {
                     message = R.string.localizable.commentsShowLikesWarning()
                 }
@@ -138,7 +134,7 @@ extension SettingsVC: UITableViewDelegate, UITableViewDataSource {
                 alert.addAction(okAction)
                 alert.addAction(cancelAction)
                 
-                if isOn {
+                if (isOn && indexPath.row == 2) || (!isOn && indexPath.row == 1) {
                     present(alert, animated: true)
                 }
             }

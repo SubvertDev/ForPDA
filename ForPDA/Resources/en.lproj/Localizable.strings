@@ -82,9 +82,9 @@
 "safari.extension" = "Safari extension";
 "safari.extension.enable" = "Open settings";
 "fast.loading.system" = "Fast loading news";
-"fast.loading.system.warning" = "After activiting this option latest news may not load and show wrong amount of comments, and likes may not appear in articles";
+"fast.loading.system.turn.off.warning" = "After deactivating this function some articles may take significant time to load";
 "comments.show.likes" = "Show likes";
-"comments.show.likes.warning" = "After activiting this option with \"Fast loading article\" you may see increase in traffic usage";
+"comments.show.likes.warning" = "Some articles may take a significant amount of time to load likes. After activiting this option with \"Fast loading article\" you may see increase in traffic usage";
 "account" = "Account";
 "sign.out" = "Sign Out";
 "about.app" = "About App";
@@ -101,14 +101,3 @@
 "captcha.uploading.failed" = "Captcha uploading failed";
 "login.failed.unknown.reasons" = "Something went wrong, try again later";
 "login" = "Log In";
-
-// Special // todo remove after 0.4
-"update03" = "Update 0.3";
-"update03.text" =
-"This update introduces two new options for opening articles in the app through Safari:
-                                                
-1) Press the Share button and select ForPDA from the list
-2) Go to Settings > Safari > Extensions > Open in ForPDA > On (Ask > Allow), after that Safari will offer to open articles in the app
-                                                
-P.S. Any issues with article rendering can be reported through a long tap on the news / menu in the upper right corner of the article / linked chat in the settings";
-"update03.enable.extension" = "Enable extension";

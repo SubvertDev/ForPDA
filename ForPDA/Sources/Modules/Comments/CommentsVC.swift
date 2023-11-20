@@ -128,7 +128,6 @@ extension CommentsVC {
 extension CommentsVC: CommentsVCProtocol {
     
     func updateComments(with comments: [Comment]) {
-        print("Updating em")
         Task { @MainActor in
             showComments(comments)
         }
