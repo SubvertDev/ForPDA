@@ -118,8 +118,10 @@ extension ArticlePagesVC: ArticlePagesVCProtocol {
     }
     
     func reconfigureHeader(model: ArticleHeaderViewModel) {
-        headerView.configure(model: model)
-        configureNavigationTitle(model.title)
+        Task { @MainActor in
+            headerView.configure(model: model)
+            configureNavigationTitle(model.title)
+        }
     }
 }
 
@@ -302,10 +304,12 @@ extension ArticlePagesVC: ArticlePageControllerDelegate {
 extension ArticlePagesVC {
     
     private func configureNavigationTitle(_ deeplinkTitle: String? = nil) {
-        let label = MarqueeLabel(frame: .zero, rate: 30, fadeLength: 0)
-        label.text = deeplinkTitle != nil ? deeplinkTitle : presenter.article.info?.title
-        label.fadeLength = 30
-        navigationItem.titleView = label
+        Task { @MainActor in
+            let label = MarqueeLabel(frame: .zero, rate: 30, fadeLength: 0)
+            label.text = deeplinkTitle != nil ? deeplinkTitle : presenter.article.info?.title
+            label.fadeLength = 30
+            navigationItem.titleView = label
+        }
     }
     
     private func configureMenu() {
