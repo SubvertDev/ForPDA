@@ -64,8 +64,19 @@ final class CommentsVC: CommentsViewController, UIGestureRecognizerDelegate {
         allComments = comments
         _currentlyDisplayed.removeAll()
         currentlyDisplayed = allComments
+        
         tableView.reloadData()
+        if comments.isEmpty {
+            tableView.backgroundView = NewsBackgroundView(
+                title: R.string.localizable.noCommentsYet(),
+                symbol: .exclamationmarkBubble
+            )
+        } else {
+            tableView.backgroundView = nil
+        }
+        
         presenter.commentsHasUpdated()
+        
         Task {
             try await Task.sleep(nanoseconds: 1_000_000_000)
             refresh.endRefreshing()

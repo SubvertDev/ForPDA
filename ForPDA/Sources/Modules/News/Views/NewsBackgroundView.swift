@@ -31,7 +31,8 @@ final class NewsBackgroundView: UIView {
         
         addSubview(stack)
         stack.snp.makeConstraints { make in
-            make.center.equalToSuperview()
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-44)
             make.horizontalEdges.equalToSuperview().inset(16)
         }
     }

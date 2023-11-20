@@ -33,6 +33,7 @@
 "learn.more" = "Learn More";
 "comments" = "Comments (%d):";
 "swipe.left.to.show.comments" = "Swipe left to show comments";
+"no.comments.yet" = "No comments yet";
 
 // In Development
 "will.fix.soon" = "We'll try to fix it soon :)";
