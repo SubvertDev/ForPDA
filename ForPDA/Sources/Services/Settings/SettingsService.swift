@@ -90,7 +90,7 @@ final class SettingsService {
     // MARK: - App Language
     
     func getAppLanguage() -> AppLanguage {
-        let language = Locale.autoupdatingCurrent.languageCode
+        let language = Locale.autoupdatingCurrent.language.languageCode?.identifier
         return AppLanguage(rawValue: language ?? AppLanguage.ru.rawValue) ?? .ru
     }
     

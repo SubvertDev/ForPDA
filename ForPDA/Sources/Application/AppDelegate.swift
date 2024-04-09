@@ -12,7 +12,6 @@ import Mixpanel
 import Sentry
 import Nuke
 
-@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     @Injected(\.settingsService) private var settingsService

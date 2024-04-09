@@ -1,5 +1,5 @@
 //
-//  ProgressView.swift
+//  ProgressViewKit.swift
 //  ForPDA
 //
 //  Created by Subvert on 05.09.2023.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ProgressView: UIView {
+final class ProgressViewKit: UIView {
     
     // MARK: - Properties
     

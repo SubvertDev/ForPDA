@@ -24,8 +24,8 @@ final class NewsView: UIView {
         return tableView
     }()
     
-    private(set) var loadingIndicator: ProgressView = {
-        let progress = ProgressView(colors: [.label], lineWidth: 4)
+    private(set) var loadingIndicator: ProgressViewKit = {
+        let progress = ProgressViewKit(colors: [.label], lineWidth: 4)
         progress.isAnimating = true
         return progress
     }()

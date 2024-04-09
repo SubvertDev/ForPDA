@@ -66,7 +66,7 @@ final class ParsingService {
     
     // MARK: - Articles
     
-    func parseArticles(from document: String) -> [Article] {
+    func parseArticles(from document: String) -> [Article] { // RELEASE: Change to News
         let document = try! SwiftSoup.parse(document)
         
         var articles = [Article]()

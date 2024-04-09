@@ -10,7 +10,7 @@ import UIKit
 final class ArticleBackgroundView: UIView {
     
     convenience init(title: String) {
-        let progress = ProgressView(colors: [.label], lineWidth: 4)
+        let progress = ProgressViewKit(colors: [.label], lineWidth: 4)
         progress.isAnimating = true
         
         let label = UILabel()

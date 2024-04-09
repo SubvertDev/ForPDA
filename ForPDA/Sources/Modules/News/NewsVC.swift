@@ -28,7 +28,7 @@ final class NewsVC: PDAViewControllerWithView<NewsView> {
 
     // MARK: - Lifecycle
     
-    init(presenter: NewsPresenter) {
+    init(presenter: NewsPresenterProtocol) {
         self.presenter = presenter
         super.init()
     }
