@@ -1,14 +1,19 @@
 import Foundation
 
-public struct News: Identifiable {
+public struct News: Identifiable, Equatable {
+    
     public let url: URL
     public let info: NewsInfo
     
-    public var id: String { url.absoluteString + String(Int.random(in: 0...1000)) }
+    public var id: String { url.absoluteString + String(Int.random(in: 0...1000)) } // RELEASE: Remove
     
     public init(url: URL, info: NewsInfo) {
         self.url = url
         self.info = info
+    }
+    
+    public static func == (lhs: News, rhs: News) -> Bool {
+        return lhs.url == rhs.url
     }
 }
 

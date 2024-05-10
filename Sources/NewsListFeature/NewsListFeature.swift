@@ -13,16 +13,28 @@ import NewsClient
 @Reducer
 public struct NewsListFeature {
     
+    public init() {}
+    
     // MARK: - State
     
     @ObservableState
-    public struct State {
+    public struct State: Equatable {
         @Presents public var alert: AlertState<Action.Alert>?
         public var news: [News] = []
         public var isLoading = true
         public var showVpnWarningBackground = false
         
-        public init() {}
+        public init(
+            alert: AlertState<Action.Alert>? = nil,
+            news: [News] = [],
+            isLoading: Bool = true,
+            showVpnWarningBackground: Bool = false
+        ) {
+            self.alert = alert
+            self.news = news
+            self.isLoading = isLoading
+            self.showVpnWarningBackground = showVpnWarningBackground
+        }
     }
     
     // MARK: - Action
@@ -40,10 +52,6 @@ public struct NewsListFeature {
             case openCaptcha
         }
     }
-    
-    // MARK: - Init
-    
-    public init() {}
     
     // MARK: - Dependencies
     

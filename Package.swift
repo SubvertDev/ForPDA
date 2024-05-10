@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -22,20 +22,28 @@ let package = Package(
         .library(name: "Models", targets: ["Models"])
     ],
     dependencies: [
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "main"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
         .package(url: "https://github.com/hmlongco/Factory", from: "2.3.2"),
         .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.7.2"),
-        .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0")
+        .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
+        .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
+        .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.25.2"),
+        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0")
     ],
     targets: [
-        // Features
+        
+        // MARK: - Features
+        
         .target(
             name: "AppFeature",
             dependencies: [
                 "NewsListFeature",
                 "NewsFeature",
                 "MenuFeature",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Mixpanel", package: "mixpanel-swift"),
+                .product(name: "Sentry", package: "sentry-cocoa")
             ]
         ),
         .target(
@@ -43,7 +51,8 @@ let package = Package(
             dependencies: [
                 "Models",
                 "NewsClient",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
             ]
         ),
         .target(
@@ -60,7 +69,8 @@ let package = Package(
             ]
         ),
         
-        // Clients
+        // MARK: - Clients
+        
         .target(
             name: "NewsClient",
             dependencies: [
@@ -85,11 +95,22 @@ let package = Package(
             ]
         ),
         
-        // Misc
+        // MARK: - Helpers
+        
         .target(
             name: "Models",
             dependencies: [
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+            ]
+        ),
+        
+        // MARK: - Tests
+        
+        .testTarget(
+            name: "AppFeatureTests",
+            dependencies: [
+                "AppFeature",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         )
     ]

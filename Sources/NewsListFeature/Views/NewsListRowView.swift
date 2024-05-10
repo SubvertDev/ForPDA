@@ -1,5 +1,5 @@
 //
-//  NewsListCellView.swift
+//  NewsListRowView.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 21.03.2024.
@@ -9,7 +9,7 @@ import SwiftUI
 import NukeUI
 import Models
 
-struct NewsListCellView: View {
+struct NewsListRowView: View {
     
     let news: News
     
@@ -66,5 +66,5 @@ struct NewsListCellView: View {
 }
 
 #Preview {
-    NewsListCellView(news: .mock)
+    NewsListRowView(news: .mock)
 }

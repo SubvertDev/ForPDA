@@ -1,5 +1,5 @@
 //
-//  NewsView.swift
+//  NewsScreen.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 21.03.2024.
@@ -8,8 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 
-// RELEASE: Remove SUI naming
-public struct NewsView: View {
+public struct NewsScreen: View {
     
     @Perception.Bindable public var store: StoreOf<NewsFeature>
     
@@ -27,7 +26,7 @@ public struct NewsView: View {
 // MARK: - Preview
 
 #Preview {
-    NewsView(
+    NewsScreen(
         store: Store(
             initialState: NewsFeature.State(news: .mock)
         ) {

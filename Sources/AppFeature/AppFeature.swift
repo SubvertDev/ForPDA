@@ -17,7 +17,7 @@ public struct AppFeature {
     
     // MARK: - Path
     
-    @Reducer
+    @Reducer(state: .equatable)
     public enum Path {
         case menu(MenuFeature)
         case news(NewsFeature)
@@ -26,12 +26,16 @@ public struct AppFeature {
     // MARK: - State
     
     @ObservableState
-    public struct State {
+    public struct State: Equatable {
         public var appDelegate = AppDelegateFeature.State()
         public var path = StackState<Path.State>()
         public var newsList = NewsListFeature.State()
         
-        public init() {}
+        public init(
+            newsList: NewsListFeature.State = NewsListFeature.State()
+        ) {
+            self.newsList = newsList
+        }
     }
     
     // MARK: - Action

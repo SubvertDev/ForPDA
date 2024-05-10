@@ -22,14 +22,14 @@ public struct AppView: View {
     public var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                NewsListView(store: store.scope(state: \.newsList, action: \.newsList))
+                NewsListScreen(store: store.scope(state: \.newsList, action: \.newsList))
             } destination: { store in
                 switch store.case {
                 case .menu:
                     MenuViewSUI()
                     
                 case let .news(store):
-                    NewsView(store: store)
+                    NewsScreen(store: store)
                 }
             }
         }

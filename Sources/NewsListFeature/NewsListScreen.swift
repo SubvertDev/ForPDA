@@ -1,5 +1,5 @@
 //
-//  NewsListView.swift
+//  NewsListScreen.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 21.03.2024.
@@ -7,9 +7,8 @@
 
 import SwiftUI
 import ComposableArchitecture
-import NewsFeature
 
-public struct NewsListView: View {
+public struct NewsListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<NewsListFeature>
     
@@ -24,13 +23,8 @@ public struct NewsListView: View {
                     Button {
                         store.send(.newsTapped(news.id))
                     } label: {
-                        NewsListCellView(news: news)
+                        NewsListRowView(news: news)
                     }
-
-//                    NavigationLink(state: AppFeature.Path.State.news(NewsFeature.State(news: news))) {
-//                        NewsListCellView(news: news)
-//                    }
-//                    .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 12, trailing: 0)) // Navigation Link Padding Fix
                     .listSectionSeparator(.hidden)
                 }
                 .listStyle(.plain)
@@ -77,12 +71,13 @@ public struct NewsListView: View {
 }
 
 #Preview {
-    NewsListView(
+    NewsListScreen(
         store: Store(
             initialState: NewsListFeature.State()
         ) {
             NewsListFeature()
-                ._printChanges()
+        } withDependencies: {
+            $0.newsClient = .previewValue
         }
     )
 }

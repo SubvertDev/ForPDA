@@ -66,7 +66,8 @@ extension ParsingClient {
                 let url = try news.select("[rel=bookmark]").attr("href")
                 let description = try news.select("[itemprop=description]").text()
                 let imageUrl = try news.select("img").get(0).attr("src")
-                let author = try news.select("[class=autor]").select("a").text()
+                var author = try news.select("[class=autor]").select("a").text()
+                if author == "News" { author = "4PDA" } // Some articles have no author and defaults to "News", I've changed it to "4PDA"
                 let date = try news.select("[class=date]").text()
                 let commentAmount = try news.select("[class=v-count]").text()
                 

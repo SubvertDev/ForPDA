@@ -13,9 +13,9 @@ public struct NewsFeature {
     
     // MARK: - State
     
-    // TODO REMOVE OBSERV?
+    // RELEASE: REMOVE OBSERV?
     @ObservableState
-    public struct State {
+    public struct State: Equatable {
         let news: News
         
         public init(news: News) {
