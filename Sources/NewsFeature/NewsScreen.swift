@@ -7,6 +7,8 @@
 
 import SwiftUI
 import ComposableArchitecture
+import NukeUI
+import SFSafeSymbols
 
 public struct NewsScreen: View {
     
@@ -18,7 +20,79 @@ public struct NewsScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            Text(store.news.info.title)
+            ScrollView {
+                ZStack {
+                    LazyImage(url: store.news.imageUrl) { state in
+                        if let image = state.image { image.resizable().scaledToFill() }
+                    }
+                    .frame(height: UIScreen.main.bounds.width * 0.6)
+                    .clipped()
+                    
+                    VStack {
+                        Spacer()
+                        
+                        Text(store.news.title)
+                            .foregroundStyle(.white)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .shadow(color: .black, radius: 5)
+                            .shadow(color: .black, radius: 10)
+                    }
+                    .padding()
+                }
+                
+                Spacer()
+                    .frame(height: UIScreen.main.bounds.height * 0.2)
+                
+                VStack {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .scaleEffect(2)
+                        .padding()
+                    
+                    Text("Загружаем статью...")
+                }
+            }
+            .navigationTitle(store.news.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        MenuButton(title: "Скопировать ссылку", symbol: .doc) {
+                            
+                        }
+                        MenuButton(title: "Поделиться ссылкой", symbol: .arrowTurnUpRight) {
+                            
+                        }
+                        MenuButton(title: "Проблемы со статьей", symbol: .questionmarkCircle) {
+                            
+                        }
+                    } label: {
+                        Image(systemSymbol: .ellipsis)
+                    }
+                }
+            }
+            .task {
+                store.send(.onTask)
+            }
+        }
+    }
+}
+
+struct MenuButton: View {
+    
+    let title: String
+    let symbol: SFSymbol
+    var action: (() -> Void)?
+    
+    var body: some View {
+        Button {
+            action?()
+        } label: {
+            HStack {
+                Text(title)
+                Image(systemSymbol: symbol)
+            }
         }
     }
 }
@@ -26,11 +100,13 @@ public struct NewsScreen: View {
 // MARK: - Preview
 
 #Preview {
-    NewsScreen(
-        store: Store(
-            initialState: NewsFeature.State(news: .mock)
-        ) {
-            NewsFeature()
-        }
-    )
+    NavigationStack {
+        NewsScreen(
+            store: Store(
+                initialState: NewsFeature.State(news: .mock)
+            ) {
+                NewsFeature()
+            }
+        )
+    }
 }

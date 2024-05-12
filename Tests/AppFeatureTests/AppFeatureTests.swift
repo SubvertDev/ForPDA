@@ -9,7 +9,7 @@ final class AppFeatureTests: XCTestCase {
     
     @MainActor
     func testOpenNews() async {
-        let news = News.mock
+        let news = NewsPreview.mock
         
         let store = TestStore(
             initialState: AppFeature.State(

@@ -15,8 +15,8 @@ import Models
 
 @DependencyClient
 public struct ParsingClient: Sendable {
-    public var parseNewsList: @Sendable (_ document: String) async throws -> [News]
-    public var parseNews: @Sendable (_ document: String) async throws -> News
+    public var parseNewsList: @Sendable (_ document: String) async throws -> [NewsPreview]
+    public var parseNews: @Sendable (_ document: String) async throws -> [any NewsElement]
 }
 
 extension DependencyValues {
@@ -32,7 +32,7 @@ extension ParsingClient: DependencyKey {
             return try await parseNewsList(from: document)
         },
         parseNews: { document in
-            return try await parseNewsList(from: document).first!
+            return try await parseNews(from: document)
         }
     )
 }
@@ -44,11 +44,12 @@ enum ParsingError: Error {
 // MARK: - Parsing News List
 
 extension ParsingClient {
-    private static func parseNewsList(from document: String) async throws -> [News] {
+    
+    private static func parseNewsList(from document: String) async throws -> [NewsPreview] {
         do {
             let document = try SwiftSoup.parse(document)
             
-            var newsList = [News]()
+            var newsList = [NewsPreview]()
             
             let newsListElements = try document.select("article")
             for news in newsListElements {
@@ -71,17 +72,15 @@ extension ParsingClient {
                 let date = try news.select("[class=date]").text()
                 let commentAmount = try news.select("[class=v-count]").text()
                 
-                let article = News(
+                let article = NewsPreview(
                     url: URL(string: url)!,
-                    info: NewsInfo(
-                        title: title,
-                        description: description,
-                        imageUrl: URL(string: imageUrl)!,
-                        author: author,
-                        date: date,
-                        isReview: isReview,
-                        commentAmount: commentAmount
-                    )
+                    title: title,
+                    description: description,
+                    imageUrl: URL(string: imageUrl)!,
+                    author: author,
+                    date: date,
+                    isReview: isReview,
+                    commentAmount: commentAmount
                 )
                 
                 newsList.append(article)
@@ -96,7 +95,8 @@ extension ParsingClient {
 // MARK: - Parsing News
 
 extension ParsingClient {
-    private static func parseNews(from document: String) -> [ArticleElement] {
+    
+    private static func parseNews(from document: String) async throws -> [any NewsElement] {
         let document = try! SwiftSoup.parse(document)
 
         if try! !document.select("[class=content-box]").isEmpty() {
@@ -104,14 +104,14 @@ extension ParsingClient {
         } else if try! !document.select("[class=article]").isEmpty() {
             return parseNewsFancy(from: document)
         } else {
-            return []
+            return [] // RELEASE: Throw an error
         }
     }
     
     // MARK: - Parse News Normal
     
-    private static func parseNewsNormal(from document: Document) -> [ArticleElement] {
-        var articleElements: [ArticleElement] = []
+    private static func parseNewsNormal(from document: Document) -> [any NewsElement] {
+        var articleElements: [any NewsElement] = []
         let elements = try! document.select("[class=content-box]").select("p, h2, li, ol, dl, ul")
         
         for element in elements {
@@ -227,8 +227,8 @@ extension ParsingClient {
     
     // MARK: - Parse News Fancy
     
-    private static func parseNewsFancy(from document: Document) -> [ArticleElement] {
-        var articleElements: [ArticleElement] = []
+    private static func parseNewsFancy(from document: Document) -> [any NewsElement] {
+        var articleElements: [any NewsElement] = []
         let elements = try! document.select("[class=article]").select("p, h2, h3, figure, dl, a[class]")
         
         for element in elements {
@@ -355,59 +355,6 @@ extension ParsingClient {
 
 // MARK: - Old Implementation
 
-protocol ArticleElement {}
-
-struct TextElement: ArticleElement {
-    let text: String
-    let isHeader: Bool
-    let isQuote: Bool
-    let inList: Bool
-    let countedListIndex: Int
-    
-    init(text: String,
-         isHeader: Bool = false,
-         isQuote: Bool = false,
-         inList: Bool = false,
-         countedListIndex: Int = 0) {
-        self.text = text
-        self.isHeader = isHeader
-        self.isQuote = isQuote
-        self.inList = inList
-        self.countedListIndex = countedListIndex
-    }
-}
-
-struct ImageElement: ArticleElement {
-    let url: URL
-    let description: String?
-    let width: Int
-    let height: Int
-}
-
-struct VideoElement: ArticleElement {
-    let url: String
-}
-
-struct GifElement: ArticleElement {
-    let url: URL
-    let width: Int
-    let height: Int
-}
-
-struct ButtonElement: ArticleElement {
-    let text: String
-    let url: URL
-}
-
-struct BulletListParentElement: ArticleElement {
-    let elements: [BulletListElement]
-}
-
-struct BulletListElement: Hashable {
-    var title: String
-    var description: [String]
-}
-
 final class ParsingService {
     
     // MARK: - URLs
@@ -473,41 +420,41 @@ final class ParsingService {
 //        }
 //    }
     
-    // MARK: - Article Info (deeplink case)
+    // MARK: - Article Info (deeplink case) / RELEASE: Handle deeplink
     
-    func parseArticleInfo(from document: String) -> ArticleInfo {
-        let document = try! SwiftSoup.parse(document)
-        
-        let author = try! document.select("[class=name]").text()
-        let date = try! document.select("[class=date]").get(0).text()
-        let commentAmount = try! document.select("[class=number]").text()
-        
-        var title = ""
-        var imageUrl = ""
-        if try! !document.select("[class=content-box]").isEmpty() {
-            title = try! document.select("[itemprop=headline]").get(0).text()
-            for element in try! document.select("[itemprop=image") where element.hasAttr("sizes") {
-                imageUrl = try! element.attr("src")
-                break
-            }
-        } else if try! !document.select("[class=article]").isEmpty() {
-            title = try! document.select("[class=article-header]").select("h1").text()
-            imageUrl = try! document.select("[class*=article]").attr("src")
-            if !imageUrl.contains("https:") { imageUrl = "https:" + imageUrl }
-        }
-        
-        let articleInfo = ArticleInfo(
-            title: title,
-            description: "",
-            imageUrl: URL(string: imageUrl)!,
-            author: author,
-            date: date,
-            isReview: false,
-            commentAmount: commentAmount
-        )
-        
-        return articleInfo
-    }
+//    func parseArticleInfo(from document: String) -> ArticleInfo {
+//        let document = try! SwiftSoup.parse(document)
+//        
+//        let author = try! document.select("[class=name]").text()
+//        let date = try! document.select("[class=date]").get(0).text()
+//        let commentAmount = try! document.select("[class=number]").text()
+//        
+//        var title = ""
+//        var imageUrl = ""
+//        if try! !document.select("[class=content-box]").isEmpty() {
+//            title = try! document.select("[itemprop=headline]").get(0).text()
+//            for element in try! document.select("[itemprop=image") where element.hasAttr("sizes") {
+//                imageUrl = try! element.attr("src")
+//                break
+//            }
+//        } else if try! !document.select("[class=article]").isEmpty() {
+//            title = try! document.select("[class=article-header]").select("h1").text()
+//            imageUrl = try! document.select("[class*=article]").attr("src")
+//            if !imageUrl.contains("https:") { imageUrl = "https:" + imageUrl }
+//        }
+//        
+//        let articleInfo = ArticleInfo(
+//            title: title,
+//            description: "",
+//            imageUrl: URL(string: imageUrl)!,
+//            author: author,
+//            date: date,
+//            isReview: false,
+//            commentAmount: commentAmount
+//        )
+//        
+//        return articleInfo
+//    }
     
     // MARK: - Article (normal)
     

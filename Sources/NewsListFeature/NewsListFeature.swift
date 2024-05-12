@@ -20,13 +20,13 @@ public struct NewsListFeature {
     @ObservableState
     public struct State: Equatable {
         @Presents public var alert: AlertState<Action.Alert>?
-        public var news: [News] = []
+        public var news: [NewsPreview] = []
         public var isLoading = true
         public var showVpnWarningBackground = false
         
         public init(
             alert: AlertState<Action.Alert>? = nil,
-            news: [News] = [],
+            news: [NewsPreview] = [],
             isLoading: Bool = true,
             showVpnWarningBackground: Bool = false
         ) {
@@ -41,11 +41,11 @@ public struct NewsListFeature {
     
     public enum Action {
         case menuTapped
-        case newsTapped(News.ID)
+        case newsTapped(NewsPreview.ID)
         case onTask
         case onRefresh
         
-        case newsResponse(Result<[News], Error>)
+        case newsResponse(Result<[NewsPreview], Error>)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {

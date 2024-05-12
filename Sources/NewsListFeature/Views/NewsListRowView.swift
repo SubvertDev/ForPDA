@@ -11,15 +11,13 @@ import Models
 
 struct NewsListRowView: View {
     
-    let news: News
-    
-    private var info: NewsInfo { news.info }
+    let news: NewsPreview
     
     private let cellPadding: CGFloat = 16
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            LazyImage(url: info.imageUrl) { state in
+            LazyImage(url: news.imageUrl) { state in
                 if let image = state.image { image.resizable().scaledToFill() }
             }
             .frame(width: UIScreen.main.bounds.width - cellPadding * 2,
@@ -27,17 +25,17 @@ struct NewsListRowView: View {
             .clipped()
             .cornerRadius(16)
             
-            Text(info.title)
+            Text(news.title)
                 .font(.title3)
                 .fontWeight(.medium)
             
-            Text(info.description)
+            Text(news.description)
                 .font(.subheadline)
                 .fontWeight(.light)
                 .lineLimit(3)
             
             HStack {
-                Text(info.author)
+                Text(news.author)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundStyle(.gray)
@@ -48,14 +46,14 @@ struct NewsListRowView: View {
                     Image(systemSymbol: .message)
                         .foregroundStyle(.gray)
                     
-                    Text(info.commentAmount)
+                    Text(news.commentAmount)
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundStyle(.gray)
                 }
                 .padding(.trailing, 8)
                 
-                Text(info.date)
+                Text(news.date)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundStyle(.gray)

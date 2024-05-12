@@ -59,7 +59,9 @@ let package = Package(
             name: "NewsFeature",
             dependencies: [
                 "Models",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                "NewsClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
             ]
         ),
         .target(

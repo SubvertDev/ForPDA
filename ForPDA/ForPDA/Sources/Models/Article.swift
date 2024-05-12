@@ -19,18 +19,16 @@ struct Article: Identifiable {
     // RELEASE: Make UUID instead?
     var id: String { path.joined() + String(Int.random(in: 0...1000)) }
     
-    func toNews() -> News {
-        return News(
+    func toNews() -> NewsPreview {
+        return NewsPreview(
             url: URL(string: url)!,
-            info: NewsInfo(
-                title: info!.title,
-                description: info!.description,
-                imageUrl: info!.imageUrl,
-                author: info!.author,
-                date: info!.date,
-                isReview: info!.isReview,
-                commentAmount: info!.commentAmount
-            )
+            title: info!.title,
+            description: info!.description,
+            imageUrl: info!.imageUrl,
+            author: info!.author,
+            date: info!.date,
+            isReview: info!.isReview,
+            commentAmount: info!.commentAmount
         )
     }
 }
