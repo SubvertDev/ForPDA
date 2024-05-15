@@ -102,3 +102,4 @@
 "captcha.uploading.failed" = "Не получилось отправить капчу";
 "login.failed.unknown.reasons" = "Что-то пошло не так, попробуйте позже";
 "login" = "Войти";
+"done" = "Готово";

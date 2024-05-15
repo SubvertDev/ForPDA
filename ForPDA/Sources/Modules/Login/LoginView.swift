@@ -91,6 +91,7 @@ final class LoginView: UIView {
         
         addSubviews()
         makeConstraints()
+        setupToolbar()
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(captchaImageTapped))
         captchaImageView.addGestureRecognizer(tap)
@@ -111,6 +112,10 @@ final class LoginView: UIView {
         delegate?.captchaImageTapped()
     }
     
+    @objc private func doneButtonTapped() {
+        endEditing(true)
+    }
+    
     // MARK: - Layout
     
     private func addSubviews() {
@@ -125,9 +130,10 @@ final class LoginView: UIView {
     }
     
     private func makeConstraints() {
+        let isSE = UIScreen.main.bounds.height <= 667
         loginTextField.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(safeAreaLayoutGuide).inset(64)
+            make.top.equalTo(safeAreaLayoutGuide).inset(isSE ? 16 : 64)
         }
         
         passwordTextField.snp.makeConstraints { make in
@@ -160,6 +166,17 @@ final class LoginView: UIView {
             make.horizontalEdges.equalToSuperview().inset(16)
             make.height.equalTo(100)
         }
+    }
+    
+    private func  setupToolbar() {
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let doneButton = UIBarButtonItem(title: R.string.localizable.done(), style: .done, target: self, action: #selector(doneButtonTapped))
+        toolbar.items = [flexibleSpace, doneButton]
+        captchaTextField.inputAccessoryView = toolbar
+        loginTextField.inputAccessoryView = toolbar
+        passwordTextField.inputAccessoryView = toolbar
     }
 }
 
