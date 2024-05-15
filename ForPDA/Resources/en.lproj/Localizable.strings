@@ -102,3 +102,4 @@
 "captcha.uploading.failed" = "Captcha uploading failed";
 "login.failed.unknown.reasons" = "Something went wrong, try again later";
 "login" = "Log In";
+"done" = "Ready";
