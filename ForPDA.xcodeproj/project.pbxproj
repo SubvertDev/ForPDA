@@ -212,7 +212,7 @@
 		B8001CD92A1AA0FE00E7A8A8 /* CookiesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookiesService.swift; sourceTree = "<group>"; };
 		B8001CDB2A1ADD4000E7A8A8 /* Cookie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cookie.swift; sourceTree = "<group>"; };
 		B8001CDE2A1B01D000E7A8A8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
-		B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SecretsExample.xcconfig; sourceTree = "<group>"; };
+		B802965E2AAE87D100D5B413 /* SecretsExapmle.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SecretsExapmle.xcconfig; sourceTree = "<group>"; };
 		B8086F672B066081003A7D57 /* ArticlePagesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePagesFactory.swift; sourceTree = "<group>"; };
 		B8086F692B066086003A7D57 /* ArticlePagesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePagesVC.swift; sourceTree = "<group>"; };
 		B8086F6B2B0677E7003A7D57 /* ArticleHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleHeaderView.swift; sourceTree = "<group>"; };
@@ -906,7 +906,7 @@
 				B8FD82092A1163EE00EB7035 /* Sources */,
 				B8FD820E2A11681500EB7035 /* Resources */,
 				B82B2EC62A89306000CB067C /* Secrets.xcconfig */,
-				B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */,
+				B802965E2AAE87D100D5B413 /* SecretsExapmle.xcconfig */,
 				B82B2EFE2A8942E900CB067C /* Info.plist */,
 			);
 			path = ForPDA;

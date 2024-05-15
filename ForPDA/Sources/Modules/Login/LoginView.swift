@@ -130,10 +130,10 @@ final class LoginView: UIView {
     }
     
     private func makeConstraints() {
-        let isSE = UIScreen.main.bounds.height < 680 ? 16 : 64
+        let isSE = UIScreen.main.bounds.height <= 667
         loginTextField.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16)
-            make.top.equalTo(safeAreaLayoutGuide).inset(isSE)
+            make.top.equalTo(safeAreaLayoutGuide).inset(isSE ? 16 : 64)
         }
         
         passwordTextField.snp.makeConstraints { make in
