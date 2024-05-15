@@ -1158,18 +1158,18 @@
 			);
 			mainGroup = B8D351EC293CABB6008A84EA;
 			packageReferences = (
-				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */,
-				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */,
-				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */,
-				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */,
-				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */,
-				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */,
+				B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */,
+				B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
+				B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */,
+				B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */,
+				B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */,
 				B8495D40294CCE1E00F60171 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
-				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */,
-				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */,
+				B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */,
+				B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 				B8B55B002A07C948008C93D3 /* XCRemoteSwiftPackageReference "Factory" */,
 				B88D3F572A098C600061C6C4 /* XCRemoteSwiftPackageReference "SFSafeSymbols" */,
-				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */,
+				B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */,
 				B85EC41D2B0AC6D000659A04 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 			);
@@ -1400,7 +1400,7 @@
 /* Begin PBXTargetDependency section */
 		B834034D296770C300C3CF37 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = B834034C296770C300C3CF37 /* plugin:RswiftGenerateInternalResources */;
+			productRef = B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */;
 		};
 		B8A85A912AA10CF500EDFE58 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1788,7 +1788,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */ = {
+		B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
 			requirement = {
@@ -1796,7 +1796,7 @@
 				minimumVersion = 5.6.0;
 			};
 		};
-		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */ = {
+		B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
 			requirement = {
@@ -1812,7 +1812,7 @@
 				minimumVersion = 2.10.4;
 			};
 		};
-		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */ = {
+		B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kirualex/SwiftyGif.git";
 			requirement = {
@@ -1828,7 +1828,7 @@
 				minimumVersion = 9.0.6;
 			};
 		};
-		B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */ = {
+		B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kean/Nuke.git";
 			requirement = {
@@ -1844,7 +1844,7 @@
 				minimumVersion = 4.2.0;
 			};
 		};
-		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */ = {
+		B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit.git";
 			requirement = {
@@ -1860,7 +1860,7 @@
 				minimumVersion = 4.1.1;
 			};
 		};
-		B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */ = {
+		B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/malcommac/SwiftRichString.git";
 			requirement = {
@@ -1876,7 +1876,7 @@
 				minimumVersion = 2.1.5;
 			};
 		};
-		B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */ = {
+		B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cbpowell/MarqueeLabel.git";
 			requirement = {
@@ -1884,7 +1884,7 @@
 				minimumVersion = 4.3.0;
 			};
 		};
-		B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */ = {
+		B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
 			requirement = {
@@ -1892,7 +1892,7 @@
 				minimumVersion = 2.6.0;
 			};
 		};
-		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */ = {
+		B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mac-cain13/R.swift";
 			requirement = {
@@ -1905,12 +1905,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		B809925A293CBF5C0053202C /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit.git" */;
+			package = B8099259293CBF5C0053202C /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
 		};
 		B82B2EB22A87D58D00CB067C /* Sentry */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa.git" */;
+			package = B82B2EB12A87D58D00CB067C /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
 			productName = Sentry;
 		};
 		B82EFA242A896CBD00C8B2AC /* RouteComposer */ = {
@@ -1918,13 +1918,13 @@
 			package = B82EFA232A896CBD00C8B2AC /* XCRemoteSwiftPackageReference "route-composer" */;
 			productName = RouteComposer;
 		};
-		B834034C296770C300C3CF37 /* plugin:RswiftGenerateInternalResources */ = {
+		B834034C296770C300C3CF37 /* RswiftGenerateInternalResources */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = "plugin:RswiftGenerateInternalResources";
 		};
 		B83E8AC4294A75DA000D59E7 /* SwiftyGif */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif.git" */;
+			package = B83E8AC3294A75DA000D59E7 /* XCRemoteSwiftPackageReference "SwiftyGif" */;
 			productName = SwiftyGif;
 		};
 		B8495D41294CCE1E00F60171 /* SwiftMessages */ = {
@@ -1934,12 +1934,12 @@
 		};
 		B84CCC51294A6EDA0001EB24 /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */;
+			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = Nuke;
 		};
 		B84CCC53294A6EDA0001EB24 /* NukeExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke.git" */;
+			package = B84CCC50294A6EDA0001EB24 /* XCRemoteSwiftPackageReference "Nuke" */;
 			productName = NukeExtensions;
 		};
 		B85EC41E2B0AC6D000659A04 /* Mixpanel */ = {
@@ -1949,7 +1949,7 @@
 		};
 		B884AFF729FD9D6F00BC1AA1 /* YouTubePlayerKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit.git" */;
+			package = B884AFF629FD9D6F00BC1AA1 /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
 			productName = YouTubePlayerKit;
 		};
 		B88D3F582A098C600061C6C4 /* SFSafeSymbols */ = {
@@ -1959,7 +1959,7 @@
 		};
 		B89301182947CF5500D14141 /* SwiftRichString */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString.git" */;
+			package = B89301172947CF5500D14141 /* XCRemoteSwiftPackageReference "SwiftRichString" */;
 			productName = SwiftRichString;
 		};
 		B8B55B012A07C948008C93D3 /* Factory */ = {
@@ -1969,17 +1969,17 @@
 		};
 		B8BD2D78293E1C3F00E12E29 /* MarqueeLabel */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel.git" */;
+			package = B8BD2D77293E1C3F00E12E29 /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
 			productName = MarqueeLabel;
 		};
 		B8D3521A293CBE46008A84EA /* SwiftSoup */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup.git" */;
+			package = B8D35219293CBE46008A84EA /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
 		};
 		B8FEA1C129676FC3002DFAA4 /* RswiftLibrary */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R.swift" */;
+			package = B8FEA1C029676FC3002DFAA4 /* XCRemoteSwiftPackageReference "R" */;
 			productName = RswiftLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
