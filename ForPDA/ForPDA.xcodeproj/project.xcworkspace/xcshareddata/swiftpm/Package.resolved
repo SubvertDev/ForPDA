@@ -1,4 +1,5 @@
 {
+  "originHash" : "3770e4566c0707f957c62d5925467d2a65657863d7d6d44ba5dee797dfee7e8a",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -16,15 +17,6 @@
       "state" : {
         "revision" : "587995f7d5cc667951d635fbf6b4252324ba0439",
         "version" : "2.3.2"
-      }
-    },
-    {
-      "identity" : "marqueelabel",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cbpowell/MarqueeLabel.git",
-      "state" : {
-        "revision" : "877e810534cda9afabb8143ae319b7c3341b121b",
-        "version" : "4.5.0"
       }
     },
     {
@@ -48,19 +40,10 @@
     {
       "identity" : "r.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mac-cain13/R.swift",
+      "location" : "https://github.com/mac-cain13/R.swift.git",
       "state" : {
         "revision" : "384eab88d1a0b98ac96f4819e50a4308ecd5359f",
         "version" : "7.5.0"
-      }
-    },
-    {
-      "identity" : "route-composer",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ekazaev/route-composer",
-      "state" : {
-        "revision" : "54f23cdd9b56099a5c2e27b1a8b475a0ee702833",
-        "version" : "2.10.5"
       }
     },
     {
@@ -79,15 +62,6 @@
       "state" : {
         "revision" : "afd0a1da4ed62bab1413caa6dd6b60a7a7089ed2",
         "version" : "5.2.0"
-      }
-    },
-    {
-      "identity" : "snapkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SnapKit/SnapKit.git",
-      "state" : {
-        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
-        "version" : "5.7.1"
       }
     },
     {
@@ -190,24 +164,6 @@
       }
     },
     {
-      "identity" : "swiftmessages",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftKickMobile/SwiftMessages",
-      "state" : {
-        "revision" : "62e12e138fc3eedf88c7553dd5d98712aa119f40",
-        "version" : "9.0.9"
-      }
-    },
-    {
-      "identity" : "swiftrichstring",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/malcommac/SwiftRichString.git",
-      "state" : {
-        "revision" : "9bf4b5af6bb4386865636fc504d6c588c2b65040",
-        "version" : "3.7.2"
-      }
-    },
-    {
       "identity" : "swiftsoup",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/scinfu/SwiftSoup.git",
@@ -223,15 +179,6 @@
       "state" : {
         "revision" : "2ec6c3a15293efff6083966b38439a4004f25565",
         "version" : "1.3.0"
-      }
-    },
-    {
-      "identity" : "swiftygif",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kirualex/SwiftyGif.git",
-      "state" : {
-        "revision" : "4430cbc148baa3907651d40562d96325426f409a",
-        "version" : "5.4.5"
       }
     },
     {
@@ -262,5 +209,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

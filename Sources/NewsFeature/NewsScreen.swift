@@ -9,6 +9,8 @@ import SwiftUI
 import ComposableArchitecture
 import NukeUI
 import SFSafeSymbols
+import YouTubePlayerKit
+import Models
 
 public struct NewsScreen: View {
     
@@ -33,9 +35,12 @@ public struct NewsScreen: View {
                         
                         Text(store.news.title)
                             .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .minimumScaleFactor(0.75)
+                            .lineLimit(2)
                             .font(.title2)
                             .fontWeight(.semibold)
-                            .shadow(color: .black, radius: 5)
+                            .shadow(color: .black.opacity(0.75), radius: 5)
                             .shadow(color: .black, radius: 10)
                     }
                     .padding()
@@ -47,7 +52,7 @@ public struct NewsScreen: View {
                 VStack {
                     ProgressView()
                         .progressViewStyle(.circular)
-                        .scaleEffect(2)
+                        .scaleEffect(1.5)
                         .padding()
                     
                     Text("Загружаем статью...")
@@ -103,7 +108,7 @@ struct MenuButton: View {
     NavigationStack {
         NewsScreen(
             store: Store(
-                initialState: NewsFeature.State(news: .mock)
+                initialState: NewsFeature.State(news: NewsPreview(url: URL(string: "/")!, title: "Poetry Camera прверащает увиденное в стихи.", description: "Test", imageUrl: URL(string: "/")!, author: "", date: "", isReview: false, commentAmount: ""))
             ) {
                 NewsFeature()
             }

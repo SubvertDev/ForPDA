@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import SharedUI
 
 @Reducer
 public struct MenuFeature {
@@ -17,13 +18,20 @@ public struct MenuFeature {
     
     @ObservableState
     public struct State: Equatable {
-        public init() {}
+        var loggedIn = false
+        
+        public init(
+            loggedIn: Bool = false
+        ) {
+            self.loggedIn = loggedIn
+        }
     }
     
     // MARK: - Action
     
     public enum Action {
         case profileTapped
+        case settingsTapped
     }
     
     // MARK: - Dependencies
@@ -37,8 +45,10 @@ public struct MenuFeature {
             switch action {
             case .profileTapped:
                 return .none
+                
+            case .settingsTapped:
+                return .none
             }
         }
     }
 }
-

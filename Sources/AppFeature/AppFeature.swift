@@ -9,6 +9,7 @@ import ComposableArchitecture
 import NewsListFeature
 import NewsFeature
 import MenuFeature
+import SettingsFeature
 
 @Reducer
 public struct AppFeature {
@@ -19,8 +20,9 @@ public struct AppFeature {
     
     @Reducer(state: .equatable)
     public enum Path {
-        case menu(MenuFeature)
         case news(NewsFeature)
+        case menu(MenuFeature)
+        case settings(SettingsFeature)
     }
     
     // MARK: - State
@@ -62,21 +64,29 @@ public struct AppFeature {
             case .appDelegate:
                 return .none
                 
-            case .path:
-                return .none
+                // MARK: NewsList
                 
             case .newsList(.menuTapped):
                 state.path.append(.menu(MenuFeature.State()))
                 return .none
                 
-            case let .newsList(.newsTapped(id)):
-                print(id)
-                state.path.append(.news(NewsFeature.State(news: .mock)))
+            case let .newsList(.newsTapped(news)):
+                state.path.append(.news(NewsFeature.State(news: news)))
                 return .none
                 
             case .newsList:
                 return .none
+                
+                // MARK: Menu
+                
+            case .path(.element(id: _, action: .menu(.settingsTapped))):
+                state.path.append(.settings(SettingsFeature.State()))
+                return .none
+                
+            case .path:
+                return .none
             }
+            
         }
         .forEach(\.path, action: \.path)
     }

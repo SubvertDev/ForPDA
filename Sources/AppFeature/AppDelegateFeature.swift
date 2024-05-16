@@ -53,6 +53,10 @@ public struct AppDelegateFeature {
                 // Configuring Nuke
                 ImagePipeline.shared = ImagePipeline(configuration: .withDataCache)
                 
+                //    private func configureCookies() {
+                //        cookiesService.configureCookies()
+                //    }
+                
                 return .none
             }
         }

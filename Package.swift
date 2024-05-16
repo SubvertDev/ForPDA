@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -12,14 +12,16 @@ let package = Package(
         .library(name: "NewsListFeature", targets: ["NewsListFeature"]),
         .library(name: "NewsFeature", targets: ["NewsFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
+        .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
         
         // Clients
         .library(name: "NewsClient", targets: ["NewsClient"]),
         .library(name: "SettingsClient", targets: ["SettingsClient"]),
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
         
-        // Misc
-        .library(name: "Models", targets: ["Models"])
+        // Shared
+        .library(name: "Models", targets: ["Models"]),
+        .library(name: "SharedUI", targets: ["SharedUI"])
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
@@ -29,7 +31,8 @@ let package = Package(
         .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
         .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.25.2"),
-        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0")
+        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0"),
+        .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0")
     ],
     targets: [
         
@@ -41,9 +44,10 @@ let package = Package(
                 "NewsListFeature",
                 "NewsFeature",
                 "MenuFeature",
+                "SettingsFeature",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Mixpanel", package: "mixpanel-swift"),
-                .product(name: "Sentry", package: "sentry-cocoa")
+                .product(name: "Sentry-Dynamic", package: "sentry-cocoa")
             ]
         ),
         .target(
@@ -61,11 +65,20 @@ let package = Package(
                 "Models",
                 "NewsClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "NukeUI", package: "nuke")
+                .product(name: "NukeUI", package: "nuke"),
+                .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit")
             ]
         ),
         .target(
             name: "MenuFeature",
+            dependencies: [
+                "SharedUI",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+            ]
+        ),
+        .target(
+            name: "SettingsFeature",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
@@ -97,13 +110,20 @@ let package = Package(
             ]
         ),
         
-        // MARK: - Helpers
+        // MARK: - Shared
         
         .target(
             name: "Models",
             dependencies: [
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
+        ),
+        .target(
+            name: "SharedUI",
+            dependencies: [
+                .product(name: "RswiftLibrary", package: "R.swift")
+            ],
+            plugins: [.plugin(name: "RswiftGeneratePublicResources", package: "R.swift")]
         ),
         
         // MARK: - Tests

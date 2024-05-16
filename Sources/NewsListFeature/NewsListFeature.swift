@@ -41,7 +41,7 @@ public struct NewsListFeature {
     
     public enum Action {
         case menuTapped
-        case newsTapped(NewsPreview.ID)
+        case newsTapped(NewsPreview)
         case onTask
         case onRefresh
         

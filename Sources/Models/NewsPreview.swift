@@ -11,7 +11,7 @@ public struct NewsPreview: Identifiable, Equatable {
     public let isReview: Bool
     public let commentAmount: String
     
-    public var id: String { url.absoluteString + String(Int.random(in: 0...1000)) } // RELEASE: Remove Int.random
+    public var id: String { url.absoluteString }
     
     public var path: [String] {
         return url.pathComponents // RELEASE: What do I need this for?
@@ -44,8 +44,9 @@ public struct NewsPreview: Identifiable, Equatable {
 
 public extension NewsPreview {
     
+    // RELEASE: Remove random in URL
     static let mock = NewsPreview(
-        url: URL(string: "https://4pda.to/2024/03/20/425729/bogoborchestvo_gejmery_vybrali_glavnyj_khit_playstation/")!,
+        url: URL(string: "https://4pda.to/2024/03/20/425729/bogoborchestvo_gejmery_vybrali_glavnyj_khit_playstation/\(String(Int.random(in: 0...1000)))")!,
         title: "Богоборчество. Геймеры выбрали главный хит PlayStation",
         description: "Геймеры любят две вещи — материалы-подборки и опросы на тему любимых игр. Журналисты и издатели нагло этим пользуются: на прошлой неделе Sony, например, решила выяснить, какой из недавних эксклюзивов PlayStation публика любит больше всего. Что ж, народ сделал свой выбор.",
         imageUrl: URL(string: "https://4pda.to/s/Zy0hIejPviN8gsdKRo1w1tcRxouUXo5P22iXG1Univz0K.jpg?v=1710934951")!,

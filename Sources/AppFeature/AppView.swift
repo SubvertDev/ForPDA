@@ -10,6 +10,7 @@ import ComposableArchitecture
 import NewsListFeature
 import NewsFeature
 import MenuFeature
+import SettingsFeature
 
 public struct AppView: View {
     
@@ -25,11 +26,14 @@ public struct AppView: View {
                 NewsListScreen(store: store.scope(state: \.newsList, action: \.newsList))
             } destination: { store in
                 switch store.case {
-                case .menu:
-                    MenuViewSUI()
-                    
                 case let .news(store):
                     NewsScreen(store: store)
+                    
+                case let .menu(store):
+                    MenuScreen(store: store)
+                    
+                case let .settings(store):
+                    SettingsScreen(store: store)
                 }
             }
         }

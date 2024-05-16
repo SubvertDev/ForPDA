@@ -21,7 +21,7 @@ public struct NewsListScreen: View {
             ZStack {
                 List(store.news) { news in
                     Button {
-                        store.send(.newsTapped(news.id))
+                        store.send(.newsTapped(news))
                     } label: {
                         NewsListRowView(news: news)
                     }
