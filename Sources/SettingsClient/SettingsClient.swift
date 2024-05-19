@@ -6,157 +6,172 @@
 //
 
 import Foundation
+import ComposableArchitecture
 import WebKit
 import Models
 
-final class SettingsClient {
+// RELEASE: REDO
+private enum Keys: String {
+    case savedCookies
+    case authKey
+    case userId // RELEASE: Rename to user?
+    case appTheme
+    case appNightModeBackgroundColor
+    case fastLoadingSystem
+    case showLikesInComments
+    case isDeeplinking
+}
+
+@DependencyClient
+public struct SettingsClient {
+    // RELEASE: Make concrete types?
+    public var getUser: () -> Data?
+    public var setUser: (Data) -> Void
+    public var deleteUser: () -> Void
+    public var logout: () -> Void
     
-    private let defaults = UserDefaults.standard
+    // RELEASE: Make concrete types?
+    public var getCookiesData: () -> Data?
+    public var setCookiesData: (Data) -> Void
+    public var deleteCookies: () -> Void
     
-    private enum Keys {
-        static let savedCookies = "savedCookies"
-        static let authKey = "authKey"
-        static let userId = "userId"
-        static let appTheme = "appTheme"
-        static let appNightModeBackgroundColor = "appDarkThemeBackgroundColor"
-        static let fastLoadingSystem = "fastLoadingSystem"
-        static let showLikesInComments = "showLikesInComments"
-        static let isDeeplinking = "isDeeplinking"
+    // RELEASE: Make associated type AuthKey?
+    public var getAuthKey: () -> String?
+    public var setAuthKey: (String) -> Void
+    public var deleteAuthKey: () -> Void
+    
+    // RELEASE: REDO
+    public var getAppLanguage: () -> AppLanguage = { .ru }
+    
+    public var getAppTheme: () -> AppTheme = { .auto }
+    public var setAppTheme: (AppTheme) -> Void
+    
+    // RELEASE: Rename to AppBackgroundColor?
+    public var getAppBackgroundColor: () -> AppNightModeBackgroundColor = { .black }
+    public var setAppBackgroundColor: (AppNightModeBackgroundColor) -> Void
+    
+    public var getFastLoadingSystem: () -> Bool = { true }
+    public var setFastLoadingSystem: (Bool) -> Void
+    
+    public var getShowLikesInComments: () -> Bool = { false }
+    public var setShowLikesInComments: (Bool) -> Void
+}
+
+public extension DependencyValues {
+    var settingsClient: SettingsClient {
+        get { self[SettingsClient.self] }
+        set { self[SettingsClient.self] = newValue }
     }
-    
-    // MARK: - Logout
-    
-    func logout() {
-        removeCookies()
-        removeUser()
-        removeAuthKey()
-    }
-    
-    // MARK: - Cookies
-    
-    func setCookiesAsData(_ cookies: Data) {
-        defaults.set(cookies, forKey: Keys.savedCookies)
-    }
-    
-    func getCookiesAsData() -> Data? {
-        return defaults.data(forKey: Keys.savedCookies)
-    }
-    
-    private func removeCookies() {
-        defaults.removeObject(forKey: Keys.savedCookies)
+}
+
+extension SettingsClient: DependencyKey {
         
-        HTTPCookieStorage.shared.removeCookies(since: .distantPast)
+    public static let liveValue = Self(
         
-        DispatchQueue.main.async {
-            WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                WKWebsiteDataStore.default().removeData(
-                    ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
-                    for: records.filter { $0.displayName.contains("4pda") },
-                    completionHandler: {  }
-                )
+        // MARK: - User
+        getUser: {
+            return UserDefaults.standard.data(forKey: Keys.userId.rawValue)
+        },
+        setUser: { data in
+            UserDefaults.standard.set(data, forKey: Keys.userId.rawValue)
+            // RELEASE: Handle change?
+            //        NotificationCenter.default.post(name: .userDidChange, object: nil)
+        },
+        deleteUser: {
+            UserDefaults.standard.removeObject(forKey: Keys.userId.rawValue)
+            // RELEASE: Handle change?
+            //        NotificationCenter.default.post(name: .userDidChange, object: nil)
+        },
+        logout: {
+            @Dependency(\.settingsClient) var settingsClient
+            settingsClient.deleteCookies()
+            settingsClient.deleteUser()
+            settingsClient.deleteAuthKey()
+        },
+        
+        // MARK: - Cookies
+        
+        getCookiesData: {
+            return UserDefaults.standard.data(forKey: Keys.savedCookies.rawValue)
+        },
+        setCookiesData: { data in
+            UserDefaults.standard.set(data, forKey: Keys.savedCookies.rawValue)
+        },
+        deleteCookies: {
+            UserDefaults.standard.removeObject(forKey: Keys.savedCookies.rawValue)
+            
+            HTTPCookieStorage.shared.removeCookies(since: .distantPast)
+            
+            DispatchQueue.main.async {
+                // RELEASE: Make async? Add documentation?
+                WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                    WKWebsiteDataStore.default().removeData(
+                        ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                        for: records.filter { $0.displayName.contains("4pda") },
+                        completionHandler: {  }
+                    )
+                }
             }
+        },
+        
+        // MARK: - AuthKey
+        
+        getAuthKey: {
+            return UserDefaults.standard.string(forKey: Keys.authKey.rawValue)
+        },
+        setAuthKey: { key in
+            UserDefaults.standard.set(key, forKey: Keys.authKey.rawValue)
+        },
+        deleteAuthKey: {
+            UserDefaults.standard.removeObject(forKey: Keys.authKey.rawValue)
+        },
+        
+        // MARK: - App Language
+        
+        getAppLanguage: {
+            // RELEASE: REDO
+            let language = Locale.autoupdatingCurrent.language.languageCode?.identifier
+            return AppLanguage(rawValue: language ?? AppLanguage.ru.rawValue) ?? .ru
+        },
+        
+        // MARK: - App Theme
+        
+        getAppTheme: {
+            let theme = UserDefaults.standard.string(forKey: Keys.appTheme.rawValue)
+            return AppTheme(rawValue: theme ?? AppTheme.auto.rawValue) ?? .auto
+        },
+        setAppTheme: { theme in
+            UserDefaults.standard.set(theme.rawValue, forKey: Keys.appTheme.rawValue)
+        },
+        
+        // MARK: - App Background Color
+        
+        getAppBackgroundColor: {
+            let backgroundColor = UserDefaults.standard.string(forKey: Keys.appNightModeBackgroundColor.rawValue)
+            return AppNightModeBackgroundColor(rawValue: backgroundColor ?? AppNightModeBackgroundColor.black.rawValue) ?? .black
+        },
+        setAppBackgroundColor: { color in
+            UserDefaults.standard.set(color.rawValue, forKey: Keys.appNightModeBackgroundColor.rawValue)
+            // RELEASE: Handle change?
+//            NotificationCenter.default.post(name: .nightModeBackgroundColorDidChange, object: color)
+        },
+        
+        // MARK: - Fast Loading System
+        
+        getFastLoadingSystem: {
+            return UserDefaults.standard.value(forKey: Keys.fastLoadingSystem.rawValue) as? Bool ?? true
+        },
+        setFastLoadingSystem: { state in
+            UserDefaults.standard.set(state, forKey: Keys.fastLoadingSystem.rawValue)
+        },
+        
+        // MARK: - Show Likes In Comments
+        
+        getShowLikesInComments: {
+            return UserDefaults.standard.value(forKey: Keys.showLikesInComments.rawValue) as? Bool ?? false
+        },
+        setShowLikesInComments: { state in
+            UserDefaults.standard.set(state, forKey: Keys.showLikesInComments.rawValue)
         }
-    }
-    
-    // MARK: - Auth Key
-    
-    func setAuthKey(_ key: String) {
-        defaults.set(key, forKey: Keys.authKey)
-    }
-    
-    func getAuthKey() -> String? {
-        return defaults.string(forKey: Keys.authKey)
-    }
-    
-    private func removeAuthKey() {
-        defaults.removeObject(forKey: Keys.authKey)
-    }
-    
-    // MARK: - User
-    
-    func setUser(_ user: Data) {
-        defaults.set(user, forKey: Keys.userId)
-        NotificationCenter.default.post(name: .userDidChange, object: nil)
-    }
-    
-    func getUser() -> Data? {
-        return defaults.data(forKey: Keys.userId)
-    }
-    
-    private func removeUser() {
-        defaults.removeObject(forKey: Keys.userId)
-        NotificationCenter.default.post(name: .userDidChange, object: nil)
-    }
-    
-    // MARK: - App Language
-    
-    func getAppLanguage() -> AppLanguage {
-        let language = Locale.autoupdatingCurrent.language.languageCode?.identifier
-        return AppLanguage(rawValue: language ?? AppLanguage.ru.rawValue) ?? .ru
-    }
-    
-    // MARK: - App Theme
-    
-    func setAppTheme(to theme: AppTheme) {
-        defaults.set(theme.rawValue, forKey: Keys.appTheme)
-    }
-    
-    func getAppTheme() -> AppTheme {
-        let theme = defaults.string(forKey: Keys.appTheme)
-        return AppTheme(rawValue: theme ?? AppTheme.auto.rawValue) ?? .auto
-    }
-    
-    // MARK: - App Background Color
-    
-    func setAppBackgroundColor(to color: AppNightModeBackgroundColor) {
-        defaults.set(color.rawValue, forKey: Keys.appNightModeBackgroundColor)
-        NotificationCenter.default.post(name: .nightModeBackgroundColorDidChange, object: color)
-    }
-    
-    func getAppBackgroundColor() -> AppNightModeBackgroundColor {
-        let backgroundColor = defaults.string(forKey: Keys.appNightModeBackgroundColor)
-        return AppNightModeBackgroundColor(rawValue: backgroundColor ?? AppNightModeBackgroundColor.black.rawValue) ?? .black
-    }
-    
-    // MARK: - Loading System
-    
-    func setFastLoadingSystem(to state: Bool) {
-        defaults.set(state, forKey: Keys.fastLoadingSystem)
-    }
-    
-    func getFastLoadingSystem() -> Bool {
-        if let show = defaults.value(forKey: Keys.fastLoadingSystem) as? Bool {
-            return show
-        } else {
-            return true // Enabled by default
-        }
-    }
-    
-    // MARK: - Show Likes In Comments
-    
-    func setShowLikesInComments(to state: Bool) {
-        defaults.set(state, forKey: Keys.showLikesInComments)
-    }
-    
-    func getShowLikesInComments() -> Bool {
-        if let show = defaults.value(forKey: Keys.showLikesInComments) as? Bool {
-            return show
-        } else {
-            return false // Disabled by default
-        }
-    }
-    
-    // MARK: - Is Deeplinking
-    
-    func setIsDeeplinking(to state: Bool) {
-        defaults.set(state, forKey: Keys.isDeeplinking)
-    }
-    
-    func getIsDeeplinking() -> Bool {
-        if let isDeeplinking = defaults.value(forKey: Keys.isDeeplinking) as? Bool {
-            return isDeeplinking
-        } else {
-            return false
-        }
-    }
+    )
 }

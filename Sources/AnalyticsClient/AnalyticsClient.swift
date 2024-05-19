@@ -7,13 +7,17 @@
 
 import Foundation
 import ComposableArchitecture
+import Mixpanel
+import Sentry
 
 @DependencyClient
-struct AnalyticsClient {
-    
+public struct AnalyticsClient {
+    public var configure: () -> Void
+    public var log: (Event) -> Void
+    public var capture: (Error) -> Void
 }
 
-extension DependencyValues {
+public extension DependencyValues {
     var analyticsClient: AnalyticsClient {
         get { self[AnalyticsClient.self] }
         set { self[AnalyticsClient.self] = newValue }
@@ -21,9 +25,81 @@ extension DependencyValues {
 }
 
 extension AnalyticsClient: DependencyKey {
-    static let liveValue = Self()
     
-    static let previewValue = Self()
+    public static var liveValue: Self {
+        return AnalyticsClient(
+            configure: {
+                configureMixpanel()
+                configureSentry()
+            },
+            log: { event in
+                Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
+            },
+            capture: { error in
+                SentrySDK.capture(error: error)
+            }
+        )
+    }
     
-    static let testValue = Self()
+    public static let previewValue = Self(
+        configure: {},
+        log: { event in
+            print("[Analytics] \(event.name) \(event.properties)")
+        },
+        capture: { error in
+            print("[Sentry] \(error)")
+        }
+    )
+}
+
+extension AnalyticsClient {
+    private static func configureMixpanel() {
+        Mixpanel.initialize(
+            token: Secrets.for(key: .MIXPANEL_TOKEN),
+            trackAutomaticEvents: true, // RELEASE: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
+            optOutTrackingByDefault: isDebug
+        )
+    }
+    
+    private static func configureSentry() {
+        SentrySDK.start { options in
+            options.dsn = Secrets.for(key: .SENTRY_DSN)
+            options.debug = isDebug
+            options.enabled = !isDebug
+            options.tracesSampleRate = 1.0
+            options.diagnosticLevel = .warning
+            options.attachScreenshot = true
+            options.attachViewHierarchy = true
+            options.swiftAsyncStacktraces = true
+        }
+    }
+}
+
+public enum AnalyticsError: Error {
+    case brokenNews(URL)
+}
+
+// RELEASE: Move to another place
+private var isDebug: Bool {
+    #if DEBUG
+        return true
+    #else
+        return false
+    #endif
+}
+
+private struct Secrets {
+    
+    enum Keys: String {
+        case SENTRY_DSN
+        case MIXPANEL_TOKEN
+    }
+    
+    static func `for`(key: Keys) -> String {
+        if let dictionary = Bundle.main.object(forInfoDictionaryKey: "SECRET_KEYS") as? [String: String] {
+            return dictionary[key.rawValue] ?? ""
+        } else {
+            return ""
+        }
+    }
 }

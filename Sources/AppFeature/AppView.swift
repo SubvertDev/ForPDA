@@ -11,6 +11,7 @@ import NewsListFeature
 import NewsFeature
 import MenuFeature
 import SettingsFeature
+import AlertToast
 
 public struct AppView: View {
     
@@ -35,6 +36,9 @@ public struct AppView: View {
                 case let .settings(store):
                     SettingsScreen(store: store)
                 }
+            }
+            .toast(isPresenting: $store.showToast) {
+                AlertToast(displayMode: .hud, type: .regular, title: store.toastMessage)
             }
         }
     }

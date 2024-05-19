@@ -18,6 +18,10 @@ let package = Package(
         .library(name: "NewsClient", targets: ["NewsClient"]),
         .library(name: "SettingsClient", targets: ["SettingsClient"]),
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
+        .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
+        .library(name: "ImageClient", targets: ["ImageClient"]),
+        .library(name: "CookiesClient", targets: ["CookiesClient"]),
+        .library(name: "PasteboardClient", targets: ["PasteboardClient"]),
         
         // Shared
         .library(name: "Models", targets: ["Models"]),
@@ -30,9 +34,10 @@ let package = Package(
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
         .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.25.2"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.26.0"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0"),
-        .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0")
+        .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0"),
+        .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9")
     ],
     targets: [
         
@@ -45,16 +50,21 @@ let package = Package(
                 "NewsFeature",
                 "MenuFeature",
                 "SettingsFeature",
+                "AnalyticsClient",
+                "ImageClient",
+                "CookiesClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Mixpanel", package: "mixpanel-swift"),
-                .product(name: "Sentry-Dynamic", package: "sentry-cocoa")
+                .product(name: "AlertToast", package: "AlertToast")
             ]
         ),
         .target(
             name: "NewsListFeature",
             dependencies: [
                 "Models",
+                "SharedUI",
                 "NewsClient",
+                "AnalyticsClient",
+                "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
             ]
@@ -63,7 +73,9 @@ let package = Package(
             name: "NewsFeature",
             dependencies: [
                 "Models",
+                "SharedUI",
                 "NewsClient",
+                "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit")
@@ -98,7 +110,31 @@ let package = Package(
         .target(
             name: "SettingsClient",
             dependencies: [
-                "Models"
+                "Models",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .target(
+            name: "AnalyticsClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Mixpanel", package: "mixpanel-swift"),
+                .product(name: "Sentry", package: "sentry-cocoa")
+            ]
+        ),
+        .target(
+            name: "ImageClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "Nuke", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "CookiesClient",
+            dependencies: [
+                "Models",
+                "SettingsClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
         .target(
@@ -107,6 +143,12 @@ let package = Package(
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SwiftSoup", package: "SwiftSoup")
+            ]
+        ),
+        .target(
+            name: "PasteboardClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
         

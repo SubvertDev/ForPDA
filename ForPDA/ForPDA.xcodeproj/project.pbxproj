@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B88BDA882BF6BC0200E17268 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B88BDA872BF6BC0200E17268 /* Assets.xcassets */; };
-		B8A372AB2BC5DC2A00432F7D /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = B8A372AA2BC5DC2A00432F7D /* AppFeature */; };
 		B8A85A8B2AA10CF400EDFE58 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */; };
 		B8A85A922AA10CF500EDFE58 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B8AB63C02AA49F6100F2CEFF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */; };
@@ -17,6 +16,7 @@
 		B8AB63C72AA49F6100F2CEFF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C62AA49F6100F2CEFF /* manifest.json */; };
 		B8AB63CB2AA49F6100F2CEFF /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63CA2AA49F6100F2CEFF /* content.js */; };
 		B8AB63D52AA49F6100F2CEFF /* OpenInAppExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B8CC72E02BF8FE660071A67A /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = B8CC72DF2BF8FE660071A67A /* AppFeature */; };
 		B8DEB2222BAB81CC00AD97C6 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DEB2212BAB81CC00AD97C6 /* App.swift */; };
 /* End PBXBuildFile section */
 
@@ -91,21 +91,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B8A372AB2BC5DC2A00432F7D /* AppFeature in Frameworks */,
+				B8CC72E02BF8FE660071A67A /* AppFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B8A372A92BC5DA5D00432F7D /* App */ = {
-			isa = PBXGroup;
-			children = (
-				B8DEB2212BAB81CC00AD97C6 /* App.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
 		B8A85A892AA10CF400EDFE58 /* ShareExtension */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,7 +153,7 @@
 		B8D351F7293CABB6008A84EA /* ForPDA */ = {
 			isa = PBXGroup;
 			children = (
-				B8A372A92BC5DA5D00432F7D /* App */,
+				B8DEB2212BAB81CC00AD97C6 /* App.swift */,
 				B88BDA872BF6BC0200E17268 /* Assets.xcassets */,
 				B82B2EC62A89306000CB067C /* Secrets.xcconfig */,
 				B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */,
@@ -232,7 +224,7 @@
 			);
 			name = ForPDA;
 			packageProductDependencies = (
-				B8A372AA2BC5DC2A00432F7D /* AppFeature */,
+				B8CC72DF2BF8FE660071A67A /* AppFeature */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -388,16 +380,20 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5.3;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -414,16 +410,20 @@
 				INFOPLIST_FILE = ShareExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ShareExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5.3;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -440,13 +440,13 @@
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OpenInAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5.3;
+				MARKETING_VERSION = 0.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -454,6 +454,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInAppExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -470,13 +474,13 @@
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = OpenInAppExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5.3;
+				MARKETING_VERSION = 0.6;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -484,6 +488,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.OpenInAppExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -734,7 +742,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B8A372AA2BC5DC2A00432F7D /* AppFeature */ = {
+		B8CC72DF2BF8FE660071A67A /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
 		};

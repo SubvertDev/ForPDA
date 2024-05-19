@@ -7,10 +7,12 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SharedUI
 
 public struct NewsListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<NewsListFeature>
+    @State private var cock: Bool = false
     
     public init(store: StoreOf<NewsListFeature>) {
         self.store = store
@@ -20,15 +22,33 @@ public struct NewsListScreen: View {
         WithPerceptionTracking {
             ZStack {
                 List(store.news) { news in
-                    Button {
-                        store.send(.newsTapped(news))
-                    } label: {
-                        NewsListRowView(news: news)
+                    WithPerceptionTracking {
+                        Button {
+                            store.send(.newsTapped(news))
+                        } label: {
+                            NewsListRowView(news: news)
+                                .contextMenu {
+                                    ContextButton(text: "Скопировать ссылку", symbol: .doc) {
+                                        store.send(.cellMenuOpened(news, .copyLink))
+                                    }
+                                    ContextShareButton(
+                                        text: "Поделиться ссылкой",
+                                        symbol: .arrowTurnUpRight,
+                                        showShareSheet: $store.showShareSheet,
+                                        shareURL: news.url
+                                    ) {
+                                        store.send(.cellMenuOpened(news, .shareLink))
+                                    }
+                                    ContextButton(text: "Проблемы со статьей?", symbol: .questionmarkCircle) {
+                                        store.send(.cellMenuOpened(news, .report))
+                                    }
+                                }
+                        }
+                        .listSectionSeparator(.hidden)
                     }
-                    .listSectionSeparator(.hidden)
                 }
                 .listStyle(.plain)
-                .scrollIndicators(.hidden) // FIX: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
+                .scrollIndicators(.hidden) // RELEASE: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
                 .navigationTitle("Новости")
                 .navigationBarTitleDisplayMode(.inline)
                 .refreshable {
@@ -48,6 +68,7 @@ public struct NewsListScreen: View {
                 if store.isLoading {
                     ProgressView()
                         .progressViewStyle(.circular)
+                        .scaleEffect(1.5)
                 }
                 
                 if store.showVpnWarningBackground {
@@ -71,13 +92,15 @@ public struct NewsListScreen: View {
 }
 
 #Preview {
-    NewsListScreen(
-        store: Store(
-            initialState: NewsListFeature.State()
-        ) {
-            NewsListFeature()
-        } withDependencies: {
-            $0.newsClient = .previewValue
-        }
-    )
+    NavigationStack {
+        NewsListScreen(
+            store: Store(
+                initialState: NewsListFeature.State()
+            ) {
+                NewsListFeature()
+            } withDependencies: {
+                $0.newsClient = .previewValue
+            }
+        )
+    }
 }

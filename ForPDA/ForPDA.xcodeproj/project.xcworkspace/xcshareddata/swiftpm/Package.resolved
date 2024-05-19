@@ -1,6 +1,15 @@
 {
-  "originHash" : "3770e4566c0707f957c62d5925467d2a65657863d7d6d44ba5dee797dfee7e8a",
+  "originHash" : "523019e4a89a0be8c262a2449466986fcdb66f7c8ebbd75bb31c9f059edac654",
   "pins" : [
+    {
+      "identity" : "alerttoast",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/elai950/AlertToast.git",
+      "state" : {
+        "revision" : "b39252eacd159904afd7d718bba0afabb87f2f2f",
+        "version" : "1.3.9"
+      }
+    },
     {
       "identity" : "combine-schedulers",
       "kind" : "remoteSourceControl",
@@ -51,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "0da9c56283b8aada5ef05b16b6cbd6c2790872c4",
-        "version" : "8.25.2"
+        "revision" : "7fc7ca43967e2980d8691a8e017c118a84133aac",
+        "version" : "8.26.0"
       }
     },
     {

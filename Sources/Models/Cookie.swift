@@ -1,13 +1,13 @@
 //
-//  Cookie.swift
-//  ForPDA
+//  File.swift
+//  
 //
-//  Created by Subvert on 22.05.2023.
+//  Created by Ilia Lubianoi on 18.05.2024.
 //
 
 import Foundation
 
-struct Cookie: Codable {
+public struct Cookie: Codable {
     var name: String
     var value: String
     var domain: String
@@ -15,7 +15,9 @@ struct Cookie: Codable {
     var expires: Date?
     var secure: Bool
 
-    init(_ cookie: HTTPCookie) {
+    public init(
+        _ cookie: HTTPCookie
+    ) {
         name = cookie.name
         value = cookie.value
         domain = cookie.domain
@@ -24,15 +26,15 @@ struct Cookie: Codable {
         secure = cookie.isSecure
     }
 
-    static func decode(_ data: Data) -> Cookie? {
+    public static func decode(_ data: Data) -> Cookie? {
         return try? JSONDecoder().decode(Cookie.self, from: data)
     }
 
-    var data: Data? {
+    public var data: Data? {
         return try? JSONEncoder().encode(self)
     }
 
-    var httpCookie: HTTPCookie? {
+    public var httpCookie: HTTPCookie? {
         return HTTPCookie(properties: [
             HTTPCookiePropertyKey.name: name,
             HTTPCookiePropertyKey.value: value,

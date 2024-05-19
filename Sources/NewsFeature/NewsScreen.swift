@@ -11,6 +11,7 @@ import NukeUI
 import SFSafeSymbols
 import YouTubePlayerKit
 import Models
+import SharedUI
 
 public struct NewsScreen: View {
     
@@ -63,14 +64,19 @@ public struct NewsScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        MenuButton(title: "Скопировать ссылку", symbol: .doc) {
-                            
+                        ContextButton(text: "Скопировать ссылку", symbol: .doc) {
+                            store.send(.menuActionTapped(.copyLink))
                         }
-                        MenuButton(title: "Поделиться ссылкой", symbol: .arrowTurnUpRight) {
-                            
+                        ContextShareButton(
+                            text: "Поделиться ссылкой",
+                            symbol: .arrowTurnUpRight,
+                            showShareSheet: $store.showShareSheet,
+                            shareURL: store.news.url
+                        ) {
+                            store.send(.menuActionTapped(.shareLink))
                         }
-                        MenuButton(title: "Проблемы со статьей", symbol: .questionmarkCircle) {
-                            
+                        ContextButton(text: "Проблемы со статьей?", symbol: .questionmarkCircle) {
+                            store.send(.menuActionTapped(.report))
                         }
                     } label: {
                         Image(systemSymbol: .ellipsis)
@@ -79,24 +85,6 @@ public struct NewsScreen: View {
             }
             .task {
                 store.send(.onTask)
-            }
-        }
-    }
-}
-
-struct MenuButton: View {
-    
-    let title: String
-    let symbol: SFSymbol
-    var action: (() -> Void)?
-    
-    var body: some View {
-        Button {
-            action?()
-        } label: {
-            HStack {
-                Text(title)
-                Image(systemSymbol: symbol)
             }
         }
     }

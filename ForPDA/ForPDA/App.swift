@@ -23,11 +23,19 @@ struct ForPDAApp: App {
     }
 }
 
+#Preview {
+    AppView(store: Store(initialState: AppFeature.State()) { AppFeature() })
+}
+
 // MARK: - App Delegate
 
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    let store = Store(initialState: AppFeature.State()) { AppFeature() }
+    let store = Store(
+        initialState: AppFeature.State()
+    ) {
+        AppFeature()
+    }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         store.send(.appDelegate(.didFinishLaunching))
