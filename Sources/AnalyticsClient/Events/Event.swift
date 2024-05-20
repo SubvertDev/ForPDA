@@ -9,7 +9,7 @@ import Foundation
 
 public protocol Event {
     var name: String { get }
-    var properties: [String: String] { get }
+    var properties: [String: String]? { get }
 }
 
 // RELEASE: Test if this works accurately

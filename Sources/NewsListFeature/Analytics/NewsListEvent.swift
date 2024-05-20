@@ -14,6 +14,7 @@ public enum NewsListEvent: Event {
     case linkShared(URL)
     case linkReported(URL)
     case refreshTriggered
+    case loadMoreTriggered
     case menuTapped
     case vpnWarningShown
     case vpnWarningAction(WarningAction)
@@ -22,7 +23,7 @@ public enum NewsListEvent: Event {
         return "News List " + eventName(for: self)
     }
     
-    public var properties: [String: String] {
+    public var properties: [String: String]? {
         switch self {
         case .newsTapped(let url),
              .linkCopied(let url),
@@ -32,7 +33,7 @@ public enum NewsListEvent: Event {
         case .vpnWarningAction(let action):
             return ["action": action.rawValue]
         default:
-            return [:]
+            return nil
         }
     }
     

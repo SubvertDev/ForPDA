@@ -5,8 +5,10 @@
 //  Created by Ilia Lubianoi on 19.05.2024.
 //
 
-public enum NewsListRowMenuAction: String {
-    case copyLink = "Скопировано"
-    case shareLink
-    case report = "Скоро починим :)"
+import SwiftUI
+
+public enum NewsListRowMenuAction: LocalizedStringKey {
+    case copyLink = "Copied"
+    case shareLink // Not tracked in l10n
+    case report = "Will be fixed soon :)"
 }

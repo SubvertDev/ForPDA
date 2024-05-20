@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "ForPDA",
+    defaultLocalization: "ru",
     platforms: [.iOS(.v16)],
     products: [
         // Features
@@ -163,7 +164,8 @@ let package = Package(
         .target(
             name: "SharedUI",
             dependencies: [
-                .product(name: "RswiftLibrary", package: "R.swift")
+                .product(name: "RswiftLibrary", package: "R.swift"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ],
             plugins: [.plugin(name: "RswiftGeneratePublicResources", package: "R.swift")]
         ),

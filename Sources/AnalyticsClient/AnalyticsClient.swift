@@ -44,7 +44,11 @@ extension AnalyticsClient: DependencyKey {
     public static let previewValue = Self(
         configure: {},
         log: { event in
-            print("[Analytics] \(event.name) \(event.properties)")
+            if let properties = event.properties {
+                print("[Analytics] \(event.name) (\(properties))")
+            } else {
+                print("[Analytics] \(event.name)")
+            }
         },
         capture: { error in
             print("[Sentry] \(error)")

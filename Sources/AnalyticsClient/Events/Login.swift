@@ -16,14 +16,14 @@ public enum LoginEvent: Event {
         return "Login " + eventName(for: self).inProperCase
     }
     
-    public var properties: [String: String] {
+    public var properties: [String: String]? {
         switch self {
         case .authSuccess(let username):
             return ["username": username]
         case .authFailure(let failureMessage):
             return ["failure_message": failureMessage]
         default:
-            return [:]
+            return nil
         }
     }
 }

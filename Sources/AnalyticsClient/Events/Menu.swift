@@ -24,10 +24,10 @@ public enum MenuEvent: Event {
         return "Menu " + eventName(for: self).inProperCase
     }
     
-    public var properties: [String: String] {
+    public var properties: [String: String]? {
         switch self {
         default:
-            return [:]
+            return nil
         }
     }
 }

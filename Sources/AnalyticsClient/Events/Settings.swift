@@ -23,7 +23,7 @@ public enum SettingsEvent: Event {
         return "Settings " + eventName(for: self).inProperCase
     }
     
-    public var properties: [String: String] {
+    public var properties: [String: String]? {
         switch self {
         case .themeAction(let action):
             return ["action": action.rawValue]
@@ -33,7 +33,7 @@ public enum SettingsEvent: Event {
              .showLikesInCommentsAction(let action):
             return ["action": action.rawValue]
         default:
-            return [:]
+            return nil
         }
     }
 }

@@ -20,7 +20,7 @@ public enum NewsEvent: Event {
         return "News " + eventName(for: self).inProperCase
     }
     
-    public var properties: [String: String] {
+    public var properties: [String: String]? {
         switch self {
         case .linkCopied(let url),
              .linkShared(let url),
@@ -29,7 +29,7 @@ public enum NewsEvent: Event {
              .inlineButtonTapped(let url):
             return ["url": url.absoluteString]
         default:
-            return [:]
+            return nil
         }
     }
 }

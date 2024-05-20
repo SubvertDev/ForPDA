@@ -23,6 +23,7 @@ public struct NewsListFeature {
     public struct State: Equatable {
         @Presents public var alert: AlertState<Action.Alert>?
         public var news: [NewsPreview]
+        public var page: Int
         public var isLoading: Bool
         public var showShareSheet: Bool
         public var showVpnWarningBackground: Bool
@@ -30,12 +31,14 @@ public struct NewsListFeature {
         public init(
             alert: AlertState<Action.Alert>? = nil,
             news: [NewsPreview] = [],
+            page: Int = 1,
             isLoading: Bool = true,
             showShareSheet: Bool = false,
             showVpnWarningBackground: Bool = false
         ) {
             self.alert = alert
             self.news = news
+            self.page = page
             self.isLoading = isLoading
             self.showShareSheet = showShareSheet
             self.showVpnWarningBackground = showVpnWarningBackground
@@ -47,9 +50,10 @@ public struct NewsListFeature {
     public enum Action: BindableAction {
         case menuTapped
         case newsTapped(NewsPreview)
-        case cellMenuOpened(NewsPreview, NewsListRowMenuAction) // RELEASE: Half-delegate?
+        case cellMenuOpened(NewsPreview, NewsListRowMenuAction) // RELEASE: Should it be a delegate?
         case onTask
         case onRefresh
+        case onLoadMoreAppear
         case binding(BindingAction<State>)
         
         case _newsResponse(Result<[NewsPreview], Error>)
@@ -72,11 +76,9 @@ public struct NewsListFeature {
         Reduce { state, action in
             switch action {
             case .menuTapped:
-//                analyticsClient.log(.newsList(.menuTapped))
                 return .none
             
             case .newsTapped:
-//                analyticsClient.log(.newsList(.newsTapped(news.url)))
                 return .none
                 
             case .binding:
@@ -102,18 +104,30 @@ public struct NewsListFeature {
                 }
                 
             case .onRefresh:
-                return .run { send in
+                return .run { [page = state.page] send in
+                    // RELEASE: Better way to hold for 1 sec?
                     let startTime = DispatchTime.now()
-                    let result = await Result { try await newsClient.newsList(page: 1) }
+                    let result = await Result { try await newsClient.newsList(page: page) }
                     let endTime = DispatchTime.now()
                     let timeInterval = Int(Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds))
                     try await Task.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
                     await send(._newsResponse(result))
                 }
                 
+            case .onLoadMoreAppear:
+                state.page += 1
+                return .run { [page = state.page] send in
+                    let result = await Result { try await newsClient.newsList(page: page) }
+                    await send(._newsResponse(result))
+                }
+                
             case let ._newsResponse(.success(news)):
                 state.isLoading = false
-                state.news = news
+                if state.page == 1 {
+                    state.news = news
+                } else {
+                    state.news.append(contentsOf: news)
+                }
                 return .none
                 
             case ._newsResponse(.failure):
@@ -142,15 +156,15 @@ public struct NewsListFeature {
 
 extension AlertState where Action == NewsListFeature.Action.Alert {
     static let vpnWarning = Self {
-        TextState("Упс!")
+        TextState("Whoops!")
     } actions: {
         ButtonState(action: .openCaptcha) {
-            TextState("Показать капчу")
+            TextState("Show captcha")
         }
         ButtonState(role: .cancel, action: .cancel) {
             TextState("OK")
         }
     } message: {
-        TextState("Похоже у вас запущен ВПН или вы находитесь не в России, на данный момент обход капчи находится в тестовом режиме и может работать некорректно, рекомендуется отключить ВПН вместо ввода капчи")
+        TextState("Looks like you have your VPN on or not located in Russia so you need to enter captcha. At this moment captcha validation works in test mode so it's recommended to disable vpn instead.")
     }
 }

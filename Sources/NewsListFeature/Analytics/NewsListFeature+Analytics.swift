@@ -42,6 +42,9 @@ extension NewsListFeature {
                 case .onRefresh:
                     analyticsClient.log(NewsListEvent.refreshTriggered)
                     
+                case .onLoadMoreAppear:
+                    analyticsClient.log(NewsListEvent.loadMoreTriggered)
+                    
                 case ._newsResponse(.failure):
                     analyticsClient.log(NewsListEvent.vpnWarningShown)
                     

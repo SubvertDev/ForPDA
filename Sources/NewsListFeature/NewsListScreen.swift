@@ -12,7 +12,6 @@ import SharedUI
 public struct NewsListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<NewsListFeature>
-    @State private var cock: Bool = false
     
     public init(store: StoreOf<NewsListFeature>) {
         self.store = store
@@ -21,35 +20,44 @@ public struct NewsListScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                List(store.news) { news in
-                    WithPerceptionTracking {
-                        Button {
-                            store.send(.newsTapped(news))
-                        } label: {
-                            NewsListRowView(news: news)
-                                .contextMenu {
-                                    ContextButton(text: "Скопировать ссылку", symbol: .doc) {
-                                        store.send(.cellMenuOpened(news, .copyLink))
+                List {
+                    ForEach(store.news) { news in
+                        WithPerceptionTracking {
+                            Button {
+                                store.send(.newsTapped(news))
+                            } label: {
+                                NewsListRowView(news: news)
+                                    .contextMenu {
+                                        ContextButton(text: "Copy link", symbol: .doc) {
+                                            store.send(.cellMenuOpened(news, .copyLink))
+                                        }
+                                        ContextShareButton(
+                                            text: "Share link",
+                                            symbol: .arrowTurnUpRight,
+                                            showShareSheet: $store.showShareSheet,
+                                            shareURL: news.url
+                                        ) {
+                                            store.send(.cellMenuOpened(news, .shareLink))
+                                        }
+                                        ContextButton(text: "News is broken", symbol: .questionmarkCircle) {
+                                            store.send(.cellMenuOpened(news, .report))
+                                        }
                                     }
-                                    ContextShareButton(
-                                        text: "Поделиться ссылкой",
-                                        symbol: .arrowTurnUpRight,
-                                        showShareSheet: $store.showShareSheet,
-                                        shareURL: news.url
-                                    ) {
-                                        store.send(.cellMenuOpened(news, .shareLink))
-                                    }
-                                    ContextButton(text: "Проблемы со статьей?", symbol: .questionmarkCircle) {
-                                        store.send(.cellMenuOpened(news, .report))
-                                    }
-                                }
+                            }
+                            .listSectionSeparator(.hidden)
                         }
-                        .listSectionSeparator(.hidden)
+                    }
+                    
+                    if !store.isLoading {
+                        LoadMoreView()
+                            .onAppear {
+                                store.send(.onLoadMoreAppear)
+                            }
                     }
                 }
                 .listStyle(.plain)
                 .scrollIndicators(.hidden) // RELEASE: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
-                .navigationTitle("Новости")
+                .navigationTitle("News")
                 .navigationBarTitleDisplayMode(.inline)
                 .refreshable {
                     await store.send(.onRefresh).finish()
@@ -66,9 +74,8 @@ public struct NewsListScreen: View {
                 }
                 
                 if store.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .scaleEffect(1.5)
+                    ModernCircularLoader()
+                        .frame(width: 24, height: 24)
                 }
                 
                 if store.showVpnWarningBackground {
@@ -77,7 +84,7 @@ public struct NewsListScreen: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: UIScreen.main.bounds.width * 0.25)
-                        Text("Упс! Похоже у вас включен ВПН, отключите его и попробуйте перезагрузить страницу")
+                        Text("Whoops! Looks like you have VPN on, try disabling it and refresh the page")
                             .multilineTextAlignment(.center)
                             .padding()
                     }

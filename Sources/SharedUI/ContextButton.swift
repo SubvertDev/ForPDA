@@ -12,12 +12,12 @@ import SFSafeSymbols
 
 public struct ContextButton: View {
     
-    public let text: String
+    public let text: LocalizedStringKey
     public let symbol: SFSymbol
     public let action: (() -> Void)
     
     public init(
-        text: String,
+        text: LocalizedStringKey,
         symbol: SFSymbol,
         action: @escaping () -> Void
     ) {
@@ -45,13 +45,13 @@ public struct ContextShareButton: View {
     
     @Binding public var showShareSheet: Bool
     
-    public let text: String
+    public let text: LocalizedStringKey
     public let symbol: SFSymbol
     public let shareURL: URL
     public let action: (() -> Void)
     
     public init(
-        text: String,
+        text: LocalizedStringKey,
         symbol: SFSymbol,
         showShareSheet: Binding<Bool>,
         shareURL: URL,

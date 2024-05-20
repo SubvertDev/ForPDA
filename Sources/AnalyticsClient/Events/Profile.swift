@@ -15,10 +15,10 @@ public enum ProfileEvent: Event {
         return "Profile " + eventName(for: self).inProperCase
     }
     
-    public var properties: [String: String] {
+    public var properties: [String: String]? {
         switch self {
         default:
-            return [:]
+            return nil
         }
     }
 }

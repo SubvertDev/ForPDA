@@ -64,5 +64,5 @@ struct NewsListRowView: View {
 }
 
 #Preview {
-    NewsListRowView(news: .mock)
+    NewsListRowView(news: .mock())
 }
