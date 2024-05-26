@@ -5,11 +5,13 @@
 //  Created by Ilia Lubianoi on 09.04.2024.
 //
 
+import Foundation
 import ComposableArchitecture
 import NewsListFeature
 import NewsFeature
 import MenuFeature
 import SettingsFeature
+import Models
 
 @Reducer
 public struct AppFeature {
@@ -58,6 +60,7 @@ public struct AppFeature {
         case path(StackActionOf<Path>)
         case newsList(NewsListFeature.Action)
         case binding(BindingAction<State>)
+        case deeplink(URL)
     }
     
     // MARK: - Body
@@ -78,10 +81,39 @@ public struct AppFeature {
                 
                 // MARK: - Common
                 
-            case .appDelegate:
+            case .appDelegate, .binding:
                 return .none
                 
-            case .binding:
+                // MARK: - Deeplink
+                
+            case .deeplink(let url):
+                switch url.host {
+                case "news":
+                    guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { fatalError() }
+                    urlComponents.scheme = "https"
+                    urlComponents.host =   "4pda.to"
+                    
+                    // RELEASE: Refactor. Add crashlytics?
+                    guard let url            = urlComponents.url                      else { fatalError() }
+                    guard let titleEncoded   = urlComponents.queryItems?.first?.value else { fatalError() }
+                    guard let title          = titleEncoded.removingPercentEncoding   else { fatalError() }
+                    guard let imageUrlString = urlComponents.queryItems?[1].value     else { fatalError() }
+                    guard let imageUrl       = URL(string: imageUrlString)            else { fatalError() }
+                    
+                    let news = NewsPreview(
+                        url: url,
+                        title: title,
+                        description: "", // Not needed
+                        imageUrl: imageUrl,
+                        author: "", // Not needed
+                        date: "", // Not needed
+                        isReview: false,
+                        commentAmount: "" // Not needed
+                    )
+                    state.path.append(.news(NewsFeature.State(news: news)))
+                default: // For new deeplink usage cases
+                    break
+                }
                 return .none
                 
                 // MARK: - NewsList
@@ -97,7 +129,7 @@ public struct AppFeature {
             case let .newsList(.cellMenuOpened(_, action)):
                 switch action {
                 case .copyLink, .report:
-                    state.toastMessage = action.rawValue
+                    state.toastMessage = action.rawValue.toString()
                 case .shareLink:
                     return .none
                 }
@@ -112,7 +144,7 @@ public struct AppFeature {
             case let .path(.element(id: _, action: .news(.menuActionTapped(action)))):
                 switch action {
                 case .copyLink, .report:
-                    state.toastMessage = action.rawValue
+                    state.toastMessage = action.rawValue.toString()
                 case .shareLink:
                     return .none
                 }

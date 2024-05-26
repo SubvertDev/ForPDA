@@ -1,5 +1,5 @@
 {
-  "originHash" : "7023d5f4cded56d5a4c84f7fd8aeec306d05439eef567e456c67cb765aec916f",
+  "originHash" : "65316c06652f61f15b171538c7c374587aa5ba7384c6a575407e4179c26a8248",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -188,6 +188,15 @@
       "state" : {
         "revision" : "2ec6c3a15293efff6083966b38439a4004f25565",
         "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "swiftygif",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kirualex/SwiftyGif.git",
+      "state" : {
+        "revision" : "4430cbc148baa3907651d40562d96325426f409a",
+        "version" : "5.4.5"
       }
     },
     {

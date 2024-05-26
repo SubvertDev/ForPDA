@@ -16,7 +16,8 @@ import Models
 @DependencyClient
 public struct ParsingClient: Sendable {
     public var parseNewsList: @Sendable (_ document: String) async throws -> [NewsPreview]
-    public var parseNews: @Sendable (_ document: String) async throws -> [any NewsElement]
+    public var parsePreview: @Sendable (_ document: String) async throws -> NewsPreview
+    public var parseNews: @Sendable (_ document: String) async throws -> [NewsElement]
 }
 
 extension DependencyValues {
@@ -30,6 +31,9 @@ extension ParsingClient: DependencyKey {
     public static let liveValue = Self(
         parseNewsList: { document in
             return try await parseNewsList(from: document)
+        },
+        parsePreview: { document in
+            return try await parsePreview(document: document)
         },
         parseNews: { document in
             return try await parseNews(from: document)
@@ -90,13 +94,31 @@ extension ParsingClient {
             throw ParsingError.genericParsingError
         }
     }
+    
+    // MARK: - Parse Single Preview (For Deeplink)
+    
+    public static func parsePreview(document: String) async throws -> NewsPreview {
+        let document = try SwiftSoup.parse(document)
+        let title = try document.select("[itemprop=headline]").text()
+        let imageUrl = try document.select("[itemprop=image]").get(0).attr("src")
+        return NewsPreview(
+            url: URL(string: "/")!, // Not needed
+            title: title,
+            description: "", // Not needed
+            imageUrl: URL(string: imageUrl)!,
+            author: "",
+            date: "",
+            isReview: false, // RELEASE: Needed?
+            commentAmount: "" // RELEASE: Needed?
+        )
+    }
 }
 
 // MARK: - Parsing News
 
 extension ParsingClient {
     
-    private static func parseNews(from document: String) async throws -> [any NewsElement] {
+    private static func parseNews(from document: String) async throws -> [NewsElement] {
         let document = try! SwiftSoup.parse(document)
 
         if try! !document.select("[class=content-box]").isEmpty() {
@@ -110,35 +132,35 @@ extension ParsingClient {
     
     // MARK: - Parse News Normal
     
-    private static func parseNewsNormal(from document: Document) -> [any NewsElement] {
-        var articleElements: [any NewsElement] = []
+    private static func parseNewsNormal(from document: Document) -> [NewsElement] {
+        var articleElements: [NewsElement] = []
         let elements = try! document.select("[class=content-box]").select("p, h2, li, ol, dl, ul")
         
         for element in elements {
             if try! element.iS("[style=text-align:justify]") || (try! element.iS("[style=text-align: justify;]")) {
                 let text = try! element.html()
                 if let quote = try! element.parent()?.iS("blockquote"), quote {
-                    articleElements.append(TextElement(text: text, isQuote: true))
+                    articleElements.append(.text(TextElement(text: text, isQuote: true)))
                 } else if try! element.iS("h2") {
                     try! element.select("br").remove()
                     let text = try! element.html()
                     guard text != "&nbsp;" else { continue }
-                    articleElements.append(TextElement(text: text, isHeader: true))
+                    articleElements.append(.text(TextElement(text: text, isHeader: true)))
                 } else if let inList = try! element.parent()?.iS("ul"), inList {
-                    articleElements.append(TextElement(text: text, inList: true))
+                    articleElements.append(.text(TextElement(text: text, inList: true)))
                 } else if let insideList = try! element.parent()?.iS("ol"), insideList {
                     continue
                 } else {
                     guard text != "<!--more-->" else { continue }
                     guard text != "&nbsp;" else { continue }
-                    articleElements.append(TextElement(text: text))
+                    articleElements.append(.text(TextElement(text: text)))
                 }
                 
             } else if try! element.iS("ol") {
                 let elements = try! element.select("li")
                 for (index, element) in elements.enumerated() {
                     let text = try! element.html()
-                    articleElements.append(TextElement(text: text, countedListIndex: index + 1))
+                    articleElements.append(.text(TextElement(text: text, countedListIndex: index + 1)))
                 }
             } else if try! element.iS("[style=text-align:center]") || (try! element.iS("[style=text-align: center;]")) {
                 
@@ -159,7 +181,7 @@ extension ParsingClient {
                                 width: Int(width.trimmingCharacters(in: .letters))!,
                                 height: Int(height.trimmingCharacters(in: .letters))!
                             )
-                            articleElements.append(imageElement)
+                            articleElements.append(.image(imageElement))
                         } else if url.suffix(3) == "gif" {
                             // Some gifs are not working when inside a[title] with working href inside it
                             // couldn't figure out how to get them and not kill .jpg parsing
@@ -168,7 +190,7 @@ extension ParsingClient {
                                 width: Int(width.trimmingCharacters(in: .letters))!,
                                 height: Int(height.trimmingCharacters(in: .letters))!
                             )
-                            articleElements.append(gifElement)
+                            articleElements.append(.gif(gifElement))
                         }
                     }
                     
@@ -189,21 +211,21 @@ extension ParsingClient {
                                 text: text,
                                 url: URL(string: url)!
                             )
-                            articleElements.append(buttonElement)
+                            articleElements.append(.button(buttonElement))
                         }
                         
                     } else {
                         imageUrl.removeFirst(24)
                         imageUrl.removeLast(7)
-                        articleElements.append(VideoElement(url: imageUrl))
+                        articleElements.append(.video(VideoElement(url: imageUrl)))
                     }
                 }
             } else if try! element.iS("h2") {
                 let text = try! element.text()
-                articleElements.append(TextElement(text: text, isHeader: true))
+                articleElements.append(.text(TextElement(text: text, isHeader: true)))
             } else if try! element.iS("dl") {
                 let bulletList = parseBulletList(element)
-                articleElements.append(BulletListParentElement(elements: bulletList))
+                articleElements.append(.bulletList(BulletListElement(elements: bulletList)))
             } else if try! element.iS("ul") {
                 let galCont = try! element.select("a[data-lightbox]")
                 for gal in galCont {
@@ -218,7 +240,7 @@ extension ParsingClient {
                         width: Int(width.trimmingCharacters(in: .letters))!,
                         height: Int(height.trimmingCharacters(in: .letters))!
                     )
-                    articleElements.append(imageElement)
+                    articleElements.append(.image(imageElement))
                 }
             }
         }
@@ -227,8 +249,8 @@ extension ParsingClient {
     
     // MARK: - Parse News Fancy
     
-    private static func parseNewsFancy(from document: Document) -> [any NewsElement] {
-        var articleElements: [any NewsElement] = []
+    private static func parseNewsFancy(from document: Document) -> [NewsElement] {
+        var articleElements: [NewsElement] = []
         let elements = try! document.select("[class=article]").select("p, h2, h3, figure, dl, a[class]")
         
         for element in elements {
@@ -236,7 +258,7 @@ extension ParsingClient {
                 let text = try! element.text()
                 if !text.isEmpty {
                     if try! !element.html().contains("btn") {
-                        articleElements.append(TextElement(text: text))
+                        articleElements.append(.text(TextElement(text: text)))
                     } else {
                         continue
                     }
@@ -257,19 +279,19 @@ extension ParsingClient {
                                 text: text,
                                 url: URL(string: url)!
                             )
-                            articleElements.append(buttonElement)
+                            articleElements.append(.button(buttonElement))
                         }
                     } else {
                         imageUrl.removeFirst(24)
                         imageUrl.removeLast(7)
-                        articleElements.append(VideoElement(url: imageUrl))
+                        articleElements.append(.video(VideoElement(url: imageUrl)))
                     }
                 }
             } else if try! element.iS("h2") || (try! element.iS("h3")) {
                 guard try! !element.text().isEmpty else { continue }
                 try! element.select("br").remove()
                 let text = try! element.html()
-                articleElements.append(TextElement(text: text, isHeader: true))
+                articleElements.append(.text(TextElement(text: text, isHeader: true)))
             } else if try! element.iS("figure") {
                 let images = try! element.select("img[alt]")
                 for image in images {
@@ -291,19 +313,19 @@ extension ParsingClient {
                             width: Int(width.trimmingCharacters(in: .letters))!,
                             height: Int(height.trimmingCharacters(in: .letters))!
                         )
-                        articleElements.append(imageElement)
+                        articleElements.append(.image(imageElement))
                     } else if url.suffix(3) == "gif" {
                         let gifElement = GifElement(
                             url: URL(string: url)!,
                             width: Int(width.trimmingCharacters(in: .letters))!,
                             height: Int(height.trimmingCharacters(in: .letters))!
                         )
-                        articleElements.append(gifElement)
+                        articleElements.append(.gif(gifElement))
                     }
                 }
             } else if try! element.iS("dl") {
                 let charters = parseBulletList(element)
-                articleElements.append(BulletListParentElement(elements: charters))
+                articleElements.append(.bulletList(BulletListElement(elements: charters)))
             } else if try! element.iS("a") {
                 var text = ""
                 if element.children().count > 1 {
@@ -318,7 +340,7 @@ extension ParsingClient {
                     text: text.trimmingCharacters(in: .whitespacesAndNewlines),
                     url: URL(string: url)!
                 )
-                articleElements.append(buttonElement)
+                articleElements.append(.button(buttonElement))
             }
         }
         return articleElements
@@ -326,11 +348,11 @@ extension ParsingClient {
     
     // MARK: - Parse Bullet List
     
-    private static func parseBulletList(_ element: Element) -> [BulletListElement] {
-        var charterElements: [BulletListElement] = []
+    private static func parseBulletList(_ element: Element) -> [BulletListSingleElement] {
+        var charterElements: [BulletListSingleElement] = []
         let elements = try! element.select("dd, dt")
         
-        var charter = BulletListElement(title: "", description: [])
+        var charter = BulletListSingleElement(title: "", description: [])
         
         for element in elements {
             if try! element.iS("dt") {
@@ -346,7 +368,7 @@ extension ParsingClient {
                     charter.description.append(text.trimmingCharacters(in: .whitespaces))
                 }
                 charterElements.append(charter)
-                charter = BulletListElement(title: "", description: [])
+                charter = BulletListSingleElement(title: "", description: [])
             }
         }
         return charterElements

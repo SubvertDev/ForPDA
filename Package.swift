@@ -38,7 +38,8 @@ let package = Package(
         .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.26.0"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0"),
         .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0"),
-        .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9")
+        .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9"),
+        .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4")
     ],
     targets: [
         
@@ -165,7 +166,8 @@ let package = Package(
             name: "SharedUI",
             dependencies: [
                 .product(name: "RswiftLibrary", package: "R.swift"),
-                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
+                .product(name: "SwiftyGif", package: "SwiftyGif")
             ],
             plugins: [.plugin(name: "RswiftGeneratePublicResources", package: "R.swift")]
         ),

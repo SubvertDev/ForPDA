@@ -19,6 +19,9 @@ struct ForPDAApp: App {
     var body: some Scene {
         WindowGroup {
             AppView(store: appDelegate.store)
+                .onOpenURL { url in
+                    appDelegate.store.send(.deeplink(url))
+                }
         }
     }
 }

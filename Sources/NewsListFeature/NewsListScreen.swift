@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import Models
 
 public struct NewsListScreen: View {
     
@@ -27,19 +28,19 @@ public struct NewsListScreen: View {
                                 store.send(.newsTapped(news))
                             } label: {
                                 NewsListRowView(news: news)
-                                    .contextMenu {
-                                        ContextButton(text: "Copy link", symbol: .doc) {
+                                    .contextMenu { // RELEASE: Extract
+                                        ContextButton(text: "Copy Link", symbol: .doc) {
                                             store.send(.cellMenuOpened(news, .copyLink))
                                         }
                                         ContextShareButton(
-                                            text: "Share link",
+                                            text: "Share Link",
                                             symbol: .arrowTurnUpRight,
                                             showShareSheet: $store.showShareSheet,
                                             shareURL: news.url
                                         ) {
                                             store.send(.cellMenuOpened(news, .shareLink))
                                         }
-                                        ContextButton(text: "News is broken", symbol: .questionmarkCircle) {
+                                        ContextButton(text: "Problem with news?", symbol: .questionmarkCircle) {
                                             store.send(.cellMenuOpened(news, .report))
                                         }
                                     }

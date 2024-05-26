@@ -5,16 +5,44 @@
 //  Created by Ilia Lubianoi on 11.05.2024.
 //
 
-import Foundation
+import SwiftUI
 
-public protocol NewsElement {}
+public enum NewsElement: Equatable, Hashable {
+    case text(TextElement)
+    case image(ImageElement)
+    case video(VideoElement)
+    case gif(GifElement)
+    case button(ButtonElement)
+    case bulletList(BulletListElement)
+}
 
-public struct TextElement: NewsElement {
+// MARK: - Text
+
+public struct TextElement: Equatable, Hashable {
     public let text: String
     public let isHeader: Bool
     public let isQuote: Bool
     public let inList: Bool
     public let countedListIndex: Int
+    
+    public var markdown: LocalizedStringKey {
+        let regex = #/<a href="(.+?) target="_blank">(.*?)</a>/#
+//        let regex = try! Regex("<a href=\"(.+?)\">(.*?)</a>")
+        
+        if let match = text.firstMatch(of: regex) {
+            var url = match.1
+            let linkText = match.2
+            if !url.contains("https") { // RELEASE: No-https links are 4pda ones, need to implement deeplink on tap
+                url = "https:" + url
+            }
+            
+            let markdownLink = "[\(linkText)](\(url))"
+            
+            return LocalizedStringKey(text.replacingCharacters(in: match.range, with: markdownLink))
+        } else {
+            return LocalizedStringKey(text)
+        }
+    }
     
     public init(
         text: String,
@@ -31,11 +59,17 @@ public struct TextElement: NewsElement {
     }
 }
 
-public struct ImageElement: NewsElement {
+// MARK: - Image
+
+public struct ImageElement: Equatable, Hashable {
     public let url: URL
     public let description: String?
     public let width: Int
     public let height: Int
+    
+    public var ratioHW: Double {
+        return Double(height) / Double(width)
+    }
     
     public init(
         url: URL,
@@ -50,7 +84,9 @@ public struct ImageElement: NewsElement {
     }
 }
 
-public struct VideoElement: NewsElement {
+// MARK: - Video
+
+public struct VideoElement: Equatable, Hashable {
     public let url: String
     
     public init(
@@ -60,7 +96,9 @@ public struct VideoElement: NewsElement {
     }
 }
 
-public struct GifElement: NewsElement {
+// MARK: - GIF
+
+public struct GifElement: Equatable, Hashable {
     public let url: URL
     public let width: Int
     public let height: Int
@@ -76,7 +114,9 @@ public struct GifElement: NewsElement {
     }
 }
 
-public struct ButtonElement: NewsElement {
+// MARK: - Button
+
+public struct ButtonElement: Equatable, Hashable {
     public let text: String
     public let url: URL
     
@@ -89,17 +129,21 @@ public struct ButtonElement: NewsElement {
     }
 }
 
-public struct BulletListParentElement: NewsElement {
-    public let elements: [BulletListElement]
+// MARK: - BulletList
+
+public struct BulletListElement: Equatable, Hashable {
+    public let elements: [BulletListSingleElement]
     
     public init(
-        elements: [BulletListElement]
+        elements: [BulletListSingleElement]
     ) {
         self.elements = elements
     }
 }
 
-public struct BulletListElement: Hashable {
+// MARK: - BulletListSingle
+
+public struct BulletListSingleElement: Equatable, Hashable {
     public var title: String
     public var description: [String]
     

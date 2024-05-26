@@ -10,12 +10,6 @@ import Models
 import NewsClient
 import PasteboardClient
 
-public enum MenuAction: String {
-    case copyLink = "Скопировано"
-    case shareLink
-    case report = "Скоро починим :)"
-}
-
 @Reducer
 public struct NewsFeature {
     
@@ -23,19 +17,19 @@ public struct NewsFeature {
     
     @ObservableState
     public struct State: Equatable {
-        let news: NewsPreview
-//        let elements: [any Models.NewsElement] = [] // RELEASE: Remove "Models."
+        var news: NewsPreview
+        var elements: [NewsElement]
         var isLoading: Bool
         var showShareSheet: Bool
         
         public init(
             news: NewsPreview,
-//            elements: [any Models.NewsElement] = [], // RELEASE: Remove "Models."
+            elements: [NewsElement] = [],
             isLoading: Bool = true,
             showShareSheet: Bool = false
         ) {
             self.news = news
-//            self.elements = elements
+            self.elements = elements
             self.isLoading = isLoading
             self.showShareSheet = showShareSheet
         }
@@ -45,8 +39,10 @@ public struct NewsFeature {
     
     public enum Action: BindableAction {
         case onTask
-        case menuActionTapped(MenuAction)
+        case menuActionTapped(NewsMenuAction)
         case binding(BindingAction<State>)
+        
+        case _newsResponse(Result<[NewsElement], Error>)
     }
     
     // MARK: - Dependencies
@@ -66,9 +62,16 @@ public struct NewsFeature {
         Reduce { state, action in
             switch action {
             case .onTask:
-                return .run { [news = state.news] send in
-//                    let elements = try! await newsClient.news(url: news.url)
-                    print(news)
+                if state.elements.isEmpty {
+                    return .run { [news = state.news] send in
+                        let result = await Result {
+                            try await newsClient.news(url: news.url)
+                        }
+                        await send(._newsResponse(result))
+                    }
+                } else {
+                    state.isLoading = false
+                    return .none // RELEASE: For test purposes only, remove
                 }
                 
             case let .menuActionTapped(action):
@@ -85,6 +88,18 @@ public struct NewsFeature {
                 return .none
                 
             case .binding:
+                return .none
+                
+            case ._newsResponse(let result):
+                switch result {
+                case .success(let elements):
+                    state.elements = elements
+                    state.isLoading = false
+                    customDump(elements) // RELEASE: Remove
+                case .failure(let error):
+                    print("Critical error NewsFeature \(error)") // RELEASE: Handle
+                    state.isLoading = false
+                }
                 return .none
             }
         }

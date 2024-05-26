@@ -5,6 +5,7 @@
 //  Created by Ilia Lubianoi on 09.04.2024.
 //
 
+import Foundation
 import ComposableArchitecture
 import AnalyticsClient
 import ImageClient
@@ -42,7 +43,6 @@ public struct AppDelegateFeature {
                 analyticsClient.configure() // RELEASE: Check
                 imageClient.configure()
                 cookiesClient.configure()
-                
                 return .none
             }
         }
