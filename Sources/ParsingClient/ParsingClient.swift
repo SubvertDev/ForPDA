@@ -11,13 +11,20 @@ import SwiftSoup
 import ComposableArchitecture
 import Models
 
+// RELEASE: Move
+enum ParsingError: Error {
+    case unknownNewsStyle
+    case genericParsingError
+}
+
 // MARK: - New Implementation
 
 @DependencyClient
 public struct ParsingClient: Sendable {
     public var parseNewsList: @Sendable (_ document: String) async throws -> [NewsPreview]
-    public var parsePreview: @Sendable (_ document: String) async throws -> NewsPreview
-    public var parseNews: @Sendable (_ document: String) async throws -> [NewsElement]
+//    public var parsePreview: @Sendable (_ document: String) async throws -> NewsPreview
+//    public var parseNews: @Sendable (_ document: String) async throws -> [NewsElement]
+    public var parseNews: @Sendable (_ document: String) async throws -> News
 }
 
 extension DependencyValues {
@@ -32,17 +39,13 @@ extension ParsingClient: DependencyKey {
         parseNewsList: { document in
             return try await parseNewsList(from: document)
         },
-        parsePreview: { document in
-            return try await parsePreview(document: document)
-        },
+//        parsePreview: { document in
+//            return try await parsePreview(document: document)
+//        },
         parseNews: { document in
             return try await parseNews(from: document)
         }
     )
-}
-
-enum ParsingError: Error {
-    case genericParsingError
 }
 
 // MARK: - Parsing News List
@@ -97,10 +100,11 @@ extension ParsingClient {
     
     // MARK: - Parse Single Preview (For Deeplink)
     
-    public static func parsePreview(document: String) async throws -> NewsPreview {
+    public static func parsePreview(document: String) throws -> NewsPreview {
         let document = try SwiftSoup.parse(document)
-        let title = try document.select("[itemprop=headline]").text()
-        let imageUrl = try document.select("[itemprop=image]").get(0).attr("src")
+        let title = try document.select("[itemprop=headline]").get(0).text()
+        let imageDiv = try document.select("div[class=photo]").get(0)
+        let imageUrl = try imageDiv.select("[itemprop=image]").get(0).attr("src")
         return NewsPreview(
             url: URL(string: "/")!, // Not needed
             title: title,
@@ -118,16 +122,22 @@ extension ParsingClient {
 
 extension ParsingClient {
     
-    private static func parseNews(from document: String) async throws -> [NewsElement] {
-        let document = try! SwiftSoup.parse(document)
-
+    private static func parseNews(from rawPage: String) async throws -> News {
+        let document = try! SwiftSoup.parse(rawPage)
+        
+        let preview = try parsePreview(document: rawPage)
+        
+        var news = News(preview: preview)
+        
         if try! !document.select("[class=content-box]").isEmpty() {
-            return parseNewsNormal(from: document)
+            news.elements = parseNewsNormal(from: document)
         } else if try! !document.select("[class=article]").isEmpty() {
-            return parseNewsFancy(from: document)
+            news.elements = parseNewsFancy(from: document)
         } else {
-            return [] // RELEASE: Throw an error
+            throw ParsingError.unknownNewsStyle
         }
+        
+        return news
     }
     
     // MARK: - Parse News Normal
@@ -138,18 +148,24 @@ extension ParsingClient {
         
         for element in elements {
             if try! element.iS("[style=text-align:justify]") || (try! element.iS("[style=text-align: justify;]")) {
-                let text = try! element.html()
+                let text = try! element.html().filterFromTags()
                 if let quote = try! element.parent()?.iS("blockquote"), quote {
                     articleElements.append(.text(TextElement(text: text, isQuote: true)))
                 } else if try! element.iS("h2") {
                     try! element.select("br").remove()
-                    let text = try! element.html()
+                    let text = try! element.html().filterFromTags()
                     guard text != "&nbsp;" else { continue }
                     articleElements.append(.text(TextElement(text: text, isHeader: true)))
                 } else if let inList = try! element.parent()?.iS("ul"), inList {
                     articleElements.append(.text(TextElement(text: text, inList: true)))
                 } else if let insideList = try! element.parent()?.iS("ol"), insideList {
                     continue
+                } else if element.children().count > 0, element.children().get(0).hasAttr("data-lightbox") {
+                    let element = element.children().get(0).children()
+                    let url = URL(string: try! element.attr("src"))!
+                    let width = Int(try! element.attr("width"))!
+                    let height = Int(try! element.attr("height"))!
+                    articleElements.append(.image(ImageElement(url: url, width: width, height: height)))
                 } else {
                     guard text != "<!--more-->" else { continue }
                     guard text != "&nbsp;" else { continue }
@@ -159,7 +175,7 @@ extension ParsingClient {
             } else if try! element.iS("ol") {
                 let elements = try! element.select("li")
                 for (index, element) in elements.enumerated() {
-                    let text = try! element.html()
+                    let text = try! element.html().filterFromTags()
                     articleElements.append(.text(TextElement(text: text, countedListIndex: index + 1)))
                 }
             } else if try! element.iS("[style=text-align:center]") || (try! element.iS("[style=text-align: center;]")) {
@@ -221,7 +237,7 @@ extension ParsingClient {
                     }
                 }
             } else if try! element.iS("h2") {
-                let text = try! element.text()
+                let text = try! element.text().filterFromTags()
                 articleElements.append(.text(TextElement(text: text, isHeader: true)))
             } else if try! element.iS("dl") {
                 let bulletList = parseBulletList(element)
@@ -255,7 +271,7 @@ extension ParsingClient {
         
         for element in elements {
             if try! element.iS("p") {
-                let text = try! element.text()
+                let text = try! element.text().filterFromTags()
                 if !text.isEmpty {
                     if try! !element.html().contains("btn") {
                         articleElements.append(.text(TextElement(text: text)))
@@ -290,7 +306,7 @@ extension ParsingClient {
             } else if try! element.iS("h2") || (try! element.iS("h3")) {
                 guard try! !element.text().isEmpty else { continue }
                 try! element.select("br").remove()
-                let text = try! element.html()
+                let text = try! element.html().filterFromTags()
                 articleElements.append(.text(TextElement(text: text, isHeader: true)))
             } else if try! element.iS("figure") {
                 let images = try! element.select("img[alt]")
@@ -914,5 +930,23 @@ final class ParsingService {
         let strippedHTMLExceptBr = comment.replacing(htmlRegex, with: "")
         let brRegex = #/\s*<br>\s*/#
         return strippedHTMLExceptBr.replacing(brRegex, with: "\n")
+    }
+}
+
+extension String {
+    func filterFromTags() -> String {
+        let tags = [
+            ("<!--more-->", ""),
+            ("<br>", ""),
+            ("&nbsp;", " "),
+            ("<span></span>", "")
+        ]
+        
+        var filteredString = self
+        for tag in tags where filteredString.contains(tag.0) {
+            filteredString = filteredString.replacingOccurrences(of: tag.0, with: tag.1)
+        }
+        
+        return filteredString.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

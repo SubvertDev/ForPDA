@@ -5,6 +5,7 @@
 //  Created by Ilia Lubianoi on 21.03.2024.
 //
 
+import Foundation
 import ComposableArchitecture
 import Models
 import NewsClient
@@ -17,19 +18,22 @@ public struct NewsFeature {
     
     @ObservableState
     public struct State: Equatable {
-        var news: NewsPreview
-        var elements: [NewsElement]
+        var news: News
+//        var news: NewsPreview
+//        var elements: [NewsElement]
         var isLoading: Bool
         var showShareSheet: Bool
         
         public init(
-            news: NewsPreview,
-            elements: [NewsElement] = [],
+            news: News,
+//            news: NewsPreview,
+//            elements: [NewsElement] = [],
             isLoading: Bool = true,
             showShareSheet: Bool = false
         ) {
             self.news = news
-            self.elements = elements
+//            self.news = news
+//            self.elements = elements
             self.isLoading = isLoading
             self.showShareSheet = showShareSheet
         }
@@ -40,15 +44,23 @@ public struct NewsFeature {
     public enum Action: BindableAction {
         case onTask
         case menuActionTapped(NewsMenuAction)
+        case linkInTextTapped(URL)
+        case delegate(Delegate)
         case binding(BindingAction<State>)
         
-        case _newsResponse(Result<[NewsElement], Error>)
+        case _newsResponse(Result<News, Error>)
+        
+        @CasePathable
+        public enum Delegate {
+            case handleDeeplink(URL)
+        }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.newsClient) var newsClient
     @Dependency(\.pasteboardClient) var pasteboardClient
+    @Dependency(\.openURL) var openURL
     
     // MARK: - Init
     
@@ -62,7 +74,7 @@ public struct NewsFeature {
         Reduce { state, action in
             switch action {
             case .onTask:
-                if state.elements.isEmpty {
+                if state.news.elements.isEmpty {
                     return .run { [news = state.news] send in
                         let result = await Result {
                             try await newsClient.news(url: news.url)
@@ -87,15 +99,31 @@ public struct NewsFeature {
                 }
                 return .none
                 
-            case .binding:
+            case let .linkInTextTapped(url):
+                return .run { send in
+                    if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
+                        if let host = components.host, host.contains("4pda") {
+                            await send(.delegate(.handleDeeplink(url)))
+                            return
+                        }
+                    }
+                    await openURL(url)
+                }
+                
+            case .binding, .delegate:
                 return .none
                 
             case ._newsResponse(let result):
                 switch result {
-                case .success(let elements):
-                    state.elements = elements
+                case .success(let news):
+                    // In-app deeplink
+                    if state.news.preview.description.isEmpty { // RELEASE: Make test for empty description
+                        state.news.preview = news.preview
+                    }
+                    state.news.elements = news.elements
                     state.isLoading = false
-                    customDump(elements) // RELEASE: Remove
+                    customDump(news.elements) // RELEASE: Remove
+                    
                 case .failure(let error):
                     print("Critical error NewsFeature \(error)") // RELEASE: Handle
                     state.isLoading = false

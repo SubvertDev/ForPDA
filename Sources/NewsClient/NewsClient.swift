@@ -14,7 +14,7 @@ import ParsingClient
 public struct NewsClient: Sendable {
     @Dependency(\.parsingClient) static var parsingClient
     public var newsList: @Sendable (_ page: Int) async throws -> [NewsPreview]
-    public var news: @Sendable (_ url: URL) async throws -> [NewsElement]
+    public var news: @Sendable (_ url: URL) async throws -> News
 }
 
 extension DependencyValues {
@@ -46,7 +46,10 @@ extension NewsClient: DependencyKey {
         },
         news: { url in
             try await Task.sleep(for: .seconds(2))
-            return [.text(TextElement(text: "Lorem Ipsum I Guess?"))]
+            return News(
+                preview: .mock(),
+                elements: [.text(TextElement(text: "Lorem Ipsum I Guess?"))]
+            )
         }
     )
     

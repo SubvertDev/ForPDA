@@ -22,7 +22,7 @@ public struct NewsListFeature {
     @ObservableState
     public struct State: Equatable {
         @Presents public var alert: AlertState<Action.Alert>?
-        public var news: [NewsPreview]
+        public var news: [News]
         public var page: Int
         public var isLoading: Bool
         public var showShareSheet: Bool
@@ -30,7 +30,7 @@ public struct NewsListFeature {
         
         public init(
             alert: AlertState<Action.Alert>? = nil,
-            news: [NewsPreview] = [],
+            news: [News] = [],
             page: Int = 1,
             isLoading: Bool = true,
             showShareSheet: Bool = false,
@@ -49,7 +49,7 @@ public struct NewsListFeature {
     
     public enum Action: BindableAction {
         case menuTapped
-        case newsTapped(NewsPreview)
+        case newsTapped(News)
         case cellMenuOpened(NewsPreview, NewsListRowMenuAction) // RELEASE: Should it be a delegate?
         case onTask
         case onRefresh
@@ -121,8 +121,9 @@ public struct NewsListFeature {
                     await send(._newsResponse(result))
                 }
                 
-            case let ._newsResponse(.success(news)):
+            case let ._newsResponse(.success(previews)):
                 state.isLoading = false
+                let news = previews.map { News(preview: $0) }
                 if state.page == 1 {
                     state.news = news
                 } else {

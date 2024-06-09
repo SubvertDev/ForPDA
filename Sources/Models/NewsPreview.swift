@@ -1,6 +1,6 @@
 import Foundation
 
-public struct NewsPreview: Identifiable, Equatable {
+public struct NewsPreview: Identifiable, Equatable, Hashable {
     
     public let url: URL
     public let title: String
@@ -55,6 +55,19 @@ public extension NewsPreview {
             date: "20.03.24",
             isReview: false,
             commentAmount: "\(Int.random(in: 0...100))"
+        )
+    }
+    
+    static func deeplink(url: URL) -> NewsPreview {
+        NewsPreview(
+            url: url,
+            title: "",
+            description: "",
+            imageUrl: URL(string: "/")!,
+            author: "",
+            date: "",
+            isReview: false,
+            commentAmount: ""
         )
     }
 }

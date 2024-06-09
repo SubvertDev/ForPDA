@@ -100,7 +100,7 @@ public struct AppFeature {
                     guard let imageUrlString = urlComponents.queryItems?[1].value     else { fatalError() }
                     guard let imageUrl       = URL(string: imageUrlString)            else { fatalError() }
                     
-                    let news = NewsPreview(
+                    let preview = NewsPreview(
                         url: url,
                         title: title,
                         description: "", // Not needed
@@ -110,6 +110,7 @@ public struct AppFeature {
                         isReview: false,
                         commentAmount: "" // Not needed
                     )
+                    let news = News(preview: preview)
                     state.path.append(.news(NewsFeature.State(news: news)))
                 default: // For new deeplink usage cases
                     break
@@ -149,6 +150,13 @@ public struct AppFeature {
                     return .none
                 }
                 state.showToast = true
+                return .none
+                
+            case let .path(.element(id: _, action: .news(.delegate(.handleDeeplink(url))))):
+                // RELEASE: Get the title? Move to deeplink section above?
+                let preview = NewsPreview.deeplink(url: url)
+                let news = News(preview: preview)
+                state.path.append(.news(NewsFeature.State(news: news)))
                 return .none
                 
                 // MARK: - Menu

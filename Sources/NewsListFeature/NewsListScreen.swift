@@ -22,26 +22,26 @@ public struct NewsListScreen: View {
         WithPerceptionTracking {
             ZStack {
                 List {
-                    ForEach(store.news) { news in
+                    ForEach(store.news, id: \.self) { news in
                         WithPerceptionTracking {
                             Button {
                                 store.send(.newsTapped(news))
                             } label: {
-                                NewsListRowView(news: news)
+                                NewsListRowView(preview: news.preview)
                                     .contextMenu { // RELEASE: Extract
                                         ContextButton(text: "Copy Link", symbol: .doc) {
-                                            store.send(.cellMenuOpened(news, .copyLink))
+                                            store.send(.cellMenuOpened(news.preview, .copyLink))
                                         }
                                         ContextShareButton(
                                             text: "Share Link",
                                             symbol: .arrowTurnUpRight,
                                             showShareSheet: $store.showShareSheet,
-                                            shareURL: news.url
+                                            shareURL: news.preview.url
                                         ) {
-                                            store.send(.cellMenuOpened(news, .shareLink))
+                                            store.send(.cellMenuOpened(news.preview, .shareLink))
                                         }
                                         ContextButton(text: "Problem with news?", symbol: .questionmarkCircle) {
-                                            store.send(.cellMenuOpened(news, .report))
+                                            store.send(.cellMenuOpened(news.preview, .report))
                                         }
                                     }
                             }

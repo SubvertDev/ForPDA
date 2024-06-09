@@ -11,13 +11,13 @@ import Models
 
 struct NewsListRowView: View {
     
-    let news: NewsPreview
+    let preview: NewsPreview
     
     private let cellPadding: CGFloat = 16
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            LazyImage(url: news.imageUrl) { state in
+            LazyImage(url: preview.imageUrl) { state in
                 if let image = state.image { image.resizable().scaledToFill() }
             }
             .frame(width: UIScreen.main.bounds.width - cellPadding * 2,
@@ -25,17 +25,17 @@ struct NewsListRowView: View {
             .clipped()
             .cornerRadius(16)
             
-            Text(news.title)
+            Text(preview.title)
                 .font(.title3)
                 .fontWeight(.medium)
             
-            Text(news.description)
+            Text(preview.description)
                 .font(.subheadline)
                 .fontWeight(.light)
                 .lineLimit(3)
             
             HStack {
-                Text(news.author)
+                Text(preview.author)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundStyle(.gray)
@@ -46,14 +46,14 @@ struct NewsListRowView: View {
                     Image(systemSymbol: .message)
                         .foregroundStyle(.gray)
                     
-                    Text(news.commentAmount)
+                    Text(preview.commentAmount)
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundStyle(.gray)
                 }
                 .padding(.trailing, 8)
                 
-                Text(news.date)
+                Text(preview.date)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundStyle(.gray)
@@ -64,5 +64,5 @@ struct NewsListRowView: View {
 }
 
 #Preview {
-    NewsListRowView(news: .mock())
+    NewsListRowView(preview: .mock())
 }

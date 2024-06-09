@@ -25,7 +25,7 @@ public struct NewsScreen: View {
         WithPerceptionTracking {
             ScrollView {
                 ZStack {
-                    LazyImage(url: store.news.imageUrl) { state in
+                    LazyImage(url: store.news.preview.imageUrl) { state in
                         if let image = state.image { image.resizable().scaledToFill() }
                     }
                     .frame(height: UIScreen.main.bounds.width * 0.6)
@@ -34,7 +34,7 @@ public struct NewsScreen: View {
                     VStack {
                         Spacer()
                         
-                        Text(store.news.title)
+                        Text(store.news.preview.title)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .minimumScaleFactor(0.75)
@@ -60,16 +60,17 @@ public struct NewsScreen: View {
                         Text("Loading news...")
                     }
                 } else {
-                    Group {
-                        ForEach(store.elements, id: \.self) { element in
-                            NewsElementView(element: element)
+                    VStack(spacing: 0) {
+                        ForEach(store.news.elements, id: \.self) { element in
+                            NewsElementView(store: store, element: element)
+                                .padding(.vertical, 8)
                         }
-                        Spacer()
                     }
+                    Spacer()
                 }
             }
             .scrollIndicators(.hidden)
-            .navigationTitle(store.news.title)
+            .navigationTitle(store.news.preview.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -104,6 +105,7 @@ struct NewsElementView: View {
     
     @Environment(\.openURL) private var openURL
     
+    let store: StoreOf<NewsFeature>
     let element: NewsElement
     
     @ViewBuilder
@@ -112,11 +114,12 @@ struct NewsElementView: View {
         case .text(let textElement):
             Text(textElement.markdown)
                 .environment(\.openURL, OpenURLAction { url in
-                    print("TAP!!!") // RELEASE: Handle deeplink into 4pda
-                    return .systemAction
+                    store.send(.linkInTextTapped(url))
+                    return .handled
                 })
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .bold(textElement.isHeader)
-                .padding(12)
+                .padding(.horizontal, 12)
             
         case .image(let imageElement):
             LazyImage(url: imageElement.url) { state in
@@ -155,22 +158,14 @@ struct NewsElementView: View {
         NewsScreen(
             store: Store(
                 initialState: NewsFeature.State(
-                    news: NewsPreview(url: URL(string: "https://4pda.to/2024/05/12/427498/poetry_camera_prevraschaet_uvidennoe_v_stikhi/")!, title: "Poetry Camera прверащает увиденное в стихи.", description: "Test", imageUrl: URL(string: "https://4pda.to/s/pwpySNenqOcAabgmgXCz10SdH1JeFXwoq453mGv9CYgGW.jpg?v=1715094399")!, author: "", date: "", isReview: false, commentAmount: ""),
-                    elements: .fullMock
+                    news: News(
+                        preview: .mock(),
+                        elements: .fullMock
+                    )
                 )
             ) {
                 NewsFeature()
             }
         )
     }
-}
-
-extension Array where Element == NewsElement {
-    static let fullMock: [NewsElement] = [
-        .text(.init(text: "Nulla reprehenderit eiusmod consectetur aute voluptate et enim reprehenderit eu minim ea id commodo. Voluptate ipsum amet Lorem culpa pariatur Lorem consectetur dolor veniam officia dolore commodo. Incididunt ea ullamco nulla dolore nostrud pariatur. Sit ex non proident consequat culpa fugiat elit duis aliqua cupidatat labore nostrud officia est.")),
-        .image(.init(url: URL(string: "https://4pda.to/s/Zy0hPxnqmrklKWliotRS8kVWdhGv.jpg")!, width: 200, height: 100)),
-        .text(.init(text: "Esse id pariatur elit pariatur quis nisi pariatur do aliquip deserunt fugiat aliqua minim Lorem. Anim ut ea ea esse incididunt commodo qui laborum. Commodo aliqua irure culpa quis magna duis aliqua. Voluptate magna ut incididunt. Ipsum ex ex amet eu. Aute dolore deserunt proident elit incididunt occaecat nostrud labore Lorem duis.")),
-        .image(.init(url: URL(string: "https://4pda.to/s/Zy0hPxnqmrklKWliotRS8kVWdhGv.jpg")!, description: "Test Description", width: 200, height: 75)),
-        .text(.init(text: "Fugiat commodo minim aliquip deserunt laboris Lorem laborum magna voluptate reprehenderit. Elit irure in ut nostrud magna. Tempor consectetur deserunt quis ipsum cillum aute culpa. Consequat velit incididunt nostrud aute amet voluptate voluptate in ex sit dolore sunt voluptate eu commodo. Officia officia cupidatat mollit sunt excepteur id fugiat est sit amet nostrud culpa fugiat id ea.", isQuote: true))
-    ]
 }

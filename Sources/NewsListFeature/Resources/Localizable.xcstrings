@@ -81,6 +81,9 @@
         }
       }
     },
+    "shareLink" : {
+
+    },
     "Show captcha" : {
       "localizations" : {
         "ru" : {
