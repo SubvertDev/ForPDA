@@ -7,7 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
-import NewsListFeature
+import ArticlesListFeature
 import NewsFeature
 import MenuFeature
 import SettingsFeature
@@ -33,7 +33,7 @@ public struct AppFeature {
     public struct State: Equatable {
         public var path: StackState<Path.State>
         public var appDelegate: AppDelegateFeature.State
-        public var newsList: NewsListFeature.State
+        public var articlesList: ArticlesListFeature.State
         
         public var showToast: Bool
         public var toastMessage: String
@@ -41,13 +41,13 @@ public struct AppFeature {
         public init(
             path: StackState<Path.State> = StackState(),
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
-            newsList: NewsListFeature.State = NewsListFeature.State(),
+            articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             showToast: Bool = false,
             toastMessage: String = ""
         ) {
             self.path = path
             self.appDelegate = appDelegate
-            self.newsList = newsList
+            self.articlesList = articlesList
             self.showToast = showToast
             self.toastMessage = toastMessage
         }
@@ -58,7 +58,7 @@ public struct AppFeature {
     public enum Action: BindableAction {
         case appDelegate(AppDelegateFeature.Action)
         case path(StackActionOf<Path>)
-        case newsList(NewsListFeature.Action)
+        case articlesList(ArticlesListFeature.Action)
         case binding(BindingAction<State>)
         case deeplink(URL)
     }
@@ -72,8 +72,8 @@ public struct AppFeature {
             AppDelegateFeature()
         }
         
-        Scope(state: \.newsList, action: \.newsList) {
-            NewsListFeature()
+        Scope(state: \.articlesList, action: \.articlesList) {
+            ArticlesListFeature()
         }
         
         Reduce { state, action in
@@ -119,15 +119,16 @@ public struct AppFeature {
                 
                 // MARK: - NewsList
                 
-            case .newsList(.menuTapped):
+            case .articlesList(.menuTapped):
                 state.path.append(.menu(MenuFeature.State()))
                 return .none
                 
-            case let .newsList(.newsTapped(news)):
-                state.path.append(.news(NewsFeature.State(news: news)))
+            case let .articlesList(.articleTapped(article)):
+                #warning("сделать переход")
+//                state.path.append(.news(NewsFeature.State(news: news)))
                 return .none
                 
-            case let .newsList(.cellMenuOpened(_, action)):
+            case let .articlesList(.cellMenuOpened(_, action)):
                 switch action {
                 case .copyLink, .report:
                     state.toastMessage = action.rawValue.toString()
@@ -137,7 +138,7 @@ public struct AppFeature {
                 state.showToast = true
                 return .none
                 
-            case .newsList:
+            case .articlesList:
                 return .none
                 
                 // MARK: - News

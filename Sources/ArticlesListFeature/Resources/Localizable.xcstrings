@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Articles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статьи"
+          }
+        }
+      }
+    },
     "Copied" : {
       "localizations" : {
         "ru" : {
@@ -21,12 +31,12 @@
         }
       }
     },
-    "Loading news" : {
+    "Loading articles" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Загружаем новости"
+            "value" : "Загружаем статьи"
           }
         }
       }
@@ -41,16 +51,6 @@
         }
       }
     },
-    "News" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Новости"
-          }
-        }
-      }
-    },
     "OK" : {
       "localizations" : {
         "ru" : {
@@ -61,12 +61,12 @@
         }
       }
     },
-    "Problem with news?" : {
+    "Problems with article?" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проблемы с новостью?"
+            "value" : "Проблема со статьей?"
           }
         }
       }

@@ -10,12 +10,13 @@ let package = Package(
     products: [
         // Features
         .library(name: "AppFeature", targets: ["AppFeature"]),
-        .library(name: "NewsListFeature", targets: ["NewsListFeature"]),
+        .library(name: "ArticlesListFeature", targets: ["ArticlesListFeature"]),
         .library(name: "NewsFeature", targets: ["NewsFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
         
         // Clients
+        .library(name: "APIClient", targets: ["APIClient"]),
         .library(name: "NewsClient", targets: ["NewsClient"]),
         .library(name: "SettingsClient", targets: ["SettingsClient"]),
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
@@ -29,9 +30,11 @@ let package = Package(
         .library(name: "SharedUI", targets: ["SharedUI"])
     ],
     dependencies: [
+        .package(path: "../PDAPI"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
         .package(url: "https://github.com/hmlongco/Factory", from: "2.3.2"),
         .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.7.2"),
+        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
         .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
@@ -48,7 +51,7 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
-                "NewsListFeature",
+                "ArticlesListFeature",
                 "NewsFeature",
                 "MenuFeature",
                 "SettingsFeature",
@@ -60,10 +63,11 @@ let package = Package(
             ]
         ),
         .target(
-            name: "NewsListFeature",
+            name: "ArticlesListFeature",
             dependencies: [
                 "Models",
                 "SharedUI",
+                "APIClient",
                 "NewsClient",
                 "AnalyticsClient",
                 "PasteboardClient",
@@ -100,6 +104,15 @@ let package = Package(
         
         // MARK: - Clients
         
+            .target(
+                name: "APIClient",
+                dependencies: [
+//                    "SettingsClient",
+                    "ParsingClient",
+                    .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                    .product(name: "PDAPI", package: "PDAPI")
+                ]
+            ),
         .target(
             name: "NewsClient",
             dependencies: [
@@ -159,7 +172,8 @@ let package = Package(
         .target(
             name: "Models",
             dependencies: [
-                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
+                .product(name: "Parsing", package: "swift-parsing")
             ]
         ),
         .target(

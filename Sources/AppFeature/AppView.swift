@@ -7,7 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
-import NewsListFeature
+import ArticlesListFeature
 import NewsFeature
 import MenuFeature
 import SettingsFeature
@@ -24,7 +24,7 @@ public struct AppView: View {
     public var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                NewsListScreen(store: store.scope(state: \.newsList, action: \.newsList))
+                ArticlesListScreen(store: store.scope(state: \.articlesList, action: \.articlesList))
             } destination: { store in
                 switch store.case {
                 case let .news(store):

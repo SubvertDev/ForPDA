@@ -1,7 +1,7 @@
 import XCTest
 import ComposableArchitecture
 import AppFeature
-import NewsListFeature
+import ArticlesListFeature
 import NewsFeature
 import Models
 
@@ -13,15 +13,15 @@ final class AppFeatureTests: XCTestCase {
         
         let store = TestStore(
             initialState: AppFeature.State(
-                newsList: NewsListFeature.State(
-                    news: [news]
+                articlesList: ArticlesListFeature.State(
+                    articles: []
                 )
             )
         ) {
             AppFeature()
         }
         
-        await store.send(\.newsList.newsTapped, news.id) {
+        await store.send(\.articlesList.articleTapped, article.id) {
             $0.path[id: 0] = .news(NewsFeature.State(news: news))
         }
     }

@@ -1,5 +1,5 @@
 //
-//  NewsListScreen.swift
+//  ArticlesListScreen.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 21.03.2024.
@@ -10,11 +10,11 @@ import ComposableArchitecture
 import SharedUI
 import Models
 
-public struct NewsListScreen: View {
+public struct ArticlesListScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<NewsListFeature>
+    @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
     
-    public init(store: StoreOf<NewsListFeature>) {
+    public init(store: StoreOf<ArticlesListFeature>) {
         self.store = store
     }
     
@@ -22,26 +22,27 @@ public struct NewsListScreen: View {
         WithPerceptionTracking {
             ZStack {
                 List {
-                    ForEach(store.news, id: \.self) { news in
+                    ForEach(store.articles, id: \.self) { article in
                         WithPerceptionTracking {
                             Button {
-                                store.send(.newsTapped(news))
+                                store.send(.articleTapped(article))
                             } label: {
-                                NewsListRowView(preview: news.preview)
-                                    .contextMenu { // RELEASE: Extract
+                                ArticleRowView(article: article)
+                                // FIXME: Extract context menu
+                                    .contextMenu {
                                         ContextButton(text: "Copy Link", symbol: .doc) {
-                                            store.send(.cellMenuOpened(news.preview, .copyLink))
+                                            store.send(.cellMenuOpened(article, .copyLink))
                                         }
                                         ContextShareButton(
                                             text: "Share Link",
                                             symbol: .arrowTurnUpRight,
                                             showShareSheet: $store.showShareSheet,
-                                            shareURL: news.preview.url
+                                            shareURL: article.url
                                         ) {
-                                            store.send(.cellMenuOpened(news.preview, .shareLink))
+                                            store.send(.cellMenuOpened(article, .shareLink))
                                         }
-                                        ContextButton(text: "Problem with news?", symbol: .questionmarkCircle) {
-                                            store.send(.cellMenuOpened(news.preview, .report))
+                                        ContextButton(text: "Problems with article?", symbol: .questionmarkCircle) {
+                                            store.send(.cellMenuOpened(article, .report))
                                         }
                                     }
                             }
@@ -58,7 +59,7 @@ public struct NewsListScreen: View {
                 }
                 .listStyle(.plain)
                 .scrollIndicators(.hidden) // RELEASE: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
-                .navigationTitle("News")
+                .navigationTitle("Articles")
                 .navigationBarTitleDisplayMode(.inline)
                 .refreshable {
                     await store.send(.onRefresh).finish()
@@ -101,14 +102,14 @@ public struct NewsListScreen: View {
 
 #Preview {
     NavigationStack {
-        NewsListScreen(
+        ArticlesListScreen(
             store: Store(
-                initialState: NewsListFeature.State()
-            ) {
-                NewsListFeature()
-            } withDependencies: {
-                $0.newsClient = .previewValue
-            }
+                initialState: ArticlesListFeature.State(),
+                reducer: { ArticlesListFeature() },
+                withDependencies: {
+                    $0.apiClient = .previewValue
+                }
+            )
         )
     }
 }

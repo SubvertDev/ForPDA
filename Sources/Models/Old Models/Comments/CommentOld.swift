@@ -1,5 +1,5 @@
 //
-//  Comment.swift
+//  CommentOld.swift
 //  ForPDA
 //
 //  Created by Subvert on 05.12.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Comment: AbstractComment, ReflectedStringConvertible, Hashable {
+public class CommentOld: AbstractComment, ReflectedStringConvertible, Hashable {
     
     // MARK: - Properties
     
@@ -56,7 +56,7 @@ public class Comment: AbstractComment, ReflectedStringConvertible, Hashable {
     
     // MARK: - Hashable & Equatable
     
-    public static func == (lhs: Comment, rhs: Comment) -> Bool {
+    public static func == (lhs: CommentOld, rhs: CommentOld) -> Bool {
         return lhs.id == rhs.id
     }
     

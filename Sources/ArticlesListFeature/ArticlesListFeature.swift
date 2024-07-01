@@ -1,5 +1,5 @@
 //
-//  NewsListFeature.swift
+//  ArticlesListFeature.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 21.03.2024.
@@ -9,11 +9,12 @@ import Foundation
 import ComposableArchitecture
 import Models
 import NewsClient
+import APIClient
 import AnalyticsClient
 import PasteboardClient
 
 @Reducer
-public struct NewsListFeature {
+public struct ArticlesListFeature {
     
     public init() {}
     
@@ -22,23 +23,23 @@ public struct NewsListFeature {
     @ObservableState
     public struct State: Equatable {
         @Presents public var alert: AlertState<Action.Alert>?
-        public var news: [News]
-        public var page: Int
+        public var articles: [ArticlePreview]
         public var isLoading: Bool
         public var showShareSheet: Bool
         public var showVpnWarningBackground: Bool
         
+        var loadAmount: Int = 30
+        var offset: Int = 0
+        
         public init(
             alert: AlertState<Action.Alert>? = nil,
-            news: [News] = [],
-            page: Int = 1,
+            articles: [ArticlePreview] = [],
             isLoading: Bool = true,
             showShareSheet: Bool = false,
             showVpnWarningBackground: Bool = false
         ) {
             self.alert = alert
-            self.news = news
-            self.page = page
+            self.articles = articles
             self.isLoading = isLoading
             self.showShareSheet = showShareSheet
             self.showVpnWarningBackground = showVpnWarningBackground
@@ -48,15 +49,15 @@ public struct NewsListFeature {
     // MARK: - Action
     
     public enum Action: BindableAction {
+        case articleTapped(ArticlePreview)
+        case binding(BindingAction<State>)
+        case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // RELEASE: Should it be a delegate?
         case menuTapped
-        case newsTapped(News)
-        case cellMenuOpened(NewsPreview, NewsListRowMenuAction) // RELEASE: Should it be a delegate?
         case onTask
         case onRefresh
         case onLoadMoreAppear
-        case binding(BindingAction<State>)
         
-        case _newsResponse(Result<[NewsPreview], Error>)
+        case _articlesResponse(Result<[ArticlePreview], Error>)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
@@ -67,7 +68,7 @@ public struct NewsListFeature {
     
     // MARK: - Dependencies
     
-    @Dependency(\.newsClient) var newsClient
+    @Dependency(\.apiClient) var apiClient
     @Dependency(\.pasteboardClient) var pasteboardClient
     
     // MARK: - Body
@@ -75,66 +76,65 @@ public struct NewsListFeature {
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .menuTapped:
-                return .none
-            
-            case .newsTapped:
+                
+                // MARK: External
+            case .articleTapped, .binding, .menuTapped:
                 return .none
                 
-            case .binding:
-                return .none
-                
-            case .cellMenuOpened(let news, let action):
+            case .cellMenuOpened(let article, let action):
                 switch action {
-                case .copyLink:
-                    pasteboardClient.copy(url: news.url)
-                    
-                case .shareLink:
-                    state.showShareSheet = true
-                    
-                case .report:
-                    break
+                case .copyLink:  pasteboardClient.copy(url: article.url)
+                case .shareLink: state.showShareSheet = true
+                case .report:    break
                 }
                 return .none
                 
             case .onTask:
-                return .run { send in
-                    let result = await Result { try await newsClient.newsList(page: 1) }
-                    await send(._newsResponse(result))
+                return .run { [offset = state.offset, amount = state.loadAmount] send in
+                    #warning("Получил эпический PDAPIError.failedToConnect")
+                    try await apiClient.connect()
+                    let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
+                    await send(._articlesResponse(result))
                 }
                 
             case .onRefresh:
-                return .run { [page = state.page] send in
+                return .run { [offset = state.offset, amount = state.loadAmount] send in
                     // RELEASE: Better way to hold for 1 sec?
                     let startTime = DispatchTime.now()
-                    let result = await Result { try await newsClient.newsList(page: page) }
+                    let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
                     let endTime = DispatchTime.now()
                     let timeInterval = Int(Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds))
                     try await Task.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
-                    await send(._newsResponse(result))
+                    await send(._articlesResponse(result))
                 }
                 
             case .onLoadMoreAppear:
-                state.page += 1
-                return .run { [page = state.page] send in
-                    let result = await Result { try await newsClient.newsList(page: page) }
-                    await send(._newsResponse(result))
+                state.offset += state.loadAmount
+                return .run { [offset = state.offset, amount = state.loadAmount] send in
+                    let result = await Result {
+                        try await apiClient.getArticlesList(offset: offset, amount: amount)
+                    }
+                    await send(._articlesResponse(result))
                 }
+
+                // MARK: Internal
                 
-            case let ._newsResponse(.success(previews)):
+            case let ._articlesResponse(.success(articles)):
                 state.isLoading = false
-                let news = previews.map { News(preview: $0) }
-                if state.page == 1 {
-                    state.news = news
+                if state.offset == 0 {
+                    state.articles = articles
                 } else {
-                    state.news.append(contentsOf: news)
+                    state.articles.append(contentsOf: articles)
                 }
+                state.offset += state.loadAmount
                 return .none
                 
-            case ._newsResponse(.failure):
+            case ._articlesResponse(.failure):
                 state.isLoading = false
                 state.alert = .vpnWarning // RELEASE: Triggers if no internet
                 return .none
+                
+                // MARK: Alert
                 
             case .alert(.presented(.openCaptcha)):
                 return .none
@@ -155,7 +155,7 @@ public struct NewsListFeature {
 
 // MARK: - Alert Extension
 
-extension AlertState where Action == NewsListFeature.Action.Alert {
+extension AlertState where Action == ArticlesListFeature.Action.Alert {
     static let vpnWarning = Self {
         TextState("Whoops!")
     } actions: {

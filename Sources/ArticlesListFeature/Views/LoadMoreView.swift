@@ -13,7 +13,7 @@ struct LoadMoreView: View {
         HStack {
             Spacer()
             
-            Text("Loading news")
+            Text("Loading articles")
                 .padding(.trailing, 8)
             
             ModernCircularLoader(lineWidth: 2)

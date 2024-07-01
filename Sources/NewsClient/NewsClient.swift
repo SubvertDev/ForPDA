@@ -29,13 +29,13 @@ extension NewsClient: DependencyKey {
     public static var liveValue = Self(
         newsList: { page in
             let raw = try await NewsService().news(page: page) // RELEASE: Refactor NewsService to TCA way?
-            let newsList = try await parsingClient.parseNewsList(raw)
-            return newsList
+//            let newsList = try await parsingClient.parseNewsList(raw)
+            return []
         },
         news: { url in
             let raw = try await NewsService().article(path: url.pathComponents)
-            let news = try await parsingClient.parseNews(document: raw)
-            return news
+//            let news = try await parsingClient.parseNews(document: raw)
+            return News(preview: .mock())
         }
     )
     
