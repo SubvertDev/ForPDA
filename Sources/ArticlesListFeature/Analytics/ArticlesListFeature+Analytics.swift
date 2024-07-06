@@ -34,11 +34,11 @@ extension ArticlesListFeature {
                         analyticsClient.log(ArticlesListEvent.linkShared(article.url))
                     case .report:
                         analyticsClient.log(ArticlesListEvent.linkReported(article.url))
-                        analyticsClient.capture(AnalyticsError.brokenNews(article.url))
+                        analyticsClient.capture(AnalyticsError.brokenArticle(article.url))
                     }
                     
-                case .onTask:
-                    break // RELEASE: Make First App Open/App Session here?
+                case .onFirstAppear:
+                    break // TODO: Make First App Open/App Session here?
                     
                 case .onRefresh:
                     analyticsClient.log(ArticlesListEvent.refreshTriggered)
@@ -46,17 +46,20 @@ extension ArticlesListFeature {
                 case .onLoadMoreAppear:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
-                case ._articlesResponse(.failure):
-                    analyticsClient.log(ArticlesListEvent.vpnWarningShown)
+                case ._articlesResponse(.success):
+                    analyticsClient.log(ArticlesListEvent.articlesHasLoaded)
+                
+                case ._articlesResponse(.failure(let error)):
+                    analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
+                    analyticsClient.capture(AnalyticsError.apiFailure(error))
                     
-                case .alert(.presented(.openCaptcha)):
-                    analyticsClient.log(ArticlesListEvent.vpnWarningAction(.openCaptcha))
-                    
-                case .alert(.presented(.cancel)):
-                    analyticsClient.log(ArticlesListEvent.vpnWarningAction(.cancel))
-                    
-                case .binding, .alert, ._articlesResponse(.success):
+                case .binding, .alert, ._articlesResponse:
                     break
+                    
+                case ._failedToConnect(let error):
+                    print(error)
+                    analyticsClient.log(ArticlesListEvent.failedToConnect)
+                    analyticsClient.capture(error)
                 }
                 return .none
             }

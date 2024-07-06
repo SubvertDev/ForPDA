@@ -1,5 +1,5 @@
 {
-  "originHash" : "07762065f677a733d46cfccc28274f69882283eb39e5c14f4a0621c69dde3869",
+  "originHash" : "277a0250c6fc123d3a52ca700aafcd9f3e075836f47728b68bb75695d1b4b2af",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -26,15 +26,6 @@
       "state" : {
         "revision" : "9dc9cbe4bc45c65164fa653a563d8d8db61b09bb",
         "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "factory",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hmlongco/Factory",
-      "state" : {
-        "revision" : "587995f7d5cc667951d635fbf6b4252324ba0439",
-        "version" : "2.3.2"
       }
     },
     {

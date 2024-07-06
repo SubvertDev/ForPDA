@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import ArticlesListFeature
-import NewsFeature
+import ArticleFeature
 import MenuFeature
 import SettingsFeature
 import AlertToast
@@ -27,8 +27,8 @@ public struct AppView: View {
                 ArticlesListScreen(store: store.scope(state: \.articlesList, action: \.articlesList))
             } destination: { store in
                 switch store.case {
-                case let .news(store):
-                    NewsScreen(store: store)
+                case let .article(store):
+                    ArticleScreen(store: store)
                     
                 case let .menu(store):
                     MenuScreen(store: store)
@@ -42,4 +42,14 @@ public struct AppView: View {
             }
         }
     }
+}
+
+#Preview {
+    AppView(
+        store: Store(
+            initialState: AppFeature.State()
+        ) {
+            AppFeature()
+        }
+    )
 }

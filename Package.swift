@@ -11,18 +11,16 @@ let package = Package(
         // Features
         .library(name: "AppFeature", targets: ["AppFeature"]),
         .library(name: "ArticlesListFeature", targets: ["ArticlesListFeature"]),
-        .library(name: "NewsFeature", targets: ["NewsFeature"]),
+        .library(name: "ArticleFeature", targets: ["ArticleFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
         
         // Clients
         .library(name: "APIClient", targets: ["APIClient"]),
-        .library(name: "NewsClient", targets: ["NewsClient"]),
         .library(name: "SettingsClient", targets: ["SettingsClient"]),
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
         .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
         .library(name: "ImageClient", targets: ["ImageClient"]),
-        .library(name: "CookiesClient", targets: ["CookiesClient"]),
         .library(name: "PasteboardClient", targets: ["PasteboardClient"]),
         
         // Shared
@@ -32,7 +30,6 @@ let package = Package(
     dependencies: [
         .package(path: "../PDAPI"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
-        .package(url: "https://github.com/hmlongco/Factory", from: "2.3.2"),
         .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.7.2"),
         .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
@@ -52,12 +49,11 @@ let package = Package(
             name: "AppFeature",
             dependencies: [
                 "ArticlesListFeature",
-                "NewsFeature",
+                "ArticleFeature",
                 "MenuFeature",
                 "SettingsFeature",
                 "AnalyticsClient",
                 "ImageClient",
-                "CookiesClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "AlertToast", package: "AlertToast")
             ]
@@ -68,7 +64,6 @@ let package = Package(
                 "Models",
                 "SharedUI",
                 "APIClient",
-                "NewsClient",
                 "AnalyticsClient",
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -76,11 +71,12 @@ let package = Package(
             ]
         ),
         .target(
-            name: "NewsFeature",
+            name: "ArticleFeature",
             dependencies: [
                 "Models",
                 "SharedUI",
-                "NewsClient",
+                "APIClient",
+                "ParsingClient",
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
@@ -114,15 +110,6 @@ let package = Package(
                 ]
             ),
         .target(
-            name: "NewsClient",
-            dependencies: [
-                "SettingsClient",
-                "ParsingClient",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Factory", package: "Factory")
-            ]
-        ),
-        .target(
             name: "SettingsClient",
             dependencies: [
                 "Models",
@@ -142,14 +129,6 @@ let package = Package(
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Nuke", package: "nuke")
-            ]
-        ),
-        .target(
-            name: "CookiesClient",
-            dependencies: [
-                "Models",
-                "SettingsClient",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
         .target(

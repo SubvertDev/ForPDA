@@ -8,7 +8,6 @@
 import Foundation
 import ComposableArchitecture
 import Models
-import NewsClient
 import APIClient
 import AnalyticsClient
 import PasteboardClient
@@ -53,15 +52,15 @@ public struct ArticlesListFeature {
         case binding(BindingAction<State>)
         case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // RELEASE: Should it be a delegate?
         case menuTapped
-        case onTask
+        case onFirstAppear
         case onRefresh
         case onLoadMoreAppear
         
+        case _failedToConnect(Error)
         case _articlesResponse(Result<[ArticlePreview], Error>)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
-            case openCaptcha
             case cancel
         }
     }
@@ -89,17 +88,21 @@ public struct ArticlesListFeature {
                 }
                 return .none
                 
-            case .onTask:
+            case .onFirstAppear:
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
-                    #warning("Получил эпический PDAPIError.failedToConnect")
-                    try await apiClient.connect()
-                    let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
-                    await send(._articlesResponse(result))
+                    do {
+                        await apiClient.setLogResponses(type: .short)
+                        try await apiClient.connect()
+                        let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
+                        await send(._articlesResponse(result))
+                    } catch {
+                        await send(._failedToConnect(error))
+                    }
                 }
                 
             case .onRefresh:
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
-                    // RELEASE: Better way to hold for 1 sec?
+                    // TODO: Better way to hold for 1 sec?
                     let startTime = DispatchTime.now()
                     let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
                     let endTime = DispatchTime.now()
@@ -119,6 +122,10 @@ public struct ArticlesListFeature {
 
                 // MARK: Internal
                 
+            case ._failedToConnect:
+                state.alert = .failedToConnect
+                return .none
+                
             case let ._articlesResponse(.success(articles)):
                 state.isLoading = false
                 if state.offset == 0 {
@@ -131,16 +138,10 @@ public struct ArticlesListFeature {
                 
             case ._articlesResponse(.failure):
                 state.isLoading = false
-                state.alert = .vpnWarning // RELEASE: Triggers if no internet
+                state.alert = .failedToConnect
                 return .none
                 
                 // MARK: Alert
-                
-            case .alert(.presented(.openCaptcha)):
-                return .none
-                
-            case .alert(.presented(.cancel)):
-                return .none
                 
             case .alert:
                 state.alert = nil
@@ -156,16 +157,14 @@ public struct ArticlesListFeature {
 // MARK: - Alert Extension
 
 extension AlertState where Action == ArticlesListFeature.Action.Alert {
-    static let vpnWarning = Self {
+    
+    static let failedToConnect = Self {
         TextState("Whoops!")
     } actions: {
-        ButtonState(action: .openCaptcha) {
-            TextState("Show captcha")
-        }
-        ButtonState(role: .cancel, action: .cancel) {
+        ButtonState(role: .cancel) {
             TextState("OK")
         }
     } message: {
-        TextState("Looks like you have your VPN on or not located in Russia so you need to enter captcha. At this moment captcha validation works in test mode so it's recommended to disable vpn instead.")
+        TextState("Something went wrong while trying to connect to 4pda server...\nPlease try again later!")
     }
 }

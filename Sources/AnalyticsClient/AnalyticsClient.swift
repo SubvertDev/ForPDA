@@ -36,6 +36,7 @@ extension AnalyticsClient: DependencyKey {
                 Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
             },
             capture: { error in
+                print("[Sentry] \(error)")
                 SentrySDK.capture(error: error)
             }
         )
@@ -57,10 +58,11 @@ extension AnalyticsClient: DependencyKey {
 }
 
 extension AnalyticsClient {
+    
     private static func configureMixpanel() {
         Mixpanel.initialize(
             token: Secrets.for(key: .MIXPANEL_TOKEN),
-            trackAutomaticEvents: true, // RELEASE: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
+            trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
             optOutTrackingByDefault: isDebug
         )
     }
@@ -80,10 +82,11 @@ extension AnalyticsClient {
 }
 
 public enum AnalyticsError: Error {
-    case brokenNews(URL)
+    case brokenArticle(URL)
+    case apiFailure(Error)
 }
 
-// RELEASE: Move to another place
+// TODO: Move to another place
 private var isDebug: Bool {
     #if DEBUG
         return true
@@ -91,6 +94,8 @@ private var isDebug: Bool {
         return false
     #endif
 }
+
+// FIXME: Find easier way to manage keys
 
 private struct Secrets {
     

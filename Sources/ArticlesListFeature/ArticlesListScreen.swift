@@ -28,7 +28,7 @@ public struct ArticlesListScreen: View {
                                 store.send(.articleTapped(article))
                             } label: {
                                 ArticleRowView(article: article)
-                                // FIXME: Extract context menu
+                                // TODO: Extract context menu
                                     .contextMenu {
                                         ContextButton(text: "Copy Link", symbol: .doc) {
                                             store.send(.cellMenuOpened(article, .copyLink))
@@ -50,7 +50,7 @@ public struct ArticlesListScreen: View {
                         }
                     }
                     
-                    if !store.isLoading {
+                    if !store.isLoading && !store.articles.isEmpty {
                         LoadMoreView()
                             .onAppear {
                                 store.send(.onLoadMoreAppear)
@@ -80,21 +80,22 @@ public struct ArticlesListScreen: View {
                         .frame(width: 24, height: 24)
                 }
                 
-                if store.showVpnWarningBackground {
-                    VStack {
-                        Image(systemSymbol: .wifiExclamationmark)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: UIScreen.main.bounds.width * 0.25)
-                        Text("Whoops! Looks like you have VPN on, try disabling it and refresh the page")
-                            .multilineTextAlignment(.center)
-                            .padding()
-                    }
-                }
+                // TODO: Redo as generic error
+//                if store.showVpnWarningBackground {
+//                    VStack {
+//                        Image(systemSymbol: .wifiExclamationmark)
+//                            .resizable()
+//                            .scaledToFit()
+//                            .frame(width: UIScreen.main.bounds.width * 0.25)
+//                        Text("Whoops! Looks like you have VPN on, try disabling it and refresh the page")
+//                            .multilineTextAlignment(.center)
+//                            .padding()
+//                    }
+//                }
             }
             .alert($store.scope(state: \.alert, action: \.alert))
-            .task {
-                store.send(.onTask)
+            .onFirstAppear {
+                store.send(.onFirstAppear)
             }
         }
     }
@@ -104,12 +105,12 @@ public struct ArticlesListScreen: View {
     NavigationStack {
         ArticlesListScreen(
             store: Store(
-                initialState: ArticlesListFeature.State(),
-                reducer: { ArticlesListFeature() },
-                withDependencies: {
-                    $0.apiClient = .previewValue
-                }
-            )
+                initialState: ArticlesListFeature.State()
+            ) {
+                ArticlesListFeature()
+            } withDependencies: {
+                $0.apiClient = .previewValue
+            }
         )
     }
 }
