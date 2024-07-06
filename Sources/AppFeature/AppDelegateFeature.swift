@@ -9,7 +9,6 @@ import Foundation
 import ComposableArchitecture
 import AnalyticsClient
 import ImageClient
-import CookiesClient
 
 @Reducer
 public struct AppDelegateFeature {

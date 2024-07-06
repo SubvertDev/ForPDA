@@ -31,7 +31,7 @@ public struct ArticlePreview: Hashable {
         formatter.dateFormat = "yyyy/MM/dd"
         let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
         let dateAsString = formatter.string(from: date)
-        #warning("Сделать 4pda.to по всему проекту")
+        // TODO: Single url across the app
         return URL(string: "https://4pda.to/\(dateAsString)/\(id)/")!
     }
     
