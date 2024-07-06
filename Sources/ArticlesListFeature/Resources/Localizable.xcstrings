@@ -41,17 +41,6 @@
         }
       }
     },
-    "Looks like you have your VPN on or not located in Russia so you need to enter captcha. At this moment captcha validation works in test mode so it's recommended to disable vpn instead." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Похоже у вас запущен ВПН или вы находитесь не в России, поэтому необходимо ввести капчу. На данный момент капча работает в тестовом режиме, поэтому предпочтительно выключить ВПН."
-          }
-        }
-      }
-    },
     "OK" : {
       "localizations" : {
         "ru" : {
@@ -83,21 +72,24 @@
       }
     },
     "shareLink" : {
-
-    },
-    "Show captcha" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Показать капчу"
+            "value" : "Поделиться ссылкой"
           }
         }
       }
     },
     "Something went wrong while trying to connect to 4pda server...\nPlease try again later!" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так во время попытки соединения с 4pda...\nПопробуйте попозже!"
+          }
+        }
+      }
     },
     "Whoops!" : {
       "localizations" : {
@@ -105,17 +97,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упс!"
-          }
-        }
-      }
-    },
-    "Whoops! Looks like you have VPN on, try disabling it and refresh the page" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Упс! Похоже у вас включен ВПН, отключите его и попробуйте перезагрузить страницу"
           }
         }
       }
