@@ -28,7 +28,7 @@ public struct TextElement: Equatable, Hashable {
     public let countedListIndex: Int
     
     public var markdown: LocalizedStringKey {
-        let regex = #/\[url=\\"(?<url>.+?)\\"](?<text>.+?)\[/url]/#
+        let regex = #/\[url=\"(?<url>.+?)\"](?<text>.+?)\[/url]/#
         
         var text = text
         let matches = text.matches(of: regex)

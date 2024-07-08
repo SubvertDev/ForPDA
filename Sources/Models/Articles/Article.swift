@@ -10,7 +10,7 @@ import Foundation
 public struct Article: Hashable {
 
     public let id: Int
-    public let timestamp: Int
+    public let date: Date
     public let authorId: Int
     public let authorName: String
     public let commentsAmount: Int
@@ -23,7 +23,7 @@ public struct Article: Hashable {
     
     public init(
         id: Int,
-        timestamp: Int,
+        date: Date,
         authorId: Int,
         authorName: String,
         commentsAmount: Int,
@@ -35,7 +35,7 @@ public struct Article: Hashable {
         comments: [Comment]
     ) {
         self.id = id
-        self.timestamp = timestamp
+        self.date = date
         self.authorId = authorId
         self.authorName = authorName
         self.commentsAmount = commentsAmount
@@ -51,7 +51,7 @@ public struct Article: Hashable {
 public extension Article {
     static let mock = Article(
         id: 123456,
-        timestamp: 1234567890,
+        date: Date(timeIntervalSince1970: 1234567890),
         authorId: 123456,
         authorName: "Lorem Ipsum",
         commentsAmount: 69,

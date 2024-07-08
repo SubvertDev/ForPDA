@@ -50,6 +50,7 @@ public struct ArticleFeature {
         case onTask
         
         case _articleResponse(Result<Article, Error>)
+        case _parseArticleElements(Result<[ArticleElement], Error>)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
@@ -117,14 +118,25 @@ public struct ArticleFeature {
             case ._articleResponse(.success(let article)):
                 customDump(article)
                 // Outer deeplink case
-                if state.articlePreview.timestamp == 0 {
+                if state.articlePreview.date.timeIntervalSince1970 == 0 {
                     state.articlePreview = ArticlePreview.makeFromArticle(article)
                 }
-                state.elements = parsingClient.parseArticleElements(article)
+                return .run { send in
+                    let result = await Result { try await parsingClient.parseArticleElements(article) }
+                    await send(._parseArticleElements(result))
+                }
+                
+            case ._articleResponse(.failure):
+                state.isLoading = false
+                state.alert = .error
+                return .none
+                
+            case ._parseArticleElements(.success(let elements)):
+                state.elements = elements
                 state.isLoading = false
                 return .none
                 
-            case ._articleResponse(.failure):
+            case ._parseArticleElements(.failure):
                 state.isLoading = false
                 state.alert = .error
                 return .none

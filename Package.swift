@@ -31,7 +31,6 @@ let package = Package(
         .package(path: "../PDAPI"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
         .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.7.2"),
-        .package(url: "https://github.com/pointfreeco/swift-parsing", from: "0.13.0"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
         .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
@@ -151,8 +150,7 @@ let package = Package(
         .target(
             name: "Models",
             dependencies: [
-                .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
-                .product(name: "Parsing", package: "swift-parsing")
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
         .target(

@@ -10,18 +10,9 @@ import Models
 
 public struct ArticleElementParser {
     
-    public static func parse(from article: Article) -> [ArticleElement] {
+    public static func parse(from article: Article) throws -> [ArticleElement] {
         var result: [ArticleElement] = []
         var remainingText = article.description
-
-        func extractText(from text: String, startTag: String, endTag: String) -> (String, String?) {
-            if let startRange = text.range(of: startTag), let endRange = text.range(of: endTag, range: startRange.upperBound..<text.endIndex) {
-                let extractedText = String(text[startRange.upperBound..<endRange.lowerBound])
-                let remainingText = String(text[endRange.upperBound..<text.endIndex])
-                return (extractedText, remainingText)
-            }
-            return ("", nil)
-        }
 
         while !remainingText.isEmpty {
             // TODO: Extract size value in [size]
@@ -51,13 +42,13 @@ public struct ArticleElementParser {
                     // Attachment (single image)
                     // Youtube (video)
                     if parts.0.contains("attachment") && parts.0.contains("spoiler") {
-                        let imageElements = try! extractImageElements(text: parts.0, attachments: article.attachments)
+                        let imageElements = try extractImageElements(text: parts.0, attachments: article.attachments)
                         result.append(.gallery(imageElements))
                     } else if parts.0.contains("attachment") {
-                        let imageElement = try! extractImageElement(text: parts.0, attachments: article.attachments)
+                        let imageElement = try extractImageElement(text: parts.0, attachments: article.attachments)
                         result.append(.image(imageElement))
                     } else if parts.0.contains("youtube") {
-                        let videoElement = try! extractVideoElement(text: parts.0)
+                        let videoElement = try extractVideoElement(text: parts.0)
                         result.append(.video(videoElement))
                     }
                     remainingText = parts.1 ?? ""
@@ -68,13 +59,13 @@ public struct ArticleElementParser {
                     }
                     remainingText = parts.1 ?? ""
                 } else if nextTag == "[attachment]" { // Centerless attachment
-                    let parts = extractText(from: remainingText, startTag: "[attachment=\\\"", endTag: ":dummy\\\"]")
-                    let imageElement = try! extractImageElement(text: parts.0, attachments: article.attachments)
+                    let parts = extractText(from: remainingText, startTag: "[attachment=\"", endTag: ":dummy\"]")
+                    let imageElement = try extractImageElement(text: parts.0, attachments: article.attachments)
                     result.append(.image(imageElement))
                     remainingText = parts.1 ?? ""
                 } else if nextTag == "[table]" {
                     let parts = extractText(from: remainingText, startTag: "[table]", endTag: "[/table]")
-                    let tableElement = try! extractTableElement(text: parts.0)
+                    let tableElement = try extractTableElement(text: parts.0)
                     result.append(.table(tableElement))
                     remainingText = parts.1 ?? ""
                 }
@@ -89,40 +80,20 @@ public struct ArticleElementParser {
         return result
     }
     
-    private static func extractTableElement(text: String) throws -> TableElement {
-        let components = text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "]\\t[")
-
-        var titles: [String] = []
-        var descriptions: [String] = []
-        for index in components.indices {
-            if index % 2 == 0 {
-                titles.append(
-                    String(
-                        components[index]
-                            .dropFirst(index == 0 ? 20 : 17)
-                            .dropLast(16)
-                    )
-                )
-            } else {
-                descriptions.append(
-                    String(
-                        components[index]
-                            .dropFirst(3)
-                            .dropLast(index == components.count - 1 ? 10 : 9)
-                    )
-                    .replacingOccurrences(of: "\\n\\t", with: "\n")
-                )
-            }
+    // MARK: - Helpers
+    
+    private static func extractText(from text: String, startTag: String, endTag: String) -> (String, String?) {
+        if let startRange = text.range(of: startTag), let endRange = text.range(of: endTag, range: startRange.upperBound..<text.endIndex) {
+            let extractedText = String(text[startRange.upperBound..<endRange.lowerBound])
+            let remainingText = String(text[endRange.upperBound..<text.endIndex])
+            return (extractedText, remainingText)
         }
-
-        let rows = Array(zip(titles, descriptions)).map { TableRowElement(title: $0.0, description: $0.1) }
-        
-        return TableElement(rows: rows)
+        return ("", nil)
     }
     
     /// [attachment=\"1:dummy\"] -> 1
     private static func extractImageElement(text: String, attachments: [Attachment]) throws -> ImageElement {
-        let pattern = #/=\\"(\d+):/#
+        let pattern = #/=\"(\d+):/#
         
         var id: Int
         if let match = text.firstMatch(of: pattern), let number = Int(match.output.1) {
@@ -130,7 +101,7 @@ public struct ArticleElementParser {
         } else if let number = Int(text) { // Centerless attachment
             id = number
         } else {
-            throw NSError(domain: "Image Element Extracting Failed", code: 430)
+            throw ParsingError.failedToExtractImage
         }
         
         let attachment = attachments[id - 1]
@@ -141,7 +112,7 @@ public struct ArticleElementParser {
     
     /// [attachment=\"1:dummy\"] -> 1
     private static func extractImageElements(text: String, attachments: [Attachment]) throws -> [ImageElement] {
-        let pattern = #/=\\"(\d+):/#
+        let pattern = #/=\"(\d+):/#
         
         var imageElements: [ImageElement] = []
         
@@ -154,7 +125,7 @@ public struct ArticleElementParser {
         }
         
         if imageElements.isEmpty {
-            throw NSError(domain: "Whoops", code: 42)
+            throw ParsingError.failedToExtractImages
         } else {
             return imageElements
         }
@@ -166,17 +137,47 @@ public struct ArticleElementParser {
         
         if let match = text.firstMatch(of: pattern) {
             return VideoElement(id: String(match.output.1))
+        } else {
+            throw ParsingError.failedToExtractVideo
         }
+    }
+    
+    private static func extractTableElement(text: String) throws -> TableElement {
+        let components = text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "]\t[")
+
+        var titles: [String] = []
+        var descriptions: [String] = []
+        for index in components.indices {
+            if index % 2 == 0 {
+                titles.append(
+                    String(
+                        components[index]
+                            .dropFirst(index == 0 ? 18 : 17)
+                            .dropLast(16)
+                    )
+                )
+            } else {
+                descriptions.append(
+                    String(
+                        components[index]
+                            .dropFirst(3)
+                            .dropLast(index == components.count - 1 ? 10 : 9)
+                    )
+                )
+            }
+        }
+
+        let rows = Array(zip(titles, descriptions)).map { TableRowElement(title: $0.0, description: $0.1) }
         
-        throw NSError(domain: "Whoops", code: 66)
+        return TableElement(rows: rows)
     }
 }
 
 private extension String {
     func trim() -> String {
         return self
-            .replacingOccurrences(of: "\\n ", with: "\n")
             .replacingOccurrences(of: "\\n", with: "\n")
+            .replacingOccurrences(of: "\n ", with: "\n")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

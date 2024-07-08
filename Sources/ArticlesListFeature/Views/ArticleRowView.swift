@@ -53,7 +53,7 @@ struct ArticleRowView: View {
                 }
                 .padding(.trailing, 8)
                 
-                Text(article.date)
+                Text(article.formattedDate)
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundStyle(.gray)

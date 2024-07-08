@@ -10,20 +10,13 @@ import Foundation
 import ComposableArchitecture
 import Models
 
-// RELEASE: Move
-enum ParsingError: Error {
-    case unknownNewsStyle
-    case genericParsingError
-}
-
 // MARK: - New Implementation
 
 @DependencyClient
 public struct ParsingClient: Sendable {
     public var parseArticlesList: @Sendable (_ rawString: String) async throws -> [ArticlePreview]
     public var parseArticle: @Sendable (_ rawString: String) async throws -> Article
-    public var parseArticleElements: @Sendable (_ article: Article) -> [ArticleElement] = { _ in [] }
-    // TODO: Non-async call, check if it's ok
+    public var parseArticleElements: @Sendable (_ article: Article) async throws -> [ArticleElement]
 }
 
 extension DependencyValues {
@@ -42,7 +35,7 @@ extension ParsingClient: DependencyKey {
             return try ArticleParser.parse(from: rawString)
         },
         parseArticleElements: { article in
-            return ArticleElementParser.parse(from: article)
+            return try ArticleElementParser.parse(from: article)
         }
     )
 }

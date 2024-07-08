@@ -17,6 +17,7 @@ public enum ArticleEvent: Event {
     case inlineButtonTapped(URL)
     case loadingSuccess
     case loadingFailure(Error)
+    case parsingFailure(Error)
     // TODO: Comments
     
     public var name: String {
@@ -32,7 +33,8 @@ public enum ArticleEvent: Event {
              .inlineButtonTapped(let url):
             return ["url": url.absoluteString]
             
-        case .loadingFailure(let error):
+        case .loadingFailure(let error),
+             .parsingFailure(let error):
             return ["reason": error.localizedDescription]
             
         default:

@@ -6,170 +6,116 @@
 //
 
 import Foundation
-import Parsing
 import Models
 
 public struct ArticleParser {
     
+    /**
+    0. 68111 - atomic
+    1. 0 - ???
+    2. 429778 - id
+    3. 1720354500 - timestamp
+    4. 0 - ???
+    5. [] - ???
+    6. 64 - ???
+    7. 11029883 - author id
+    8. "Оксана Рубко" - author name
+    9. 0 - comments amount
+    10. "https..." - image url
+    11. "title" - title
+    12. "description" - description
+    13. [attachment] - attachments
+    14. [tag] - tags
+    15. [comment] - comments
+    16. [] - ???
+    */
     public static func parse(from string: String) throws -> Article {
-        let tagParser = Parse(input: Substring.self) {
-            Tag(id: $0, name: $1)
-        } with: {
-            "["
-            Prefix { $0 != "," }.map { Int($0)! }
-            ","
-            Prefix { $0 != "]" }.map(String.init)
-            "]"
-        }
-
-        let tagsParser = Parse(input: Substring.self) {
-            "["
-            Many {
-                tagParser
-            } separator: {
-                ","
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let fields = try JSONSerialization.jsonObject(with: data) as? [Any] else {
+                    throw ParsingError.failedToCastDataToAny
+                }
+                
+                return Article(
+                    id: fields[2] as! Int,
+                    date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
+                    authorId: fields[7] as! Int,
+                    authorName: fields[8] as! String,
+                    commentsAmount: fields[9] as! Int,
+                    imageUrl: URL(string: (fields[10] as! String))!,
+                    title: fields[11] as! String,
+                    description: fields[12] as! String,
+                    attachments: extractAttachments(from: fields[13] as! [[Any]]),
+                    tags: extractTags(from: fields[14] as! [[Any]]),
+                    comments: extractComments(from: fields[15] as! [[Any]])
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
             }
-            "]"
+        } else {
+            throw ParsingError.failedToCreateDataFromString
         }
-
-        let titleAndDescriptionParser = Parse(input: Substring.self) {
-            "\""
-            PrefixUpTo("\",\"").map { String($0) }
-            "\",\""
-            PrefixUpTo("\",[").map { String($0) } //",[],
-            "\""
-        }
-
-        let attachmentParser = Parse(input: Substring.self) {
-            Attachment(
-                id: $0,
-                smallUrl: $1,
-                width: $2,
-                height: $3,
-                description: $4,
-                fullUrl: $5
+    }
+    
+    // MARK: - Helpers
+    
+    /**
+    0. 1 - id
+    1. "https..." - small image url
+    2. 480 - width
+    3. 300 - height
+    4. "description" - description
+    5. "https..." - (optional) full image url
+    */
+    private static func extractAttachments(from array: [[Any]]) -> [Attachment] {
+        return array.map { fields in
+            return Attachment(
+                id: fields[0] as! Int,
+                smallUrl: URL(string: fields[1] as! String)!,
+                width: fields[2] as! Int,
+                height: fields[3] as! Int,
+                description: fields[4] as! String,
+                fullUrl: URL(string: fields[5] as! String)
             )
-        } with: {
-            "["
-            PrefixUpTo(",").map { Int($0)! } // ID
-            ",\""
-            PrefixUpTo("\",").map { URL(string: String($0))! } // Small URL
-            "\","
-            PrefixUpTo(",").map { Int($0)! } // Width
-            ","
-            PrefixUpTo(",").map { Int($0)! } // Height
-            ","
-            PrefixUpTo(",").map { String($0) } // Description
-            ",\""
-            PrefixUpTo("\"").map { URL(string: String($0)) } // Full URL (Optional)
-            "\""
-            "]"
         }
-        #warning("Иногда нет full url")
-
-        let attachmentsParser = Parse(input: Substring.self) {
-            "["
-            Many {
-                attachmentParser
-            } separator: {
-                ","
-            }
-            "]"
+    }
+    
+    /**
+    0. 24540 - id
+    1. "!!технологии" - name
+    */
+    private static func extractTags(from array: [[Any]]) -> [Tag] {
+        return array.map { fields in
+            return Tag(
+                id: fields[0] as! Int,
+                name: fields[1] as! String
+            )
         }
-
-        let commentParser = Parse(input: Substring.self) {
+    }
+    
+    /**
+    0. 9425129 - id
+    1. 1720355277 - date
+    2. 0 - ???
+    3. 11393353 - author id
+    4. "name" - author name
+    5. 9425113 - parent id
+    6. "text" - text
+    7. 0 - likes amount
+    8. "https..." - (optional) avatar url
+    */
+    private static func extractComments(from array: [[Any]]) -> [Comment] {
+        return array.map { fields in
             Comment(
-                id: $0,
-                timestamp: $1,
-                authorId: $2,
-                authorName: $3,
-                parentId: $4,
-                text: $5,
-                likesAmount: $6,
-                avatarUrl: $7
+                id: fields[0] as! Int,
+                date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
+                authorId: fields[3] as! Int,
+                authorName: fields[4] as! String,
+                parentId: fields[5] as! Int,
+                text: fields[6] as! String,
+                likesAmount: fields[7] as! Int,
+                avatarUrl: URL(string: fields[8] as! String)
             )
-        } with: {
-            "["
-            PrefixUpTo(",").map { Int($0)! } // Comment ID
-            ","
-            PrefixUpTo(",").map { Int($0)! } // Timestamp
-            ","
-            Skip { PrefixUpTo(",").map { Int($0)! } } // 0?
-            ","
-            PrefixUpTo(",").map { Int($0)! } // Author ID
-            ",\""
-            PrefixUpTo("\"").map { String($0) } // Author Name
-            "\","
-            PrefixUpTo(",").map { Int($0)! } // Parent ID
-            ","
-            QuotedFieldParser().map { String($0) }
-            ","
-            PrefixUpTo(",").map { Int($0)! } // Likes Amount
-            ",\""
-            PrefixUpTo("\"").map { URL(string: String($0)) } // Avatar URL
-            "\""
-            "]"
         }
-
-        let commentsParser = Parse(input: Substring.self) {
-            "["
-            Many {
-                commentParser
-            } separator: {
-                ","
-            }
-            "]"
-        }
-
-        let articleParser = Parse(input: Substring.self) {
-            Article(
-                id: $0,
-                timestamp: $1,
-                authorId: $2,
-                authorName: $3,
-                commentsAmount: $4,
-                imageUrl: $5,
-                title: $6.0,
-                description: $6.1,
-                attachments: $7,
-                tags: $8,
-                comments: $9
-            )
-        } with: {
-            "["
-            Skip { Prefix { $0 != ","} }
-            ","
-            Skip { Prefix { $0 != ","} }
-            ","
-            Prefix { $0 != "," }.map { Int($0)! } // ID
-            ","
-            Prefix { $0 != "," }.map { Int($0)! } // Timestamp
-            ","
-            Skip { Prefix { $0 != "," } } // 0 ?
-            ","
-            Skip { Prefix { $0 != "," } } // [] ?
-            ","
-            Skip { Prefix { $0 != "," } } // 64 ?
-            ","
-            Prefix { $0 != "," }.map { Int($0)! } // Author ID
-            ",\""
-            Prefix { $0 != "\"" }.map { String($0) } // Author Name
-            "\","
-            Prefix { $0 != "," }.map { Int($0)! } // Comments Amount
-            ",\""
-            Prefix { $0 != "\"" }.map { URL(string: String($0))! } // Image URL
-            "\","
-            titleAndDescriptionParser
-            ","
-            attachmentsParser
-            ","
-            tagsParser
-            ","
-            commentsParser
-            ",[]" // ?
-            "]"
-        }
-
-        return try articleParser.parse(string)
     }
 }

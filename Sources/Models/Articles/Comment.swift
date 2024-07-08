@@ -9,7 +9,7 @@ import Foundation
 
 public struct Comment: Hashable {
     public let id: Int
-    public let timestamp: Int
+    public let date: Date
     public let authorId: Int
     public let authorName: String
     public let parentId: Int
@@ -19,7 +19,7 @@ public struct Comment: Hashable {
     
     public init(
         id: Int,
-        timestamp: Int,
+        date: Date,
         authorId: Int,
         authorName: String,
         parentId: Int,
@@ -28,7 +28,7 @@ public struct Comment: Hashable {
         avatarUrl: URL?
     ) {
         self.id = id
-        self.timestamp = timestamp
+        self.date = date
         self.authorId = authorId
         self.authorName = authorName
         self.parentId = parentId

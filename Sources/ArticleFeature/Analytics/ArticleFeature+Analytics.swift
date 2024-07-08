@@ -46,7 +46,15 @@ extension ArticleFeature {
                 case ._articleResponse(.failure(let error)):
                     analyticsClient.log(ArticleEvent.loadingFailure(error))
                     analyticsClient.capture(error)
+                    
+                case ._parseArticleElements(.success):
+                    break
+                    
+                case ._parseArticleElements(.failure(let error)):
+                    analyticsClient.log(ArticleEvent.loadingFailure(error))
+                    analyticsClient.capture(error)
                 }
+                
                 return .none
             }
         }
