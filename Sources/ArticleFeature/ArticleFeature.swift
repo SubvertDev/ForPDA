@@ -116,9 +116,8 @@ public struct ArticleFeature {
                 }
                 
             case ._articleResponse(.success(let article)):
-                customDump(article)
-                // Outer deeplink case
-                if state.articlePreview.date.timeIntervalSince1970 == 0 {
+                // Outer && inner deeplink case
+                if state.articlePreview.date.timeIntervalSince1970 == 0 || state.articlePreview.title.isEmpty {
                     state.articlePreview = ArticlePreview.makeFromArticle(article)
                 }
                 return .run { send in
