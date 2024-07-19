@@ -63,6 +63,7 @@ struct ArticleElementView: View {
                         if let image = state.image { image.resizable() }
                     }
                     .aspectRatio(imageElement.ratioWH, contentMode: .fill)
+                    .frame(height: UIScreen.main.bounds.width * imageElement.ratioHW)
                     .clipped()
                 }
                 .padding(.bottom, 48) // Fix against index overlaying

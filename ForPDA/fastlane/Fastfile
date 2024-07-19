@@ -97,7 +97,7 @@ platform :ios do
             path: 'ForPDA/Secrets.xcconfig',
             name: 'SENTRY_DSYM_TOKEN'
         )
-        sentry_upload_dif(
+        sentry_debug_files_upload(
             auth_token: sentry_auth_token,
             org_slug: 'forpda',
             project_slug: 'apple-ios',

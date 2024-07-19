@@ -1,5 +1,5 @@
 {
-  "originHash" : "3a4cbe5a9a0a2a7a5aeb4478b73d3872cf14a6b1a3af336a38e30c59a89b5286",
+  "originHash" : "f62faabbff847c271027e56908ad6f8c1d7a979f8d90032c58a118e6b1d61465",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa",
       "state" : {
-        "revision" : "8fd4e804f2e72e0b9c1b189ce4e8349c4d10b6a2",
-        "version" : "8.30.0"
+        "revision" : "7339fcbab2ded21fe5753687022f2b673a1a1865",
+        "version" : "8.31.1"
       }
     },
     {
@@ -170,15 +170,6 @@
       "state" : {
         "revision" : "03ecd41814d8929362f7439529f9682536a8de13",
         "version" : "1.2.11"
-      }
-    },
-    {
-      "identity" : "swift-parsing",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-parsing",
-      "state" : {
-        "revision" : "a0e7d73f462c1c38c59dc40a3969ac40cea42950",
-        "version" : "0.13.0"
       }
     },
     {

@@ -34,7 +34,7 @@ let package = Package(
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
         .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.26.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.31.1"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0"),
         .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0"),
         .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9"),
