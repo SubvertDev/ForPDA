@@ -66,6 +66,10 @@ public struct ImageElement: Equatable, Hashable {
         return Double(height) / Double(width)
     }
     
+    public var ratioWH: Double {
+        return Double(width) / Double(height)
+    }
+    
     public init(
         url: URL,
         description: String? = nil,

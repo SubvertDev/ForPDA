@@ -62,7 +62,7 @@ struct ArticleElementView: View {
                     LazyImage(url: imageElement.url) { state in
                         if let image = state.image { image.resizable() }
                     }
-                    .aspectRatio(imageElement.ratioHW, contentMode: .fill)
+                    .aspectRatio(imageElement.ratioWH, contentMode: .fill)
                     .clipped()
                 }
                 .padding(.bottom, 48) // Fix against index overlaying
