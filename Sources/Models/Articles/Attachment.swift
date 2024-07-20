@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Attachment: Hashable {
+public struct Attachment: Sendable, Hashable {
     public let id: Int
     public let smallUrl: URL
     public let width: Int

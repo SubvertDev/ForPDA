@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Tag: Hashable {
+public struct Tag: Sendable, Hashable {
     public let id: Int
     public let name: String
     

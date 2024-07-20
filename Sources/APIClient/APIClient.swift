@@ -13,7 +13,6 @@ import ComposableArchitecture
 
 @DependencyClient
 public struct APIClient: Sendable {
-    @Dependency(\.parsingClient) static var parsingClient
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -22,7 +21,7 @@ public struct APIClient: Sendable {
 
 extension APIClient: DependencyKey {
     
-    private static let api = try! PDAPI()
+    private nonisolated(unsafe) static let api = try! PDAPI()
     
     public static var liveValue: APIClient {
         APIClient(
@@ -34,11 +33,13 @@ extension APIClient: DependencyKey {
             },
             getArticlesList: { offset, amount in
                 let rawString = try api.get(SiteCommand.articlesList(offset: offset, amount: amount))
+                @Dependency(\.parsingClient) var parsingClient
                 let parsedResponse = try await parsingClient.parseArticlesList(rawString: rawString)
                 return parsedResponse
             },
             getArticle: { id in
                 let rawString = try api.get(SiteCommand.article(id: id))
+                @Dependency(\.parsingClient) var parsingClient
                 let parsedResponse = try await parsingClient.parseArticle(rawString: rawString)
                 return parsedResponse
             }

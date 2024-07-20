@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Article: Hashable {
+public struct Article: Sendable, Hashable {
 
     public let id: Int
     public let date: Date

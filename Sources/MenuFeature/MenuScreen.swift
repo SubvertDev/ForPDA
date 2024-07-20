@@ -25,7 +25,7 @@ public struct MenuScreen: View {
                     SettingRowView(
                         title: store.loggedIn ? "Никнейм" : "Гость",
                         type: .auth(
-                            store.loggedIn ? R.image.fourpda : R.image.avatarDefault,
+                            store.loggedIn ? ._4pda : .avatarDefault,
                             store.loggedIn ? "Никнейм" : nil
                         ),
                         action: { store.send(.profileTapped) }
@@ -44,12 +44,12 @@ public struct MenuScreen: View {
                 }
                 
                 Section {
-                    SettingRowView(title: "Автор приложения", type: .image(R.image.fourpda)) {}
-                    SettingRowView(title: "Обсуждение приложения", type: .image(R.image.fourpda)) {}
+                    SettingRowView(title: "Автор приложения", type: .image(._4pda)) {}
+                    SettingRowView(title: "Обсуждение приложения", type: .image(._4pda)) {}
                         .disabled(true)
-                    SettingRowView(title: "Список изменений в Telegram", type: .image(R.image.telegram)) {}
-                    SettingRowView(title: "Чат приложения в Telegram", type: .image(R.image.telegram)) {}
-                    SettingRowView(title: "GitHub репозиторий", type: .image(R.image.github)) {}
+                    SettingRowView(title: "Список изменений в Telegram", type: .image(.telegram)) {}
+                    SettingRowView(title: "Чат приложения в Telegram", type: .image(.telegram)) {}
+                    SettingRowView(title: "GitHub репозиторий", type: .image(.github)) {}
                 }
             }
         }

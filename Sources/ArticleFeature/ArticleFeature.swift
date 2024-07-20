@@ -12,7 +12,7 @@ import APIClient
 import PasteboardClient
 
 @Reducer
-public struct ArticleFeature {
+public struct ArticleFeature: Sendable {
     
     // MARK: - State
     
@@ -49,8 +49,8 @@ public struct ArticleFeature {
         case menuActionTapped(ArticleMenuAction)
         case onTask
         
-        case _articleResponse(Result<Article, Error>)
-        case _parseArticleElements(Result<[ArticleElement], Error>)
+        case _articleResponse(Result<Article, any Error>)
+        case _parseArticleElements(Result<[ArticleElement], any Error>)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
@@ -153,7 +153,7 @@ public struct ArticleFeature {
 // MARK: - Alert Extension
 
 public extension AlertState where Action == ArticleFeature.Action.Alert {
-    static let error = Self {
+    nonisolated(unsafe) static let error = Self {
         TextState("Whoops!")
     } actions: {
         ButtonState(role: .cancel, action: .cancel) {

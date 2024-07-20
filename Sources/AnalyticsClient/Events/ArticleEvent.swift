@@ -16,8 +16,8 @@ public enum ArticleEvent: Event {
     case inlineLinkTapped(URL) // TODO: Rename from inline to TCA action name?
     case inlineButtonTapped(URL)
     case loadingSuccess
-    case loadingFailure(Error)
-    case parsingFailure(Error)
+    case loadingFailure(any Error)
+    case parsingFailure(any Error)
     // TODO: Comments
     
     public var name: String {

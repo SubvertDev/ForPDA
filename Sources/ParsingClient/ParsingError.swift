@@ -9,7 +9,7 @@ import Foundation
 
 enum ParsingError: Error {
     case failedToCreateDataFromString
-    case failedToSerializeData(Error)
+    case failedToSerializeData(any Error)
     case failedToCastDataToAny
     
     case failedToExtractImage

@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -35,7 +35,6 @@ let package = Package(
         .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.31.1"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.8.0"),
-        .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0"),
         .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4")
     ],
@@ -155,11 +154,9 @@ let package = Package(
         .target(
             name: "SharedUI",
             dependencies: [
-                .product(name: "RswiftLibrary", package: "R.swift"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
                 .product(name: "SwiftyGif", package: "SwiftyGif")
-            ],
-            plugins: [.plugin(name: "RswiftGeneratePublicResources", package: "R.swift")]
+            ]
         ),
         
         // MARK: - Tests
@@ -173,3 +170,13 @@ let package = Package(
         )
     ]
 )
+
+for target in package.targets where target.type != .binary {
+    var swiftSettings = target.swiftSettings ?? []
+    
+    #if !hasFeature(ExistentialAny)
+    swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
+    #endif
+    
+    target.swiftSettings = swiftSettings
+}

@@ -9,8 +9,8 @@ import UIKit
 import ComposableArchitecture
 
 @DependencyClient
-public struct PasteboardClient {
-    public var copy: (_ url: URL) -> Void
+public struct PasteboardClient: Sendable {
+    public var copy: @Sendable (_ url: URL) -> Void
 }
 
 public extension DependencyValues {
@@ -27,4 +27,3 @@ extension PasteboardClient: DependencyKey {
         }
     )
 }
-

@@ -11,10 +11,10 @@ import Mixpanel
 import Sentry
 
 @DependencyClient
-public struct AnalyticsClient {
-    public var configure: () -> Void
-    public var log: (Event) -> Void
-    public var capture: (Error) -> Void
+public struct AnalyticsClient: Sendable {
+    public var configure: @Sendable () -> Void
+    public var log: @Sendable (any Event) -> Void
+    public var capture: @Sendable (any Error) -> Void
 }
 
 public extension DependencyValues {
@@ -83,7 +83,7 @@ extension AnalyticsClient {
 
 public enum AnalyticsError: Error {
     case brokenArticle(URL)
-    case apiFailure(Error)
+    case apiFailure(any Error)
 }
 
 // TODO: Move to another place

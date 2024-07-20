@@ -7,12 +7,11 @@
 
 import SwiftUI
 import SharedUI
-import RswiftResources
 import SFSafeSymbols
 
 enum SettingType {
-    case auth(RswiftResources.ImageResource, String? = nil)
-    case image(RswiftResources.ImageResource)
+    case auth(Image, String? = nil)
+    case image(Image)
     case symbol(SFSymbol)
 }
 
@@ -31,9 +30,9 @@ struct SettingRowView: View {
             HStack {
                 Group {
                     switch type {
-                    case .auth(let resource, let name):
+                    case .auth(let image, let name):
                         HStack {
-                            Image(resource)
+                            image
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 48, height: 48)
@@ -53,9 +52,9 @@ struct SettingRowView: View {
                             Spacer()
                         }
                         
-                    case .image(let resource):
+                    case .image(let image):
                         HStack {
-                            Image(resource)
+                            image
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 24, height: 24)

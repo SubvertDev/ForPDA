@@ -10,8 +10,8 @@ import ComposableArchitecture
 import Nuke
 
 @DependencyClient
-public struct ImageClient {
-    public var configure: () -> Void
+public struct ImageClient: Sendable {
+    public var configure: @Sendable () -> Void
 }
 
 public extension DependencyValues {

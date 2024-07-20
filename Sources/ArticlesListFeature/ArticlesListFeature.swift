@@ -13,7 +13,7 @@ import AnalyticsClient
 import PasteboardClient
 
 @Reducer
-public struct ArticlesListFeature {
+public struct ArticlesListFeature: Sendable {
     
     public init() {}
     
@@ -56,8 +56,8 @@ public struct ArticlesListFeature {
         case onRefresh
         case onLoadMoreAppear
         
-        case _failedToConnect(Error)
-        case _articlesResponse(Result<[ArticlePreview], Error>)
+        case _failedToConnect(any Error)
+        case _articlesResponse(Result<[ArticlePreview], any Error>)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
@@ -158,7 +158,7 @@ public struct ArticlesListFeature {
 
 extension AlertState where Action == ArticlesListFeature.Action.Alert {
     
-    static let failedToConnect = Self {
+    nonisolated(unsafe) static let failedToConnect = Self {
         TextState("Whoops!")
     } actions: {
         ButtonState(role: .cancel) {

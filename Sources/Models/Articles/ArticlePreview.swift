@@ -57,8 +57,7 @@ public struct ArticlePreview: Hashable {
 }
 
 public extension ArticlePreview {
-    
-    static let mock = ArticlePreview(
+    nonisolated(unsafe) static let mock = ArticlePreview(
         id: 123456,
         date: Date(timeIntervalSince1970: 1234567890),
         authorId: 123456,

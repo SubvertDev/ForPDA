@@ -6,33 +6,13 @@
 //
 
 import SwiftUI
-import RswiftResources
 
 // MARK: - Images
 
+// TODO: 17+ change to ImageResource
 public extension Image {
-    
-    static func shared(_ resource: RswiftResources.ImageResource) -> Image {
-        .init(resource)
-    }
-    
-    init(_ resource: RswiftResources.ImageResource) {
-        self.init(resource.name)
-    }
+    static let avatarDefault = Image(.avatarDefault)
+    static let _4pda = Image(._4Pda)
+    static let github = Image(.github)
+    static let telegram = Image(.telegram)
 }
-
-// MARK: - Fonts
-
-//extension RswiftResources.FontResource {
-//    func wrapped(size: CGFloat) -> Font {
-//        Font.custom(name, size: size)
-//    }
-//}
-
-// MARK: - Colors
-
-//extension RswiftResources.ColorResource {
-//    var asColor: Color {
-//        Color(name)
-//    }
-//}
