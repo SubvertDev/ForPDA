@@ -7,8 +7,8 @@
 
 import Foundation
 import ComposableArchitecture
-import NewsListFeature
-import NewsFeature
+import ArticlesListFeature
+import ArticleFeature
 import MenuFeature
 import SettingsFeature
 import Models
@@ -22,7 +22,7 @@ public struct AppFeature {
     
     @Reducer(state: .equatable)
     public enum Path {
-        case news(NewsFeature)
+        case article(ArticleFeature)
         case menu(MenuFeature)
         case settings(SettingsFeature)
     }
@@ -33,7 +33,7 @@ public struct AppFeature {
     public struct State: Equatable {
         public var path: StackState<Path.State>
         public var appDelegate: AppDelegateFeature.State
-        public var newsList: NewsListFeature.State
+        public var articlesList: ArticlesListFeature.State
         
         public var showToast: Bool
         public var toastMessage: String
@@ -41,13 +41,13 @@ public struct AppFeature {
         public init(
             path: StackState<Path.State> = StackState(),
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
-            newsList: NewsListFeature.State = NewsListFeature.State(),
+            articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             showToast: Bool = false,
             toastMessage: String = ""
         ) {
             self.path = path
             self.appDelegate = appDelegate
-            self.newsList = newsList
+            self.articlesList = articlesList
             self.showToast = showToast
             self.toastMessage = toastMessage
         }
@@ -58,7 +58,7 @@ public struct AppFeature {
     public enum Action: BindableAction {
         case appDelegate(AppDelegateFeature.Action)
         case path(StackActionOf<Path>)
-        case newsList(NewsListFeature.Action)
+        case articlesList(ArticlesListFeature.Action)
         case binding(BindingAction<State>)
         case deeplink(URL)
     }
@@ -72,8 +72,8 @@ public struct AppFeature {
             AppDelegateFeature()
         }
         
-        Scope(state: \.newsList, action: \.newsList) {
-            NewsListFeature()
+        Scope(state: \.articlesList, action: \.articlesList) {
+            ArticlesListFeature()
         }
         
         Reduce { state, action in
@@ -89,45 +89,42 @@ public struct AppFeature {
             case .deeplink(let url):
                 switch url.host {
                 case "news":
+                    // TODO: Make DeeplinkHandlerClient?
                     guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { fatalError() }
                     urlComponents.scheme = "https"
                     urlComponents.host =   "4pda.to"
                     
-                    // RELEASE: Refactor. Add crashlytics?
+                    // TODO: Refactor. Add crashlytics?
                     guard let url            = urlComponents.url                      else { fatalError() }
                     guard let titleEncoded   = urlComponents.queryItems?.first?.value else { fatalError() }
                     guard let title          = titleEncoded.removingPercentEncoding   else { fatalError() }
                     guard let imageUrlString = urlComponents.queryItems?[1].value     else { fatalError() }
                     guard let imageUrl       = URL(string: imageUrlString)            else { fatalError() }
                     
-                    let preview = NewsPreview(
-                        url: url,
-                        title: title,
-                        description: "", // Not needed
-                        imageUrl: imageUrl,
-                        author: "", // Not needed
-                        date: "", // Not needed
-                        isReview: false,
-                        commentAmount: "" // Not needed
-                    )
-                    let news = News(preview: preview)
-                    state.path.append(.news(NewsFeature.State(news: news)))
+                    // TODO: Has duplicate in ArticleFeature
+                    let regex = #//([\d]{6})//#
+                    let match = url.absoluteString.firstMatch(of: regex)
+                    let id = Int(match!.output.1)!
+                    
+                    let articlePreview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
+                    state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
+                    
                 default: // For new deeplink usage cases
                     break
                 }
                 return .none
                 
-                // MARK: - NewsList
+                // MARK: - ArticlesList
                 
-            case .newsList(.menuTapped):
+            case .articlesList(.menuTapped):
                 state.path.append(.menu(MenuFeature.State()))
                 return .none
                 
-            case let .newsList(.newsTapped(news)):
-                state.path.append(.news(NewsFeature.State(news: news)))
+            case let .articlesList(.articleTapped(articlePreview)):
+                state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
-            case let .newsList(.cellMenuOpened(_, action)):
+            case let .articlesList(.cellMenuOpened(_, action)):
                 switch action {
                 case .copyLink, .report:
                     state.toastMessage = action.rawValue.toString()
@@ -137,12 +134,12 @@ public struct AppFeature {
                 state.showToast = true
                 return .none
                 
-            case .newsList:
+            case .articlesList:
                 return .none
                 
-                // MARK: - News
+                // MARK: - Article
                 
-            case let .path(.element(id: _, action: .news(.menuActionTapped(action)))):
+            case let .path(.element(id: _, action: .article(.menuActionTapped(action)))):
                 switch action {
                 case .copyLink, .report:
                     state.toastMessage = action.rawValue.toString()
@@ -152,11 +149,9 @@ public struct AppFeature {
                 state.showToast = true
                 return .none
                 
-            case let .path(.element(id: _, action: .news(.delegate(.handleDeeplink(url))))):
-                // RELEASE: Get the title? Move to deeplink section above?
-                let preview = NewsPreview.deeplink(url: url)
-                let news = News(preview: preview)
-                state.path.append(.news(NewsFeature.State(news: news)))
+            case let .path(.element(id: _, action: .article(.delegate(.handleDeeplink(id))))):
+                let articlePreview = ArticlePreview.innerDeeplink(id: id)
+                state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
                 // MARK: - Menu

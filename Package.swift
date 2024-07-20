@@ -10,18 +10,17 @@ let package = Package(
     products: [
         // Features
         .library(name: "AppFeature", targets: ["AppFeature"]),
-        .library(name: "NewsListFeature", targets: ["NewsListFeature"]),
-        .library(name: "NewsFeature", targets: ["NewsFeature"]),
+        .library(name: "ArticlesListFeature", targets: ["ArticlesListFeature"]),
+        .library(name: "ArticleFeature", targets: ["ArticleFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
         
         // Clients
-        .library(name: "NewsClient", targets: ["NewsClient"]),
+        .library(name: "APIClient", targets: ["APIClient"]),
         .library(name: "SettingsClient", targets: ["SettingsClient"]),
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
         .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
         .library(name: "ImageClient", targets: ["ImageClient"]),
-        .library(name: "CookiesClient", targets: ["CookiesClient"]),
         .library(name: "PasteboardClient", targets: ["PasteboardClient"]),
         
         // Shared
@@ -29,13 +28,13 @@ let package = Package(
         .library(name: "SharedUI", targets: ["SharedUI"])
     ],
     dependencies: [
+        .package(path: "../PDAPI"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
-        .package(url: "https://github.com/hmlongco/Factory", from: "2.3.2"),
         .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.7.2"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
         .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.26.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.31.1"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0"),
         .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0"),
         .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9"),
@@ -48,23 +47,22 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
-                "NewsListFeature",
-                "NewsFeature",
+                "ArticlesListFeature",
+                "ArticleFeature",
                 "MenuFeature",
                 "SettingsFeature",
                 "AnalyticsClient",
                 "ImageClient",
-                "CookiesClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "AlertToast", package: "AlertToast")
             ]
         ),
         .target(
-            name: "NewsListFeature",
+            name: "ArticlesListFeature",
             dependencies: [
                 "Models",
                 "SharedUI",
-                "NewsClient",
+                "APIClient",
                 "AnalyticsClient",
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -72,11 +70,12 @@ let package = Package(
             ]
         ),
         .target(
-            name: "NewsFeature",
+            name: "ArticleFeature",
             dependencies: [
                 "Models",
                 "SharedUI",
-                "NewsClient",
+                "APIClient",
+                "ParsingClient",
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
@@ -100,15 +99,15 @@ let package = Package(
         
         // MARK: - Clients
         
-        .target(
-            name: "NewsClient",
-            dependencies: [
-                "SettingsClient",
-                "ParsingClient",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Factory", package: "Factory")
-            ]
-        ),
+            .target(
+                name: "APIClient",
+                dependencies: [
+//                    "SettingsClient",
+                    "ParsingClient",
+                    .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                    .product(name: "PDAPI", package: "PDAPI")
+                ]
+            ),
         .target(
             name: "SettingsClient",
             dependencies: [
@@ -129,14 +128,6 @@ let package = Package(
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Nuke", package: "nuke")
-            ]
-        ),
-        .target(
-            name: "CookiesClient",
-            dependencies: [
-                "Models",
-                "SettingsClient",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
         .target(

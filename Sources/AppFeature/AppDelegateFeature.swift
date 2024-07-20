@@ -9,7 +9,6 @@ import Foundation
 import ComposableArchitecture
 import AnalyticsClient
 import ImageClient
-import CookiesClient
 
 @Reducer
 public struct AppDelegateFeature {
@@ -32,7 +31,6 @@ public struct AppDelegateFeature {
     
     @Dependency(\.analyticsClient) var analyticsClient
     @Dependency(\.imageClient) var imageClient
-    @Dependency(\.cookiesClient) var cookiesClient
     
     // MARK: - Body
     
@@ -40,9 +38,8 @@ public struct AppDelegateFeature {
         Reduce { state, action in
             switch action {
             case .didFinishLaunching:
-                analyticsClient.configure() // RELEASE: Check
+                analyticsClient.configure() // TODO: Check
                 imageClient.configure()
-                cookiesClient.configure()
                 return .none
             }
         }
