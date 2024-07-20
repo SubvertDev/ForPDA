@@ -1,5 +1,5 @@
 {
-  "originHash" : "f62faabbff847c271027e56908ad6f8c1d7a979f8d90032c58a118e6b1d61465",
+  "originHash" : "8b8accf53e4958375b2c88c0e4ebf8198573217ff43f95dd794250b6720d798b",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mixpanel/mixpanel-swift",
       "state" : {
-        "revision" : "7f73084879cf6f8c50ab93e34ab0aae2569b04a8",
-        "version" : "4.2.7"
+        "revision" : "48d6668ceaaefc338f94e2b084c3cf77b90182f8",
+        "version" : "4.3.0"
       }
     },
     {
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke",
       "state" : {
-        "revision" : "311016d972aa751ae8ab0cd5897422ebe7db0501",
-        "version" : "12.7.3"
+        "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
+        "version" : "12.8.0"
       }
     },
     {
@@ -188,15 +188,6 @@
       "state" : {
         "revision" : "303e5c5c36d6a558407d364878df131c3546fad8",
         "version" : "510.0.2"
-      }
-    },
-    {
-      "identity" : "swiftsoup",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/scinfu/SwiftSoup.git",
-      "state" : {
-        "revision" : "028487d4a8a291b2fe1b4392b5425b6172056148",
-        "version" : "2.7.2"
       }
     },
     {

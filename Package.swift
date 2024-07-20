@@ -29,13 +29,12 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../PDAPI"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.10.3"),
-        .package(url: "https://github.com/scinfu/SwiftSoup", from: "2.7.2"),
-        .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", from: "5.2.0"),
-        .package(url: "https://github.com/kean/Nuke", from: "12.6.0"),
-        .package(url: "https://github.com/mixpanel/mixpanel-swift", from: "4.2.7"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", from: "8.31.1"),
-        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", from: "1.8.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.11.2"),
+        .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
+        .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
+        .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.31.1"),
+        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.8.0"),
         .package(url: "https://github.com/mac-cain13/R.swift.git", from: "7.5.0"),
         .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4")
@@ -75,6 +74,7 @@ let package = Package(
                 "Models",
                 "SharedUI",
                 "APIClient",
+                "AnalyticsClient",
                 "ParsingClient",
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -134,8 +134,7 @@ let package = Package(
             name: "ParsingClient",
             dependencies: [
                 "Models",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "SwiftSoup", package: "SwiftSoup")
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         .target(
