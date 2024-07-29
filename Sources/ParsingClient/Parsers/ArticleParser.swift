@@ -43,7 +43,7 @@ public struct ArticleParser {
                     authorName: fields[8] as! String,
                     commentsAmount: fields[9] as! Int,
                     imageUrl: URL(string: (fields[10] as! String))!,
-                    title: fields[11] as! String,
+                    title: (fields[11] as! String).convertUnicodes(),
                     description: fields[12] as! String,
                     attachments: extractAttachments(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
@@ -105,17 +105,25 @@ public struct ArticleParser {
     8. "https..." - (optional) avatar url
     */
     private static func extractComments(from array: [[Any]]) -> [Comment] {
-        return array.map { fields in
+        var comments = array.map { fields in
             Comment(
                 id: fields[0] as! Int,
                 date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
+                type: CommentType(rawValue: fields[2] as! Int) ?? .normal,
                 authorId: fields[3] as! Int,
                 authorName: fields[4] as! String,
                 parentId: fields[5] as! Int,
-                text: fields[6] as! String,
+                childIds: [],
+                text: (fields[6] as! String).convertUnicodes(),
                 likesAmount: fields[7] as! Int,
                 avatarUrl: URL(string: fields[8] as! String)
             )
         }
+        
+        for (index, comment) in comments.enumerated() {
+            comments[index].childIds = comments.filter { $0.parentId == comment.id }.map { $0.id }
+        }
+        
+        return comments
     }
 }

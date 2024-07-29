@@ -58,16 +58,8 @@ public struct ArticleScreen: View {
                         
                         Text("Loading article...")
                     }
-                } else {
-                    VStack(spacing: 0) {
-                        if let elements = store.elements {
-                            ForEach(elements, id: \.self) { element in
-                                ArticleElementView(store: store, element: element)
-                                    .padding(.vertical, 8)
-                            }
-                        }
-                    }
-                    Spacer()
+                } else if let elements = store.elements, let comments = store.article?.comments {
+                    ArticleView(store: store, elements: elements, comments: comments)
                 }
             }
             .scrollIndicators(.hidden)
@@ -77,18 +69,19 @@ public struct ArticleScreen: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     // TODO: Extract and reuse context menu?
                     Menu {
-                        ContextButton(text: "Copy Link", symbol: .doc) {
+                        ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
                             store.send(.menuActionTapped(.copyLink))
                         }
                         ContextShareButton(
                             text: "Share Link",
                             symbol: .arrowTurnUpRight,
+                            bundle: .module,
                             showShareSheet: $store.showShareSheet,
                             shareURL: store.articlePreview.url
                         ) {
                             store.send(.menuActionTapped(.shareLink))
                         }
-                        ContextButton(text: "Problem with article?", symbol: .questionmarkCircle) {
+                        ContextButton(text: "Problem with article?", symbol: .questionmarkCircle, bundle: .module) {
                             store.send(.menuActionTapped(.report))
                         }
                     } label: {
@@ -111,7 +104,8 @@ public struct ArticleScreen: View {
         ArticleScreen(
             store: Store(
                 initialState: ArticleFeature.State(
-                    articlePreview: .mock
+                    articlePreview: .mock,
+                    article: .mock
                 )
             ) {
                 ArticleFeature()

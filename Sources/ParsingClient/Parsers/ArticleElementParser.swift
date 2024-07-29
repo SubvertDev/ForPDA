@@ -16,7 +16,7 @@ public struct ArticleElementParser {
 
         while !remainingText.isEmpty {
             // TODO: Extract size value in [size]
-            let tags = ["[quote]", "[center]", "[size=4]", "[size=3]", "[attachment=", "[table]"] // Add new tags as needed
+            let tags = ["[quote]", "[center]", "[size=4]", "[size=3]", "[attachment=", "[table]", "[list]"] // Add new tags as needed
             let ranges = tags.compactMap { remainingText.range(of: $0) }
 
             let nextTagRange = ranges.min(by: { $0.lowerBound < $1.lowerBound })
@@ -67,6 +67,11 @@ public struct ArticleElementParser {
                     let parts = extractText(from: remainingText, startTag: "[table]", endTag: "[/table]")
                     let tableElement = try extractTableElement(text: parts.0)
                     result.append(.table(tableElement))
+                    remainingText = parts.1 ?? ""
+                } else if nextTag == "[list]" {
+                    let parts = extractText(from: remainingText, startTag: "[list]", endTag: "[/list]")
+                    let bulletListElement = try extractBulletListElement(text: parts.0)
+                    result.append(.bulletList(bulletListElement))
                     remainingText = parts.1 ?? ""
                 }
             } else {
@@ -171,6 +176,10 @@ public struct ArticleElementParser {
         
         return TableElement(rows: rows)
     }
+    
+    private static func extractBulletListElement(text: String) throws -> BulletListElement {
+        return BulletListElement.init(elements: [])
+    }
 }
 
 private extension String {
@@ -178,6 +187,7 @@ private extension String {
         return self
             .replacingOccurrences(of: "\\n", with: "\n")
             .replacingOccurrences(of: "\n ", with: "\n")
+            .replacingOccurrences(of: "&nbsp;", with: " ")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

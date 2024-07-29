@@ -120,6 +120,9 @@ public struct ArticleFeature: Sendable {
                 if state.articlePreview.date.timeIntervalSince1970 == 0 || state.articlePreview.title.isEmpty {
                     state.articlePreview = ArticlePreview.makeFromArticle(article)
                 }
+                
+                state.article = article
+                
                 return .run { send in
                     let result = await Result { try await parsingClient.parseArticleElements(article) }
                     await send(._parseArticleElements(result))

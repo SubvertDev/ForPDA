@@ -91,7 +91,7 @@ public struct ArticlesListFeature: Sendable {
             case .onFirstAppear:
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     do {
-                        await apiClient.setLogResponses(type: .short)
+                        await apiClient.setLogResponses(type: .full)
                         try await apiClient.connect()
                         let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
                         await send(._articlesResponse(result))

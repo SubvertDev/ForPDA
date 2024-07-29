@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "ForPDA",
-    defaultLocalization: "ru",
+    defaultLocalization: "en",
     platforms: [.iOS(.v16)],
     products: [
         // Features
@@ -65,7 +65,8 @@ let package = Package(
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
-            ]
+            ],
+            resources: [.process("Resources")]
         ),
         .target(
             name: "ArticleFeature",

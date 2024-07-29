@@ -89,7 +89,8 @@ struct ArticleElementView: View {
             .buttonStyle(.borderedProminent)
             
         case .bulletList(let bulletListElement):
-            fatalError(bulletListElement.elements.first!.title)
+            EmptyView()
+//            fatalError(bulletListElement.elements.first!.title)
             
         case .table(let tableElement):
             VStack(spacing: 0) {

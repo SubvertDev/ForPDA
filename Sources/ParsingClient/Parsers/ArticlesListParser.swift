@@ -25,7 +25,7 @@ public struct ArticlesListParser {
                         authorName: article[6] as! String,
                         commentsAmount: article[7] as! Int,
                         imageUrl: URL(string: article[8] as! String)!,
-                        title: article[9] as! String,
+                        title: (article[9] as! String).convertUnicodes(),
                         description: clean(string: article[10] as! String),
                         tags: extractTags(from: article[11] as! [[Any]])
                     )

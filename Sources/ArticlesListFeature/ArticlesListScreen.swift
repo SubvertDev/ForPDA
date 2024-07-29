@@ -30,18 +30,19 @@ public struct ArticlesListScreen: View {
                                 ArticleRowView(article: article)
                                 // TODO: Extract context menu
                                     .contextMenu {
-                                        ContextButton(text: "Copy Link", symbol: .doc) {
+                                        ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
                                             store.send(.cellMenuOpened(article, .copyLink))
                                         }
                                         ContextShareButton(
                                             text: "Share Link",
                                             symbol: .arrowTurnUpRight,
+                                            bundle: .module,
                                             showShareSheet: $store.showShareSheet,
                                             shareURL: article.url
                                         ) {
                                             store.send(.cellMenuOpened(article, .shareLink))
                                         }
-                                        ContextButton(text: "Problems with article?", symbol: .questionmarkCircle) {
+                                        ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
                                             store.send(.cellMenuOpened(article, .report))
                                         }
                                     }
@@ -59,7 +60,7 @@ public struct ArticlesListScreen: View {
                 }
                 .listStyle(.plain)
                 .scrollIndicators(.hidden) // RELEASE: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
-                .navigationTitle("Articles")
+                .navigationTitle(Text("Articles", bundle: .module))
                 .navigationBarTitleDisplayMode(.inline)
                 .refreshable {
                     await store.send(.onRefresh).finish()

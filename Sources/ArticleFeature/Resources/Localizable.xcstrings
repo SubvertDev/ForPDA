@@ -1,6 +1,36 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "(Comment has been deleted)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(Комментарий удален)"
+          }
+        }
+      }
+    },
+    "(edited)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "(отредактирован)"
+          }
+        }
+      }
+    },
+    "Comments (%@):" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарии (%@):"
+          }
+        }
+      }
+    },
     "Copied" : {
       "localizations" : {
         "ru" : {
@@ -26,7 +56,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Загружаем статью..."
+            "value" : "Загружаем статью"
           }
         }
       }
@@ -46,7 +76,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проблемы со статьей?"
+            "value" : "Проблема со статьей?"
           }
         }
       }
@@ -76,7 +106,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Что-то пошло не так при загрузке этой статьи :("
+            "value" : "Что-то пошло не так во время загрузки статьи :("
           }
         }
       }
