@@ -25,7 +25,8 @@ let package = Package(
         
         // Shared
         .library(name: "Models", targets: ["Models"]),
-        .library(name: "SharedUI", targets: ["SharedUI"])
+        .library(name: "SharedUI", targets: ["SharedUI"]),
+        .library(name: "TCAExtensions", targets: ["TCAExtensions"])
     ],
     dependencies: [
         .package(path: "../PDAPI"),
@@ -93,6 +94,7 @@ let package = Package(
         .target(
             name: "SettingsFeature",
             dependencies: [
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -157,6 +159,12 @@ let package = Package(
             dependencies: [
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
                 .product(name: "SwiftyGif", package: "SwiftyGif")
+            ]
+        ),
+        .target(
+            name: "TCAExtensions",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         
