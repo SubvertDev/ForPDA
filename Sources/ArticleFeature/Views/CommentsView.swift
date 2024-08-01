@@ -102,6 +102,7 @@ struct CommentView: View {
                         
                         Text(comment.text)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
                         
                         if comment.type == .edited {
                             Text("(edited)", bundle: .module)
