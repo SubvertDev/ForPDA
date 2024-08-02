@@ -1,12 +1,13 @@
 //
-//  File.swift
-//  
+//  ArticleParser.swift
+//
 //
 //  Created by Ilia Lubianoi on 01.07.2024.
 //
 
 import Foundation
 import Models
+import OSLog
 
 public struct ArticleParser {
     
@@ -35,7 +36,7 @@ public struct ArticleParser {
                 guard let fields = try JSONSerialization.jsonObject(with: data) as? [Any] else {
                     throw ParsingError.failedToCastDataToAny
                 }
-                
+                print(fields[15] as! [[Any]])
                 return Article(
                     id: fields[2] as! Int,
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
@@ -105,8 +106,14 @@ public struct ArticleParser {
     8. "https..." - (optional) avatar url
     */
     private static func extractComments(from array: [[Any]]) -> [Comment] {
-        var comments = array.map { fields in
-            Comment(
+        var comments: [Comment] = array.compactMap { fields in
+            // Fix for some "[0]" aka empty comments
+            if fields.count < 9 {
+                // TODO: Add oslog
+                print("[WARNING] Found empty comment, skipping iteration...")
+                return nil
+            }
+            return Comment(
                 id: fields[0] as! Int,
                 date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
                 type: CommentType(rawValue: fields[2] as! Int) ?? .normal,

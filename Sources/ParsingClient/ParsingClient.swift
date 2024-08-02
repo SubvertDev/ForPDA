@@ -17,6 +17,8 @@ public struct ParsingClient: Sendable {
     public var parseArticlesList: @Sendable (_ rawString: String) async throws -> [ArticlePreview]
     public var parseArticle: @Sendable (_ rawString: String) async throws -> Article
     public var parseArticleElements: @Sendable (_ article: Article) async throws -> [ArticleElement]
+    public var parseCaptchaUrl: @Sendable (_ rawString: String) async throws -> URL
+    public var parseLoginResponse: @Sendable (_ rawString: String) async throws -> AuthResponse
 }
 
 extension DependencyValues {
@@ -36,6 +38,12 @@ extension ParsingClient: DependencyKey {
         },
         parseArticleElements: { article in
             return try ArticleElementParser.parse(from: article)
+        },
+        parseCaptchaUrl: { rawString in
+            return try AuthParser.parseCaptchaUrl(rawString: rawString)
+        },
+        parseLoginResponse: { rawString in
+            return try AuthParser.parseLoginResponse(rawString: rawString)
         }
     )
 }

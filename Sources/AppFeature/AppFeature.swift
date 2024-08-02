@@ -10,6 +10,7 @@ import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
 import MenuFeature
+import AuthFeature
 import SettingsFeature
 import Models
 
@@ -24,6 +25,7 @@ public struct AppFeature {
     public enum Path {
         case article(ArticleFeature)
         case menu(MenuFeature)
+        case auth(AuthFeature)
         case settings(SettingsFeature)
     }
     
@@ -155,6 +157,10 @@ public struct AppFeature {
                 return .none
                 
                 // MARK: - Menu
+                
+            case .path(.element(id: _, action: .menu(.profileTapped))):
+                state.path.append(.auth(AuthFeature.State()))
+                return .none
                 
             case .path(.element(id: _, action: .menu(.settingsTapped))):
                 state.path.append(.settings(SettingsFeature.State()))

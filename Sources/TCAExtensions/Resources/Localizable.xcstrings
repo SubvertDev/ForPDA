@@ -21,6 +21,16 @@
         }
       }
     },
+    "Something went wrong while trying to connect to 4pda server...\nPlease try again later!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так во время попытки соединения с 4pda...\nПопробуйте попозже!"
+          }
+        }
+      }
+    },
     "Whoops!" : {
       "localizations" : {
         "ru" : {

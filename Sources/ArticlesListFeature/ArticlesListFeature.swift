@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import TCAExtensions
 import Models
 import APIClient
 import AnalyticsClient
@@ -151,20 +152,5 @@ public struct ArticlesListFeature: Sendable {
         }
         
         Analytics()
-    }
-}
-
-// MARK: - Alert Extension
-
-extension AlertState where Action == ArticlesListFeature.Action.Alert {
-    
-    nonisolated(unsafe) static let failedToConnect = Self {
-        TextState("Whoops!")
-    } actions: {
-        ButtonState(role: .cancel) {
-            TextState("OK")
-        }
-    } message: {
-        TextState("Something went wrong while trying to connect to 4pda server...\nPlease try again later!")
     }
 }

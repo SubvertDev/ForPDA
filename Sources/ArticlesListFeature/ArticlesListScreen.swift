@@ -71,7 +71,7 @@ public struct ArticlesListScreen: View {
                             store.send(.menuTapped)
                         } label: {
                             Image(systemSymbol: .listDash)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(Color(.label))
                         }
                     }
                 }

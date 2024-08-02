@@ -1,48 +1,77 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Articles" : {
+    "Authhorization" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Статьи"
+            "value" : "Авторизация"
           }
         }
       }
     },
-    "Copied" : {
+    "Captcha" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скопировано"
+            "value" : "Капча"
           }
         }
       }
     },
-    "Copy Link" : {
+    "Captcha is wrong, try again" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скопировать ссылку"
+            "value" : "Неверная капча, попробуйте еще раз"
           }
         }
       }
     },
-    "Loading articles" : {
+    "Hidden entry" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Загружаем статьи"
+            "value" : "Скрытый вход"
+          }
+        }
+      }
+    },
+    "Log in" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Авторизоваться"
+          }
+        }
+      }
+    },
+    "Login" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Логин"
+          }
+        }
+      }
+    },
+    "Login or pasword is wrong, try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неправильный логин или пароль, попробуйте еще раз"
           }
         }
       }
     },
     "OK" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -52,64 +81,22 @@
         }
       }
     },
-    "Problems with article?" : {
+    "Password" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проблема со статьей?"
-          }
-        }
-      }
-    },
-    "Share Link" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
-          }
-        }
-      }
-    },
-    "shareLink" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
-          }
-        }
-      }
-    },
-    "Something went wrong while trying to connect to 4pda server...\nPlease try again later!" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Что-то пошло не так во время попытки соединения с 4pda...\nПопробуйте попозже!"
+            "value" : "Пароль"
           }
         }
       }
     },
     "Whoops!" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упс!"
-          }
-        }
-      }
-    },
-    "Will be fixed soon :)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скоро починим :)"
           }
         }
       }

@@ -13,6 +13,7 @@ let package = Package(
         .library(name: "ArticlesListFeature", targets: ["ArticlesListFeature"]),
         .library(name: "ArticleFeature", targets: ["ArticleFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
+        .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
         
         // Clients
@@ -49,6 +50,7 @@ let package = Package(
                 "ArticlesListFeature",
                 "ArticleFeature",
                 "MenuFeature",
+                "AuthFeature",
                 "SettingsFeature",
                 "AnalyticsClient",
                 "ImageClient",
@@ -92,6 +94,15 @@ let package = Package(
             ]
         ),
         .target(
+            name: "AuthFeature",
+            dependencies: [
+                "APIClient",
+                "TCAExtensions",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
             name: "SettingsFeature",
             dependencies: [
                 "TCAExtensions",
@@ -104,7 +115,6 @@ let package = Package(
             .target(
                 name: "APIClient",
                 dependencies: [
-//                    "SettingsClient",
                     "ParsingClient",
                     .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                     .product(name: "PDAPI", package: "PDAPI")

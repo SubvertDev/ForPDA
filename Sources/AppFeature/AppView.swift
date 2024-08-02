@@ -10,6 +10,7 @@ import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
 import MenuFeature
+import AuthFeature
 import SettingsFeature
 import AlertToast
 
@@ -32,6 +33,9 @@ public struct AppView: View {
                     
                 case let .menu(store):
                     MenuScreen(store: store)
+                    
+                case let .auth(store):
+                    AuthScreen(store: store)
                     
                 case let .settings(store):
                     SettingsScreen(store: store)
