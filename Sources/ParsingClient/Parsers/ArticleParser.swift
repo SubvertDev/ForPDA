@@ -41,11 +41,11 @@ public struct ArticleParser {
                     id: fields[2] as! Int,
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
                     authorId: fields[7] as! Int,
-                    authorName: fields[8] as! String,
+                    authorName: (fields[8] as! String).convertHtmlCodes(),
                     commentsAmount: fields[9] as! Int,
                     imageUrl: URL(string: (fields[10] as! String))!,
-                    title: (fields[11] as! String).convertUnicodes(),
-                    description: fields[12] as! String,
+                    title: (fields[11] as! String).convertHtmlCodes(),
+                    description: (fields[12] as! String).convertHtmlCodes(),
                     attachments: extractAttachments(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
                     comments: extractComments(from: fields[15] as! [[Any]])
@@ -118,10 +118,10 @@ public struct ArticleParser {
                 date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
                 type: CommentType(rawValue: fields[2] as! Int) ?? .normal,
                 authorId: fields[3] as! Int,
-                authorName: fields[4] as! String,
+                authorName: (fields[4] as! String).convertHtmlCodes(),
                 parentId: fields[5] as! Int,
                 childIds: [],
-                text: (fields[6] as! String).convertUnicodes(),
+                text: (fields[6] as! String).convertHtmlCodes(),
                 likesAmount: fields[7] as! Int,
                 avatarUrl: URL(string: fields[8] as! String)
             )

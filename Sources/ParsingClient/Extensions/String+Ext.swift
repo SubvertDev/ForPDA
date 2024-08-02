@@ -8,19 +8,15 @@
 import Foundation
 
 extension String {
-    func convertUnicodes() -> String {
-        var string = self
-        
-        let pattern = /&#(\d+);/
-        
-        for match in string.matches(of: pattern).reversed() {
-            let input = match.output.0
-            let numeric = Int(input.dropFirst(2).dropLast(1))!
-            let scalar = Unicode.Scalar(numeric)!
-            let output = String(Character(scalar))
-            string = string.replacingOccurrences(of: input, with: output)
-        }
-        
-        return string
+    func convertHtmlCodes() -> String {
+        let attributedString = try! NSAttributedString(
+            data: Data(utf8),
+            options: [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ],
+            documentAttributes: nil
+        )
+        return attributedString.string
     }
 }
