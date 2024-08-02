@@ -11,6 +11,7 @@ import ArticlesListFeature
 import ArticleFeature
 import MenuFeature
 import AuthFeature
+import ProfileFeature
 import SettingsFeature
 import Models
 
@@ -26,6 +27,7 @@ public struct AppFeature {
         case article(ArticleFeature)
         case menu(MenuFeature)
         case auth(AuthFeature)
+        case profile(ProfileFeature)
         case settings(SettingsFeature)
     }
     
@@ -165,6 +167,16 @@ public struct AppFeature {
             case .path(.element(id: _, action: .menu(.settingsTapped))):
                 state.path.append(.settings(SettingsFeature.State()))
                 return .none
+                
+                // MARK: - Auth
+                
+            case let .path(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
+                // TODO: How to make seamless animation?
+                state.path.pop(from: id)
+                state.path.append(.profile(ProfileFeature.State(userId: userId)))
+                return .none
+                
+                // MARK: - Default
                 
             case .path:
                 return .none

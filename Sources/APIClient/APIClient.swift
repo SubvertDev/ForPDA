@@ -19,6 +19,7 @@ public struct APIClient: Sendable {
     public var getArticle: @Sendable (_ id: Int) async throws -> Article
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
+    public var getUser: @Sendable (_ userId: Int) async throws -> User
 }
 
 extension APIClient: DependencyKey {
@@ -36,28 +37,34 @@ extension APIClient: DependencyKey {
             getArticlesList: { offset, amount in
                 let rawString = try api.get(SiteCommand.articlesList(offset: offset, amount: amount))
                 @Dependency(\.parsingClient) var parsingClient
-                let parsedResponse = try await parsingClient.parseArticlesList(rawString: rawString)
-                return parsedResponse
+                let articleList = try await parsingClient.parseArticlesList(rawString: rawString)
+                return articleList
             },
             getArticle: { id in
                 let rawString = try api.get(SiteCommand.article(id: id))
                 @Dependency(\.parsingClient) var parsingClient
-                let parsedResponse = try await parsingClient.parseArticle(rawString: rawString)
-                return parsedResponse
+                let article = try await parsingClient.parseArticle(rawString: rawString)
+                return article
             },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
                 let rawString = try api.get(AuthCommand.login(data: request))
                 @Dependency(\.parsingClient) var parsingClient
-                let parsedResponse = try await parsingClient.parseCaptchaUrl(rawString: rawString)
-                return parsedResponse
+                let url = try await parsingClient.parseCaptchaUrl(rawString: rawString)
+                return url
             },
             authorize: { login, password, hidden, captcha in
                 let request = LoginRequest(name: login, password: password, hidden: hidden, captcha: captcha)
                 let rawString = try api.get(AuthCommand.login(data: request))
                 @Dependency(\.parsingClient) var parsingClient
-                let parsedResponse = try await parsingClient.parseLoginResponse(rawString: rawString)
-                return parsedResponse
+                let authResponse = try await parsingClient.parseLoginResponse(rawString: rawString)
+                return authResponse
+            },
+            getUser: { userId in
+                let rawString = try api.get(MemberCommand.info(memberId: userId))
+                @Dependency(\.parsingClient) var parsingClient
+                let user = try await parsingClient.parseUser(rawString: rawString)
+                return user
             }
         )
     }
@@ -82,6 +89,9 @@ extension APIClient: DependencyKey {
             },
             authorize: { _, _, _, _ in
                 return .success(userId: -1, token: "preview_token")
+            },
+            getUser: { userId in
+                return User(id: 0, nickname: "", imageUrl: URL(string: "/")!, registrationDate: Date.now, lastSeenDate: Date.now, userCity: "", karma: 0, posts: 0, comments: 0, reputation: 0, topics: 0, replies: 0, email: "")
             }
         )
     }

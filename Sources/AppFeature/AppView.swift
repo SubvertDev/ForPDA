@@ -11,6 +11,7 @@ import ArticlesListFeature
 import ArticleFeature
 import MenuFeature
 import AuthFeature
+import ProfileFeature
 import SettingsFeature
 import AlertToast
 
@@ -36,6 +37,9 @@ public struct AppView: View {
                     
                 case let .auth(store):
                     AuthScreen(store: store)
+                    
+                case let .profile(store):
+                    ProfileScreen(store: store)
                     
                 case let .settings(store):
                     SettingsScreen(store: store)

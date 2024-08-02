@@ -19,7 +19,7 @@ struct SettingRowView: View {
     
     @State private var highlighted = false
     
-    let title: String
+    let title: LocalizedStringKey
     let type: SettingType
     let action: (() -> Void)
     
@@ -42,10 +42,10 @@ struct SettingRowView: View {
                             VStack(alignment: .leading) {
                                 if let name {
                                     Text(name)
-                                    Text("Перейти в профиль")
+                                    Text("Open profile")
                                 } else {
-                                    Text("Гость")
-                                    Text("Авторизоваться")
+                                    Text("Guest")
+                                    Text("Log in")
                                 }
                             }
                             

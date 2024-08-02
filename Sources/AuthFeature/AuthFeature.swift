@@ -40,7 +40,7 @@ public struct AuthFeature: Sendable {
             isHiddenEntry: Bool = false,
             captchaUrl: URL? = nil,
             captcha: String = "",
-            focus: Field? = .login
+            focus: Field? = nil
         ) {
             self.login = login
             self.password = password
