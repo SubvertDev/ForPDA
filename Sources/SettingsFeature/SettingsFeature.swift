@@ -108,16 +108,6 @@ public struct SettingsFeature: Sendable {
         }
         .ifLet(\.$destination, action: \.destination)
     }
-    
-    private func open(url: URL) async {
-        if #available(iOS 18, *) {
-            Task { @MainActor in
-                await UIApplication.shared.open(url)
-            }
-        } else {
-            await openURL(url)
-        }
-    }
 }
 
 // MARK: - Alert Extensions

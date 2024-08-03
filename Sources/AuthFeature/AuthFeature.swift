@@ -23,6 +23,7 @@ public struct AuthFeature: Sendable {
         public enum Field { case login, password, captcha }
         
         @Presents public var alert: AlertState<Action.Alert>?
+        public var isLoading: Bool
         public var login: String
         public var password: String
         public var isHiddenEntry: Bool
@@ -31,10 +32,11 @@ public struct AuthFeature: Sendable {
         public var focus: Field?
         
         public var isLoginButtonDisabled: Bool {
-            return login.isEmpty || password.isEmpty
+            return login.isEmpty || password.isEmpty || captcha.count < 4 || isLoading
         }
         
         public init(
+            isLoading: Bool = true,
             login: String = "",
             password: String = "",
             isHiddenEntry: Bool = false,
@@ -42,6 +44,7 @@ public struct AuthFeature: Sendable {
             captcha: String = "",
             focus: Field? = nil
         ) {
+            self.isLoading = isLoading
             self.login = login
             self.password = password
             self.isHiddenEntry = isHiddenEntry
@@ -108,6 +111,7 @@ public struct AuthFeature: Sendable {
                 return .none
                 
             case .loginButtonTapped:
+                state.isLoading = true
                 return .run { [
                     login = state.login,
                     password = state.password,
@@ -133,6 +137,7 @@ public struct AuthFeature: Sendable {
                 // MARK: - Internal
                 
             case ._captchaResponse(let response):
+                state.isLoading = false
                 switch response {
                 case .success(let url):
                     state.captchaUrl = url
@@ -143,6 +148,7 @@ public struct AuthFeature: Sendable {
                 return .none
                 
             case ._loginResponse(.success(let loginState)):
+                state.isLoading = false
                 return .run { send in
                     switch loginState {
                     case .success(userId: let userId, token: let token):
@@ -161,15 +167,20 @@ public struct AuthFeature: Sendable {
                 }
                 
             case ._loginResponse(.failure(let error)):
+                state.isLoading = false
                 print(error, #line)
                 state.alert = .failedToConnect
                 return .none
                 
             case ._wrongPassword:
                 state.alert = .wrongPassword
-                return .none
+                return .run { send in
+                    let result = await Result { try await apiClient.getCaptcha() }
+                    await send(._captchaResponse(result))
+                }
 
             case let ._wrongCaptcha(url: url):
+                state.captcha.removeAll()
                 state.captchaUrl = url
                 state.alert = .wrongCaptcha
                 return .none

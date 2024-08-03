@@ -1,22 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Authhorization" : {
+    "Authorization" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Авторизация"
-          }
-        }
-      }
-    },
-    "Captcha" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Капча"
           }
         }
       }
@@ -27,6 +17,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неверная капча, попробуйте еще раз"
+          }
+        }
+      }
+    },
+    "Enter captcha" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите капчу"
           }
         }
       }

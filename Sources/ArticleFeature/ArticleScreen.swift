@@ -51,10 +51,8 @@ public struct ArticleScreen: View {
                         .frame(height: UIScreen.main.bounds.height * 0.2)
                     
                     VStack {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .scaleEffect(1.5)
-                            .padding()
+                        ModernCircularLoader()
+                            .frame(width: 24, height: 24)
                         
                         Text("Loading article...")
                     }

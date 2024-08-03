@@ -26,23 +26,24 @@ public struct ArticlesListFeature: Sendable {
         public var articles: [ArticlePreview]
         public var isLoading: Bool
         public var showShareSheet: Bool
-        public var showVpnWarningBackground: Bool
+        public var loadAmount: Int = 30
+        public var offset: Int = 0
         
-        var loadAmount: Int = 30
-        var offset: Int = 0
+        public var isScrollDisabled: Bool {
+            // Disables scroll until first load
+            return articles.isEmpty && isLoading
+        }
         
         public init(
             alert: AlertState<Action.Alert>? = nil,
             articles: [ArticlePreview] = [],
             isLoading: Bool = true,
-            showShareSheet: Bool = false,
-            showVpnWarningBackground: Bool = false
+            showShareSheet: Bool = false
         ) {
             self.alert = alert
             self.articles = articles
             self.isLoading = isLoading
             self.showShareSheet = showShareSheet
-            self.showVpnWarningBackground = showVpnWarningBackground
         }
     }
     
@@ -146,7 +147,6 @@ public struct ArticlesListFeature: Sendable {
                 
             case .alert:
                 state.alert = nil
-                state.showVpnWarningBackground = true
                 return .none
             }
         }

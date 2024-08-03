@@ -59,6 +59,7 @@ public struct ArticlesListScreen: View {
                     }
                 }
                 .listStyle(.plain)
+                .scrollDisabled(store.isScrollDisabled)
                 .scrollIndicators(.hidden) // RELEASE: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
                 .navigationTitle(Text("Articles", bundle: .module))
                 .navigationBarTitleDisplayMode(.inline)
@@ -80,19 +81,6 @@ public struct ArticlesListScreen: View {
                     ModernCircularLoader()
                         .frame(width: 24, height: 24)
                 }
-                
-                // TODO: Redo as generic error
-//                if store.showVpnWarningBackground {
-//                    VStack {
-//                        Image(systemSymbol: .wifiExclamationmark)
-//                            .resizable()
-//                            .scaledToFit()
-//                            .frame(width: UIScreen.main.bounds.width * 0.25)
-//                        Text("Whoops! Looks like you have VPN on, try disabling it and refresh the page")
-//                            .multilineTextAlignment(.center)
-//                            .padding()
-//                    }
-//                }
             }
             .alert($store.scope(state: \.alert, action: \.alert))
             .onFirstAppear {
@@ -111,6 +99,23 @@ public struct ArticlesListScreen: View {
                 ArticlesListFeature()
             } withDependencies: {
                 $0.apiClient = .previewValue
+            }
+        )
+    }
+}
+
+#Preview("Infinite loading") {
+    NavigationStack {
+        ArticlesListScreen(
+            store: Store(
+                initialState: ArticlesListFeature.State()
+            ) {
+                ArticlesListFeature()
+            } withDependencies: {
+                $0.apiClient.getArticlesList = { @Sendable _, _ in
+                    try await Task.never()
+                    return []
+                }
             }
         )
     }

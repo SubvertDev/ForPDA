@@ -33,10 +33,19 @@ public struct MenuScreen: View {
                 }
                 
                 Section {
-                    SettingRowView(title: "History", type: .symbol(.clockArrowCirclepath)) {}
-                    SettingRowView(title: "Bookmarks", type: .symbol(.bookmarkFill)) {}
+                    SettingRowView(title: "Forum", type: .symbol(.bubbleLeftAndBubbleRightFill)) {
+                        store.send(.notImplementedFeatureTapped)
+                    }
+                    SettingRowView(title: "QMS", type: .symbol(.person2Fill)) {
+                        store.send(.notImplementedFeatureTapped)
+                    }
+                    SettingRowView(title: "History", type: .symbol(.clockArrowCirclepath)) {
+                        store.send(.notImplementedFeatureTapped)
+                    }
+                    SettingRowView(title: "Bookmarks", type: .symbol(.bookmarkFill)) {
+                        store.send(.notImplementedFeatureTapped)
+                    }
                 }
-                .disabled(true)
                 
                 Section {
                     SettingRowView(title: "Settings", type: .symbol(.gearshapeFill)) { store.send(.settingsTapped)
@@ -44,14 +53,26 @@ public struct MenuScreen: View {
                 }
                 
                 Section {
-                    SettingRowView(title: "App author", type: .image(._4pda)) {}
-                    SettingRowView(title: "App discussion", type: .image(._4pda)) {}
-                        .disabled(true)
-                    SettingRowView(title: "Changelog in Telegram", type: .image(.telegram)) {}
-                    SettingRowView(title: "Chat in Telegram", type: .image(.telegram)) {}
-                    SettingRowView(title: "GitHub repository", type: .image(.github)) {}
+                    SettingRowView(title: "App author", type: .image(._4pda)) {
+                        store.send(.appAuthorButtonTapped)
+                    }
+                    SettingRowView(title: "App discussion", type: .image(._4pda)) {
+                        store.send(.notImplementedFeatureTapped)
+                    }
+                    SettingRowView(title: "Changelog in Telegram", type: .image(.telegram)) {
+                        store.send(.telegramChangelogButtonTapped)
+                    }
+                    SettingRowView(title: "Chat in Telegram", type: .image(.telegram)) {
+                        store.send(.telegramChatButtonTapped)
+                    }
+                    SettingRowView(title: "GitHub repository", type: .image(.github)) {
+                        store.send(.githubButtonTapped)
+                    }
                 }
             }
+            .alert($store.scope(state: \.alert, action: \.alert))
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle(Text("Menu", bundle: .module))
         }
     }
 }
@@ -60,14 +81,10 @@ public struct MenuScreen: View {
     NavigationStack {
         MenuScreen(
             store: Store(
-                initialState: MenuFeature.State(
-                    loggedIn: false
-                )
+                initialState: MenuFeature.State()
             ) {
                 MenuFeature()
             }
         )
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationTitle("Menu")
     }
 }

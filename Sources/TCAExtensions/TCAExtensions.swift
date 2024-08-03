@@ -5,7 +5,10 @@
 //  Created by Ilia Lubianoi on 01.08.2024.
 //
 
+import UIKit
 import ComposableArchitecture
+
+// MARK: - AlertState
 
 public extension AlertState {
     
@@ -29,5 +32,18 @@ public extension AlertState {
         } message: {
             TextState("Something went wrong while trying to connect to 4pda server...\nPlease try again later!")
         }
+    }
+}
+
+// MARK: - Open URL
+
+public func open(url: URL) async {
+    if #available(iOS 18, *) {
+        Task { @MainActor in
+            await UIApplication.shared.open(url)
+        }
+    } else {
+        @Dependency(\.openURL) var openURL
+        await openURL(url)
     }
 }

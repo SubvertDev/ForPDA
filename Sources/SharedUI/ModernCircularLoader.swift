@@ -22,7 +22,7 @@ public struct ModernCircularLoader: View {
     public var body: some View {
         Circle()
             .trim(from: 0.0, to: trimEnd)
-            .stroke(.black, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin:.round))
+            .stroke(.foreground, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin:.round))
             .animation(
                 Animation.easeIn(duration: 1.5)
                     .repeatForever(autoreverses: true),

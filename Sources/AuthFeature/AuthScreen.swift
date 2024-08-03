@@ -58,7 +58,7 @@ public struct AuthScreen: View {
                             }
                         
                         TextField(text: $store.captcha) {
-                            Text("Captcha", bundle: .module)
+                            Text("Enter captcha", bundle: .module)
                         }
                         .focused($focus, equals: .captcha)
                         .onSubmit { store.send(.onSumbit(.captcha)) }
@@ -79,7 +79,7 @@ public struct AuthScreen: View {
                     }
                 }
             }
-            .navigationTitle(Text("Authhorization", bundle: .module))
+            .navigationTitle(Text("Authorization", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .alert($store.scope(state: \.alert, action: \.alert))
             .bind($store.focus, to: $focus)

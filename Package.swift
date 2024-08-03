@@ -68,6 +68,7 @@ let package = Package(
                 "APIClient",
                 "AnalyticsClient",
                 "PasteboardClient",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
             ],
@@ -91,6 +92,7 @@ let package = Package(
             name: "MenuFeature",
             dependencies: [
                 "SharedUI",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]

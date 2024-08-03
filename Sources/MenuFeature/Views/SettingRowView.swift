@@ -10,14 +10,12 @@ import SharedUI
 import SFSafeSymbols
 
 enum SettingType {
-    case auth(Image, String? = nil)
+    case auth(Image, LocalizedStringKey? = nil)
     case image(Image)
     case symbol(SFSymbol)
 }
 
 struct SettingRowView: View {
-    
-    @State private var highlighted = false
     
     let title: LocalizedStringKey
     let type: SettingType
@@ -41,13 +39,14 @@ struct SettingRowView: View {
                             
                             VStack(alignment: .leading) {
                                 if let name {
-                                    Text(name)
-                                    Text("Open profile")
+                                    Text(name, bundle: .module)
+                                    Text("Open profile", bundle: .module)
                                 } else {
-                                    Text("Guest")
-                                    Text("Log in")
+                                    Text("Guest", bundle: .module)
+                                    Text("Log in", bundle: .module)
                                 }
                             }
+                            .foregroundStyle(Color(.label))
                             
                             Spacer()
                         }
@@ -60,7 +59,8 @@ struct SettingRowView: View {
                                 .frame(width: 24, height: 24)
                                 .padding(.leading, 16)
                             
-                            Text(title)
+                            Text(title, bundle: .module)
+                                .foregroundStyle(Color(.label))
                             
                             Spacer()
                         }
@@ -74,7 +74,8 @@ struct SettingRowView: View {
                                 .foregroundStyle(.gray)
                                 .padding(.leading, 16)
                             
-                            Text(title)
+                            Text(title, bundle: .module)
+                                .foregroundStyle(Color(.label))
                             
                             Spacer()
                         }
@@ -87,7 +88,7 @@ struct SettingRowView: View {
             .contentShape(.rect)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .buttonStyle(ListButtonStyle())
+//        .buttonStyle(ListButtonStyle())
         .listRowInsets(EdgeInsets())
     }
 }

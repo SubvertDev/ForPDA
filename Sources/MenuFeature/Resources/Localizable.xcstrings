@@ -51,6 +51,16 @@
         }
       }
     },
+    "Forum" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Форум"
+          }
+        }
+      }
+    },
     "GitHub repository" : {
       "localizations" : {
         "ru" : {
@@ -91,6 +101,16 @@
         }
       }
     },
+    "Menu" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Меню"
+          }
+        }
+      }
+    },
     "Nickname" : {
       "localizations" : {
         "ru" : {
@@ -107,6 +127,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть профиль"
+          }
+        }
+      }
+    },
+    "QMS" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QMS"
           }
         }
       }
