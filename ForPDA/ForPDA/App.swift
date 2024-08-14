@@ -15,10 +15,14 @@ import AppFeature
 struct ForPDAApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
             AppView(store: appDelegate.store)
+                .onChange(of: scenePhase) { newScenePhase in
+                    appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
+                }
                 .onOpenURL { url in
                     appDelegate.store.send(.deeplink(url))
                 }
@@ -34,9 +38,7 @@ struct ForPDAApp: App {
 
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     
-    let store = Store(
-        initialState: AppFeature.State()
-    ) {
+    let store = Store(initialState: AppFeature.State()) {
         AppFeature()
     }
 
@@ -44,31 +46,4 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         store.send(.appDelegate(.didFinishLaunching))
         return true
     }
-    
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        let sceneConfig: UISceneConfiguration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
-        sceneConfig.delegateClass = SceneDelegate.self
-        return sceneConfig
-    }
-}
-
-// MARK: - Scene Delegate
-
-class SceneDelegate: NSObject, UIWindowSceneDelegate {
-    
-    var window: UIWindow?
-
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let _ = (scene as? UIWindowScene) else { return }
-    }
-
-    func sceneDidDisconnect(_ scene: UIScene) { }
-
-    func sceneDidBecomeActive(_ scene: UIScene) { }
-
-    func sceneWillResignActive(_ scene: UIScene) { }
-
-    func sceneWillEnterForeground(_ scene: UIScene) { }
-
-    func sceneDidEnterBackground(_ scene: UIScene) { }
 }

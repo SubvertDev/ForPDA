@@ -5,7 +5,7 @@
 //  Created by Ilia Lubianoi on 09.04.2024.
 //
 
-import Foundation
+import SwiftUI
 import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
@@ -13,10 +13,11 @@ import MenuFeature
 import AuthFeature
 import ProfileFeature
 import SettingsFeature
+import APIClient
 import Models
 
 @Reducer
-public struct AppFeature {
+public struct AppFeature: Sendable {
     
     public init() {}
     
@@ -63,9 +64,14 @@ public struct AppFeature {
         case appDelegate(AppDelegateFeature.Action)
         case path(StackActionOf<Path>)
         case articlesList(ArticlesListFeature.Action)
-        case binding(BindingAction<State>)
+        case binding(BindingAction<State>) // TODO: Do I need it?
         case deeplink(URL)
+        case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
     }
+    
+    // MARK: - Dependencies
+    
+    @Dependency(\.apiClient) private var apiClient
     
     // MARK: - Body
     
@@ -117,6 +123,17 @@ public struct AppFeature {
                     break
                 }
                 return .none
+                
+                // MARK: - ScenePhase
+                
+            case let .scenePhaseDidChange(from: from, to: to):
+                if from == .background && to == .inactive {
+                    return .run { _ in
+                        try await apiClient.reconnect()
+                    }
+                } else {
+                    return .none
+                }
                 
                 // MARK: - ArticlesList
                 

@@ -28,7 +28,7 @@ public struct ArticleFeature: Sendable {
         public init(
             articlePreview: ArticlePreview,
             article: Article? = nil,
-            isLoading: Bool = true,
+            isLoading: Bool = false,
             showShareSheet: Bool = false,
             alert: AlertState<Action.Alert>? = nil
         ) {
@@ -49,6 +49,7 @@ public struct ArticleFeature: Sendable {
         case menuActionTapped(ArticleMenuAction)
         case onTask
         
+        case _checkLoading
         case _articleResponse(Result<Article, any Error>)
         case _parseArticleElements(Result<[ArticleElement], any Error>)
         
@@ -111,9 +112,23 @@ public struct ArticleFeature: Sendable {
                 
             case .onTask:
                 return .run { [id = state.articlePreview.id] send in
+                    let loadingTask = Task {
+                        try? await Task.sleep(for: .seconds(0.5))
+                        await send(._checkLoading)
+                    }
+                    
                     let result = await Result { try await apiClient.getArticle(id: id) }
+                    
+                    loadingTask.cancel()
+                    
                     await send(._articleResponse(result))
                 }
+                
+            case ._checkLoading:
+                if state.article == nil {
+                    state.isLoading = true
+                }
+                return .none
                 
             case ._articleResponse(.success(let article)):
                 // Outer && inner deeplink case

@@ -51,7 +51,7 @@ public struct ArticlesListFeature: Sendable {
     
     public enum Action: BindableAction {
         case articleTapped(ArticlePreview)
-        case binding(BindingAction<State>)
+        case binding(BindingAction<State>) // TODO: Remove
         case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // RELEASE: Should it be a delegate?
         case menuTapped
         case onFirstAppear

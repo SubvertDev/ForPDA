@@ -54,7 +54,7 @@ public struct ArticleScreen: View {
                         ModernCircularLoader()
                             .frame(width: 24, height: 24)
                         
-                        Text("Loading article...")
+                        Text("Loading article...", bundle: .module)
                     }
                 } else if let elements = store.elements, let comments = store.article?.comments {
                     ArticleView(store: store, elements: elements, comments: comments)

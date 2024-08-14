@@ -20,7 +20,7 @@ extension ArticleFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .binding, .delegate, .alert:
+                case .binding, .delegate, .alert, ._checkLoading:
                     break
                     
                 case .linkInTextTapped(let url):

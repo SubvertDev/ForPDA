@@ -11,7 +11,7 @@ import AnalyticsClient
 import ImageClient
 
 @Reducer
-public struct AppDelegateFeature {
+public struct AppDelegateFeature: Sendable {
     
     public init() {}
     
@@ -29,8 +29,8 @@ public struct AppDelegateFeature {
     
     // MARK: - Dependencies
     
-    @Dependency(\.analyticsClient) var analyticsClient
-    @Dependency(\.imageClient) var imageClient
+    @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.imageClient) private var imageClient
     
     // MARK: - Body
     
@@ -38,7 +38,7 @@ public struct AppDelegateFeature {
         Reduce { state, action in
             switch action {
             case .didFinishLaunching:
-                analyticsClient.configure() // TODO: Check
+                analyticsClient.configure()
                 imageClient.configure()
                 return .none
             }

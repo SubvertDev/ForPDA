@@ -33,6 +33,7 @@ let package = Package(
     dependencies: [
         .package(path: "../PDAPI"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.12.1"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies.git", from: "1.3.7"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),

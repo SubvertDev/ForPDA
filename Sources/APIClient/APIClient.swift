@@ -15,6 +15,7 @@ import ComposableArchitecture
 public struct APIClient: Sendable {
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
+    public var reconnect: @Sendable () async throws -> Void
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
     public var getArticle: @Sendable (_ id: Int) async throws -> Article
     public var getCaptcha: @Sendable () async throws -> URL
@@ -33,6 +34,9 @@ extension APIClient: DependencyKey {
             },
             connect: {
                 try api.connect(as: .anonymous)
+            },
+            reconnect: {
+                try api.reconnect()
             },
             getArticlesList: { offset, amount in
                 let rawString = try api.get(SiteCommand.articlesList(offset: offset, amount: amount))
@@ -71,12 +75,9 @@ extension APIClient: DependencyKey {
     
     public static var previewValue: APIClient {
         APIClient(
-            setLogResponses: { _ in
-                
-            },
-            connect: {
-                
-            },
+            setLogResponses: { _ in },
+            connect: { },
+            reconnect: { },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
