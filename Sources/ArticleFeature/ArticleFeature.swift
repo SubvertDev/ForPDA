@@ -71,6 +71,13 @@ public struct ArticleFeature: Sendable {
     @Dependency(\.pasteboardClient) var pasteboardClient
     @Dependency(\.openURL) var openURL
     @Dependency(\.dismiss) var dismiss
+    @Dependency(\.continuousClock) var clock
+    
+    // MARK: - Cancellable
+    
+    enum CancelID {
+        case loading
+    }
     
     // MARK: - Init
     
@@ -111,18 +118,10 @@ public struct ArticleFeature: Sendable {
                 return .none
                 
             case .onTask:
-                return .run { [id = state.articlePreview.id] send in
-                    let loadingTask = Task {
-                        try? await Task.sleep(for: .seconds(0.5))
-                        await send(._checkLoading)
-                    }
-                    
-                    let result = await Result { try await apiClient.getArticle(id: id) }
-                    
-                    loadingTask.cancel()
-                    
-                    await send(._articleResponse(result))
-                }
+                return .merge([
+                    loadingIndicator(),
+                    getArticle(id: state.articlePreview.id)
+                ])
                 
             case ._checkLoading:
                 if state.article == nil {
@@ -165,6 +164,26 @@ public struct ArticleFeature: Sendable {
         }
         
         Analytics()
+    }
+    
+    // MARK: - Effects
+    
+    private func loadingIndicator() -> EffectOf<Self> {
+        return .run { send in
+            try await clock.sleep(for: .seconds(0.5))
+            await send(._checkLoading)
+        }
+        .cancellable(id: CancelID.loading)
+    }
+    
+    private func getArticle(id: Int) -> EffectOf<Self> {
+        return .concatenate([
+            .run { send in
+                let result = await Result { try await apiClient.getArticle(id: id) }
+                await send(._articleResponse(result))
+            },
+            .cancel(id: CancelID.loading)
+        ])
     }
 }
 
