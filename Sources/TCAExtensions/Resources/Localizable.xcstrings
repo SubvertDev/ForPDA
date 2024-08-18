@@ -31,6 +31,16 @@
         }
       }
     },
+    "Something went wrong... Try again later!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так.. Попробуйте попозже!"
+          }
+        }
+      }
+    },
     "Whoops!" : {
       "localizations" : {
         "ru" : {

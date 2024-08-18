@@ -131,10 +131,10 @@ public struct ButtonElement: Equatable, Hashable {
 // MARK: - BulletList
 
 public struct BulletListElement: Equatable, Hashable {
-    public let elements: [BulletListSingleElement]
+    public let elements: [String]
     
     public init(
-        elements: [BulletListSingleElement]
+        elements: [String]
     ) {
         self.elements = elements
     }

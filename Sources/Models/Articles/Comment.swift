@@ -7,13 +7,13 @@
 
 import Foundation
 
-public enum CommentType: Int, Sendable {
+public enum CommentType: Int, Sendable, Codable {
     case normal = 0
     case deleted = 2
     case edited = 32
 }
 
-public struct Comment: Sendable, Identifiable, Hashable {
+public struct Comment: Sendable, Identifiable, Hashable, Codable {
     
     public let id: Int
     public let date: Date

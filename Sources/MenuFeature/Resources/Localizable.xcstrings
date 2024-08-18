@@ -111,16 +111,6 @@
         }
       }
     },
-    "Nickname" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Имя"
-          }
-        }
-      }
-    },
     "Open profile" : {
       "localizations" : {
         "ru" : {

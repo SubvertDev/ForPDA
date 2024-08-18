@@ -1,5 +1,5 @@
 {
-  "originHash" : "2ff9b60a4d4e22720b6c9bd212d523703a0aaead243369868734bae01974946c",
+  "originHash" : "ba17fb84cfa75a690d7eea290915808bb90d4e10b56b8a709eb2138624ffa491",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "7b23a867008e0027bfd6f4d398d44720707bc8ca",
         "version" : "2.0.4"
+      }
+    },
+    {
+      "identity" : "cache",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hyperoslo/Cache.git",
+      "state" : {
+        "revision" : "d2e8f5a53c601b43371fdc90277d7f64b0e89a25",
+        "version" : "7.3.0"
       }
     },
     {
@@ -105,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "b35827a61c1420e40ff8e7c584b5042144d20195",
-        "version" : "1.12.1"
+        "revision" : "b432441cbc11a38c678312bad1a01138a7cd64e0",
+        "version" : "1.13.0"
       }
     },
     {
@@ -146,6 +155,15 @@
       }
     },
     {
+      "identity" : "swift-navigation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-navigation",
+      "state" : {
+        "revision" : "339ba3e305dc727b5baa6ddb476430a842167d4e",
+        "version" : "2.0.5"
+      }
+    },
+    {
       "identity" : "swift-package-zlib",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/fourplusone/swift-package-zlib",
@@ -170,15 +188,6 @@
       "state" : {
         "revision" : "303e5c5c36d6a558407d364878df131c3546fad8",
         "version" : "510.0.2"
-      }
-    },
-    {
-      "identity" : "swiftui-navigation",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swiftui-navigation",
-      "state" : {
-        "revision" : "fc91d591ebba1f90d65028ccb65c861e5979e898",
-        "version" : "1.5.4"
       }
     },
     {

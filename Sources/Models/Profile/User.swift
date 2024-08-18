@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct User: Sendable, Hashable {
+public struct User: Sendable, Hashable, Codable {
     public let id: Int
     public let nickname: String
     public let imageUrl: URL
@@ -25,7 +25,7 @@ public struct User: Sendable, Hashable {
     public init(
         id: Int,
         nickname: String,
-        imageUrl: URL,
+        imageUrl: URL?,
         registrationDate: Date,
         lastSeenDate: Date,
         userCity: String,
@@ -39,7 +39,7 @@ public struct User: Sendable, Hashable {
     ) {
         self.id = id
         self.nickname = nickname
-        self.imageUrl = imageUrl
+        self.imageUrl = imageUrl ?? Links.defaultAvatar
         self.registrationDate = registrationDate
         self.lastSeenDate = lastSeenDate
         self.userCity = userCity
@@ -51,4 +51,22 @@ public struct User: Sendable, Hashable {
         self.replies = replies
         self.email = email
     }
+}
+
+public extension User {
+    static let mock = User(
+        id: 0,
+        nickname: "Test Nickname",
+        imageUrl: Links.defaultAvatar,
+        registrationDate: Date(timeIntervalSince1970: 1168875045),
+        lastSeenDate: Date(timeIntervalSince1970: 1168875045),
+        userCity: "Moscow",
+        karma: 1500,
+        posts: 23,
+        comments: 173,
+        reputation: 78,
+        topics: 5,
+        replies: 82,
+        email: "some@email.com"
+    )
 }

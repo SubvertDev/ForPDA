@@ -178,7 +178,12 @@ public struct ArticleElementParser {
     }
     
     private static func extractBulletListElement(text: String) throws -> BulletListElement {
-        return BulletListElement.init(elements: [])
+        let components = text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: "[*]")
+            .filter { !$0.isEmpty }
+        
+        return BulletListElement.init(elements: components)
     }
 }
 

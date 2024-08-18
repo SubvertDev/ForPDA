@@ -61,6 +61,26 @@
         }
       }
     },
+    "Clear cache" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить кеш"
+          }
+        }
+      }
+    },
+    "Clear Cache?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить кеш?"
+          }
+        }
+      }
+    },
     "General" : {
       "localizations" : {
         "ru" : {
@@ -87,6 +107,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Язык"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
           }
         }
       }

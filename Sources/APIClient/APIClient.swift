@@ -9,18 +9,18 @@ import Foundation
 import PDAPI
 import Models
 import ParsingClient
+import CacheClient
 import ComposableArchitecture
 
 @DependencyClient
 public struct APIClient: Sendable {
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
-    public var reconnect: @Sendable () async throws -> Void
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
-    public var getArticle: @Sendable (_ id: Int) async throws -> Article
+    public var getArticle: @Sendable (_ id: Int) async throws -> AsyncThrowingStream<Article, any Error>
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
-    public var getUser: @Sendable (_ userId: Int) async throws -> User
+    public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
 }
 
 extension APIClient: DependencyKey {
@@ -35,9 +35,6 @@ extension APIClient: DependencyKey {
             connect: {
                 try api.connect(as: .anonymous)
             },
-            reconnect: {
-                try api.reconnect()
-            },
             getArticlesList: { offset, amount in
                 let rawString = try api.get(SiteCommand.articlesList(offset: offset, amount: amount))
                 @Dependency(\.parsingClient) var parsingClient
@@ -45,10 +42,26 @@ extension APIClient: DependencyKey {
                 return articleList
             },
             getArticle: { id in
-                let rawString = try api.get(SiteCommand.article(id: id))
-                @Dependency(\.parsingClient) var parsingClient
-                let article = try await parsingClient.parseArticle(rawString: rawString)
-                return article
+                AsyncThrowingStream { continuation in
+                    Task {
+                        do {
+                            @Dependency(\.cacheClient) var cacheClient
+                            if let article = await cacheClient.getArticle(id) {
+                                continuation.yield(article)
+                            }
+                            
+                            @Dependency(\.parsingClient) var parsingClient
+                            let rawString = try api.get(SiteCommand.article(id: id))
+                            let article = try await parsingClient.parseArticle(rawString: rawString)
+                            
+                            try await cacheClient.cacheArticle(article)
+                            continuation.yield(article)
+                            continuation.finish()
+                        } catch {
+                            continuation.finish(throwing: error)
+                        }
+                    }
+                }
             },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
@@ -65,10 +78,26 @@ extension APIClient: DependencyKey {
                 return authResponse
             },
             getUser: { userId in
-                let rawString = try api.get(MemberCommand.info(memberId: userId))
-                @Dependency(\.parsingClient) var parsingClient
-                let user = try await parsingClient.parseUser(rawString: rawString)
-                return user
+                AsyncThrowingStream { continuation in
+                    Task {
+                        do {
+                            @Dependency(\.cacheClient) var cacheClient
+                            if let user = await cacheClient.getUser(userId) {
+                                continuation.yield(user)
+                            }
+                            
+                            @Dependency(\.parsingClient) var parsingClient
+                            let rawString = try api.get(MemberCommand.info(memberId: userId))
+                            let user = try await parsingClient.parseUser(rawString: rawString)
+                            
+                            try await cacheClient.cacheUser(user)
+                            continuation.yield(user)
+                            continuation.finish()
+                        } catch {
+                            continuation.finish(throwing: error)
+                        }
+                    }
+                }
             }
         )
     }
@@ -77,12 +106,11 @@ extension APIClient: DependencyKey {
         APIClient(
             setLogResponses: { _ in },
             connect: { },
-            reconnect: { },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
             getArticle: { _ in
-                return .mock
+                AsyncThrowingStream { $0.yield(.mock) }
             },
             getCaptcha: {
                 try await Task.sleep(for: .seconds(2))
@@ -91,8 +119,8 @@ extension APIClient: DependencyKey {
             authorize: { _, _, _, _ in
                 return .success(userId: -1, token: "preview_token")
             },
-            getUser: { userId in
-                return User(id: 0, nickname: "", imageUrl: URL(string: "/")!, registrationDate: Date.now, lastSeenDate: Date.now, userCity: "", karma: 0, posts: 0, comments: 0, reputation: 0, topics: 0, replies: 0, email: "")
+            getUser: { _ in
+                AsyncThrowingStream { $0.yield(.mock) }
             }
         )
     }

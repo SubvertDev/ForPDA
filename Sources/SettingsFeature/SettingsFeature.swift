@@ -7,6 +7,7 @@
 
 import UIKit
 import ComposableArchitecture
+import CacheClient
 import TCAExtensions
 
 @Reducer
@@ -56,16 +57,22 @@ public struct SettingsFeature: Sendable {
         case languageButtonTapped
         case themeButtonTapped
         case safariExtensionButtonTapped
+        case clearCacheButtonTapped
         case checkVersionsButtonTapped
         
+        case _somethingWentWrong
+        
+        // TODO: Different alerts?
         case destination(PresentationAction<Destination.Action>)
         public enum Alert: Equatable {
             case openSettings
+            case clearCache
         }
     }
     
     // MARK: - Dependencies
     
+    @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.openURL) var openURL
     
     // MARK: - Body
@@ -90,6 +97,10 @@ public struct SettingsFeature: Sendable {
                 state.destination = .alert(.notImplemented)
                 return .none
                 
+            case .clearCacheButtonTapped:
+                state.destination = .alert(.clearCache)
+                return .none
+                
             case .checkVersionsButtonTapped:
                 return .run { _ in
                     // TODO: Move URL to models
@@ -100,6 +111,19 @@ public struct SettingsFeature: Sendable {
                 return .run { _ in
                     // TODO: Test on iOS 16/17
                     await open(url: URL(string: "App-Prefs:")!)
+                }
+                
+            case ._somethingWentWrong:
+                state.destination = .alert(.somethingWentWrong)
+                return .none
+                
+            case .destination(.presented(.alert(.clearCache))):
+                return .run { send in
+                    do {
+                        try await cacheClient.removeAll()
+                    } catch {
+                        await send(._somethingWentWrong)
+                    }
                 }
                 
             case .destination:
@@ -114,6 +138,8 @@ public struct SettingsFeature: Sendable {
 
 private extension AlertState where Action == SettingsFeature.Action.Alert {
     
+    // Safari Extension
+    
     nonisolated(unsafe) static let safariExtension = AlertState {
         TextState("Instructions", bundle: .module)
     } actions: {
@@ -125,5 +151,18 @@ private extension AlertState where Action == SettingsFeature.Action.Alert {
         }
     } message: {
         TextState("You need to open Settings > Apps > Safari > Extensions > Open in ForPDA > Allow Extension", bundle: .module)
+    }
+    
+    // Clear Cache
+    
+    nonisolated(unsafe) static let clearCache = AlertState {
+        TextState("Clear Cache?", bundle: .module)
+    } actions: {
+        ButtonState(action: .clearCache) {
+            TextState("OK", bundle: .module)
+        }
+        ButtonState(role: .cancel) {
+            TextState("Cancel", bundle: .module)
+        }
     }
 }

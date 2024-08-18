@@ -61,6 +61,7 @@ public struct ArticleFeature: Sendable {
         @CasePathable
         public enum Delegate {
             case handleDeeplink(Int)
+            case commentHeaderTapped(Int)
         }
     }
     
@@ -118,6 +119,7 @@ public struct ArticleFeature: Sendable {
                 return .none
                 
             case .onTask:
+                guard state.article == nil else { return .none }
                 return .merge([
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id)
@@ -179,8 +181,13 @@ public struct ArticleFeature: Sendable {
     private func getArticle(id: Int) -> EffectOf<Self> {
         return .concatenate([
             .run { send in
-                let result = await Result { try await apiClient.getArticle(id: id) }
-                await send(._articleResponse(result))
+                do {
+                    for try await article in try await apiClient.getArticle(id: id) {
+                        await send(._articleResponse(.success(article)))
+                    }
+                } catch {
+                    await send(._articleResponse(.failure(error)))
+                }
             },
             .cancel(id: CancelID.loading)
         ])

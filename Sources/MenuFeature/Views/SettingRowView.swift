@@ -7,10 +7,12 @@
 
 import SwiftUI
 import SharedUI
+import NukeUI
 import SFSafeSymbols
 
 enum SettingType {
-    case auth(Image, LocalizedStringKey? = nil)
+    case auth(URL?, String)
+    case guest(Image)
     case image(Image)
     case symbol(SFSymbol)
 }
@@ -28,7 +30,27 @@ struct SettingRowView: View {
             HStack {
                 Group {
                     switch type {
-                    case .auth(let image, let name):
+                    case .auth(let url, let name):
+                        HStack {
+                            LazyImage(url: url) { state in
+                                if let image = state.image { image.resizable() }
+                            }
+                            .scaledToFit()
+                            .frame(width: 48, height: 48)
+                            .clipShape(.circle)
+                            .padding(8)
+                            
+                            VStack(alignment: .leading) {
+                                Text(name)
+                                Text("Open profile", bundle: .module)
+                                    .font(.subheadline)
+                            }
+                            .foregroundStyle(Color(.label))
+                            
+                            Spacer()
+                        }
+                        
+                    case .guest(let image):
                         HStack {
                             image
                                 .resizable()
@@ -38,13 +60,8 @@ struct SettingRowView: View {
                                 .padding(8)
                             
                             VStack(alignment: .leading) {
-                                if let name {
-                                    Text(name, bundle: .module)
-                                    Text("Open profile", bundle: .module)
-                                } else {
-                                    Text("Guest", bundle: .module)
-                                    Text("Log in", bundle: .module)
-                                }
+                                Text("Guest", bundle: .module)
+                                Text("Log in", bundle: .module)
                             }
                             .foregroundStyle(Color(.label))
                             

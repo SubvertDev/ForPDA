@@ -129,7 +129,7 @@ public struct AppFeature: Sendable {
             case let .scenePhaseDidChange(from: from, to: to):
                 if from == .background && to == .inactive {
                     return .run { _ in
-                        try await apiClient.reconnect()
+                        // TODO: Check for notifications?
                     }
                 } else {
                     return .none
@@ -175,10 +175,18 @@ public struct AppFeature: Sendable {
                 state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
+            case let .path(.element(id: _, action: .article(.delegate(.commentHeaderTapped(id))))):
+                state.path.append(.profile(ProfileFeature.State(userId: id)))
+                return .none
+                
                 // MARK: - Menu
                 
-            case .path(.element(id: _, action: .menu(.profileTapped))):
+            case .path(.element(id: _, action: .menu(.delegate(.openAuth)))):
                 state.path.append(.auth(AuthFeature.State()))
+                return .none
+                
+            case let .path(.element(id: _, action: .menu(.delegate(.openProfile(id: id))))):
+                state.path.append(.profile(ProfileFeature.State(userId: id)))
                 return .none
                 
             case .path(.element(id: _, action: .menu(.settingsTapped))):

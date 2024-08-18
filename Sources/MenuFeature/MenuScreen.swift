@@ -22,14 +22,19 @@ public struct MenuScreen: View {
         WithPerceptionTracking {
             List {
                 Section {
-                    SettingRowView(
-                        title: store.loggedIn ? "Nickname" : "Guest",
-                        type: .auth(
-                            store.loggedIn ? ._4pda : .avatarDefault,
-                            store.loggedIn ? "Nickname" : nil
-                        ),
-                        action: { store.send(.profileTapped) }
-                    )
+                    if let user = store.user {
+                        SettingRowView(
+                            title: LocalizedStringKey(user.nickname), // TODO: Remove title
+                            type: .auth(user.imageUrl, user.nickname),
+                            action: { store.send(.profileTapped) }
+                        )
+                    } else {
+                        SettingRowView(
+                            title: "Guest", // TODO: Remove title
+                            type: .guest(.avatarDefault),
+                            action: { store.send(.profileTapped) }
+                        )
+                    }
                 }
                 
                 Section {
@@ -73,6 +78,7 @@ public struct MenuScreen: View {
             .alert($store.scope(state: \.alert, action: \.alert))
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle(Text("Menu", bundle: .module))
+            .task { store.send(.onTask) }
         }
     }
 }

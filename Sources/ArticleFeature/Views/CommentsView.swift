@@ -6,17 +6,17 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 import Models
 import NukeUI
 import SharedUI
 
+// MARK: - Comments View
+
 struct CommentsView: View {
     
+    let store: StoreOf<ArticleFeature>
     let comments: [Comment]
-    
-    init(comments: [Comment]) {
-        self.comments = comments
-    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -31,7 +31,14 @@ struct CommentsView: View {
             
             VStack(spacing: 4) {
                 ForEach(comments.filter { $0.parentId == 0 }) { comment in
-                    CommentView(comments: comments, comment: comment, indentationLevel: indentationLevel(for: comment))
+                    CommentView(
+                        comments: comments,
+                        comment: comment,
+                        indentationLevel: indentationLevel(for: comment),
+                        onCommentHeaderTapped: { comment in
+                            store.send(.delegate(.commentHeaderTapped(comment.authorId)))
+                        }
+                    )
                 }
             }
             .padding(.top, 4)
@@ -52,11 +59,14 @@ struct CommentsView: View {
     }
 }
 
+// MARK: - Comment View
+
 struct CommentView: View {
     
     let comments: [Comment]
     let comment: Comment
     let indentationLevel: CGFloat
+    let onCommentHeaderTapped: (Comment) -> Void
     
     var body: some View {
         VStack(spacing: 4) {
@@ -72,20 +82,25 @@ struct CommentView: View {
                 } else {
                     VStack(spacing: 8) {
                         HStack(spacing: 8) {
-                            LazyImage(url: comment.avatarUrl) { state in
-                                if let image = state.image {
-                                    image.resizable().scaledToFill()
-                                } else if state.error != nil {
-                                    Image.avatarDefault.resizable()
+                            Group {
+                                LazyImage(url: comment.avatarUrl) { state in
+                                    if let image = state.image {
+                                        image.resizable().scaledToFill()
+                                    } else if state.error != nil {
+                                        Image.avatarDefault.resizable()
+                                    }
                                 }
+                                .frame(width: 24, height: 24)
+                                .clipped()
+                                
+                                Text(comment.authorName)
+                                    .font(.callout)
+                                    .foregroundStyle(Color(.systemGray))
+                                    .bold()
                             }
-                            .frame(width: 24, height: 24)
-                            .clipped()
-                            
-                            Text(comment.authorName)
-                                .font(.callout)
-                                .foregroundStyle(Color(.systemGray))
-                                .bold()
+                            .onTapGesture {
+                                onCommentHeaderTapped(comment)
+                            }
                             
                             Spacer()
                             
@@ -120,7 +135,8 @@ struct CommentView: View {
                 CommentView(
                     comments: comments,
                     comment: comments.first(where: { $0.id == id })!,
-                    indentationLevel: indentationLevel + 1
+                    indentationLevel: indentationLevel + 1,
+                    onCommentHeaderTapped: onCommentHeaderTapped
                 )
             }
         }
@@ -129,7 +145,14 @@ struct CommentView: View {
 
 #Preview {
     VStack {
-        CommentsView(comments: .mockArray)
+        CommentsView(
+            store: Store(
+                initialState: ArticleFeature.State(articlePreview: .mock),
+                reducer: {
+                    ArticleFeature()
+                }),
+            comments: .mockArray
+        )
         
         Rectangle()
             .foregroundColor(Color(.systemGray6))

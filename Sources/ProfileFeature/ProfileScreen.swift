@@ -21,26 +21,88 @@ public struct ProfileScreen: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 if let user = store.user {
-                    LazyImage(url: user.imageUrl) { state in
-                        if let image = state.image { image.resizable().scaledToFit() }
-                    }
-                    .frame(width: 100, height: 100)
-                    
-                    Text(user.nickname)
-                    Text(user.registrationDate.formatted())
-                    Text(user.lastSeenDate.formatted())
-                    Text(user.userCity)
-                    Text(String(user.karma))
-                    Text(String(user.posts))
-                    Text(String(user.comments))
-                    Text(String(user.reputation))
-                    Text(String(user.topics))
-                    Text(String(user.replies))
-                    
-                    Button {
-                        store.send(.logoutButtonTapped)
-                    } label: {
-                        Text("Logout", bundle: .module)
+                    List {
+                        VStack(spacing: 16) {
+                            LazyImage(url: user.imageUrl) { state in
+                                if let image = state.image { image.resizable().scaledToFit() }
+                            }
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
+                            
+                            Text(user.nickname)
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .listRowBackground(Color(.systemGroupedBackground))
+                        
+                        Section {
+                            informationRow(
+                                title: "Registration date",
+                                description: user.registrationDate.formatted(date: .numeric, time: .omitted)
+                            )
+                            
+                            if user.registrationDate.timeIntervalSince1970 != 0 {
+                                informationRow(
+                                    title: "Last seen date",
+                                    description: user.lastSeenDate.formatted(date: .numeric, time: .shortened)
+                                )
+                            }
+                            
+                            if !user.userCity.isEmpty {
+                                informationRow(
+                                    title: "City",
+                                    description: user.userCity
+                                )
+                            }
+                        } header: {
+                            Text("Information", bundle: .module)
+                        }
+                        
+                        Section {
+                            informationRow(
+                                title: "Karma",
+                                description: String(format: "%.2f", (Double(user.karma) / 100))
+                            )
+                            
+                            informationRow(
+                                title: "Posts",
+                                description: String(user.posts)
+                            )
+                            
+                            informationRow(
+                                title: "Comments",
+                                description: String(user.comments)
+                            )
+                        } header: {
+                            Text("Site statistics", bundle: .module)
+                        }
+                        
+                        Section {
+                            informationRow(
+                                title: "Reputation",
+                                description: String(user.reputation)
+                            )
+                            
+                            informationRow(
+                                title: "Topics",
+                                description: String(user.topics)
+                            )
+                            
+                            informationRow(
+                                title: "Replies",
+                                description: String(user.replies)
+                            )
+                        } header: {
+                            Text("Forum statistics", bundle: .module)
+                        }
+                        
+                        if store.shouldShowLogoutButton {
+                            Button {
+                                store.send(.logoutButtonTapped)
+                            } label: {
+                                Text("Logout", bundle: .module)
+                            }
+                        }
                     }
                 } else {
                     ProgressView().id(UUID())
@@ -51,6 +113,18 @@ public struct ProfileScreen: View {
             .task {
                 store.send(.onTask)
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func informationRow(title: LocalizedStringKey, description: String) -> some View {
+        HStack {
+            Text(title, bundle: .module)
+            
+            Spacer()
+            
+            Text(description)
+                .foregroundStyle(.secondary)
         }
     }
 }
@@ -65,7 +139,7 @@ public struct ProfileScreen: View {
             ) {
                 ProfileFeature()
             } withDependencies: {
-                $0.apiClient = .liveValue
+                $0.apiClient = .previewValue
             }
         )
     }

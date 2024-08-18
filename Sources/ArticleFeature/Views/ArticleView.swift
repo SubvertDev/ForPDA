@@ -15,6 +15,7 @@ struct ArticleView: View {
     let elements: [ArticleElement]
     let comments: [Comment]
     
+    // TODO: Check if scoping is more applicable here
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
@@ -24,7 +25,7 @@ struct ArticleView: View {
                 }
             }
             
-            CommentsView(comments: comments)
+            CommentsView(store: store, comments: comments)
         }
     }
 }

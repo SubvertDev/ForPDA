@@ -89,8 +89,18 @@ struct ArticleElementView: View {
             .buttonStyle(.borderedProminent)
             
         case .bulletList(let bulletListElement):
-            EmptyView()
-//            fatalError(bulletListElement.elements.first!.title)
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(bulletListElement.elements, id: \.self) { element in
+                    HStack(spacing: 8) {
+                        Circle()
+                            .frame(width: 8, height: 8)
+                        
+                        Text(element)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
             
         case .table(let tableElement):
             VStack(spacing: 0) {
@@ -127,6 +137,25 @@ struct ArticleElementView: View {
             }
         ),
         element: .text(.init(text: Array(repeating: "Test ", count: 30).joined(), isQuote: true))
+    )
+    .frame(height: 100)
+}
+
+#Preview("Bullet List") {
+    ArticleElementView(
+        store: .init(
+            initialState: ArticleFeature.State(
+                articlePreview: .mock
+            ),
+            reducer: {
+                ArticleFeature()
+            }
+        ),
+        element: .bulletList(
+            .init(
+                elements: ["First Element", "Second Element", "Third Element", "Fourth Element", "Fifth Element"]
+            )
+        )
     )
     .frame(height: 100)
 }

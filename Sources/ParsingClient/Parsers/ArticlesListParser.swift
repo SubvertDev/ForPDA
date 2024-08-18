@@ -25,8 +25,8 @@ public struct ArticlesListParser {
                         authorName: article[6] as! String,
                         commentsAmount: article[7] as! Int,
                         imageUrl: URL(string: article[8] as! String)!,
-                        title: (article[9] as! String).convertHtmlCodes(),
-                        description: clean(string: article[10] as! String),
+                        title: (article[9] as! String).convertHtmlCodes().convertLinks(),
+                        description: (article[10] as! String).convertHtmlCodes().convertLinks(),
                         tags: extractTags(from: article[11] as! [[Any]])
                     )
                     articles.append(article)
@@ -47,20 +47,17 @@ public struct ArticlesListParser {
     private static func extractTags(from array: [[Any]]) -> [Tag] {
         return array.map { Tag(id: $0[0] as! Int, name: $0[1] as! String) }
     }
-    
-    private static func clean(string: String) -> String {
-        var cleanedString = string
-        
-        if string.contains("[url=") {
+}
+
+fileprivate extension String {
+    func convertLinks() -> String {
+        var cleanedString = self
+        if self.contains("[url=") {
             let pattern = #/\[url=.*?\]/#
             cleanedString = cleanedString
                 .replacing(pattern, with: "")
                 .replacingOccurrences(of: "[/url]", with: "")
         }
-        
-        cleanedString = cleanedString
-            .replacingOccurrences(of: "&nbsp;", with: " ")
-        
         return cleanedString
     }
 }

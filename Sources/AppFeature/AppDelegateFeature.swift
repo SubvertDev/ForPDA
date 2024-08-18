@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import AnalyticsClient
-import ImageClient
+import CacheClient
 
 @Reducer
 public struct AppDelegateFeature: Sendable {
@@ -30,7 +30,7 @@ public struct AppDelegateFeature: Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.analyticsClient) private var analyticsClient
-    @Dependency(\.imageClient) private var imageClient
+    @Dependency(\.cacheClient) private var cacheClient
     
     // MARK: - Body
     
@@ -39,7 +39,7 @@ public struct AppDelegateFeature: Sendable {
             switch action {
             case .didFinishLaunching:
                 analyticsClient.configure()
-                imageClient.configure()
+                cacheClient.configure()
                 return .none
             }
         }

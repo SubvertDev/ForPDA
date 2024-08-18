@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import TCAExtensions
 import APIClient
+import PersistenceKeys
 import Models
 
 @Reducer
@@ -152,7 +153,8 @@ public struct AuthFeature: Sendable {
                 return .run { send in
                     switch loginState {
                     case .success(userId: let userId, token: let token):
-                        #warning("Save Token")
+                        @Shared(.userSession) var userSession
+                        await $userSession.withLock { $0 = UserSession(userId: userId, token: token) }
                         await send(.delegate(.loginSuccess(userId: userId)))
                         
                     case .wrongPassword:

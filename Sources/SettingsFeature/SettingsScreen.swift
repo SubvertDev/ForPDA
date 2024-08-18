@@ -54,6 +54,13 @@ public struct SettingsScreen: View {
                         Text("Safari extension", bundle: .module)
                             .foregroundStyle(Color(.label))
                     }
+                    
+                    Button {
+                        store.send(.clearCacheButtonTapped)
+                    } label: {
+                        Text("Clear cache", bundle: .module)
+                            .foregroundStyle(Color(.label))
+                    }
                 }
                 
                 Section(header: Text("About App", bundle: .module)) {
