@@ -51,7 +51,7 @@ public struct ProfileParser {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 return User(
                     id: array[2] as! Int,
-                    nickname: array[3] as! String,
+                    nickname: (array[3] as! String).convertHtmlCodes(),
                     imageUrl: URL(string: array[4] as! String),
                     registrationDate: Date(timeIntervalSince1970: array[9] as! TimeInterval),
                     lastSeenDate: Date(timeIntervalSince1970: array[10] as! TimeInterval),
