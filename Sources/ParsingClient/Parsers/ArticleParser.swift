@@ -36,7 +36,7 @@ public struct ArticleParser {
                 guard let fields = try JSONSerialization.jsonObject(with: data) as? [Any] else {
                     throw ParsingError.failedToCastDataToAny
                 }
-                print(fields[15] as! [[Any]])
+                
                 return Article(
                     id: fields[2] as! Int,
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),

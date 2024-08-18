@@ -28,14 +28,21 @@ public struct TextElement: Equatable, Hashable {
     public let countedListIndex: Int
     
     public var markdown: LocalizedStringKey {
-        let regex = #/\[url=\"(?<url>.+?)\"](?<text>.+?)\[/url]/#
-        
         var text = text
+        
+        // Links
+        let regex = #/\[url=\"(?<url>.+?)\"](?<text>.+?)\[/url]/#
         let matches = text.matches(of: regex)
         for match in matches.reversed() {
             let markdownLink = "[\(match.text)](\(match.url))"
             text = text.replacingCharacters(in: match.range, with: markdownLink)
         }
+        
+        // Italic
+        text = text
+            .replacingOccurrences(of: "[i]", with: "*")
+            .replacingOccurrences(of: "[/i]", with: "*")
+        
         return LocalizedStringKey(text)
     }
     
