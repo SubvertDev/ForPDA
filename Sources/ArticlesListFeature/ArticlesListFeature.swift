@@ -56,6 +56,7 @@ public struct ArticlesListFeature: Sendable {
         case menuTapped
         case onFirstAppear
         case onRefresh
+        case onArticleAppear(ArticlePreview)
         case onLoadMoreAppear
         
         case _failedToConnect(any Error)
@@ -69,8 +70,9 @@ public struct ArticlesListFeature: Sendable {
     
     // MARK: - Dependencies
     
-    @Dependency(\.apiClient) var apiClient
-    @Dependency(\.pasteboardClient) var pasteboardClient
+    @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.pasteboardClient) private var pasteboardClient
     
     // MARK: - Body
     
@@ -111,6 +113,22 @@ public struct ArticlesListFeature: Sendable {
                     let timeInterval = Int(Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds))
                     try await Task.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
                     await send(._articlesResponse(result))
+                }
+                
+            case .onArticleAppear(let articlePreview):
+                // TODO: Revise performance-wise later
+                return .run { [articles = state.articles] _ in
+                    if let index = articles.firstIndex(where: { $0 == articlePreview }), index % 3 == 0 {
+                        var urls: [URL] = []
+                        let preloadIndex = index + 1
+                        let maxPreloadIndex = preloadIndex + 3
+                        if (preloadIndex <= articles.count - 1) && (maxPreloadIndex <= articles.count - 1) {
+                            for article in articles[preloadIndex..<maxPreloadIndex] {
+                                urls.append(article.imageUrl)
+                            }
+                            await cacheClient.preloadImages(urls)
+                        }
+                    }
                 }
                 
             case .onLoadMoreAppear:

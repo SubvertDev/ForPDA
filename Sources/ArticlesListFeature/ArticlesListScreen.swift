@@ -46,6 +46,9 @@ public struct ArticlesListScreen: View {
                                             store.send(.cellMenuOpened(article, .report))
                                         }
                                     }
+                                    .onAppear {
+                                        store.send(.onArticleAppear(article))
+                                    }
                             }
                             .listSectionSeparator(.hidden)
                         }

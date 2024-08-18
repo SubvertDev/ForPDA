@@ -16,6 +16,7 @@ public struct CacheClient: Sendable {
     public var configure: @Sendable () -> Void
     public var removeAll: @Sendable () async throws -> Void
     // Articles
+    public var preloadImages: @Sendable ([URL]) async -> Void
     public var cacheArticle: @Sendable (Article) async throws -> Void
     public var getArticle: @Sendable (_ id: Int) async -> Article?
     // Users
@@ -55,6 +56,9 @@ extension CacheClient: DependencyKey {
                 ImagePipeline.shared.cache.removeAll()
                 try await articlesStorage.async.removeAll()
                 try await usersStorage.async.removeAll()
+            },
+            preloadImages: { urls in
+                urls.forEach { ImagePipeline.shared.loadImage(with: $0, completion: { _ in }) }
             },
             cacheArticle: { article in
                 var articles = (try? await articlesStorage.async.object(forKey: articlesKey)) ?? []
