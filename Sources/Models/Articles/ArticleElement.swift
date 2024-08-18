@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum ArticleElement: Equatable, Hashable {
+public enum ArticleElement: Sendable, Equatable, Hashable {
     case text(TextElement)
     case image(ImageElement)
     case gallery([ImageElement])
@@ -20,7 +20,7 @@ public enum ArticleElement: Equatable, Hashable {
 
 // MARK: - Text
 
-public struct TextElement: Equatable, Hashable {
+public struct TextElement: Sendable, Equatable, Hashable {
     public let text: String
     public let isHeader: Bool
     public let isQuote: Bool
@@ -63,7 +63,7 @@ public struct TextElement: Equatable, Hashable {
 
 // MARK: - Image
 
-public struct ImageElement: Equatable, Hashable {
+public struct ImageElement: Sendable, Equatable, Hashable {
     public let url: URL
     public let description: String?
     public let width: Int
@@ -92,7 +92,7 @@ public struct ImageElement: Equatable, Hashable {
 
 // MARK: - Video
 
-public struct VideoElement: Equatable, Hashable {
+public struct VideoElement: Sendable, Equatable, Hashable {
     public let id: String
     
     public init(
@@ -104,7 +104,7 @@ public struct VideoElement: Equatable, Hashable {
 
 // MARK: - GIF
 
-public struct GifElement: Equatable, Hashable {
+public struct GifElement: Sendable, Equatable, Hashable {
     public let url: URL
     public let width: Int
     public let height: Int
@@ -122,7 +122,7 @@ public struct GifElement: Equatable, Hashable {
 
 // MARK: - Button
 
-public struct ButtonElement: Equatable, Hashable {
+public struct ButtonElement: Sendable, Equatable, Hashable {
     public let text: String
     public let url: URL
     
@@ -137,7 +137,7 @@ public struct ButtonElement: Equatable, Hashable {
 
 // MARK: - BulletList
 
-public struct BulletListElement: Equatable, Hashable {
+public struct BulletListElement: Sendable, Equatable, Hashable {
     public let elements: [String]
     
     public init(
@@ -149,7 +149,7 @@ public struct BulletListElement: Equatable, Hashable {
 
 // MARK: - BulletListSingle
 
-public struct BulletListSingleElement: Equatable, Hashable {
+public struct BulletListSingleElement: Sendable, Equatable, Hashable {
     public var title: String
     public var description: [String]
     
@@ -164,7 +164,7 @@ public struct BulletListSingleElement: Equatable, Hashable {
 
 // MARK: - TableElement
 
-public struct TableElement: Equatable, Hashable {
+public struct TableElement: Sendable, Equatable, Hashable {
     public var rows: [TableRowElement]
     
     public init(
@@ -174,7 +174,7 @@ public struct TableElement: Equatable, Hashable {
     }
 }
 
-public struct TableRowElement: Equatable, Hashable {
+public struct TableRowElement: Sendable, Equatable, Hashable {
     public var title: String
     public var description: String
     
@@ -190,7 +190,7 @@ public struct TableRowElement: Equatable, Hashable {
 // MARK: - Mock
 
 public extension Array where Element == ArticleElement {
-    nonisolated(unsafe) static let fullMock: [ArticleElement] = [
+    static let fullMock: [ArticleElement] = [
         .text(.init(text: "Nulla reprehenderit eiusmod consectetur aute voluptate et enim reprehenderit eu minim ea id commodo. Voluptate ipsum amet Lorem culpa pariatur Lorem consectetur dolor veniam officia dolore commodo. Incididunt ea ullamco nulla dolore nostrud pariatur. Sit ex non proident consequat culpa fugiat elit duis aliqua cupidatat labore nostrud officia est.")),
         .image(.init(url: URL(string: "https://4pda.to/s/Zy0hPxnqmrklKWliotRS8kVWdhGv.jpg")!, width: 200, height: 100)),
         .text(.init(text: "Esse id pariatur elit pariatur quis nisi pariatur do aliquip deserunt fugiat aliqua minim Lorem. Anim ut ea ea esse incididunt commodo qui laborum. Commodo aliqua irure culpa quis magna duis aliqua. Voluptate magna ut incididunt. Ipsum ex ex amet eu. Aute dolore deserunt proident elit incididunt occaecat nostrud labore Lorem duis.")),

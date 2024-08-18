@@ -9,6 +9,7 @@ import SwiftUI
 import SharedUI
 import NukeUI
 import SFSafeSymbols
+import SkeletonUI
 
 enum SettingType {
     case auth(URL?, String)
@@ -33,7 +34,14 @@ struct SettingRowView: View {
                     case .auth(let url, let name):
                         HStack {
                             LazyImage(url: url) { state in
-                                if let image = state.image { image.resizable() }
+                                Group {
+                                    if let image = state.image {
+                                        image.resizable().scaledToFill()
+                                    } else {
+                                        Color(.systemBackground)
+                                    }
+                                }
+                                .skeleton(with: state.isLoading, shape: .circle)
                             }
                             .scaledToFit()
                             .frame(width: 48, height: 48)

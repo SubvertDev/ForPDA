@@ -23,7 +23,7 @@ struct ArticleRowView: View {
                     if let image = state.image {
                         image.resizable().scaledToFill()
                     } else {
-                        Color.white
+                        Color(.systemBackground)
                     }
                 }
                 .skeleton(with: state.isLoading, shape: .rounded(.radius(16)))

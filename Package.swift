@@ -84,10 +84,12 @@ let package = Package(
                 "Models",
                 "SharedUI",
                 "APIClient",
+                "CacheClient",
                 "AnalyticsClient",
                 "ParsingClient",
                 "PasteboardClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit")
             ]
@@ -101,6 +103,7 @@ let package = Package(
                 "SharedUI",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
@@ -120,6 +123,7 @@ let package = Package(
                 "APIClient",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "NukeUI", package: "nuke")
             ]
         ),

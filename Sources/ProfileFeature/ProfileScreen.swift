@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SkeletonUI
 import NukeUI
 
 public struct ProfileScreen: View {
@@ -24,7 +25,14 @@ public struct ProfileScreen: View {
                     List {
                         VStack(spacing: 16) {
                             LazyImage(url: user.imageUrl) { state in
-                                if let image = state.image { image.resizable().scaledToFit() }
+                                Group {
+                                    if let image = state.image {
+                                        image.resizable().scaledToFill()
+                                    } else {
+                                        Color(.systemBackground)
+                                    }
+                                }
+                                .skeleton(with: state.isLoading, shape: .circle)
                             }
                             .frame(width: 80, height: 80)
                             .clipShape(Circle())

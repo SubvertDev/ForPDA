@@ -10,6 +10,7 @@ import ComposableArchitecture
 import Models
 import NukeUI
 import SharedUI
+import SkeletonUI
 
 // MARK: - Comments View
 
@@ -89,6 +90,14 @@ struct CommentView: View {
                                     } else if state.error != nil {
                                         Image.avatarDefault.resizable()
                                     }
+                                    Group {
+                                        if let image = state.image {
+                                            image.resizable().scaledToFill()
+                                        } else {
+                                            Color(.systemBackground)
+                                        }
+                                    }
+                                    .skeleton(with: state.isLoading, shape: .rectangle)
                                 }
                                 .frame(width: 24, height: 24)
                                 .clipped()

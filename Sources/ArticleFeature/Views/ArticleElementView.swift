@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  ArticleElementView.swift
+//
 //
 //  Created by Ilia Lubianoi on 03.07.2024.
 //
@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import NukeUI
+import SkeletonUI
 import YouTubePlayerKit
 import SharedUI
 import Models
@@ -23,6 +24,9 @@ struct ArticleElementView: View {
     
     var body: some View {
         switch element {
+            
+            // MARK: - Text
+            
         case .text(let textElement):
             HStack {
                 if textElement.isQuote {
@@ -48,19 +52,37 @@ struct ArticleElementView: View {
                     .padding(.horizontal, 12)
             }
             
+            // MARK: - Image
+            
         case .image(let imageElement):
             LazyImage(url: imageElement.url) { state in
-                if let image = state.image { image.resizable().scaledToFill() }
+                Group {
+                    if let image = state.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Color(.systemBackground)
+                    }
+                }
+                .skeleton(with: state.isLoading, shape: .rectangle)
             }
             .frame(width: UIScreen.main.bounds.width,
                    height: UIScreen.main.bounds.width * imageElement.ratioHW)
             .clipped()
             
+            // MARK: - Gallery
+            
         case .gallery(let imageElements):
             HeightPreservingTabView {
                 ForEach(imageElements, id: \.self) { imageElement in
                     LazyImage(url: imageElement.url) { state in
-                        if let image = state.image { image.resizable() }
+                        Group {
+                            if let image = state.image {
+                                image.resizable().scaledToFill()
+                            } else {
+                                Color(.systemBackground)
+                            }
+                        }
+                        .skeleton(with: state.isLoading, shape: .rectangle)
                     }
                     .aspectRatio(imageElement.ratioWH, contentMode: .fill)
                     .frame(height: UIScreen.main.bounds.width * imageElement.ratioHW)
@@ -72,13 +94,28 @@ struct ArticleElementView: View {
             .indexViewStyle(.page(backgroundDisplayMode: .always))
             .padding(.bottom, -16)
             
+            // MARK: - Video
+            
         case .video(let videoElement):
             let player = YouTubePlayer(source: .video(id: videoElement.id))
-            YouTubePlayerView(player)
-                .frame(height: UIScreen.main.bounds.width * 0.5625)
+            YouTubePlayerView(player) { state in
+                switch state {
+                    // TODO: Handle error
+                case .idle, .error:
+                    Color(.systemBackground)
+                        .skeleton(with: true, shape: .rectangle)
+                case .ready:
+                    EmptyView()
+                }
+            }
+            .frame(height: UIScreen.main.bounds.width * 0.5625)
+            
+            // MARK: - Gif
             
         case .gif(let gifElement):
-            GifView(url: gifElement.url) // TODO: TEST
+            GifView(url: gifElement.url) // TODO: Add skeleton?
+            
+            // MARK: - Button
             
         case .button(let buttonElement):
             Button {
@@ -87,6 +124,8 @@ struct ArticleElementView: View {
                 Text(buttonElement.text)
             }
             .buttonStyle(.borderedProminent)
+            
+            // MARK: - Bullet List
             
         case .bulletList(let bulletListElement):
             VStack(alignment: .leading, spacing: 8) {
@@ -101,6 +140,8 @@ struct ArticleElementView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
+            
+            // MARK: - Table
             
         case .table(let tableElement):
             VStack(spacing: 0) {

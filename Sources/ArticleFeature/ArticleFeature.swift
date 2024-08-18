@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import Models
 import APIClient
+import CacheClient
 import PasteboardClient
 
 @Reducer
@@ -68,6 +69,7 @@ public struct ArticleFeature: Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) var apiClient
+    @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.parsingClient) var parsingClient
     @Dependency(\.pasteboardClient) var pasteboardClient
     @Dependency(\.openURL) var openURL
@@ -152,7 +154,13 @@ public struct ArticleFeature: Sendable {
             case ._parseArticleElements(.success(let elements)):
                 state.elements = elements
                 state.isLoading = false
-                return .none
+                return .run { _ in
+                    var urls: [URL] = []
+                    for case let .image(image) in elements {
+                        urls.append(image.url)
+                    }
+                    await cacheClient.preloadImages(urls)
+                }
                 
             case ._parseArticleElements(.failure):
                 state.isLoading = false

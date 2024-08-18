@@ -12,6 +12,7 @@ import SFSafeSymbols
 import YouTubePlayerKit
 import Models
 import SharedUI
+import SkeletonUI
 
 public struct ArticleScreen: View {
     
@@ -26,7 +27,14 @@ public struct ArticleScreen: View {
             ScrollView {
                 ZStack {
                     LazyImage(url: store.articlePreview.imageUrl) { state in
-                        if let image = state.image { image.resizable().scaledToFill() }
+                        Group {
+                            if let image = state.image {
+                                image.resizable().scaledToFill()
+                            } else {
+                                Color(.systemBackground)
+                            }
+                        }
+                        .skeleton(with: state.isLoading, shape: .rectangle)
                     }
                     .frame(height: UIScreen.main.bounds.width * 0.6)
                     .clipped()
