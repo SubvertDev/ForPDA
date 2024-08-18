@@ -1,5 +1,5 @@
 {
-  "originHash" : "ba17fb84cfa75a690d7eea290915808bb90d4e10b56b8a709eb2138624ffa491",
+  "originHash" : "7877306f1df3140a585863af2340242fe74e9997a80bb817cc5225b03def523d",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -71,6 +71,15 @@
       "state" : {
         "revision" : "e2e28f4e56e1769c2ec3c61c9355fc64eb7a535a",
         "version" : "5.3.0"
+      }
+    },
+    {
+      "identity" : "skeletonui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CSolanaM/SkeletonUI.git",
+      "state" : {
+        "revision" : "f025e9ba5d051374d7344efa8859df5b9399a181",
+        "version" : "2.0.2"
       }
     },
     {
@@ -179,6 +188,15 @@
       "state" : {
         "revision" : "1552c8f722ac256cc0b8daaf1a7073217d4fcdfb",
         "version" : "1.3.4"
+      }
+    },
+    {
+      "identity" : "swift-snapshot-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
+      "state" : {
+        "revision" : "6d932a79e7173b275b96c600c86c603cf84f153c",
+        "version" : "1.17.4"
       }
     },
     {

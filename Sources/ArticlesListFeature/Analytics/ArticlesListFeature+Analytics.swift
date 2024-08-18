@@ -53,7 +53,7 @@ extension ArticlesListFeature {
                     analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
                     analyticsClient.capture(AnalyticsError.apiFailure(error))
                     
-                case .binding, .alert, ._articlesResponse:
+                case .binding, .alert, .onArticleAppear, ._articlesResponse:
                     break
                     
                 case ._failedToConnect(let error):

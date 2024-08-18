@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SkeletonUI
 import NukeUI
 import Models
 
@@ -18,7 +19,14 @@ struct ArticleRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             LazyImage(url: article.imageUrl) { state in
-                if let image = state.image { image.resizable().scaledToFill() }
+                Group {
+                    if let image = state.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Color.white
+                    }
+                }
+                .skeleton(with: state.isLoading, shape: .rounded(.radius(16)))
             }
             .frame(width: UIScreen.main.bounds.width - cellPadding * 2,
                    height: UIScreen.main.bounds.width * 0.5 - cellPadding * 2)
