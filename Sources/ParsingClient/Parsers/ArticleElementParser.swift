@@ -148,7 +148,16 @@ public struct ArticleElementParser {
     }
     
     private static func extractTableElement(text: String) throws -> TableElement {
-        let components = text.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "]\t[")
+        let lines = text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .components(separatedBy: "[/tr] [tr]")
+        
+        var components: [String] = []
+        for component in lines {
+            let line = component
+                .components(separatedBy: "[/td] [td]")
+            components.append(contentsOf: line)
+        }
 
         var titles: [String] = []
         var descriptions: [String] = []
@@ -157,22 +166,22 @@ public struct ArticleElementParser {
                 titles.append(
                     String(
                         components[index]
-                            .dropFirst(index == 0 ? 18 : 17)
-                            .dropLast(16)
+                            .dropFirst(index == 0 ? 18 : 14)
+                            .dropLast(12)
                     )
                 )
             } else {
                 descriptions.append(
                     String(
                         components[index]
-                            .dropFirst(3)
-                            .dropLast(index == components.count - 1 ? 10 : 9)
+                            .dropLast(index == components.count - 1 ? 10 : 5)
                     )
                 )
             }
         }
 
-        let rows = Array(zip(titles, descriptions)).map { TableRowElement(title: $0.0, description: $0.1) }
+        let rows = Array(zip(titles, descriptions))
+            .map { TableRowElement(title: $0.0, description: $0.1) }
         
         return TableElement(rows: rows)
     }
