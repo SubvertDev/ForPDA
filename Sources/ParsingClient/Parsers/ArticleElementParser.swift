@@ -96,6 +96,8 @@ public struct ArticleElementParser {
         return ("", nil)
     }
     
+    // MARK: - Image
+    
     /// [attachment=\"1:dummy\"] -> 1
     private static func extractImageElement(text: String, attachments: [Attachment]) throws -> ImageElement {
         let pattern = #/=\"(\d+):/#
@@ -114,6 +116,8 @@ public struct ArticleElementParser {
         if let fullUrl = attachment.fullUrl { url = fullUrl }
         return ImageElement(url: url, width: attachment.width, height: attachment.height)
     }
+    
+    // MARK: - Images
     
     /// [attachment=\"1:dummy\"] -> 1
     private static func extractImageElements(text: String, attachments: [Attachment]) throws -> [ImageElement] {
@@ -136,6 +140,8 @@ public struct ArticleElementParser {
         }
     }
     
+    // MARK: - Video
+    
     /// [youtube=Bfo2xIeaOAE:640:360:::0] -> Bfo2xIeaOAE
     private static func extractVideoElement(text: String) throws -> VideoElement {
         let pattern = #/=(.+?):/#
@@ -146,6 +152,8 @@ public struct ArticleElementParser {
             throw ParsingError.failedToExtractVideo
         }
     }
+    
+    // MARK: - Table
     
     private static func extractTableElement(text: String) throws -> TableElement {
         let lines = text
@@ -186,13 +194,16 @@ public struct ArticleElementParser {
         return TableElement(rows: rows)
     }
     
+    // MARK: - Bullet List
+    
     private static func extractBulletListElement(text: String) throws -> BulletListElement {
         let components = text
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .components(separatedBy: "[*]")
             .filter { !$0.isEmpty }
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         
-        return BulletListElement.init(elements: components)
+        return BulletListElement(elements: components)
     }
 }
 

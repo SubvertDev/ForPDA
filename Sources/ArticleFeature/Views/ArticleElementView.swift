@@ -130,9 +130,10 @@ struct ArticleElementView: View {
         case .bulletList(let bulletListElement):
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(bulletListElement.elements, id: \.self) { element in
-                    HStack(spacing: 8) {
+                    HStack(alignment: .top, spacing: 8) {
                         Circle()
-                            .frame(width: 8, height: 8)
+                            .frame(width: 4, height: 4)
+                            .padding(.top, 8)
                         
                         Text(element)
                     }
@@ -194,7 +195,7 @@ struct ArticleElementView: View {
         ),
         element: .bulletList(
             .init(
-                elements: ["First Element", "Second Element", "Third Element", "Fourth Element", "Fifth Element"]
+                elements: ["First Element", "Second Element", "Third Element", "Fourth Element", "Fifth Element Fifth Element Fifth Element Fifth Element"]
             )
         )
     )
