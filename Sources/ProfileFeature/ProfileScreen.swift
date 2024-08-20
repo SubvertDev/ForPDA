@@ -56,7 +56,7 @@ public struct ProfileScreen: View {
                                 )
                             }
                             
-                            if !user.userCity.isEmpty {
+                            if !user.userCity.isEmpty && user.userCity != "Нет" {
                                 informationRow(
                                     title: "City",
                                     description: user.userCity
