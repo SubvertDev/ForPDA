@@ -42,7 +42,7 @@ struct ArticleElementView: View {
                         }
                 }
                 
-                Text(textElement.markdown)
+                Text(textElement.text.asMarkdown)
                     .environment(\.openURL, OpenURLAction { url in
                         store.send(.linkInTextTapped(url))
                         return .handled
@@ -135,7 +135,7 @@ struct ArticleElementView: View {
                             .frame(width: 4, height: 4)
                             .padding(.top, 8)
                         
-                        Text(element)
+                        Text(element.asMarkdown)
                     }
                 }
             }

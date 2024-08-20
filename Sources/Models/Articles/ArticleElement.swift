@@ -28,25 +28,6 @@ public struct TextElement: Sendable, Equatable, Hashable {
     public let inList: Bool
     public let countedListIndex: Int
     
-    public var markdown: LocalizedStringKey {
-        var text = text
-        
-        // Links
-        let regex = #/\[url=\"(?<url>.+?)\"](?<text>.+?)\[/url]/#
-        let matches = text.matches(of: regex)
-        for match in matches.reversed() {
-            let markdownLink = "[\(match.text)](\(match.url))"
-            text = text.replacingCharacters(in: match.range, with: markdownLink)
-        }
-        
-        // Italic
-        text = text
-            .replacingOccurrences(of: "[i]", with: "*")
-            .replacingOccurrences(of: "[/i]", with: "*")
-        
-        return LocalizedStringKey(text)
-    }
-    
     public init(
         text: String,
          isHeader: Bool = false,
@@ -219,4 +200,25 @@ public extension Array where Element == ArticleElement {
         .image(.init(url: URL(string: "https://4pda.to/s/Zy0hPxnqmrklKWliotRS8kVWdhGv.jpg")!, description: "Test Description", width: 200, height: 75)),
         .text(.init(text: "Fugiat commodo minim aliquip deserunt laboris Lorem laborum magna voluptate reprehenderit. Elit irure in ut nostrud magna. Tempor consectetur deserunt quis ipsum cillum aute culpa. Consequat velit incididunt nostrud aute amet voluptate voluptate in ex sit dolore sunt voluptate eu commodo. Officia officia cupidatat mollit sunt excepteur id fugiat est sit amet nostrud culpa fugiat id ea.", isQuote: true))
     ]
+}
+
+public extension String {
+    var asMarkdown: LocalizedStringKey {
+        var text = self
+        
+        // Links
+        let regex = #/\[url=\"(?<url>.+?)\"](?<text>.+?)\[/url]/#
+        let matches = text.matches(of: regex)
+        for match in matches.reversed() {
+            let markdownLink = "[\(match.text)](\(match.url))"
+            text = text.replacingCharacters(in: match.range, with: markdownLink)
+        }
+        
+        // Italic
+        text = text
+            .replacingOccurrences(of: "[i]", with: "*")
+            .replacingOccurrences(of: "[/i]", with: "*")
+        
+        return LocalizedStringKey(text)
+    }
 }
