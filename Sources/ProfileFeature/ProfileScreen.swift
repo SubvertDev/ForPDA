@@ -49,7 +49,7 @@ public struct ProfileScreen: View {
                                 description: user.registrationDate.formatted(date: .numeric, time: .omitted)
                             )
                             
-                            if user.registrationDate.timeIntervalSince1970 != 0 {
+                            if user.lastSeenDate.timeIntervalSince1970 > 86400 {
                                 informationRow(
                                     title: "Last seen date",
                                     description: user.lastSeenDate.formatted(date: .numeric, time: .shortened)
