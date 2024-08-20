@@ -85,16 +85,11 @@ struct CommentView: View {
                         HStack(spacing: 8) {
                             Group {
                                 LazyImage(url: comment.avatarUrl) { state in
-                                    if let image = state.image {
-                                        image.resizable().scaledToFill()
-                                    } else if state.error != nil {
-                                        Image.avatarDefault.resizable()
-                                    }
                                     Group {
                                         if let image = state.image {
                                             image.resizable().scaledToFill()
                                         } else {
-                                            Color(.systemBackground)
+                                            Image.avatarDefault.resizable()
                                         }
                                     }
                                     .skeleton(with: state.isLoading, shape: .rectangle)
