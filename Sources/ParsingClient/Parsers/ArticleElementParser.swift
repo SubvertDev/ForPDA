@@ -16,7 +16,17 @@ public struct ArticleElementParser {
 
         while !remainingText.isEmpty {
             // TODO: Extract size value in [size]
-            let tags = ["[quote]", "[center]", "[size=4]", "[size=3]", "[attachment=", "[table]", "[list]"] // Add new tags as needed
+            let tags = [
+                "[quote]",
+                "[center][blockbg=",
+                "[center]",
+                "[size=4]",
+                "[size=3]",
+                "[attachment=",
+                "[table]",
+                "[list]"
+            ] // Add new tags as needed
+            
             let ranges = tags.compactMap { remainingText.range(of: $0) }
 
             let nextTagRange = ranges.min(by: { $0.lowerBound < $1.lowerBound })
@@ -35,6 +45,12 @@ public struct ArticleElementParser {
                     let parts = extractText(from: remainingText, startTag: "[quote]", endTag: "[/quote]")
                     result.append(.text(.init(text: parts.0.trim(), isQuote: true)))
                     remainingText = parts.1 ?? ""
+                } else if nextTag == "[center][blockbg]" {
+                    let parts = extractText(from: remainingText, startTag: "[center][blockbg=", endTag: "[/blockbg][/center]")
+                    let advertisementElement = try extractAdvertisementElement(text: parts.0)
+                    result.append(.advertisement(advertisementElement))
+                    remainingText = ""
+                    // remainingText = parts.1 ?? "" // TODO: Everything after advertisement is cut off
                 } else if nextTag == "[center]" {
                     let parts = extractText(from: remainingText, startTag: "[center]", endTag: "[/center]")
                     // There's three known types of center tag atm:
@@ -204,6 +220,54 @@ public struct ArticleElementParser {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         
         return BulletListElement(elements: components)
+    }
+    
+    // MARK: - Advertisement Element
+    
+    private static func extractAdvertisementElement(text: String) throws -> AdvertisementElement {        
+        var pattern = /\[background=\#(\w+)\]/
+        let buttonBackgroundColorHex: String
+        if let match = text.firstMatch(of: pattern) {
+            buttonBackgroundColorHex = String(match.output.1)
+        } else {
+            throw ParsingError.failedToExtractAdvertisment
+        }
+        
+        pattern = /\[color=\#(\w+)\]/
+        let buttonForegroundColorHex: String
+        if let match = text.firstMatch(of: pattern) {
+            buttonForegroundColorHex = String(match.output.1)
+        } else {
+            throw ParsingError.failedToExtractAdvertisment
+        }
+        
+        let buttonPattern = /color=#(\w+)\](.+)\[\/color/
+        let buttonText: String
+        if let match = text.firstMatch(of: buttonPattern) {
+            buttonText = String(match.output.2)
+        } else {
+            throw ParsingError.failedToExtractAdvertisment
+        }
+        
+        pattern = /\[url=(.+)\]\[color/
+        let linkUrl: URL
+        if let match = text.firstMatch(of: pattern) {
+            if let url = URL(string: String(match.output.1)) {
+                linkUrl = url
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+        } else {
+            throw ParsingError.failedToExtractAdvertisment
+        }
+        
+        let element = AdvertisementElement(
+            buttonBackgroundColorHex: buttonBackgroundColorHex,
+            buttonForegroundColorHex: buttonForegroundColorHex,
+            buttonText: buttonText,
+            linkUrl: linkUrl
+        )
+        return element
     }
 }
 

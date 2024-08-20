@@ -15,4 +15,5 @@ enum ParsingError: Error {
     case failedToExtractImage
     case failedToExtractImages
     case failedToExtractVideo
+    case failedToExtractAdvertisment
 }

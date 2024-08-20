@@ -16,6 +16,7 @@ public enum ArticleElement: Sendable, Equatable, Hashable {
     case button(ButtonElement)
     case bulletList(BulletListElement)
     case table(TableElement)
+    case advertisement(AdvertisementElement)
 }
 
 // MARK: - Text
@@ -184,6 +185,27 @@ public struct TableRowElement: Sendable, Equatable, Hashable {
     ) {
         self.title = title
         self.description = description
+    }
+}
+
+// MARK: - Advertismenet Element
+
+public struct AdvertisementElement: Sendable, Equatable, Hashable {
+    public let buttonBackgroundColorHex: String
+    public let buttonForegroundColorHex: String
+    public let buttonText: String
+    public let linkUrl: URL
+    
+    public init(
+        buttonBackgroundColorHex: String,
+        buttonForegroundColorHex: String,
+        buttonText: String,
+        linkUrl: URL
+    ) {
+        self.buttonBackgroundColorHex = buttonBackgroundColorHex
+        self.buttonForegroundColorHex = buttonForegroundColorHex
+        self.buttonText = buttonText
+        self.linkUrl = linkUrl
     }
 }
 

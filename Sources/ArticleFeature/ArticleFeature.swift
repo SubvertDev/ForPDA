@@ -104,9 +104,11 @@ public struct ArticleFeature: Sendable {
                             // TODO: Already has one in AppFeature, make DeeplinkHandler?
                             let regex = #//([\d]{6})//#
                             let match = url.absoluteString.firstMatch(of: regex)
-                            let id = Int(match!.output.1)!
-                            await send(.delegate(.handleDeeplink(id)))
-                            return
+                            if let match, let id = Int(match.output.1) {
+                                await send(.delegate(.handleDeeplink(id)))
+                                return
+                            }
+                            // TODO: Redirect case fallthrough
                         }
                     }
                     await openURL(url)

@@ -163,6 +163,20 @@ struct ArticleElementView: View {
                 }
             }
             .padding(.horizontal, 16)
+            
+        case .advertisement(let advertisementElement):
+            Button {
+                store.send(.linkInTextTapped(advertisementElement.linkUrl))
+            } label: {
+                Text(advertisementElement.buttonText)
+                    .font(.title3)
+                    .padding(16)
+                    .foregroundStyle(Color(hex: advertisementElement.buttonForegroundColorHex))
+                    .background(Color(hex: advertisementElement.buttonBackgroundColorHex))
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .frame(maxWidth: .infinity)
+            .padding([.horizontal, .bottom], 16)
         }
     }
 }
