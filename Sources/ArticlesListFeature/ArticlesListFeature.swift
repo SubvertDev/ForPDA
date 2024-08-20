@@ -105,6 +105,7 @@ public struct ArticlesListFeature: Sendable {
                 }
                 
             case .onRefresh:
+                state.offset = 0
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     // TODO: Better way to hold for 1 sec?
                     let startTime = DispatchTime.now()
