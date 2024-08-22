@@ -41,20 +41,26 @@ public struct AppFeature: Sendable {
         public var articlesList: ArticlesListFeature.State
         
         public var showToast: Bool
-        public var toastMessage: String
+        public var toast: ToastInfo
+        public var localizationBundle: Bundle? {
+            switch toast.screen {
+            case .articlesList: return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticlesListFeature") })
+            case .article:      return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticleFeature") })
+            }
+        }
         
         public init(
             path: StackState<Path.State> = StackState(),
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             showToast: Bool = false,
-            toastMessage: String = ""
+            toast: ToastInfo = ToastInfo(screen: .articlesList, message: "")
         ) {
             self.path = path
             self.appDelegate = appDelegate
             self.articlesList = articlesList
             self.showToast = showToast
-            self.toastMessage = toastMessage
+            self.toast = toast
         }
     }
     
@@ -148,7 +154,7 @@ public struct AppFeature: Sendable {
             case let .articlesList(.cellMenuOpened(_, action)):
                 switch action {
                 case .copyLink, .report:
-                    state.toastMessage = action.rawValue.toString()
+                    state.toast = ToastInfo(screen: .articlesList, message: action.rawValue)
                 case .shareLink:
                     return .none
                 }
@@ -163,7 +169,7 @@ public struct AppFeature: Sendable {
             case let .path(.element(id: _, action: .article(.menuActionTapped(action)))):
                 switch action {
                 case .copyLink, .report:
-                    state.toastMessage = action.rawValue.toString()
+                    state.toast = ToastInfo(screen: .article, message: action.rawValue)
                 case .shareLink:
                     return .none
                 }

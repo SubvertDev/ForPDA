@@ -46,7 +46,7 @@ public struct AppView: View {
                 }
             }
             .toast(isPresenting: $store.showToast) {
-                AlertToast(displayMode: .hud, type: .regular, title: store.toastMessage)
+                AlertToast(displayMode: .hud, type: .regular, title: store.toast.message, bundle: store.localizationBundle)
             }
         }
     }

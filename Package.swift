@@ -41,7 +41,7 @@ let package = Package(
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.31.1"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.8.0"),
-        .package(url: "https://github.com/elai950/AlertToast.git", from: "1.3.9"),
+        .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4")
     ],
     targets: [
