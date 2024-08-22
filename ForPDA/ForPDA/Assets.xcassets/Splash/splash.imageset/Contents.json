@@ -13,28 +13,6 @@
       ],
       "filename" : "forpda-icon-black.jpg",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "contrast",
-          "value" : "high"
-        }
-      ],
-      "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        },
-        {
-          "appearance" : "contrast",
-          "value" : "high"
-        }
-      ],
-      "idiom" : "universal"
     }
   ],
   "info" : {
