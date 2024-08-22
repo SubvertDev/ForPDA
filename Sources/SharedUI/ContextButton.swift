@@ -42,7 +42,7 @@ public struct ContextButton: View {
 }
 
 // MARK: - Context Share Button
-// RELEASE: - Any other way to mix Context with Share?
+// TODO: - Any other way to mix Context with Share?
 
 public struct ContextShareButton: View {
     
@@ -71,24 +71,11 @@ public struct ContextShareButton: View {
     }
     
     public var body: some View {
-        ContextButton(text: text, symbol: symbol, bundle: bundle, action: action)
-            .onChange(of: showShareSheet) { _ in
-                openShare()
+        ShareLink(item: shareURL) {
+            HStack {
+                Text(text, bundle: bundle)
+                Image(systemSymbol: symbol)
             }
-    }
-    
-    private func openShare() {
-        let activityVC = UIActivityViewController(activityItems: [shareURL], applicationActivities: nil)
-
-        if UIDevice.current.userInterfaceIdiom == .pad { // iPad crash fix
-            let thisViewVC = UIHostingController(rootView: self)
-            activityVC.popoverPresentationController?.sourceView = thisViewVC.view
         }
-
-        UIApplication.shared.connectedScenes
-            .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
-            .first { $0.isKeyWindow }?
-            .rootViewController?
-            .present(activityVC, animated: true)
     }
 }
