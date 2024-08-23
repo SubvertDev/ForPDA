@@ -10,9 +10,11 @@ import Foundation
 public struct UserSession: Sendable, Equatable, Codable {
     public let userId: Int
     public let token: String
+    public let isHidden: Bool
     
-    public init(userId: Int, token: String) {
+    public init(userId: Int, token: String, isHidden: Bool) {
         self.userId = userId
         self.token = token
+        self.isHidden = isHidden
     }
 }

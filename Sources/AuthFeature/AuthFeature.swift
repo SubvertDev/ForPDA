@@ -150,11 +150,11 @@ public struct AuthFeature: Sendable {
                 
             case ._loginResponse(.success(let loginState)):
                 state.isLoading = false
-                return .run { send in
+                return .run { [isHidden = state.isHiddenEntry] send in
                     switch loginState {
                     case .success(userId: let userId, token: let token):
                         @Shared(.userSession) var userSession
-                        await $userSession.withLock { $0 = UserSession(userId: userId, token: token) }
+                        await $userSession.withLock { $0 = UserSession(userId: userId, token: token, isHidden: isHidden) }
                         await send(.delegate(.loginSuccess(userId: userId)))
                         
                     case .wrongPassword:

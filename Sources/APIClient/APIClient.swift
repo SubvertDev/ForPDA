@@ -36,7 +36,7 @@ extension APIClient: DependencyKey {
             connect: {
                 @Shared(.userSession) var userSession
                 if let userSession {
-                    let request = AuthRequest(memberId: userSession.userId, token: userSession.token, hidden: false)
+                    let request = AuthRequest(memberId: userSession.userId, token: userSession.token, hidden: userSession.isHidden)
                     try api.connect(as: .account(data: request))
                 } else {
                     try api.connect(as: .anonymous)
