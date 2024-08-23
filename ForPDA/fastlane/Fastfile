@@ -93,12 +93,11 @@ platform :ios do
 	    }
         )
 
-        sentry_auth_token = get_xcconfig_value(
-            path: 'ForPDA/Secrets.xcconfig',
-            name: 'SENTRY_DSYM_TOKEN'
-        )
+        swift_file_path = "../../Sources/AnalyticsClient/Secrets.swift"
+        swift_file_content = File.read(swift_file_path)
+        sentry_dsym_token = swift_file_content[/let sentryDSYMToken = "(.*?)"/, 1]
         sentry_debug_files_upload(
-            auth_token: sentry_auth_token,
+            auth_token: sentry_dsym_token,
             org_slug: 'forpda',
             project_slug: 'apple-ios',
             include_sources: true

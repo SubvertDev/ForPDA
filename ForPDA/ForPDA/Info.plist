@@ -22,15 +22,6 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>SECRET_KEYS</key>
-	<dict>
-		<key>MIXPANEL_TOKEN</key>
-		<string>$(MIXPANEL_TOKEN)</string>
-		<key>SENTRY_DSN</key>
-		<string>$(SENTRY_DSN)</string>
-		<key>SENTRY_DSYM_TOKEN</key>
-		<string>$(SENTRY_DSYM_TOKEN)</string>
-	</dict>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

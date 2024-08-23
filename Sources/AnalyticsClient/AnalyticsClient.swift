@@ -66,7 +66,7 @@ extension AnalyticsClient {
     
     private static func configureMixpanel(id: String) {
         Mixpanel.initialize(
-            token: Secrets.for(key: .MIXPANEL_TOKEN),
+            token: Secrets.mixpanelToken,
             trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
             optOutTrackingByDefault: isDebug
         )
@@ -75,7 +75,7 @@ extension AnalyticsClient {
     
     private static func configureSentry(id: String) {
         SentrySDK.start { options in
-            options.dsn = Secrets.for(key: .SENTRY_DSN)
+            options.dsn = Secrets.sentryDSN
             options.debug = isDebug
             options.enabled = !isDebug
             options.tracesSampleRate = 1.0
@@ -103,22 +103,4 @@ private var isDebug: Bool {
     #else
         return false
     #endif
-}
-
-// FIXME: Find easier way to manage keys
-
-private struct Secrets {
-    
-    enum Keys: String {
-        case SENTRY_DSN
-        case MIXPANEL_TOKEN
-    }
-    
-    static func `for`(key: Keys) -> String {
-        if let dictionary = Bundle.main.object(forInfoDictionaryKey: "SECRET_KEYS") as? [String: String] {
-            return dictionary[key.rawValue] ?? ""
-        } else {
-            return ""
-        }
-    }
 }

@@ -55,8 +55,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = SecretsExample.xcconfig; sourceTree = "<group>"; };
-		B82B2EC62A89306000CB067C /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		B82B2EFE2A8942E900CB067C /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B83CF7FF2C580860005A9B9B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -161,8 +159,6 @@
 				B88BDA872BF6BC0200E17268 /* Assets.xcassets */,
 				B83CF7FF2C580860005A9B9B /* Localizable.xcstrings */,
 				B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */,
-				B82B2EC62A89306000CB067C /* Secrets.xcconfig */,
-				B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */,
 				B82B2EFE2A8942E900CB067C /* Info.plist */,
 			);
 			path = ForPDA;
@@ -511,7 +507,6 @@
 		};
 		B8D35207293CABB7008A84EA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B82B2EC62A89306000CB067C /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -581,7 +576,6 @@
 		};
 		B8D35208293CABB7008A84EA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B82B2EC62A89306000CB067C /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
