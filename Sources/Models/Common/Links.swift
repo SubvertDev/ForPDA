@@ -16,6 +16,7 @@ public struct Links {
     public static let telegramChangelog = URL(string: "https://t.me/forpda_ios")!
     public static let telegramChat = URL(string: "https://t.me/forpda_ios_chat")!
     public static let github = URL(string: "https://github.com/SubvertDev/ForPDA/")!
+    public static let githubReleases = URL(string: "https://github.com/SubvertDev/ForPDA/releases/")!
     public static let defaultAvatar = URL(string: "https://4pda.to/s/PXtijiHlTQLQuS20Pw2juZgaB7jch8eE.jpg")!
     
     // TODO: Check if needed

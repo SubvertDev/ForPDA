@@ -8,16 +8,12 @@
 import Foundation
 
 public enum SettingsEvent: Event {
-    case closed
     case languageTapped
     case themeTapped
-    case themeAction(ThemeAction)
-    case nightModeBackgroundColorTapped
-    case nightModeBackgroundColorAction(NightModeBackgroundColorAction)
-    case safariExtensionsTapped
-    case fastLoadingSystemAction(ToggleAction)
-    case showLikesInCommentsAction(ToggleAction)
-    case githubRepositoryTapped
+    case safariExtensionTapped
+    case clearCacheTapped
+    case checkVersionsTapped
+    case _somethingWentWrong(any Error)
     
     public var name: String {
         return "Settings " + eventName(for: self).inProperCase
@@ -25,32 +21,10 @@ public enum SettingsEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case .themeAction(let action):
-            return ["action": action.rawValue]
-        case .nightModeBackgroundColorAction(let action):
-            return ["action": action.rawValue]
-        case .fastLoadingSystemAction(let action), 
-             .showLikesInCommentsAction(let action):
-            return ["action": action.rawValue]
+        case let ._somethingWentWrong(error):
+            return ["error": error.localizedDescription]
         default:
             return nil
         }
     }
-}
-
-public enum ThemeAction: String {
-    case auto
-    case light
-    case dark
-    case cancel
-}
-
-public enum NightModeBackgroundColorAction: String {
-    case dark
-    case black
-}
-
-public enum ToggleAction: String {
-    case on
-    case off
 }

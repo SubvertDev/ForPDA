@@ -9,6 +9,7 @@ import UIKit
 import ComposableArchitecture
 import CacheClient
 import TCAExtensions
+import Models
 
 @Reducer
 public struct SettingsFeature: Sendable {
@@ -60,7 +61,7 @@ public struct SettingsFeature: Sendable {
         case clearCacheButtonTapped
         case checkVersionsButtonTapped
         
-        case _somethingWentWrong
+        case _somethingWentWrong(any Error)
         
         // TODO: Different alerts?
         case destination(PresentationAction<Destination.Action>)
@@ -103,7 +104,7 @@ public struct SettingsFeature: Sendable {
             case .checkVersionsButtonTapped:
                 return .run { _ in
                     // TODO: Move URL to models
-                    await open(url: URL(string: "https://github.com/SubvertDev/ForPDA/releases/")!)
+                    await open(url: Links.githubReleases)
                 }
                 
             case .destination(.presented(.alert(.openSettings))):
@@ -121,7 +122,7 @@ public struct SettingsFeature: Sendable {
                     do {
                         try await cacheClient.removeAll()
                     } catch {
-                        await send(._somethingWentWrong)
+                        await send(._somethingWentWrong(error))
                     }
                 }
                 
@@ -130,6 +131,8 @@ public struct SettingsFeature: Sendable {
             }
         }
         .ifLet(\.$destination, action: \.destination)
+        
+        Analytics()
     }
 }
 

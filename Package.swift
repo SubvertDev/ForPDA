@@ -132,6 +132,7 @@ let package = Package(
             dependencies: [
                 "CacheClient",
                 "TCAExtensions",
+                "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
