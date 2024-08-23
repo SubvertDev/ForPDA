@@ -1,5 +1,5 @@
 {
-  "originHash" : "7877306f1df3140a585863af2340242fe74e9997a80bb817cc5225b03def523d",
+  "originHash" : "feb992887552231555d5845d2ecee2f0ef2fc6c7168e3d094dad56296577c82f",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa",
       "state" : {
-        "revision" : "7339fcbab2ded21fe5753687022f2b673a1a1865",
-        "version" : "8.31.1"
+        "revision" : "e2ac1723a4a9632e291c171b6e25a0c403b0fecb",
+        "version" : "8.35.0"
       }
     },
     {
@@ -71,15 +71,6 @@
       "state" : {
         "revision" : "f025e9ba5d051374d7344efa8859df5b9399a181",
         "version" : "2.0.2"
-      }
-    },
-    {
-      "identity" : "swift-atomics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-atomics.git",
-      "state" : {
-        "revision" : "cd142fd2f64be2100422d658e7411e39489da985",
-        "version" : "1.2.0"
       }
     },
     {
@@ -114,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "b432441cbc11a38c678312bad1a01138a7cd64e0",
-        "version" : "1.13.0"
+        "revision" : "121b6080697b5457ac63e37d2f2d97cf5acd999a",
+        "version" : "1.13.1"
       }
     },
     {
@@ -159,17 +150,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "339ba3e305dc727b5baa6ddb476430a842167d4e",
-        "version" : "2.0.5"
-      }
-    },
-    {
-      "identity" : "swift-package-zlib",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/fourplusone/swift-package-zlib",
-      "state" : {
-        "revision" : "03ecd41814d8929362f7439529f9682536a8de13",
-        "version" : "1.2.11"
+        "revision" : "70321c441d51b0b893c3abbf79687f550a027fde",
+        "version" : "2.0.6"
       }
     },
     {
