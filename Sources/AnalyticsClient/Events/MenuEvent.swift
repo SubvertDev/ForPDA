@@ -8,17 +8,14 @@
 import Foundation
 
 public enum MenuEvent: Event {
-    case closed
-    case loginTapped
+    case authTapped
     case profileTapped
-    case historyTapped
-    case bookmarksTapped
     case settingsTapped
     case author4PDATapped
-    case discussion4PDATapped
     case changelogTelegramTapped
     case chatTelegramTapped
     case githubTapped
+    case _userSessionUpdated(Int?)
     
     public var name: String {
         return "Menu " + eventName(for: self).inProperCase
@@ -26,6 +23,13 @@ public enum MenuEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
+        case let ._userSessionUpdated(userId):
+            if let userId {
+                return ["userId": String(userId)]
+            } else {
+                return ["userId": "none"]
+            }
+
         default:
             return nil
         }

@@ -178,5 +178,7 @@ public struct MenuFeature: Sendable {
             }
         }
         .ifLet(\.alert, action: \.alert)
+        
+        Analytics()
     }
 }

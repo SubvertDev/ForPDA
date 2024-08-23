@@ -51,6 +51,7 @@ public struct MenuScreen: View {
                         store.send(.notImplementedFeatureTapped)
                     }
                 }
+                .disabled(true)
                 
                 Section {
                     SettingRowView(title: "Settings", type: .symbol(.gearshapeFill)) { store.send(.settingsTapped)
@@ -64,6 +65,7 @@ public struct MenuScreen: View {
                     SettingRowView(title: "App discussion", type: .image(._4pda)) {
                         store.send(.notImplementedFeatureTapped)
                     }
+                    .disabled(true)
                     SettingRowView(title: "Changelog in Telegram", type: .image(.telegram)) {
                         store.send(.telegramChangelogButtonTapped)
                     }

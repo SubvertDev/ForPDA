@@ -20,6 +20,8 @@ enum SettingType {
 
 struct SettingRowView: View {
     
+    @Environment(\.isEnabled) private var isEnabled
+    
     let title: LocalizedStringKey
     let type: SettingType
     let action: (() -> Void)
@@ -85,7 +87,7 @@ struct SettingRowView: View {
                                 .padding(.leading, 16)
                             
                             Text(title, bundle: .module)
-                                .foregroundStyle(Color(.label))
+                                .foregroundStyle(isEnabled ? Color(.label) : Color(.systemGray))
                             
                             Spacer()
                         }
@@ -100,7 +102,7 @@ struct SettingRowView: View {
                                 .padding(.leading, 16)
                             
                             Text(title, bundle: .module)
-                                .foregroundStyle(Color(.label))
+                                .foregroundStyle(isEnabled ? Color(.label) : Color(.systemGray))
                             
                             Spacer()
                         }
@@ -113,7 +115,6 @@ struct SettingRowView: View {
             .contentShape(.rect)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-//        .buttonStyle(ListButtonStyle())
         .listRowInsets(EdgeInsets())
     }
 }
