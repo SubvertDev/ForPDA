@@ -218,6 +218,8 @@ public extension String {
         text = text
             .replacingOccurrences(of: "[i]", with: "*")
             .replacingOccurrences(of: "[/i]", with: "*")
+            .replacingOccurrences(of: "[b]", with: "**")
+            .replacingOccurrences(of: "[/b]", with: "**")
         
         return LocalizedStringKey(text)
     }
