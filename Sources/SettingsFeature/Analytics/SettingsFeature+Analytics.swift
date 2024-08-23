@@ -31,6 +31,9 @@ extension SettingsFeature {
                     
                 case .safariExtensionButtonTapped:
                     analyticsClient.log(SettingsEvent.safariExtensionTapped)
+                    
+                case .copyDebugIdButtonTapped:
+                    analyticsClient.log(SettingsEvent.copyDebugIdTapped)
 
                 case .clearCacheButtonTapped:
                     analyticsClient.log(SettingsEvent.clearCacheTapped)

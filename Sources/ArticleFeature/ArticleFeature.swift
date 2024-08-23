@@ -119,7 +119,7 @@ public struct ArticleFeature: Sendable {
                 
             case let .menuActionTapped(action):
                 switch action {
-                case .copyLink:  pasteboardClient.copy(url: state.articlePreview.url)
+                case .copyLink:  pasteboardClient.copy(string: state.articlePreview.url.absoluteString)
                 case .shareLink: state.destination = .share(state.articlePreview.url)
                 case .report:    break
                 }

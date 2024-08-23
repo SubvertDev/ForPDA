@@ -81,6 +81,16 @@
         }
       }
     },
+    "Copy debug ID" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировать debug ID"
+          }
+        }
+      }
+    },
     "General" : {
       "localizations" : {
         "ru" : {

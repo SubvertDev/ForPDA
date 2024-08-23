@@ -7,6 +7,7 @@
 
 import UIKit
 import ComposableArchitecture
+import PasteboardClient
 import CacheClient
 import TCAExtensions
 import Models
@@ -58,6 +59,7 @@ public struct SettingsFeature: Sendable {
         case languageButtonTapped
         case themeButtonTapped
         case safariExtensionButtonTapped
+        case copyDebugIdButtonTapped
         case clearCacheButtonTapped
         case checkVersionsButtonTapped
         
@@ -73,6 +75,7 @@ public struct SettingsFeature: Sendable {
     
     // MARK: - Dependencies
     
+    @Dependency(\.pasteboardClient) var pasteboardClient
     @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.openURL) var openURL
     
@@ -95,6 +98,11 @@ public struct SettingsFeature: Sendable {
                 // TODO: Not working anymore, check other solutions
                 // openURL(URL(string: "App-Prefs:SAFARI&path=WEB_EXTENSIONS")!)
                 state.destination = .alert(.safariExtension)
+                return .none
+                
+            case .copyDebugIdButtonTapped:
+                @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
+                pasteboardClient.copy(analyticsId)
                 return .none
                 
             case .clearCacheButtonTapped:

@@ -56,6 +56,13 @@ public struct SettingsScreen: View {
                     }
                     
                     Button {
+                        store.send(.copyDebugIdButtonTapped)
+                    } label: {
+                        Text("Copy debug ID", bundle: .module)
+                            .foregroundStyle(Color(.label))
+                    }
+                    
+                    Button {
                         store.send(.clearCacheButtonTapped)
                     } label: {
                         Text("Clear cache", bundle: .module)

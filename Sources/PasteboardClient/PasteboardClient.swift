@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 @DependencyClient
 public struct PasteboardClient: Sendable {
-    public var copy: @Sendable (_ url: URL) -> Void
+    public var copy: @Sendable (_ string: String) -> Void
 }
 
 public extension DependencyValues {
@@ -22,8 +22,8 @@ public extension DependencyValues {
 
 extension PasteboardClient: DependencyKey {
     public static let liveValue = Self(
-        copy: { url in
-            UIPasteboard.general.string = url.absoluteString
+        copy: { string in
+            UIPasteboard.general.string = string
         }
     )
 }

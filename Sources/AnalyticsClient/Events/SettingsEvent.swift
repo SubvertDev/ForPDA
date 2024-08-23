@@ -11,6 +11,7 @@ public enum SettingsEvent: Event {
     case languageTapped
     case themeTapped
     case safariExtensionTapped
+    case copyDebugIdTapped
     case clearCacheTapped
     case checkVersionsTapped
     case _somethingWentWrong(any Error)

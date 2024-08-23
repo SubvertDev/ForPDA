@@ -89,7 +89,7 @@ public struct ArticlesListFeature: Sendable {
                 
             case .cellMenuOpened(let article, let action):
                 switch action {
-                case .copyLink:  pasteboardClient.copy(url: article.url)
+                case .copyLink:  pasteboardClient.copy(string: article.url.absoluteString)
                 case .shareLink: state.destination = .share(article.url)
                 case .report:    break
                 }
