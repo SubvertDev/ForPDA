@@ -98,5 +98,7 @@ public struct ProfileFeature: Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
 }
