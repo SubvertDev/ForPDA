@@ -11,6 +11,7 @@ import Models
 import ParsingClient
 import CacheClient
 import ComposableArchitecture
+import PersistenceKeys
 
 @DependencyClient
 public struct APIClient: Sendable {
@@ -33,7 +34,13 @@ extension APIClient: DependencyKey {
                 api.setLogResponses(to: type)
             },
             connect: {
-                try api.connect(as: .anonymous)
+                @Shared(.userSession) var userSession
+                if let userSession {
+                    let request = AuthRequest(memberId: userSession.userId, token: userSession.token, hidden: false)
+                    try api.connect(as: .account(data: request))
+                } else {
+                    try api.connect(as: .anonymous)
+                }
             },
             getArticlesList: { offset, amount in
                 let rawString = try api.get(SiteCommand.articlesList(offset: offset, amount: amount))
