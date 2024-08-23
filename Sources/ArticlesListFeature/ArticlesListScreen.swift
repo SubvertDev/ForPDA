@@ -28,18 +28,7 @@ public struct ArticlesListScreen: View {
                                 store.send(.articleTapped(article))
                             } label: {
                                 ArticleRowView(article: article)
-                                // TODO: Extract context menu
-                                    .contextMenu {
-                                        ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
-                                            store.send(.cellMenuOpened(article, .copyLink))
-                                        }
-                                        ContextButton(text: "Share Link", symbol: .arrowTurnUpRight, bundle: .module) {
-                                            store.send(.cellMenuOpened(article, .shareLink))
-                                        }
-                                        ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
-                                            store.send(.cellMenuOpened(article, .report))
-                                        }
-                                    }
+                                    .pdaContextMenu(article: article, store: store)
                                     .onAppear {
                                         store.send(.onArticleAppear(article))
                                     }

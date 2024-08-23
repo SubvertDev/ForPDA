@@ -73,20 +73,7 @@ public struct ArticleScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    // TODO: Extract and reuse context menu?
-                    Menu {
-                        ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
-                            store.send(.menuActionTapped(.copyLink))
-                        }
-                        ContextButton(text: "Share Link", symbol: .arrowTurnUpRight, bundle: .module) {
-                            store.send(.menuActionTapped(.shareLink))
-                        }
-                        ContextButton(text: "Problem with article?", symbol: .questionmarkCircle, bundle: .module) {
-                            store.send(.menuActionTapped(.report))
-                        }
-                    } label: {
-                        Image(systemSymbol: .ellipsis)
-                    }
+                    ArticleMenu(article: store.articlePreview, store: store)
                 }
             }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
