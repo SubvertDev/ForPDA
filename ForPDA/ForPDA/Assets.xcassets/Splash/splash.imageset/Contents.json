@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "forpda-icon.png",
+      "filename" : "four-black.png",
       "idiom" : "universal"
     },
     {
@@ -11,7 +11,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "forpda-icon-black.jpg",
+      "filename" : "four-white.png",
       "idiom" : "universal"
     }
   ],

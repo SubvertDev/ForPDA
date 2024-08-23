@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B83CF8002C580860005A9B9B /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B83CF7FF2C580860005A9B9B /* Localizable.xcstrings */; };
-		B84BC1E52C77DA4000C38BB2 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B84BC1E42C77DA4000C38BB2 /* Launch Screen.storyboard */; };
+		B84BC1E52C77DA4000C38BB2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */; };
 		B88BDA882BF6BC0200E17268 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B88BDA872BF6BC0200E17268 /* Assets.xcassets */; };
 		B8A85A8B2AA10CF400EDFE58 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A85A8A2AA10CF400EDFE58 /* ShareViewController.swift */; };
 		B8A85A922AA10CF500EDFE58 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -59,7 +59,7 @@
 		B82B2EC62A89306000CB067C /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		B82B2EFE2A8942E900CB067C /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B83CF7FF2C580860005A9B9B /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		B84BC1E42C77DA4000C38BB2 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B88BDA872BF6BC0200E17268 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B8A3727C2BC5ACFC00432F7D /* ForPDA */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ForPDA; path = ..; sourceTree = "<group>"; };
 		B8A85A882AA10CF400EDFE58 /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -160,7 +160,7 @@
 				B8DEB2212BAB81CC00AD97C6 /* App.swift */,
 				B88BDA872BF6BC0200E17268 /* Assets.xcassets */,
 				B83CF7FF2C580860005A9B9B /* Localizable.xcstrings */,
-				B84BC1E42C77DA4000C38BB2 /* Launch Screen.storyboard */,
+				B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */,
 				B82B2EC62A89306000CB067C /* Secrets.xcconfig */,
 				B802965E2AAE87D100D5B413 /* SecretsExample.xcconfig */,
 				B82B2EFE2A8942E900CB067C /* Info.plist */,
@@ -301,7 +301,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B84BC1E52C77DA4000C38BB2 /* Launch Screen.storyboard in Resources */,
+				B84BC1E52C77DA4000C38BB2 /* LaunchScreen.storyboard in Resources */,
 				B83CF8002C580860005A9B9B /* Localizable.xcstrings in Resources */,
 				B88BDA882BF6BC0200E17268 /* Assets.xcassets in Resources */,
 			);
