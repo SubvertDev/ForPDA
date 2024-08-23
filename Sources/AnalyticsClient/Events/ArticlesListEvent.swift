@@ -11,7 +11,8 @@ public enum ArticlesListEvent: Event {
     // TODO: Add URL to Int?
     case articleTapped(Int)
     case linkCopied(URL)
-    case linkShared(URL)
+    case linkShareOpened(URL)
+    case linkShared(Bool, URL)
     case linkReported(URL)
     case refreshTriggered
     case loadMoreTriggered
@@ -30,9 +31,12 @@ public enum ArticlesListEvent: Event {
             return ["id": String(id)]
             
         case .linkCopied(let url),
-             .linkShared(let url),
+             .linkShareOpened(let url),
              .linkReported(let url):
             return ["url": url.absoluteString]
+            
+        case let .linkShared(success, url):
+            return ["url": url.absoluteString, "success": String(success)]
             
         case .articlesHasNotLoaded(let errorMessage):
             return ["error": errorMessage]

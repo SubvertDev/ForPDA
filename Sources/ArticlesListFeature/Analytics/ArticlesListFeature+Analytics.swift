@@ -31,11 +31,14 @@ extension ArticlesListFeature {
                     case .copyLink:
                         analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
                     case .shareLink:
-                        analyticsClient.log(ArticlesListEvent.linkShared(article.url))
+                        analyticsClient.log(ArticlesListEvent.linkShareOpened(article.url))
                     case .report:
                         analyticsClient.log(ArticlesListEvent.linkReported(article.url))
                         analyticsClient.capture(AnalyticsError.brokenArticle(article.url))
                     }
+                    
+                case let .linkShared(success, url):
+                    analyticsClient.log(ArticlesListEvent.linkShared(success, url))
                     
                 case .onFirstAppear:
                     break // TODO: Make First App Open/App Session here?
@@ -53,11 +56,10 @@ extension ArticlesListFeature {
                     analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
                     analyticsClient.capture(AnalyticsError.apiFailure(error))
                     
-                case .binding, .alert, .onArticleAppear, ._articlesResponse:
+                case .binding, .onArticleAppear, ._articlesResponse, .destination:
                     break
                     
                 case ._failedToConnect(let error):
-                    print(error)
                     analyticsClient.log(ArticlesListEvent.failedToConnect)
                     analyticsClient.capture(error)
                 }

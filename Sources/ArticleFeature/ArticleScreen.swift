@@ -78,13 +78,7 @@ public struct ArticleScreen: View {
                         ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
                             store.send(.menuActionTapped(.copyLink))
                         }
-                        ContextShareButton(
-                            text: "Share Link",
-                            symbol: .arrowTurnUpRight,
-                            bundle: .module,
-                            showShareSheet: $store.showShareSheet,
-                            shareURL: store.articlePreview.url
-                        ) {
+                        ContextButton(text: "Share Link", symbol: .arrowTurnUpRight, bundle: .module) {
                             store.send(.menuActionTapped(.shareLink))
                         }
                         ContextButton(text: "Problem with article?", symbol: .questionmarkCircle, bundle: .module) {
@@ -95,7 +89,16 @@ public struct ArticleScreen: View {
                     }
                 }
             }
-            .alert($store.scope(state: \.alert, action: \.alert))
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .sheet(item: $store.destination.share, id: \.self) { url in
+                // FIXME: Perceptible warning despite tracking closure
+                WithPerceptionTracking {
+                    ShareActivityView(url: url) { success in
+                        store.send(.linkShared(success, url))
+                    }
+                    .presentationDetents([.medium])
+                }
+            }
             .task {
                 store.send(.onTask)
             }

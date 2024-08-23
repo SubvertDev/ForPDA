@@ -33,13 +33,7 @@ public struct ArticlesListScreen: View {
                                         ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
                                             store.send(.cellMenuOpened(article, .copyLink))
                                         }
-                                        ContextShareButton(
-                                            text: "Share Link",
-                                            symbol: .arrowTurnUpRight,
-                                            bundle: .module,
-                                            showShareSheet: $store.showShareSheet,
-                                            shareURL: article.url
-                                        ) {
+                                        ContextButton(text: "Share Link", symbol: .arrowTurnUpRight, bundle: .module) {
                                             store.send(.cellMenuOpened(article, .shareLink))
                                         }
                                         ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
@@ -63,7 +57,7 @@ public struct ArticlesListScreen: View {
                 }
                 .listStyle(.plain)
                 .scrollDisabled(store.isScrollDisabled)
-                .scrollIndicators(.hidden) // RELEASE: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
+                .scrollIndicators(.hidden) // TODO: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
                 .navigationTitle(Text("Articles", bundle: .module))
                 .navigationBarTitleDisplayMode(.inline)
                 .refreshable {
@@ -85,7 +79,16 @@ public struct ArticlesListScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .alert($store.scope(state: \.alert, action: \.alert))
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .sheet(item: $store.destination.share, id: \.self) { url in
+                // FIXME: Perceptible warning despite tracking closure
+                WithPerceptionTracking {
+                    ShareActivityView(url: url) { success in
+                        store.send(.linkShared(success, url))
+                    }
+                    .presentationDetents([.medium])
+                }
+            }
             .onFirstAppear {
                 store.send(.onFirstAppear)
             }

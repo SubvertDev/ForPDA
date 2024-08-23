@@ -15,49 +15,56 @@ import PasteboardClient
 @Reducer
 public struct ArticleFeature: Sendable {
     
+    public init() {}
+    
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination: Hashable {
+        @ReducerCaseIgnored
+        case share(URL)
+        case alert(AlertState<Alert>)
+        
+        public enum Alert { case ok }
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var destination: Destination.State?
         public var articlePreview: ArticlePreview
         public var article: Article?
         public var elements: [ArticleElement]?
         public var isLoading: Bool
-        public var showShareSheet: Bool
-        @Presents public var alert: AlertState<Action.Alert>?
         
         public init(
+            destination: Destination.State? = nil,
             articlePreview: ArticlePreview,
             article: Article? = nil,
-            isLoading: Bool = false,
-            showShareSheet: Bool = false,
-            alert: AlertState<Action.Alert>? = nil
+            isLoading: Bool = false
         ) {
+            self.destination = destination
             self.articlePreview = articlePreview
             self.article = article
             self.isLoading = isLoading
-            self.showShareSheet = showShareSheet
-            self.alert = alert
         }
     }
     
     // MARK: - Action
     
     public enum Action: BindableAction {
+        case destination(PresentationAction<Destination.Action>)
         case binding(BindingAction<State>)
         case delegate(Delegate)
         case linkInTextTapped(URL)
         case menuActionTapped(ArticleMenuAction)
+        case linkShared(Bool, URL)
         case onTask
         
         case _checkLoading
         case _articleResponse(Result<Article, any Error>)
         case _parseArticleElements(Result<[ArticleElement], any Error>)
-        
-        case alert(PresentationAction<Alert>)
-        public enum Alert {
-            case cancel
-        }
         
         @CasePathable
         public enum Delegate {
@@ -82,10 +89,6 @@ public struct ArticleFeature: Sendable {
         case loading
     }
     
-    // MARK: - Init
-    
-    public init() {}
-    
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
@@ -93,7 +96,7 @@ public struct ArticleFeature: Sendable {
         
         Reduce { state, action in
             switch action {
-            case .binding, .delegate:
+            case .binding, .delegate, .destination:
                 return .none
                 
             case let .linkInTextTapped(url):
@@ -117,9 +120,13 @@ public struct ArticleFeature: Sendable {
             case let .menuActionTapped(action):
                 switch action {
                 case .copyLink:  pasteboardClient.copy(url: state.articlePreview.url)
-                case .shareLink: state.showShareSheet = true
+                case .shareLink: state.destination = .share(state.articlePreview.url)
                 case .report:    break
                 }
+                return .none
+                
+            case .linkShared:
+                state.destination = nil
                 return .none
                 
             case .onTask:
@@ -150,7 +157,7 @@ public struct ArticleFeature: Sendable {
                 
             case ._articleResponse(.failure):
                 state.isLoading = false
-                state.alert = .error
+                state.destination = .alert(.error)
                 return .none
                 
             case ._parseArticleElements(.success(let elements)):
@@ -166,15 +173,16 @@ public struct ArticleFeature: Sendable {
                 
             case ._parseArticleElements(.failure):
                 state.isLoading = false
-                state.alert = .error
+                state.destination = .alert(.error)
                 return .none
-                
-            case .alert:
-                state.alert = nil
-                return .run { _ in await self.dismiss() }
+//                
+//            case .alert:
+//                state.alert = nil
+//                return .run { _ in await self.dismiss() }
             }
         }
-        
+        .ifLet(\.$destination, action: \.destination)
+
         Analytics()
     }
     
@@ -206,11 +214,11 @@ public struct ArticleFeature: Sendable {
 
 // MARK: - Alert Extension
 
-public extension AlertState where Action == ArticleFeature.Action.Alert {
+public extension AlertState where Action == ArticleFeature.Destination.Alert {
     nonisolated(unsafe) static let error = Self {
         TextState("Whoops!")
     } actions: {
-        ButtonState(role: .cancel, action: .cancel) {
+        ButtonState(role: .cancel, action: .ok) {
             TextState("OK")
         }
     } message: {

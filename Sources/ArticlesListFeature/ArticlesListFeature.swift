@@ -18,14 +18,22 @@ public struct ArticlesListFeature: Sendable {
     
     public init() {}
     
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination: Hashable {
+        @ReducerCaseIgnored
+        case share(URL)
+        case alert(AlertState<Never>)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
-        @Presents public var alert: AlertState<Action.Alert>?
+        @Presents public var destination: Destination.State?
         public var articles: [ArticlePreview]
         public var isLoading: Bool
-        public var showShareSheet: Bool
         public var loadAmount: Int = 30
         public var offset: Int = 0
         
@@ -35,24 +43,24 @@ public struct ArticlesListFeature: Sendable {
         }
         
         public init(
-            alert: AlertState<Action.Alert>? = nil,
+            destination: Destination.State? = nil,
             articles: [ArticlePreview] = [],
-            isLoading: Bool = true,
-            showShareSheet: Bool = false
+            isLoading: Bool = true
         ) {
-            self.alert = alert
+            self.destination = destination
             self.articles = articles
             self.isLoading = isLoading
-            self.showShareSheet = showShareSheet
         }
     }
     
     // MARK: - Action
     
     public enum Action: BindableAction {
+        case destination(PresentationAction<Destination.Action>)
         case articleTapped(ArticlePreview)
         case binding(BindingAction<State>) // TODO: Remove
         case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // TODO: Should it be a delegate?
+        case linkShared(Bool, URL)
         case menuTapped
         case onFirstAppear
         case onRefresh
@@ -61,11 +69,6 @@ public struct ArticlesListFeature: Sendable {
         
         case _failedToConnect(any Error)
         case _articlesResponse(Result<[ArticlePreview], any Error>)
-        
-        case alert(PresentationAction<Alert>)
-        public enum Alert {
-            case cancel
-        }
     }
     
     // MARK: - Dependencies
@@ -81,21 +84,25 @@ public struct ArticlesListFeature: Sendable {
             switch action {
                 
                 // MARK: External
-            case .articleTapped, .binding, .menuTapped:
+            case .articleTapped, .binding, .menuTapped, .destination:
                 return .none
                 
             case .cellMenuOpened(let article, let action):
                 switch action {
                 case .copyLink:  pasteboardClient.copy(url: article.url)
-                case .shareLink: state.showShareSheet = true
+                case .shareLink: state.destination = .share(article.url)
                 case .report:    break
                 }
+                return .none
+                
+            case .linkShared:
+                state.destination = nil
                 return .none
                 
             case .onFirstAppear:
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     do {
-                        await apiClient.setLogResponses(type: .full)
+                        await apiClient.setLogResponses(type: .short)
                         try await apiClient.connect()
                         let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
                         await send(._articlesResponse(result))
@@ -144,7 +151,7 @@ public struct ArticlesListFeature: Sendable {
                 // MARK: Internal
                 
             case ._failedToConnect:
-                state.alert = .failedToConnect
+                state.destination = .alert(.failedToConnect)
                 return .none
                 
             case let ._articlesResponse(.success(articles)):
@@ -159,16 +166,11 @@ public struct ArticlesListFeature: Sendable {
                 
             case ._articlesResponse(.failure):
                 state.isLoading = false
-                state.alert = .failedToConnect
-                return .none
-                
-                // MARK: Alert
-                
-            case .alert:
-                state.alert = nil
+                state.destination = .alert(.failedToConnect)
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }

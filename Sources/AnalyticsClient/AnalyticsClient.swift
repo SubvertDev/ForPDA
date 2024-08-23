@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import Mixpanel
 import Sentry
+import OSLog
 
 @DependencyClient
 public struct AnalyticsClient: Sendable {
@@ -26,6 +27,8 @@ public extension DependencyValues {
 
 extension AnalyticsClient: DependencyKey {
     
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Analytics")
+    
     public static var liveValue: Self {
         return AnalyticsClient(
             configure: {
@@ -33,10 +36,11 @@ extension AnalyticsClient: DependencyKey {
                 configureSentry()
             },
             log: { event in
+                logger.info("\(event.name) | \(event.properties ?? [:])")
                 Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
             },
             capture: { error in
-                print("[Sentry] \(error)")
+                logger.error("\(error) >>> \(error.localizedDescription)")
                 SentrySDK.capture(error: error)
             }
         )

@@ -20,7 +20,7 @@ extension ArticleFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .binding, .delegate, .alert, ._checkLoading:
+                case .binding, .delegate, ._checkLoading, .destination:
                     break
                     
                 case .linkInTextTapped(let url):
@@ -31,11 +31,14 @@ extension ArticleFeature {
                     case .copyLink:
                         analyticsClient.log(ArticleEvent.linkCopied(state.articlePreview.url))
                     case .shareLink:
-                        analyticsClient.log(ArticleEvent.linkShared(state.articlePreview.url))
+                        analyticsClient.log(ArticleEvent.linkShareOpened(state.articlePreview.url))
                     case .report:
                         analyticsClient.log(ArticleEvent.linkReported(state.articlePreview.url))
                         analyticsClient.capture(AnalyticsError.brokenArticle(state.articlePreview.url))
                     }
+                    
+                case let .linkShared(success, url):
+                    analyticsClient.log(ArticleEvent.linkShared(success, url))
                     
                 case .onTask:
                     break // TODO: Log?
