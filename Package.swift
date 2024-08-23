@@ -19,7 +19,6 @@ let package = Package(
         
         // Clients
         .library(name: "APIClient", targets: ["APIClient"]),
-        .library(name: "SettingsClient", targets: ["SettingsClient"]),
         .library(name: "CacheClient", targets: ["CacheClient"]),
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
         .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
@@ -150,13 +149,6 @@ let package = Package(
             ),
         .target(
             name: "PersistenceKeys",
-            dependencies: [
-                "Models",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
-            ]
-        ),
-        .target(
-            name: "SettingsClient",
             dependencies: [
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
