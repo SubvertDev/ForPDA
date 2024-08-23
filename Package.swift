@@ -38,7 +38,7 @@ let package = Package(
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
         .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.31.1"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.35.0"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.8.0"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),

@@ -32,8 +32,9 @@ extension AnalyticsClient: DependencyKey {
     public static var liveValue: Self {
         return AnalyticsClient(
             configure: {
-                configureMixpanel()
-                configureSentry()
+                @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
+                configureMixpanel(id: analyticsId)
+                configureSentry(id: analyticsId)
             },
             log: { event in
                 logger.info("\(event.name) | \(event.properties ?? [:])")
@@ -63,15 +64,16 @@ extension AnalyticsClient: DependencyKey {
 
 extension AnalyticsClient {
     
-    private static func configureMixpanel() {
+    private static func configureMixpanel(id: String) {
         Mixpanel.initialize(
             token: Secrets.for(key: .MIXPANEL_TOKEN),
             trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
             optOutTrackingByDefault: isDebug
         )
+        Mixpanel.mainInstance().userId = id
     }
     
-    private static func configureSentry() {
+    private static func configureSentry(id: String) {
         SentrySDK.start { options in
             options.dsn = Secrets.for(key: .SENTRY_DSN)
             options.debug = isDebug
@@ -81,7 +83,11 @@ extension AnalyticsClient {
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.swiftAsyncStacktraces = true
+            
+            options.experimental.sessionReplay.onErrorSampleRate = 1.0
+            options.experimental.sessionReplay.sessionSampleRate = 1.0
         }
+        SentrySDK.setUser(User(userId: id))
     }
 }
 
