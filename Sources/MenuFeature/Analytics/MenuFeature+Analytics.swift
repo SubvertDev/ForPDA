@@ -47,7 +47,7 @@ extension MenuFeature {
                 case .delegate(.openAuth):
                     analyticsClient.log(MenuEvent.authTapped)
                     
-                case let .delegate(.openProfile):
+                case .delegate(.openProfile):
                     analyticsClient.log(MenuEvent.profileTapped)
                 }
                 return .none
