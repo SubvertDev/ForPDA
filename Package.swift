@@ -98,6 +98,7 @@ let package = Package(
             dependencies: [
                 "APIClient",
                 "PersistenceKeys",
+                "AnalyticsClient",
                 "CacheClient",
                 "SharedUI",
                 "TCAExtensions",
@@ -110,6 +111,7 @@ let package = Package(
             name: "AuthFeature",
             dependencies: [
                 "APIClient",
+                "AnalyticsClient",
                 "PersistenceKeys",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -120,6 +122,7 @@ let package = Package(
             name: "ProfileFeature",
             dependencies: [
                 "APIClient",
+                "AnalyticsClient",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
@@ -129,6 +132,7 @@ let package = Package(
         .target(
             name: "SettingsFeature",
             dependencies: [
+                "AnalyticsClient",
                 "PasteboardClient",
                 "CacheClient",
                 "TCAExtensions",
