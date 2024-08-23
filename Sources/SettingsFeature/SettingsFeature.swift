@@ -93,8 +93,7 @@ public struct SettingsFeature: Sendable {
             case .safariExtensionButtonTapped:
                 // TODO: Not working anymore, check other solutions
                 // openURL(URL(string: "App-Prefs:SAFARI&path=WEB_EXTENSIONS")!)
-                // state.destination = .alert(.safariExtension)
-                state.destination = .alert(.notImplemented)
+                state.destination = .alert(.safariExtension)
                 return .none
                 
             case .clearCacheButtonTapped:
