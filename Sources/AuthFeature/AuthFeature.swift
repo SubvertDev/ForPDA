@@ -61,7 +61,7 @@ public struct AuthFeature: Sendable {
         case binding(BindingAction<State>)
         case loginButtonTapped
         case onTask
-        case onSumbit(State.Field)
+        case onSubmit(State.Field)
         
         case _captchaResponse(Result<URL, any Error>)
         case _loginResponse(Result<AuthResponse, any Error>)
@@ -103,7 +103,7 @@ public struct AuthFeature: Sendable {
             case .delegate:
                 return .none
             
-            case .onSumbit(let field):
+            case .onSubmit(let field):
                 switch field {
                 case .login:    state.focus = .password
                 case .password: state.focus = .captcha
@@ -175,6 +175,9 @@ public struct AuthFeature: Sendable {
                 return .none
                 
             case ._wrongPassword:
+                state.password = ""
+                state.captcha = ""
+                state.focus = .password
                 state.alert = .wrongPassword
                 return .run { send in
                     let result = await Result { try await apiClient.getCaptcha() }
@@ -182,12 +185,15 @@ public struct AuthFeature: Sendable {
                 }
 
             case let ._wrongCaptcha(url: url):
-                state.captcha.removeAll()
+                state.captcha = ""
                 state.captchaUrl = url
+                state.focus = .captcha
                 state.alert = .wrongCaptcha
                 return .none
             }
         }
+        
+        Analytics()
     }
 }
 

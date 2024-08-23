@@ -27,13 +27,13 @@ public struct AuthScreen: View {
                             Text("Login", bundle: .module)
                         }
                         .focused($focus, equals: .login)
-                        .onSubmit { store.send(.onSumbit(.login)) }
+                        .onSubmit { store.send(.onSubmit(.login)) }
                         
                         SecureField(text: $store.password) {
                             Text("Password", bundle: .module)
                         }
                         .focused($focus, equals: .password)
-                        .onSubmit { store.send(.onSumbit(.password)) }
+                        .onSubmit { store.send(.onSubmit(.password)) }
                         
                         Toggle(isOn: $store.isHiddenEntry) {
                             Text("Hidden entry", bundle: .module)
@@ -61,7 +61,7 @@ public struct AuthScreen: View {
                             Text("Enter captcha", bundle: .module)
                         }
                         .focused($focus, equals: .captcha)
-                        .onSubmit { store.send(.onSumbit(.captcha)) }
+                        .onSubmit { store.send(.onSubmit(.captcha)) }
                         .keyboardType(.numberPad)
                         // TODO: Not working in reducer smh
                         .onChange(of: store.captcha) { _ in

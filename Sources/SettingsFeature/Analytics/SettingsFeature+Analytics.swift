@@ -1,5 +1,5 @@
 //
-//  MenuFeature+Analytics.swift
+//  SettingsFeature+Analytics.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 23.08.2024.

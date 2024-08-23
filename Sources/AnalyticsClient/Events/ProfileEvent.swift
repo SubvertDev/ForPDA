@@ -8,7 +8,6 @@
 import Foundation
 
 public enum ProfileEvent: Event {
-    case closed
     case logoutTapped
     
     public var name: String {
