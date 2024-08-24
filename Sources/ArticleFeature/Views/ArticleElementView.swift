@@ -72,24 +72,24 @@ struct ArticleElementView: View {
             // MARK: - Gallery
             
         case .gallery(let imageElements):
-            HeightPreservingTabView {
+            TabView {
                 ForEach(imageElements, id: \.self) { imageElement in
                     LazyImage(url: imageElement.url) { state in
                         Group {
                             if let image = state.image {
-                                image.resizable().scaledToFill()
+                                image.resizable()
                             } else {
                                 Color(.systemBackground)
                             }
                         }
                         .skeleton(with: state.isLoading, shape: .rectangle)
                     }
-                    .aspectRatio(imageElement.ratioWH, contentMode: .fill)
-                    .frame(height: UIScreen.main.bounds.width * imageElement.ratioHW)
+                    .aspectRatio(imageElement.ratioWH, contentMode: .fit)
                     .clipped()
                 }
                 .padding(.bottom, 48) // Fix against index overlaying
             }
+            .frame(height: CGFloat(imageElements.max(by: { $0.ratioHW < $1.ratioHW})!.ratioHW) * UIScreen.main.bounds.width + 48)
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
             .padding(.bottom, -16)
@@ -180,6 +180,8 @@ struct ArticleElementView: View {
         }
     }
 }
+
+// MARK: - Previews
 
 // TODO: Make multiple previews
 #Preview {
