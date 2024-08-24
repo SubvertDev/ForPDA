@@ -1,7 +1,7 @@
 <p align="center" width="100%">
   <img width="25%" src="ForPDA/images/logo.png">
 </p>  
-<h3><p align="center">Любительский iOS клиент <a href="https://4pda.to/">4pda.to</a></p></h3>
+<h3><p align="center">Неофициальный iOS клиент <a href="https://4pda.to/">4pda.to</a></p></h3>
 
 ## Скриншоты
 ![Скриншоты](ForPDA/images/screenshots.png)
