@@ -34,13 +34,13 @@ public extension AlertState {
     
     nonisolated(unsafe) static var failedToConnect: AlertState {
         AlertState {
-            TextState("Whoops!")
+            TextState("Whoops!", bundle: .module)
         } actions: {
             ButtonState(role: .cancel) {
                 TextState("OK")
             }
         } message: {
-            TextState("Something went wrong while trying to connect to 4pda server...\nPlease try again later!")
+            TextState("Something went wrong while trying to connect to 4pda server...\nPlease try again later!", bundle: .module)
         }
     }
 }

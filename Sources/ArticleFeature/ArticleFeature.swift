@@ -216,12 +216,12 @@ public struct ArticleFeature: Sendable {
 
 public extension AlertState where Action == ArticleFeature.Destination.Alert {
     nonisolated(unsafe) static let error = Self {
-        TextState("Whoops!")
+        TextState("Whoops!", bundle: .module)
     } actions: {
         ButtonState(role: .cancel, action: .ok) {
             TextState("OK")
         }
     } message: {
-        TextState("Something went wrong while loading this article :(")
+        TextState("Something went wrong while loading this article :(", bundle: .module)
     }
 }
