@@ -83,9 +83,6 @@ extension AnalyticsClient {
             options.attachScreenshot = true
             options.attachViewHierarchy = true
             options.swiftAsyncStacktraces = true
-            
-            options.experimental.sessionReplay.onErrorSampleRate = 1.0
-            options.experimental.sessionReplay.sessionSampleRate = 1.0
         }
         SentrySDK.setUser(User(userId: id))
     }
