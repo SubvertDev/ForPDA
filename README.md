@@ -1,9 +1,10 @@
-# ForPDA
-![Лого](images/logo.png)  
-Любительский iOS клиент [4pda.to](https://4pda.to/)
+<p align="center" width="100%">
+  <img width="25%" src="ForPDA/images/logo.png">
+</p>  
+<h3><p align="center">Любительский iOS клиент <a href="https://4pda.to/">4pda.to</a></p></h3>
 
 ## Скриншоты
-![Скриншоты](images/screenshots.png)
+![Скриншоты](ForPDA/images/screenshots.png)
 
 ## Установка
 - Минимальная поддерживаемая версия: iOS 16
