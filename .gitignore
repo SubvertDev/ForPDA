@@ -6,6 +6,7 @@ fastlane/Credentials.json
 build/
 swiftlint/build_phases/
 SourcePackages/
+.swiftpm
 
 ### macOS ###
 # General
