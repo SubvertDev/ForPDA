@@ -7,15 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B8133B4B2C7FA3C800506430 /* Packages in Resources */ = {isa = PBXBuildFile; fileRef = B8133B4A2C7FA3C800506430 /* Packages */; };
 		B84BC1E52C77DA4000C38BB2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */; };
 		B88BDA882BF6BC0200E17268 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B88BDA872BF6BC0200E17268 /* Assets.xcassets */; };
+		B894CE162C7FB54700D0D18B /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = B894CE152C7FB54700D0D18B /* AppFeature */; };
 		B8AB63C02AA49F6100F2CEFF /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */; };
 		B8AB63C32AA49F6100F2CEFF /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C22AA49F6100F2CEFF /* _locales */; };
 		B8AB63C52AA49F6100F2CEFF /* images in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C42AA49F6100F2CEFF /* images */; };
 		B8AB63C72AA49F6100F2CEFF /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63C62AA49F6100F2CEFF /* manifest.json */; };
 		B8AB63CB2AA49F6100F2CEFF /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = B8AB63CA2AA49F6100F2CEFF /* content.js */; };
 		B8AB63D52AA49F6100F2CEFF /* OpenInAppExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		B8CC72E02BF8FE660071A67A /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = B8CC72DF2BF8FE660071A67A /* AppFeature */; };
 		B8DEB2222BAB81CC00AD97C6 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DEB2212BAB81CC00AD97C6 /* App.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,10 +45,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B8133B4A2C7FA3C800506430 /* Packages */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Packages; sourceTree = "<group>"; };
 		B82B2EFE2A8942E900CB067C /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B88BDA872BF6BC0200E17268 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B8A3727C2BC5ACFC00432F7D /* ForPDA */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = ForPDA; path = ..; sourceTree = "<group>"; };
 		B8AB63BD2AA49F6100F2CEFF /* OpenInAppExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OpenInAppExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8AB63BF2AA49F6100F2CEFF /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		B8AB63C22AA49F6100F2CEFF /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; path = _locales; sourceTree = "<group>"; };
@@ -71,7 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B8CC72E02BF8FE660071A67A /* AppFeature in Frameworks */,
+				B894CE162C7FB54700D0D18B /* AppFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,7 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				B8D351F7293CABB6008A84EA /* App */,
-				B8A3727C2BC5ACFC00432F7D /* ForPDA */,
+				B8133B4A2C7FA3C800506430 /* Packages */,
 				B8AB63BE2AA49F6100F2CEFF /* OpenInAppExtension */,
 				B8D351F6293CABB6008A84EA /* Products */,
 				B8DEB2282BAB839300AD97C6 /* Frameworks */,
@@ -174,7 +175,7 @@
 			);
 			name = ForPDA;
 			packageProductDependencies = (
-				B8CC72DF2BF8FE660071A67A /* AppFeature */,
+				B894CE152C7FB54700D0D18B /* AppFeature */,
 			);
 			productName = ForPDA;
 			productReference = B8D351F5293CABB6008A84EA /* ForPDA.app */;
@@ -234,6 +235,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8133B4B2C7FA3C800506430 /* Packages in Resources */,
 				B84BC1E52C77DA4000C38BB2 /* LaunchScreen.storyboard in Resources */,
 				B88BDA882BF6BC0200E17268 /* Assets.xcassets in Resources */,
 			);
@@ -629,7 +631,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B8CC72DF2BF8FE660071A67A /* AppFeature */ = {
+		B894CE152C7FB54700D0D18B /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
 		};

@@ -7,10 +7,10 @@
 SRC_ROOT=$(git rev-parse --show-toplevel)
 
 # Create a directory where we store the input/output files. This should be a folder that is ignored by git.
-mkdir -p "$SRC_ROOT/swiftlint/build_phases"
+mkdir -p "$SRC_ROOT/Scripts/build_phases"
 
 # Path to this new folder where we generate the input & output files
-BUILD_FOLDER="$SRC_ROOT/swiftlint/build_phases"
+BUILD_FOLDER="$SRC_ROOT/Scripts/build_phases"
 
 # The path of the result file where we save the current git diff
 RESULT_FILE=$BUILD_FOLDER/git_diff_result
@@ -41,7 +41,7 @@ echo "Generating new source file list"
 
 # List of folders in which we generate filelist for Swiftlint (e.g. only .swift)
 swiftlint_dirs=(
-    'ForPDA'
+    'Packages'
 )
 
 for dir in "${swiftlint_dirs[@]}"

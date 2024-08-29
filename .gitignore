@@ -4,7 +4,7 @@ Secrets.swift
 *.p8
 fastlane/Credentials.json
 build/
-swiftlint/build_phases/
+Scripts/build_phases/
 SourcePackages/
 .swiftpm
 

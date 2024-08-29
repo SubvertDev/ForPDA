@@ -31,7 +31,7 @@ let package = Package(
         .library(name: "TCAExtensions", targets: ["TCAExtensions"])
     ],
     dependencies: [
-        .package(path: "../PDAPI"),
+        .package(path: "../../PDAPI"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.13.1"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
