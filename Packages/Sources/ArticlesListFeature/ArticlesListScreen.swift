@@ -21,47 +21,22 @@ public struct ArticlesListScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
-                List {
-                    ForEach(store.articles, id: \.self) { article in
-                        WithPerceptionTracking {
+                ArticlesList()
+                    .navigationTitle(Text("Articles", bundle: .module))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .refreshable {
+                        await store.send(.onRefresh).finish()
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
                             Button {
-                                store.send(.articleTapped(article))
+                                store.send(.menuTapped)
                             } label: {
-                                ArticleRowView(article: article)
-                                    .pdaContextMenu(article: article, store: store)
-                                    .onAppear {
-                                        store.send(.onArticleAppear(article))
-                                    }
+                                Image(systemSymbol: .listDash)
+                                    .foregroundStyle(Color(.label))
                             }
-                            .listSectionSeparator(.hidden)
                         }
                     }
-                    
-                    if !store.isLoading && !store.articles.isEmpty {
-                        LoadMoreView()
-                            .onAppear {
-                                store.send(.onLoadMoreAppear)
-                            }
-                    }
-                }
-                .listStyle(.plain)
-                .scrollDisabled(store.isScrollDisabled)
-                .scrollIndicators(.hidden) // TODO: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
-                .navigationTitle(Text("Articles", bundle: .module))
-                .navigationBarTitleDisplayMode(.inline)
-                .refreshable {
-                    await store.send(.onRefresh).finish()
-                }
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            store.send(.menuTapped)
-                        } label: {
-                            Image(systemSymbol: .listDash)
-                                .foregroundStyle(Color(.label))
-                        }
-                    }
-                }
                 
                 if store.isLoading {
                     ModernCircularLoader()
@@ -83,7 +58,41 @@ public struct ArticlesListScreen: View {
             }
         }
     }
+    
+    // MARK: Articles List
+    
+    @ViewBuilder
+    private func ArticlesList() -> some View {
+        List {
+            ForEach(store.articles, id: \.self) { article in
+                WithPerceptionTracking {
+                    Button {
+                        store.send(.articleTapped(article))
+                    } label: {
+                        ArticleRowView(article: article)
+                            .pdaContextMenu(article: article, store: store)
+                            .onAppear {
+                                store.send(.onArticleAppear(article))
+                            }
+                    }
+                    .listSectionSeparator(.hidden)
+                }
+            }
+            
+            if !store.isLoading && !store.articles.isEmpty {
+                LoadMoreView()
+                    .onAppear {
+                        store.send(.onLoadMoreAppear)
+                    }
+            }
+        }
+        .listStyle(.plain)
+        .scrollDisabled(store.isScrollDisabled)
+        .scrollIndicators(.hidden) // TODO: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
+    }
 }
+
+// MARK: - Previews
 
 #Preview {
     NavigationStack {
