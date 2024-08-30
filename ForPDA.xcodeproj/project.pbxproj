@@ -250,7 +250,7 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"$(SRCROOT)/swiftlint/build_phases/ForPDA_swiftlint.xcfilelist",
+				"$(SRCROOT)/Scripts/build_phases/ForPDA_swiftlint.xcfilelist",
 			);
 			inputPaths = (
 			);
@@ -258,7 +258,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/swiftlint/build_phases/ForPDA_swiftlint_static_output\n",
+				"$(SRCROOT)/Scripts/build_phases/ForPDA_swiftlint_static_output\n",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -522,6 +522,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.6.0;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -572,6 +573,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.6.0;
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
