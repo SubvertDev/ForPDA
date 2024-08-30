@@ -250,7 +250,7 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"$(SRCROOT)/Scripts/build_phases/ForPDA_swiftlint.xcfilelist",
+				"$(SRCROOT)/Scripts/build_phases/Packages_swiftlint.xcfilelist",
 			);
 			inputPaths = (
 			);
@@ -258,7 +258,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/Scripts/build_phases/ForPDA_swiftlint_static_output\n",
+				"$(SRCROOT)/Scripts/build_phases/Packages_swiftlint_static_output\n",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
