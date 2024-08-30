@@ -229,6 +229,12 @@ for target in package.targets where target.type != .binary {
     
     #if !hasFeature(ExistentialAny)
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
+    swiftSettings.append(
+        .unsafeFlags(["-Xfrontend",
+                      "-warn-long-expression-type-checking=100",
+                      "-Xfrontend",
+                      "-warn-long-expression-type-checking=100"])
+    )
     #endif
     
     target.swiftSettings = swiftSettings
