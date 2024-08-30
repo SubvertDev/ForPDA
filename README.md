@@ -1,10 +1,10 @@
 <p align="center" width="100%">
-  <img width="25%" src="ForPDA/images/logo.png">
+  <img width="25%" src="Images/logo.png">
 </p>  
 <h3><p align="center">Неофициальный iOS клиент <a href="https://4pda.to/">4pda.to</a></p></h3>
 
 ## Скриншоты
-![Скриншоты](ForPDA/images/screenshots.png)
+![Скриншоты](Images/screenshots.png)
 
 ## Установка
 - Минимальная поддерживаемая версия: iOS 16
@@ -37,7 +37,7 @@
 ‼️ **НА ДАННЫЙ МОМЕНТ ПРОЕКТ НЕВОЗМОЖНО СОБРАТЬ ИЗ-ЗА ПРИВАТНОЙ ЗАВИСИМОСТИ** ‼️
 - Swift 6 + SwiftUI 5 + Xcode 16
 - Модульная архитектура с использованием [TCA](https://github.com/pointfreeco/swift-composable-architecture)
-- Для запуска Mixpanel/Sentry необходимо переименовать SecretsExample в Secrets и вписать свои данные
+- Для запуска Mixpanel/Sentry необходимо вписать свои ключи в Secrets.swift
 
 ## Благодарности
 - [Xialtal](https://github.com/Xialtal) - за неоценимый вклад в развитие серверной части
