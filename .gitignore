@@ -1,6 +1,6 @@
 ## CUSTOM
 
-Secrets.swift
+# Secrets.swift
 *.p8
 Credentials.json
 build/
