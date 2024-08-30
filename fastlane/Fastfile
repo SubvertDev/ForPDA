@@ -90,9 +90,13 @@ platform :ios do
             include_sources: true
         )
 
-        upload_to_testflight(
-            api_key_path: "Fastlane/Credentials.json"
+        app_store_connect_api_key(
+            key_id: "X36R58TMRJ",
+            issuer_id: "814e488e-06ba-40ba-a16c-a63e7164023f",
+            key_filepath: "Fastlane/AuthKey_X36R58TMRJ.p8"
         )
+
+        upload_to_testflight
 
         notification(
             subtitle: "Uploading Finished!",
