@@ -1,0 +1,56 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Not yet implemented :(" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Еще не сделано :("
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Something went wrong while trying to connect to 4pda server...\nPlease try again later!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так во время попытки соединения с 4pda...\nПопробуйте попозже!"
+          }
+        }
+      }
+    },
+    "Something went wrong... Try again later!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так.. Попробуйте попозже!"
+          }
+        }
+      }
+    },
+    "Whoops!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс!"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

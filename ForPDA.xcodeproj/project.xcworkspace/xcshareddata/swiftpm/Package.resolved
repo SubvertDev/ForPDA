@@ -1,31 +1,40 @@
 {
-  "originHash" : "da6aaaa5e6af09cd947ce565a42385813d6c5e4797c6c3d03d82224e49ab6df3",
+  "originHash" : "4c9a75f0d85f113c19cdb7c9692bd05aa3e3975c9f9dbfa696fbda990b976c9b",
   "pins" : [
     {
-      "identity" : "factory",
+      "identity" : "alerttoast",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/hmlongco/Factory",
+      "location" : "https://github.com/SubvertDev/AlertToast.git",
       "state" : {
-        "revision" : "8ca11a7bd1ede031e8e6d7a912bb116e2e43961b",
-        "version" : "2.3.1"
+        "branch" : "d0f7d6b",
+        "revision" : "d0f7d6bafd3e8ffe99afba4995822d24aee044fb"
       }
     },
     {
-      "identity" : "marqueelabel",
+      "identity" : "cache",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/cbpowell/MarqueeLabel.git",
+      "location" : "https://github.com/hyperoslo/Cache.git",
       "state" : {
-        "revision" : "ae3cf7c647dd7f67f1946658285f5f0ce2476caf",
-        "version" : "4.4.0"
+        "revision" : "24e47109e31b2031cb26e25cc1b81b607496066c",
+        "version" : "7.4.0"
+      }
+    },
+    {
+      "identity" : "combine-schedulers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/combine-schedulers",
+      "state" : {
+        "revision" : "9fa31f4403da54855f1e2aeaeff478f4f0e40b13",
+        "version" : "1.0.2"
       }
     },
     {
       "identity" : "mixpanel-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mixpanel/mixpanel-swift",
+      "location" : "https://github.com/mixpanel/mixpanel-swift.git",
       "state" : {
-        "revision" : "ecd44ed6af66d45a50e62401228430c54c60dd26",
-        "version" : "4.2.0"
+        "revision" : "48d6668ceaaefc338f94e2b084c3cf77b90182f8",
+        "version" : "4.3.0"
       }
     },
     {
@@ -33,26 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke.git",
       "state" : {
-        "revision" : "3f666f120b63ea7de57d42e9a7c9b47f8e7a290b",
-        "version" : "12.1.6"
-      }
-    },
-    {
-      "identity" : "r.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mac-cain13/R.swift",
-      "state" : {
-        "revision" : "a76220f2c4b73bdda670f4a318c6ec983399ac6d",
-        "version" : "7.4.0"
-      }
-    },
-    {
-      "identity" : "route-composer",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ekazaev/route-composer",
-      "state" : {
-        "revision" : "54f23cdd9b56099a5c2e27b1a8b475a0ee702833",
-        "version" : "2.10.5"
+        "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
+        "version" : "12.8.0"
       }
     },
     {
@@ -60,62 +51,134 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "c60f232c96264c3bea75bc0b81e6126b2f7475ee",
-        "version" : "8.15.2"
+        "revision" : "5575af93efb776414f243e93d6af9f6258dc539a",
+        "version" : "8.36.0"
       }
     },
     {
       "identity" : "sfsafesymbols",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SFSafeSymbols/SFSafeSymbols",
+      "location" : "https://github.com/SFSafeSymbols/SFSafeSymbols.git",
       "state" : {
-        "revision" : "7cca2d60925876b5953a2cf7341cd80fbeac983c",
-        "version" : "4.1.1"
+        "revision" : "e2e28f4e56e1769c2ec3c61c9355fc64eb7a535a",
+        "version" : "5.3.0"
       }
     },
     {
-      "identity" : "snapkit",
+      "identity" : "skeletonui",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "location" : "https://github.com/CSolanaM/SkeletonUI.git",
       "state" : {
-        "revision" : "f222cbdf325885926566172f6f5f06af95473158",
-        "version" : "5.6.0"
+        "revision" : "f025e9ba5d051374d7344efa8859df5b9399a181",
+        "version" : "2.0.2"
       }
     },
     {
-      "identity" : "swift-argument-parser",
+      "identity" : "swift-case-paths",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser",
+      "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "fee6933f37fde9a5e12a1e4aeaa93fe60116ff2a",
-        "version" : "1.2.2"
+        "revision" : "71344dd930fde41e8f3adafe260adcbb2fc2a3dc",
+        "version" : "1.5.4"
       }
     },
     {
-      "identity" : "swiftmessages",
+      "identity" : "swift-clocks",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftKickMobile/SwiftMessages",
+      "location" : "https://github.com/pointfreeco/swift-clocks",
       "state" : {
-        "revision" : "62e12e138fc3eedf88c7553dd5d98712aa119f40",
-        "version" : "9.0.9"
+        "revision" : "b9b24b69e2adda099a1fa381cda1eeec272d5b53",
+        "version" : "1.0.5"
       }
     },
     {
-      "identity" : "swiftrichstring",
+      "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/malcommac/SwiftRichString.git",
+      "location" : "https://github.com/apple/swift-collections",
       "state" : {
-        "revision" : "9bf4b5af6bb4386865636fc504d6c588c2b65040",
-        "version" : "3.7.2"
+        "revision" : "9bf03ff58ce34478e66aaee630e491823326fd06",
+        "version" : "1.1.3"
       }
     },
     {
-      "identity" : "swiftsoup",
+      "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/scinfu/SwiftSoup.git",
+      "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "8b6cf29eead8841a1fa7822481cb3af4ddaadba6",
-        "version" : "2.6.1"
+        "revision" : "0d8980f5bcc5fe6941f1788758667ff2b8c10f03",
+        "version" : "1.14.0"
+      }
+    },
+    {
+      "identity" : "swift-concurrency-extras",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
+      "state" : {
+        "revision" : "bb5059bde9022d69ac516803f4f227d8ac967f71",
+        "version" : "1.1.0"
+      }
+    },
+    {
+      "identity" : "swift-custom-dump",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-custom-dump",
+      "state" : {
+        "revision" : "82645ec760917961cfa08c9c0c7104a57a0fa4b1",
+        "version" : "1.3.3"
+      }
+    },
+    {
+      "identity" : "swift-dependencies",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-dependencies",
+      "state" : {
+        "revision" : "3ef38bb702a1a2f39c7e19fc0578403b8ee52b17",
+        "version" : "1.3.9"
+      }
+    },
+    {
+      "identity" : "swift-identified-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-identified-collections",
+      "state" : {
+        "revision" : "2f5ab6e091dd032b63dacbda052405756010dc3b",
+        "version" : "1.1.0"
+      }
+    },
+    {
+      "identity" : "swift-navigation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-navigation",
+      "state" : {
+        "revision" : "e834b3760731160d7d448509ee6a1408c8582a6b",
+        "version" : "2.2.0"
+      }
+    },
+    {
+      "identity" : "swift-perception",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-perception",
+      "state" : {
+        "revision" : "bc67aa8e461351c97282c2419153757a446ae1c9",
+        "version" : "1.3.5"
+      }
+    },
+    {
+      "identity" : "swift-snapshot-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
+      "state" : {
+        "revision" : "6d932a79e7173b275b96c600c86c603cf84f153c",
+        "version" : "1.17.4"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax",
+      "state" : {
+        "revision" : "515f79b522918f83483068d99c68daeb5116342d",
+        "version" : "600.0.0-prerelease-2024-08-20"
       }
     },
     {
@@ -123,17 +186,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kirualex/SwiftyGif.git",
       "state" : {
-        "revision" : "d6d26061d6553a493781ad3df4a8e275c43fc373",
-        "version" : "5.4.4"
+        "revision" : "4430cbc148baa3907651d40562d96325426f409a",
+        "version" : "5.4.5"
       }
     },
     {
-      "identity" : "xcodeedit",
+      "identity" : "xctest-dynamic-overlay",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/tomlokhorst/XcodeEdit",
+      "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "cd466d6e8c5ffd2f2b61165d37b0646f09068e1e",
-        "version" : "2.9.0"
+        "revision" : "96beb108a57f24c8476ae1f309239270772b2940",
+        "version" : "1.2.5"
       }
     },
     {
@@ -141,8 +204,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SvenTiigi/YouTubePlayerKit.git",
       "state" : {
-        "revision" : "94b5739d32f0108f1820091e6955d544a0363fad",
-        "version" : "1.5.4"
+        "revision" : "fe1c1ec340f6d79866131432ecaa190fd6bbc4cb",
+        "version" : "1.9.0"
       }
     }
   ],

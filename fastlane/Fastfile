@@ -30,10 +30,6 @@ platform :ios do
         )
         increment_version_number_in_xcodeproj(
             version_number: version,
-            target: 'ShareExtension'
-        )
-        increment_version_number_in_xcodeproj(
-            version_number: version,
             target: 'OpenInAppExtension'
         )
 
@@ -55,10 +51,6 @@ platform :ios do
         )
         increment_build_number_in_xcodeproj(
             build_number: build,
-            target: 'ShareExtension'
-        )
-        increment_build_number_in_xcodeproj(
-            build_number: build,
             target: 'OpenInAppExtension'
         )
         
@@ -67,10 +59,6 @@ platform :ios do
         increment_version_number_in_xcodeproj(
             version_number: version,
             target: 'ForPDA'
-        )
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'ShareExtension'
         )
         increment_version_number_in_xcodeproj(
             version_number: version,
@@ -87,31 +75,33 @@ platform :ios do
 	    export_options: {
 	    provisioningProfiles: { 
 		"com.subvert.forpda" => "com.subvert.forpda AppStore",
-		"com.subvert.forpda.OpenInAppExtension" => "com.subvert.forpda.OpenInAppExtension AppStore",
-		"com.subvert.forpda.ShareExtension" => "com.subvert.forpda.ShareExtension AppStore"
+		"com.subvert.forpda.OpenInAppExtension" => "com.subvert.forpda.OpenInAppExtension AppStore"
       	        }
 	    }
         )
 
-        sentry_auth_token = get_xcconfig_value(
-            path: 'ForPDA/Secrets.xcconfig',
-            name: 'SENTRY_DSYM_TOKEN'
-        )
-        sentry_upload_dif(
-            auth_token: sentry_auth_token,
+        swift_file_path = "../Packages/Sources/AnalyticsClient/Secrets.swift"
+        swift_file_content = File.read(swift_file_path)
+        sentry_dsym_token = swift_file_content[/let sentryDSYMToken = "(.*?)"/, 1]
+        sentry_debug_files_upload(
+            auth_token: sentry_dsym_token,
             org_slug: 'forpda',
             project_slug: 'apple-ios',
             include_sources: true
         )
 
-        upload_to_testflight(
-            api_key_path: "fastlane/Credentials.json"
+        app_store_connect_api_key(
+            key_id: "X36R58TMRJ",
+            issuer_id: "814e488e-06ba-40ba-a16c-a63e7164023f",
+            key_filepath: "Fastlane/AuthKey_X36R58TMRJ.p8"
         )
+
+        upload_to_testflight
 
         notification(
             subtitle: "Uploading Finished!",
             message: "Build is on TestFlight",
-            content_image: "images/logo.png"
+            content_image: "Images/logo.png"
         )
 
     end
@@ -120,7 +110,7 @@ platform :ios do
         notification(
             subtitle: "Error while executing #{lane}!",
             message: "#{exception}",
-            content_image: "images/logo.png"
+            content_image: "Images/logo.png"
         )
     end
 
