@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import PersistenceKeys
 import Mixpanel
 import Sentry
 import OSLog
@@ -14,6 +15,8 @@ import OSLog
 @DependencyClient
 public struct AnalyticsClient: Sendable {
     public var configure: @Sendable () -> Void
+    public var identify: @Sendable (_ distinctId: String) -> Void
+    public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
     public var capture: @Sendable (any Error) -> Void
 }
@@ -36,8 +39,16 @@ extension AnalyticsClient: DependencyKey {
                 configureMixpanel(id: analyticsId)
                 configureSentry(id: analyticsId)
             },
+            identify: { id in
+                logger.info("Identifying user with id: \(id)")
+                Mixpanel.mainInstance().identify(distinctId: id)
+            },
+            logout: {
+                logger.info("Analytics has been reset after logout")
+                Mixpanel.mainInstance().reset()
+            },
             log: { event in
-                logger.info("\(event.name) | \(event.properties ?? [:])")
+                logger.info("\(event.name) \(event.properties.map { "(\($0))" } ?? "")")
                 Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
             },
             capture: { error in
@@ -49,6 +60,8 @@ extension AnalyticsClient: DependencyKey {
     
     public static let previewValue = Self(
         configure: {},
+        identify: { _ in },
+        logout: {},
         log: { event in
             if let properties = event.properties {
                 print("[Analytics] \(event.name) (\(properties))")
@@ -70,7 +83,6 @@ extension AnalyticsClient {
             trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
             optOutTrackingByDefault: isDebug
         )
-        Mixpanel.mainInstance().userId = id
     }
     
     private static func configureSentry(id: String) {
@@ -79,6 +91,7 @@ extension AnalyticsClient {
             options.debug = isDebug
             options.enabled = !isDebug
             options.tracesSampleRate = 1.0
+            options.profilesSampleRate = 1.0
             options.diagnosticLevel = .warning
             options.attachScreenshot = true
             options.attachViewHierarchy = true

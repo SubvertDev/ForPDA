@@ -15,7 +15,7 @@ public enum MenuEvent: Event {
     case changelogTelegramTapped
     case chatTelegramTapped
     case githubTapped
-    case _userSessionUpdated(Int?)
+    case userSessionUpdated(Int?)
     
     public var name: String {
         return "Menu " + eventName(for: self).inProperCase
@@ -23,7 +23,7 @@ public enum MenuEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let ._userSessionUpdated(userId):
+        case let .userSessionUpdated(userId):
             if let userId {
                 return ["userId": String(userId)]
             } else {

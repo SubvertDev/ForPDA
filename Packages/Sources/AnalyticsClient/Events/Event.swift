@@ -12,7 +12,7 @@ public protocol Event {
     var properties: [String: String]? { get }
 }
 
-// RELEASE: Test if this works accurately
+// TODO: Test if this works accurately
 public func eventName(for object: Any) -> String {
     if let string = Mirror(reflecting: object).children.first?.label {
         return string.inProperCase
@@ -21,7 +21,7 @@ public func eventName(for object: Any) -> String {
     }
 }
 
-public extension String { // RELEASE: Move public or make private
+extension String { 
     var inProperCase: String {
         // Regular expressions to match different case styles
         let camelCasePattern = "([a-z0-9])([A-Z])"

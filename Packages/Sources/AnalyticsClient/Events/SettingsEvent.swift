@@ -14,7 +14,7 @@ public enum SettingsEvent: Event {
     case copyDebugIdTapped
     case clearCacheTapped
     case checkVersionsTapped
-    case _somethingWentWrong(any Error)
+    case somethingWentWrong(any Error)
     
     public var name: String {
         return "Settings " + eventName(for: self).inProperCase
@@ -22,7 +22,7 @@ public enum SettingsEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let ._somethingWentWrong(error):
+        case let .somethingWentWrong(error):
             return ["error": error.localizedDescription]
         default:
             return nil

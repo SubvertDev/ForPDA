@@ -34,6 +34,7 @@ extension AuthFeature {
                     
                 case let .delegate(.loginSuccess(userId: userId)):
                     analyticsClient.log(AuthEvent.loginSuccess(userId))
+                    analyticsClient.identify(String(userId))
                 }
                 return .none
             }

@@ -162,6 +162,7 @@ let package = Package(
         .target(
             name: "AnalyticsClient",
             dependencies: [
+                "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Mixpanel", package: "mixpanel-swift"),
                 .product(name: "Sentry", package: "sentry-cocoa")

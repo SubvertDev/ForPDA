@@ -25,6 +25,7 @@ extension ProfileFeature {
                     
                 case .logoutButtonTapped:
                     analyticsClient.log(ProfileEvent.logoutTapped)
+                    analyticsClient.logout()
                     
                 case let ._userResponse(.success(user)):
                     analyticsClient.log(ProfileEvent.userLoaded(user.id))
