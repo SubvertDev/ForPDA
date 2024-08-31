@@ -10,6 +10,7 @@ import Foundation
 public enum ProfileEvent: Event {
     case logoutTapped
     case userLoaded(Int)
+    case userLoadingFailed
     
     public var name: String {
         return "Profile " + eventName(for: self).inProperCase

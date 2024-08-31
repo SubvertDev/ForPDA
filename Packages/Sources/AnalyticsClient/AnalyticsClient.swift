@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import PersistenceKeys
+import Models
 import Mixpanel
 import Sentry
 import OSLog
@@ -15,7 +16,7 @@ import OSLog
 @DependencyClient
 public struct AnalyticsClient: Sendable {
     public var configure: @Sendable () -> Void
-    public var identify: @Sendable (_ distinctId: String) -> Void
+    public var identify: @Sendable (_ id: String) -> Void
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
     public var capture: @Sendable (any Error) -> Void
@@ -83,6 +84,26 @@ extension AnalyticsClient {
             trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
             optOutTrackingByDefault: isDebug
         )
+        
+        @Dependency(\.analyticsClient) var analytics
+        @Shared(.userSession) var userSession
+        
+        if let mixpanelUserId = Mixpanel.mainInstance().userId {
+            if let userId = userSession?.userId {
+                if String(userId) != mixpanelUserId {
+                    logger.warning("Mixpanel user ID mismatch, changing to \(userId)")
+                    analytics.identify(id: String(userId))
+                } else {
+                    logger.info("Analytics configured successfully")
+                }
+            } else {
+                logger.warning("Mixpanel user ID found without user session, logging out")
+                analytics.logout()
+            }
+        } else {
+            logger.info("Mixpanel user ID not found, defaulting to \(id)")
+            Mixpanel.mainInstance().distinctId = id
+        }
     }
     
     private static func configureSentry(id: String) {

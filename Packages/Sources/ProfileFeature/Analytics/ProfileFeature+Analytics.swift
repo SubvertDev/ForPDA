@@ -20,7 +20,7 @@ extension ProfileFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .onTask, .alert, ._userResponse(.failure):
+                case .onTask, .alert:
                     break
                     
                 case .logoutButtonTapped:
@@ -29,6 +29,9 @@ extension ProfileFeature {
                     
                 case let ._userResponse(.success(user)):
                     analyticsClient.log(ProfileEvent.userLoaded(user.id))
+                    
+                case ._userResponse(.failure):
+                    analyticsClient.log(ProfileEvent.userLoadingFailed)
                 }
                 return .none
             }

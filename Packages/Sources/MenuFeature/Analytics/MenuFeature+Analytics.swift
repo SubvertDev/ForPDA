@@ -20,11 +20,8 @@ extension MenuFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .onTask, .alert, .notImplementedFeatureTapped, ._subscribeToUpdates, ._loadUserResult:
+                case .onTask, .alert, .notImplementedFeatureTapped, ._subscribeToUpdates, ._loadUserResult, .profileTapped:
                     break
-                    
-                case .profileTapped:
-                    analyticsClient.log(MenuEvent.profileTapped)
                     
                 case .settingsTapped:
                     analyticsClient.log(MenuEvent.settingsTapped)

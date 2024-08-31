@@ -75,7 +75,7 @@ public struct ProfileFeature: Sendable {
             case .onTask:
                 return .run { [userId = state.userId] send in
                     do {
-                        for try await user in try await apiClient.getUser(userId: userId) {
+                        for try await user in try await apiClient.getUser(userId) {
                             await send(._userResponse(.success(user)))
                         }
                     } catch {
