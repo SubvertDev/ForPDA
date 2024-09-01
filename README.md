@@ -1,38 +1,48 @@
-# ForPDA
-![Лого](images/logo.png)  
-Альтернативный клиент [4pda.to](https://4pda.to/)
+<p align="center" width="100%">
+  <img width="25%" src="Images/logo.png">
+</p>  
+<h3><p align="center">Неофициальный iOS клиент <a href="https://4pda.to/">4pda.to</a></p></h3>
 
 ## Скриншоты
-![Скриншоты](images/screenshots.png)
+![Скриншоты](Images/screenshots.png)
 
-## TestFlight
-Актуальная ссылка на [TestFlight](https://testflight.apple.com/join/CuI3nlN2)
+## Установка
+- Минимальная поддерживаемая версия: iOS 16
+- Актуальная ссылка на TestFlight: [Стабильная](https://testflight.apple.com/join/CuI3nlN2) / [Бета](https://testflight.apple.com/join/bE3XxjQ0)
+- Также каждый релиз имеет приложенный к нему .ipa файл ([актуальная версия](https://github.com/SubvertDev/ForPDA/releases/latest))
 
-## Требования и установка
-- iOS 15.0+ / macOS 14.0+
-- Xcode 15.0+ / Swift 5.9+
-- Скачать и запустить проект, зависимости загрузятся автоматически через SPM
-- (Опционально) Для запуска сервисов Sentry/Mixpanel переименовать SecretsExample.xcconfig в Secrets.xcconfig и заменить все значения на свои
+## Функционал
+- [x] Статьи
+  - [x] Комментарии
+  - [ ] Ответы, лайки, жалобы
+- [x] Профили (частично)
+- [ ] Форум
+- [ ] Избранное, закладки, история
+- [ ] QMS, упоминания, уведомления
 
-## Используемые библиотеки
-- [Fastlane](https://github.com/fastlane/fastlane) - автоматизация сборки и выгрузки на TestFlight
-- [Mixpanel](https://github.com/mixpanel/mixpanel-swift) - аналитика
-- [Sentry](https://github.com/getsentry/sentry-cocoa) - мониторинг ошибок
-- [SwiftSoup](https://github.com/scinfu/SwiftSoup) - парсинг HTML страниц
-- [SwitchRichString](https://github.com/malcommac/SwiftRichString) - преобразование HTML в TextView
-- [RouteComposer](https://github.com/ekazaev/route-composer) - навигация
-- [Rswift](https://github.com/mac-cain13/R.swift) - кодогенерация текста/картинок/шрифтов/цветов
-- [Factory](https://github.com/hmlongco/Factory) - инъекция зависимостей
-- [Nuke](https://github.com/kean/Nuke) - загрузка и кеширование изображений
-- [SnapKit](https://github.com/SnapKit/SnapKit) - для упрощения работы с констреинтами
-- [SwiftMessages](https://github.com/SwiftKickMobile/SwiftMessages) - всплывающие окна
-- [SwipeCellKit](https://github.com/SwipeCellKit/SwipeCellKit) - отображение комментариев
-- [SwiftyGif](https://github.com/kirualex/SwiftyGif) - отображение гифок
-- [YouTubePlayerKit](https://github.com/SvenTiigi/YouTubePlayerKit) - отображение видео с YouTube
-- [SFSafeSymbols](https://github.com/SFSafeSymbols/SFSafeSymbols) - типобезопасные SF символы
+## Чаты по приложению
+Обсуждение в телеграме - [ссылка](https://t.me/forpda_ios_chat)  
+Список изменений в телеграме - [ссылка](https://t.me/forpda_ios)
+
+## Дорожная карта на ближайшие версии (может меняться)
+**0.7** - Взаимодействие с комментариями (ответы/лайки/жалобы)  
+**0.8** - Упрощенный форум  
+**0.9** - Избранное, закладки, история  
+**0.10** - Упоминания, уведомления  
+**0.11** - Доработка форума  
+**0.12** - QMS  
+**1.0** - ???
+
+## Техническая часть
+‼️ **НА ДАННЫЙ МОМЕНТ ПРОЕКТ НЕВОЗМОЖНО СОБРАТЬ ИЗ-ЗА ПРИВАТНОЙ ЗАВИСИМОСТИ** ‼️
+- Swift 6 + SwiftUI 5 + Xcode 16
+- Модульная архитектура с использованием [TCA](https://github.com/pointfreeco/swift-composable-architecture)
+- Для запуска Mixpanel/Sentry необходимо вписать свои ключи в Secrets.swift
 
 ## Благодарности
-- [Tatiana](https://github.com/tikh-hehe) - за помощь с доработкой функционала
+- [Xialtal](https://github.com/Xialtal) - за неоценимый вклад в развитие серверной части
+- [DrozD-ios-dev](https://github.com/DrozdD-ios-dev) - за исправление багов
+- [tikh-hehe](https://github.com/tikh-hehe) - за помощь с доработкой функционала
 
 ## Лицензия
-GPL v3 (C) 2022-2023 [Ilia Lubianoi](https://github.com/SubvertDev)
+GPL v3 (C) 2022-2024 [Ilia Lubianoi](https://github.com/SubvertDev)
