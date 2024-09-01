@@ -65,9 +65,12 @@ platform :ios do
             target: 'OpenInAppExtension'
         )
 
+	output_name = "ForPDA_#{version}"
+
         build_app(
             scheme: "ForPDA",
             output_directory: "build/",
+	    output_name: output_name,
             cloned_source_packages_path: "SourcePackages",
 	    silent: true,
 	    suppress_xcode_output: true,
