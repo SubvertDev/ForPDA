@@ -52,6 +52,7 @@ let package = Package(
             dependencies: [
                 "ArticlesListFeature",
                 "ArticleFeature",
+                "ForumFeature",
                 "MenuFeature",
                 "AuthFeature",
                 "ProfileFeature",
@@ -91,6 +92,19 @@ let package = Package(
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit")
+            ]
+        ),
+        .target(
+            name: "ForumFeature",
+            dependencies: [
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "CacheClient",
+                "AnalyticsClient",
+                "ParsingClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
             ]
         ),
         .target(

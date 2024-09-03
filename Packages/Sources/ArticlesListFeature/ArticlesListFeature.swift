@@ -61,7 +61,6 @@ public struct ArticlesListFeature: Sendable {
         case binding(BindingAction<State>) // TODO: Remove
         case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // TODO: Should it be a delegate?
         case linkShared(Bool, URL)
-        case menuTapped
         case onFirstAppear
         case onRefresh
         case onArticleAppear(ArticlePreview)
@@ -84,7 +83,7 @@ public struct ArticlesListFeature: Sendable {
             switch action {
                 
                 // MARK: External
-            case .articleTapped, .binding, .menuTapped, .destination:
+            case .articleTapped, .binding, .destination:
                 return .none
                 
             case .cellMenuOpened(let article, let action):

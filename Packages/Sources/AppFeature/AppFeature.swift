@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
+import ForumFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
@@ -24,9 +25,18 @@ public struct AppFeature: Sendable {
     // MARK: - Path
     
     @Reducer(state: .equatable)
-    public enum Path {
+    public enum ArticlesPath {
         case article(ArticleFeature)
-        case menu(MenuFeature)
+        case profile(ProfileFeature)
+    }
+    
+    @Reducer(state: .equatable)
+    public enum ForumPath {
+        
+    }
+    
+    @Reducer(state: .equatable)
+    public enum MenuPath {
         case auth(AuthFeature)
         case profile(ProfileFeature)
         case settings(SettingsFeature)
@@ -36,9 +46,15 @@ public struct AppFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var path: StackState<Path.State>
         public var appDelegate: AppDelegateFeature.State
+
+        public var articlesPath: StackState<ArticlesPath.State>
+        public var forumPath: StackState<ForumPath.State>
+        public var menuPath: StackState<MenuPath.State>
+        
         public var articlesList: ArticlesListFeature.State
+        public var forum: ForumFeature.State
+        public var menu: MenuFeature.State
         
         public var showToast: Bool
         public var toast: ToastInfo
@@ -50,15 +66,26 @@ public struct AppFeature: Sendable {
         }
         
         public init(
-            path: StackState<Path.State> = StackState(),
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
+            articlesPath: StackState<ArticlesPath.State> = StackState(),
+            forumPath: StackState<ForumPath.State> = StackState(),
+            menuPath: StackState<MenuPath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
+            forum: ForumFeature.State = ForumFeature.State(),
+            menu: MenuFeature.State = MenuFeature.State(),
             showToast: Bool = false,
             toast: ToastInfo = ToastInfo(screen: .articlesList, message: "")
         ) {
-            self.path = path
             self.appDelegate = appDelegate
+
+            self.articlesPath = articlesPath
+            self.forumPath = forumPath
+            self.menuPath = menuPath
+            
             self.articlesList = articlesList
+            self.forum = forum
+            self.menu = menu
+            
             self.showToast = showToast
             self.toast = toast
         }
@@ -68,9 +95,16 @@ public struct AppFeature: Sendable {
     
     public enum Action: BindableAction {
         case appDelegate(AppDelegateFeature.Action)
-        case path(StackActionOf<Path>)
+
+        case articlesPath(StackActionOf<ArticlesPath>)
+        case forumPath(StackActionOf<ForumPath>)
+        case menuPath(StackActionOf<MenuPath>)
+        
         case articlesList(ArticlesListFeature.Action)
-        case binding(BindingAction<State>) // TODO: Do I need it?
+        case forum(ForumFeature.Action)
+        case menu(MenuFeature.Action)
+        
+        case binding(BindingAction<State>) // For Toast
         case deeplink(URL)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
     }
@@ -90,6 +124,14 @@ public struct AppFeature: Sendable {
         
         Scope(state: \.articlesList, action: \.articlesList) {
             ArticlesListFeature()
+        }
+        
+        Scope(state: \.forum, action: \.forum) {
+            ForumFeature()
+        }
+        
+        Scope(state: \.menu, action: \.menu) {
+            MenuFeature()
         }
         
         Reduce { state, action in
@@ -123,7 +165,7 @@ public struct AppFeature: Sendable {
                     let id = Int(match!.output.1)!
                     
                     let articlePreview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                    state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
+                    state.articlesPath.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                     
                 default: // For new deeplink usage cases
                     break
@@ -141,14 +183,25 @@ public struct AppFeature: Sendable {
                     return .none
                 }
                 
-                // MARK: - ArticlesList
+                // MARK: - Default
                 
-            case .articlesList(.menuTapped):
-                state.path.append(.menu(MenuFeature.State()))
+            case .articlesList, .forum, .menu:
                 return .none
                 
+            case .articlesPath, .forumPath, .menuPath:
+                return .none
+            }
+        }
+        
+        // MARK: - Article Path
+        
+        Reduce { state, action in
+            switch action {
+                
+                // MARK: - Articles List
+                
             case let .articlesList(.articleTapped(articlePreview)):
-                state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
+                state.articlesPath.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
             case let .articlesList(.cellMenuOpened(_, action)):
@@ -164,9 +217,9 @@ public struct AppFeature: Sendable {
             case .articlesList:
                 return .none
                 
-                // MARK: - Article
+                // MARK: Article
                 
-            case let .path(.element(id: _, action: .article(.menuActionTapped(action)))):
+            case let .articlesPath(.element(id: _, action: .article(.menuActionTapped(action)))):
                 switch action {
                 case .copyLink, .report:
                     state.toast = ToastInfo(screen: .article, message: action.rawValue)
@@ -176,44 +229,62 @@ public struct AppFeature: Sendable {
                 state.showToast = true
                 return .none
                 
-            case let .path(.element(id: _, action: .article(.delegate(.handleDeeplink(id))))):
+            case let .articlesPath(.element(id: _, action: .article(.delegate(.handleDeeplink(id))))):
                 let articlePreview = ArticlePreview.innerDeeplink(id: id)
-                state.path.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
+                state.articlesPath.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
-            case let .path(.element(id: _, action: .article(.delegate(.commentHeaderTapped(id))))):
-                state.path.append(.profile(ProfileFeature.State(userId: id)))
+            case let .articlesPath(.element(id: _, action: .article(.delegate(.commentHeaderTapped(id))))):
+                state.articlesPath.append(.profile(ProfileFeature.State(userId: id)))
                 return .none
                 
-                // MARK: - Menu
-                
-            case .path(.element(id: _, action: .menu(.delegate(.openAuth)))):
-                state.path.append(.auth(AuthFeature.State()))
-                return .none
-                
-            case let .path(.element(id: _, action: .menu(.delegate(.openProfile(id: id))))):
-                state.path.append(.profile(ProfileFeature.State(userId: id)))
-                return .none
-                
-            case .path(.element(id: _, action: .menu(.settingsTapped))):
-                state.path.append(.settings(SettingsFeature.State()))
-                return .none
-                
-                // MARK: - Auth
-                
-            case let .path(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
-                // TODO: How to make seamless animation?
-                state.path.pop(from: id)
-                state.path.append(.profile(ProfileFeature.State(userId: userId)))
-                return .none
-                
-                // MARK: - Default
-                
-            case .path:
+            default:
                 return .none
             }
-            
         }
-        .forEach(\.path, action: \.path)
+        .forEach(\.articlesPath, action: \.articlesPath)
+        
+        // MARK: - Forum Path
+        
+        Reduce { state, action in
+            switch action {
+            default:
+                return .none
+            }
+        }
+        .forEach(\.forumPath, action: \.forumPath)
+        
+        // MARK: - Menu Path
+        
+        Reduce { state, action in
+            switch action {
+                
+                // MARK: Menu
+                
+            case .menu(.delegate(.openAuth)):
+                state.menuPath.append(.auth(AuthFeature.State()))
+                return .none
+                
+            case let .menu(.delegate(.openProfile(id: id))):
+                state.menuPath.append(.profile(ProfileFeature.State(userId: id)))
+                return .none
+                
+            case .menu(.settingsTapped):
+                state.menuPath.append(.settings(SettingsFeature.State()))
+                return .none
+                
+                // MARK: Auth
+                
+            case let .menuPath(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
+                // TODO: How to make seamless animation?
+                state.menuPath.pop(from: id)
+                state.menuPath.append(.profile(ProfileFeature.State(userId: userId)))
+                return .none
+                
+            default:
+                return .none
+            }
+        }
+        .forEach(\.menuPath, action: \.menuPath)
     }
 }

@@ -20,9 +20,6 @@ extension ArticlesListFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .menuTapped:
-                    analyticsClient.log(ArticlesListEvent.menuTapped)
-                    
                 case .articleTapped(let article):
                     analyticsClient.log(ArticlesListEvent.articleTapped(article.id))
                     
