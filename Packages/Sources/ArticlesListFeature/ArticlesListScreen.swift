@@ -27,16 +27,6 @@ public struct ArticlesListScreen: View {
                     .refreshable {
                         await store.send(.onRefresh).finish()
                     }
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button {
-                                store.send(.menuTapped)
-                            } label: {
-                                Image(systemSymbol: .listDash)
-                                    .foregroundStyle(Color(.label))
-                            }
-                        }
-                    }
                 
                 if store.isLoading {
                     ModernCircularLoader()
