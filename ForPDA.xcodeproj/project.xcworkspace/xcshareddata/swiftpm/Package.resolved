@@ -1,5 +1,5 @@
 {
-  "originHash" : "4c9a75f0d85f113c19cdb7c9692bd05aa3e3975c9f9dbfa696fbda990b976c9b",
+  "originHash" : "695b76d605e540828e1a74ec077b1b6f7e504071c61e5716e13cba3b855e658c",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -8,6 +8,15 @@
       "state" : {
         "branch" : "d0f7d6b",
         "revision" : "d0f7d6bafd3e8ffe99afba4995822d24aee044fb"
+      }
+    },
+    {
+      "identity" : "appmetrica-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/appmetrica/appmetrica-sdk-ios",
+      "state" : {
+        "revision" : "b7c28eb99c41d2c0caa9cf7d4beac7c597578188",
+        "version" : "5.8.0"
       }
     },
     {
@@ -29,12 +38,12 @@
       }
     },
     {
-      "identity" : "mixpanel-swift",
+      "identity" : "kscrash",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mixpanel/mixpanel-swift.git",
+      "location" : "https://github.com/kstenerud/KSCrash",
       "state" : {
-        "revision" : "48d6668ceaaefc338f94e2b084c3cf77b90182f8",
-        "version" : "4.3.0"
+        "revision" : "90a0c1a139ca833281423b1d2260ebf9ae188e63",
+        "version" : "2.0.0-rc.1"
       }
     },
     {
@@ -44,15 +53,6 @@
       "state" : {
         "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
         "version" : "12.8.0"
-      }
-    },
-    {
-      "identity" : "sentry-cocoa",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/getsentry/sentry-cocoa.git",
-      "state" : {
-        "revision" : "5575af93efb776414f243e93d6af9f6258dc539a",
-        "version" : "8.36.0"
       }
     },
     {

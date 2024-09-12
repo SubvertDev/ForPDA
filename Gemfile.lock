@@ -109,6 +109,7 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.3.0)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
+    fastlane-plugin-appmetrica (0.2.0)
     fastlane-plugin-sentry (1.24.0)
       os (~> 1.1, >= 1.1.4)
     fastlane-plugin-versioning (0.6.0)
@@ -219,6 +220,7 @@ PLATFORMS
 
 DEPENDENCIES
   fastlane
+  fastlane-plugin-appmetrica
   fastlane-plugin-sentry
   fastlane-plugin-versioning
   fastlane-plugin-xcconfig
