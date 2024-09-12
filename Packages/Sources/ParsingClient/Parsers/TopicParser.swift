@@ -36,15 +36,15 @@ public struct TopicParser {
         }
     }
     
-    private static func parsePoll(_ array: [Any]) -> Optional<Topic.Poll> {
+    private static func parsePoll(_ array: [Any]) -> Topic.Poll? {
         return if !array.isEmpty {
-            Optional.some(Topic.Poll(
+            Topic.Poll(
                 name: array[0] as! String,
                 voted: array[2] as! Int == 1 ? true : false,
                 totalVotes: array[1] as! Int,
                 options: parsePollOption(array[3] as! [[Any]])
-            ))
-        } else { Optional.none }
+            )
+        } else { nil }
     }
     
     private static func parsePollOption(_ array: [[Any]]) -> [Topic.Poll.Option] {
@@ -72,14 +72,14 @@ public struct TopicParser {
     
     private static func parsePost(_ array: [[Any]]) -> [Post] {
         return array.map { post in
-            let lastEdit: Optional<Post.LastEdit> = if post.count > 13 {
-                .some(Post.LastEdit(
+            let lastEdit: Post.LastEdit? = if post.count > 13 {
+                Post.LastEdit(
                     userId: post[16] as! Int,
                     username: post[14] as! String,
                     reason: post[15] as! String,
                     date: Date(timeIntervalSince1970: post[13] as! TimeInterval)
-                ))
-            } else { .none }
+                )
+            } else { nil }
             
             return Post(
                 id: post[0] as! Int,
@@ -104,13 +104,13 @@ public struct TopicParser {
     
     private static func parseAttachment(_ array: [[Any]]) -> [Post.Attachment] {
         return array.map { attachment in
-            let metadata: Optional<Post.Attachment.Metadata> = if attachment.count > 4 {
-                .some(Post.Attachment.Metadata(
+            let metadata: Post.Attachment.Metadata? = if attachment.count > 4 {
+                Post.Attachment.Metadata(
                     width: attachment[5] as! Int,
                     height: attachment[6] as! Int,
                     url: attachment[4] as! String
-                ))
-            } else { .none }
+                )
+            } else { nil }
             
             let type = if attachment[1] as! Int == 1 {
                 Post.Attachment.AttachmentType.image

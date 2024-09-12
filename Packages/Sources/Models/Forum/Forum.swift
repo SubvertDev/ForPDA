@@ -7,14 +7,14 @@
 
 import Foundation
 
-public struct Forum: Sendable, Hashable, Codable {
+public struct Forum: Sendable, Hashable, Decodable {
     public let id: Int
     public let name: String
-    public let flag: Int // 64
+    public let flag: Int
     public let description: String
     public let announcements: [Announcement]
     public let subforums: [ForumInfo]
-    public let topicsCount: Int // 42
+    public let topicsCount: Int
     public let topics: [TopicInfo]
     public let navigation: [ForumInfo]
     
@@ -60,8 +60,7 @@ public extension Forum {
             ForumInfo(
                 id: 543,
                 name: "Second subforum",
-                flag: 64,
-                redirectUrl: .none
+                flag: 64
             )
         ],
         topicsCount: 1709,
@@ -72,8 +71,7 @@ public extension Forum {
             ForumInfo(
                 id: 200,
                 name: "Forum heading",
-                flag: 1,
-                redirectUrl: .none
+                flag: 1
             )
         ]
     )

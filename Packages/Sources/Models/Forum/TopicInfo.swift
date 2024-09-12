@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct TopicInfo: Sendable, Hashable, Codable {
+public struct TopicInfo: Sendable, Hashable, Decodable {
     public let id: Int
     public let name: String
     public let description: String
@@ -24,7 +24,7 @@ public struct TopicInfo: Sendable, Hashable, Codable {
         self.lastPost = lastPost
     }
         
-    public struct LastPost: Sendable, Hashable, Codable {
+    public struct LastPost: Sendable, Hashable, Decodable {
         public let date: Date
         public let userId: Int
         public let username: String

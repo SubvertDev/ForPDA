@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Topic: Sendable, Codable {
+public struct Topic: Sendable, Decodable {
     public let id: Int
     public let name: String
     public let description: String
@@ -17,16 +17,16 @@ public struct Topic: Sendable, Codable {
     public let authorName: String
     public let curatorId: Int
     public let curatorName: String
-    public let poll: Optional<Poll>
+    public let poll: Poll?
     public let postsCount: Int
     public let posts: [Post]
     public let navigation: [ForumInfo]
     
-    public struct Poll: Sendable, Codable {
-        public let name: String // 0
-        public let voted: Bool // 2
-        public let totalVotes: Int // 1
-        public let options: [Option] // 3
+    public struct Poll: Sendable, Decodable {
+        public let name: String
+        public let voted: Bool
+        public let totalVotes: Int
+        public let options: [Option]
         
         public init(name: String, voted: Bool, totalVotes: Int, options: [Option]) {
             self.name = name
@@ -48,9 +48,9 @@ public struct Topic: Sendable, Codable {
         }
         
         public struct Option: Sendable, Codable {
-            public let name: String // 0
-            public let several: Bool // 1
-            public let choices: [Choice] // 2 - value; 3 - key
+            public let name: String
+            public let several: Bool
+            public let choices: [Choice]
             
             public init(name: String, several: Bool, choices: [Choice]) {
                 self.name = name
@@ -70,7 +70,7 @@ public struct Topic: Sendable, Codable {
         authorName: String,
         curatorId: Int,
         curatorName: String,
-        poll: Optional<Poll>,
+        poll: Poll?,
         postsCount: Int,
         posts: [Post],
         navigation: [ForumInfo]
@@ -102,7 +102,7 @@ public extension Topic {
         authorName: "4spander",
         curatorId: 6176341,
         curatorName: "AirFlare",
-        poll: .some(Poll(
+        poll: Poll(
             name: "Some simple poll...",
             voted: false,
             totalVotes: 2134,
@@ -115,7 +115,7 @@ public extension Topic {
                     ]
                 )
             ]
-        )),
+        ),
         postsCount: 1709,
         posts: [
             .mock

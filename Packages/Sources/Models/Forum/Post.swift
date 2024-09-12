@@ -7,16 +7,16 @@
 
 import Foundation
 
-public struct Post: Sendable, Hashable, Codable {
-    public let id: Int// 0
-    public let first: Bool // 1
-    public let flag: Int // 4
-    public let content: String // 8
+public struct Post: Sendable, Hashable, Decodable {
+    public let id: Int
+    public let first: Bool
+    public let flag: Int
+    public let content: String
     public let author: Author
     public let karma: Int
-    public let attachments: [Attachment] // 11
-    public let createdAt: Date // 7
-    public let lastEdit: Optional<LastEdit>
+    public let attachments: [Attachment]
+    public let createdAt: Date
+    public let lastEdit: LastEdit?
     
     // TODO: 12 => 0 on first post; other - 1; can be 17 also
     
@@ -29,7 +29,7 @@ public struct Post: Sendable, Hashable, Codable {
         karma: Int,
         attachments: [Attachment],
         createdAt: Date,
-        lastEdit: Optional<LastEdit>
+        lastEdit: LastEdit?
     ) {
         self.id = id
         self.first = first
@@ -42,19 +42,19 @@ public struct Post: Sendable, Hashable, Codable {
         self.lastEdit = lastEdit
     }
     
-    public struct Attachment: Sendable, Hashable, Codable {
+    public struct Attachment: Sendable, Hashable, Decodable {
         public let id: Int
         public let type: AttachmentType
         public let name: String
         public let size: Int
-        public let metadata: Optional<Metadata>
+        public let metadata: Metadata?
         
-        public enum AttachmentType: Sendable, Hashable, Codable {
+        public enum AttachmentType: Sendable, Hashable, Decodable {
             case file
             case image
         }
         
-        public struct Metadata: Sendable, Hashable, Codable {
+        public struct Metadata: Sendable, Hashable, Decodable {
             public let url: String
             public let width: Int
             public let height: Int
@@ -71,7 +71,7 @@ public struct Post: Sendable, Hashable, Codable {
             type: AttachmentType,
             name: String,
             size: Int,
-            metadata: Optional<Metadata>
+            metadata: Metadata?
         ) {
             self.id = id
             self.type = type
@@ -81,11 +81,11 @@ public struct Post: Sendable, Hashable, Codable {
         }
     }
     
-    public struct LastEdit: Sendable, Hashable, Codable {
-        public let userId: Int // 16
-        public let username: String // 14
-        public let reason: String // 15
-        public let date: Date // 13
+    public struct LastEdit: Sendable, Hashable, Decodable {
+        public let userId: Int
+        public let username: String
+        public let reason: String
+        public let date: Date
         
         public init(userId: Int, username: String, reason: String, date: Date) {
             self.userId = userId
@@ -95,14 +95,13 @@ public struct Post: Sendable, Hashable, Codable {
         }
     }
     
-    public struct Author: Sendable, Hashable, Codable {
-        public let id: Int // 2
-        public let name: String // 3
-        public let avatarUrl: String // 9
-        public let lastSeenDate: Date // 5
-        // in cap empty
-        public let signature: String // 10
-        public let reputationCount: Int // 6
+    public struct Author: Sendable, Hashable, Decodable {
+        public let id: Int
+        public let name: String
+        public let avatarUrl: String
+        public let lastSeenDate: Date
+        public let signature: String
+        public let reputationCount: Int
         
         public init(
             id: Int,
