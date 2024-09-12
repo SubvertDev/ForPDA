@@ -20,6 +20,9 @@ public struct ParsingClient: Sendable {
     public var parseCaptchaUrl: @Sendable (_ rawString: String) async throws -> URL
     public var parseLoginResponse: @Sendable (_ rawString: String) async throws -> AuthResponse
     public var parseUser: @Sendable (_ rawString: String) async throws -> User
+    public var parseForumsList: @Sendable (_ rawString: String) async throws -> [ForumInfo]
+    public var parseForum: @Sendable (_ rawString: String) async throws -> Forum
+    public var parseTopic: @Sendable (_ rawString: String) async throws -> Topic
 }
 
 extension DependencyValues {
@@ -48,6 +51,15 @@ extension ParsingClient: DependencyKey {
         },
         parseUser: { rawString in
             return try ProfileParser.parseUser(rawString: rawString)
+        },
+        parseForumsList: { rawString in
+            return try ForumParser.parseForumList(rawString: rawString)
+        },
+        parseForum: { rawString in
+            return try ForumParser.parse(rawString: rawString)
+        },
+        parseTopic: { rawString in
+            return try TopicParser.parse(rawString: rawString)
         }
     )
 }
