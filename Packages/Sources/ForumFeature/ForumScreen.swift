@@ -20,25 +20,16 @@ public struct ForumScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-//            List(store.sections, children: \.subtopics) { section in
-//                WithPerceptionTracking {
-//                    if section.typeId == 0 {
-//                        Button {
-//                            store.send(.topicTapped(id: section.id))
-//                        } label: {
-//                            Text(section.title)
-//                                .foregroundStyle(Color(.label))
-//                        }
-//                    } else {
-//                        Text(section.title)
-//                    }
-//                }
-//            }
-//            .navigationTitle(Text("Forum", bundle: .module))
-//            .navigationBarTitleDisplayMode(.inline)
-//            .task {
-//                store.send(.onTask)
-//            }
+            List(store.forums, id: \.self) { forum in
+                WithPerceptionTracking {
+                    Text(forum.name)
+                }
+            }
+            .navigationTitle(Text("Forum", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
+            .task {
+                store.send(.onTask)
+            }
         }
     }
 }

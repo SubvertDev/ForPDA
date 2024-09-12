@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ForumFeature.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 02.09.2024.
@@ -19,15 +19,12 @@ public struct ForumFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var sections: [ForumSection] = []
-//        public var topics: [ForumTopic] = []
+        public var forums: [ForumInfo] = []
         
         public init(
-            sections: [ForumSection] = []
-//            topics: [ForumTopic] = []
+            forums: [ForumInfo] = []
         ) {
-            self.sections = sections
-//            self.topics = topics
+            self.forums = forums
         }
     }
     
@@ -35,8 +32,8 @@ public struct ForumFeature: Sendable {
     
     public enum Action {
         case onTask
-        case topicTapped(id: Int)
-//        case _forumTopicsResponse(Result<[ForumTopic], any Error>)
+        case forumTapped(id: Int)
+        case _forumsListResponse(Result<[ForumInfo], any Error>)
     }
     
     // MARK: - Dependencies
@@ -50,54 +47,23 @@ public struct ForumFeature: Sendable {
             switch action {
             case .onTask:
                 return .run { send in
-//                    let result = await Result { try await apiClient.getForumTopics() }
-//                    await send(._forumTopicsResponse(result))
+//                    let result = await Result { try await apiClient.getForumsList() }
+//                    await send(._forumsListResponse(result))
                 }
                 
-            case let .topicTapped(id: id):
+            case .forumTapped(id: _):
                 return .run { send in
 //                    let result = await Result { try await apiClient.getForumTopic(id: id, page: 0, itemsPerPage: 10) }
                 }
                 
-//            case let ._forumTopicsResponse(.success(topics)):
-//                var sections: [ForumSection] = []
-//                
-//                for topic in topics {
-//                    switch topic.type {
-//                    case .header:
-//                        let section = ForumSection(id: topic.id, title: topic.title, typeId: topic.typeId)
-//                        sections.append(section)
-//                        
-//                    case .topic:
-//                        let topic = ForumSection(id: topic.id, title: topic.title, typeId: topic.typeId)
-//                        
-//                        if let lastSection = sections.last {
-//                            if let subtopics = lastSection.subtopics {
-//                                sections[sections.count - 1].subtopics!.append(topic)
-//                            } else {
-//                                sections[sections.count - 1].subtopics = []
-//                                sections[sections.count - 1].subtopics?.append(topic)
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                state.sections = sections
-//                state.topics = topics
-//                return .none
-//                
-//            case let ._forumTopicsResponse(.failure(error)):
-//                print(error)
-//                return .none
+            case let ._forumsListResponse(.success(forums)):
+                state.forums = forums
+                return .none
+                
+            case let ._forumsListResponse(.failure(error)):
+                print(error)
+                return .none
             }
         }
     }
-}
-
-public struct ForumSection: Identifiable, Hashable, Sendable {
-    public let id: Int
-    public let title: String
-    public let typeId: Int
-    
-    public var subtopics: [ForumSection]?
 }
