@@ -5,7 +5,7 @@
 //  Created by Ilia Lubianoi on 21.03.2024.
 //
 
-import Foundation
+import SwiftUI
 import ComposableArchitecture
 import TCAExtensions
 import Models
@@ -34,7 +34,7 @@ public struct ArticlesListFeature: Sendable {
         @Presents public var destination: Destination.State?
         public var articles: [ArticlePreview]
         public var isLoading: Bool
-        public var loadAmount: Int = 30
+        public var loadAmount: Int = 15
         public var offset: Int = 0
         public var listGridTypeShort = false
         
@@ -69,10 +69,10 @@ public struct ArticlesListFeature: Sendable {
         case onFirstAppear
         case onRefresh
         case onArticleAppear(ArticlePreview)
-        case onLoadMoreAppear
         
         case _failedToConnect(any Error)
         case _articlesResponse(Result<[ArticlePreview], any Error>)
+        case _loadMoreArticles
     }
     
     // MARK: - Dependencies
@@ -129,8 +129,8 @@ public struct ArticlesListFeature: Sendable {
                 
             case .onArticleAppear(let articlePreview):
                 // TODO: Revise performance-wise later
-                return .run { [articles = state.articles] _ in
-                    if let index = articles.firstIndex(where: { $0 == articlePreview }), index % 3 == 0 {
+                return .run { [articles = state.articles] send in
+                    if let index = articles.firstIndex(where: { $0 == articlePreview }), index != 0, index % 3 == 0 {
                         var urls: [URL] = []
                         let preloadIndex = index + 1
                         let maxPreloadIndex = preloadIndex + 3
@@ -140,22 +140,27 @@ public struct ArticlesListFeature: Sendable {
                             }
                             await cacheClient.preloadImages(urls)
                         }
+                        
+                        if articles.count - index < 5 {
+                            await send(._loadMoreArticles)
+                        }
                     }
                 }
                 
-            case .onLoadMoreAppear:
-                // FIXME: Not working well with scrollview?
-                return .none
-//                state.offset += state.loadAmount
-//                return .run { [offset = state.offset, amount = state.loadAmount] send in
-//                    let result = await Result {
-//                        try await apiClient.getArticlesList(offset: offset, amount: amount)
-//                    }
-//                    await send(._articlesResponse(result))
-//                }
+            case ._loadMoreArticles:
+                guard state.articles.count != 0 else { return .none }
+                state.offset += state.loadAmount
+                return .run { [offset = state.offset, amount = state.loadAmount] send in
+                    let result = await Result {
+                        try await apiClient.getArticlesList(offset: offset, amount: amount)
+                    }
+                    await send(._articlesResponse(result))
+                }
                 
             case .listGridTypeButtonTapped:
-                state.listGridTypeShort.toggle()
+                withAnimation {
+                    state.listGridTypeShort.toggle()
+                }
                 return .none
                 
             case .settingsButtonTapped:

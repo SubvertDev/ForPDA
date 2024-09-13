@@ -63,7 +63,7 @@ public struct ArticlesListScreen: View {
     @ViewBuilder
     private func ArticlesList() -> some View {
         ScrollView {
-            VStack(spacing: 14) {
+            LazyVStack(spacing: 14) {
                 ForEach(store.articles, id: \.self) { article in
                     WithPerceptionTracking {
                         Button {
@@ -80,13 +80,6 @@ public struct ArticlesListScreen: View {
                 }
             }
             .padding(.top, 16)
-            
-            if !store.isLoading && !store.articles.isEmpty {
-                LoadMoreView()
-                    .onAppear {
-                        store.send(.onLoadMoreAppear)
-                    }
-            }
         }
         .scrollDisabled(store.isScrollDisabled)
     }

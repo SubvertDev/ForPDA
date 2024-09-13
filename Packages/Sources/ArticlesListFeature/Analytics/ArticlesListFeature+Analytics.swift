@@ -49,15 +49,15 @@ extension ArticlesListFeature {
                 case .onRefresh:
                     analyticsClient.log(ArticlesListEvent.refreshTriggered)
                     
-                case .onLoadMoreAppear:
-                    analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
-                    
                 case ._articlesResponse(.success):
                     analyticsClient.log(ArticlesListEvent.articlesHasLoaded)
                 
                 case ._articlesResponse(.failure(let error)):
                     analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
                     analyticsClient.capture(AnalyticsError.apiFailure(error))
+                    
+                case ._loadMoreArticles:
+                    analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
                 case .binding, .onArticleAppear, ._articlesResponse, .destination:
                     break

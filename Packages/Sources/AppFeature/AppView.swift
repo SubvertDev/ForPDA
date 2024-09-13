@@ -60,8 +60,6 @@ public struct AppView: View {
     
     public init(store: StoreOf<AppFeature>) {
         self.store = store
-        
-        UITabBar.appearance().isHidden = true
     }
     
     public var body: some View {
@@ -73,6 +71,7 @@ public struct AppView: View {
                     ForumTab()
                     ProfileTab()
                 }
+                .toolbar(.hidden, for: .tabBar)
                 
                 PDATabView()
 //                .toast(isPresenting: $store.showToast) {
@@ -81,7 +80,6 @@ public struct AppView: View {
             }
             .tint(currentTintColor)
 //            .environment(\.tintColor, currentTintColor)
-            .ignoresSafeArea()
         }
     }
     
@@ -189,6 +187,7 @@ public struct AppView: View {
         .background(Color.Background.primary)
         .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
         .shadow(color: Color.black.opacity(0.15), radius: 2)
+        .offset(y: 34)
     }
     
     // MARK: - PDA Tab Item
