@@ -11,6 +11,16 @@
         }
       }
     },
+    "addToBookmarks" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить в закладки"
+          }
+        }
+      }
+    },
     "Articles" : {
       "localizations" : {
         "ru" : {
@@ -61,23 +71,22 @@
         }
       }
     },
+    "openInBrowser" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть в браузере"
+          }
+        }
+      }
+    },
     "Problems with article?" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Проблема со статьей?"
-          }
-        }
-      }
-    },
-    "Share Link" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
           }
         }
       }

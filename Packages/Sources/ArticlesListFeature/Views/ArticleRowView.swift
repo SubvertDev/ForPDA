@@ -14,7 +14,7 @@ import SharedUI
 
 struct ArticleRowView: View {
     
-    @Namespace private var animationNamespace
+    @Namespace private var namespace
     
     let article: ArticlePreview
     let store: StoreOf<ArticlesListFeature>
@@ -32,8 +32,9 @@ struct ArticleRowView: View {
                 NormalRow()
             }
         }
-        .transition(.opacity)
-        .animation(.smooth, value: isShort)
+        .pdaContextMenu(article: article, store: store)
+//        .transition(.opacity)
+//        .animation(.smooth, value: isShort)
     }
     
     // MARK: - Normal Row
@@ -46,14 +47,11 @@ struct ArticleRowView: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 Description()
-                    .matchedGeometryEffect(id: "description\(id)", in: animationNamespace)
                 
                 Separator()
                     .padding(.bottom, 17)
-                    .matchedGeometryEffect(id: "separator\(id)", in: animationNamespace)
                 
                 Footer()
-                    .matchedGeometryEffect(id: "footer\(id)", in: animationNamespace)
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 16)
@@ -65,7 +63,6 @@ struct ArticleRowView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.Separator.primary, lineWidth: isShort ? 0 : 0.67)
         )
-        .pdaContextMenu(article: article, store: store)
     }
     
     // MARK: - Short Row
@@ -75,23 +72,16 @@ struct ArticleRowView: View {
         VStack(spacing: 0) {
             Separator()
                 .padding(.bottom, 12)
-                .matchedGeometryEffect(id: "separator\(id)", in: animationNamespace)
             
-            HStack(spacing: 12) {
-                VStack(spacing: 0) {
-                    ArticleImage()
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .frame(width: 90, height: 90)
-                    
-                    Spacer()
-                }
+            HStack(alignment: .top, spacing: 12) {
+                ArticleImage()
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .frame(width: 90, height: 90)
                 
                 VStack(spacing: 0) {
                     Description()
-                        .matchedGeometryEffect(id: "description\(id)", in: animationNamespace)
                     
                     Footer()
-                        .matchedGeometryEffect(id: "footer\(id)", in: animationNamespace)
                 }
             }
         }
@@ -108,9 +98,11 @@ struct ArticleRowView: View {
                         .overlay { image.resizable().scaledToFill() }
                         .clipped()
                         .contentShape(Rectangle())
+//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 } else {
                     Color.Background.teritary
                         .frame(maxHeight: .infinity)
+//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 }
             }
             .skeleton(with: state.isLoading, shape: .rectangle)
@@ -119,7 +111,6 @@ struct ArticleRowView: View {
         .clipShape(
             .rect(topLeadingRadius: 16, bottomLeadingRadius: isShort ? 16 : 0, bottomTrailingRadius: isShort ? 16 : 0, topTrailingRadius: 16)
         )
-        .matchedGeometryEffect(id: "image\(id)", in: animationNamespace)
     }
     
     // MARK: - Description
@@ -142,6 +133,7 @@ struct ArticleRowView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, isShort ? 8 : 12)
         }
+//        .matchedGeometryEffect(id: "description\(id)", in: namespace)
     }
     
     // MARK: - Footer
@@ -178,24 +170,25 @@ struct ArticleRowView: View {
                         store.send(.cellMenuOpened(article, .copyLink))
                     },
                     openInBrowserAction: {
-                        print("not implemented")
+                        store.send(.cellMenuOpened(article, .openInBrowser))
                     },
                     reportAction: {
                         store.send(.cellMenuOpened(article, .report))
                     },
                     addToBookmarksAction: {
-                        print("not implemented")
+                        store.send(.cellMenuOpened(article, .addToBookmarks))
                     }
                 )
             } label: {
                 Image(systemSymbol: .ellipsis)
                     .font(.body)
                     .foregroundStyle(Color.Labels.teritary)
-                    .padding(.horizontal, 16) // Padding for tap area
-                    .padding(.vertical, 22)
+                    .padding(.horizontal, isShort ? 8 : 16) // Padding for tap area
+                    .padding(.vertical, isShort ? 11 : 22)
             }
             .frame(width: 19, height: 22)
         }
+//        .matchedGeometryEffect(id: "footer\(id)", in: namespace)
     }
     
     // MARK: - Separator
@@ -205,5 +198,6 @@ struct ArticleRowView: View {
         Rectangle()
             .foregroundStyle(Color.Separator.primary)
             .frame(height: 0.33)
+//            .matchedGeometryEffect(id: "separator\(id)", in: namespace)
     }
 }

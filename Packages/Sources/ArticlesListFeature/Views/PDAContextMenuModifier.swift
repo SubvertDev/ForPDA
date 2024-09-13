@@ -31,13 +31,13 @@ public struct PDAContextMenuModifier: ViewModifier {
                         store.send(.cellMenuOpened(article, .copyLink))
                     },
                     openInBrowserAction: {
-                        print("not implemented")
+                        store.send(.cellMenuOpened(article, .openInBrowser))
                     },
                     reportAction: {
                         store.send(.cellMenuOpened(article, .report))
                     },
                     addToBookmarksAction: {
-                        print("not implemented")
+                        store.send(.cellMenuOpened(article, .addToBookmarks))
                     }
                 )
             }

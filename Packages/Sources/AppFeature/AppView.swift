@@ -60,8 +60,13 @@ public struct AppView: View {
     
     public init(store: StoreOf<AppFeature>) {
         self.store = store
+        
+        let tabBarAppearance: UITabBarAppearance = UITabBarAppearance()
+        tabBarAppearance.configureWithTransparentBackground()
+        UITabBar.appearance().standardAppearance = tabBarAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
     }
-    
+        
     public var body: some View {
         WithPerceptionTracking {
             ZStack(alignment: .bottom) {
@@ -71,7 +76,6 @@ public struct AppView: View {
                     ForumTab()
                     ProfileTab()
                 }
-                .toolbar(.hidden, for: .tabBar)
                 
                 PDATabView()
 //                .toast(isPresenting: $store.showToast) {

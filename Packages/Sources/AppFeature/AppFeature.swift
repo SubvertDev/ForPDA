@@ -211,7 +211,7 @@ public struct AppFeature: Sendable {
                 switch action {
                 case .copyLink, .report:
                     state.toast = ToastInfo(screen: .articlesList, message: action.rawValue)
-                case .shareLink:
+                case .shareLink, .openInBrowser, .addToBookmarks:
                     return .none
                 }
                 state.showToast = true

@@ -5,7 +5,7 @@
 //  Created by Ilia Lubianoi on 21.03.2024.
 //
 
-import SwiftUI
+import Foundation
 import ComposableArchitecture
 import TCAExtensions
 import Models
@@ -93,9 +93,11 @@ public struct ArticlesListFeature: Sendable {
                 
             case .cellMenuOpened(let article, let action):
                 switch action {
-                case .copyLink:  pasteboardClient.copy(string: article.url.absoluteString)
-                case .shareLink: state.destination = .share(article.url)
-                case .report:    break
+                case .shareLink:      state.destination = .share(article.url)
+                case .copyLink:       pasteboardClient.copy(string: article.url.absoluteString)
+                case .openInBrowser:  return .run { _ in await open(url: article.url) }
+                case .report:         break
+                case .addToBookmarks: break
                 }
                 return .none
                 
@@ -147,6 +149,15 @@ public struct ArticlesListFeature: Sendable {
                     }
                 }
                 
+            case .listGridTypeButtonTapped:
+                state.listGridTypeShort.toggle()
+                return .none
+                
+            case .settingsButtonTapped:
+                return .none
+                
+                // MARK: Internal
+                
             case ._loadMoreArticles:
                 guard state.articles.count != 0 else { return .none }
                 state.offset += state.loadAmount
@@ -156,17 +167,6 @@ public struct ArticlesListFeature: Sendable {
                     }
                     await send(._articlesResponse(result))
                 }
-                
-            case .listGridTypeButtonTapped:
-                withAnimation {
-                    state.listGridTypeShort.toggle()
-                }
-                return .none
-                
-            case .settingsButtonTapped:
-                return .none
-                
-                // MARK: Internal
                 
             case ._failedToConnect:
                 state.destination = .alert(.failedToConnect)

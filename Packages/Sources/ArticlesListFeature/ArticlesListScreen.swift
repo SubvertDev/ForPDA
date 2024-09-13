@@ -62,26 +62,28 @@ public struct ArticlesListScreen: View {
     
     @ViewBuilder
     private func ArticlesList() -> some View {
-        ScrollView {
-            LazyVStack(spacing: 14) {
-                ForEach(store.articles, id: \.self) { article in
-                    WithPerceptionTracking {
-                        Button {
-                            store.send(.articleTapped(article))
-                        } label: {
-                            ArticleRowView(article: article, store: store, isShort: store.listGridTypeShort)
-                                .onAppear {
-                                    store.send(.onArticleAppear(article))
-                                }
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 16)
+        List {
+            ForEach(store.articles, id: \.self) { article in
+                WithPerceptionTracking {
+                    Button {
+                        store.send(.articleTapped(article))
+                    } label: {
+                        ArticleRowView(article: article, store: store, isShort: store.listGridTypeShort)
+                            .onAppear {
+                                store.send(.onArticleAppear(article))
+                            }
                     }
+                    .buttonStyle(.plain)
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.Background.primary)
+                    .listRowInsets(EdgeInsets(top: 7, leading: 16, bottom: 7, trailing: 16))
                 }
             }
-            .padding(.top, 16)
         }
+        .background(Color.Background.primary)
+        .listStyle(.plain)
         .scrollDisabled(store.isScrollDisabled)
+        .scrollIndicators(.hidden)
     }
     
     // MARK: - Toolbar Items

@@ -8,7 +8,9 @@
 import SwiftUI
 
 public enum ArticlesListRowMenuAction: LocalizedStringKey {
-    case copyLink = "Copied"
     case shareLink // Not tracked in l10n
+    case copyLink = "Copied"
+    case openInBrowser // Not tracked in l10n
     case report = "Will be fixed soon :)"
+    case addToBookmarks
 }

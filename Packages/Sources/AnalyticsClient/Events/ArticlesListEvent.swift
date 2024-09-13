@@ -11,9 +11,11 @@ public enum ArticlesListEvent: Event {
     // TODO: Add URL to Int?
     case articleTapped(Int)
     case linkCopied(URL)
-    case linkShareOpened(URL)
     case linkShared(Bool, URL)
+    case linkShareOpened(URL)
+    case articleOpenedInBrowser(URL)
     case linkReported(URL)
+    case articleAddedToBookmarks(URL)
     case listGridTypeChanged(Bool)
     case settingsButtonTapped
     case refreshTriggered

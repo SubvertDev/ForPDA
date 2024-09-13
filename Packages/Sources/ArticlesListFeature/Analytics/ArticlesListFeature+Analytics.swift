@@ -25,13 +25,17 @@ extension ArticlesListFeature {
                     
                 case .cellMenuOpened(let article, let action):
                     switch action {
-                    case .copyLink:
-                        analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
                     case .shareLink:
                         analyticsClient.log(ArticlesListEvent.linkShareOpened(article.url))
+                    case .copyLink:
+                        analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
+                    case .openInBrowser:
+                        analyticsClient.log(ArticlesListEvent.articleOpenedInBrowser(article.url))
                     case .report:
                         analyticsClient.log(ArticlesListEvent.linkReported(article.url))
                         analyticsClient.capture(AnalyticsError.brokenArticle(article.url))
+                    case .addToBookmarks:
+                        analyticsClient.log(ArticlesListEvent.articleAddedToBookmarks(article.url))
                     }
                     
                 case let .linkShared(success, url):
