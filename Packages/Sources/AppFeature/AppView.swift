@@ -175,7 +175,7 @@ public struct AppView: View {
             HStack(spacing: 0) {
                 ForEach(Tab.allCases, id: \.self) { tab in
                     Button {
-                        store.selectedTab = tab
+                        store.send(.didSelectTab(tab))
                         shouldAnimatedTabItem[tab.rawValue].toggle()
                     } label: {
                         PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)

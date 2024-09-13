@@ -25,17 +25,24 @@ public struct ArticlesListScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                ArticlesList()
-                    .navigationTitle(Text("Articles", bundle: .module))
-                    .toolbar {
-                        ToolbarItemGroup(placement: .topBarTrailing) {
-                            ToolbarButtons()
-                        }
+                ScrollViewReader { reader in
+                    WithPerceptionTracking {
+                        ArticlesList()
+                            .onChange(of: store.scrollToTop) { _ in
+                                withAnimation { reader.scrollTo(0) }
+                            }
                     }
-                    .toolbarBackground(Color.Background.primary, for: .navigationBar)
-                    .refreshable {
-                        await store.send(.onRefresh).finish()
+                }
+                .navigationTitle(Text("Articles", bundle: .module))
+                .toolbarBackground(Color.Background.primary, for: .navigationBar)
+                .toolbar {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        ToolbarButtons()
                     }
+                }
+                .refreshable {
+                    await store.send(.onRefresh).finish()
+                }
                 
                 if store.isLoading {
                     ModernCircularLoader()
@@ -63,14 +70,14 @@ public struct ArticlesListScreen: View {
     @ViewBuilder
     private func ArticlesList() -> some View {
         List {
-            ForEach(store.articles, id: \.self) { article in
+            ForEach(store.articles.indices, id: \.self) { index in
                 WithPerceptionTracking {
                     Button {
-                        store.send(.articleTapped(article))
+                        store.send(.articleTapped(store.articles[index]))
                     } label: {
-                        ArticleRowView(article: article, store: store, isShort: store.listGridTypeShort)
+                        ArticleRowView(article: store.articles[index], store: store, isShort: store.listGridTypeShort)
                             .onAppear {
-                                store.send(.onArticleAppear(article))
+                                store.send(.onArticleAppear(store.articles[index]))
                             }
                     }
                     .buttonStyle(.plain)

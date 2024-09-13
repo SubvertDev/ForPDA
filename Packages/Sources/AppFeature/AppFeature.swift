@@ -108,6 +108,7 @@ public struct AppFeature: Sendable {
         case menu(MenuFeature.Action)
         
         case binding(BindingAction<State>) // For Toast
+        case didSelectTab(AppView.Tab)
         case deeplink(URL)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
     }
@@ -139,6 +140,16 @@ public struct AppFeature: Sendable {
         
         Reduce { state, action in
             switch action {
+                
+            case let .didSelectTab(tab):
+                if state.selectedTab == tab {
+                    if tab == .articlesList, state.articlesPath.isEmpty {
+                        state.articlesList.scrollToTop.toggle()
+                    }
+                } else {
+                    state.selectedTab = tab
+                }
+                return .none
                 
                 // MARK: - Common
                 

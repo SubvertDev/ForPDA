@@ -43,6 +43,8 @@ public struct ArticlesListFeature: Sendable {
             return articles.isEmpty && isLoading
         }
         
+        public var scrollToTop: Bool = false
+        
         public init(
             destination: Destination.State? = nil,
             articles: [ArticlePreview] = [],
