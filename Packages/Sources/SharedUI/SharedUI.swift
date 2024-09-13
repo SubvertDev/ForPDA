@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+private struct TintKey: EnvironmentKey {
+    static let defaultValue: Color = Color.blue
+}
+
+public extension EnvironmentValues {
+    var tintColor: Color {
+        get { self[TintKey.self] }
+        set { self[TintKey.self] = newValue }
+    }
+}
+
 // MARK: - Images
 
 // TODO: 17+ change to ImageResource
@@ -15,6 +26,34 @@ public extension Image {
     static let _4pda = Image(._4Pda)
     static let github = Image(.github)
     static let telegram = Image(.telegram)
+}
+
+public extension Color {
+    struct Labels {
+        public static let secondary = Color(.Labels.secondary)
+        public static let teritary = Color(.Labels.teritary)
+        public static let quaternary = Color(.Labels.quaternary)
+    }
+    
+    struct Background {
+        public static let primary = Color(.Background.primary)
+        public static let teritary = Color(.Background.teritary)
+    }
+    
+    struct Separator {
+        public static let primary = Color(.Separator.primary)
+    }
+    
+    struct Theme {
+        public static let primary = Color(.Theme.primary)
+        public static let lettuce = Color(.Theme.lettuce)
+        public static let orange = Color(.Theme.orange)
+        public static let pink = Color(.Theme.pink)
+        public static let purple = Color(.Theme.purple)
+        public static let scarlet = Color(.Theme.scarlet)
+        public static let sky = Color(.Theme.sky)
+        public static let yellow = Color(.Theme.yellow)
+    }
 }
 
 extension Color {

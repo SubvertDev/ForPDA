@@ -22,15 +22,24 @@ public struct PDAContextMenuModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .contextMenu {
-                ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
-                    store.send(.cellMenuOpened(article, .copyLink))
-                }
-                ContextButton(text: "Share Link", symbol: .arrowTurnUpRight, bundle: .module) {
-                    store.send(.cellMenuOpened(article, .shareLink))
-                }
-                ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
-                    store.send(.cellMenuOpened(article, .report))
-                }
+                MenuButtons(
+                    article: article,
+                    shareAction: {
+                        store.send(.cellMenuOpened(article, .shareLink))
+                    },
+                    copyAction: {
+                        store.send(.cellMenuOpened(article, .copyLink))
+                    },
+                    openInBrowserAction: {
+                        print("not implemented")
+                    },
+                    reportAction: {
+                        store.send(.cellMenuOpened(article, .report))
+                    },
+                    addToBookmarksAction: {
+                        print("not implemented")
+                    }
+                )
             }
     }
 }

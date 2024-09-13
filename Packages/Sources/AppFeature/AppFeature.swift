@@ -56,6 +56,7 @@ public struct AppFeature: Sendable {
         public var forum: ForumFeature.State
         public var menu: MenuFeature.State
         
+        public var selectedTab: AppView.Tab
         public var showToast: Bool
         public var toast: ToastInfo
         public var localizationBundle: Bundle? {
@@ -73,8 +74,9 @@ public struct AppFeature: Sendable {
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
             menu: MenuFeature.State = MenuFeature.State(),
+            selectedTab: AppView.Tab = .articlesList,
             showToast: Bool = false,
-            toast: ToastInfo = ToastInfo(screen: .articlesList, message: "")
+            toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""))
         ) {
             self.appDelegate = appDelegate
 
@@ -86,6 +88,7 @@ public struct AppFeature: Sendable {
             self.forum = forum
             self.menu = menu
             
+            self.selectedTab = selectedTab
             self.showToast = showToast
             self.toast = toast
         }
@@ -212,6 +215,15 @@ public struct AppFeature: Sendable {
                     return .none
                 }
                 state.showToast = true
+                return .none
+                
+            case .articlesList(.settingsButtonTapped):
+                state.selectedTab = .profile
+                if case .settings = state.menuPath.last {
+                    // Last screen is already settings
+                } else {
+                    state.menuPath.append(.settings(SettingsFeature.State()))
+                }
                 return .none
                 
             case .articlesList:

@@ -6,67 +6,114 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 import SkeletonUI
 import NukeUI
 import Models
+import SharedUI
 
 struct ArticleRowView: View {
     
     let article: ArticlePreview
-    
-    private let cellPadding: CGFloat = 16
+    let store: StoreOf<ArticlesListFeature>
+    let isShort: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(spacing: 0) {
             LazyImage(url: article.imageUrl) { state in
                 Group {
                     if let image = state.image {
-                        image.resizable().scaledToFill()
+                        Color.clear
+                            .aspectRatio(21/9, contentMode: .fit)
+                            .overlay { image.resizable().scaledToFill()}
+                            .clipped()
+                            .contentShape(Rectangle())
                     } else {
-                        Color(.systemBackground)
+                        Color.Background.teritary
+                            .aspectRatio(21/9, contentMode: .fit)
                     }
                 }
-                .skeleton(with: state.isLoading, shape: .rounded(.radius(16)))
+                .skeleton(with: state.isLoading, shape: .rectangle)
             }
-            .frame(width: UIScreen.main.bounds.width - cellPadding * 2,
-                   height: UIScreen.main.bounds.width * 0.5 - cellPadding * 2)
-            .clipped()
-            .cornerRadius(16)
+            .padding(.bottom, 12)
             
-            Text(article.title)
-                .font(.title3)
-                .fontWeight(.medium)
-            
-            Text(article.description)
-                .font(.subheadline)
-                .fontWeight(.light)
-                .lineLimit(3)
-            
-            HStack {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(article.authorName)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.gray)
+                    .font(.footnote)
+                    .fontWeight(.regular)
+                    .foregroundStyle(Color.Labels.secondary)
+                    .padding(.bottom, 4)
                 
-                Spacer()
+                Text(article.title)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 12)
                 
-                HStack(spacing: 2) {
-                    Image(systemSymbol: .message)
-                        .foregroundStyle(.gray)
+                Rectangle()
+                    .foregroundStyle(Color.Separator.primary)
+                    .frame(height: 0.33)
+                    .padding(.bottom, 17)
+                
+                HStack(spacing: 0) {
+                    HStack(spacing: 3) {
+                        Image(systemSymbol: .bubbleRight)
+                        Text(String(article.commentsAmount))
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Color.Labels.teritary)
+                    .padding(.trailing, 6)
                     
-                    Text(String(article.commentsAmount))
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.gray)
+                    Text(String("·"))
+                        .font(.caption)
+                        .foregroundStyle(Color.Labels.quaternary)
+                        .padding(.trailing, 6)
+                    
+                    Text(article.formattedDate)
+                        .font(.caption)
+                        .foregroundStyle(Color.Labels.quaternary)
+                    
+                    Spacer()
+                    
+                    Menu {
+                        MenuButtons(
+                            article: article,
+                            shareAction: {
+                                store.send(.cellMenuOpened(article, .shareLink))
+                            },
+                            copyAction: {
+                                store.send(.cellMenuOpened(article, .copyLink))
+                            },
+                            openInBrowserAction: {
+                                print("not implemented")
+                            },
+                            reportAction: {
+                                store.send(.cellMenuOpened(article, .report))
+                            },
+                            addToBookmarksAction: {
+                                print("not implemented")
+                            }
+                        )
+                    } label: {
+                        Image(systemSymbol: .ellipsis)
+                            .font(.body)
+                            .foregroundStyle(Color.Labels.teritary)
+                            .padding(.horizontal, 16) // Padding for tap area
+                            .padding(.vertical, 22)
+                    }
+                    .frame(width: 19, height: 22)
                 }
-                .padding(.trailing, 8)
-                
-                Text(article.formattedDate)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.gray)
             }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 14)
         }
-        .padding(.horizontal, cellPadding)
+        .background(Color.Background.primary)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.Separator.primary, lineWidth: 0.67)
+        )
+        .pdaContextMenu(article: article, store: store)
     }
 }

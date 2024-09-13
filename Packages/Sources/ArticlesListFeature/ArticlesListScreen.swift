@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SharedUI
 import Models
+import SFSafeSymbols
 
 public struct ArticlesListScreen: View {
     
@@ -21,9 +22,17 @@ public struct ArticlesListScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
+                Color.Background.primary
+                    .ignoresSafeArea()
+                
                 ArticlesList()
                     .navigationTitle(Text("Articles", bundle: .module))
-                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .topBarTrailing) {
+                            ToolbarButtons()
+                        }
+                    }
+                    .toolbarBackground(Color.Background.primary, for: .navigationBar)
                     .refreshable {
                         await store.send(.onRefresh).finish()
                     }
@@ -53,21 +62,24 @@ public struct ArticlesListScreen: View {
     
     @ViewBuilder
     private func ArticlesList() -> some View {
-        List {
-            ForEach(store.articles, id: \.self) { article in
-                WithPerceptionTracking {
-                    Button {
-                        store.send(.articleTapped(article))
-                    } label: {
-                        ArticleRowView(article: article)
-                            .pdaContextMenu(article: article, store: store)
-                            .onAppear {
-                                store.send(.onArticleAppear(article))
-                            }
+        ScrollView {
+            VStack(spacing: 14) {
+                ForEach(store.articles, id: \.self) { article in
+                    WithPerceptionTracking {
+                        Button {
+                            store.send(.articleTapped(article))
+                        } label: {
+                            ArticleRowView(article: article, store: store, isShort: store.listGridTypeShort)
+                                .onAppear {
+                                    store.send(.onArticleAppear(article))
+                                }
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 16)
                     }
-                    .listSectionSeparator(.hidden)
                 }
             }
+            .padding(.top, 16)
             
             if !store.isLoading && !store.articles.isEmpty {
                 LoadMoreView()
@@ -76,9 +88,25 @@ public struct ArticlesListScreen: View {
                     }
             }
         }
-        .listStyle(.plain)
         .scrollDisabled(store.isScrollDisabled)
-        .scrollIndicators(.hidden) // TODO: Find SUI alternative to estimatedRowHeight in UIKit to prevent scroll indicator jumping
+    }
+    
+    // MARK: - Toolbar Items
+    
+    @ViewBuilder
+    private func ToolbarButtons() -> some View {
+        Button {
+            store.send(.listGridTypeButtonTapped)
+        } label: {
+            Image(systemSymbol: store.listGridTypeShort ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
+                .replaceDownUpByLayerEffect(value: true)
+        }
+        
+        Button {
+            store.send(.settingsButtonTapped)
+        } label: {
+            Image(systemSymbol: .gearshape)
+        }
     }
 }
 

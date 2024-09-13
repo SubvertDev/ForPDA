@@ -21,7 +21,7 @@ public struct ArticlePreview: Sendable, Hashable {
     
     public var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
+        formatter.dateFormat = "dd MMM yyyy"
         return formatter.string(from: date)
     }
     

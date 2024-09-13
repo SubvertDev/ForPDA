@@ -75,7 +75,8 @@ let package = Package(
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
-                .product(name: "SkeletonUI", package: "SkeletonUI")
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ],
             resources: [.process("Resources")]
         ),

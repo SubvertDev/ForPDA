@@ -37,6 +37,12 @@ extension ArticlesListFeature {
                 case let .linkShared(success, url):
                     analyticsClient.log(ArticlesListEvent.linkShared(success, url))
                     
+                case .listGridTypeButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.listGridTypeChanged(state.listGridTypeShort))
+                    
+                case .settingsButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.settingsButtonTapped)
+                    
                 case .onFirstAppear:
                     break // TODO: Make First App Open/App Session here?
                     

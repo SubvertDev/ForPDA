@@ -36,6 +36,7 @@ public struct ArticlesListFeature: Sendable {
         public var isLoading: Bool
         public var loadAmount: Int = 30
         public var offset: Int = 0
+        public var listGridTypeShort = false
         
         public var isScrollDisabled: Bool {
             // Disables scroll until first load
@@ -45,11 +46,13 @@ public struct ArticlesListFeature: Sendable {
         public init(
             destination: Destination.State? = nil,
             articles: [ArticlePreview] = [],
-            isLoading: Bool = true
+            isLoading: Bool = true,
+            listGridTypeShort: Bool = false
         ) {
             self.destination = destination
             self.articles = articles
             self.isLoading = isLoading
+            self.listGridTypeShort = listGridTypeShort
         }
     }
     
@@ -61,6 +64,8 @@ public struct ArticlesListFeature: Sendable {
         case binding(BindingAction<State>) // TODO: Remove
         case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // TODO: Should it be a delegate?
         case linkShared(Bool, URL)
+        case listGridTypeButtonTapped
+        case settingsButtonTapped
         case onFirstAppear
         case onRefresh
         case onArticleAppear(ArticlePreview)
@@ -139,14 +144,23 @@ public struct ArticlesListFeature: Sendable {
                 }
                 
             case .onLoadMoreAppear:
-                state.offset += state.loadAmount
-                return .run { [offset = state.offset, amount = state.loadAmount] send in
-                    let result = await Result {
-                        try await apiClient.getArticlesList(offset: offset, amount: amount)
-                    }
-                    await send(._articlesResponse(result))
-                }
-
+                // FIXME: Not working well with scrollview?
+                return .none
+//                state.offset += state.loadAmount
+//                return .run { [offset = state.offset, amount = state.loadAmount] send in
+//                    let result = await Result {
+//                        try await apiClient.getArticlesList(offset: offset, amount: amount)
+//                    }
+//                    await send(._articlesResponse(result))
+//                }
+                
+            case .listGridTypeButtonTapped:
+                state.listGridTypeShort.toggle()
+                return .none
+                
+            case .settingsButtonTapped:
+                return .none
+                
                 // MARK: Internal
                 
             case ._failedToConnect:

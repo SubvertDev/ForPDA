@@ -14,6 +14,8 @@ public enum ArticlesListEvent: Event {
     case linkShareOpened(URL)
     case linkShared(Bool, URL)
     case linkReported(URL)
+    case listGridTypeChanged(Bool)
+    case settingsButtonTapped
     case refreshTriggered
     case loadMoreTriggered
     case menuTapped

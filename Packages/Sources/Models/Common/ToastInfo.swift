@@ -18,6 +18,14 @@ public struct ToastInfo: Equatable {
         self.screen = screen
         self.message = message
     }
+    
+    public init(
+        screen: ToastScreen,
+        message: String
+    ) {
+        self.screen = screen
+        self.message = LocalizedStringKey(message)
+    }
 }
 
 public enum ToastScreen: Equatable {

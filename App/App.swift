@@ -26,6 +26,7 @@ struct ForPDAApp: App {
                 .onOpenURL { url in
                     appDelegate.store.send(.deeplink(url))
                 }
+                .tint(.Theme.primary)
         }
     }
 }
