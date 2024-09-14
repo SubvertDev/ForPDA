@@ -13,7 +13,7 @@ import SharedUI
 public struct BookmarksScreen: View {
     
     @Perception.Bindable public var store: StoreOf<BookmarksFeature>
-    @Environment(\.tintColor) var tintColor
+    @Environment(\.tintColor) private var tintColor
     
     public init(store: StoreOf<BookmarksFeature>) {
         self.store = store
@@ -43,25 +43,7 @@ public struct BookmarksScreen: View {
                 }
                 
                 if !store.isLoading && store.articles.isEmpty {
-                    VStack(spacing: 0) {
-                        Image(systemSymbol: .bookmark)
-                            .font(.title)
-                            .foregroundStyle(tintColor)
-                            .frame(width: 48, height: 48)
-                            .padding(.bottom, 8)
-                        
-                        Text("No bookmarks", bundle: .module)
-                            .font(.title3)
-                            .bold()
-                            .foregroundColor(Color.Labels.primary)
-                            .padding(.bottom, 6)
-                        
-                        Text("Tap “Add To Bookmarks” in article menu, to save it here", bundle: .module)
-                            .font(.footnote)
-                            .multilineTextAlignment(.center)
-                            .foregroundStyle(Color.Labels.teritary)
-                            .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
-                    }
+                    EmptyBookmarks()
                 }
             }
             .navigationTitle(Text("Bookmarks", bundle: .module))
@@ -149,7 +131,28 @@ public struct BookmarksScreen: View {
     
     // MARK: - Empty Screen
     
-    
+    @ViewBuilder
+    private func EmptyBookmarks() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .bookmark)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 8)
+            
+            Text("No bookmarks", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundColor(Color.Labels.primary)
+                .padding(.bottom, 6)
+            
+            Text("Tap “Add To Bookmarks” in article menu, to save it here", bundle: .module)
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.Labels.teritary)
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+        }
+    }
 }
 
 // MARK: - Previews

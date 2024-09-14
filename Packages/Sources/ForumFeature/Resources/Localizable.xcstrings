@@ -1,12 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "COMING SOON" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "COMING SOON"
+          }
+        }
+      }
+    },
     "Forum" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Форум"
+          }
+        }
+      }
+    },
+    "Forum is coming soon" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скоро появится форум"
+          }
+        }
+      }
+    },
+    "While it is in development, you can stay tuned for updates in our telegram chat" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока он находится в разработке, вы можете следить за обновлениями в нашем телеграм чате"
           }
         }
       }

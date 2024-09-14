@@ -31,6 +31,7 @@ public extension Image {
 public extension Color {
     struct Labels {
         public static let primary = Color(.Labels.primary)
+        public static let primaryInvariably = Color(.Labels.primaryInvariably)
         public static let secondary = Color(.Labels.secondary)
         public static let teritary = Color(.Labels.teritary)
         public static let quaternary = Color(.Labels.quaternary)
