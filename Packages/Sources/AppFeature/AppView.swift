@@ -161,8 +161,8 @@ public struct AppView: View {
     
     @ViewBuilder
     private func ProfileTab() -> some View {
-        NavigationStack(path: $store.scope(state: \.menuPath, action: \.menuPath)) {
-            MenuScreen(store: store.scope(state: \.menu, action: \.menu))
+        NavigationStack(path: $store.scope(state: \.profilePath, action: \.profilePath)) {
+            MenuScreen(store: store.scope(state: \.profile, action: \.profile))
         } destination: { store in
             switch store.case {
             case let .auth(store):

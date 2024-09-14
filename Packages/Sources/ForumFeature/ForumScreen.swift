@@ -34,6 +34,15 @@ public struct ForumScreen: View {
             }
             .navigationTitle(Text("Forum", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        store.send(.settingsButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .gearshape)
+                    }
+                }
+            }
             .task {
                 store.send(.onTask)
             }

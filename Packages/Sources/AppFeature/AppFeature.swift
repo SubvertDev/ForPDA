@@ -42,7 +42,7 @@ public struct AppFeature: Sendable {
     }
     
     @Reducer(state: .equatable)
-    public enum MenuPath {
+    public enum ProfilePath {
         case auth(AuthFeature)
         case profile(ProfileFeature)
         case settings(SettingsFeature)
@@ -57,12 +57,12 @@ public struct AppFeature: Sendable {
         public var articlesPath: StackState<ArticlesPath.State>
         public var bookmarksPath: StackState<BookmarksPath.State>
         public var forumPath: StackState<ForumPath.State>
-        public var menuPath: StackState<MenuPath.State>
+        public var profilePath: StackState<ProfilePath.State>
         
         public var articlesList: ArticlesListFeature.State
         public var bookmarks: BookmarksFeature.State
         public var forum: ForumFeature.State
-        public var menu: MenuFeature.State
+        public var profile: MenuFeature.State
         
         public var selectedTab: AppView.Tab
         public var showToast: Bool
@@ -79,11 +79,11 @@ public struct AppFeature: Sendable {
             articlesPath: StackState<ArticlesPath.State> = StackState(),
             bookmarksPath: StackState<BookmarksPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
-            menuPath: StackState<MenuPath.State> = StackState(),
+            menuPath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
-            menu: MenuFeature.State = MenuFeature.State(),
+            profile: MenuFeature.State = MenuFeature.State(),
             selectedTab: AppView.Tab = .articlesList,
             showToast: Bool = false,
             toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""))
@@ -93,12 +93,12 @@ public struct AppFeature: Sendable {
             self.articlesPath = articlesPath
             self.bookmarksPath = bookmarksPath
             self.forumPath = forumPath
-            self.menuPath = menuPath
+            self.profilePath = menuPath
             
             self.articlesList = articlesList
             self.bookmarks = bookmarks
             self.forum = forum
-            self.menu = menu
+            self.profile = profile
             
             self.selectedTab = selectedTab
             self.showToast = showToast
@@ -114,12 +114,12 @@ public struct AppFeature: Sendable {
         case articlesPath(StackActionOf<ArticlesPath>)
         case bookmarksPath(StackActionOf<BookmarksPath>)
         case forumPath(StackActionOf<ForumPath>)
-        case menuPath(StackActionOf<MenuPath>)
+        case profilePath(StackActionOf<ProfilePath>)
         
         case articlesList(ArticlesListFeature.Action)
         case bookmarks(BookmarksFeature.Action)
         case forum(ForumFeature.Action)
-        case menu(MenuFeature.Action)
+        case profile(MenuFeature.Action)
         
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppView.Tab)
@@ -152,7 +152,7 @@ public struct AppFeature: Sendable {
             ForumFeature()
         }
         
-        Scope(state: \.menu, action: \.menu) {
+        Scope(state: \.profile, action: \.profile) {
             MenuFeature()
         }
         
@@ -217,10 +217,10 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .bookmarks, .forum, .menu:
+            case .articlesList, .bookmarks, .forum, .profile:
                 return .none
                 
-            case .articlesPath, .bookmarksPath, .forumPath, .menuPath:
+            case .articlesPath, .bookmarksPath, .forumPath, .profilePath:
                 return .none
             }
         }
@@ -248,10 +248,10 @@ public struct AppFeature: Sendable {
                 
             case .articlesList(.settingsButtonTapped):
                 state.selectedTab = .profile
-                if case .settings = state.menuPath.last {
+                if case .settings = state.profilePath.last {
                     // Last screen is already settings
                 } else {
-                    state.menuPath.append(.settings(SettingsFeature.State()))
+                    state.profilePath.append(.settings(SettingsFeature.State()))
                 }
                 return .none
                 
@@ -289,6 +289,15 @@ public struct AppFeature: Sendable {
         
         Reduce { state, action in
             switch action {
+            case .bookmarks(.settingsButtonTapped):
+                state.selectedTab = .profile
+                if case .settings = state.profilePath.last {
+                    // Last screen is already settings
+                } else {
+                    state.profilePath.append(.settings(SettingsFeature.State()))
+                }
+                return .none
+                
             default:
                 return .none
             }
@@ -299,43 +308,52 @@ public struct AppFeature: Sendable {
         
         Reduce { state, action in
             switch action {
+            case .forum(.settingsButtonTapped):
+                state.selectedTab = .profile
+                if case .settings = state.profilePath.last {
+                    // Last screen is already settings
+                } else {
+                    state.profilePath.append(.settings(SettingsFeature.State()))
+                }
+                return .none
+                
             default:
                 return .none
             }
         }
         .forEach(\.forumPath, action: \.forumPath)
         
-        // MARK: - Menu Path
+        // MARK: - Profile Path
         
         Reduce { state, action in
             switch action {
                 
                 // MARK: Menu
                 
-            case .menu(.delegate(.openAuth)):
-                state.menuPath.append(.auth(AuthFeature.State()))
+            case .profile(.delegate(.openAuth)):
+                state.profilePath.append(.auth(AuthFeature.State()))
                 return .none
                 
-            case let .menu(.delegate(.openProfile(id: id))):
-                state.menuPath.append(.profile(ProfileFeature.State(userId: id)))
+            case let .profile(.delegate(.openProfile(id: id))):
+                state.profilePath.append(.profile(ProfileFeature.State(userId: id)))
                 return .none
                 
-            case .menu(.settingsTapped):
-                state.menuPath.append(.settings(SettingsFeature.State()))
+            case .profile(.settingsTapped):
+                state.profilePath.append(.settings(SettingsFeature.State()))
                 return .none
                 
                 // MARK: Auth
                 
-            case let .menuPath(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
+            case let .profilePath(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
                 // TODO: How to make seamless animation?
-                state.menuPath.pop(from: id)
-                state.menuPath.append(.profile(ProfileFeature.State(userId: userId)))
+                state.profilePath.pop(from: id)
+                state.profilePath.append(.profile(ProfileFeature.State(userId: userId)))
                 return .none
                 
             default:
                 return .none
             }
         }
-        .forEach(\.menuPath, action: \.menuPath)
+        .forEach(\.profilePath, action: \.profilePath)
     }
 }
