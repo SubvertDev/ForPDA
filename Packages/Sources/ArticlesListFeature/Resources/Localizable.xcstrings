@@ -1,112 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add To Bookmarks" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить в закладки"
-          }
-        }
-      }
-    },
-    "addToBookmarks" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить в закладки"
-          }
-        }
-      }
-    },
     "Articles" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Статьи"
-          }
-        }
-      }
-    },
-    "Copied" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скопировано"
-          }
-        }
-      }
-    },
-    "Copy Link" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скопировать ссылку"
-          }
-        }
-      }
-    },
-    "Loading articles" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Загружаем статьи"
-          }
-        }
-      }
-    },
-    "Open In Browser" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открыть в браузере"
-          }
-        }
-      }
-    },
-    "openInBrowser" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открыть в браузере"
-          }
-        }
-      }
-    },
-    "Problems with article?" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проблема со статьей?"
-          }
-        }
-      }
-    },
-    "shareLink" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
-          }
-        }
-      }
-    },
-    "Will be fixed soon :)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скоро починим :)"
           }
         }
       }

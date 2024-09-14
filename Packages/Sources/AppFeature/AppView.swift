@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
+import BookmarksFeature
 import ForumFeature
 import MenuFeature
 import AuthFeature
@@ -72,7 +73,7 @@ public struct AppView: View {
             ZStack(alignment: .bottom) {
                 TabView(selection: $store.selectedTab) {
                     ArticlesListTab()
-                    ForumTab()
+                    BookmarksTab()
                     ForumTab()
                     ProfileTab()
                 }
@@ -83,7 +84,7 @@ public struct AppView: View {
 //                }
             }
             .tint(currentTintColor)
-//            .environment(\.tintColor, currentTintColor)
+            .environment(\.tintColor, currentTintColor)
         }
     }
     
@@ -110,6 +111,28 @@ public struct AppView: View {
             }
         }
         .tag(Tab.articlesList)
+    }
+    
+    // MARK: - Bookmarks Tab
+    
+    @ViewBuilder
+    private func BookmarksTab() -> some View {
+        NavigationStack(path: $store.scope(state: \.bookmarksPath, action: \.bookmarksPath)) {
+            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
+        } destination: { store in
+            switch store.case {
+            default:
+                return EmptyView()
+            }
+        }
+        .tabItem {
+            Label {
+                Text("Bookmarks", bundle: .module)
+            } icon: {
+                Image(systemSymbol: .bookmark)
+            }
+        }
+        .tag(Tab.bookmarks)
     }
     
     // MARK: - Forum Tab

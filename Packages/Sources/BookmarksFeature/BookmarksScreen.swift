@@ -1,25 +1,24 @@
 //
-//  ArticlesListScreen.swift
+//  BookmarksScreen.swift
 //  ForPDA
 //
-//  Created by Ilia Lubianoi on 21.03.2024.
+//  Created by Ilia Lubianoi on 14.09.2024.
 //
 
 import SwiftUI
 import ComposableArchitecture
-import SharedUI
-import Models
 import SFSafeSymbols
+import SharedUI
 
-public struct ArticlesListScreen: View {
+public struct BookmarksScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
-    @State private var scrollViewContentHeight: CGFloat = 0
+    @Perception.Bindable public var store: StoreOf<BookmarksFeature>
+    @Environment(\.tintColor) var tintColor
     
-    public init(store: StoreOf<ArticlesListFeature>) {
+    public init(store: StoreOf<BookmarksFeature>) {
         self.store = store
     }
-        
+    
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
@@ -42,8 +41,30 @@ public struct ArticlesListScreen: View {
                     ModernCircularLoader()
                         .frame(width: 24, height: 24)
                 }
+                
+                if !store.isLoading && store.articles.isEmpty {
+                    VStack(spacing: 0) {
+                        Image(systemSymbol: .bookmark)
+                            .font(.title)
+                            .foregroundStyle(tintColor)
+                            .frame(width: 48, height: 48)
+                            .padding(.bottom, 8)
+                        
+                        Text("No bookmarks", bundle: .module)
+                            .font(.title3)
+                            .bold()
+                            .foregroundColor(Color.Labels.primary)
+                            .padding(.bottom, 6)
+                        
+                        Text("Tap “Add To Bookmarks” in article menu, to save it here", bundle: .module)
+                            .font(.footnote)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(Color.Labels.teritary)
+                            .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                    }
+                }
             }
-            .navigationTitle(Text("Articles", bundle: .module))
+            .navigationTitle(Text("Bookmarks", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(Color.Background.primary, for: .navigationBar)
             .toolbar {
@@ -61,8 +82,8 @@ public struct ArticlesListScreen: View {
                     .presentationDetents([.medium])
                 }
             }
-            .onFirstAppear {
-                store.send(.onFirstAppear)
+            .task {
+                store.send(.onTask)
             }
         }
     }
@@ -95,7 +116,6 @@ public struct ArticlesListScreen: View {
                     }
                 }
             }
-            .modifier(ScrollViewOffsetObserver(store: store, scrollViewContentHeight: $scrollViewContentHeight))
             
             if !store.articles.isEmpty {
                 ModernCircularLoader()
@@ -107,37 +127,6 @@ public struct ArticlesListScreen: View {
         .coordinateSpace(name: "scroll")
         .background(Color.Background.primary)
         .scrollDisabled(store.isScrollDisabled)
-    }
-    
-    // MARK: - Scroll View Offset Observer
-    
-    struct ScrollViewOffsetObserver: ViewModifier {
-        
-        let store: StoreOf<ArticlesListFeature>
-        @Binding var scrollViewContentHeight: CGFloat
-        
-        func body(content: Content) -> some View {
-            content
-                .background(GeometryReader { geometry in
-                    Color.clear
-                        .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
-                        .onChange(of: store.articles) { _ in
-                            scrollViewContentHeight = geometry.size.height
-                        }
-                })
-                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    guard scrollViewContentHeight != 0 else { return }
-                    if scrollViewContentHeight - 350 * 3 < abs(value.y) { // ~ 3 articles
-                        guard !store.isLoading else { return } // Preventing actions overload
-                        store.send(.scrolledToNearEnd)
-                    }
-                }
-        }
-        
-        struct ScrollOffsetPreferenceKey: PreferenceKey {
-            nonisolated(unsafe) static var defaultValue: CGPoint = .zero
-            static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {}
-        }
     }
     
     // MARK: - Toolbar Items
@@ -157,36 +146,21 @@ public struct ArticlesListScreen: View {
             Image(systemSymbol: .gearshape)
         }
     }
+    
+    // MARK: - Empty Screen
+    
+    
 }
 
 // MARK: - Previews
 
 #Preview {
     NavigationStack {
-        ArticlesListScreen(
+        BookmarksScreen(
             store: Store(
-                initialState: ArticlesListFeature.State()
+                initialState: BookmarksFeature.State()
             ) {
-                ArticlesListFeature()
-            } withDependencies: {
-                $0.apiClient = .previewValue
-            }
-        )
-    }
-}
-
-#Preview("Infinite loading") {
-    NavigationStack {
-        ArticlesListScreen(
-            store: Store(
-                initialState: ArticlesListFeature.State()
-            ) {
-                ArticlesListFeature()
-            } withDependencies: {
-                $0.apiClient.getArticlesList = { @Sendable _, _ in
-                    try await Task.never()
-                    return []
-                }
+                BookmarksFeature()
             }
         )
     }

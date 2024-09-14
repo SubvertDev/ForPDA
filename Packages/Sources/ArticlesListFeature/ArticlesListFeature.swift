@@ -38,7 +38,7 @@ public struct ArticlesListFeature: Sendable {
         public var isLoading: Bool
         public var loadAmount: Int = 15
         public var offset: Int = 0
-        public var listRowType: ArticlesListRowType = .normal
+        public var listRowType: ArticleListRowType = .normal
         
         public var isScrollDisabled: Bool {
             // Disables scroll until first load
@@ -65,8 +65,8 @@ public struct ArticlesListFeature: Sendable {
     public enum Action: BindableAction {
         case destination(PresentationAction<Destination.Action>)
         case articleTapped(ArticlePreview)
-        case binding(BindingAction<State>) // TODO: Remove
-        case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // TODO: Should it be a delegate?
+        case binding(BindingAction<State>)
+        case cellMenuOpened(ArticlePreview, ContextMenuOptions)
         case linkShared(Bool, URL)
         case listGridTypeButtonTapped
         case settingsButtonTapped
@@ -134,7 +134,7 @@ public struct ArticlesListFeature: Sendable {
                 }
                 
             case .listGridTypeButtonTapped:
-                state.listRowType = state.listRowType == .normal ? .short : .normal
+                state.listRowType = ArticleListRowType.toggle(from: state.listRowType)
                 return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
                     await appSettings.withLock { $0.articlesListRowType = listRowType }
                 }

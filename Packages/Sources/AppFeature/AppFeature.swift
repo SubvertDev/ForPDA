@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
+import BookmarksFeature
 import ForumFeature
 import MenuFeature
 import AuthFeature
@@ -31,6 +32,11 @@ public struct AppFeature: Sendable {
     }
     
     @Reducer(state: .equatable)
+    public enum BookmarksPath {
+        
+    }
+    
+    @Reducer(state: .equatable)
     public enum ForumPath {
         
     }
@@ -49,10 +55,12 @@ public struct AppFeature: Sendable {
         public var appDelegate: AppDelegateFeature.State
 
         public var articlesPath: StackState<ArticlesPath.State>
+        public var bookmarksPath: StackState<BookmarksPath.State>
         public var forumPath: StackState<ForumPath.State>
         public var menuPath: StackState<MenuPath.State>
         
         public var articlesList: ArticlesListFeature.State
+        public var bookmarks: BookmarksFeature.State
         public var forum: ForumFeature.State
         public var menu: MenuFeature.State
         
@@ -69,9 +77,11 @@ public struct AppFeature: Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
+            bookmarksPath: StackState<BookmarksPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
             menuPath: StackState<MenuPath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
+            bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
             menu: MenuFeature.State = MenuFeature.State(),
             selectedTab: AppView.Tab = .articlesList,
@@ -81,10 +91,12 @@ public struct AppFeature: Sendable {
             self.appDelegate = appDelegate
 
             self.articlesPath = articlesPath
+            self.bookmarksPath = bookmarksPath
             self.forumPath = forumPath
             self.menuPath = menuPath
             
             self.articlesList = articlesList
+            self.bookmarks = bookmarks
             self.forum = forum
             self.menu = menu
             
@@ -100,10 +112,12 @@ public struct AppFeature: Sendable {
         case appDelegate(AppDelegateFeature.Action)
 
         case articlesPath(StackActionOf<ArticlesPath>)
+        case bookmarksPath(StackActionOf<BookmarksPath>)
         case forumPath(StackActionOf<ForumPath>)
         case menuPath(StackActionOf<MenuPath>)
         
         case articlesList(ArticlesListFeature.Action)
+        case bookmarks(BookmarksFeature.Action)
         case forum(ForumFeature.Action)
         case menu(MenuFeature.Action)
         
@@ -130,6 +144,10 @@ public struct AppFeature: Sendable {
             ArticlesListFeature()
         }
         
+        Scope(state: \.bookmarks, action: \.bookmarks) {
+            BookmarksFeature()
+        }
+        
         Scope(state: \.forum, action: \.forum) {
             ForumFeature()
         }
@@ -141,6 +159,11 @@ public struct AppFeature: Sendable {
         Reduce { state, action in
             switch action {
                 
+                // MARK: - Common
+                
+            case .appDelegate, .binding:
+                return .none
+                
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
                     if tab == .articlesList, state.articlesPath.isEmpty {
@@ -149,11 +172,6 @@ public struct AppFeature: Sendable {
                 } else {
                     state.selectedTab = tab
                 }
-                return .none
-                
-                // MARK: - Common
-                
-            case .appDelegate, .binding:
                 return .none
                 
                 // MARK: - Deeplink
@@ -199,10 +217,10 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .forum, .menu:
+            case .articlesList, .bookmarks, .forum, .menu:
                 return .none
                 
-            case .articlesPath, .forumPath, .menuPath:
+            case .articlesPath, .bookmarksPath, .forumPath, .menuPath:
                 return .none
             }
         }
@@ -266,6 +284,16 @@ public struct AppFeature: Sendable {
             }
         }
         .forEach(\.articlesPath, action: \.articlesPath)
+        
+        // MARK: - Bookmarks Path
+        
+        Reduce { state, action in
+            switch action {
+            default:
+                return .none
+            }
+        }
+        .forEach(\.bookmarksPath, action: \.bookmarksPath)
         
         // MARK: - Forum Path
         

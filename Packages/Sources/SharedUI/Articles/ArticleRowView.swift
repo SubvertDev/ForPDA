@@ -6,19 +6,17 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 import SkeletonUI
 import NukeUI
 import Models
-import SharedUI
 
-struct ArticleRowView: View {
+public struct ArticleRowView: View {
     
     @Namespace private var namespace
     
-    let article: ArticlePreview
-    let store: StoreOf<ArticlesListFeature>
-    let rowType: ArticlesListRowType
+    public let article: ArticlePreview
+    public let rowType: ArticleListRowType
+    public let contextMenuActions: ContextMenuActions
     
     private var isShort: Bool {
         return rowType == .short
@@ -28,7 +26,17 @@ struct ArticleRowView: View {
         return String(article.id)
     }
     
-    var body: some View {
+    public init(
+        article: ArticlePreview,
+        rowType: ArticleListRowType,
+        contextMenuActions: ContextMenuActions
+    ) {
+        self.article = article
+        self.rowType = rowType
+        self.contextMenuActions = contextMenuActions
+    }
+    
+    public var body: some View {
         Group {
             switch rowType {
             case .normal:
@@ -37,9 +45,13 @@ struct ArticleRowView: View {
                 ShortRow()
             }
         }
-        .pdaContextMenu(article: article, store: store)
         .transition(.opacity)
         .animation(.smooth, value: isShort)
+        .pdaContextMenu(
+            title: article.title,
+            authorName: article.authorName,
+            contextMenuActions: contextMenuActions
+        )
     }
     
     // MARK: - Normal Row
@@ -62,7 +74,10 @@ struct ArticleRowView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 14)
         }
-        .background(Color.Background.primary)
+        .background(
+            Color.Background.primary
+                .matchedGeometryEffect(id: "background\(id)", in: namespace)
+        )
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
@@ -90,6 +105,10 @@ struct ArticleRowView: View {
                 }
             }
         }
+        .background(
+            Color.Background.primary
+                .matchedGeometryEffect(id: "background\(id)", in: namespace)
+        )
     }
     
     // MARK: - Image
@@ -167,22 +186,9 @@ struct ArticleRowView: View {
             
             Menu {
                 MenuButtons(
-                    article: article,
-                    shareAction: {
-                        store.send(.cellMenuOpened(article, .shareLink))
-                    },
-                    copyAction: {
-                        store.send(.cellMenuOpened(article, .copyLink))
-                    },
-                    openInBrowserAction: {
-                        store.send(.cellMenuOpened(article, .openInBrowser))
-                    },
-                    reportAction: {
-                        store.send(.cellMenuOpened(article, .report))
-                    },
-                    addToBookmarksAction: {
-                        store.send(.cellMenuOpened(article, .addToBookmarks))
-                    }
+                    title: article.title,
+                    authorName: article.authorName,
+                    contextMenuActions: contextMenuActions
                 )
             } label: {
                 Image(systemSymbol: .ellipsis)
