@@ -12,6 +12,7 @@ import Models
 import APIClient
 import AnalyticsClient
 import PasteboardClient
+import PersistenceKeys
 
 @Reducer
 public struct ArticlesListFeature: Sendable {
@@ -32,11 +33,12 @@ public struct ArticlesListFeature: Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
+        @Shared(.appSettings) public var appSettings: AppSettings
         public var articles: [ArticlePreview]
         public var isLoading: Bool
         public var loadAmount: Int = 15
         public var offset: Int = 0
-        public var listGridTypeShort = false
+        public var listRowType: ArticlesListRowType = .normal
         
         public var isScrollDisabled: Bool {
             // Disables scroll until first load
@@ -48,13 +50,13 @@ public struct ArticlesListFeature: Sendable {
         public init(
             destination: Destination.State? = nil,
             articles: [ArticlePreview] = [],
-            isLoading: Bool = true,
-            listGridTypeShort: Bool = false
+            isLoading: Bool = true
         ) {
             self.destination = destination
             self.articles = articles
             self.isLoading = isLoading
-            self.listGridTypeShort = listGridTypeShort
+            
+            self.listRowType = $appSettings.articlesListRowType.wrappedValue
         }
     }
     
@@ -132,8 +134,10 @@ public struct ArticlesListFeature: Sendable {
                 }
                 
             case .listGridTypeButtonTapped:
-                state.listGridTypeShort.toggle()
-                return .none
+                state.listRowType = state.listRowType == .normal ? .short : .normal
+                return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
+                    await appSettings.withLock { $0.articlesListRowType = listRowType }
+                }
                 
             case .settingsButtonTapped:
                 return .none

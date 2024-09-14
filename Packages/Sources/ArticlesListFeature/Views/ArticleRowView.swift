@@ -18,7 +18,11 @@ struct ArticleRowView: View {
     
     let article: ArticlePreview
     let store: StoreOf<ArticlesListFeature>
-    let isShort: Bool
+    let rowType: ArticlesListRowType
+    
+    private var isShort: Bool {
+        return rowType == .short
+    }
     
     private var id: String {
         return String(article.id)
@@ -26,10 +30,11 @@ struct ArticleRowView: View {
     
     var body: some View {
         Group {
-            if isShort {
-                ShortRow()
-            } else {
+            switch rowType {
+            case .normal:
                 NormalRow()
+            case .short:
+                ShortRow()
             }
         }
         .pdaContextMenu(article: article, store: store)

@@ -73,6 +73,7 @@ let package = Package(
                 "AnalyticsClient",
                 "PasteboardClient",
                 "TCAExtensions",
+                "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "SkeletonUI", package: "SkeletonUI"),

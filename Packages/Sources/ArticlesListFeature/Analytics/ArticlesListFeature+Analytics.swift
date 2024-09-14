@@ -42,7 +42,7 @@ extension ArticlesListFeature {
                     analyticsClient.log(ArticlesListEvent.linkShared(success, url))
                     
                 case .listGridTypeButtonTapped:
-                    analyticsClient.log(ArticlesListEvent.listGridTypeChanged(state.listGridTypeShort))
+                    analyticsClient.log(ArticlesListEvent.listGridTypeChanged(state.listRowType.rawValue))
                     
                 case .settingsButtonTapped:
                     analyticsClient.log(ArticlesListEvent.settingsButtonTapped)

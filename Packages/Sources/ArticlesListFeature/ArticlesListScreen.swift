@@ -78,7 +78,7 @@ public struct ArticlesListScreen: View {
                         Button {
                             store.send(.articleTapped(article))
                         } label: {
-                            ArticleRowView(article: article, store: store, isShort: store.listGridTypeShort)
+                            ArticleRowView(article: article, store: store, rowType: store.listRowType)
                         }
                         .buttonStyle(.plain)
                         .padding(.horizontal, 16)
@@ -137,7 +137,7 @@ public struct ArticlesListScreen: View {
         Button {
             store.send(.listGridTypeButtonTapped)
         } label: {
-            Image(systemSymbol: store.listGridTypeShort ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
+            Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
                 .replaceDownUpByLayerEffect(value: true)
         }
         
