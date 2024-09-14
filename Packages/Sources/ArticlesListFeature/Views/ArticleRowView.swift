@@ -33,8 +33,8 @@ struct ArticleRowView: View {
             }
         }
         .pdaContextMenu(article: article, store: store)
-//        .transition(.opacity)
-//        .animation(.smooth, value: isShort)
+        .transition(.opacity)
+        .animation(.smooth, value: isShort)
     }
     
     // MARK: - Normal Row
@@ -98,11 +98,11 @@ struct ArticleRowView: View {
                         .overlay { image.resizable().scaledToFill() }
                         .clipped()
                         .contentShape(Rectangle())
-//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
+                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 } else {
                     Color.Background.teritary
                         .frame(maxHeight: .infinity)
-//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
+                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 }
             }
             .skeleton(with: state.isLoading, shape: .rectangle)
@@ -133,7 +133,7 @@ struct ArticleRowView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, isShort ? 8 : 12)
         }
-//        .matchedGeometryEffect(id: "description\(id)", in: namespace)
+        .matchedGeometryEffect(id: "description\(id)", in: namespace)
     }
     
     // MARK: - Footer
@@ -188,7 +188,7 @@ struct ArticleRowView: View {
             }
             .frame(width: 19, height: 22)
         }
-//        .matchedGeometryEffect(id: "footer\(id)", in: namespace)
+        .matchedGeometryEffect(id: "footer\(id)", in: namespace)
     }
     
     // MARK: - Separator
@@ -198,6 +198,6 @@ struct ArticleRowView: View {
         Rectangle()
             .foregroundStyle(Color.Separator.primary)
             .frame(height: 0.33)
-//            .matchedGeometryEffect(id: "separator\(id)", in: namespace)
+            .matchedGeometryEffect(id: "separator\(id)", in: namespace)
     }
 }

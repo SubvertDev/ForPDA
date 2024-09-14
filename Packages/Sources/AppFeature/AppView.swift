@@ -89,7 +89,6 @@ public struct AppView: View {
     
     // MARK: - Articles List Tab
     
-    @State private var animateTab = false
     @ViewBuilder
     private func ArticlesListTab() -> some View {
         NavigationStack(path: $store.scope(state: \.articlesPath, action: \.articlesPath)) {
@@ -108,11 +107,7 @@ public struct AppView: View {
                 Text("Articles", bundle: .module)
             } icon: {
                 Image(systemSymbol: .docTextImage)
-                    .bounceUpByLayerEffect(value: animateTab)
             }
-        }
-        .onAppear {
-            animateTab.toggle()
         }
         .tag(Tab.articlesList)
     }

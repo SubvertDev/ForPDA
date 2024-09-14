@@ -70,7 +70,7 @@ public struct ArticlesListFeature: Sendable {
         case settingsButtonTapped
         case onFirstAppear
         case onRefresh
-        case onArticleAppear(ArticlePreview)
+        case scrolledToNearEnd
         
         case _failedToConnect(any Error)
         case _articlesResponse(Result<[ArticlePreview], any Error>)
@@ -131,26 +131,6 @@ public struct ArticlesListFeature: Sendable {
                     await send(._articlesResponse(result))
                 }
                 
-            case .onArticleAppear(let articlePreview):
-                // TODO: Revise performance-wise later
-                return .run { [articles = state.articles] send in
-                    if let index = articles.firstIndex(where: { $0 == articlePreview }), index != 0, index % 3 == 0 {
-                        var urls: [URL] = []
-                        let preloadIndex = index + 1
-                        let maxPreloadIndex = preloadIndex + 3
-                        if (preloadIndex <= articles.count - 1) && (maxPreloadIndex <= articles.count - 1) {
-                            for article in articles[preloadIndex..<maxPreloadIndex] {
-                                urls.append(article.imageUrl)
-                            }
-                            await cacheClient.preloadImages(urls)
-                        }
-                        
-                        if articles.count - index < 5 {
-                            await send(._loadMoreArticles)
-                        }
-                    }
-                }
-                
             case .listGridTypeButtonTapped:
                 state.listGridTypeShort.toggle()
                 return .none
@@ -158,10 +138,17 @@ public struct ArticlesListFeature: Sendable {
             case .settingsButtonTapped:
                 return .none
                 
+            case .scrolledToNearEnd:
+                guard !state.isLoading else { return .none }
+                guard state.articles.count != 0 else { return .none }
+                return .run { send in
+                    await send(._loadMoreArticles)
+                }
+                
                 // MARK: Internal
                 
             case ._loadMoreArticles:
-                guard state.articles.count != 0 else { return .none }
+                state.isLoading = true
                 state.offset += state.loadAmount
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     let result = await Result {
@@ -175,13 +162,13 @@ public struct ArticlesListFeature: Sendable {
                 return .none
                 
             case let ._articlesResponse(.success(articles)):
-                state.isLoading = false
                 if state.offset == 0 {
                     state.articles = articles
                 } else {
                     state.articles.append(contentsOf: articles)
                 }
                 state.offset += state.loadAmount
+                state.isLoading = false
                 return .none
                 
             case ._articlesResponse(.failure):

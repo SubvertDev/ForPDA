@@ -14,11 +14,12 @@ import SFSafeSymbols
 public struct ArticlesListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
+    @State private var scrollViewContentHeight: CGFloat = 0
     
     public init(store: StoreOf<ArticlesListFeature>) {
         self.store = store
     }
-    
+        
     public var body: some View {
         WithPerceptionTracking {
             ZStack {
@@ -33,13 +34,6 @@ public struct ArticlesListScreen: View {
                             }
                     }
                 }
-                .navigationTitle(Text("Articles", bundle: .module))
-                .toolbarBackground(Color.Background.primary, for: .navigationBar)
-                .toolbar {
-                    ToolbarItemGroup(placement: .topBarTrailing) {
-                        ToolbarButtons()
-                    }
-                }
                 .refreshable {
                     await store.send(.onRefresh).finish()
                 }
@@ -47,6 +41,14 @@ public struct ArticlesListScreen: View {
                 if store.isLoading {
                     ModernCircularLoader()
                         .frame(width: 24, height: 24)
+                }
+            }
+            .navigationTitle(Text("Articles", bundle: .module))
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(Color.Background.primary, for: .navigationBar)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    ToolbarButtons()
                 }
             }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
@@ -65,32 +67,67 @@ public struct ArticlesListScreen: View {
         }
     }
     
-    // MARK: Articles List
-    
+    // MARK: - Articles List
+        
     @ViewBuilder
     private func ArticlesList() -> some View {
-        List {
-            ForEach(store.articles.indices, id: \.self) { index in
-                WithPerceptionTracking {
-                    Button {
-                        store.send(.articleTapped(store.articles[index]))
-                    } label: {
-                        ArticleRowView(article: store.articles[index], store: store, isShort: store.listGridTypeShort)
-                            .onAppear {
-                                store.send(.onArticleAppear(store.articles[index]))
-                            }
+        ScrollView {
+            VStack(spacing: 14) {
+                ForEach(store.articles, id: \.self) { article in
+                    WithPerceptionTracking {
+                        Button {
+                            store.send(.articleTapped(article))
+                        } label: {
+                            ArticleRowView(article: article, store: store, isShort: store.listGridTypeShort)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 16)
                     }
-                    .buttonStyle(.plain)
-                    .listRowSeparator(.hidden)
-                    .listRowBackground(Color.Background.primary)
-                    .listRowInsets(EdgeInsets(top: 7, leading: 16, bottom: 7, trailing: 16))
                 }
             }
+            .modifier(ScrollViewOffsetObserver(store: store, scrollViewContentHeight: $scrollViewContentHeight))
+            
+            if !store.articles.isEmpty {
+                ModernCircularLoader()
+                    .frame(width: 24, height: 24)
+                    .padding(.top, 14)
+                    .padding(.bottom, 20)
+            }
         }
+        .coordinateSpace(name: "scroll")
         .background(Color.Background.primary)
-        .listStyle(.plain)
         .scrollDisabled(store.isScrollDisabled)
-        .scrollIndicators(.hidden)
+    }
+    
+    // MARK: - Scroll View Offset Observer
+    
+    struct ScrollViewOffsetObserver: ViewModifier {
+        
+        let store: StoreOf<ArticlesListFeature>
+        @Binding var scrollViewContentHeight: CGFloat
+        
+        func body(content: Content) -> some View {
+            content
+                .background(GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
+                        .onChange(of: store.articles) { _ in
+                            scrollViewContentHeight = geometry.size.height
+                        }
+                })
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                    guard scrollViewContentHeight != 0 else { return }
+                    if scrollViewContentHeight - 350 * 3 < abs(value.y) { // ~ 3 articles
+                        guard !store.isLoading else { return } // Preventing actions overload
+                        store.send(.scrolledToNearEnd)
+                    }
+                }
+        }
+        
+        struct ScrollOffsetPreferenceKey: PreferenceKey {
+            nonisolated(unsafe) static var defaultValue: CGPoint = .zero
+            static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {}
+        }
     }
     
     // MARK: - Toolbar Items

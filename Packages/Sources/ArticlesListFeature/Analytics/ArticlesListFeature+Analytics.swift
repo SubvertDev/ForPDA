@@ -63,7 +63,7 @@ extension ArticlesListFeature {
                 case ._loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
-                case .binding, .onArticleAppear, ._articlesResponse, .destination:
+                case .binding, .scrolledToNearEnd, ._articlesResponse, .destination:
                     break
                     
                 case ._failedToConnect(let error):

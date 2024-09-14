@@ -34,6 +34,7 @@ public struct ModernCircularLoader: View {
                     .repeatForever(autoreverses: false),
                 value: animate
             )
+            .foregroundStyle(Color.Labels.primary)
             .onAppear {
                 Task { @MainActor in
                     animate = true
