@@ -208,7 +208,7 @@ public struct AppView: View {
         .frame(maxWidth: .infinity, maxHeight: 84)
         .background(Color.Background.primary)
         .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
-        .shadow(color: Color.black.opacity(0.15), radius: 2)
+        .shadow(color: Color.Labels.primary.opacity(0.15), radius: 2)
         .offset(y: 34)
     }
     
