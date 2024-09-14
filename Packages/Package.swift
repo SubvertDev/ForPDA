@@ -25,6 +25,7 @@ let package = Package(
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
         .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
         .library(name: "PasteboardClient", targets: ["PasteboardClient"]),
+        .library(name: "HapticClient", targets: ["HapticClient"]),
         .library(name: "PersistenceKeys", targets: ["PersistenceKeys"]),
         
         // Shared
@@ -74,6 +75,7 @@ let package = Package(
                 "APIClient",
                 "AnalyticsClient",
                 "PasteboardClient",
+                "HapticClient",
                 "TCAExtensions",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -213,6 +215,12 @@ let package = Package(
         ),
         .target(
             name: "PasteboardClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+            ]
+        ),
+        .target(
+            name: "HapticClient",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]

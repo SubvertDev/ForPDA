@@ -21,16 +21,21 @@ public struct ForumScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 0) {
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: 12))
-                    .padding(.bottom, 100)
+            ZStack {
+                Color.Background.primary
+                    .ignoresSafeArea()
                 
-                ForumIsInDevelopment()
-                
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: -20))
-                    .padding(.top, 80)
+                VStack(spacing: 0) {
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: 12))
+                        .padding(.bottom, 100)
+                    
+                    ForumIsInDevelopment()
+                    
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: -20))
+                        .padding(.top, 80)
+                }
             }
             .navigationTitle(Text("Forum", bundle: .module))
             .navigationBarTitleDisplayMode(.large)

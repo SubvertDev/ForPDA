@@ -12,6 +12,7 @@ import Models
 import APIClient
 import AnalyticsClient
 import PasteboardClient
+import HapticClient
 import PersistenceKeys
 
 @Reducer
@@ -84,6 +85,7 @@ public struct ArticlesListFeature: Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
+    @Dependency(\.hapticClient) private var hapticClient
     
     // MARK: - Body
     
@@ -101,7 +103,7 @@ public struct ArticlesListFeature: Sendable {
                 case .copyLink:       pasteboardClient.copy(string: article.url.absoluteString)
                 case .openInBrowser:  return .run { _ in await open(url: article.url) }
                 case .report:         break
-                case .addToBookmarks: break
+                case .addToBookmarks: return .run { _ in await hapticClient.play(.rigid) }
                 }
                 return .none
                 
@@ -136,6 +138,7 @@ public struct ArticlesListFeature: Sendable {
             case .listGridTypeButtonTapped:
                 state.listRowType = ArticleListRowType.toggle(from: state.listRowType)
                 return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
+                    await hapticClient.play(.selection)
                     await appSettings.withLock { $0.articlesListRowType = listRowType }
                 }
                 

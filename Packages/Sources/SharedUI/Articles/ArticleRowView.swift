@@ -13,6 +13,7 @@ import Models
 public struct ArticleRowView: View {
     
     @Namespace private var namespace
+    @Environment(\.tintColor) private var tintColor
     
     public let article: ArticlePreview
     public let rowType: ArticleListRowType
@@ -184,20 +185,7 @@ public struct ArticleRowView: View {
             
             Spacer()
             
-            Menu {
-                MenuButtons(
-                    title: article.title,
-                    authorName: article.authorName,
-                    contextMenuActions: contextMenuActions
-                )
-            } label: {
-                Image(systemSymbol: .ellipsis)
-                    .font(.body)
-                    .foregroundStyle(Color.Labels.teritary)
-                    .padding(.horizontal, isShort ? 8 : 16) // Padding for tap area
-                    .padding(.vertical, isShort ? 11 : 22)
-            }
-            .frame(width: 19, height: 22)
+            ContextMenu()
         }
         .matchedGeometryEffect(id: "footer\(id)", in: namespace)
     }
@@ -210,5 +198,25 @@ public struct ArticleRowView: View {
             .foregroundStyle(Color.Separator.primary)
             .frame(height: 0.33)
             .matchedGeometryEffect(id: "separator\(id)", in: namespace)
+    }
+    
+    // MARK: - Context Menu
+        
+    @ViewBuilder
+    private func ContextMenu() -> some View {
+        Menu {
+            MenuButtons(
+                title: article.title,
+                authorName: article.authorName,
+                contextMenuActions: contextMenuActions
+            )
+        } label: {
+            Image(systemSymbol: .ellipsis)
+                .font(.body)
+                .foregroundStyle(Color.Labels.teritary)
+                .padding(.horizontal, isShort ? 8 : 16) // Padding for tap area
+                .padding(.vertical, isShort ? 11 : 22)
+        }
+        .frame(width: 19, height: 22)
     }
 }
