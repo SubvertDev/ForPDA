@@ -39,8 +39,7 @@ let package = Package(
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
-        .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.36.0"),
+        .package(url: "https://github.com/appmetrica/appmetrica-sdk-ios", from: "5.8.0"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.9.0"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
@@ -202,8 +201,8 @@ let package = Package(
                 "Models",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Mixpanel", package: "mixpanel-swift"),
-                .product(name: "Sentry", package: "sentry-cocoa")
+                .product(name: "AppMetricaCore", package: "appmetrica-sdk-ios"),
+                .product(name: "AppMetricaCrashes", package: "appmetrica-sdk-ios")
             ]
         ),
         .target(
