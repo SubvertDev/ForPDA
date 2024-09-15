@@ -1,5 +1,5 @@
 {
-  "originHash" : "695b76d605e540828e1a74ec077b1b6f7e504071c61e5716e13cba3b855e658c",
+  "originHash" : "0bef767fac59f690bf28f70c2c596ae1d56cbcc4bf0a31115d69e05cb55e725d",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -53,6 +53,15 @@
       "state" : {
         "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
         "version" : "12.8.0"
+      }
+    },
+    {
+      "identity" : "push-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/appmetrica/push-sdk-ios",
+      "state" : {
+        "revision" : "508724be021df2300a853e94991ccab475caea82",
+        "version" : "2.0.0"
       }
     },
     {

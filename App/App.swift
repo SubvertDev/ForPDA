@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 import ComposableArchitecture
 import AppFeature
 
@@ -44,7 +45,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        store.send(.appDelegate(.didFinishLaunching))
+        store.send(.appDelegate(.didFinishLaunching(application)))
         return true
     }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        store.send(.appDelegate(.didRegisterForRemoteNotifications(deviceToken)))
+    }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    
 }

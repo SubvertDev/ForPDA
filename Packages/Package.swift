@@ -25,6 +25,7 @@ let package = Package(
         .library(name: "ParsingClient", targets: ["ParsingClient"]),
         .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
         .library(name: "PasteboardClient", targets: ["PasteboardClient"]),
+        .library(name: "NotificationsClient", targets: ["NotificationsClient"]),
         .library(name: "HapticClient", targets: ["HapticClient"]),
         .library(name: "PersistenceKeys", targets: ["PersistenceKeys"]),
         
@@ -40,6 +41,7 @@ let package = Package(
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
         .package(url: "https://github.com/appmetrica/appmetrica-sdk-ios", from: "5.8.0"),
+        .package(url: "https://github.com/appmetrica/push-sdk-ios", from: "2.0.0"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.9.0"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
@@ -62,6 +64,7 @@ let package = Package(
                 "SettingsFeature",
                 "AnalyticsClient",
                 "CacheClient",
+                "NotificationsClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "AlertToast", package: "AlertToast")
             ]
@@ -219,6 +222,13 @@ let package = Package(
             ]
         ),
         .target(
+            name: "NotificationsClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "AppMetricaPush", package: "push-sdk-ios")
+            ]
+        ),
+        .target(
             name: "HapticClient",
             dependencies: [
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -245,6 +255,7 @@ let package = Package(
         .target(
             name: "SharedUI",
             dependencies: [
+                .product(name: "NukeUI", package: "nuke"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
                 .product(name: "SwiftyGif", package: "SwiftyGif")
             ]

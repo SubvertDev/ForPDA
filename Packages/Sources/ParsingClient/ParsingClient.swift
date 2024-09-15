@@ -4,13 +4,10 @@
 //
 //  Created by Subvert on 14.12.2022.
 //
-//  swiftlint:disable force_try cyclomatic_complexity function_body_length type_body_length file_length
 
 import Foundation
 import ComposableArchitecture
 import Models
-
-// MARK: - New Implementation
 
 @DependencyClient
 public struct ParsingClient: Sendable {
