@@ -38,7 +38,7 @@ public struct ArticlesListScreen: View {
                     await store.send(.onRefresh).finish()
                 }
                 
-                if store.isLoading {
+                if store.isLoading && store.articles.isEmpty {
                     ModernCircularLoader()
                         .frame(width: 24, height: 24)
                 }
