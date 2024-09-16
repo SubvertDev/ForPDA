@@ -18,6 +18,7 @@ import SettingsFeature
 import AlertToast
 import SFSafeSymbols
 import SharedUI
+import Models
 
 public struct AppView: View {
     
@@ -55,10 +56,7 @@ public struct AppView: View {
     }
     
     @Perception.Bindable public var store: StoreOf<AppFeature>
-    // TODO: Refactor something to store?
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
-    @Environment(\.tintColor) var tintColor
-    @State private var currentTintColor = Color.Theme.primary
     
     public init(store: StoreOf<AppFeature>) {
         self.store = store
@@ -86,8 +84,10 @@ public struct AppView: View {
 //                    AlertToast(displayMode: .hud, type: .regular, title: store.toast.message, bundle: store.localizationBundle)
 //                }
             }
-            .tint(currentTintColor)
-            .environment(\.tintColor, currentTintColor)
+//            .tint(tintColor)
+            .tint(store.appSettings.appTintColor.asColor)
+            .environment(\.tintColor, store.appSettings.appTintColor.asColor)
+            .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
         }
     }
     
@@ -202,10 +202,31 @@ public struct AppView: View {
             Text(title, bundle: .module)
                 .font(.caption2)
         }
-        .foregroundStyle(store.selectedTab.rawValue == index ? currentTintColor : Color.Labels.quaternary)
+        .foregroundStyle(store.selectedTab.rawValue == index
+                         ? store.appSettings.appTintColor.asColor
+                         : Color.Labels.quaternary)
         .frame(maxWidth: .infinity)
     }
 }
+
+// MARK: - Model Extensions
+
+extension AppTintColor {
+    var asColor: Color {
+        switch self {
+        case .primary:  Color.Theme.primary
+        case .purple:   Color.Theme.purple
+        case .lettuce:  Color.Theme.lettuce
+        case .orange:   Color.Theme.orange
+        case .pink:     Color.Theme.pink
+        case .scarlet:  Color.Theme.scarlet
+        case .sky:      Color.Theme.sky
+        case .yellow:   Color.Theme.yellow
+        }
+    }
+}
+
+// MARK: - Previews
 
 #Preview {
     AppView(

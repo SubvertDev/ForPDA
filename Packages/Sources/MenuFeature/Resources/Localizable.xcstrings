@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "App author" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -12,6 +13,7 @@
       }
     },
     "App discussion" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

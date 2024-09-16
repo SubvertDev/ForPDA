@@ -82,7 +82,6 @@ let package = Package(
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
-                .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ],
             resources: [.process("Resources")]
@@ -176,7 +175,10 @@ let package = Package(
                 "CacheClient",
                 "TCAExtensions",
                 "Models",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                "SharedUI",
+                "PersistenceKeys",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
         
@@ -257,7 +259,8 @@ let package = Package(
             dependencies: [
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
-                .product(name: "SwiftyGif", package: "SwiftyGif")
+                .product(name: "SwiftyGif", package: "SwiftyGif"),
+                .product(name: "SkeletonUI", package: "SkeletonUI")
             ]
         ),
         .target(

@@ -10,6 +10,7 @@ import ComposableArchitecture
 import PasteboardClient
 import CacheClient
 import TCAExtensions
+import PersistenceKeys
 import Models
 
 @Reducer
@@ -29,6 +30,10 @@ public struct SettingsFeature: Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
+        @Shared(.appSettings) public var appSettings: AppSettings
+        public var appColorScheme: AppColorScheme
+        public var backgroundTheme: BackgroundTheme
+        public var appTintColor: AppTintColor
         
         public var appVersionAndBuild: String {
             let info = Bundle.main.infoDictionary
@@ -50,18 +55,33 @@ public struct SettingsFeature: Sendable {
             destination: Destination.State? = nil
         ) {
             self.destination = destination
+            
+            // TODO: Two liners so I don't need to set default in state
+            self.appColorScheme = AppSettings.default.appColorScheme
+            self.backgroundTheme = AppSettings.default.backgroundTheme
+            self.appTintColor = AppSettings.default.appTintColor
+
+            self.appColorScheme = $appSettings.appColorScheme.wrappedValue
+            self.backgroundTheme = $appSettings.backgroundTheme.wrappedValue
+            self.appTintColor = $appSettings.appTintColor.wrappedValue
         }
     }
     
     // MARK: - Action
     
-    public enum Action {
+    public enum Action: BindableAction {
+        case binding(BindingAction<State>)
         case languageButtonTapped
-        case themeButtonTapped
+        case schemeButtonTapped(AppColorScheme)
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
         case clearCacheButtonTapped
+        case appDiscussionButtonTapped
+        case telegramChangelogButtonTapped
+        case telegramChatButtonTapped
+        case githubButtonTapped
         case checkVersionsButtonTapped
+        case notImplementedFeatureTapped
         
         case _somethingWentWrong(any Error)
         
@@ -82,6 +102,8 @@ public struct SettingsFeature: Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
+        BindingReducer()
+        
         Reduce { state, action in
             switch action {
             case .languageButtonTapped:
@@ -90,9 +112,13 @@ public struct SettingsFeature: Sendable {
                     await open(url: settingsURL)
                 }
                 
-            case .themeButtonTapped:
-                state.destination = .alert(.notImplemented)
-                return .none
+            case let .schemeButtonTapped(scheme):
+                state.appColorScheme = scheme
+//                state.destination = .alert(.notImplemented)
+                return .run { [appSettings = state.$appSettings,
+                               scheme = state.appColorScheme] _ in
+                    await appSettings.withLock { $0.appColorScheme = scheme }
+                }
                 
             case .safariExtensionButtonTapped:
                 // TODO: Not working anymore, check other solutions
@@ -109,11 +135,33 @@ public struct SettingsFeature: Sendable {
                 state.destination = .alert(.clearCache)
                 return .none
                 
+            case .appDiscussionButtonTapped:
+                return .none
+                
+            case .telegramChangelogButtonTapped:
+                return .run { _ in
+                    await open(url: Links.telegramChangelog)
+                }
+                
+            case .telegramChatButtonTapped:
+                return .run { _ in
+                    await open(url: Links.telegramChat)
+                }
+                
+            case .githubButtonTapped:
+                return .run { _ in
+                    await open(url: Links.github)
+                }
+                
             case .checkVersionsButtonTapped:
                 return .run { _ in
                     // TODO: Move URL to models
                     await open(url: Links.githubReleases)
                 }
+                
+            case .notImplementedFeatureTapped:
+                state.destination = .alert(.notImplemented)
+                return .none
                 
             case .destination(.presented(.alert(.openSettings))):
                 return .run { _ in
@@ -134,7 +182,13 @@ public struct SettingsFeature: Sendable {
                     }
                 }
                 
-            case .destination:
+            case .binding(\.appTintColor):
+                return .run { [appSettings = state.$appSettings,
+                               tint = state.appTintColor] _ in
+                    await appSettings.withLock { $0.appTintColor = tint }
+                }
+                
+            case .destination, .binding:
                 return .none
             }
         }

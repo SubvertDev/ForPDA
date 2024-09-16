@@ -26,8 +26,8 @@ extension MenuFeature {
                 case .settingsTapped:
                     analyticsClient.log(MenuEvent.settingsTapped)
                     
-                case .appAuthorButtonTapped:
-                    analyticsClient.log(MenuEvent.author4PDATapped)
+//                case .appAuthorButtonTapped:
+//                    analyticsClient.log(MenuEvent.author4PDATapped)
                     
                 case .telegramChangelogButtonTapped:
                     analyticsClient.log(MenuEvent.changelogTelegramTapped)

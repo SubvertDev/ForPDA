@@ -47,7 +47,6 @@ public struct MenuFeature: Sendable {
         case notImplementedFeatureTapped
         case profileTapped
         case settingsTapped
-        case appAuthorButtonTapped
         case telegramChangelogButtonTapped
         case telegramChatButtonTapped
         case githubButtonTapped
@@ -121,11 +120,6 @@ public struct MenuFeature: Sendable {
                 
             case .settingsTapped:
                 return .none
-                
-            case .appAuthorButtonTapped:
-                return .run { _ in
-                    await open(url: Links._4pdaAuthor)
-                }
                 
             case .telegramChangelogButtonTapped:
                 return .run { _ in

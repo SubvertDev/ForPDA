@@ -23,9 +23,27 @@ public extension EnvironmentValues {
 // TODO: 17+ change to ImageResource
 public extension Image {
     static let avatarDefault = Image(.avatarDefault)
-    static let _4pda = Image(._4Pda)
     static let github = Image(.github)
     static let telegram = Image(.telegram)
+    
+    struct Settings {
+        public static let lightThemeExample = Image(.Settings.lightThemeExample)
+        public static let darkThemeExample = Image(.Settings.darkThemeExample)
+        public static let systemThemeExample = Image(.Settings.systemThemeExample)
+        public static let circleBlue = Image(.Settings.circleBlue)
+        public static let circleDark = Image(.Settings.circleDark)
+        
+        public struct Theme {
+            public static let circleLettuce = Image(.Settings.Theme.circleLettuce)
+            public static let circleOrange = Image(.Settings.Theme.circleOrange)
+            public static let circlePink = Image(.Settings.Theme.circlePink)
+            public static let circlePrimary = Image(.Settings.Theme.circlePrimary)
+            public static let circlePurple = Image(.Settings.Theme.circlePurple)
+            public static let circleScarlet = Image(.Settings.Theme.circleScarlet)
+            public static let circleSky = Image(.Settings.Theme.circleSky)
+            public static let circleYellow = Image(.Settings.Theme.circleYellow)
+        }
+    }
 }
 
 public extension Color {
@@ -35,6 +53,7 @@ public extension Color {
         public static let secondary = Color(.Labels.secondary)
         public static let teritary = Color(.Labels.teritary)
         public static let quaternary = Color(.Labels.quaternary)
+        public static let quintuple = Color(.Labels.quintuple)
     }
     
     struct Background {

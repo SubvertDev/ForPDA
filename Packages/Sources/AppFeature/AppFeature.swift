@@ -65,6 +65,7 @@ public struct AppFeature: Sendable {
         public var forum: ForumFeature.State
         public var profile: MenuFeature.State
         
+        @Shared(.appSettings) public var appSettings: AppSettings
         public var selectedTab: AppView.Tab
         public var isShowingTabBar: Bool
         public var showToast: Bool
