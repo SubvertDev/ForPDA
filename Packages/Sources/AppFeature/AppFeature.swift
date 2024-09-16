@@ -29,16 +29,17 @@ public struct AppFeature: Sendable {
     public enum ArticlesPath {
         case article(ArticleFeature)
         case profile(ProfileFeature)
+        case settings(SettingsFeature)
     }
     
     @Reducer(state: .equatable)
     public enum BookmarksPath {
-        
+        case settings(SettingsFeature)
     }
     
     @Reducer(state: .equatable)
     public enum ForumPath {
-        
+        case settings(SettingsFeature)
     }
     
     @Reducer(state: .equatable)
@@ -65,6 +66,7 @@ public struct AppFeature: Sendable {
         public var profile: MenuFeature.State
         
         public var selectedTab: AppView.Tab
+        public var isShowingTabBar: Bool
         public var showToast: Bool
         public var toast: ToastInfo
         public var localizationBundle: Bundle? {
@@ -85,6 +87,7 @@ public struct AppFeature: Sendable {
             forum: ForumFeature.State = ForumFeature.State(),
             profile: MenuFeature.State = MenuFeature.State(),
             selectedTab: AppView.Tab = .articlesList,
+            isShowingTabBar: Bool = true,
             showToast: Bool = false,
             toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""))
         ) {
@@ -101,6 +104,7 @@ public struct AppFeature: Sendable {
             self.profile = profile
             
             self.selectedTab = selectedTab
+            self.isShowingTabBar = isShowingTabBar
             self.showToast = showToast
             self.toast = toast
         }
@@ -247,12 +251,8 @@ public struct AppFeature: Sendable {
                 return .none
                 
             case .articlesList(.settingsButtonTapped):
-                state.selectedTab = .profile
-                if case .settings = state.profilePath.last {
-                    // Last screen is already settings
-                } else {
-                    state.profilePath.append(.settings(SettingsFeature.State()))
-                }
+                state.isShowingTabBar = false
+                state.articlesPath.append(.settings(SettingsFeature.State()))
                 return .none
                 
             case .articlesList:
@@ -284,18 +284,21 @@ public struct AppFeature: Sendable {
             }
         }
         .forEach(\.articlesPath, action: \.articlesPath)
+        .onChange(of: \.articlesPath) { _, newValue in
+            // TODO: Another way?
+            Reduce { state, _ in
+                state.isShowingTabBar = newValue.isEmpty
+                return .none
+            }
+        }
         
         // MARK: - Bookmarks Path
         
         Reduce { state, action in
             switch action {
             case .bookmarks(.settingsButtonTapped):
-                state.selectedTab = .profile
-                if case .settings = state.profilePath.last {
-                    // Last screen is already settings
-                } else {
-                    state.profilePath.append(.settings(SettingsFeature.State()))
-                }
+                state.isShowingTabBar = false
+                state.bookmarksPath.append(.settings(SettingsFeature.State()))
                 return .none
                 
             default:
@@ -303,18 +306,21 @@ public struct AppFeature: Sendable {
             }
         }
         .forEach(\.bookmarksPath, action: \.bookmarksPath)
+        .onChange(of: \.bookmarksPath) { _, newValue in
+            // TODO: Another way?
+            Reduce { state, _ in
+                state.isShowingTabBar = newValue.isEmpty
+                return .none
+            }
+        }
         
         // MARK: - Forum Path
         
         Reduce { state, action in
             switch action {
             case .forum(.settingsButtonTapped):
-                state.selectedTab = .profile
-                if case .settings = state.profilePath.last {
-                    // Last screen is already settings
-                } else {
-                    state.profilePath.append(.settings(SettingsFeature.State()))
-                }
+                state.isShowingTabBar = false
+                state.forumPath.append(.settings(SettingsFeature.State()))
                 return .none
                 
             default:
@@ -322,6 +328,13 @@ public struct AppFeature: Sendable {
             }
         }
         .forEach(\.forumPath, action: \.forumPath)
+        .onChange(of: \.forumPath) { _, newValue in
+            // TODO: Another way?
+            Reduce { state, _ in
+                state.isShowingTabBar = newValue.isEmpty
+                return .none
+            }
+        }
         
         // MARK: - Profile Path
         

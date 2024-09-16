@@ -55,9 +55,10 @@ public struct AppView: View {
     }
     
     @Perception.Bindable public var store: StoreOf<AppFeature>
+    // TODO: Refactor something to store?
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
     @Environment(\.tintColor) var tintColor
-    @State var currentTintColor = Color.Theme.primary
+    @State private var currentTintColor = Color.Theme.primary
     
     public init(store: StoreOf<AppFeature>) {
         self.store = store
@@ -79,6 +80,8 @@ public struct AppView: View {
                 }
                 
                 PDATabView()
+                    .offset(y: store.isShowingTabBar ? 0 : 84)
+                    .animation(.default, value: store.isShowingTabBar)
 //                .toast(isPresenting: $store.showToast) {
 //                    AlertToast(displayMode: .hud, type: .regular, title: store.toast.message, bundle: store.localizationBundle)
 //                }
@@ -101,13 +104,9 @@ public struct AppView: View {
                 
             case let .profile(store):
                 ProfileScreen(store: store)
-            }
-        }
-        .tabItem {
-            Label {
-                Text("Articles", bundle: .module)
-            } icon: {
-                Image(systemSymbol: .docTextImage)
+                
+            case let .settings(store):
+                SettingsScreen(store: store)
             }
         }
         .tag(Tab.articlesList)
@@ -121,15 +120,8 @@ public struct AppView: View {
             BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
         } destination: { store in
             switch store.case {
-            default:
-                return EmptyView()
-            }
-        }
-        .tabItem {
-            Label {
-                Text("Bookmarks", bundle: .module)
-            } icon: {
-                Image(systemSymbol: .bookmark)
+            case let .settings(store):
+                SettingsScreen(store: store)
             }
         }
         .tag(Tab.bookmarks)
@@ -143,15 +135,8 @@ public struct AppView: View {
             ForumScreen(store: store.scope(state: \.forum, action: \.forum))
         } destination: { store in
             switch store.case {
-            default:
-                return EmptyView()
-            }
-        }
-        .tabItem {
-            Label {
-                Text("Forum", bundle: .module)
-            } icon: {
-                Image(systemSymbol: .bubbleLeftAndBubbleRight)
+            case let .settings(store):
+                SettingsScreen(store: store)
             }
         }
         .tag(Tab.forum)
@@ -173,13 +158,6 @@ public struct AppView: View {
                 
             case let .settings(store):
                 SettingsScreen(store: store)
-            }
-        }
-        .tabItem {
-            Label {
-                Text("Profile", bundle: .module)
-            } icon: {
-                Image(systemSymbol: .personCropCircle)
             }
         }
         .tag(Tab.profile)
