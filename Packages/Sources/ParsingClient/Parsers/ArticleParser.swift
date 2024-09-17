@@ -37,6 +37,8 @@ public struct ArticleParser {
                     throw ParsingError.failedToCastDataToAny
                 }
                 
+                let pollFields = fields.count > 16 ? fields[16] as! [[Any]] : []
+                
                 return Article(
                     id: fields[2] as! Int,
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
@@ -48,7 +50,8 @@ public struct ArticleParser {
                     description: (fields[12] as! String).convertHtmlCodes(),
                     attachments: extractAttachments(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
-                    comments: extractComments(from: fields[15] as! [[Any]])
+                    comments: extractComments(from: fields[15] as! [[Any]]),
+                    poll: extractPoll(from: pollFields)
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -132,5 +135,22 @@ public struct ArticleParser {
         }
         
         return comments
+    }
+    
+    private static func extractPoll(from array: [[Any]]) -> ArticlePoll? {
+        guard !array.isEmpty else { return nil }
+        return ArticlePoll(
+            id: array[0][0] as! Int,
+            title: array[0][1] as! String,
+            type: array[0][2] as! Int,
+            totalVotes: array[0][3] as! Int,
+            options: (array[0][4] as! [[Any]]).map {
+                ArticlePoll.Option(
+                    id: $0[0] as! Int,
+                    text: $0[1] as! String,
+                    votes: $0[2] as! Int
+                )
+            }
+        )
     }
 }

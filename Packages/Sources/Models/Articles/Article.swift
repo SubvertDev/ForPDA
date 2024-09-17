@@ -20,6 +20,7 @@ public struct Article: Sendable, Hashable, Codable {
     public let attachments: [Attachment]
     public let tags: [Tag]
     public let comments: [Comment]
+    public let poll: ArticlePoll?
     
     public init(
         id: Int,
@@ -32,7 +33,8 @@ public struct Article: Sendable, Hashable, Codable {
         description: String,
         attachments: [Attachment],
         tags: [Tag],
-        comments: [Comment]
+        comments: [Comment],
+        poll: ArticlePoll?
     ) {
         self.id = id
         self.date = date
@@ -45,6 +47,7 @@ public struct Article: Sendable, Hashable, Codable {
         self.attachments = attachments
         self.tags = tags
         self.comments = comments
+        self.poll = poll
     }
 }
 
@@ -60,6 +63,7 @@ public extension Article {
         description: "Occaecat enim duis dolor tempor nostrud ea veniam culpa magna incididunt nisi ut laborum amet.\n\n Игру можно [url=\"https://store.epicgames.com/ru/p/fist-forged-in-shadow-torch\"]забрать бесплатно[/url] до 1 августа.&nbsp;\n\n [quote] «Шесть лет назад Легион захватил и колонизировал город Светоч.\n\n [/quote]\n[center][attachment=\"1:dummy\"][/center]\n\n[center][youtube=eOqif3M_UFY:640:360:::0][/center]\n\n[list]\t[*]41 мм, GPS — $249\n\t[*]41 мм, LTE (или 5G) — $299\n\t[*]45 мм, GPS — $279\n\t[*]45 мм, LTE (или 5G) — $329\n [/list]\n",
         attachments: [Attachment(id: 1, smallUrl: URL(string: "https://4pda.to/static/img/news/60/601868t.jpg")!, width: 480, height: 270, description: "", fullUrl: URL(string: "https://4pda.to/static/img/news/60/601868.jpg")!)],
         tags: [],
-        comments: .mockArray
+        comments: .mockArray,
+        poll: nil
     )
 }
