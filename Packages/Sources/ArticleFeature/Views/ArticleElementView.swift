@@ -169,13 +169,24 @@ struct ArticleElementView: View {
     @ViewBuilder
     private func bulletList(_ element: BulletListElement) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(element.elements, id: \.self) { element in
+            ForEach(Array(element.elements.enumerated()), id: \.0) { index, singleElement in
                 HStack(alignment: .top, spacing: 8) {
-                    Circle()
-                        .frame(width: 4, height: 4)
-                        .padding(.top, 8)
+                    switch element.type {
+                    case .numeric:
+                        Text(String("\(index + 1)."))
+                            .font(.callout)
+                            .foregroundStyle(Color.Labels.primary)
+                        
+                    case .dotted:
+                        Circle()
+                            .foregroundStyle(Color.Labels.primary)
+                            .frame(width: 4, height: 4)
+                            .padding(.top, 8)
+                    }
                     
-                    Text(element.asMarkdown)
+                    Text(singleElement.asMarkdown)
+                        .font(.callout)
+                        .foregroundStyle(Color.Labels.primary)
                 }
             }
         }
@@ -265,6 +276,7 @@ struct ArticleElementView: View {
         ),
         element: .bulletList(
             .init(
+                type: .dotted,
                 elements: ["First Element", "Second Element", "Third Element", "Fourth Element", "Fifth Element Fifth Element Fifth Element Fifth Element"]
             )
         )

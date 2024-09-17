@@ -120,11 +120,20 @@ public struct ButtonElement: Sendable, Equatable, Hashable {
 // MARK: - BulletList
 
 public struct BulletListElement: Sendable, Equatable, Hashable {
+    
+    public enum BulletType: Sendable, Equatable, Hashable {
+        case numeric
+        case dotted
+    }
+    
+    public let type: BulletType
     public let elements: [String]
     
     public init(
+        type: BulletType,
         elements: [String]
     ) {
+        self.type = type
         self.elements = elements
     }
 }
