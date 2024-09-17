@@ -15,6 +15,7 @@ import Models
 
 struct ArticleElementView: View {
     
+    @Environment(\.tintColor) private var tintColor
     @Environment(\.openURL) private var openURL
     @State private var gallerySelection: Int = 0
     
@@ -57,29 +58,33 @@ struct ArticleElementView: View {
     
     @ViewBuilder
     private func text(_ element: TextElement) -> some View {
-        HStack {
-            if element.isQuote {
-                Rectangle()
-                    .foregroundStyle(.gray.opacity(2/3))
-                    .frame(width: 16)
-                    .overlay(alignment: .top) {
-                        Image(systemSymbol: .quoteClosing)
+        Text(element.text.asMarkdown)
+            .font(element.isHeader ? .title3 : .callout)
+            .foregroundStyle(Color.Labels.primary)
+            .environment(\.openURL, OpenURLAction { url in
+                store.send(.linkInTextTapped(url))
+                return .handled
+            })
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, element.isQuote ? 46 : 0)
+            .padding(.top, element.isHeader ? 16 : 0)
+            .padding([.horizontal, .bottom], element.isQuote ? 12 : 0)
+            .overlay {
+                if element.isQuote {
+                    ZStack(alignment: .top) {
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.Separator.secondary, lineWidth: 0.67)
+                        
+                        Image.quote
                             .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.white)
-                            .padding(1)
+                            .frame(width: 30, height: 20)
+                            .padding([.top, .leading], 12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundStyle(tintColor)
                     }
+                }
             }
-            
-            Text(element.text.asMarkdown)
-                .environment(\.openURL, OpenURLAction { url in
-                    store.send(.linkInTextTapped(url))
-                    return .handled
-                })
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(element.isHeader ? .title : .body)
-                .padding(.horizontal, 12)
-        }
+            .padding(.horizontal, 16)
     }
     
     // MARK: - Image
@@ -237,6 +242,15 @@ struct ArticleElementView: View {
         element: .text(.init(text: Array(repeating: "Test ", count: 30).joined(), isQuote: true))
     )
     .frame(height: 100)
+}
+
+#Preview("Quote") {
+    ArticleElementView(
+        store: .init(initialState: ArticleFeature.State(articlePreview: .mock), reducer: {
+            ArticleFeature()
+        }),
+        element: .text(TextElement(text: "Adipisicing mollit pariatur magna ullamco mollit mollit sit quis. Pariatur irure fugiat consequat mollit aliqua pariatur cillum fugiat occaecat non fugiat id. Nostrud consequat enim elit veniam.", isQuote: true))
+    )
 }
 
 #Preview("Bullet List") {

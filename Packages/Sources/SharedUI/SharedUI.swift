@@ -25,6 +25,7 @@ public extension Image {
     static let avatarDefault = Image(.avatarDefault)
     static let github = Image(.github)
     static let telegram = Image(.telegram)
+    static let quote = Image(.quote)
     
     struct Settings {
         public static let lightThemeExample = Image(.Settings.lightThemeExample)
@@ -51,18 +52,23 @@ public extension Color {
         public static let primary = Color(.Labels.primary)
         public static let primaryInvariably = Color(.Labels.primaryInvariably)
         public static let secondary = Color(.Labels.secondary)
+        public static let secondaryInvariably = Color(.Labels.secondaryInvariably)
         public static let teritary = Color(.Labels.teritary)
         public static let quaternary = Color(.Labels.quaternary)
         public static let quintuple = Color(.Labels.quintuple)
+        public static let forcedLight = Color(.Labels.forcedLight)
     }
     
     struct Background {
         public static let primary = Color(.Background.primary)
+        public static let primaryAlpha = Color(.Background.primaryAlpha)
         public static let teritary = Color(.Background.teritary)
+        public static let forcedDark = Color(.Background.forcedDark)
     }
     
     struct Separator {
         public static let primary = Color(.Separator.primary)
+        public static let secondary = Color(.Separator.secondary)
     }
     
     struct Theme {

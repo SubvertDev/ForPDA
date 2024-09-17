@@ -21,9 +21,10 @@ struct ArticleView: View {
             VStack(spacing: 0) {
                 ForEach(elements, id: \.self) { element in
                     ArticleElementView(store: store, element: element)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 10)
                 }
             }
+            .padding(.vertical, 14)
             
             CommentsView(store: store, comments: comments)
         }

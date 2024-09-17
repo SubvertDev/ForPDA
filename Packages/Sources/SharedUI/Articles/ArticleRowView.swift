@@ -153,8 +153,8 @@ public struct ArticleRowView: View {
             Text(article.title)
                 .font(isShort ? .callout : .title3)
                 .fontWeight(.semibold)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(nil)
+                .foregroundStyle(Color.Labels.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, isShort ? 8 : 12)
         }
