@@ -27,6 +27,10 @@ struct ArticleView: View {
             }
             .padding(.vertical, 14)
             
+            Rectangle()
+                .frame(maxWidth: .infinity, maxHeight: 16)
+                .foregroundStyle(Color.Background.teritary)
+            
             CommentsView(store: store, comments: comments)
         }
     }

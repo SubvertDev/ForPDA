@@ -1,22 +1,32 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "(Comment has been deleted)" : {
+    "%lldh" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(Комментарий удален)"
+            "value" : "%lldч"
           }
         }
       }
     },
-    "(edited)" : {
+    "%lldm" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(отредактирован)"
+            "value" : "%lldм"
+          }
+        }
+      }
+    },
+    "Comment has been deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий удален"
           }
         }
       }
@@ -47,6 +57,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скопировать ссылку"
+          }
+        }
+      }
+    },
+    "Edited" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отредактировано"
           }
         }
       }

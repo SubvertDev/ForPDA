@@ -26,12 +26,6 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
     public let likesAmount: Int
     public let avatarUrl: URL?
     
-    public var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy, HH:mm"
-        return formatter.string(from: date)
-    }
-    
     public init(
         id: Int,
         date: Date,

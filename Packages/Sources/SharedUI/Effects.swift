@@ -61,3 +61,31 @@ public extension View {
         self.modifier(BounceUpByLayerEffect(value: value))
     }
 }
+
+// MARK: - Bounce Down WholeSymbol
+
+public struct BounceDownByLayerEffect: ViewModifier {
+    
+    public var value: Bool
+    
+    public init(value: Bool) {
+        self.value = value
+    }
+
+    @ViewBuilder
+    public func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content
+                .symbolEffect(.bounce.down.wholeSymbol, value: value)
+        } else {
+            content
+        }
+    }
+}
+
+public extension View {
+    func bounceDownWholeSymbolEffect(value: Bool) -> some View {
+        self.modifier(BounceDownByLayerEffect(value: value))
+    }
+}
+
