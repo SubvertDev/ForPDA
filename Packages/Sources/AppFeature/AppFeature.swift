@@ -288,7 +288,11 @@ public struct AppFeature: Sendable {
         .onChange(of: \.articlesPath) { _, newValue in
             // TODO: Another way?
             Reduce { state, _ in
-                state.isShowingTabBar = newValue.isEmpty
+                let hasSettings = newValue.contains(where: { screen in
+                    if case .settings = screen { return true }
+                    return false
+                })
+                state.isShowingTabBar = !hasSettings
                 return .none
             }
         }
@@ -310,7 +314,11 @@ public struct AppFeature: Sendable {
         .onChange(of: \.bookmarksPath) { _, newValue in
             // TODO: Another way?
             Reduce { state, _ in
-                state.isShowingTabBar = newValue.isEmpty
+                let hasSettings = newValue.contains(where: { screen in
+                    if case .settings = screen { return true }
+                    return false
+                })
+                state.isShowingTabBar = !hasSettings
                 return .none
             }
         }
@@ -332,7 +340,11 @@ public struct AppFeature: Sendable {
         .onChange(of: \.forumPath) { _, newValue in
             // TODO: Another way?
             Reduce { state, _ in
-                state.isShowingTabBar = newValue.isEmpty
+                let hasSettings = newValue.contains(where: { screen in
+                    if case .settings = screen { return true }
+                    return false
+                })
+                state.isShowingTabBar = !hasSettings
                 return .none
             }
         }
