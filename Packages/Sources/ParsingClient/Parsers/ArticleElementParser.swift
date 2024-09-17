@@ -230,50 +230,57 @@ public struct ArticleElementParser {
     
     // MARK: - Advertisement Element
     
-    private static func extractAdvertisementElement(text: String) throws -> AdvertisementElement {        
-        var pattern = /\[background=\#(\w+)\]/
-        let buttonBackgroundColorHex: String
-        if let match = text.firstMatch(of: pattern) {
-            buttonBackgroundColorHex = String(match.output.1)
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
-        }
+    private static func extractAdvertisementElement(text: String) throws -> [AdvertisementElement] {
+        let components = text.components(separatedBy: "/blockbg] [blockbg")
+        var elements: [AdvertisementElement] = []
         
-        pattern = /\[color=\#(\w+)\]/
-        let buttonForegroundColorHex: String
-        if let match = text.firstMatch(of: pattern) {
-            buttonForegroundColorHex = String(match.output.1)
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
-        }
-        
-        let buttonPattern = /color=#(\w+)\](.+)\[\/color/
-        let buttonText: String
-        if let match = text.firstMatch(of: buttonPattern) {
-            buttonText = String(match.output.2)
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
-        }
-        
-        pattern = /\[url=(.+)\]\[color/
-        let linkUrl: URL
-        if let match = text.firstMatch(of: pattern) {
-            if let url = URL(string: String(match.output.1)) {
-                linkUrl = url
+        for component in components {
+            var pattern = /\[background=\#(\w+)\]/
+            let buttonBackgroundColorHex: String
+            if let match = component.firstMatch(of: pattern) {
+                buttonBackgroundColorHex = String(match.output.1)
             } else {
                 throw ParsingError.failedToExtractAdvertisment
             }
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
+            
+            pattern = /\[color=\#(\w+)\]/
+            let buttonForegroundColorHex: String
+            if let match = component.firstMatch(of: pattern) {
+                buttonForegroundColorHex = String(match.output.1)
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+            
+            let buttonPattern = /color=#(\w+)\](.+)\[\/color/
+            let buttonText: String
+            if let match = component.firstMatch(of: buttonPattern) {
+                buttonText = String(match.output.2)
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+            
+            pattern = /\[url=(.+)\]\[color/
+            let linkUrl: URL
+            if let match = component.firstMatch(of: pattern) {
+                if let url = URL(string: String(match.output.1)) {
+                    linkUrl = url
+                } else {
+                    throw ParsingError.failedToExtractAdvertisment
+                }
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+            
+            let element = AdvertisementElement(
+                buttonBackgroundColorHex: buttonBackgroundColorHex,
+                buttonForegroundColorHex: buttonForegroundColorHex,
+                buttonText: buttonText,
+                linkUrl: linkUrl
+            )
+            elements.append(element)
         }
         
-        let element = AdvertisementElement(
-            buttonBackgroundColorHex: buttonBackgroundColorHex,
-            buttonForegroundColorHex: buttonForegroundColorHex,
-            buttonText: buttonText,
-            linkUrl: linkUrl
-        )
-        return element
+        return elements
     }
 }
 

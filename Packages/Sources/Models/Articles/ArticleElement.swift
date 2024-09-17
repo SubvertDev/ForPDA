@@ -16,7 +16,7 @@ public enum ArticleElement: Sendable, Equatable, Hashable {
     case button(ButtonElement)
     case bulletList(BulletListElement)
     case table(TableElement)
-    case advertisement(AdvertisementElement)
+    case advertisement([AdvertisementElement])
 }
 
 // MARK: - Text

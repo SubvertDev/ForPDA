@@ -41,6 +41,8 @@ public struct ArticleScreen: View {
         return navBarOpacity >= 1
     }
     
+    // MARK: - Body
+    
     public var body: some View {
         WithPerceptionTracking {
             ArticleScrollView()
@@ -51,19 +53,6 @@ public struct ArticleScreen: View {
                     ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {}
                     ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {}
                     ToolbarButton(placement: .topBarTrailing, symbol: .ellipsis) {}
-                }
-                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
-                .sheet(item: $store.destination.share, id: \.self) { url in
-                    // FIXME: Perceptible warning despite tracking closure
-                    WithPerceptionTracking {
-                        ShareActivityView(url: url) { success in
-                            store.send(.linkShared(success, url))
-                        }
-                        .presentationDetents([.medium])
-                    }
-                }
-                .task {
-                    store.send(.onTask)
                 }
                 .overlay(alignment: .top) {
                     Color.Background.primaryAlpha
@@ -78,6 +67,20 @@ public struct ArticleScreen: View {
                             print(safeAreaTopHeight)
                         }
                 })
+                .background(Color.Background.primary)
+                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .sheet(item: $store.destination.share, id: \.self) { url in
+                    // FIXME: Perceptible warning despite tracking closure
+                    WithPerceptionTracking {
+                        ShareActivityView(url: url) { success in
+                            store.send(.linkShared(success, url))
+                        }
+                        .presentationDetents([.medium])
+                    }
+                }
+                .task {
+                    store.send(.onTask)
+                }
         }
     }
     

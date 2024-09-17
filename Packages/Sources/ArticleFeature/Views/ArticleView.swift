@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SharedUI
 import Models
 
 struct ArticleView: View {

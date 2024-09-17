@@ -49,8 +49,8 @@ struct ArticleElementView: View {
         case let .table(element):
             table(element)
             
-        case let .advertisement(element):
-            advertisement(element)
+        case let .advertisement(elements):
+            advertisement(elements)
         }
     }
     
@@ -221,19 +221,23 @@ struct ArticleElementView: View {
     // MARK: - Advertisement
     
     @ViewBuilder
-    private func advertisement(_ element: AdvertisementElement) -> some View {
-        Button {
-            store.send(.linkInTextTapped(element.linkUrl))
-        } label: {
-            Text(element.buttonText)
-                .font(.title3)
-                .padding(16)
-                .foregroundStyle(Color(hex: element.buttonForegroundColorHex))
-                .background(Color(hex: element.buttonBackgroundColorHex))
+    private func advertisement(_ elements: [AdvertisementElement]) -> some View {
+        VStack(spacing: 8) {
+            ForEach(elements, id: \.self) { element in
+                Button {
+                    store.send(.linkInTextTapped(element.linkUrl))
+                } label: {
+                    Text(element.buttonText)
+                        .font(.title3)
+                        .padding(16)
+                        .foregroundStyle(Color(hex: element.buttonForegroundColorHex))
+                        .frame(maxWidth: .infinity)
+                        .background(Color(hex: element.buttonBackgroundColorHex))
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .frame(maxWidth: .infinity)
-        .padding([.horizontal, .bottom], 16)
+        .padding(.horizontal, 16)
     }
 }
 
