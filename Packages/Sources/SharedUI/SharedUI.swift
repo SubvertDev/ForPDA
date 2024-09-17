@@ -48,6 +48,11 @@ public extension Image {
 }
 
 public extension Color {
+    struct Main {
+        public static let greyAlpha = Color(.Main.greyAlpha)
+        public static let primaryAlpha = Color(.Main.primaryAlpha)
+    }
+    
     struct Labels {
         public static let primary = Color(.Labels.primary)
         public static let primaryInvariably = Color(.Labels.primaryInvariably)

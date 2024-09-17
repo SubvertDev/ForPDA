@@ -142,7 +142,7 @@ public struct ArticleParser {
         return ArticlePoll(
             id: array[0][0] as! Int,
             title: array[0][1] as! String,
-            type: array[0][2] as! Int,
+            type: ArticlePoll.PollType(rawValue: array[0][2] as! Int)!,
             totalVotes: array[0][3] as! Int,
             options: (array[0][4] as! [[Any]]).map {
                 ArticlePoll.Option(

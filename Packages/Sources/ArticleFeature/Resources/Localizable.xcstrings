@@ -131,6 +131,16 @@
         }
       }
     },
+    "Vote" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проголосовать"
+          }
+        }
+      }
+    },
     "Whoops!" : {
       "localizations" : {
         "ru" : {

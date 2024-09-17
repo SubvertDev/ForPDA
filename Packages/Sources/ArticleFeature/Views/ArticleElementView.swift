@@ -18,6 +18,8 @@ struct ArticleElementView: View {
     @Environment(\.tintColor) private var tintColor
     @Environment(\.openURL) private var openURL
     @State private var gallerySelection: Int = 0
+    @State private var pollSelection: ArticlePoll.Option?
+    @State private var pollSelections: Set<ArticlePoll.Option>?
     
     // TODO: Is it good to send store here?
     let store: StoreOf<ArticleFeature>
@@ -48,6 +50,9 @@ struct ArticleElementView: View {
                         
         case let .table(element):
             table(element)
+            
+        case let .poll(element):
+            poll(element)
             
         case let .advertisement(elements):
             advertisement(elements)
@@ -218,6 +223,88 @@ struct ArticleElementView: View {
         .padding(.horizontal, 16)
     }
     
+    // MARK: - Poll
+    
+    @ViewBuilder
+    private func poll(_ element: PollElement) -> some View {
+        let poll = element.poll
+        VStack(spacing: 12) {
+            if !poll.title.isEmpty {
+                Text(poll.title)
+                    .font(.headline)
+                    .foregroundStyle(Color.Labels.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            VStack(spacing: 12) {
+                ForEach(poll.options, id: \.self) { option in
+                    HStack(spacing: 11) {
+                        Button {
+                            withAnimation {
+                                if option == pollSelection {
+                                    pollSelection = nil
+                                } else {
+                                    pollSelection = option
+                                }
+                            }
+                        } label: {
+                            HStack(alignment: .top, spacing: 11) {
+                                if option == pollSelection {
+                                    ZStack {
+                                        Circle()
+                                            .strokeBorder(Color.Labels.quintuple)
+                                            .frame(width: 22, height: 22)
+                                        
+                                        Circle()
+                                            .foregroundStyle(tintColor)
+                                            .frame(width: 12, height: 12)
+                                        
+                                        // multiple choice
+//                                    Circle()
+//                                        .foregroundStyle(tintColor)
+                                        
+//                                    Image(systemSymbol: .checkmark)
+//                                        .font(.system(size: 13.5, weight: .semibold))
+//                                        .foregroundStyle(Color.Labels.primaryInvariably)
+//                                        .frame(width: 22, height: 22)
+                                    }
+                                    .frame(width: 22, height: 22)
+                                } else {
+                                    Circle()
+                                        .strokeBorder(Color.Labels.quintuple)
+                                        .frame(width: 22, height: 22)
+                                }
+                                
+                                Text(option.text)
+                                    .font(.callout)
+                                    .foregroundStyle(Color.Labels.secondary)
+                                    .multilineTextAlignment(.leading)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                        }
+                    }
+                }
+            }
+            
+            HStack {
+                Button {
+                    
+                } label: {
+                    Text("Vote", bundle: .module)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 9)
+                }
+                .foregroundStyle(pollSelection == nil ? Color.Labels.quintuple : tintColor)
+                .background(pollSelection == nil ? Color.Main.greyAlpha : Color.Main.primaryAlpha)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                
+                Spacer()
+            }
+//            .disabled(pollSelection == nil)
+        }
+        .padding(.horizontal, 16)
+    }
+    
     // MARK: - Advertisement
     
     @ViewBuilder
@@ -265,6 +352,30 @@ struct ArticleElementView: View {
             ArticleFeature()
         }),
         element: .text(TextElement(text: "Adipisicing mollit pariatur magna ullamco mollit mollit sit quis. Pariatur irure fugiat consequat mollit aliqua pariatur cillum fugiat occaecat non fugiat id. Nostrud consequat enim elit veniam.", isQuote: true))
+    )
+}
+
+#Preview("Poll") {
+    ArticleElementView(
+        store: .init(initialState: ArticleFeature.State(articlePreview: .mock), reducer: {
+            ArticleFeature()
+        }),
+        element: .poll(
+            PollElement(
+                poll: ArticlePoll(
+                    id: 1,
+                    title: "Test",
+                    type: .oneChoice,
+                    totalVotes: 1000,
+                    options: [
+                        ArticlePoll.Option(id: 1, text: "Test 1", votes: 1),
+                        ArticlePoll.Option(id: 2, text: "Test 2", votes: 2),
+                        ArticlePoll.Option(id: 3, text: "Test 3", votes: 3),
+                        ArticlePoll.Option(id: 4, text: "Test 4", votes: 4),
+                    ]
+                )
+            )
+        )
     )
 }
 

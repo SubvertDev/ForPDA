@@ -103,6 +103,10 @@ public struct ArticleElementParser {
                 break
             }
         }
+        
+        if let poll = article.poll {
+            result.append(.poll(.init(poll: poll)))
+        }
 
         return result
     }
