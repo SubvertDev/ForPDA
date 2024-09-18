@@ -37,8 +37,16 @@ public struct ProfileScreen: View {
                             .frame(width: 80, height: 80)
                             .clipShape(Circle())
                             
-                            Text(user.nickname)
-                                .font(.headline)
+                            HStack {
+                                Text(user.nickname)
+                                    .font(.headline)
+                                
+                                if user.lastSeenDate.isUserOnline() {
+                                    Circle()
+                                        .fill(.green)
+                                        .frame(width: 14, height: 14)
+                                }
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .listRowBackground(Color(.systemGroupedBackground))
@@ -52,7 +60,7 @@ public struct ProfileScreen: View {
                             if user.lastSeenDate.timeIntervalSince1970 > 86400 {
                                 informationRow(
                                     title: "Last seen date",
-                                    description: user.lastSeenDate.formatted(date: .numeric, time: .shortened)
+                                    description: user.lastSeenDate.formattedDate()
                                 )
                             }
                             
@@ -135,6 +143,18 @@ public struct ProfileScreen: View {
                 .foregroundStyle(.secondary)
         }
     }
+    
+    @ViewBuilder
+    private func informationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
+        HStack {
+            Text(title, bundle: .module)
+            
+            Spacer()
+            
+            Text(description, bundle: .module)
+                .foregroundStyle(.secondary)
+        }
+    }
 }
 
 #Preview {
@@ -150,5 +170,26 @@ public struct ProfileScreen: View {
                 $0.apiClient = .previewValue
             }
         )
+    }
+}
+
+private extension Date {
+    func formattedDate() -> LocalizedStringKey {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        let formattedTime = formatter.string(from: self)
+
+        if Calendar.current.isDateInToday(self) {
+            return LocalizedStringKey("Today, \(formattedTime)")
+        } else if Calendar.current.isDateInYesterday(self) {
+            return LocalizedStringKey("Yesterday, \(formattedTime)")
+        }
+        
+        formatter.dateFormat = "dd.MM.yy, HH:mm"
+        return LocalizedStringKey(formatter.string(from: self))
+    }
+    
+    func isUserOnline() -> Bool {
+        return (Date().timeIntervalSince1970) - self.timeIntervalSince1970 < 900
     }
 }
