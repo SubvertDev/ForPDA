@@ -46,8 +46,8 @@ public struct ArticleRowView: View {
                 ShortRow()
             }
         }
-        .transition(.opacity)
-        .animation(.smooth, value: isShort)
+//        .transition(.opacity)
+//        .animation(.smooth, value: isShort)
         .pdaContextMenu(
             title: article.title,
             authorName: article.authorName,
@@ -77,7 +77,7 @@ public struct ArticleRowView: View {
         }
         .background(
             Color.Background.primary
-                .matchedGeometryEffect(id: "background\(id)", in: namespace)
+//                .matchedGeometryEffect(id: "background\(id)", in: namespace)
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
@@ -108,7 +108,7 @@ public struct ArticleRowView: View {
         }
         .background(
             Color.Background.primary
-                .matchedGeometryEffect(id: "background\(id)", in: namespace)
+//                .matchedGeometryEffect(id: "background\(id)", in: namespace)
         )
     }
     
@@ -123,11 +123,11 @@ public struct ArticleRowView: View {
                         .overlay { image.resizable().scaledToFill() }
                         .clipped()
                         .contentShape(Rectangle())
-                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
+//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 } else {
                     Color.Background.teritary
                         .frame(maxHeight: .infinity)
-                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
+//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 }
             }
             .skeleton(with: state.isLoading, shape: .rectangle)
@@ -158,7 +158,7 @@ public struct ArticleRowView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, isShort ? 8 : 12)
         }
-        .matchedGeometryEffect(id: "description\(id)", in: namespace)
+//        .matchedGeometryEffect(id: "description\(id)", in: namespace)
     }
     
     // MARK: - Footer
@@ -187,7 +187,7 @@ public struct ArticleRowView: View {
             
             ContextMenu()
         }
-        .matchedGeometryEffect(id: "footer\(id)", in: namespace)
+//        .matchedGeometryEffect(id: "footer\(id)", in: namespace)
     }
     
     // MARK: - Separator
@@ -197,7 +197,7 @@ public struct ArticleRowView: View {
         Rectangle()
             .foregroundStyle(Color.Separator.primary)
             .frame(height: 0.33)
-            .matchedGeometryEffect(id: "separator\(id)", in: namespace)
+//            .matchedGeometryEffect(id: "separator\(id)", in: namespace)
     }
     
     // MARK: - Context Menu

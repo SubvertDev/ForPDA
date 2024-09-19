@@ -111,6 +111,7 @@ public struct ArticlesListScreen: View {
         .coordinateSpace(name: "scroll")
         .background(Color.Background.primary)
         .scrollDisabled(store.isScrollDisabled)
+        .animation(.default, value: store.listRowType)
     }
     
     // MARK: - Scroll View Offset Observer
