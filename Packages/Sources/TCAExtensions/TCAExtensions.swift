@@ -28,7 +28,7 @@ public extension AlertState {
         } actions: {
             ButtonState(role: .cancel) { TextState("OK", bundle: .module) }
         } message: {
-            TextState("Not yet implemented :(", bundle: .module)
+            TextState("Not yet implemented, but will be soon!", bundle: .module)
         }
     }
     

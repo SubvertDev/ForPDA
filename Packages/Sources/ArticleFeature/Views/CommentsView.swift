@@ -16,48 +16,26 @@ import SFSafeSymbols
 // MARK: - Comments View
 
 struct CommentsView: View {
-        
+    
     let store: StoreOf<ArticleFeature>
-    let comments: [Comment]
     
     var body: some View {
         VStack(spacing: 0) {
-            Text("Comments (\(comments.count.description)):", bundle: .module)
+            Text("Comments (\(store.comments.count.description)):", bundle: .module)
                 .font(.title3)
                 .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 16)
                 .padding(.vertical, 24)
+                .frame(maxWidth: .infinity, alignment: .leading)
             
-            VStack(spacing: 4) {
-                ForEach(comments.filter { $0.parentId == 0 }) { comment in
-                    CommentView(
-                        comments: comments,
-                        comment: comment,
-                        indentationLevel: indentationLevel(for: comment),
-                        onCommentHeaderTapped: { comment in
-                            store.send(.delegate(.commentHeaderTapped(comment.authorId)))
-                        },
-                        onCommentLikeButtonTapped: { id in
-                            store.send(.likeButtonTapped(id))
-                        }
-                    )
+            VStack(spacing: 0) {
+                ForEach(store.scope(state: \.comments, action: \.comments)) { store in
+                    WithPerceptionTracking {
+                        CommentView(store: store)
+                    }
                 }
             }
-            .padding(.horizontal, 16)
         }
-    }
-    
-    // TODO: Optimize alghoritm?
-    private func indentationLevel(for comment: Comment, level: Int = 0) -> Int {
-        var level: Int = level
-        if comment.parentId != 0 {
-            level += 1
-            let parentComment = comments.first(where: { $0.id == comment.parentId })
-            return indentationLevel(for: parentComment!, level: level)
-        } else {
-            return level
-        }
+        .padding(.horizontal, 16)
     }
 }
 
@@ -68,84 +46,59 @@ struct CommentView: View {
     // MARK: - Properties
     
     @Environment(\.tintColor) private var tintColor
-    @State private var isLiked: Bool
-    @State private var likesAmount: Int
-
-    let comments: [Comment]
-    let comment: Comment
-    let indentationLevel: Int
-    let onCommentHeaderTapped: (Comment) -> Void
-    let onCommentLikeButtonTapped: (Int) -> Void
     
-    init(
-        comments: [Comment],
-        comment: Comment,
-        indentationLevel: Int,
-        onCommentHeaderTapped: @escaping (Comment) -> Void,
-        onCommentLikeButtonTapped: @escaping (Int) -> Void
-    ) {
-        self.isLiked = comment.type == .liked
-        self.likesAmount = comment.likesAmount
-        self.comments = comments
-        self.comment = comment
-        self.indentationLevel = indentationLevel
-        self.onCommentHeaderTapped = onCommentHeaderTapped
-        self.onCommentLikeButtonTapped = onCommentLikeButtonTapped
+    @Perception.Bindable public var store: StoreOf<CommentFeature>
+    
+    public init(store: StoreOf<CommentFeature>) {
+        self.store = store
     }
-
+    
     // MARK: - Body
-
+    
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                if comment.type == .deleted {
-                    Text("Comment has been deleted", bundle: .module)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.Labels.quaternary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, 16)
-                } else {
-                    VStack(spacing: 6) {
-                        Header()
-                        
-                        Text(comment.text)
+        WithPerceptionTracking {
+            VStack(spacing: 0) {
+                ZStack {
+                    if store.comment.type == .deleted {
+                        Text("Comment has been deleted", bundle: .module)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.Labels.quaternary)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
-                        
-                        Footer()
-                    }
-                    .padding(.bottom, 16)
-                    .overlay(alignment: .topLeading) {
-                        Rectangle()
-                            .foregroundStyle(Color.Background.primary)
-                            .frame(width: 128, height: 16)
-                            .offset(x: -1, y: -16)
-                    }
-                }
-            }
-            .overlay(alignment: .leading) {
-                if indentationLevel > 0 {
-                    HStack(spacing: 0) {
-                        ForEach(1...indentationLevel, id: \.self) { index in
+                            .padding(.bottom, 16)
+                    } else {
+                        VStack(spacing: 6) {
+                            Header()
+                            
+                            Text(store.comment.text)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                            
+                            Footer()
+                        }
+                        .padding(.bottom, 16)
+                        .overlay(alignment: .topLeading) {
                             Rectangle()
-                                .frame(width: 1)
-                                .foregroundStyle(Color.Separator.secondary)
-                                .offset(x: CGFloat(-17 * index))
+                                .foregroundStyle(Color.Background.primary)
+                                .frame(width: 128, height: 16)
+                                .offset(x: -1, y: -16)
                         }
                     }
                 }
+                .overlay(alignment: .leading) {
+                    if store.comment.nestLevel > 0 {
+                        HStack(spacing: 0) {
+                            ForEach(1...store.comment.nestLevel, id: \.self) { index in
+                                Rectangle()
+                                    .frame(width: 1)
+                                    .foregroundStyle(Color.Separator.secondary)
+                                    .offset(x: CGFloat(-17 * index))
+                            }
+                        }
+                    }
+                }
+                .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
-            .padding(.leading, 16 * CGFloat(indentationLevel))
-            
-            ForEach(comment.childIds, id: \.self) { id in
-                CommentView(
-                    comments: comments,
-                    comment: comments.first(where: { $0.id == id })!,
-                    indentationLevel: indentationLevel + 1,
-                    onCommentHeaderTapped: onCommentHeaderTapped,
-                    onCommentLikeButtonTapped: onCommentLikeButtonTapped
-                )
-            }
+            .alert($store.scope(state: \.alert, action: \.alert))
         }
     }
     
@@ -155,7 +108,7 @@ struct CommentView: View {
     private func Header() -> some View {
         HStack(spacing: 6) {
             Group {
-                LazyImage(url: comment.avatarUrl) { state in
+                LazyImage(url: store.comment.avatarUrl) { state in
                     Group {
                         if let image = state.image {
                             image.resizable().scaledToFill()
@@ -169,19 +122,19 @@ struct CommentView: View {
                 .clipShape(Circle())
                 .padding(.trailing, 2)
                 
-                Text(comment.authorName)
+                Text(store.comment.authorName)
                     .font(.footnote)
                     .bold()
                     .foregroundStyle(Color.Labels.teritary)
                     .bold()
             }
             .onTapGesture {
-                onCommentHeaderTapped(comment)
+                store.send(.profileTapped)
             }
             
             Group {
                 Text(String("·"))
-                Text(format(date: comment.date), bundle: .module)
+                Text(format(date: store.comment.date), bundle: .module)
             }
             .font(.footnote)
             .foregroundStyle(Color.Labels.teritary)
@@ -195,7 +148,7 @@ struct CommentView: View {
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 2) {
-            if comment.type == .edited {
+            if store.comment.type == .edited {
                 Text("Edited", bundle: .module)
                     .font(.caption)
                     .foregroundStyle(Color.Labels.teritary)
@@ -204,10 +157,14 @@ struct CommentView: View {
             
             Spacer()
             
-            ActionButton(symbol: .ellipsis) {}
-            ActionButton(symbol: .arrowTurnUpLeft) {}
+            ActionButton(symbol: .ellipsis) {
+                store.send(.contextMenuTapped)
+            }
+            ActionButton(symbol: .arrowTurnUpLeft) {
+                store.send(.replyButtonTapped)
+            }
             LikeButton()
-            Text(String(likesAmount))
+            Text(String(store.comment.likesAmount))
                 .font(.subheadline)
                 .foregroundStyle(Color.Labels.teritary)
                 .padding(.trailing, 6)
@@ -222,7 +179,7 @@ struct CommentView: View {
         action: @escaping () -> Void
     ) -> some View {
         Button {
-            
+            action()
         } label: {
             Image(systemSymbol: symbol)
                 .font(.body)
@@ -236,22 +193,18 @@ struct CommentView: View {
     @ViewBuilder
     private func LikeButton() -> some View {
         Button {
-            if !isLiked {
-                isLiked = true
-                likesAmount += 1
-                onCommentLikeButtonTapped(comment.id)
-            }
+            store.send(.likeButtonTapped)
         } label: {
-            Image(systemSymbol: isLiked ? .handThumbsupFill : .handThumbsup)
+            Image(systemSymbol: store.isLiked ? .handThumbsupFill : .handThumbsup)
                 .font(.body)
-                .foregroundStyle(isLiked ? tintColor : Color.Labels.teritary)
-                .bounceDownWholeSymbolEffect(value: isLiked)
+                .foregroundStyle(store.isLiked ? tintColor : Color.Labels.teritary)
+                .bounceDownWholeSymbolEffect(value: store.isLiked)
         }
         .frame(width: 32, height: 32)
     }
 }
 
-// MARK: Helpers
+// MARK: - Helpers
 
 extension CommentView {
     func format(date: Date) -> LocalizedStringKey {
@@ -280,10 +233,9 @@ extension CommentView {
                 initialState: ArticleFeature.State(articlePreview: .mock),
                 reducer: {
                     ArticleFeature()
-                }),
-            comments: .mockArray
+                })
         )
-        
+
         Rectangle()
             .foregroundColor(Color(.systemGray6))
     }

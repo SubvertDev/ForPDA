@@ -145,7 +145,19 @@ public struct ArticleParser {
             comments[index].childIds = comments.filter { $0.parentId == comment.id }.map { $0.id }
         }
         
-        return comments
+        let intermediateComments = comments.map { IntermediateComment.from($0) }
+        let nested = nestComments(intermediateComments)
+        let flattened = flattenComments(nested)
+        
+        var result: [Comment] = []
+        for (intermediate, level) in flattened {
+            if var comment = comments.first(where: { $0.id == intermediate.id}) {
+                comment.nestLevel = level
+                result.append(comment)
+            }
+        }
+        
+        return result
     }
     
     private static func extractPoll(from array: [[Any]]) -> ArticlePoll? {
@@ -163,5 +175,65 @@ public struct ArticleParser {
                 )
             }
         )
+    }
+    
+    struct IntermediateComment {
+        let id: Int
+        let parentId: Int
+        let childIds: [Int]
+        var children: [IntermediateComment]
+        
+        static func from(_ comment: Comment) -> IntermediateComment {
+            return IntermediateComment(
+                id: comment.id,
+                parentId: comment.parentId,
+                childIds: comment.childIds,
+                children: []
+            )
+        }
+    }
+    
+    private static func nestComments(_ comments: [IntermediateComment]) -> [IntermediateComment] {
+        // Create a dictionary to quickly access comments by ID
+        var commentMap = [Int: IntermediateComment]()
+        for comment in comments {
+            commentMap[comment.id] = comment
+        }
+        
+        // Helper function to build children recursively
+        func buildChildren(for comment: inout IntermediateComment) {
+            // For each childId, retrieve the child from the map, build its children, and append it
+            for childId in comment.childIds {
+                if var childComment = commentMap[childId] {
+                    buildChildren(for: &childComment) // Recursively build the child's children
+                    comment.children.append(childComment) // Append the built child
+                }
+            }
+        }
+        
+        // Step 2: Build the tree structure, starting from the root comments
+        var result: [IntermediateComment] = []
+        
+        for comment in comments {
+            if comment.parentId == 0 {
+                // This is a root comment, so we build its children recursively
+                var rootComment = commentMap[comment.id]!
+                buildChildren(for: &rootComment)
+                result.append(rootComment) // Append the fully built root comment
+            }
+        }
+        
+        return result
+    }
+
+    private static func flattenComments(_ comments: [IntermediateComment], level: Int = 0) -> [(comment: IntermediateComment, level: Int)] {
+        var result: [(IntermediateComment, Int)] = []
+        
+        for comment in comments {
+            result.append((comment, level)) // Add the current comment with its nesting level
+            result.append(contentsOf: flattenComments(comment.children, level: level + 1)) // Recursively flatten and add the children with incremented level
+        }
+        
+        return result
     }
 }

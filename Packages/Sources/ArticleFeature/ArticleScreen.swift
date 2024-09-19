@@ -52,8 +52,12 @@ public struct ArticleScreen: View {
                     ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
                         store.send(.backButtonTapped)
                     }
-                    ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {}
-                    ToolbarButton(placement: .topBarTrailing, symbol: .ellipsis) {}
+                    ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
+                        store.send(.bookmarkButtonTapped)
+                    }
+                    ToolbarButton(placement: .topBarTrailing, symbol: .ellipsis) {
+                        store.send(.notImplementedButtonTapped)
+                    }
                 }
                 .overlay(alignment: .top) {
                     Color.Background.primaryAlpha
@@ -95,8 +99,8 @@ public struct ArticleScreen: View {
                 
                 if store.isLoading {
                     ArticleLoader()
-                } else if let elements = store.elements, let comments = store.article?.comments {
-                    ArticleView(store: store, elements: elements, comments: comments)
+                } else if let elements = store.elements {
+                    ArticleView(elements: elements)
                 }
             }
             .modifier(
@@ -182,6 +186,29 @@ public struct ArticleScreen: View {
                 .foregroundStyle(Color.Labels.secondaryInvariably)
             }
             .padding()
+        }
+    }
+    
+    // MARK: - Article + Comments View
+    
+    @ViewBuilder
+    private func ArticleView(elements: [ArticleElement]) -> some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 0) {
+                ForEach(elements, id: \.self) { element in
+                    WithPerceptionTracking {
+                        ArticleElementView(store: store, element: element)
+                            .padding(.vertical, 10)
+                    }
+                }
+            }
+            .padding(.vertical, 14)
+            
+            Rectangle()
+                .frame(maxWidth: .infinity, maxHeight: 16)
+                .foregroundStyle(Color.Background.teritary)
+            
+            CommentsView(store: store)
         }
     }
     

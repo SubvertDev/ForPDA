@@ -27,22 +27,22 @@ public struct CacheClient: Sendable {
 extension CacheClient: DependencyKey {
     
     private static var articlesKey: String { "articlesKey" }
-    private static var articlesStorage: Storage<String, [Article]> {
+    private static var articlesStorage: Storage<Int, Article> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Articles", expiry: .seconds(2592000), maxSize: 163840),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: [Article].self)
+            transformer: TransformerFactory.forCodable(ofType: Article.self)
         )
     }
     
     private static var usersKey: String { "usersKey" }
-    private static var usersStorage: Storage<String, [User]> {
+    private static var usersStorage: Storage<Int, User> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Users", expiry: .seconds(2592000), maxSize: 81920),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: [User].self)
+            transformer: TransformerFactory.forCodable(ofType: User.self)
         )
     }
     
@@ -61,22 +61,16 @@ extension CacheClient: DependencyKey {
                 urls.forEach { ImagePipeline.shared.loadImage(with: $0, completion: { _ in }) }
             },
             cacheArticle: { article in
-                var articles = (try? await articlesStorage.async.object(forKey: articlesKey)) ?? []
-                articles.append(article)
-                try articlesStorage.setObject(articles, forKey: articlesKey)
+                try articlesStorage.setObject(article, forKey: article.id)
             },
-            getArticle: { id in
-                let articles = (try? await articlesStorage.async.object(forKey: articlesKey)) ?? []
-                return articles.first(where: { $0.id == id })
+            getArticle: { articleId in
+                return try? articlesStorage.object(forKey: articleId)
             },
             cacheUser: { user in
-                var users = (try? await usersStorage.async.object(forKey: usersKey)) ?? []
-                users.append(user)
-                try usersStorage.setObject(users, forKey: usersKey)
+                try usersStorage.setObject(user, forKey: user.id)
             },
-            getUser: { id in
-                let users = (try? await usersStorage.async.object(forKey: usersKey)) ?? []
-                return users.first(where: { $0.id == id })
+            getUser: { userId in
+                return try? usersStorage.object(forKey: userId)
             }
         )
     }

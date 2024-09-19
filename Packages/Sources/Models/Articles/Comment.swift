@@ -24,8 +24,9 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
     public let parentId: Int
     public var childIds: [Int]
     public let text: String
-    public let likesAmount: Int
+    public var likesAmount: Int
     public let avatarUrl: URL?
+    public var nestLevel: Int
     
     public init(
         id: Int,
@@ -37,7 +38,8 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
         childIds: [Int],
         text: String,
         likesAmount: Int,
-        avatarUrl: URL?
+        avatarUrl: URL?,
+        nestLevel: Int = 0
     ) {
         self.id = id
         self.date = date
@@ -49,6 +51,7 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
         self.text = text
         self.likesAmount = likesAmount
         self.avatarUrl = avatarUrl
+        self.nestLevel = nestLevel
     }
 }
 

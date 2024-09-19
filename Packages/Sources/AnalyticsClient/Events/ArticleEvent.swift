@@ -16,6 +16,7 @@ public enum ArticleEvent: Event {
     case linkReported(URL)
     case inlineLinkTapped(URL) // TODO: Rename from inline to TCA action name?
     case inlineButtonTapped(URL)
+    case bookmarkButtonTapped(URL)
     case commentLiked(Int)
     case loadingSuccess
     case loadingFailure(any Error)
@@ -28,11 +29,12 @@ public enum ArticleEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case .linkCopied(let url),
-             .linkShareOpened(let url),
-             .linkReported(let url),
-             .inlineLinkTapped(let url),
-             .inlineButtonTapped(let url):
+        case let .linkCopied(url),
+             let .linkShareOpened(url),
+             let .linkReported(url),
+             let .inlineLinkTapped(url),
+             let .inlineButtonTapped(url),
+             let .bookmarkButtonTapped(url):
             return ["url": url.absoluteString]
             
         case let .linkShared(success, url):

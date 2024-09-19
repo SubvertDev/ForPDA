@@ -288,7 +288,7 @@ struct ArticleElementView: View {
             
             HStack {
                 Button {
-                    
+                    store.send(.notImplementedButtonTapped)
                 } label: {
                     Text("Vote", bundle: .module)
                         .padding(.horizontal, 18)

@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import TCAExtensions
 import Models
 import APIClient
 import CacheClient
@@ -37,17 +38,20 @@ public struct ArticleFeature: Sendable {
         public var article: Article?
         public var elements: [ArticleElement]?
         public var isLoading: Bool
+        public var comments: IdentifiedArrayOf<CommentFeature.State>
         
         public init(
             destination: Destination.State? = nil,
             articlePreview: ArticlePreview,
             article: Article? = nil,
-            isLoading: Bool = false
+            isLoading: Bool = false,
+            comments: IdentifiedArrayOf<CommentFeature.State> = []
         ) {
             self.destination = destination
             self.articlePreview = articlePreview
             self.article = article
             self.isLoading = isLoading
+            self.comments = comments
         }
     }
     
@@ -58,11 +62,13 @@ public struct ArticleFeature: Sendable {
         case binding(BindingAction<State>)
         case delegate(Delegate)
         case backButtonTapped
-        case linkInTextTapped(URL)
+        case bookmarkButtonTapped
+        case notImplementedButtonTapped
         case menuActionTapped(ArticleMenuAction)
         case linkShared(Bool, URL)
+        case linkInTextTapped(URL)
         case onTask
-        case likeButtonTapped(Int)
+        case comments(IdentifiedActionOf<CommentFeature>)
         
         case _checkLoading
         case _articleResponse(Result<Article, any Error>)
@@ -98,6 +104,9 @@ public struct ArticleFeature: Sendable {
         
         Reduce { state, action in
             switch action {
+            case .comments:
+                return .none
+                
             case .binding, .delegate, .destination:
                 return .none
                 
@@ -138,13 +147,16 @@ public struct ArticleFeature: Sendable {
                     getArticle(id: state.articlePreview.id)
                 ])
                 
-            case let .likeButtonTapped(commentId):
-                return .run { [articleId = state.articlePreview.id] _ in
-                    let _ = await Result { try await apiClient.likeComment(articleId, commentId) }
-                }
-                
             case .backButtonTapped:
                 return .run { _ in await dismiss() }
+                
+            case .bookmarkButtonTapped:
+                state.destination = .alert(.notImplemented)
+                return .none
+                
+            case .notImplementedButtonTapped:
+                state.destination = .alert(.notImplemented)
+                return .none
                 
             case ._checkLoading:
                 if state.article == nil {
@@ -160,6 +172,13 @@ public struct ArticleFeature: Sendable {
                 
                 state.article = article
                 
+                for comment in article.comments {
+                    let commentFeature = CommentFeature.State(comment: comment, articleId: state.articlePreview.id)
+                    // TODO: Does equality check helps with performance?
+                    state.comments[id: comment.id] = commentFeature
+                }
+                
+                // TODO: Cache parsing result and move into cache check
                 return .run { send in
                     let result = await Result { try await parsingClient.parseArticleElements(article) }
                     await send(._parseArticleElements(result))
@@ -185,13 +204,12 @@ public struct ArticleFeature: Sendable {
                 state.isLoading = false
                 state.destination = .alert(.error)
                 return .none
-//                
-//            case .alert:
-//                state.alert = nil
-//                return .run { _ in await self.dismiss() }
             }
         }
         .ifLet(\.$destination, action: \.destination)
+        .forEach(\.comments, action: \.comments) {
+            CommentFeature()
+        }
 
         Analytics()
     }

@@ -19,7 +19,7 @@ public struct APIClient: Sendable {
     public var connect: @Sendable () async throws -> Void
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
     public var getArticle: @Sendable (_ id: Int) async throws -> AsyncThrowingStream<Article, any Error>
-    public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Void
+    public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
@@ -73,7 +73,12 @@ extension APIClient: DependencyKey {
             },
             likeComment: { articleId, commentId in
                 let rawString = try api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
-                print("RESPONSE ON LIKE: \(rawString)")
+                // TODO: Parse
+                let response = rawString
+                    .replacingOccurrences(of: "[", with: "")
+                    .replacingOccurrences(of: "]", with: "")
+                    .components(separatedBy: ",")[1]
+                return Int(response) == 0
             },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
@@ -125,7 +130,7 @@ extension APIClient: DependencyKey {
                 AsyncThrowingStream { $0.yield(.mock) }
             },
             likeComment: { _, _ in
-                
+                return true
             },
             getCaptcha: {
                 try await Task.sleep(for: .seconds(2))
