@@ -16,6 +16,7 @@ public enum ArticleEvent: Event {
     case linkReported(URL)
     case inlineLinkTapped(URL) // TODO: Rename from inline to TCA action name?
     case inlineButtonTapped(URL)
+    case commentLiked(Int)
     case loadingSuccess
     case loadingFailure(any Error)
     case parsingFailure(any Error)
@@ -41,6 +42,8 @@ public enum ArticleEvent: Event {
              .parsingFailure(let error):
             return ["reason": error.localizedDescription]
             
+        case let .commentLiked(id):
+            return ["id": String(id)]
         default:
             return nil
         }

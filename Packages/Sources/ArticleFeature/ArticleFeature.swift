@@ -57,10 +57,12 @@ public struct ArticleFeature: Sendable {
         case destination(PresentationAction<Destination.Action>)
         case binding(BindingAction<State>)
         case delegate(Delegate)
+        case backButtonTapped
         case linkInTextTapped(URL)
         case menuActionTapped(ArticleMenuAction)
         case linkShared(Bool, URL)
         case onTask
+        case likeButtonTapped(Int)
         
         case _checkLoading
         case _articleResponse(Result<Article, any Error>)
@@ -135,6 +137,14 @@ public struct ArticleFeature: Sendable {
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id)
                 ])
+                
+            case let .likeButtonTapped(commentId):
+                return .run { [articleId = state.articlePreview.id] _ in
+                    let _ = await Result { try await apiClient.likeComment(articleId, commentId) }
+                }
+                
+            case .backButtonTapped:
+                return .run { _ in await dismiss() }
                 
             case ._checkLoading:
                 if state.article == nil {

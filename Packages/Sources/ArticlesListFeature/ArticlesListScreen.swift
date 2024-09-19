@@ -30,7 +30,7 @@ public struct ArticlesListScreen: View {
                     WithPerceptionTracking {
                         ArticlesList()
                             .onChange(of: store.scrollToTop) { _ in
-                                withAnimation { reader.scrollTo(0) }
+                                withAnimation { reader.scrollTo(-1) }
                             }
                     }
                 }
@@ -72,6 +72,10 @@ public struct ArticlesListScreen: View {
     @ViewBuilder
     private func ArticlesList() -> some View {
         ScrollView {
+            Color.clear
+                .frame(height: 0)
+                .id(-1)
+            
             VStack(spacing: 14) {
                 ForEach(store.articles, id: \.self) { article in
                     WithPerceptionTracking {

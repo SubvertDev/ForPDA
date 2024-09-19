@@ -33,7 +33,6 @@ public struct ArticleScreen: View {
         self.store = store
     }
     
-//    @State private var navigationBarVisibility: Visibility = .hidden
     @State private var scrollViewContentHeight: CGFloat = 0
     @State private var safeAreaTopHeight: CGFloat = 0
     @State private var navBarOpacity: CGFloat = 0
@@ -50,7 +49,9 @@ public struct ArticleScreen: View {
                 .navigationBarBackButtonHidden()
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar {
-                    ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {}
+                    ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
+                        store.send(.backButtonTapped)
+                    }
                     ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {}
                     ToolbarButton(placement: .topBarTrailing, symbol: .ellipsis) {}
                 }
@@ -117,20 +118,27 @@ public struct ArticleScreen: View {
         ZStack {
             ZStack {
                 Rectangle()
-                    .background(
-                        Color.Background.primary
-                            .environment(\.colorScheme, .dark)
-                    )
+                    .background(Color.Background.forcedDark)
                 
                 LazyImage(url: store.articlePreview.imageUrl) { state in
                     Group {
                         if let image = state.image {
                             image.resizable().scaledToFill()
                         } else {
-                            Color(.systemBackground)
+                            Color.Background.forcedDark
                         }
                     }
-                    .skeleton(with: state.isLoading, shape: .rectangle)
+                    .skeleton(
+                        with: state.isLoading,
+                        appearance: .gradient(
+                            .linear,
+                            color: Color.Labels.forcedLight.opacity(0.25),
+                            background: Color.Background.forcedDark,
+                            radius: 1,
+                            angle: .zero
+                        ),
+                        shape: .rectangle
+                    )
                 }
                 .overlay(alignment: .bottom) {
                     LinearGradient(
@@ -240,9 +248,7 @@ extension ArticleScreen {
                     let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
                     let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
                     let opacity = min(coefficient, 1)
-                    withAnimation {
-                        navBarOpacity = opacity
-                    }
+                    navBarOpacity = opacity
                 }
         }
         

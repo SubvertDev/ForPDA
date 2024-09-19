@@ -10,7 +10,8 @@ import Foundation
 public enum CommentType: Int, Sendable, Codable {
     case normal = 0
     case deleted = 2
-    case edited = 32
+    case hidden = 4
+    case edited = 32 // (36)
 }
 
 public struct Comment: Sendable, Identifiable, Hashable, Codable {

@@ -37,6 +37,9 @@ struct CommentsView: View {
                         indentationLevel: indentationLevel(for: comment),
                         onCommentHeaderTapped: { comment in
                             store.send(.delegate(.commentHeaderTapped(comment.authorId)))
+                        },
+                        onCommentLikeButtonTapped: { id in
+                            store.send(.likeButtonTapped(id))
                         }
                     )
                 }
@@ -65,12 +68,30 @@ struct CommentView: View {
     // MARK: - Properties
     
     @Environment(\.tintColor) private var tintColor
-    @State private var isLiked = false
+    @State private var isLiked: Bool
+    @State private var likesAmount: Int
 
     let comments: [Comment]
     let comment: Comment
     let indentationLevel: Int
     let onCommentHeaderTapped: (Comment) -> Void
+    let onCommentLikeButtonTapped: (Int) -> Void
+    
+    init(
+        comments: [Comment],
+        comment: Comment,
+        indentationLevel: Int,
+        onCommentHeaderTapped: @escaping (Comment) -> Void,
+        onCommentLikeButtonTapped: @escaping (Int) -> Void
+    ) {
+        self.isLiked = comment.type == .liked
+        self.likesAmount = comment.likesAmount
+        self.comments = comments
+        self.comment = comment
+        self.indentationLevel = indentationLevel
+        self.onCommentHeaderTapped = onCommentHeaderTapped
+        self.onCommentLikeButtonTapped = onCommentLikeButtonTapped
+    }
 
     // MARK: - Body
 
@@ -121,7 +142,8 @@ struct CommentView: View {
                     comments: comments,
                     comment: comments.first(where: { $0.id == id })!,
                     indentationLevel: indentationLevel + 1,
-                    onCommentHeaderTapped: onCommentHeaderTapped
+                    onCommentHeaderTapped: onCommentHeaderTapped,
+                    onCommentLikeButtonTapped: onCommentLikeButtonTapped
                 )
             }
         }
@@ -185,7 +207,7 @@ struct CommentView: View {
             ActionButton(symbol: .ellipsis) {}
             ActionButton(symbol: .arrowTurnUpLeft) {}
             LikeButton()
-            Text(String(comment.likesAmount))
+            Text(String(likesAmount))
                 .font(.subheadline)
                 .foregroundStyle(Color.Labels.teritary)
                 .padding(.trailing, 6)
@@ -214,7 +236,11 @@ struct CommentView: View {
     @ViewBuilder
     private func LikeButton() -> some View {
         Button {
-            isLiked.toggle()
+            if !isLiked {
+                isLiked = true
+                likesAmount += 1
+                onCommentLikeButtonTapped(comment.id)
+            }
         } label: {
             Image(systemSymbol: isLiked ? .handThumbsupFill : .handThumbsup)
                 .font(.body)
