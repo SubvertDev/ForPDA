@@ -88,6 +88,11 @@ public struct AppView: View {
             .tint(store.appSettings.appTintColor.asColor)
             .environment(\.tintColor, store.appSettings.appTintColor.asColor)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
+            .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
+                NavigationStack {
+                    AuthScreen(store: store)
+                }
+            }
         }
     }
     
@@ -147,14 +152,11 @@ public struct AppView: View {
     @ViewBuilder
     private func ProfileTab() -> some View {
         NavigationStack(path: $store.scope(state: \.profilePath, action: \.profilePath)) {
-            MenuScreen(store: store.scope(state: \.profile, action: \.profile))
+            ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
         } destination: { store in
             switch store.case {
             case let .auth(store):
                 AuthScreen(store: store)
-                
-            case let .profile(store):
-                ProfileScreen(store: store)
                 
             case let .settings(store):
                 SettingsScreen(store: store)

@@ -14,7 +14,8 @@ import Models
 import SharedUI
 import SkeletonUI
 
-extension UINavigationController: UIGestureRecognizerDelegate {
+// TODO: Move somewhere else
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     override open func viewDidLoad() {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.delegate = self

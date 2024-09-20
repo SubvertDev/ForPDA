@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import TCAExtensions
+import PersistenceKeys
 import APIClient
 import Models
 
@@ -26,6 +27,7 @@ public struct CommentFeature: Sendable {
     @ObservableState
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
+        @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
         public let articleId: Int
@@ -81,6 +83,7 @@ public struct CommentFeature: Sendable {
                 
             case .likeButtonTapped:
                 guard !state.isLiked else { return .none }
+                guard state.userSession != nil else { return .none }
                 state.comment.likesAmount += 1
                 state.isLiked = true
                 return .run { [articleId = state.articleId, commentId = state.comment.id] send in

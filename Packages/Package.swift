@@ -152,8 +152,10 @@ let package = Package(
                 "AnalyticsClient",
                 "PersistenceKeys",
                 "TCAExtensions",
+                "SharedUI",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "NukeUI", package: "nuke")
+                .product(name: "NukeUI", package: "nuke"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
         .target(
@@ -289,7 +291,7 @@ for target in package.targets where target.type != .binary {
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
     swiftSettings.append(
         .unsafeFlags(["-Xfrontend",
-                      "-warn-long-function-bodies=350",
+                      "-warn-long-function-bodies=600",
                       "-Xfrontend",
                       "-warn-long-expression-type-checking=100"])
     )

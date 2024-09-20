@@ -45,7 +45,6 @@ public struct AppFeature: Sendable {
     @Reducer(state: .equatable)
     public enum ProfilePath {
         case auth(AuthFeature)
-        case profile(ProfileFeature)
         case settings(SettingsFeature)
     }
     
@@ -63,10 +62,14 @@ public struct AppFeature: Sendable {
         public var articlesList: ArticlesListFeature.State
         public var bookmarks: BookmarksFeature.State
         public var forum: ForumFeature.State
-        public var profile: MenuFeature.State
+        public var profile: ProfileFeature.State
         
+        @Presents public var auth: AuthFeature.State?
+        
+        @Shared(.userSession) public var userSession: UserSession?
         @Shared(.appSettings) public var appSettings: AppSettings
         public var selectedTab: AppView.Tab
+        public var previousTab: AppView.Tab
         public var isShowingTabBar: Bool
         public var showToast: Bool
         public var toast: ToastInfo
@@ -86,8 +89,10 @@ public struct AppFeature: Sendable {
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
-            profile: MenuFeature.State = MenuFeature.State(),
+            profile: ProfileFeature.State = ProfileFeature.State(),
+            auth: AuthFeature.State? = nil,
             selectedTab: AppView.Tab = .articlesList,
+            previousTab: AppView.Tab = .articlesList,
             isShowingTabBar: Bool = true,
             showToast: Bool = false,
             toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""))
@@ -104,7 +109,10 @@ public struct AppFeature: Sendable {
             self.forum = forum
             self.profile = profile
             
+            self.auth = auth
+            
             self.selectedTab = selectedTab
+            self.previousTab = previousTab
             self.isShowingTabBar = isShowingTabBar
             self.showToast = showToast
             self.toast = toast
@@ -124,7 +132,9 @@ public struct AppFeature: Sendable {
         case articlesList(ArticlesListFeature.Action)
         case bookmarks(BookmarksFeature.Action)
         case forum(ForumFeature.Action)
-        case profile(MenuFeature.Action)
+        case profile(ProfileFeature.Action)
+        
+        case auth(PresentationAction<AuthFeature.Action>)
         
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppView.Tab)
@@ -158,7 +168,7 @@ public struct AppFeature: Sendable {
         }
         
         Scope(state: \.profile, action: \.profile) {
-            MenuFeature()
+            ProfileFeature()
         }
         
         Reduce { state, action in
@@ -175,8 +185,31 @@ public struct AppFeature: Sendable {
                         state.articlesList.scrollToTop.toggle()
                     }
                 } else {
-                    state.selectedTab = tab
+                    if tab == .profile && state.userSession == nil {
+                        state.auth = AuthFeature.State(openReason: .profile)
+                        // Opening tab only after auth via delegate action
+                    } else {
+                        state.previousTab = state.selectedTab
+                        state.selectedTab = tab
+                    }
                 }
+                return .none
+                
+            case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
+                state.auth = nil
+                if reason == .profile {
+                    state.previousTab = state.selectedTab
+                    state.selectedTab = .profile
+                }
+                return .none
+                
+            case .auth(.dismiss):
+                if state.userSession == nil {
+                    state.selectedTab = state.previousTab
+                }
+                return .none
+                
+            case .auth:
                 return .none
                 
                 // MARK: - Deeplink
@@ -229,6 +262,9 @@ public struct AppFeature: Sendable {
                 return .none
             }
         }
+        .ifLet(\.$auth, action: \.auth) {
+            AuthFeature()
+        }
         
         // MARK: - Article Path
         
@@ -278,6 +314,14 @@ public struct AppFeature: Sendable {
                 
             case let .articlesPath(.element(id: _, action: .article(.delegate(.commentHeaderTapped(id))))):
                 state.articlesPath.append(.profile(ProfileFeature.State(userId: id)))
+                return .none
+                
+            case let .articlesPath(.element(id: _, action: .article(.comments(.element(_, action))))):
+                if case .likeButtonTapped = action {
+                    if state.userSession == nil {
+                        state.auth = AuthFeature.State(openReason: .like)
+                    }
+                }
                 return .none
                 
             default:
@@ -354,27 +398,29 @@ public struct AppFeature: Sendable {
         Reduce { state, action in
             switch action {
                 
-                // MARK: Menu
-                
-            case .profile(.delegate(.openAuth)):
-                state.profilePath.append(.auth(AuthFeature.State()))
+            case .profile(.logoutButtonTapped):
+                state.selectedTab = .articlesList
                 return .none
                 
-            case let .profile(.delegate(.openProfile(id: id))):
-                state.profilePath.append(.profile(ProfileFeature.State(userId: id)))
-                return .none
-                
-            case .profile(.settingsTapped):
-                state.profilePath.append(.settings(SettingsFeature.State()))
-                return .none
+//            case .profile(.delegate(.openAuth)):
+//                state.profilePath.append(.auth(AuthFeature.State()))
+//                return .none
+//                
+//            case let .profile(.delegate(.openProfile(id: id))):
+//                state.profilePath.append(.profile(ProfileFeature.State(userId: id)))
+//                return .none
+//                
+//            case .profile(.settingsTapped):
+//                state.profilePath.append(.settings(SettingsFeature.State()))
+//                return .none
                 
                 // MARK: Auth
                 
-            case let .profilePath(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
-                // TODO: How to make seamless animation?
-                state.profilePath.pop(from: id)
-                state.profilePath.append(.profile(ProfileFeature.State(userId: userId)))
-                return .none
+//            case let .profilePath(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
+//                // TODO: How to make seamless animation?
+//                state.profilePath.pop(from: id)
+//                state.profilePath.append(.profile(ProfileFeature.State(userId: userId)))
+//                return .none
                 
             default:
                 return .none

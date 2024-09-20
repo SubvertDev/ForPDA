@@ -22,6 +22,7 @@ public extension EnvironmentValues {
 
 // TODO: 17+ change to ImageResource
 public extension Image {
+    static let logoLight = Image(.logoLight)
     static let avatarDefault = Image(.avatarDefault)
     static let github = Image(.github)
     static let telegram = Image(.telegram)
