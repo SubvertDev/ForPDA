@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import TCAExtensions
 import APIClient
+import HapticClient
 import PersistenceKeys
 import Models
 
@@ -100,6 +101,7 @@ public struct AuthFeature: Sendable {
     
     @Dependency(\.dismiss) private var dismiss
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.hapticClient) private var hapticClient
     
     // MARK: - Body
     
@@ -202,6 +204,7 @@ public struct AuthFeature: Sendable {
 //                state.focus = .password
                 state.loginErrorReason = .wrongLoginOrPassword
                 return .run { send in
+                    await hapticClient.play(.error)
                     let result = await Result { try await apiClient.getCaptcha() }
                     await send(._captchaResponse(result))
                 }
@@ -211,7 +214,9 @@ public struct AuthFeature: Sendable {
                 state.captchaUrl = url
                 state.focus = .captcha
                 state.loginErrorReason = .wrongCaptcha
-                return .none
+                return .run { _ in
+                    await hapticClient.play(.error)
+                }
             }
         }
         

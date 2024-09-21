@@ -152,6 +152,7 @@ let package = Package(
             dependencies: [
                 "APIClient",
                 "AnalyticsClient",
+                "HapticClient",
                 "PersistenceKeys",
                 "TCAExtensions",
                 "SharedUI",

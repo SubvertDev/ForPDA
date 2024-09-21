@@ -17,6 +17,7 @@ public struct AuthScreen: View {
     @Environment(\.tintColor) private var tintColor
     @FocusState public var focus: AuthFeature.State.Field?
     @State private var animateOnFocus = [false, false, false]
+    @State private var safeAreaTopHeight: CGFloat = 0
     
     public init(store: StoreOf<AuthFeature>) {
         self.store = store
@@ -144,6 +145,18 @@ public struct AuthScreen: View {
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(Color.Background.primary, for: .navigationBar)
+            .overlay(alignment: .top) {
+                Color.Background.primary
+                    .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
+                    .ignoresSafeArea()
+            }
+            .background(GeometryReader { proxy in
+                Color.clear.task(id: proxy.size.width) {
+                    safeAreaTopHeight = proxy.safeAreaInsets.top
+                }
+            })
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {

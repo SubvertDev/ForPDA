@@ -69,6 +69,7 @@ public extension Color {
     struct Background {
         public static let primary = Color(.Background.primary)
         public static let primaryAlpha = Color(.Background.primaryAlpha)
+        public static let secondary = Color(.Background.secondary)
         public static let teritary = Color(.Background.teritary)
         public static let forcedDark = Color(.Background.forcedDark)
     }
