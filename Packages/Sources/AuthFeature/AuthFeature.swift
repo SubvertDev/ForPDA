@@ -12,9 +12,14 @@ import APIClient
 import PersistenceKeys
 import Models
 
-public enum AuthOpenReason: String, Sendable{
+public enum AuthOpenReason: String, Sendable {
     case like
     case profile
+}
+
+public enum LoginErrorReason {
+    case wrongLoginOrPassword
+    case wrongCaptcha
 }
 
 @Reducer
@@ -37,6 +42,7 @@ public struct AuthFeature: Sendable {
         public var captchaUrl: URL?
         public var captcha: String
         public var focus: Field?
+        public var loginErrorReason: LoginErrorReason?
         
         public var isLoginButtonDisabled: Bool {
             return login.isEmpty || password.isEmpty || captcha.count < 4 || isLoading
@@ -50,7 +56,8 @@ public struct AuthFeature: Sendable {
             isHiddenEntry: Bool = false,
             captchaUrl: URL? = nil,
             captcha: String = "",
-            focus: Field? = nil
+            focus: Field? = nil,
+            loginErrorReason: LoginErrorReason? = nil
         ) {
             self.openReason = openReason
             self.isLoading = isLoading
@@ -60,6 +67,7 @@ public struct AuthFeature: Sendable {
             self.captchaUrl = captchaUrl
             self.captcha = captcha
             self.focus = focus
+            self.loginErrorReason = loginErrorReason
         }
     }
     
@@ -126,6 +134,7 @@ public struct AuthFeature: Sendable {
                 
             case .loginButtonTapped:
                 state.isLoading = true
+                state.loginErrorReason = nil
                 return .run { [
                     login = state.login,
                     password = state.password,
@@ -155,8 +164,8 @@ public struct AuthFeature: Sendable {
                 switch response {
                 case .success(let url):
                     state.captchaUrl = url
-                case .failure(let error):
-                    print(error, #line)
+                case .failure:
+                    // TODO: Send error
                     state.alert = .failedToConnect
                 }
                 return .none
@@ -190,8 +199,8 @@ public struct AuthFeature: Sendable {
             case ._wrongPassword:
                 state.password = ""
                 state.captcha = ""
-                state.focus = .password
-                state.alert = .wrongPassword
+//                state.focus = .password
+                state.loginErrorReason = .wrongLoginOrPassword
                 return .run { send in
                     let result = await Result { try await apiClient.getCaptcha() }
                     await send(._captchaResponse(result))
@@ -201,7 +210,7 @@ public struct AuthFeature: Sendable {
                 state.captcha = ""
                 state.captchaUrl = url
                 state.focus = .captcha
-                state.alert = .wrongCaptcha
+                state.loginErrorReason = .wrongCaptcha
                 return .none
             }
         }
@@ -214,7 +223,7 @@ public struct AuthFeature: Sendable {
 
 extension AlertState where Action == AuthFeature.Action.Alert {
         
-    nonisolated(unsafe) static var wrongPassword: AlertState {
+    nonisolated(unsafe) static var wrongLoginOrPassword: AlertState {
         AlertState {
             TextState("Whoops!", bundle: .module)
         } actions: {

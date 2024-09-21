@@ -96,10 +96,12 @@ let package = Package(
                 "AnalyticsClient",
                 "ParsingClient",
                 "PasteboardClient",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "NukeUI", package: "nuke"),
-                .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit")
+                .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
         .target(

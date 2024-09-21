@@ -42,7 +42,7 @@ public struct AuthScreen: View {
                             .padding(.top, 16)
                             .padding(.bottom, 12)
                         
-                        Text("Welcome back!")
+                        Text("Welcome back!", bundle: .module)
                             .font(.title2)
                             .bold()
                             .foregroundStyle(Color.Labels.primary)
@@ -64,6 +64,8 @@ public struct AuthScreen: View {
                                 placeholder: "Password",
                                 focusEqual: .password,
                                 isSecure: true,
+                                errorMessage: "Login or password is incorrect",
+                                showError: store.loginErrorReason == .wrongLoginOrPassword,
                                 onSubmit: { store.send(.onSubmit(.password)) }
                             )
                             .bounceUpByLayerEffect(value: animateOnFocus[1])
@@ -106,6 +108,8 @@ public struct AuthScreen: View {
                             text: $store.captcha,
                             placeholder: "Enter captcha",
                             focusEqual: .captcha,
+                            errorMessage: "Captcha is incorrect",
+                            showError: store.loginErrorReason == .wrongCaptcha,
                             onSubmit: { store.send(.onSubmit(.captcha)) }
                         )
                         .bounceUpByLayerEffect(value: animateOnFocus[2])
@@ -175,46 +179,61 @@ public struct AuthScreen: View {
         placeholder: LocalizedStringKey,
         focusEqual: AuthFeature.State.Field,
         isSecure: Bool = false,
+        errorMessage: LocalizedStringKey? = nil,
+        showError: Bool = false,
         onSubmit: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: 8) {
-            Image(systemSymbol: symbol)
-                .font(.body)
-                .foregroundStyle(tintColor)
-                .frame(width: 32, height: 32)
-            
-            Group {
-                if isSecure {
-                    SecureField(text: text) {
-                        Text(placeholder, bundle: .module)
-                            .font(.body)
-                            .foregroundStyle(Color.Labels.quaternary)
-                    }
-                } else {
-                    TextField(text: text) {
-                        Text(placeholder, bundle: .module)
-                            .font(.body)
-                            .foregroundStyle(Color.Labels.quaternary)
+        VStack(spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemSymbol: symbol)
+                    .font(.body)
+                    .foregroundStyle(tintColor)
+                    .frame(width: 32, height: 32)
+                
+                Group {
+                    if isSecure {
+                        SecureField(text: text) {
+                            Text(placeholder, bundle: .module)
+                                .font(.body)
+                                .foregroundStyle(Color.Labels.quaternary)
+                        }
+                    } else {
+                        TextField(text: text) {
+                            Text(placeholder, bundle: .module)
+                                .font(.body)
+                                .foregroundStyle(Color.Labels.quaternary)
+                        }
                     }
                 }
+                .font(.body)
+                .foregroundStyle(Color.Labels.primary)
+                .focused($focus, equals: focusEqual)
+                .onSubmit { onSubmit() }
             }
-            .font(.body)
-            .foregroundStyle(Color.Labels.primary)
-            .focused($focus, equals: focusEqual)
-            .onSubmit { onSubmit() }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.Background.teritary)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke($focus.wrappedValue == focusEqual ? tintColor : Color.Separator.primary, lineWidth: 0.67)
+            )
+            
+            if let errorMessage, showError {
+                Text(errorMessage, bundle: .module)
+                    .font(.caption)
+                    .foregroundStyle(Color.Main.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 12)
+            }
         }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(Color.Background.teritary)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke($focus.wrappedValue == focusEqual ? tintColor : Color.Separator.primary, lineWidth: 0.67)
-        )
+        .animation(.default, value: showError)
     }
 }
+
+// MARK: - Previews
 
 #Preview {
     NavigationStack {
@@ -225,6 +244,30 @@ public struct AuthScreen: View {
                 AuthFeature()
             } withDependencies: {
                 $0.apiClient = .previewValue
+            }
+        )
+    }
+    .environment(\.tintColor, Color.Theme.primary)
+}
+
+#Preview("Wrong Credentials") {
+    NavigationStack {
+        AuthScreen(
+            store: Store(
+                initialState: AuthFeature.State.init(
+                    openReason: .profile,
+                    login: "TestLogin",
+                    password: "TestPassword",
+                    captcha: "1234"
+                )
+            ) {
+                AuthFeature()
+            } withDependencies: {
+                $0.apiClient.getCaptcha = { return URL(string: "/")! }
+                $0.apiClient.authorize = { @Sendable _, _, _, _ in
+                    try? await Task.sleep(for: .seconds(1))
+                    return .wrongPassword
+                }
             }
         )
     }

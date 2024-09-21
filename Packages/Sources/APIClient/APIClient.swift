@@ -134,7 +134,7 @@ extension APIClient: DependencyKey {
             },
             getCaptcha: {
                 try await Task.sleep(for: .seconds(2))
-                return URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/images/logo.png")!
+                return URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!
             },
             authorize: { _, _, _, _ in
                 return .success(userId: -1, token: "preview_token")
