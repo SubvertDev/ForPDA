@@ -140,6 +140,7 @@ public struct AuthScreen: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .background(Color.Background.primary)
+                    .tint(tintColor)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -149,7 +150,7 @@ public struct AuthScreen: View {
                         store.send(.cancelButtonTapped)
                     } label: {
                         Text("Cancel", bundle: .module)
-                            .foregroundStyle(Color.Theme.primary)
+                            .foregroundStyle(tintColor)
                     }
                 }
             }
