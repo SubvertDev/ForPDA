@@ -44,7 +44,6 @@ public struct AppFeature: Sendable {
     
     @Reducer(state: .equatable)
     public enum ProfilePath {
-        case auth(AuthFeature)
         case settings(SettingsFeature)
     }
     
@@ -405,29 +404,13 @@ public struct AppFeature: Sendable {
         Reduce { state, action in
             switch action {
                 
+            case .profile(.settingsButtonTapped):
+                state.profilePath.append(.settings(SettingsFeature.State()))
+                return .none
+                
             case .profile(.logoutButtonTapped):
                 state.selectedTab = .articlesList
                 return .none
-                
-//            case .profile(.delegate(.openAuth)):
-//                state.profilePath.append(.auth(AuthFeature.State()))
-//                return .none
-//                
-//            case let .profile(.delegate(.openProfile(id: id))):
-//                state.profilePath.append(.profile(ProfileFeature.State(userId: id)))
-//                return .none
-//                
-//            case .profile(.settingsTapped):
-//                state.profilePath.append(.settings(SettingsFeature.State()))
-//                return .none
-                
-                // MARK: Auth
-                
-//            case let .profilePath(.element(id: id, action: .auth(.delegate(.loginSuccess(userId: userId))))):
-//                // TODO: How to make seamless animation?
-//                state.profilePath.pop(from: id)
-//                state.profilePath.append(.profile(ProfileFeature.State(userId: userId)))
-//                return .none
                 
             default:
                 return .none

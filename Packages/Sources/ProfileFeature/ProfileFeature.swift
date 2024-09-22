@@ -47,6 +47,7 @@ public struct ProfileFeature: Sendable {
     
     public enum Action {
         case onTask
+        case settingsButtonTapped
         case logoutButtonTapped
         
         case _userResponse(Result<User, any Error>)
@@ -82,6 +83,9 @@ public struct ProfileFeature: Sendable {
                         await send(._userResponse(.failure(error)))
                     }
                 }
+                
+            case .settingsButtonTapped:
+                return .none
                 
             case .logoutButtonTapped:
                 state.userSession = nil

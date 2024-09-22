@@ -20,7 +20,7 @@ extension ProfileFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .onTask, .alert:
+                case .onTask, .alert, .settingsButtonTapped: // TODO: Settings analytics
                     break
                     
                 case .logoutButtonTapped:

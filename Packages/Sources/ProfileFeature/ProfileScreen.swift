@@ -60,9 +60,31 @@ public struct ProfileScreen: View {
             }
             .navigationTitle(Text("Profile", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    ToolbarButtons()
+                }
+            }
             .task {
                 store.send(.onTask)
             }
+        }
+    }
+    
+    // MARK: - Toolbar Items
+    
+    @ViewBuilder
+    private func ToolbarButtons() -> some View {
+        Button {
+            store.send(.settingsButtonTapped)
+        } label: {
+            Image(systemSymbol: .gearshape)
+        }
+        
+        Button {
+            store.send(.logoutButtonTapped)
+        } label: {
+            Image(systemSymbol: .rectanglePortraitAndArrowForward)
         }
     }
     

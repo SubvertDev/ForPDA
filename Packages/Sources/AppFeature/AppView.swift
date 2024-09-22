@@ -155,9 +155,6 @@ public struct AppView: View {
             ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
         } destination: { store in
             switch store.case {
-            case let .auth(store):
-                AuthScreen(store: store)
-                
             case let .settings(store):
                 SettingsScreen(store: store)
             }
