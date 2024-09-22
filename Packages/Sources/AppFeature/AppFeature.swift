@@ -202,12 +202,6 @@ public struct AppFeature: Sendable {
                 }
                 return .none
                 
-            case .auth(.dismiss):
-                if state.userSession == nil {
-                    state.selectedTab = state.previousTab
-                }
-                return .none
-                
             case .auth:
                 return .none
                 
