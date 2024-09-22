@@ -188,6 +188,10 @@ public struct SettingsFeature: Sendable {
                     await appSettings.withLock { $0.appTintColor = tint }
                 }
                 
+            case .binding(\.backgroundTheme):
+                state.destination = .alert(.notImplemented)
+                return .none
+                
             case .destination, .binding:
                 return .none
             }

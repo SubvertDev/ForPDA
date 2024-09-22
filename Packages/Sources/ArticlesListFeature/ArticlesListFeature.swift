@@ -103,7 +103,9 @@ public struct ArticlesListFeature: Sendable {
                 case .copyLink:       pasteboardClient.copy(string: article.url.absoluteString)
                 case .openInBrowser:  return .run { _ in await open(url: article.url) }
                 case .report:         break
-                case .addToBookmarks: return .run { _ in await hapticClient.play(.rigid) }
+                case .addToBookmarks:
+                    state.destination = .alert(.notImplemented)
+                    return .run { _ in await hapticClient.play(.rigid) }
                 }
                 return .none
                 
