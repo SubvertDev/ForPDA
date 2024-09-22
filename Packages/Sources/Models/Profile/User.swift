@@ -32,6 +32,21 @@ public struct User: Sendable, Hashable, Codable {
     public let forumDevices: [Device]?
     public let email: String?
     
+    public var userTimeFormatted: String? {
+        if let userTime {
+            let currentDate = Date()
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "HH:mm"
+            dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+            // let gmtTimeString = dateFormatter.string(from: currentDate)
+            let gmtDateWithOffset = currentDate.addingTimeInterval(TimeInterval(userTime))
+            let offsetTimeString = dateFormatter.string(from: gmtDateWithOffset)
+            return offsetTimeString
+        } else {
+            return nil
+        }
+    }
+    
     public init(
         id: Int,
         nickname: String,

@@ -253,7 +253,7 @@ public struct ProfileScreen: View {
             if let city = user.city {
                 Row(title: "City", type: .description(city))
             }
-            if let userTime = user.userTime {
+            if let userTime = user.userTimeFormatted {
                 // TODO: Format
                 Row(title: "User time", type: .description(String(userTime)))
             }
