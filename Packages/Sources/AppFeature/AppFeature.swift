@@ -417,5 +417,16 @@ public struct AppFeature: Sendable {
             }
         }
         .forEach(\.profilePath, action: \.profilePath)
+        .onChange(of: \.profilePath) { _, newValue in
+            // TODO: Another way?
+            Reduce { state, _ in
+                let hasSettings = newValue.contains(where: { screen in
+                    if case .settings = screen { return true }
+                    return false
+                })
+                state.isShowingTabBar = !hasSettings
+                return .none
+            }
+        }
     }
 }
