@@ -81,10 +81,12 @@ public struct ProfileScreen: View {
             Image(systemSymbol: .gearshape)
         }
         
-        Button {
-            store.send(.logoutButtonTapped)
-        } label: {
-            Image(systemSymbol: .rectanglePortraitAndArrowForward)
+        if store.shouldShowLogoutButton {
+            Button {
+                store.send(.logoutButtonTapped)
+            } label: {
+                Image(systemSymbol: .rectanglePortraitAndArrowForward)
+            }
         }
     }
     
