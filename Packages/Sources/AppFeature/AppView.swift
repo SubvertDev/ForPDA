@@ -84,15 +84,15 @@ public struct AppView: View {
 //                    AlertToast(displayMode: .hud, type: .regular, title: store.toast.message, bundle: store.localizationBundle)
 //                }
             }
-//            .tint(tintColor)
-            .tint(store.appSettings.appTintColor.asColor)
-            .environment(\.tintColor, store.appSettings.appTintColor.asColor)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
             .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
                 NavigationStack {
                     AuthScreen(store: store)
                 }
             }
+            // Tint and environment should be after sheets/covers
+            .tint(store.appSettings.appTintColor.asColor)
+            .environment(\.tintColor, store.appSettings.appTintColor.asColor)
         }
     }
     
