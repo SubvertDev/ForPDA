@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UserNotifications
 import ComposableArchitecture
 import AppFeature
 
@@ -52,8 +51,4 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         store.send(.appDelegate(.didRegisterForRemoteNotifications(deviceToken)))
     }
-}
-
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    
 }
