@@ -164,12 +164,15 @@ let package = Package(
         .target(
             name: "ProfileFeature",
             dependencies: [
+                "Models",
+                "SharedUI",
                 "APIClient",
                 "AnalyticsClient",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
-                .product(name: "NukeUI", package: "nuke")
+                .product(name: "NukeUI", package: "nuke"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
         .target(

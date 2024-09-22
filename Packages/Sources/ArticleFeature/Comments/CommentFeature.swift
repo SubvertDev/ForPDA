@@ -50,7 +50,7 @@ public struct CommentFeature: Sendable {
     
     public enum Action {
         case alert(PresentationAction<Never>)
-        case profileTapped
+        case profileTapped(userId: Int)
         case contextMenuTapped
         case replyButtonTapped
         case likeButtonTapped

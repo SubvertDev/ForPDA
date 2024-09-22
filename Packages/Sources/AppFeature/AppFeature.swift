@@ -317,10 +317,17 @@ public struct AppFeature: Sendable {
                 return .none
                 
             case let .articlesPath(.element(id: _, action: .article(.comments(.element(_, action))))):
-                if case .likeButtonTapped = action {
+                switch action {
+                case let .profileTapped(userId: userId):
+                    state.articlesPath.append(.profile(ProfileFeature.State(userId: userId)))
+                    
+                case .likeButtonTapped:
                     if state.userSession == nil {
                         state.auth = AuthFeature.State(openReason: .like)
                     }
+                    
+                default:
+                    break
                 }
                 return .none
                 

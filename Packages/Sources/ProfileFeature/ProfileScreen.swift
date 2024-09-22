@@ -9,10 +9,21 @@ import SwiftUI
 import ComposableArchitecture
 import SkeletonUI
 import NukeUI
+import SharedUI
+import SFSafeSymbols
+import Models
 
 public struct ProfileScreen: View {
     
+    public enum PickerSelection {
+        case general
+        case statistics
+        case achievements
+    }
+    
     public let store: StoreOf<ProfileFeature>
+    @Environment(\.tintColor) private var tintColor
+    @State private var pickerSelection: PickerSelection = .general
     
     public init(store: StoreOf<ProfileFeature>) {
         self.store = store
@@ -20,116 +31,347 @@ public struct ProfileScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 0) {
+            ZStack {
+                Color.Background.primary
+                    .ignoresSafeArea()
+                
                 if let user = store.user {
                     List {
-                        VStack(spacing: 16) {
-                            LazyImage(url: user.imageUrl) { state in
-                                Group {
-                                    if let image = state.image {
-                                        image.resizable().scaledToFill()
-                                    } else {
-                                        Color(.systemBackground)
-                                    }
-                                }
-                                .skeleton(with: state.isLoading, shape: .circle)
-                            }
-                            .frame(width: 80, height: 80)
-                            .clipShape(Circle())
-                            
-                            HStack {
-                                Text(user.nickname)
-                                    .font(.headline)
-                                
-                                if user.lastSeenDate.isUserOnline() {
-                                    Circle()
-                                        .fill(.green)
-                                        .frame(width: 14, height: 14)
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .listRowBackground(Color(.systemGroupedBackground))
+                        Header(user: user)
+//                        NavigationSection()
+                        SegmentPicker()
                         
-                        Section {
-                            informationRow(
-                                title: "Registration date",
-                                description: user.registrationDate.formatted(date: .numeric, time: .omitted)
-                            )
+                        switch pickerSelection {
+                        case .general:
+                            GeneralSegment(user: user)
                             
-                            if user.lastSeenDate.timeIntervalSince1970 > 86400 {
-                                informationRow(
-                                    title: "Last seen date",
-                                    description: user.lastSeenDate.formattedDate()
-                                )
-                            }
+                        case .statistics:
+                            StatisticsSegment(user: user)
                             
-                            if !user.userCity.isEmpty && user.userCity != "Нет" {
-                                informationRow(
-                                    title: "City",
-                                    description: user.userCity
-                                )
-                            }
-                        } header: {
-                            Text("Information", bundle: .module)
-                        }
-                        
-                        Section {
-                            informationRow(
-                                title: "Karma",
-                                description: String(format: "%.2f", (Double(user.karma) / 100))
-                            )
-                            
-                            informationRow(
-                                title: "Posts",
-                                description: String(user.posts)
-                            )
-                            
-                            informationRow(
-                                title: "Comments",
-                                description: String(user.comments)
-                            )
-                        } header: {
-                            Text("Site statistics", bundle: .module)
-                        }
-                        
-                        Section {
-                            informationRow(
-                                title: "Reputation",
-                                description: String(user.reputation)
-                            )
-                            
-                            informationRow(
-                                title: "Topics",
-                                description: String(user.topics)
-                            )
-                            
-                            informationRow(
-                                title: "Replies",
-                                description: String(user.replies)
-                            )
-                        } header: {
-                            Text("Forum statistics", bundle: .module)
-                        }
-                        
-                        if store.shouldShowLogoutButton {
-                            Button {
-                                store.send(.logoutButtonTapped)
-                            } label: {
-                                Text("Logout", bundle: .module)
-                            }
+                        case .achievements:
+                            AchievementsSegment(user: user)
                         }
                     }
+                    .listSectionSpacingBackport(28)
+                    .scrollContentBackground(.hidden)
                 } else {
                     ProgressView().id(UUID())
                 }
             }
             .navigationTitle(Text("Profile", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .task {
                 store.send(.onTask)
             }
         }
+    }
+    
+    // MARK: - Profile Header
+    
+    @ViewBuilder
+    private func Header(user: User) -> some View {
+        VStack(alignment: .center, spacing: 0) {
+            LazyImage(url: user.imageUrl) { state in
+                Group {
+                    if let image = state.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Color(.systemBackground)
+                    }
+                }
+                .skeleton(with: state.isLoading, shape: .circle)
+            }
+            .frame(width: 128, height: 128)
+            .clipShape(Circle())
+            .padding(.bottom, 10)
+            
+            Text(user.nickname)
+                .font(.headline)
+                .foregroundStyle(Color.Labels.primary)
+                .padding(.bottom, 8)
+            
+            if let signature = user.signature {
+                Text(signature)
+                    .font(.footnote)
+                    .foregroundStyle(Color.Labels.primary)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(
+                        Color.Background.teritary
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    )
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+    }
+    
+    // MARK: - Navigation Section
+    
+    @ViewBuilder
+    private func NavigationSection() -> some View {
+        Section {
+            Row(symbol: .person2, title: "QMS", type: .navigation) {}
+            Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {}
+        }
+        .listRowBackground(Color.Background.teritary)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Segment Picker
+    
+    @ViewBuilder
+    private func SegmentPicker() -> some View {
+        Picker(String(""), selection: $pickerSelection) {
+            Text("General", bundle: .module)
+                .tag(PickerSelection.general)
+            Text("Statistics", bundle: .module)
+                .tag(PickerSelection.statistics)
+            Text("Achievements", bundle: .module)
+                .tag(PickerSelection.achievements)
+        }
+        .pickerStyle(.segmented)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - General Segment
+    
+    @ViewBuilder
+    private func GeneralSegment(user: User) -> some View {
+        GroupsSection(user: user)
+        PersonalSection(user: user)
+        if let aboutMe = user.aboutMe {
+            AboutSection(text: aboutMe)
+        }
+        // TODO: List of devices
+        // DevicesSection()
+    }
+    
+    // MARK: - Groups Section
+    @ViewBuilder
+    private func GroupsSection(user: User) -> some View {
+        Section {
+            VStack(spacing: 12) {
+                HStack(spacing: 12) {
+                    VStack(spacing: 2) {
+                        Text("Group", bundle: .module)
+                            .font(.footnote)
+                            .foregroundStyle(Color.Labels.teritary)
+                        Text(user.group.title)
+                            .font(.body)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(Color.Labels.primary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(12)
+                    .background(
+                        Color.Background.teritary
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    )
+                    
+                    if let status = user.status {
+                        VStack(spacing: 2) {
+                            Text("Status", bundle: .module)
+                                .font(.footnote)
+                                .foregroundStyle(Color.Labels.teritary)
+                            Text(status)
+                                .font(.body)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(Color.Labels.primary)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(12)
+                        .background(
+                            Color.Background.teritary
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        )
+                    }
+                }
+                
+                HStack {
+                    Text("Registration date", bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(Color.Labels.primary)
+                    
+                    Spacer()
+                    
+                    Text(user.registrationDate.formatted(date: .numeric, time: .omitted))
+                        .font(.body)
+                        .foregroundStyle(Color.Labels.teritary)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 19)
+                .background(
+                    Color.Background.teritary
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                )
+            }
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Personal Section
+    
+    @ViewBuilder
+    private func PersonalSection(user: User) -> some View {
+        Section {
+            if let email = user.email {
+                Row(title: "Email", type: .description(email))
+            }
+            if let birthdate = user.birthdate {
+                // TODO: Format
+                Row(title: "Birthdate", type: .description(birthdate))
+            }
+            if let gender = user.gender, gender != .unknown {
+                Row(title: "Gender", type: .description(gender.title))
+            }
+            if let city = user.city {
+                Row(title: "City", type: .description(city))
+            }
+            if let userTime = user.userTime {
+                // TODO: Format
+                Row(title: "User time", type: .description(String(userTime)))
+            }
+        } header: {
+            SectionHeader(title: "Personal info")
+        }
+        .listRowBackground(Color.Background.teritary)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - About Section
+    
+    @ViewBuilder
+    private func AboutSection(text: String) -> some View {
+        Section {
+            Text(text)
+                .font(.body)
+                .foregroundStyle(Color.Labels.primary)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } header: {
+            SectionHeader(title: "About me")
+        }
+        .listRowBackground(Color.Background.teritary)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Statistics Segment
+    
+    @ViewBuilder
+    private func StatisticsSegment(user: User) -> some View {
+        SiteStatisticsSection(user: user)
+        ForumStatisticsSection(user: user)
+    }
+    
+    // MARK: - Site Statistics Section
+    
+    @ViewBuilder
+    private func SiteStatisticsSection(user: User) -> some View {
+        Section {
+            Row(title: "Karma", type: .description(String(user.karma)))
+            Row(title: "Posts", type: .description(String(user.posts)))
+            Row(title: "Comments", type: .description(String(user.comments)))
+        } header: {
+            SectionHeader(title: "Site statistics")
+        }
+        .listRowBackground(Color.Background.teritary)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Forum Statistics Section
+    
+    @ViewBuilder
+    private func ForumStatisticsSection(user: User) -> some View {
+        Section {
+            Row(title: "Reputation", type: .description(String(user.reputation)))
+            Row(title: "Topics", type: .description(String(user.topics)))
+            Row(title: "Replies", type: .description(String(user.replies)))
+        } header: {
+            SectionHeader(title: "Forum statistics")
+        }
+        .listRowBackground(Color.Background.teritary)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Achievements Segment
+    
+    @ViewBuilder
+    private func AchievementsSegment(user: User) -> some View {
+        Section {
+            Text("In Development")
+                .font(.footnote)
+                .foregroundStyle(Color.Labels.teritary)
+                .frame(maxWidth: .infinity)
+        }
+        .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Section Header
+    
+    @ViewBuilder
+    private func SectionHeader(title: LocalizedStringKey) -> some View {
+        Text(title, bundle: .module)
+            .font(.subheadline)
+            .foregroundStyle(Color.Labels.teritary)
+            .textCase(nil)
+            .offset(x: 16)
+            .padding(.bottom, 4)
+    }
+    
+    // MARK: - Row
+    
+    enum RowType {
+        case basic
+        case description(String)
+        case navigation
+    }
+    
+    @ViewBuilder
+    private func Row(symbol: SFSymbol? = nil, title: LocalizedStringKey, type: RowType, action: @escaping () -> Void = {}) -> some View {
+        HStack(spacing: 0) { // Hacky HStack to enable tap animations
+            Button {
+                action()
+            } label: {
+                HStack(spacing: 0) {
+                    if let symbol {
+                        Image(systemSymbol: symbol)
+                            .font(.title2)
+                            .foregroundStyle(tintColor)
+                            .frame(width: 36)
+                            .padding(.trailing, 12)
+                    }
+                    
+                    Text(title, bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(Color.Labels.primary)
+                    
+                    Spacer(minLength: 8)
+                    
+                    switch type {
+                    case .basic:
+                        EmptyView()
+                        
+                    case let .description(text):
+                        Text(text)
+                            .font(.body)
+                            .foregroundStyle(Color.Labels.teritary)
+                        
+                    case .navigation:
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color.Labels.quintuple)
+                    }
+                }
+            }
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        .buttonStyle(.plain)
+        .frame(height: 60)
     }
     
     @ViewBuilder
@@ -157,21 +399,7 @@ public struct ProfileScreen: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        ProfileScreen(
-            store: Store(
-                initialState: ProfileFeature.State(
-                    userId: 3640948
-                )
-            ) {
-                ProfileFeature()
-            } withDependencies: {
-                $0.apiClient = .previewValue
-            }
-        )
-    }
-}
+// MARK: - Extensions
 
 private extension Date {
     func formattedDate() -> LocalizedStringKey {
@@ -192,4 +420,43 @@ private extension Date {
     func isUserOnline() -> Bool {
         return (Date().timeIntervalSince1970) - self.timeIntervalSince1970 < 900
     }
+}
+
+private extension View {
+    func listSectionSpacingBackport(_ value: CGFloat) -> some View {
+        self.modifier(ListSectionSpacing(value: value))
+    }
+}
+
+private struct ListSectionSpacing: ViewModifier {
+    
+    var value: CGFloat
+    
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content
+                .listSectionSpacing(value)
+        } else {
+            content
+        }
+    }
+}
+
+// MARK: - Previews
+
+#Preview {
+    NavigationStack {
+        ProfileScreen(
+            store: Store(
+                initialState: ProfileFeature.State(
+                    userId: 3640948
+                )
+            ) {
+                ProfileFeature()
+            } withDependencies: {
+                $0.apiClient = .previewValue
+            }
+        )
+    }
+    .environment(\.tintColor, Color.Theme.primary)
 }

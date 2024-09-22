@@ -178,6 +178,9 @@ public struct AuthScreen: View {
                 case nil:       break
                 }
             }
+            .onTapGesture {
+                focus = nil
+            }
             .task {
                 store.send(.onTask)
             }

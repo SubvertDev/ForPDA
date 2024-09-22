@@ -129,7 +129,7 @@ struct CommentView: View {
                     .bold()
             }
             .onTapGesture {
-                store.send(.profileTapped)
+                store.send(.profileTapped(userId: store.comment.authorId))
             }
             
             Group {

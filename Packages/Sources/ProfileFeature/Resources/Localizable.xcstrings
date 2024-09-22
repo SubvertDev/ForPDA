@@ -1,6 +1,39 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "About me" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О себе"
+          }
+        }
+      }
+    },
+    "Achievements" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Достижения"
+          }
+        }
+      }
+    },
+    "Birthdate" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата рождения"
+          }
+        }
+      }
+    },
     "City" : {
       "localizations" : {
         "ru" : {
@@ -21,6 +54,16 @@
         }
       }
     },
+    "Email" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
+    },
     "Forum statistics" : {
       "localizations" : {
         "ru" : {
@@ -31,12 +74,52 @@
         }
       }
     },
-    "Information" : {
+    "Gender" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Информация"
+            "value" : "Пол"
+          }
+        }
+      }
+    },
+    "General" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Главная"
+          }
+        }
+      }
+    },
+    "Group" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Группа"
+          }
+        }
+      }
+    },
+    "History" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "История"
+          }
+        }
+      }
+    },
+    "In Development" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В разработке"
           }
         }
       }
@@ -51,22 +134,12 @@
         }
       }
     },
-    "Last seen date" : {
+    "Personal info" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Последнее посещение"
-          }
-        }
-      }
-    },
-    "Logout" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выйти"
+            "value" : "Личная информация"
           }
         }
       }
@@ -87,6 +160,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль"
+          }
+        }
+      }
+    },
+    "QMS" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QMS"
           }
         }
       }
@@ -131,6 +214,26 @@
         }
       }
     },
+    "Statistics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статистика"
+          }
+        }
+      }
+    },
+    "Status" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стаутс"
+          }
+        }
+      }
+    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {
@@ -147,6 +250,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тем"
+          }
+        }
+      }
+    },
+    "User time" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время у юзера"
           }
         }
       }
