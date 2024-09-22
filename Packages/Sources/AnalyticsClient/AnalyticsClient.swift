@@ -9,14 +9,9 @@ import Foundation
 import ComposableArchitecture
 import PersistenceKeys
 import Models
-import AppMetricaCore
-import AppMetricaCrashes
+import Mixpanel
+import Sentry
 import OSLog
-
-public enum AnalyticsError: Error {
-    case brokenArticle(URL)
-    case apiFailure(any Error)
-}
 
 @DependencyClient
 public struct AnalyticsClient: Sendable {
@@ -27,6 +22,13 @@ public struct AnalyticsClient: Sendable {
     public var capture: @Sendable (any Error) -> Void
 }
 
+public extension DependencyValues {
+    var analyticsClient: AnalyticsClient {
+        get { self[AnalyticsClient.self] }
+        set { self[AnalyticsClient.self] = newValue }
+    }
+}
+
 extension AnalyticsClient: DependencyKey {
     
     private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Analytics")
@@ -34,24 +36,25 @@ extension AnalyticsClient: DependencyKey {
     public static var liveValue: Self {
         return AnalyticsClient(
             configure: {
-                configureAnalytics()
+                @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
+                configureMixpanel(id: analyticsId)
+                configureSentry(id: analyticsId)
             },
             identify: { id in
                 logger.info("Identifying user with id: \(id)")
-                AppMetrica.userProfileID = id
+                Mixpanel.mainInstance().identify(distinctId: id)
             },
             logout: {
-                @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
-                logger.info("Analytics has been reset after logout to \(analyticsId)")
-                AppMetrica.userProfileID = analyticsId
+                logger.info("Analytics has been reset after logout")
+                Mixpanel.mainInstance().reset()
             },
             log: { event in
                 logger.info("\(event.name) \(event.properties.map { "(\($0))" } ?? "")")
-                AppMetrica.reportEvent(name: event.name, parameters: event.properties)
+                Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
             },
             capture: { error in
-                logger.error("\(error)\nLocalized: \(error.localizedDescription)")
-                AppMetricaCrashes.crashes().report(nserror: error)
+                logger.error("\(error) >>> \(error.localizedDescription)")
+                SentrySDK.capture(error: error)
             }
         )
     }
@@ -68,44 +71,61 @@ extension AnalyticsClient: DependencyKey {
             }
         },
         capture: { error in
-            print("[Crashlytics] \(error)")
+            print("[Sentry] \(error)")
         }
     )
 }
 
-// MARK: - Extension
-
 extension AnalyticsClient {
     
-    private static func configureAnalytics() {
-        @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
+    private static func configureMixpanel(id: String) {
+        Mixpanel.initialize(
+            token: Secrets.mixpanelToken,
+            trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
+            optOutTrackingByDefault: isDebug
+        )
+        
+        @Dependency(\.analyticsClient) var analytics
         @Shared(.userSession) var userSession
         
-        let userProfileID: String
-        if let sessionUserId = userSession?.userId {
-            logger.info("User session found, setting AppMetrica's id to \(sessionUserId)")
-            userProfileID = String(sessionUserId)
+        if let mixpanelUserId = Mixpanel.mainInstance().userId {
+            if let userId = userSession?.userId {
+                if String(userId) != mixpanelUserId {
+                    logger.warning("Mixpanel user ID mismatch, changing to \(userId)")
+                    analytics.identify(id: String(userId))
+                } else {
+                    logger.info("Analytics configured successfully")
+                }
+            } else {
+                logger.warning("Mixpanel user ID found without user session, logging out")
+                analytics.logout()
+            }
         } else {
-            logger.info("User session not found, defaulting to \(analyticsId)")
-            userProfileID = analyticsId
+            logger.info("Mixpanel user ID not found, defaulting to \(id)")
+            Mixpanel.mainInstance().distinctId = id
         }
-
-        if let configuration = AppMetricaConfiguration(apiKey: Secrets.appmetricaToken) {
-            configuration.dataSendingEnabled = !isDebug
-            configuration.userProfileID = userProfileID
-            AppMetrica.activate(with: configuration)
+    }
+    
+    private static func configureSentry(id: String) {
+        SentrySDK.start { options in
+            options.dsn = Secrets.sentryDSN
+            options.debug = isDebug
+            options.enabled = !isDebug
+            options.tracesSampleRate = 1.0
+            options.profilesSampleRate = 1.0
+            options.diagnosticLevel = .warning
+            options.attachScreenshot = true
+            options.attachViewHierarchy = true
+            options.swiftAsyncStacktraces = true
         }
+        SentrySDK.setUser(User(userId: id))
     }
 }
 
-public extension DependencyValues {
-    var analyticsClient: AnalyticsClient {
-        get { self[AnalyticsClient.self] }
-        set { self[AnalyticsClient.self] = newValue }
-    }
+public enum AnalyticsError: Error {
+    case brokenArticle(URL)
+    case apiFailure(any Error)
 }
-
-// MARK: - Helpers
 
 // TODO: Move to another place
 private var isDebug: Bool {

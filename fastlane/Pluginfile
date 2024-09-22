@@ -4,4 +4,3 @@
 gem 'fastlane-plugin-sentry'
 gem 'fastlane-plugin-versioning'
 gem 'fastlane-plugin-xcconfig'
-gem 'fastlane-plugin-appmetrica'

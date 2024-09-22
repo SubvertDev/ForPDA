@@ -1,3 +1,5 @@
 struct Secrets {
-    static let appmetricaToken = ""
+    static let sentryDSN = ""
+    static let sentryDSYMToken = ""
+    static let mixpanelToken = ""
 }

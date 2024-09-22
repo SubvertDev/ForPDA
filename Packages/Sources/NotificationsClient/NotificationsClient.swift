@@ -5,10 +5,9 @@
 //  Created by Ilia Lubianoi on 15.09.2024.
 //
 
-import Foundation
+import UIKit
 import ComposableArchitecture
 import Models
-import AppMetricaPush
 
 @DependencyClient
 public struct NotificationsClient: Sendable {
@@ -39,17 +38,10 @@ extension NotificationsClient: DependencyKey {
             }
         },
         setDeviceToken: { deviceToken in
-            #if DEBUG
-                let pushEnvironment = AppMetricaPushEnvironment.development
-            #else
-                let pushEnvironment = AppMetricaPushEnvironment.production
-            #endif
-            
-            AppMetricaPush.setDeviceTokenFrom(deviceToken, pushEnvironment: pushEnvironment)
+
         },
         setNotificationsDelegate: {
-            let delegate = AppMetricaPush.userNotificationCenterDelegate
-            UNUserNotificationCenter.current().delegate = delegate
+            
         }
     )
 }
