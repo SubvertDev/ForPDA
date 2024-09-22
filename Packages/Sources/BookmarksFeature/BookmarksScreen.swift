@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SFSafeSymbols
 import SharedUI
+import Models
 
 public struct BookmarksScreen: View {
     
@@ -82,8 +83,15 @@ public struct BookmarksScreen: View {
                             store.send(.articleTapped(article))
                         } label: {
                             ArticleRowView(
-                                article: article,
-                                rowType: store.listRowType,
+                                state: ArticleRowView.State(
+                                    id: article.id,
+                                    title: article.title,
+                                    authorName: article.authorName,
+                                    imageUrl: article.imageUrl,
+                                    commentsAmount: article.commentsAmount,
+                                    date: article.date
+                                ),
+                                rowType: settingsToRow(store.listRowType),
                                 contextMenuActions: ContextMenuActions(
                                     shareAction:          { store.send(.cellMenuOpened(article, .shareLink)) },
                                     copyAction:           { store.send(.cellMenuOpened(article, .copyLink)) },
@@ -109,6 +117,10 @@ public struct BookmarksScreen: View {
         .coordinateSpace(name: "scroll")
         .background(Color.Background.primary)
         .scrollDisabled(store.isScrollDisabled)
+    }
+    
+    private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
+        rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
     }
     
     // MARK: - Toolbar Items

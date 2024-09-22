@@ -39,7 +39,7 @@ public struct ArticlesListFeature: Sendable {
         public var isLoading: Bool
         public var loadAmount: Int = 15
         public var offset: Int = 0
-        public var listRowType: ArticleListRowType = .normal
+        public var listRowType: AppSettings.ArticleListRowType = .normal
         
         public var isScrollDisabled: Bool {
             // Disables scroll until first load
@@ -138,7 +138,7 @@ public struct ArticlesListFeature: Sendable {
                 }
                 
             case .listGridTypeButtonTapped:
-                state.listRowType = ArticleListRowType.toggle(from: state.listRowType)
+                state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
                 return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
                     await hapticClient.play(.selection)
                     await appSettings.withLock { $0.articlesListRowType = listRowType }

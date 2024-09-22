@@ -34,7 +34,7 @@ public struct BookmarksFeature: Sendable {
         @Presents public var destination: Destination.State?
         @Shared(.appSettings) public var appSettings: AppSettings
         public var isLoading: Bool = false
-        public var listRowType: ArticleListRowType = .normal
+        public var listRowType: AppSettings.ArticleListRowType = .normal
         public var articles: [ArticlePreview] = []
         public var scrollToTop: Bool = false
         
@@ -84,7 +84,7 @@ public struct BookmarksFeature: Sendable {
                 return .none
                 
             case .listGridTypeButtonTapped:
-                state.listRowType = ArticleListRowType.toggle(from: state.listRowType)
+                state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
                 return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
                     await appSettings.withLock { $0.articlesListRowType = listRowType }
                 }

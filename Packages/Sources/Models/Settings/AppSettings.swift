@@ -9,6 +9,14 @@ import Foundation
 
 public struct AppSettings: Sendable, Equatable, Codable {
     
+    public enum ArticleListRowType: String, Sendable, Equatable, Codable {
+        case normal, short
+        
+        public static func toggle(from state: ArticleListRowType) -> ArticleListRowType {
+            return state == ArticleListRowType.normal ? ArticleListRowType.short : ArticleListRowType.normal
+        }
+    }
+    
     public var articlesListRowType: ArticleListRowType
     public var bookmarksListRowType: ArticleListRowType
     public var appColorScheme: AppColorScheme
