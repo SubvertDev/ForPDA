@@ -7,19 +7,6 @@
 
 import Foundation
 
-public enum ArticleListRowType: String, Sendable, Equatable, Codable {
-    case normal
-    case short
-    
-    public static func toggle(from state: ArticleListRowType) -> ArticleListRowType {
-        if state == ArticleListRowType.normal {
-            return ArticleListRowType.short
-        } else {
-            return ArticleListRowType.normal
-        }
-    }
-}
-
 public struct AppSettings: Sendable, Equatable, Codable {
     
     public var articlesListRowType: ArticleListRowType

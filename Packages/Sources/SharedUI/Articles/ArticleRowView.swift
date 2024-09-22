@@ -8,15 +8,14 @@
 import SwiftUI
 import SkeletonUI
 import NukeUI
-import Models
 
 public struct ArticleRowView: View {
     
     @Namespace private var namespace
     @Environment(\.tintColor) private var tintColor
     
-    public let article: ArticlePreview
-    public let rowType: ArticleListRowType
+    public let state: State
+    public let rowType: RowType
     public let contextMenuActions: ContextMenuActions
     
     private var isShort: Bool {
@@ -24,15 +23,15 @@ public struct ArticleRowView: View {
     }
     
     private var id: String {
-        return String(article.id)
+        return String(state.id)
     }
     
     public init(
-        article: ArticlePreview,
-        rowType: ArticleListRowType,
+        state: State,
+        rowType: RowType,
         contextMenuActions: ContextMenuActions
     ) {
-        self.article = article
+        self.state = state
         self.rowType = rowType
         self.contextMenuActions = contextMenuActions
     }
@@ -49,8 +48,8 @@ public struct ArticleRowView: View {
 //        .transition(.opacity)
 //        .animation(.smooth, value: isShort)
         .pdaContextMenu(
-            title: article.title,
-            authorName: article.authorName,
+            title: state.title,
+            authorName: state.authorName,
             contextMenuActions: contextMenuActions
         )
     }
@@ -116,7 +115,7 @@ public struct ArticleRowView: View {
     
     @ViewBuilder
     private func ArticleImage() -> some View {
-        LazyImage(url: article.imageUrl) { state in
+        LazyImage(url: state.imageUrl) { state in
             Group {
                 if let image = state.image {
                     Color.clear
@@ -143,14 +142,14 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func Description() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(article.authorName)
+            Text(state.authorName)
                 .font(isShort ? .caption : .footnote)
                 .fontWeight(.regular)
                 .foregroundStyle(Color.Labels.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 4)
             
-            Text(article.title)
+            Text(state.title)
                 .font(isShort ? .callout : .title3)
                 .fontWeight(.semibold)
                 .lineLimit(nil)
@@ -168,7 +167,7 @@ public struct ArticleRowView: View {
         HStack(spacing: 0) {
             HStack(spacing: 3) {
                 Image(systemSymbol: .bubbleRight)
-                Text(String(article.commentsAmount))
+                Text(String(state.commentsAmount))
             }
             .font(.caption)
             .foregroundStyle(Color.Labels.teritary)
@@ -179,7 +178,7 @@ public struct ArticleRowView: View {
                 .foregroundStyle(Color.Labels.quaternary)
                 .padding(.trailing, 6)
             
-            Text(article.formattedDate)
+            Text(state.formattedDate)
                 .font(.caption)
                 .foregroundStyle(Color.Labels.quaternary)
             
@@ -206,8 +205,8 @@ public struct ArticleRowView: View {
     private func ContextMenu() -> some View {
         Menu {
             MenuButtons(
-                title: article.title,
-                authorName: article.authorName,
+                title: state.title,
+                authorName: state.authorName,
                 contextMenuActions: contextMenuActions
             )
         } label: {
@@ -218,5 +217,50 @@ public struct ArticleRowView: View {
                 .padding(.vertical, isShort ? 11 : 22)
         }
         .frame(width: 19, height: 22)
+    }
+}
+
+// MARK: - State Model
+
+public extension ArticleRowView {
+    struct State {
+        public let id: Int
+        public let title: String
+        public let authorName: String
+        public let imageUrl: URL
+        public let commentsAmount: Int
+        public let date: Date
+        
+        public init(id: Int, title: String, authorName: String, imageUrl: URL, commentsAmount: Int, date: Date) {
+            self.id = id
+            self.title = title
+            self.authorName = authorName
+            self.imageUrl = imageUrl
+            self.commentsAmount = commentsAmount
+            self.date = date
+        }
+        
+        public var formattedDate: String {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd MMM yyyy"
+            return formatter.string(from: date)
+        }
+    }
+}
+
+// MARK: - Row Type
+
+public extension ArticleRowView {
+    enum RowType: String, Sendable, Equatable, Codable {
+        case normal
+        case short
+        
+        public static func toggle(from state: RowType) -> RowType {
+            if state == RowType.normal {
+                return RowType.short
+            } else {
+                return RowType.normal
+            }
+        }
     }
 }
