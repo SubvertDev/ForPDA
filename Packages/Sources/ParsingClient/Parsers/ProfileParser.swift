@@ -64,7 +64,7 @@ public struct ProfileParser {
                     userTime: (array[13] as! Int),
                     city: (array[14] as? String).flatMap { ($0.isEmpty || $0 == "Нет") ? nil : $0 },
                     devDBdevices: nil,
-                    karma: array[16] as! Int,
+                    karma: ((array[16] as! Double) / 100).round(to: 2),
                     posts: array[17] as! Int,
                     comments: array[18] as! Int,
                     reputation: array[19] as! Int,
@@ -80,5 +80,12 @@ public struct ProfileParser {
         } else {
             throw ParsingError.failedToCreateDataFromString
         }
+    }
+}
+
+private extension Double {
+    func round(to places: Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
     }
 }

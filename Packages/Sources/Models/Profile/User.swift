@@ -22,7 +22,7 @@ public struct User: Sendable, Hashable, Codable {
     public let userTime: Int?
     public let city: String?
     public let devDBdevices: [Device]?
-    public let karma: Int
+    public let karma: Double
     public let posts: Int
     public let comments: Int
     public let reputation: Int
@@ -62,7 +62,7 @@ public struct User: Sendable, Hashable, Codable {
         userTime: Int?,
         city: String?,
         devDBdevices: [Device]?,
-        karma: Int,
+        karma: Double,
         posts: Int,
         comments: Int,
         reputation: Int,
