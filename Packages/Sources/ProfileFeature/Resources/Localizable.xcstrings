@@ -131,22 +131,22 @@
         }
       }
     },
-    "Last online today: %@" : {
+    "Last seen at %@" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Был в сети сегодня: %@"
+            "value" : "Был в сети в"
           }
         }
       }
     },
-    "Last online yesterday: %@" : {
+    "Last seen yesterday at %@" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Был в сети вчера: %@"
+            "value" : "Был в сети вчера в"
           }
         }
       }

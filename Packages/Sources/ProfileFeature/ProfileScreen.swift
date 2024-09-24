@@ -454,13 +454,13 @@ private extension Date {
         if isUserOnline() {
             return LocalizedStringKey("Online")
         } else if Calendar.current.isDateInToday(self) {
-            return LocalizedStringKey("Last online today: \(formattedTime)")
+            return LocalizedStringKey("Last seen at \(formattedTime)")
         } else if Calendar.current.isDateInYesterday(self) {
-            return LocalizedStringKey("Last online yesterday: \(formattedTime)")
+            return LocalizedStringKey("Last seen yesterday at \(formattedTime)")
         }
         
         formatter.dateFormat = "dd.MM.yy, HH:mm"
-        return LocalizedStringKey("Last online: " + formatter.string(from: self))
+        return LocalizedStringKey("Last seen " + formatter.string(from: self))
     }
 }
 
