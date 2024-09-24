@@ -8,15 +8,21 @@
 import Foundation
 
 extension String {
+    /// Mostly used to decode specific symbols like emojis
     func convertHtmlCodes() -> String {
+        var text = self
+        // raw html parse loses \r\n that are used in article comments
+        text = text.replacingOccurrences(of: "\\r\\n\\s*", with: "/r/n", options: .regularExpression)
         let attributedString = try! NSAttributedString(
-            data: Data(utf8),
+            data: Data(text.utf8),
             options: [
                 .documentType: NSAttributedString.DocumentType.html,
                 .characterEncoding: String.Encoding.utf8.rawValue
             ],
             documentAttributes: nil
         )
-        return attributedString.string
+        var editedString = attributedString.string
+        editedString = editedString.replacingOccurrences(of: "/r/n", with: "\r\n")
+        return editedString
     }
 }
