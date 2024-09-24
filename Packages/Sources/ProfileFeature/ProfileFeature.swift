@@ -26,7 +26,7 @@ public struct ProfileFeature: Sendable {
         public var isLoading: Bool
         public var user: User?
         
-        public var shouldShowLogoutButton: Bool {
+        public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
         }
         

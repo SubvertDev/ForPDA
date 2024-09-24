@@ -77,13 +77,13 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func ToolbarButtons() -> some View {
-        Button {
-            store.send(.settingsButtonTapped)
-        } label: {
-            Image(systemSymbol: .gearshape)
-        }
-        
-        if store.shouldShowLogoutButton {
+        if store.shouldShowToolbarButtons {
+            Button {
+                store.send(.settingsButtonTapped)
+            } label: {
+                Image(systemSymbol: .gearshape)
+            }
+            
             Button {
                 store.send(.logoutButtonTapped)
             } label: {
