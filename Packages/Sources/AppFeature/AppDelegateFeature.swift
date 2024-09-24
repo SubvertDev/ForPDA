@@ -43,12 +43,13 @@ public struct AppDelegateFeature: Sendable {
             case let .didFinishLaunching(application):
                 analyticsClient.configure()
                 cacheClient.configure()
-                return .run { send in
-                    let granted = await notificationsClient.requestPermission()
-                    if granted {
-                        await application.registerForRemoteNotifications()
-                    }
-                }
+                return .none
+//                return .run { send in
+//                    let granted = await notificationsClient.requestPermission()
+//                    if granted {
+//                        await application.registerForRemoteNotifications()
+//                    }
+//                }
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
