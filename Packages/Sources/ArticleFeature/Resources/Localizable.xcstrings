@@ -91,12 +91,12 @@
         }
       }
     },
-    "Problem with article?" : {
+    "Problems with article?" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проблема со статьей?"
+            "value" : "Проблемы со статьей?"
           }
         }
       }

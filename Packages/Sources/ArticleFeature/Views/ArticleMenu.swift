@@ -11,27 +11,38 @@ import SharedUI
 import Models
 
 public struct ArticleMenu: View {
-    public let article: ArticlePreview
     public let store: StoreOf<ArticleFeature>
+    public let isDark: Bool
     
-    public init(article: ArticlePreview, store: StoreOf<ArticleFeature>) {
-        self.article = article
+    public init(store: StoreOf<ArticleFeature>, isDark: Bool) {
         self.store = store
+        self.isDark = isDark
     }
     
     public var body: some View {
         Menu {
-            ContextButton(text: "Copy Link", symbol: .doc, bundle: .module) {
+            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
                 store.send(.menuActionTapped(.copyLink))
             }
-            ContextButton(text: "Share Link", symbol: .arrowTurnUpRight, bundle: .module) {
+            ContextButton(text: "Share Link", symbol: .squareAndArrowUp, bundle: .module) {
                 store.send(.menuActionTapped(.shareLink))
             }
-            ContextButton(text: "Problem with article?", symbol: .questionmarkCircle, bundle: .module) {
+            ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
                 store.send(.menuActionTapped(.report))
             }
         } label: {
-            Image(systemSymbol: .ellipsis)
+            ZStack {
+                Circle()
+                    .fill(Color.clear)
+                    .background(.ultraThinMaterial)
+                    .frame(width: 32, height: 32)
+                    .clipShape(Circle())
+                
+                Image(systemSymbol: .ellipsis)
+                    .font(.body)
+                    .foregroundStyle(isDark ? Color.Labels.teritary : Color.Labels.primaryInvariably)
+                    .scaleEffect(0.8) // TODO: ?
+            }
         }
     }
 }

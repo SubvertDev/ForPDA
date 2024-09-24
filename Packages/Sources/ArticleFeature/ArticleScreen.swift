@@ -56,8 +56,8 @@ public struct ArticleScreen: View {
                     ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
                         store.send(.bookmarkButtonTapped)
                     }
-                    ToolbarButton(placement: .topBarTrailing, symbol: .ellipsis) {
-                        store.send(.notImplementedButtonTapped)
+                    ToolbarItem(placement: .topBarTrailing) {
+                        ArticleMenu(store: store, isDark: navBarFullyVisible)
                     }
                 }
                 .overlay(alignment: .top) {
