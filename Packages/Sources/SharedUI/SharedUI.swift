@@ -50,6 +50,7 @@ public extension Image {
 
 public extension Color {
     struct Main {
+        public static let green = Color(.Main.green)
         public static let red = Color(.Main.red)
         public static let greyAlpha = Color(.Main.greyAlpha)
         public static let primaryAlpha = Color(.Main.primaryAlpha)

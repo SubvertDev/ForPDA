@@ -114,7 +114,14 @@ public struct ProfileScreen: View {
             Text(user.nickname)
                 .font(.headline)
                 .foregroundStyle(Color.Labels.primary)
-                .padding(.bottom, 8)
+                .padding(.bottom, 4)
+            
+            if !user.lastSeenDate.isOnlineHidden() {
+                Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
+                    .font(.footnote)
+                    .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color.Main.green : Color.Labels.teritary)
+                    .padding(.bottom, 8)
+            }
             
             if let signature = user.signatureAttributed {
                 RichTextEditor(text: .constant(signature), context: .init()) {
@@ -430,23 +437,30 @@ public struct ProfileScreen: View {
 // MARK: - Extensions
 
 private extension Date {
-    func formattedDate() -> LocalizedStringKey {
+    
+    func isOnlineHidden() -> Bool {
+        return timeIntervalSince1970 == 0
+    }
+    
+    func isUserOnline() -> Bool {
+        return Date().timeIntervalSince1970 - timeIntervalSince1970 < 900
+    }
+    
+    func formattedOnlineDate() -> LocalizedStringKey {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         let formattedTime = formatter.string(from: self)
 
-        if Calendar.current.isDateInToday(self) {
-            return LocalizedStringKey("Today, \(formattedTime)")
+        if isUserOnline() {
+            return LocalizedStringKey("Online")
+        } else if Calendar.current.isDateInToday(self) {
+            return LocalizedStringKey("Last online today: \(formattedTime)")
         } else if Calendar.current.isDateInYesterday(self) {
-            return LocalizedStringKey("Yesterday, \(formattedTime)")
+            return LocalizedStringKey("Last online yesterday: \(formattedTime)")
         }
         
         formatter.dateFormat = "dd.MM.yy, HH:mm"
-        return LocalizedStringKey(formatter.string(from: self))
-    }
-    
-    func isUserOnline() -> Bool {
-        return (Date().timeIntervalSince1970) - self.timeIntervalSince1970 < 900
+        return LocalizedStringKey("Last online: " + formatter.string(from: self))
     }
 }
 

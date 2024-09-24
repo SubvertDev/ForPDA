@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "About me" : {
       "localizations" : {
         "ru" : {
@@ -134,6 +131,36 @@
         }
       }
     },
+    "Last online today: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Был в сети сегодня: %@"
+          }
+        }
+      }
+    },
+    "Last online yesterday: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Был в сети вчера: %@"
+          }
+        }
+      }
+    },
+    "Online" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В сети"
+          }
+        }
+      }
+    },
     "Personal info" : {
       "localizations" : {
         "ru" : {
@@ -234,16 +261,6 @@
         }
       }
     },
-    "Today, %@" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сегодня, %@"
-          }
-        }
-      }
-    },
     "Topics" : {
       "localizations" : {
         "ru" : {
@@ -260,16 +277,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Время у юзера"
-          }
-        }
-      }
-    },
-    "Yesterday, %@" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вчера, %@"
           }
         }
       }
