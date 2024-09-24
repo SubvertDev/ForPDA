@@ -127,6 +127,8 @@ public struct ProfileScreen: View {
                 RichTextEditor(text: .constant(signature), context: .init()) {
                     ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
+                    ($0 as? UITextView)?.isEditable = false
+                    ($0 as? UITextView)?.isScrollEnabled = false
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
@@ -134,7 +136,6 @@ public struct ProfileScreen: View {
                     Color.Background.teritary
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                 )
-                .allowsHitTesting(false)
             }
         }
         .frame(maxWidth: .infinity)
@@ -214,6 +215,8 @@ public struct ProfileScreen: View {
                             RichTextEditor(text: .constant(status), context: .init()) {
                                 ($0 as? UITextView)?.backgroundColor = .clear
                                 ($0 as? UITextView)?.textAlignment = .center
+                                ($0 as? UITextView)?.isEditable = false
+                                ($0 as? UITextView)?.isScrollEnabled = false
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -222,7 +225,6 @@ public struct ProfileScreen: View {
                             Color.Background.teritary
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                         )
-                        .allowsHitTesting(false)
                     }
                 }
                 
