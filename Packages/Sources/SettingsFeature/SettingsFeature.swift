@@ -189,6 +189,7 @@ public struct SettingsFeature: Sendable {
                 }
                 
             case .binding(\.backgroundTheme):
+                state.backgroundTheme = .blue
                 state.destination = .alert(.notImplemented)
                 return .none
                 
