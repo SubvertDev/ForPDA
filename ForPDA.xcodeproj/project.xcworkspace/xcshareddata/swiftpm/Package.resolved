@@ -1,5 +1,5 @@
 {
-  "originHash" : "de7ab04611c20646ccc62e909faf29f49a60c66b4506acecfc623774be420ab7",
+  "originHash" : "b8b700690282385eae7b5fd2a0948d20ecb389cf7979e945b2c055663a594cb4",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -44,6 +44,15 @@
       "state" : {
         "revision" : "0ead44350d2737db384908569c012fe67c421e4d",
         "version" : "12.8.0"
+      }
+    },
+    {
+      "identity" : "richtextkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SubvertDev/RichTextKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "9962cd5d95eb58dda1d6d67ead70736edc505683"
       }
     },
     {
@@ -206,6 +215,24 @@
       "state" : {
         "revision" : "fe1c1ec340f6d79866131432ecaa190fd6bbc4cb",
         "version" : "1.9.0"
+      }
+    },
+    {
+      "identity" : "zmarkupparser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ZhgChgLi/ZMarkupParser.git",
+      "state" : {
+        "revision" : "c305a8be7d6c6fb96e4b387574dc16563d140c0e",
+        "version" : "1.11.0"
+      }
+    },
+    {
+      "identity" : "znstextattachment",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ZhgChgLi/ZNSTextAttachment",
+      "state" : {
+        "revision" : "8c6c34e82eb31ad373b209cb88c2a2aff76c6cdf",
+        "version" : "1.1.9"
       }
     }
   ],

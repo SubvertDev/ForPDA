@@ -45,7 +45,9 @@ let package = Package(
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.9.0"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
-        .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4")
+        .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
+        .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.11.0"),
+        .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main")
     ],
     targets: [
         
@@ -170,6 +172,7 @@ let package = Package(
                 "AnalyticsClient",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "RichTextKit", package: "RichTextKit"),
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
@@ -222,7 +225,8 @@ let package = Package(
             name: "ParsingClient",
             dependencies: [
                 "Models",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "ZMarkupParser", package: "ZMarkupParser")
             ]
         ),
         .target(

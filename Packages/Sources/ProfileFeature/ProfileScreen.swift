@@ -12,6 +12,8 @@ import NukeUI
 import SharedUI
 import SFSafeSymbols
 import Models
+import RichTextKit
+import ParsingClient
 
 public struct ProfileScreen: View {
     
@@ -114,16 +116,18 @@ public struct ProfileScreen: View {
                 .foregroundStyle(Color.Labels.primary)
                 .padding(.bottom, 8)
             
-            if let signature = user.signature {
-                Text(signature)
-                    .font(.footnote)
-                    .foregroundStyle(Color.Labels.primary)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 10)
-                    .background(
-                        Color.Background.teritary
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
-                    )
+            if let signature = user.signatureAttributed {
+                RichTextEditor(text: .constant(signature), context: .init()) {
+                    ($0 as? UITextView)?.backgroundColor = .clear
+                    ($0 as? UITextView)?.textAlignment = .center
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 10)
+                .background(
+                    Color.Background.teritary
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                )
+                .allowsHitTesting(false)
             }
         }
         .frame(maxWidth: .infinity)
@@ -195,15 +199,15 @@ public struct ProfileScreen: View {
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     )
                     
-                    if let status = user.status {
+                    if let status = user.statusAttributed {
                         VStack(spacing: 2) {
                             Text("Status", bundle: .module)
                                 .font(.footnote)
                                 .foregroundStyle(Color.Labels.teritary)
-                            Text(status)
-                                .font(.body)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(Color.Labels.primary)
+                            RichTextEditor(text: .constant(status), context: .init()) {
+                                ($0 as? UITextView)?.backgroundColor = .clear
+                                ($0 as? UITextView)?.textAlignment = .center
+                            }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(12)
@@ -466,6 +470,16 @@ private struct ListSectionSpacing: ViewModifier {
     }
 }
 
+extension User {
+    var signatureAttributed: NSAttributedString? {
+        return BBCodeParser.parse(signature, fontStyle: .footnote)
+    }
+    
+    var statusAttributed: NSAttributedString? {
+        return BBCodeParser.parse(status)
+    }
+}
+
 // MARK: - Previews
 
 #Preview {
@@ -479,6 +493,15 @@ private struct ListSectionSpacing: ViewModifier {
                 ProfileFeature()
             } withDependencies: {
                 $0.apiClient = .previewValue
+                $0.apiClient.getUser = { @Sendable _ in
+                    return AsyncThrowingStream { continuation in
+                        Task {
+                            continuation.yield(User.mock)
+                            try? await Task.sleep(for: .seconds(0.1))
+                            continuation.yield(User.mock)
+                        }
+                    }
+                }
             }
         )
     }
