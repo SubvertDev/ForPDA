@@ -222,6 +222,7 @@ public struct ProfileScreen: View {
                             Color.Background.teritary
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                         )
+                        .allowsHitTesting(false)
                     }
                 }
                 
