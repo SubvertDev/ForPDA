@@ -49,6 +49,17 @@ public final class BBCodeParser {
             }))
             .build()
         
-        return parser.render(text)
+        let renderedText = parser.render(text)
+        
+        // Making text color adapt to dark mode
+        let mutableString = NSMutableAttributedString(attributedString: renderedText)
+        let fullRange = NSRange(location: 0, length: mutableString.length)
+        mutableString.enumerateAttributes(in: fullRange, options: []) { attributes, range, _ in
+            if attributes[.foregroundColor] == nil {
+                mutableString.addAttribute(.foregroundColor, value: UIColor.label, range: range)
+            }
+        }
+        
+        return NSAttributedString(attributedString: mutableString)
     }
 }
