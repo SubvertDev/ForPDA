@@ -311,7 +311,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -347,7 +347,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
