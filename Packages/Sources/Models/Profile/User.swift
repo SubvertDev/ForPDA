@@ -136,42 +136,47 @@ public extension User {
         
         public var title: String {
             switch self {
-            case .nonActivated:
-                return "Не активирован"
-            case .guest:
-                return "Гость"
-            case .beginning:
-                return "Начинающий"
-            case .admin:
-                return "Администратор"
-            case .banned:
-                return "Забанен"
-            case .active:
-                return "Активный"
-            case .regular:
-                return "Постоянный"
-            case .moderator:
-                return "Модератор"
-            case .supermoderator:
-                return "Супермодератор"
-            case .moderatorHelper:
-                return "Помощник модератора"
-            case .faqMaker:
-                return "FAQMaker"
-            case .honorary:
-                return "Почётный форумчанин"
-            case .developer:
-                return "Разработчик"
-            case .router:
-                return "Роутер"
-            case .buisnessman:
-                return "Бизнесмен"
-            case .specproject:
-                return "Спецпроекты"
-            case .moderatorSchool:
-                return "Школа модераторов"
-            case .curator:
-                return "Куратор"
+            case .nonActivated:     return "Не активирован"
+            case .guest:            return "Гость"
+            case .beginning:        return "Начинающий"
+            case .admin:            return "Администратор"
+            case .banned:           return "Забанен"
+            case .active:           return "Активный"
+            case .regular:          return "Постоянный"
+            case .moderator:        return "Модератор"
+            case .supermoderator:   return "Супермодератор"
+            case .moderatorHelper:  return "Помощник модератора"
+            case .faqMaker:         return "FAQMaker"
+            case .honorary:         return "Почётный форумчанин"
+            case .developer:        return "Разработчик"
+            case .router:           return "Роутер"
+            case .buisnessman:      return "Бизнесмен"
+            case .specproject:      return "Спецпроекты"
+            case .moderatorSchool:  return "Школа модераторов"
+            case .curator:          return "Куратор"
+            }
+        }
+        
+        public var hexColor: String {
+            switch self {
+            case .nonActivated:     return "0000ff"
+            case .guest:            return "0000ff"
+            case .beginning:        return "008000"
+            case .admin:            return "ff0000"
+            case .banned:           return "a0a0a0"
+            case .active:           return "008000"
+            case .regular:          return "ff9900"
+            case .moderator:        return "0099ff"
+            case .supermoderator:   return "0000ff"
+            case .moderatorHelper:  return "0099ff"
+            case .faqMaker:         return "32cd32"
+            case .honorary:         return "800080"
+            case .developer:        return "bc33ff"
+            case .router:           return "000000"
+            case .buisnessman:      return "b100bf"
+            case .specproject:      return "9a60ff"
+            case .moderatorSchool:  return "0099ff"
+            case .curator:          return "008b8b"
             }
         }
     }
