@@ -11,6 +11,8 @@ extension String {
     /// Mostly used to decode specific symbols like emojis
     func convertHtmlCodes() -> String {
         var text = self
+        // raw html parse loses \n\t that are used in article tables
+        text = text.replacingOccurrences(of: "\\n\\t", with: "/n/t", options: .regularExpression)
         // raw html parse loses \r\n that are used in article comments
         text = text.replacingOccurrences(of: "\\r\\n\\s*", with: "/r/n", options: .regularExpression)
         let attributedString = try! NSAttributedString(
@@ -22,6 +24,7 @@ extension String {
             documentAttributes: nil
         )
         var editedString = attributedString.string
+        editedString = editedString.replacingOccurrences(of: "/n/t", with: "\n")
         editedString = editedString.replacingOccurrences(of: "/r/n", with: "\r\n")
         return editedString
     }
