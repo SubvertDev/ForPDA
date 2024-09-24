@@ -136,7 +136,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Был в сети в"
+            "value" : "Был в сети в %@"
           }
         }
       }
@@ -146,7 +146,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Был в сети вчера в"
+            "value" : "Был в сети вчера в %@"
           }
         }
       }
