@@ -67,6 +67,7 @@ let package = Package(
                 "AnalyticsClient",
                 "CacheClient",
                 "NotificationsClient",
+                "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "AlertToast", package: "AlertToast")
             ]
@@ -85,8 +86,7 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
-            ],
-            resources: [.process("Resources")]
+            ]
         ),
         .target(
             name: "ArticleFeature",
@@ -98,6 +98,7 @@ let package = Package(
                 "AnalyticsClient",
                 "ParsingClient",
                 "PasteboardClient",
+                "HapticClient",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
@@ -300,7 +301,7 @@ for target in package.targets where target.type != .binary {
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
     swiftSettings.append(
         .unsafeFlags(["-Xfrontend",
-                      "-warn-long-function-bodies=600",
+                      "-warn-long-function-bodies=1000",
                       "-Xfrontend",
                       "-warn-long-expression-type-checking=100"])
     )

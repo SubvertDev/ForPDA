@@ -19,7 +19,7 @@ public struct Article: Sendable, Hashable, Codable {
     public let description: String
     public let attachments: [Attachment]
     public let tags: [Tag]
-    public let comments: [Comment]
+    public var comments: [Comment]
     public let poll: ArticlePoll?
     
     public init(
@@ -66,4 +66,21 @@ public extension Article {
         comments: .mockArray,
         poll: nil
     )
+    
+    static var mockWithComment: Article {
+        var mock = mock
+        mock.comments = [
+            .mock
+        ]
+        return mock
+    }
+    
+    static var mockWithTwoComments: Article {
+        var mock = mock
+        mock.comments = [
+            .mock,
+            .init(id: 1, date: .now, type: .normal, authorId: 666, authorName: "Tester", parentId: 0, childIds: [], text: "Test text", likesAmount: 0, avatarUrl: nil)
+        ]
+        return mock
+    }
 }

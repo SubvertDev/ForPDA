@@ -76,6 +76,7 @@ public struct AppFeature: Sendable {
             switch toast.screen {
             case .articlesList: return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticlesListFeature") })
             case .article:      return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticleFeature") })
+            case .comments:     return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
             }
         }
         
@@ -94,7 +95,7 @@ public struct AppFeature: Sendable {
             previousTab: AppView.Tab = .articlesList,
             isShowingTabBar: Bool = true,
             showToast: Bool = false,
-            toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""))
+            toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""), isError: false)
         ) {
             self.appDelegate = appDelegate
 
@@ -267,13 +268,14 @@ public struct AppFeature: Sendable {
                 // MARK: - Articles List
                 
             case let .articlesList(.articleTapped(articlePreview)):
+                state.isShowingTabBar = false
                 state.articlesPath.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
             case let .articlesList(.cellMenuOpened(_, action)):
                 switch action {
                 case .copyLink, .report:
-                    state.toast = ToastInfo(screen: .articlesList, message: action.rawValue)
+                    state.toast = ToastInfo(screen: .articlesList, message: action.rawValue, isError: false)
                 case .shareLink, .openInBrowser, .addToBookmarks:
                     return .none
                 }
@@ -293,7 +295,7 @@ public struct AppFeature: Sendable {
             case let .articlesPath(.element(id: _, action: .article(.menuActionTapped(action)))):
                 switch action {
                 case .copyLink, .report:
-                    state.toast = ToastInfo(screen: .article, message: action.rawValue)
+                    state.toast = ToastInfo(screen: .article, message: action.rawValue, isError: false)
                 case .shareLink:
                     return .none
                 }
@@ -307,6 +309,11 @@ public struct AppFeature: Sendable {
                 
             case let .articlesPath(.element(id: _, action: .article(.delegate(.commentHeaderTapped(id))))):
                 state.articlesPath.append(.profile(ProfileFeature.State(userId: id)))
+                return .none
+                
+            case let .articlesPath(.element(id: _, action: .article(.delegate(.showToast(type))))):
+                state.toast = ToastInfo(screen: .comments, message: type.description, isError: type.isError)
+                state.showToast = true
                 return .none
                 
             case let .articlesPath(.element(id: _, action: .article(.comments(.element(_, action))))):
@@ -324,6 +331,12 @@ public struct AppFeature: Sendable {
                 }
                 return .none
                 
+            case .articlesPath(.element(id: _, action: .article(.sendCommentButtonTapped))):
+                if state.userSession == nil {
+                    state.auth = AuthFeature.State(openReason: .comment)
+                }
+                return .none
+                
             default:
                 return .none
             }
@@ -332,11 +345,12 @@ public struct AppFeature: Sendable {
         .onChange(of: \.articlesPath) { _, newValue in
             // TODO: Another way?
             Reduce { state, _ in
-                let hasSettings = newValue.contains(where: { screen in
-                    if case .settings = screen { return true }
-                    return false
-                })
-                state.isShowingTabBar = !hasSettings
+                state.isShowingTabBar = newValue.count == 0
+//                let hasSettings = newValue.contains(where: { screen in
+//                    if case .settings = screen { return true }
+//                    return false
+//                })
+//                state.isShowingTabBar = !hasSettings
                 return .none
             }
         }

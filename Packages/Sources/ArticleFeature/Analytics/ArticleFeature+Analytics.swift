@@ -20,7 +20,8 @@ extension ArticleFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped:
+                    // TODO: Catch all
+                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, .sendCommentButtonTapped, .removeReplyCommentButtonTapped, ._commentResponse:
                     break
                     
                 case .linkInTextTapped(let url):

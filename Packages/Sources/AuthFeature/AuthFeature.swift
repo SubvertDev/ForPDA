@@ -15,6 +15,7 @@ import Models
 
 public enum AuthOpenReason: String, Sendable {
     case like
+    case comment
     case profile
 }
 

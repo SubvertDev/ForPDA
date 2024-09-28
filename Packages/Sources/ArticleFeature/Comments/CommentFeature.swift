@@ -78,7 +78,6 @@ public struct CommentFeature: Sendable {
                 return .none
                 
             case .replyButtonTapped:
-                state.alert = .notImplemented
                 return .none
                 
             case .likeButtonTapped:

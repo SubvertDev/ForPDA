@@ -1,42 +1,32 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lldh" : {
+    "addToBookmarks" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lldч"
+            "value" : "Добавить в закладки"
           }
         }
       }
     },
-    "%lldm" : {
+    "Comment has been added" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lldм"
+            "value" : "Комментарий добавлен"
           }
         }
       }
     },
-    "Comment has been deleted" : {
+    "Commenting on this post is closed" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Комментарий удален"
-          }
-        }
-      }
-    },
-    "Comments (%@):" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Комментарии (%@):"
+            "value" : "Комментирование этого поста окончено"
           }
         }
       }
@@ -51,72 +41,42 @@
         }
       }
     },
-    "Copy Link" : {
+    "Error adding comment" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скопировать ссылку"
+            "value" : "Ошибка при добавлении комментария"
           }
         }
       }
     },
-    "Edited" : {
+    "No comment text" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отредактировано"
+            "value" : "Нет текста комментария"
           }
         }
       }
     },
-    "Loading article..." : {
+    "openInBrowser" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Загружаем статью..."
+            "value" : "Открыть в браузере"
           }
         }
       }
     },
-    "Message" : {
+    "Repeated comment" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сообщение"
-          }
-        }
-      }
-    },
-    "OK" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ОК"
-          }
-        }
-      }
-    },
-    "Problems with article?" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проблемы со статьей?"
-          }
-        }
-      }
-    },
-    "Share Link" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
+            "value" : "Повторный комментарий"
           }
         }
       }
@@ -131,42 +91,62 @@
         }
       }
     },
-    "Something went wrong while loading this article :(" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Что-то пошло не так во время загрузки статьи :("
-          }
-        }
-      }
-    },
-    "Vote" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проголосовать"
-          }
-        }
-      }
-    },
-    "Whoops!" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Упс!"
-          }
-        }
-      }
-    },
     "Will be fixed soon :)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скоро починим :)"
+            "value" : "Скоро будет исправлено :)"
+          }
+        }
+      }
+    },
+    "You cannot reply to a comment you have hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы не можете ответить на свернутый вами комментарий"
+          }
+        }
+      }
+    },
+    "You're not allowed to comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вам запрещено комментировать"
+          }
+        }
+      }
+    },
+    "You've hit the carmine limit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы достигли кармического лимита комментирования"
+          }
+        }
+      }
+    },
+    "You've hit the daily commenting limit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы достигли дневного лимита комментирования"
+          }
+        }
+      }
+    },
+    "You've hit the hourly commenting limit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы достигли часового лимита комментирования"
           }
         }
       }

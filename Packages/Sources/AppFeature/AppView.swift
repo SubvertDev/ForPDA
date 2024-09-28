@@ -56,6 +56,7 @@ public struct AppView: View {
     }
     
     @Perception.Bindable public var store: StoreOf<AppFeature>
+    @Environment(\.tintColor) private var tintColor
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
     
     public init(store: StoreOf<AppFeature>) {
@@ -77,13 +78,25 @@ public struct AppView: View {
                     ProfileTab()
                 }
                 
-                PDATabView()
-                    .offset(y: store.isShowingTabBar ? 0 : 84)
-                    .animation(.default, value: store.isShowingTabBar)
-//                .toast(isPresenting: $store.showToast) {
-//                    AlertToast(displayMode: .hud, type: .regular, title: store.toast.message, bundle: store.localizationBundle)
-//                }
+                Group {
+                    if store.isShowingTabBar {
+                        PDATabView()
+                            .transition(.move(edge: .bottom))
+                    }
+                }
+                // Animation on whole ZStack breaks safeareainset for next screens
+                .animation(.default, value: store.isShowingTabBar)
+                
+                if store.showToast {
+                    Toast()
+                        .ignoresSafeArea(.keyboard, edges: .bottom)
+                }
+                
+                // Models Bundle load fix, do NOT delete
+                Color.doNotDeleteMe.frame(width: 0, height: 0)
             }
+            .animation(.default, value: store.showToast)
+            .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
             .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
                 NavigationStack {
@@ -115,6 +128,7 @@ public struct AppView: View {
             }
         }
         .tag(Tab.articlesList)
+        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
     // MARK: - Bookmarks Tab
@@ -130,6 +144,7 @@ public struct AppView: View {
             }
         }
         .tag(Tab.bookmarks)
+        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
     // MARK: - Forum Tab
@@ -145,6 +160,7 @@ public struct AppView: View {
             }
         }
         .tag(Tab.forum)
+        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
     // MARK: - Menu Tab
@@ -160,6 +176,7 @@ public struct AppView: View {
             }
         }
         .tag(Tab.profile)
+        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
     // MARK: - PDA Tab View
@@ -186,7 +203,7 @@ public struct AppView: View {
         .background(Color.Background.primary)
         .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
         .shadow(color: Color.Labels.primary.opacity(0.15), radius: 2)
-        .offset(y: 34)
+        .offset(y: 34) // TODO: Check for different screens
     }
     
     // MARK: - PDA Tab Item
@@ -205,6 +222,38 @@ public struct AppView: View {
                          ? store.appSettings.appTintColor.asColor
                          : Color.Labels.quaternary)
         .frame(maxWidth: .infinity)
+    }
+    
+    // MARK: - Toast
+    
+    @State private var duration = 5
+    
+    @ViewBuilder
+    private func Toast() -> some View {
+        HStack(spacing: 0) {
+            Image(systemSymbol: store.toast.isError ? .xmarkCircleFill : .checkmarkCircleFill)
+                .font(.body)
+                .foregroundStyle(store.toast.isError ? Color.Main.red : tintColor)
+                .frame(width: 32, height: 32)
+            
+            Text(store.toast.message, bundle: store.localizationBundle)
+                .font(.caption)
+                .foregroundStyle(Color.Labels.primary)
+                .padding(.trailing, 12)
+        }
+        .background(Color.Background.primary)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.Separator.secondary, lineWidth: 0.33)
+        }
+        .padding(.bottom, 50 + 16)
+        .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
+        .padding(.horizontal, 16)
+        .task {
+            try? await Task.sleep(for: .seconds(duration))
+            store.showToast = false
+        }
     }
 }
 

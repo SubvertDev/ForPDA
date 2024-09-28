@@ -20,7 +20,7 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.delegate = self
     }
-
+    
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return viewControllers.count > 1
     }
@@ -29,6 +29,8 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
 public struct ArticleScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ArticleFeature>
+    @FocusState public var focus: ArticleFeature.State.Field?
+    @Environment(\.tintColor) private var tintColor
     
     public init(store: StoreOf<ArticleFeature>) {
         self.store = store
@@ -46,6 +48,13 @@ public struct ArticleScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ArticleScrollView()
+                .safeAreaInset(edge: .bottom) {
+                    Keyboard()
+                }
+                .onTapGesture {
+                    focus = nil
+                }
+                .bind($store.focus, to: $focus)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarBackButtonHidden()
                 .toolbarBackground(.hidden, for: .navigationBar)
@@ -213,6 +222,98 @@ public struct ArticleScreen: View {
         }
     }
     
+    // MARK: - Keyboard
+    
+    @ViewBuilder
+    private func Keyboard() -> some View {
+        VStack(spacing: 10) {
+            if let comment = store.replyComment {
+                HStack(spacing: 0) {
+                    Rectangle()
+                        .fill(tintColor)
+                        .frame(width: 1)
+                        .padding(.trailing, 8)
+                    
+                    VStack(spacing: 2) {
+                        HStack(spacing: 6) {
+                            LazyImage(url: store.replyComment?.avatarUrl) { state in
+                                if let image = state.image { image.resizable().scaledToFill() }
+                            }
+                            .clipShape(Circle())
+                            .frame(width: 20, height: 20)
+                            
+                            Text(comment.authorName)
+                                .font(.caption2)
+                                .bold()
+                                .foregroundStyle(Color.Labels.teritary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        
+                        Text(comment.text)
+                            .lineLimit(2)
+                            .font(.footnote)
+                            .foregroundStyle(Color.Labels.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(.trailing, 6)
+                    
+                    Button {
+                        store.send(.removeReplyCommentButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .xmark)
+                            .font(.body)
+                    }
+                    .frame(width: 32, height: 32)
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            HStack(alignment: .bottom, spacing: 8) {
+                TextField("Message", text: $store.commentText.removeDuplicates(), axis: .vertical)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.Labels.primary)
+                    .lineLimit(1...10)
+                    .focused($focus, equals: ArticleFeature.State.Field.comment)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 7)
+                    .background(Color.Background.teritary)
+                    .background(Color.Background.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(Color.Separator.secondary, lineWidth: 0.33)
+                    }
+                
+                Button {
+                    store.send(.sendCommentButtonTapped)
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(tintColor)
+                        
+                        if store.isUploadingComment {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .tint(Color.Labels.primaryInvariably)
+                        } else {
+                            Image(systemSymbol: .arrowUp)
+                                .font(.body)
+                                .fontWeight(.medium)
+                                .foregroundStyle(Color.Labels.primaryInvariably)
+                        }
+                    }
+                    .frame(width: 34, height: 34)
+                }
+                .disabled(store.isUploadingComment)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.top, 8)
+        .padding(.bottom, 6)
+        .background(Color.Background.primaryAlpha)
+        .animation(.default, value: store.replyComment)
+    }
+    
     // MARK: - Toolbar Button
     
     @ToolbarContentBuilder
@@ -299,6 +400,35 @@ extension ArticleScreen {
                 )
             ) {
                 ArticleFeature()
+            }
+        )
+    }
+}
+
+#Preview("Test comments") {
+    NavigationStack {
+        ArticleScreen(
+            store: Store(
+                initialState: ArticleFeature.State(
+                    articlePreview: .mock,
+                    commentText: "Test"
+                )
+            ) {
+                ArticleFeature()
+            } withDependencies: {
+                $0.apiClient.getArticle = { @Sendable _ in
+                    return AsyncThrowingStream { continuation in
+                        continuation.yield(.mockWithComment)
+                        Task {
+                            try? await Task.sleep(for: .seconds(5))
+                            continuation.yield(.mockWithTwoComments)
+                        }
+                    }
+                }
+                $0.apiClient.replyToComment = { @Sendable _, _, _ in
+                    try? await Task.sleep(for: .seconds(2))
+                    return CommentResponseType.success
+                }
             }
         )
     }

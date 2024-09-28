@@ -12,6 +12,7 @@ import Models
 import APIClient
 import CacheClient
 import PasteboardClient
+import HapticClient
 
 @Reducer
 public struct ArticleFeature: Sendable {
@@ -33,25 +34,39 @@ public struct ArticleFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        public enum Field: Sendable { case comment }
+
         @Presents public var destination: Destination.State?
         public var articlePreview: ArticlePreview
         public var article: Article?
         public var elements: [ArticleElement]?
         public var isLoading: Bool
         public var comments: IdentifiedArrayOf<CommentFeature.State>
+        public var replyComment: Comment?
+        public var commentText: String
+        public var isUploadingComment: Bool
+        public var focus: Field?
         
         public init(
             destination: Destination.State? = nil,
             articlePreview: ArticlePreview,
             article: Article? = nil,
             isLoading: Bool = false,
-            comments: IdentifiedArrayOf<CommentFeature.State> = []
+            comments: IdentifiedArrayOf<CommentFeature.State> = [],
+            replyComment: Comment? = nil,
+            commentText: String = "",
+            isUploadingComment: Bool = false,
+            focus: Field? = nil
         ) {
             self.destination = destination
             self.articlePreview = articlePreview
             self.article = article
             self.isLoading = isLoading
             self.comments = comments
+            self.replyComment = replyComment
+            self.commentText = commentText
+            self.isUploadingComment = isUploadingComment
+            self.focus = focus
         }
     }
     
@@ -69,15 +84,19 @@ public struct ArticleFeature: Sendable {
         case linkInTextTapped(URL)
         case onTask
         case comments(IdentifiedActionOf<CommentFeature>)
+        case sendCommentButtonTapped
+        case removeReplyCommentButtonTapped
         
         case _checkLoading
         case _articleResponse(Result<Article, any Error>)
+        case _commentResponse(Result<CommentResponseType, any Error>)
         case _parseArticleElements(Result<[ArticleElement], any Error>)
         
         @CasePathable
         public enum Delegate {
             case handleDeeplink(Int)
             case commentHeaderTapped(Int)
+            case showToast(CommentResponseType)
         }
     }
     
@@ -85,6 +104,7 @@ public struct ArticleFeature: Sendable {
     
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.cacheClient) var cacheClient
+    @Dependency(\.hapticClient) var hapticClient
     @Dependency(\.parsingClient) var parsingClient
     @Dependency(\.pasteboardClient) var pasteboardClient
     @Dependency(\.openURL) var openURL
@@ -104,6 +124,15 @@ public struct ArticleFeature: Sendable {
         
         Reduce { state, action in
             switch action {
+            case let .comments(.element(id, action)):
+                if case .replyButtonTapped = action {
+                    if let comment = state.comments[id: id]?.comment {
+                        state.focus = .comment
+                        state.replyComment = comment
+                    }
+                }
+                return .none
+                
             case .comments:
                 return .none
                 
@@ -158,6 +187,26 @@ public struct ArticleFeature: Sendable {
                 state.destination = .alert(.notImplemented)
                 return .none
                 
+            case .sendCommentButtonTapped:
+                state.isUploadingComment = true
+                return .run { [articleId = state.articlePreview.id,
+                               replyComment = state.replyComment,
+                               message = state.commentText] send in
+                    let parentId: Int
+                    if let replyComment {
+                        parentId = replyComment.id
+                    } else {
+                        parentId = 0
+                    }
+                    
+                    let result = await Result { try await apiClient.replyToComment(articleId, parentId, message) }
+                    await send(._commentResponse(result))
+                }
+                
+            case .removeReplyCommentButtonTapped:
+                state.replyComment = nil
+                return .none
+                
             case ._checkLoading:
                 if state.article == nil {
                     state.isLoading = true
@@ -186,6 +235,33 @@ public struct ArticleFeature: Sendable {
                 
             case ._articleResponse(.failure):
                 state.isLoading = false
+                state.destination = .alert(.error)
+                return .none
+                
+            case let ._commentResponse(.success(type)):
+                state.isUploadingComment = false
+                if type.isError {
+                    state.focus = nil
+                    return .run { send in
+                        await hapticClient.play(.error)
+                        await send(.delegate(.showToast(type)))
+                    }
+                } else {
+                    state.commentText.removeAll()
+                    state.replyComment = nil
+                    state.focus = nil
+                    return .concatenate([
+                        getArticle(id: state.articlePreview.id),
+                        .run { send in
+                            await hapticClient.play(.success)
+                            await send(.delegate(.showToast(type)))
+                        }
+                    ])
+                }
+                
+            case let ._commentResponse(.failure(error)):
+                print(error) // TODO: Catch to Issue
+                state.isUploadingComment = false
                 state.destination = .alert(.error)
                 return .none
                 
