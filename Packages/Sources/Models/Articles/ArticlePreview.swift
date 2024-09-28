@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ArticlePreview: Sendable, Hashable {
+public struct ArticlePreview: Sendable, Hashable, Identifiable {
     
     public let id: Int
     public let date: Date

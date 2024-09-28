@@ -60,10 +60,10 @@ extension ArticlesListFeature {
                     analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
                     analyticsClient.capture(AnalyticsError.apiFailure(error))
                     
-                case ._loadMoreArticles:
+                case .loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
-                case .binding, .scrolledToNearEnd, ._articlesResponse, .destination:
+                case .binding, ._articlesResponse, .destination:
                     break
                     
                 case ._failedToConnect(let error):

@@ -71,89 +71,59 @@ public struct ArticlesListScreen: View {
         
     @ViewBuilder
     private func ArticlesList() -> some View {
-        ScrollView {
-            Color.clear
-                .frame(height: 0)
-                .id(-1)
-            
-            VStack(spacing: 14) {
-                ForEach(store.articles, id: \.self) { article in
-                    WithPerceptionTracking {
-                        Button {
-                            store.send(.articleTapped(article))
-                        } label: {
-                            ArticleRowView(
-                                state: ArticleRowView.State(
-                                    id: article.id,
-                                    title: article.title,
-                                    authorName: article.authorName,
-                                    imageUrl: article.imageUrl,
-                                    commentsAmount: article.commentsAmount,
-                                    date: article.date
-                                ),
-                                rowType: settingsToRow(store.listRowType),
-                                contextMenuActions: ContextMenuActions(
-                                    shareAction:          { store.send(.cellMenuOpened(article, .shareLink)) },
-                                    copyAction:           { store.send(.cellMenuOpened(article, .copyLink)) },
-                                    openInBrowserAction:  { store.send(.cellMenuOpened(article, .openInBrowser)) },
-                                    reportAction:         { store.send(.cellMenuOpened(article, .report)) },
-                                    addToBookmarksAction: { store.send(.cellMenuOpened(article, .addToBookmarks)) }
-                                )
+        List {
+            ForEach(store.articles) { article in
+                WithPerceptionTracking {
+                    Button {
+                        store.send(.articleTapped(article))
+                    } label: {
+                        ArticleRowView(
+                            state: ArticleRowView.State(
+                                id: article.id,
+                                title: article.title,
+                                authorName: article.authorName,
+                                imageUrl: article.imageUrl,
+                                commentsAmount: article.commentsAmount,
+                                date: article.date
+                            ),
+                            rowType: settingsToRow(store.listRowType),
+                            contextMenuActions: ContextMenuActions(
+                                shareAction:          { store.send(.cellMenuOpened(article, .shareLink)) },
+                                copyAction:           { store.send(.cellMenuOpened(article, .copyLink)) },
+                                openInBrowserAction:  { store.send(.cellMenuOpened(article, .openInBrowser)) },
+                                reportAction:         { store.send(.cellMenuOpened(article, .report)) },
+                                addToBookmarksAction: { store.send(.cellMenuOpened(article, .addToBookmarks)) }
                             )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 16)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    .onAppear {
+                        guard let index = store.articles.firstIndex(of: article) else { return }
+                        if store.articles.count - 5 == index {
+                            store.send(.loadMoreArticles)
                         }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 16)
                     }
                 }
             }
-            .modifier(ScrollViewOffsetObserver(store: store, scrollViewContentHeight: $scrollViewContentHeight))
             
             if !store.articles.isEmpty {
                 ModernCircularLoader()
                     .frame(width: 24, height: 24)
                     .padding(.top, 14)
                     .padding(.bottom, 20)
+                    .frame(maxWidth: .infinity)
+                    .listRowSeparator(.hidden)
             }
         }
-        .coordinateSpace(name: "scroll")
-        .background(Color.Background.primary)
-        .scrollDisabled(store.isScrollDisabled)
-        .animation(.default, value: store.listRowType)
+        .listRowSpacing(14)
+        .listStyle(.plain)
     }
     
     private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
         rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
-    }
-    
-    // MARK: - Scroll View Offset Observer
-    
-    struct ScrollViewOffsetObserver: ViewModifier {
-        
-        let store: StoreOf<ArticlesListFeature>
-        @Binding var scrollViewContentHeight: CGFloat
-        
-        func body(content: Content) -> some View {
-            content
-                .background(GeometryReader { geometry in
-                    Color.clear
-                        .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
-                        .onChange(of: store.articles) { _ in
-                            scrollViewContentHeight = geometry.size.height
-                        }
-                })
-                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    guard scrollViewContentHeight != 0 else { return }
-                    if scrollViewContentHeight - 350 * 3 < abs(value.y) { // ~ 3 articles
-                        guard !store.isLoading else { return } // Preventing actions overload
-                        store.send(.scrolledToNearEnd)
-                    }
-                }
-        }
-        
-        struct ScrollOffsetPreferenceKey: PreferenceKey {
-            nonisolated(unsafe) static var defaultValue: CGPoint = .zero
-            static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {}
-        }
     }
     
     // MARK: - Toolbar Items

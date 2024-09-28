@@ -73,11 +73,10 @@ public struct ArticlesListFeature: Sendable {
         case settingsButtonTapped
         case onFirstAppear
         case onRefresh
-        case scrolledToNearEnd
+        case loadMoreArticles
         
         case _failedToConnect(any Error)
         case _articlesResponse(Result<[ArticlePreview], any Error>)
-        case _loadMoreArticles
     }
     
     // MARK: - Dependencies
@@ -147,18 +146,12 @@ public struct ArticlesListFeature: Sendable {
             case .settingsButtonTapped:
                 return .none
                 
-            case .scrolledToNearEnd:
-                guard !state.isLoading else { return .none }
-                guard state.articles.count != 0 else { return .none }
-                return .run { send in
-                    await send(._loadMoreArticles)
-                }
-                
                 // MARK: Internal
                 
-            case ._loadMoreArticles:
+            case .loadMoreArticles:
+                guard !state.isLoading else { return .none }
+                guard state.articles.count != 0 else { return .none }
                 state.isLoading = true
-                state.offset += state.loadAmount
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     let result = await Result {
                         try await apiClient.getArticlesList(offset: offset, amount: amount)
