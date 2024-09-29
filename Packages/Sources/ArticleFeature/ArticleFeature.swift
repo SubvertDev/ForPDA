@@ -45,6 +45,8 @@ public struct ArticleFeature: Sendable {
         public var replyComment: Comment?
         public var commentText: String
         public var isUploadingComment: Bool
+        public var isUploadingPollVote: Bool
+        public var isShowingVoteResults: Bool
         public var focus: Field?
         
         public var canComment: Bool {
@@ -64,6 +66,8 @@ public struct ArticleFeature: Sendable {
             replyComment: Comment? = nil,
             commentText: String = "",
             isUploadingComment: Bool = false,
+            isUploadingPollVote: Bool = false,
+            isShowingVoteResults: Bool = false,
             focus: Field? = nil
         ) {
             self.destination = destination
@@ -74,6 +78,8 @@ public struct ArticleFeature: Sendable {
             self.replyComment = replyComment
             self.commentText = commentText
             self.isUploadingComment = isUploadingComment
+            self.isUploadingPollVote = isUploadingPollVote
+            self.isShowingVoteResults = isShowingVoteResults
             self.focus = focus
         }
     }
@@ -91,6 +97,7 @@ public struct ArticleFeature: Sendable {
         case linkShared(Bool, URL)
         case linkInTextTapped(URL)
         case onTask
+        case pollVoteButtonTapped(Int, [Int])
         case comments(IdentifiedActionOf<CommentFeature>)
         case sendCommentButtonTapped
         case removeReplyCommentButtonTapped
@@ -99,6 +106,7 @@ public struct ArticleFeature: Sendable {
         case _articleResponse(Result<Article, any Error>)
         case _commentResponse(Result<CommentResponseType, any Error>)
         case _parseArticleElements(Result<[ArticleElement], any Error>)
+        case _pollVoteResponse(Result<Bool, any Error>)
         
         @CasePathable
         public enum Delegate {
@@ -183,6 +191,13 @@ public struct ArticleFeature: Sendable {
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id)
                 ])
+                
+            case let .pollVoteButtonTapped(pollId, selections):
+                state.isUploadingPollVote = true
+                return .run { send in
+                    let result = await Result { try await apiClient.voteInPoll(pollId, selections) }
+                    await send(._pollVoteResponse(result))
+                }
                 
             case .backButtonTapped:
                 return .run { _ in await dismiss() }
@@ -298,6 +313,16 @@ public struct ArticleFeature: Sendable {
                 
             case ._parseArticleElements(.failure):
                 state.isLoading = false
+                state.destination = .alert(.error)
+                return .none
+                
+            case let ._pollVoteResponse(.success(success)):
+                state.isUploadingPollVote = false
+                state.isShowingVoteResults = true
+                return .none
+                
+            case ._pollVoteResponse(.failure):
+                state.isUploadingPollVote = false
                 state.destination = .alert(.error)
                 return .none
             }

@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld people voted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проголосовало %lld чел."
+          }
+        }
+      }
+    },
     "%lldh" : {
       "localizations" : {
         "ru" : {

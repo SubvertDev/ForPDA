@@ -19,7 +19,7 @@ struct ArticleElementView: View {
     @Environment(\.openURL) private var openURL
     @State private var gallerySelection: Int = 0
     @State private var pollSelection: ArticlePoll.Option?
-    @State private var pollSelections: Set<ArticlePoll.Option>?
+    @State private var pollSelections: Set<ArticlePoll.Option> = .init()
     
     // TODO: Is it good to send store here?
     let store: StoreOf<ArticleFeature>
@@ -236,73 +236,174 @@ struct ArticleElementView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             
-            VStack(spacing: 12) {
-                ForEach(poll.options, id: \.self) { option in
-                    HStack(spacing: 11) {
-                        Button {
-                            withAnimation {
-                                if option == pollSelection {
-                                    pollSelection = nil
-                                } else {
-                                    pollSelection = option
-                                }
-                            }
-                        } label: {
-                            HStack(alignment: .top, spacing: 11) {
-                                if option == pollSelection {
-                                    ZStack {
-                                        Circle()
-                                            .strokeBorder(Color.Labels.quintuple)
-                                            .frame(width: 22, height: 22)
-                                        
-                                        Circle()
-                                            .foregroundStyle(tintColor)
-                                            .frame(width: 12, height: 12)
-                                        
-                                        // multiple choice
-//                                    Circle()
-//                                        .foregroundStyle(tintColor)
-                                        
-//                                    Image(systemSymbol: .checkmark)
-//                                        .font(.system(size: 13.5, weight: .semibold))
-//                                        .foregroundStyle(Color.Labels.primaryInvariably)
-//                                        .frame(width: 22, height: 22)
-                                    }
-                                    .frame(width: 22, height: 22)
-                                } else {
-                                    Circle()
-                                        .strokeBorder(Color.Labels.quintuple)
-                                        .frame(width: 22, height: 22)
+            if store.isShowingVoteResults {
+                VStack(spacing: 12) {
+                    ForEach(poll.options, id: \.self) { option in
+                        VStack(spacing: 4) {
+                            Text(option.text)
+                                .font(.caption)
+                                .foregroundStyle(Color.Labels.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .foregroundStyle(Color.Background.teritary)
+                                    .frame(height: 18)
+                                
+                                HStack(spacing: 0) {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .foregroundStyle(tintColor)
+                                        .frame(width: (UIScreen.main.bounds.width - 32) * progressPercentage(option: option, poll: poll), height: 18)
+                                    
+                                    Spacer()
                                 }
                                 
-                                Text(option.text)
-                                    .font(.callout)
-                                    .foregroundStyle(Color.Labels.secondary)
-                                    .multilineTextAlignment(.leading)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Text(String("\(Int(progressPercentage(option: option, poll: poll) * 100))%"))
+                                    .font(.caption2)
+                                    .foregroundStyle(Color.Labels.quaternary)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.trailing, 4)
+                            }
+                        }
+                    }
+                }
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(poll.options, id: \.self) { option in
+                        HStack(spacing: 11) {
+                            Button {
+                                withAnimation {
+                                    switch poll.type {
+                                    case .oneChoice:
+                                        pollSelection = (option == pollSelection) ? nil : option
+                                    case .multipleChoice:
+                                        if !pollSelections.insert(option).inserted {
+                                            pollSelections.remove(option)
+                                        }
+                                    }
+                                }
+                            } label: {
+                                HStack(alignment: .top, spacing: 11) {
+                                    switch poll.type {
+                                    case .oneChoice:
+                                        if option == pollSelection {
+                                            ZStack {
+                                                Circle()
+                                                    .strokeBorder(Color.Labels.quintuple)
+                                                    .frame(width: 22, height: 22)
+                                                
+                                                Circle()
+                                                    .foregroundStyle(tintColor)
+                                                    .frame(width: 12, height: 12)
+                                            }
+                                            .frame(width: 22, height: 22)
+                                        } else {
+                                            Circle()
+                                                .strokeBorder(Color.Labels.quintuple)
+                                                .frame(width: 22, height: 22)
+                                        }
+                                        
+                                    case .multipleChoice:
+                                        if pollSelections.contains(option) {
+                                            ZStack {
+                                                Circle()
+                                                    .foregroundStyle(tintColor)
+                                                    .frame(width: 22, height: 22)
+                                                
+                                                Image(systemSymbol: .checkmark)
+                                                    .font(.system(size: 13.5, weight: .semibold))
+                                                    .foregroundStyle(Color.Labels.primaryInvariably)
+                                                    .frame(width: 22, height: 22)
+                                            }
+                                            .frame(width: 22, height: 22)
+                                        } else {
+                                            Circle()
+                                                .strokeBorder(Color.Labels.quintuple)
+                                                .frame(width: 22, height: 22)
+                                        }
+                                    }
+                                    
+                                    Text(option.text)
+                                        .font(.callout)
+                                        .foregroundStyle(Color.Labels.secondary)
+                                        .multilineTextAlignment(.leading)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
                             }
                         }
                     }
                 }
             }
             
-            HStack {
-                Button {
-                    store.send(.notImplementedButtonTapped)
-                } label: {
-                    Text("Vote", bundle: .module)
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 9)
+            if !store.isShowingVoteResults {
+                HStack {
+                    Button {
+                        switch poll.type {
+                        case .oneChoice:
+                            if let pollSelection {
+                                store.send(.pollVoteButtonTapped(poll.id, [pollSelection.id]))
+                            }
+                        case .multipleChoice:
+                            if !pollSelections.isEmpty {
+                                store.send(.pollVoteButtonTapped(poll.id, Array(pollSelections.map { $0.id })))
+                            }
+                        }
+                    } label: {
+                        Text("Vote", bundle: .module)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 9)
+                    }
+                    .foregroundStyle(voteButtonForegroundColor(poll: poll))
+                    .background(voteButtonBackgroundColor(poll: poll))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    
+                    Spacer()
                 }
-                .foregroundStyle(pollSelection == nil ? Color.Labels.quintuple : tintColor)
-                .background(pollSelection == nil ? Color.Main.greyAlpha : Color.Main.primaryAlpha)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                
-                Spacer()
+                .disabled(voteButtonDisabled(poll: poll))
+            } else {
+                Text("\(poll.totalVotes) people voted", bundle: .module)
+                    .font(.caption)
+                    .foregroundStyle(Color.Labels.teritary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-//            .disabled(pollSelection == nil)
         }
+        .animation(.default, value: store.isShowingVoteResults)
+        .animation(.default, value: store.isUploadingPollVote)
         .padding(.horizontal, 16)
+    }
+    
+    private func progressPercentage(option: ArticlePoll.Option, poll: ArticlePoll) -> CGFloat {
+        return CGFloat(option.votes) / CGFloat(poll.totalVotes)
+    }
+    
+    private func voteButtonForegroundColor(poll: ArticlePoll) -> Color {
+        switch poll.type {
+        case .oneChoice:
+            return (pollSelection == nil || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
+        case .multipleChoice:
+            return (pollSelections.isEmpty || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
+        }
+    }
+    
+    private func voteButtonBackgroundColor(poll: ArticlePoll) -> Color {
+        switch poll.type {
+        case .oneChoice:
+            return (pollSelection == nil || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
+        case .multipleChoice:
+            return (pollSelections.isEmpty || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
+        }
+    }
+    
+    private func voteButtonDisabled(poll: ArticlePoll) -> Bool {
+        if store.isUploadingPollVote {
+            return true
+        }
+        switch poll.type {
+        case .oneChoice:
+            return pollSelection == nil
+        case .multipleChoice:
+            return pollSelections.isEmpty
+        }
     }
     
     // MARK: - Advertisement

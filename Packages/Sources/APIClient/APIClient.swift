@@ -21,6 +21,7 @@ public struct APIClient: Sendable {
     public var getArticle: @Sendable (_ id: Int, _ cache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
     public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var replyToComment: @Sendable (_ articleId: Int, _ parentId: Int, _ message: String) async throws -> CommentResponseType
+    public var voteInPoll: @Sendable (_ pollId: Int, _ selections: [Int]) async throws -> Bool
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
@@ -87,6 +88,12 @@ extension APIClient: DependencyKey {
                     return CommentResponseType.success
                 }
             },
+            voteInPoll: { pollId, selections in
+                let rawString = try api.get(SiteCommand.vote(pollId: pollId, selections: selections))
+                let responseAsInt = Int(rawString.getLastNumber())!
+                // TODO: Always returns 3 (error)
+                return responseAsInt == 0
+            },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
                 let rawString = try api.get(AuthCommand.login(data: request))
@@ -141,6 +148,9 @@ extension APIClient: DependencyKey {
             },
             replyToComment: { _, _, _ in
                 return .success
+            },
+            voteInPoll: { _, _ in
+                return true
             },
             getCaptcha: {
                 try await Task.sleep(for: .seconds(2))

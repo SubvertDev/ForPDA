@@ -18,6 +18,9 @@ public enum ArticleEvent: Event {
     case inlineButtonTapped(URL)
     case bookmarkButtonTapped(URL)
     case commentLiked(Int)
+    case removeReplyCommentTapped
+    case sendCommentTapped
+    case pollVoteTapped
     case loadingSuccess
     case loadingFailure(any Error)
     case parsingFailure(any Error)
@@ -46,6 +49,7 @@ public enum ArticleEvent: Event {
             
         case let .commentLiked(id):
             return ["id": String(id)]
+            
         default:
             return nil
         }
