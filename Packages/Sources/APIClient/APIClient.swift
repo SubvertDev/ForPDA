@@ -18,7 +18,7 @@ public struct APIClient: Sendable {
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
-    public var getArticle: @Sendable (_ id: Int) async throws -> AsyncThrowingStream<Article, any Error>
+    public var getArticle: @Sendable (_ id: Int, _ cache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
     public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var replyToComment: @Sendable (_ articleId: Int, _ parentId: Int, _ message: String) async throws -> CommentResponseType
     public var getCaptcha: @Sendable () async throws -> URL
@@ -50,13 +50,15 @@ extension APIClient: DependencyKey {
                 let articleList = try await parsingClient.parseArticlesList(rawString: rawString)
                 return articleList
             },
-            getArticle: { id in
+            getArticle: { id, cache in
                 AsyncThrowingStream { continuation in
                     Task {
                         do {
                             @Dependency(\.cacheClient) var cacheClient
-                            if let article = await cacheClient.getArticle(id) {
-                                continuation.yield(article)
+                            if cache {
+                                if let article = await cacheClient.getArticle(id) {
+                                    continuation.yield(article)
+                                }
                             }
                             
                             @Dependency(\.parsingClient) var parsingClient
@@ -79,8 +81,11 @@ extension APIClient: DependencyKey {
             replyToComment: { articleId, parentId, message in
                 let rawString = try api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
                 let responseAsInt = Int(rawString.getLastNumber())!
-                let type = CommentResponseType(rawValue: responseAsInt) ?? .error
-                return type
+                if CommentResponseType.codes.contains(responseAsInt) {
+                    return CommentResponseType(rawValue: responseAsInt) ?? .unknown
+                } else {
+                    return CommentResponseType.success
+                }
             },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
@@ -128,7 +133,7 @@ extension APIClient: DependencyKey {
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
-            getArticle: { _ in
+            getArticle: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }
             },
             likeComment: { _, _ in

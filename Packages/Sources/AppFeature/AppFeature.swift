@@ -217,11 +217,11 @@ public struct AppFeature: Sendable {
                     urlComponents.host =   "4pda.to"
                     
                     // TODO: Refactor. Add crashlytics?
-                    guard let url            = urlComponents.url                      else { fatalError() }
-                    guard let titleEncoded   = urlComponents.queryItems?.first?.value else { fatalError() }
-                    guard let title          = titleEncoded.removingPercentEncoding   else { fatalError() }
-                    guard let imageUrlString = urlComponents.queryItems?[1].value     else { fatalError() }
-                    guard let imageUrl       = URL(string: imageUrlString)            else { fatalError() }
+                    let url            = urlComponents.url ?? URL(string: "/")!
+                    let titleEncoded   = urlComponents.queryItems?.first?.value ?? ""
+                    let title          = titleEncoded.removingPercentEncoding ?? ""
+                    let imageUrlString = urlComponents.queryItems?[1].value
+                    let imageUrl       = URL(string: imageUrlString ?? "/")!
                     
                     // TODO: Has duplicate in ArticleFeature
                     let regex = #//([\d]{6})//#

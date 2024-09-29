@@ -7,18 +7,11 @@
 
 import Foundation
 
-public enum CommentType: Int, Sendable, Codable {
-    case normal = 0
-    case deleted = 2
-    case hidden = 4
-    case edited = 32 // (36)
-}
-
 public struct Comment: Sendable, Identifiable, Hashable, Codable {
     
     public let id: Int
     public let date: Date
-    public let type: CommentType
+    public let flag: Int
     public let authorId: Int
     public let authorName: String
     public let parentId: Int
@@ -28,10 +21,14 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
     public let avatarUrl: URL?
     public var nestLevel: Int
     
+    public let isDeleted: Bool
+    public var isHidden: Bool
+    public let isEdited: Bool
+    
     public init(
         id: Int,
         date: Date,
-        type: CommentType,
+        flag: Int,
         authorId: Int,
         authorName: String,
         parentId: Int,
@@ -39,11 +36,14 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
         text: String,
         likesAmount: Int,
         avatarUrl: URL?,
-        nestLevel: Int = 0
+        nestLevel: Int = 0,
+        isDeleted: Bool? = nil,
+        isHidden: Bool? = nil,
+        isEdited: Bool? = nil
     ) {
         self.id = id
         self.date = date
-        self.type = type
+        self.flag = flag
         self.authorId = authorId
         self.authorName = authorName
         self.parentId = parentId
@@ -52,6 +52,10 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
         self.likesAmount = likesAmount
         self.avatarUrl = avatarUrl
         self.nestLevel = nestLevel
+        
+        self.isDeleted = isDeleted ?? (flag & 2 != 0)
+        self.isHidden = isHidden ?? (flag & 4 != 0)
+        self.isEdited = isEdited ?? (flag & 32 != 0)
     }
 }
 
@@ -59,7 +63,7 @@ public extension Comment {
     static let mock = Comment(
         id: 0,
         date: Date(timeIntervalSince1970: 1234567890),
-        type: .normal,
+        flag: 0,
         authorId: 123,
         authorName: "Test Author",
         parentId: 0,
@@ -75,7 +79,7 @@ public extension Array where Element == Comment {
         Comment(
             id: 1,
             date: Date(timeIntervalSince1970: 1722199374),
-            type: .normal,
+            flag: 0,
             authorId: 10,
             authorName: "Strubus",
             parentId: 0,
@@ -87,7 +91,7 @@ public extension Array where Element == Comment {
         Comment(
             id: 2,
             date: Date(timeIntervalSince1970: 1722199474),
-            type: .normal,
+            flag: 0,
             authorId: 10,
             authorName: "Strubus",
             parentId: 1,
@@ -99,7 +103,7 @@ public extension Array where Element == Comment {
         Comment(
             id: 3,
             date: Date(timeIntervalSince1970: 1722199574),
-            type: .normal,
+            flag: 0,
             authorId: 10,
             authorName: "Strubus",
             parentId: 2,
@@ -111,7 +115,7 @@ public extension Array where Element == Comment {
         Comment(
             id: 4,
             date: Date(timeIntervalSince1970: 1722199574),
-            type: .normal,
+            flag: 0,
             authorId: 10,
             authorName: "Обыватель",
             parentId: 0,

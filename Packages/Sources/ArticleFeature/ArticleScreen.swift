@@ -49,7 +49,13 @@ public struct ArticleScreen: View {
         WithPerceptionTracking {
             ArticleScrollView()
                 .safeAreaInset(edge: .bottom) {
-                    Keyboard()
+                    Group {
+                        if store.canComment {
+                            Keyboard()
+                                .transition(.push(from: .bottom))
+                        }
+                    }
+                    .animation(.default, value: store.canComment)
                 }
                 .onTapGesture {
                     focus = nil
@@ -79,7 +85,6 @@ public struct ArticleScreen: View {
                     Color.clear
                         .task(id: proxy.size.width) {
                             safeAreaTopHeight = proxy.safeAreaInsets.top
-                            print(safeAreaTopHeight)
                         }
                 })
                 .background(Color.Background.primary)
@@ -416,7 +421,7 @@ extension ArticleScreen {
             ) {
                 ArticleFeature()
             } withDependencies: {
-                $0.apiClient.getArticle = { @Sendable _ in
+                $0.apiClient.getArticle = { @Sendable _, _ in
                     return AsyncThrowingStream { continuation in
                         continuation.yield(.mockWithComment)
                         Task {

@@ -31,6 +31,16 @@
         }
       }
     },
+    "Comment is hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий скрыт"
+          }
+        }
+      }
+    },
     "Comments (%@):" : {
       "localizations" : {
         "ru" : {
@@ -67,6 +77,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отредактировано"
+          }
+        }
+      }
+    },
+    "just now" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "только что"
           }
         }
       }

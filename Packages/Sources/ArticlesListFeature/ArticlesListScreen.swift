@@ -14,7 +14,6 @@ import SFSafeSymbols
 public struct ArticlesListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
-    @State private var scrollViewContentHeight: CGFloat = 0
     
     public init(store: StoreOf<ArticlesListFeature>) {
         self.store = store
@@ -26,17 +25,10 @@ public struct ArticlesListScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                ScrollViewReader { reader in
-                    WithPerceptionTracking {
-                        ArticlesList()
-                            .onChange(of: store.scrollToTop) { _ in
-                                withAnimation { reader.scrollTo(-1) }
-                            }
+                ArticlesList()
+                    .refreshable {
+                        await store.send(.onRefresh).finish()
                     }
-                }
-                .refreshable {
-                    await store.send(.onRefresh).finish()
-                }
                 
                 if store.isLoading && store.articles.isEmpty {
                     ModernCircularLoader()
@@ -100,6 +92,7 @@ public struct ArticlesListScreen: View {
                     .padding(.horizontal, 16)
                     .listRowSeparator(.hidden)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    .listRowBackground(Color.Background.primary)
                     .onAppear {
                         guard let index = store.articles.firstIndex(of: article) else { return }
                         if store.articles.count - 5 == index {

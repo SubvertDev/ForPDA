@@ -18,7 +18,7 @@ public struct ArticleParser {
     3. 1720354500 - timestamp
     4. 0 - ???
     5. [] - ???
-    6. 64 - ???
+    6. 80 - flag ?
     7. 11029883 - author id
     8. "Оксана Рубко" - author name
     9. 0 - comments amount
@@ -42,6 +42,7 @@ public struct ArticleParser {
                 return Article(
                     id: fields[2] as! Int,
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
+                    flag: fields[6] as! Int,
                     authorId: fields[7] as! Int,
                     authorName: (fields[8] as! String).convertHtmlCodes(),
                     commentsAmount: fields[9] as! Int,
@@ -109,17 +110,6 @@ public struct ArticleParser {
     8. "https..." - (optional) avatar url
     */
     private static func extractComments(from array: [[Any]]) -> [Comment] {
-        func toCommentType(_ value: Int, text: String) -> CommentType {
-            switch value {
-            case 0: return .normal
-            case 2: return .deleted
-            case 4: return .hidden
-            case 32: return .edited
-            case 36: return .edited // TODO: 32/36 difference?
-            default: fatalError("Unknown comment type: \(value)")
-            }
-        }
-        
         var comments: [Comment] = array.compactMap { fields in
             // Fix for some "[0]" aka empty comments
             if fields.count < 9 {
@@ -130,7 +120,7 @@ public struct ArticleParser {
             return Comment(
                 id: fields[0] as! Int,
                 date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
-                type: toCommentType(fields[2] as! Int, text: fields[6] as! String),
+                flag: fields[2] as! Int,
                 authorId: fields[3] as! Int,
                 authorName: (fields[4] as! String).convertHtmlCodes(),
                 parentId: fields[5] as! Int,

@@ -42,6 +42,7 @@
       }
     },
     "Error adding comment" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -87,6 +88,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Поделиться ссылкой"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
           }
         }
       }

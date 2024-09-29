@@ -31,17 +31,20 @@ public struct CommentFeature: Sendable {
         public var id: Int { return comment.id }
         public var comment: Comment
         public let articleId: Int
+        public let isArticleExpired: Bool
         public var isLiked: Bool
         
         init(
             alert: AlertState<Never>? = nil,
             comment: Comment,
             articleId: Int,
+            isArticleExpired: Bool,
             isLiked: Bool = false
         ) {
             self.alert = alert
             self.comment = comment
             self.articleId = articleId
+            self.isArticleExpired = isArticleExpired
             self.isLiked = isLiked
         }
     }
@@ -51,6 +54,7 @@ public struct CommentFeature: Sendable {
     public enum Action {
         case alert(PresentationAction<Never>)
         case profileTapped(userId: Int)
+        case hiddenLabelTapped
         case contextMenuTapped
         case replyButtonTapped
         case likeButtonTapped
@@ -71,6 +75,10 @@ public struct CommentFeature: Sendable {
                 return .none
                 
             case .profileTapped:
+                return .none
+                
+            case .hiddenLabelTapped:
+                state.comment.isHidden = false
                 return .none
                 
             case .contextMenuTapped:

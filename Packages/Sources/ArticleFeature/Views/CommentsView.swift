@@ -59,7 +59,7 @@ struct CommentView: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 ZStack {
-                    if store.comment.type == .deleted {
+                    if store.comment.isDeleted {
                         Text("Comment has been deleted", bundle: .module)
                             .font(.subheadline)
                             .foregroundStyle(Color.Labels.quaternary)
@@ -69,12 +69,28 @@ struct CommentView: View {
                         VStack(spacing: 6) {
                             Header()
                             
-                            Text(store.comment.text)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .textSelection(.enabled)
+                            if !store.comment.isHidden {
+                                Text(store.comment.text)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .textSelection(.enabled)
+                                
+                                Footer()
+                            }
                             
-                            Footer()
+                            if store.comment.isHidden {
+                                Button {
+                                    store.send(.hiddenLabelTapped)
+                                } label: {
+                                    Text("Comment is hidden", bundle: .module)
+                                        .font(.subheadline)
+                                        .foregroundStyle(Color.Labels.quaternary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.bottom, 16)
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
+                        .animation(.default, value: store.comment.isHidden)
                         .padding(.bottom, 16)
                         .overlay(alignment: .topLeading) {
                             Rectangle()
@@ -148,7 +164,7 @@ struct CommentView: View {
     @ViewBuilder
     private func Footer() -> some View {
         HStack(spacing: 2) {
-            if store.comment.type == .edited {
+            if store.comment.isEdited {
                 Text("Edited", bundle: .module)
                     .font(.caption)
                     .foregroundStyle(Color.Labels.teritary)
@@ -160,14 +176,19 @@ struct CommentView: View {
             ActionButton(symbol: .ellipsis) {
                 store.send(.contextMenuTapped)
             }
-            ActionButton(symbol: .arrowTurnUpLeft) {
-                store.send(.replyButtonTapped)
+            
+            if !store.isArticleExpired {
+                ActionButton(symbol: .arrowTurnUpLeft) {
+                    store.send(.replyButtonTapped)
+                }
+                
+                LikeButton()
+                
+                Text(String(store.comment.likesAmount))
+                    .font(.subheadline)
+                    .foregroundStyle(Color.Labels.teritary)
+                    .padding(.trailing, 6)
             }
-            LikeButton()
-            Text(String(store.comment.likesAmount))
-                .font(.subheadline)
-                .foregroundStyle(Color.Labels.teritary)
-                .padding(.trailing, 6)
         }
     }
     
@@ -211,9 +232,11 @@ extension CommentView {
         let calendar = Calendar.current
         let formatter = DateFormatter()
         
-        let components = calendar.dateComponents([.minute, .hour, .day], from: date, to: Date.now)
+        let components = calendar.dateComponents([.second, .minute, .hour, .day], from: date, to: Date.now)
         
-        if let minutes = components.minute, minutes < 60, components.hour == 0, components.day == 0 {
+        if let seconds = components.second, seconds < 60, components.minute == 0, components.hour == 0, components.day == 0 {
+            return "just now"
+        } else if let minutes = components.minute, minutes < 60, components.hour == 0, components.day == 0 {
             return "\(minutes)m"
         } else if let hours = components.hour, hours < 24, components.day == 0 {
             return "\(hours)h"

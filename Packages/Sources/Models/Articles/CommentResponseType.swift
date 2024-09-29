@@ -17,7 +17,27 @@ public enum CommentResponseType: Int, Sendable {
     case repeatedComment = 9
     case hourLimitExceeded = 10
     case dayLimitExceeded = 11
-    case error = 14 //
+    case unknown = 14
+    
+    public init?(rawValue: Int) {
+        switch rawValue {
+        case 0: self = .success
+        case 4: self = .accessDenied
+        case 5: self = .emptyMessage
+        case 6: self = .postExpired
+        case 7: self = .hiddenDenied
+        case 8: self = .limitExceeded
+        case 9: self = .repeatedComment
+        case 10: self = .hourLimitExceeded
+        case 11: self = .dayLimitExceeded
+        case 12, 13: self = .unknown; print(">>> GOT UNKNOWN ERROR ON COMMENT") // TODO: Check case
+        default: self = .success
+        }
+    }
+    
+    public static var codes: [Int] {
+        return [0,4,5,6,7,8,9,10,11,12,13]
+    }
     
     public var description: LocalizedStringKey {
         switch self {
@@ -30,7 +50,7 @@ public enum CommentResponseType: Int, Sendable {
         case .repeatedComment:      return "Repeated comment"
         case .hourLimitExceeded:    return "You've hit the hourly commenting limit"
         case .dayLimitExceeded:     return "You've hit the daily commenting limit"
-        case .error:                return "Error adding comment"
+        case .unknown:              return "Unknown error"
         }
     }
     

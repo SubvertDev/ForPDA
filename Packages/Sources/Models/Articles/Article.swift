@@ -11,6 +11,7 @@ public struct Article: Sendable, Hashable, Codable {
 
     public let id: Int
     public let date: Date
+    public let flag: Int
     public let authorId: Int
     public let authorName: String
     public let commentsAmount: Int
@@ -22,9 +23,14 @@ public struct Article: Sendable, Hashable, Codable {
     public var comments: [Comment]
     public let poll: ArticlePoll?
     
+    public var canComment: Bool {
+        return flag & 16 != 0
+    }
+    
     public init(
         id: Int,
         date: Date,
+        flag: Int,
         authorId: Int,
         authorName: String,
         commentsAmount: Int,
@@ -38,6 +44,7 @@ public struct Article: Sendable, Hashable, Codable {
     ) {
         self.id = id
         self.date = date
+        self.flag = flag
         self.authorId = authorId
         self.authorName = authorName
         self.commentsAmount = commentsAmount
@@ -55,6 +62,7 @@ public extension Article {
     static let mock = Article(
         id: 123456,
         date: Date(timeIntervalSince1970: 1234567890),
+        flag: 80,
         authorId: 234567,
         authorName: "Lorem Author",
         commentsAmount: 69,
@@ -79,7 +87,7 @@ public extension Article {
         var mock = mock
         mock.comments = [
             .mock,
-            .init(id: 1, date: .now, type: .normal, authorId: 666, authorName: "Tester", parentId: 0, childIds: [], text: "Test text", likesAmount: 0, avatarUrl: nil)
+            .init(id: 1, date: .now, flag: 0, authorId: 666, authorName: "Tester", parentId: 0, childIds: [], text: "Test text", likesAmount: 0, avatarUrl: nil)
         ]
         return mock
     }

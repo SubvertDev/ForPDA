@@ -47,6 +47,14 @@ public struct ArticleFeature: Sendable {
         public var isUploadingComment: Bool
         public var focus: Field?
         
+        public var canComment: Bool {
+            return article?.canComment ?? false
+        }
+        
+        public var isArticleExpired: Bool {
+            return (article?.flag ?? 4) & 16 == 0
+        }
+        
         public init(
             destination: Destination.State? = nil,
             articlePreview: ArticlePreview,
@@ -221,13 +229,25 @@ public struct ArticleFeature: Sendable {
                 
                 state.article = article
                 
-                for comment in article.comments {
-                    let commentFeature = CommentFeature.State(comment: comment, articleId: state.articlePreview.id)
-                    // TODO: Does equality check helps with performance?
-                    state.comments[id: comment.id] = commentFeature
+                for (index, comment) in article.comments.enumerated() {
+                    let commentFeature = CommentFeature.State(
+                        comment: comment,
+                        articleId: state.articlePreview.id,
+                        isArticleExpired: state.isArticleExpired
+                    )
+                    
+                    if let feature = state.comments[id: comment.id] {
+                        // If comment is not new and changed, update it
+                        if feature.comment != comment {
+                            state.comments[id: comment.id] = commentFeature
+                        } // If comment did change, do nothing
+                    } else {
+                        // If comment is new
+                        state.comments.insert(commentFeature, at: index)
+                    }
                 }
                 
-                // TODO: Cache parsing result and move into cache check
+                // TODO: Cache articles parsing result
                 return .run { send in
                     let result = await Result { try await parsingClient.parseArticleElements(article) }
                     await send(._parseArticleElements(result))
@@ -251,7 +271,7 @@ public struct ArticleFeature: Sendable {
                     state.replyComment = nil
                     state.focus = nil
                     return .concatenate([
-                        getArticle(id: state.articlePreview.id),
+                        getArticle(id: state.articlePreview.id, cache: false),
                         .run { send in
                             await hapticClient.play(.success)
                             await send(.delegate(.showToast(type)))
@@ -300,11 +320,11 @@ public struct ArticleFeature: Sendable {
         .cancellable(id: CancelID.loading)
     }
     
-    private func getArticle(id: Int) -> EffectOf<Self> {
+    private func getArticle(id: Int, cache: Bool = true) -> EffectOf<Self> {
         return .concatenate([
             .run { send in
                 do {
-                    for try await article in try await apiClient.getArticle(id: id) {
+                    for try await article in try await apiClient.getArticle(id: id, cache: cache) {
                         await send(._articleResponse(.success(article)))
                     }
                 } catch {
