@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 import ComposableArchitecture
 import NukeUI
 import SFSafeSymbols
@@ -33,7 +34,7 @@ public struct ArticleScreen: View {
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
     
-    @State private var safeAreaTopHeight: CGFloat = 0
+    @State private var safeAreaTopHeight: CGFloat = UIApplication.topSafeArea + 44 // (status + navbar)
     @State private var navBarOpacity: CGFloat = 0
     private var navBarFullyVisible: Bool {
         return navBarOpacity >= 1
@@ -84,12 +85,6 @@ public struct ArticleScreen: View {
                 .overlay {
                     RefreshIndicator()
                 }
-                .background(GeometryReader { proxy in
-                    Color.clear
-                        .task(id: proxy.size.width) {
-                            safeAreaTopHeight = proxy.safeAreaInsets.top
-                        }
-                })
                 .background(Color.Background.primary)
                 .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .sheet(item: $store.destination.share, id: \.self) { url in
@@ -129,6 +124,7 @@ public struct ArticleScreen: View {
                         .offset(y: -safeAreaTopHeight)
                 }
             }
+            .animation(.default, value: store.elements)
             .modifier(
                 ScrollViewOffsetObserver(
                     safeAreaTopHeight: safeAreaTopHeight,
@@ -142,53 +138,6 @@ public struct ArticleScreen: View {
         }
         .scrollIndicators(.hidden)
         .coordinateSpace(name: "scroll")
-    }
-    
-    struct ParallaxHeader<Content: View, Space: Hashable>: View {
-        let content: () -> Content
-        let coordinateSpace: Space
-        let defaultHeight: CGFloat
-        let safeAreaTopHeight: CGFloat
-
-        init(
-            coordinateSpace: Space,
-            defaultHeight: CGFloat,
-            safeAreaTopHeight: CGFloat,
-            @ViewBuilder _ content: @escaping () -> Content
-        ) {
-            self.content = content
-            self.coordinateSpace = coordinateSpace
-            self.defaultHeight = defaultHeight
-            self.safeAreaTopHeight = safeAreaTopHeight
-        }
-        
-        var body: some View {
-            GeometryReader { proxy in
-                let offset = offset(for: proxy)
-                let heightModifier = heightModifier(for: proxy)
-                content()
-                    .edgesIgnoringSafeArea(.horizontal)
-                    .frame(
-                        width: proxy.size.width,
-                        height: proxy.size.height + heightModifier
-                    )
-                    .offset(y: offset - safeAreaTopHeight)
-            }
-            .frame(height: defaultHeight)
-        }
-        
-        private func offset(for proxy: GeometryProxy) -> CGFloat {
-            let frame = proxy.frame(in: .named("scroll"))
-            if frame.minY < 0 {
-                return -frame.minY * 0.8
-            }
-            return -frame.minY
-        }
-        
-        private func heightModifier(for proxy: GeometryProxy) -> CGFloat {
-            let frame = proxy.frame(in: .named("scroll"))
-            return max(0, frame.minY)
-        }
     }
     
     // MARK: - Article Header
@@ -403,9 +352,6 @@ public struct ArticleScreen: View {
     
     @ViewBuilder
     private func ArticleLoader() -> some View {
-        Spacer()
-            .frame(height: UIScreen.main.bounds.height * 0.2)
-        
         VStack {
             ModernCircularLoader()
                 .frame(width: 24, height: 24)
@@ -482,6 +428,21 @@ extension ArticleScreen {
             nonisolated(unsafe) static var defaultValue: CGPoint = .zero
             static func reduce(value: inout CGPoint, nextValue: () -> CGPoint) {}
         }
+    }
+}
+
+// MARK: UI Extensions
+
+extension UIApplication {
+    var keyWindow: UIWindow? {
+        connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+    }
+    
+    static var topSafeArea: CGFloat {
+        return UIApplication.shared.keyWindow?.safeAreaInsets.top ?? 0
     }
 }
 
