@@ -43,6 +43,7 @@ let package = Package(
         .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.36.0"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
+        .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", branch: "main"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "1.9.0"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
@@ -104,7 +105,8 @@ let package = Package(
                 .product(name: "SkeletonUI", package: "SkeletonUI"),
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "YouTubePlayerKit", package: "YouTubePlayerKit"),
-                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
+                .product(name: "SmoothGradient", package: "SmoothGradient")
             ]
         ),
         .target(

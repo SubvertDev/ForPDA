@@ -13,6 +13,7 @@ import YouTubePlayerKit
 import Models
 import SharedUI
 import SkeletonUI
+import SmoothGradient
 
 // TODO: Move somewhere else
 extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
@@ -32,15 +33,14 @@ public struct ArticleScreen: View {
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
     
-    public init(store: StoreOf<ArticleFeature>) {
-        self.store = store
-    }
-    
-    @State private var scrollViewContentHeight: CGFloat = 0
     @State private var safeAreaTopHeight: CGFloat = 0
     @State private var navBarOpacity: CGFloat = 0
     private var navBarFullyVisible: Bool {
         return navBarOpacity >= 1
+    }
+    
+    public init(store: StoreOf<ArticleFeature>) {
+        self.store = store
     }
     
     // MARK: - Body
@@ -81,6 +81,9 @@ public struct ArticleScreen: View {
                         .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
                         .ignoresSafeArea()
                 }
+                .overlay {
+                    RefreshIndicator()
+                }
                 .background(GeometryReader { proxy in
                     Color.clear
                         .task(id: proxy.size.width) {
@@ -110,24 +113,82 @@ public struct ArticleScreen: View {
     private func ArticleScrollView() -> some View {
         ScrollView(.vertical) {
             VStack(spacing: 0) {
-                ArticleHeader()
+                ParallaxHeader(
+                    coordinateSpace: "scroll",
+                    defaultHeight: UIScreen.main.bounds.width,
+                    safeAreaTopHeight: safeAreaTopHeight
+                ) {
+                    ArticleHeader()
+                }
                 
                 if store.isLoading {
                     ArticleLoader()
                 } else if let elements = store.elements {
                     ArticleView(elements: elements)
+                        .background(Color.Background.primary)
+                        .offset(y: -safeAreaTopHeight)
                 }
             }
             .modifier(
                 ScrollViewOffsetObserver(
-                    scrollViewContentHeight: $scrollViewContentHeight,
+                    safeAreaTopHeight: safeAreaTopHeight,
                     navBarOpacity: $navBarOpacity
-                )
+                ) {
+                    if !store.isRefreshing {
+                        store.send(.onRefresh)
+                    }
+                }
             )
         }
         .scrollIndicators(.hidden)
-        .ignoresSafeArea(.all, edges: .top)
         .coordinateSpace(name: "scroll")
+    }
+    
+    struct ParallaxHeader<Content: View, Space: Hashable>: View {
+        let content: () -> Content
+        let coordinateSpace: Space
+        let defaultHeight: CGFloat
+        let safeAreaTopHeight: CGFloat
+
+        init(
+            coordinateSpace: Space,
+            defaultHeight: CGFloat,
+            safeAreaTopHeight: CGFloat,
+            @ViewBuilder _ content: @escaping () -> Content
+        ) {
+            self.content = content
+            self.coordinateSpace = coordinateSpace
+            self.defaultHeight = defaultHeight
+            self.safeAreaTopHeight = safeAreaTopHeight
+        }
+        
+        var body: some View {
+            GeometryReader { proxy in
+                let offset = offset(for: proxy)
+                let heightModifier = heightModifier(for: proxy)
+                content()
+                    .edgesIgnoringSafeArea(.horizontal)
+                    .frame(
+                        width: proxy.size.width,
+                        height: proxy.size.height + heightModifier
+                    )
+                    .offset(y: offset - safeAreaTopHeight)
+            }
+            .frame(height: defaultHeight)
+        }
+        
+        private func offset(for proxy: GeometryProxy) -> CGFloat {
+            let frame = proxy.frame(in: .named("scroll"))
+            if frame.minY < 0 {
+                return -frame.minY * 0.8
+            }
+            return -frame.minY
+        }
+        
+        private func heightModifier(for proxy: GeometryProxy) -> CGFloat {
+            let frame = proxy.frame(in: .named("scroll"))
+            return max(0, frame.minY)
+        }
     }
     
     // MARK: - Article Header
@@ -135,52 +196,41 @@ public struct ArticleScreen: View {
     @ViewBuilder
     private func ArticleHeader() -> some View {
         ZStack {
-            ZStack {
-                Rectangle()
-                    .background(Color.Background.forcedDark)
-                
-                LazyImage(url: store.articlePreview.imageUrl) { state in
-                    Group {
-                        if let image = state.image {
-                            image.resizable().scaledToFill()
-                        } else {
-                            Color.Background.forcedDark
-                        }
+            LazyImage(url: store.articlePreview.imageUrl) { state in
+                Group {
+                    if let image = state.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Color.Background.forcedDark
                     }
-                    .skeleton(
-                        with: state.isLoading,
-                        appearance: .gradient(
-                            .linear,
-                            color: Color.Labels.forcedLight.opacity(0.25),
-                            background: Color.Background.forcedDark,
-                            radius: 1,
-                            angle: .zero
-                        ),
-                        shape: .rectangle
-                    )
                 }
-                .overlay(alignment: .bottom) {
-                    LinearGradient(
-                        gradient: Gradient(
-                            colors: [
-                                Color.Background.forcedDark.opacity(0),
-                                Color.Background.forcedDark.opacity(0.5),
-                                Color.Background.forcedDark.opacity(0.7),
-                                Color.Background.forcedDark.opacity(0.9),
-                                Color.Background.forcedDark,
-                                Color.Background.forcedDark,
-                                Color.Background.forcedDark,
-                                Color.Background.forcedDark
-                            ]
-                        ),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                    .frame(height: 124)
-                }
+                .skeleton(
+                    with: state.isLoading,
+                    appearance: .gradient(
+                        .linear,
+                        color: Color.Labels.forcedLight.opacity(0.25),
+                        background: Color.Background.forcedDark,
+                        radius: 1,
+                        angle: .zero
+                    ),
+                    shape: .rectangle
+                )
             }
-            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
-            .clipped()
+            .overlay(alignment: .bottom) {
+                LinearGradient(
+                    gradient: .smooth(
+                        from: .clear,
+                        to: Color.Background.forcedDark,
+                        easing: CubicBezierCurve(
+                            p1: UnitPoint(x: 0, y: 0),
+                            p2: UnitPoint(x: 0.25, y: 1)
+                        )
+                    ),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: UIScreen.main.bounds.width / 3)
+            }
             
             VStack(spacing: 0) {
                 Spacer()
@@ -201,6 +251,7 @@ public struct ArticleScreen: View {
                 .foregroundStyle(Color.Labels.secondaryInvariably)
             }
             .padding()
+            .frame(maxWidth: UIScreen.main.bounds.width)
         }
     }
     
@@ -344,6 +395,7 @@ public struct ArticleScreen: View {
                         .scaleEffect(0.8) // TODO: ?
                 }
             }
+            .animation(.default, value: navBarFullyVisible)
         }
     }
     
@@ -361,6 +413,36 @@ public struct ArticleScreen: View {
             Text("Loading article...", bundle: .module)
         }
     }
+    
+    // MARK: - Refresh Indicator
+    
+    @ViewBuilder
+    private func RefreshIndicator() -> some View {
+        VStack {
+            if store.isRefreshing {
+                VStack {
+                    ZStack {
+                        Circle()
+                            .fill(Color.clear)
+                            .background(.ultraThinMaterial)
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                        
+                        ProgressView()
+                            .tint(Color.white)
+                            .progressViewStyle(.circular)
+                            .controlSize(.regular)
+                    }
+                    .padding(.top, 16)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .transition(.move(edge: .top))
+            }
+        }
+        .animation(.bouncy, value: store.isRefreshing)
+    }
 }
 
 // MARK: - Scroll View Offset Observer
@@ -368,8 +450,10 @@ public struct ArticleScreen: View {
 extension ArticleScreen {
     struct ScrollViewOffsetObserver: ViewModifier {
         
-        @Binding var scrollViewContentHeight: CGFloat
+        let safeAreaTopHeight: CGFloat
         @Binding var navBarOpacity: CGFloat
+        @State private var lastValue: CGFloat = .zero
+        let onRefreshTriggered: () -> Void
         
         func body(content: Content) -> some View {
             content
@@ -379,10 +463,18 @@ extension ArticleScreen {
                 })
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
                     let percentage = 0.8
-                    let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
+                    let adjustedValue = max(0, abs(value.y - safeAreaTopHeight) - (UIScreen.main.bounds.width * percentage))
                     let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
                     let opacity = min(coefficient, 1)
-                    navBarOpacity = opacity
+                    if lastValue != opacity {
+                        navBarOpacity = opacity
+                    }
+                    lastValue = opacity
+                }
+                .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                    if value.y > safeAreaTopHeight {
+                        onRefreshTriggered()
+                    }
                 }
         }
         

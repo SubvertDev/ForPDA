@@ -42,6 +42,7 @@ public struct ArticleMenu: View {
                     .font(.body)
                     .foregroundStyle(isDark ? Color.Labels.teritary : Color.Labels.primaryInvariably)
                     .scaleEffect(0.8) // TODO: ?
+                    .animation(.default, value: isDark)
             }
         }
     }

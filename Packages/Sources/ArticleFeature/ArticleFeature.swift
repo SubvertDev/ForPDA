@@ -41,6 +41,7 @@ public struct ArticleFeature: Sendable {
         public var article: Article?
         public var elements: [ArticleElement]?
         public var isLoading: Bool
+        public var isRefreshing: Bool
         public var comments: IdentifiedArrayOf<CommentFeature.State>
         public var replyComment: Comment?
         public var commentText: String
@@ -57,11 +58,15 @@ public struct ArticleFeature: Sendable {
             return (article?.flag ?? 4) & 16 == 0
         }
         
+        var refreshRequestFinished = false
+        var refreshTimePassed = false
+        
         public init(
             destination: Destination.State? = nil,
             articlePreview: ArticlePreview,
             article: Article? = nil,
             isLoading: Bool = false,
+            isRefreshing: Bool = false,
             comments: IdentifiedArrayOf<CommentFeature.State> = [],
             replyComment: Comment? = nil,
             commentText: String = "",
@@ -74,6 +79,7 @@ public struct ArticleFeature: Sendable {
             self.articlePreview = articlePreview
             self.article = article
             self.isLoading = isLoading
+            self.isRefreshing = isRefreshing
             self.comments = comments
             self.replyComment = replyComment
             self.commentText = commentText
@@ -97,12 +103,14 @@ public struct ArticleFeature: Sendable {
         case linkShared(Bool, URL)
         case linkInTextTapped(URL)
         case onTask
+        case onRefresh
         case pollVoteButtonTapped(Int, [Int])
         case comments(IdentifiedActionOf<CommentFeature>)
         case sendCommentButtonTapped
         case removeReplyCommentButtonTapped
         
         case _checkLoading
+        case _stopRefreshingIfFinished
         case _articleResponse(Result<Article, any Error>)
         case _commentResponse(Result<CommentResponseType, any Error>)
         case _parseArticleElements(Result<[ArticleElement], any Error>)
@@ -192,6 +200,28 @@ public struct ArticleFeature: Sendable {
                     getArticle(id: state.articlePreview.id)
                 ])
                 
+            case .onRefresh:
+                guard !state.isLoading else { return .none }
+                state.isRefreshing = true
+                return .merge([
+                    .run { send in
+                        await hapticClient.play(.light)
+                        try await Task.sleep(for: .seconds(1.5))
+                        await send(._stopRefreshingIfFinished)
+                    },
+                    getArticle(id: state.articlePreview.id, cache: false)
+                ])
+                
+            case ._stopRefreshingIfFinished:
+                if state.refreshRequestFinished {
+                    state.isRefreshing = false
+                    state.refreshTimePassed = false
+                    state.refreshRequestFinished = false
+                } else {
+                    state.refreshTimePassed = true
+                }
+                return .none
+                
             case let .pollVoteButtonTapped(pollId, selections):
                 state.isUploadingPollVote = true
                 return .run { send in
@@ -237,6 +267,14 @@ public struct ArticleFeature: Sendable {
                 return .none
                 
             case ._articleResponse(.success(let article)):
+                if state.refreshTimePassed {
+                    state.isRefreshing = false
+                    state.refreshTimePassed = false
+                    state.refreshRequestFinished = false
+                } else {
+                    state.refreshRequestFinished = true
+                }
+                
                 // Outer && inner deeplink case
                 if state.articlePreview.date.timeIntervalSince1970 == 0 || state.articlePreview.title.isEmpty {
                     state.articlePreview = ArticlePreview.makeFromArticle(article)

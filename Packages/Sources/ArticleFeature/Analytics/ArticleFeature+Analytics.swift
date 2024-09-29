@@ -20,16 +20,16 @@ extension ArticleFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, ._commentResponse, ._pollVoteResponse:
+                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, ._commentResponse, ._pollVoteResponse, ._stopRefreshingIfFinished:
                     break
                     
                 case .pollVoteButtonTapped:
                     analyticsClient.log(ArticleEvent.pollVoteTapped)
                     
-                case let .removeReplyCommentButtonTapped:
+                case .removeReplyCommentButtonTapped:
                     analyticsClient.log(ArticleEvent.removeReplyCommentTapped)
                     
-                case let .sendCommentButtonTapped:
+                case .sendCommentButtonTapped:
                     analyticsClient.log(ArticleEvent.sendCommentTapped)
                     
                 case .linkInTextTapped(let url):
@@ -51,6 +51,9 @@ extension ArticleFeature {
                     
                 case .onTask:
                     break // TODO: Log?
+                    
+                case .onRefresh:
+                    analyticsClient.log(ArticleEvent.onRefresh)
                     
                 case .bookmarkButtonTapped:
                     analyticsClient.log(ArticleEvent.bookmarkButtonTapped(state.articlePreview.url))
