@@ -165,41 +165,40 @@ public struct ArticleScreen: View {
                     shape: .rectangle
                 )
             }
-            .overlay(alignment: .bottom) {
-                LinearGradient(
-                    gradient: .smooth(
-                        from: .clear,
-                        to: Color.Background.forcedDark,
-                        easing: CubicBezierCurve(
-                            p1: UnitPoint(x: 0, y: 0),
-                            p2: UnitPoint(x: 0.25, y: 1)
-                        )
-                    ),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: UIScreen.main.bounds.width / 3)
-            }
             
             VStack(spacing: 0) {
                 Spacer()
                 
-                Text(store.articlePreview.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(Color.Labels.forcedLight)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.bottom, 8)
-                
-                HStack {
-                    Text(store.articlePreview.authorName)
-                    Spacer()
-                    Text(store.articlePreview.formattedDate)
+                VStack(spacing: 0) {
+                    Text(store.articlePreview.title)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(Color.Labels.forcedLight)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 8)
+                    
+                    HStack {
+                        Text(store.articlePreview.authorName)
+                        Spacer()
+                        Text(store.articlePreview.formattedDate)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Color.Labels.secondaryInvariably)
                 }
-                .font(.caption)
-                .foregroundStyle(Color.Labels.secondaryInvariably)
+                .padding(.top, 32)
+                .padding(16)
+                .background(
+                    LinearGradient(
+                        gradient: .smooth(
+                            from: .clear,
+                            to: Color.Background.forcedDark,
+                            easing: .easeInOut
+                        ),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
             }
-            .padding()
             .frame(maxWidth: UIScreen.main.bounds.width)
         }
     }
