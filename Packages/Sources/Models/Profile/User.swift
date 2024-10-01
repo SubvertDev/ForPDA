@@ -21,7 +21,7 @@ public struct User: Sendable, Hashable, Codable {
     public let gender: Gender?
     public let userTime: Int?
     public let city: String?
-    public let devDBdevices: [Device]?
+    public let devDBdevices: [Device]
     public let karma: Double
     public let posts: Int
     public let comments: Int
@@ -61,7 +61,7 @@ public struct User: Sendable, Hashable, Codable {
         gender: Gender?,
         userTime: Int?,
         city: String?,
-        devDBdevices: [Device]?,
+        devDBdevices: [Device],
         karma: Double,
         posts: Int,
         comments: Int,
@@ -202,8 +202,16 @@ public extension User {
     
     // MARK: Device
     
-    struct Device: Codable, Hashable, Sendable {
-        let name: String
+    struct Device: Codable, Hashable, Sendable, Identifiable {
+        public let id: String
+        public let name: String
+        public let main: Bool
+        
+        public init(id: String, name: String, main: Bool) {
+            self.id = id
+            self.name = name
+            self.main = main
+        }
     }
 }
 
@@ -224,7 +232,7 @@ public extension User {
         gender: .male,
         userTime: 10800,
         city: "Moscow",
-        devDBdevices: nil,
+        devDBdevices: [],
         karma: 1500,
         posts: 23,
         comments: 173,

@@ -51,6 +51,16 @@
         }
       }
     },
+    "Devices List" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Список девайсов"
+          }
+        }
+      }
+    },
     "Email" : {
       "localizations" : {
         "ru" : {
