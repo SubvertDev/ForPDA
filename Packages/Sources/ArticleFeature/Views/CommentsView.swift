@@ -27,8 +27,8 @@ struct CommentsView: View {
                 .padding(.vertical, 24)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            VStack(spacing: 0) {
-                ForEach(store.scope(state: \.comments, action: \.comments)) { store in
+            LazyVStack(spacing: 0) {
+                ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
                     WithPerceptionTracking {
                         CommentView(store: store)
                     }
