@@ -235,7 +235,9 @@ public struct ArticleFeature: Sendable {
                 
             case .bookmarkButtonTapped:
                 state.destination = .alert(.notImplemented)
-                return .none
+                return .run { _ in
+                    await hapticClient.play(.rigid)
+                }
                 
             case .notImplementedButtonTapped:
                 state.destination = .alert(.notImplemented)
@@ -361,7 +363,9 @@ public struct ArticleFeature: Sendable {
             case ._pollVoteResponse(.success):
                 state.isUploadingPollVote = false
                 state.isShowingVoteResults = true
-                return .none
+                return .run { _ in
+                    await hapticClient.play(.success)
+                }
                 
             case ._pollVoteResponse(.failure):
                 state.isUploadingPollVote = false

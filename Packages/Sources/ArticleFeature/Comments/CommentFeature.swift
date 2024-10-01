@@ -66,6 +66,7 @@ public struct CommentFeature: Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.hapticClient) private var hapticClient
     
     // MARK: - Body
     
@@ -89,6 +90,7 @@ public struct CommentFeature: Sendable {
             case .hideButtonTapped:
                 state.comment.isHidden.toggle()
                 return .run { [articleId = state.articleId, commentId = state.comment.id] _ in
+                    await hapticClient.play(.selection)
                     let _ = try await apiClient.hideComment(articleId: articleId, commentId: commentId)
                 }
                 
