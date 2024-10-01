@@ -35,19 +35,19 @@ struct ParallaxHeader<Content: View, Space: Hashable>: View {
                     width: proxy.size.width,
                     height: proxy.size.height + heightModifier
                 )
-                .offset(y: offset - safeAreaTopHeight)
+                .offset(y: offset)
         }
         .frame(height: defaultHeight)
     }
     
     private func offset(for proxy: GeometryProxy) -> CGFloat {
         let frame = proxy.frame(in: .named(coordinateSpace))
-        if frame.minY < 0 { return 0 }
-        return -frame.minY
+        if frame.minY + safeAreaTopHeight < 0 { return 0 }
+        return -frame.minY - safeAreaTopHeight
     }
     
     private func heightModifier(for proxy: GeometryProxy) -> CGFloat {
         let frame = proxy.frame(in: .named(coordinateSpace))
-        return max(0, frame.minY)
+        return max(0, frame.minY + safeAreaTopHeight)
     }
 }

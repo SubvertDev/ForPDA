@@ -121,7 +121,6 @@ public struct ArticleScreen: View {
                 } else if let elements = store.elements {
                     ArticleView(elements: elements)
                         .background(Color.Background.primary)
-                        .offset(y: -safeAreaTopHeight)
                 }
             }
             .animation(.default, value: store.elements)
@@ -136,6 +135,7 @@ public struct ArticleScreen: View {
                 }
             )
         }
+        .ignoresSafeArea(.all, edges: .top)
         .scrollIndicators(.hidden)
         .coordinateSpace(name: "scroll")
     }
@@ -409,7 +409,7 @@ extension ArticleScreen {
                 })
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
                     let percentage = 0.8
-                    let adjustedValue = max(0, abs(value.y - safeAreaTopHeight) - (UIScreen.main.bounds.width * percentage))
+                    let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
                     let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
                     let opacity = min(coefficient, 1)
                     if lastValue != opacity {
@@ -418,7 +418,7 @@ extension ArticleScreen {
                     lastValue = opacity
                 }
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    if value.y > safeAreaTopHeight {
+                    if value.y > 0 {
                         onRefreshTriggered()
                     }
                 }
