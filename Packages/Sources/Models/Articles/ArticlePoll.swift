@@ -12,6 +12,7 @@ public struct ArticlePoll: Sendable, Hashable, Codable {
     public enum PollType: Int, Sendable, Hashable, Codable {
         case oneChoice = 1
         case multipleChoice = 3
+        case voted = 5
     }
     
     public struct Option: Sendable, Hashable, Codable {

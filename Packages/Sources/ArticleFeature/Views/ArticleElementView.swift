@@ -280,6 +280,8 @@ struct ArticleElementView: View {
                                         if !pollSelections.insert(option).inserted {
                                             pollSelections.remove(option)
                                         }
+                                    case .voted:
+                                        break
                                     }
                                 }
                             } label: {
@@ -321,6 +323,9 @@ struct ArticleElementView: View {
                                                 .strokeBorder(Color.Labels.quintuple)
                                                 .frame(width: 22, height: 22)
                                         }
+                                        
+                                    case .voted:
+                                        EmptyView()
                                     }
                                     
                                     Text(option.text)
@@ -347,6 +352,9 @@ struct ArticleElementView: View {
                             if !pollSelections.isEmpty {
                                 store.send(.pollVoteButtonTapped(poll.id, Array(pollSelections.map { $0.id })))
                             }
+                            
+                        case .voted:
+                            break
                         }
                     } label: {
                         Text("Vote", bundle: .module)
@@ -382,6 +390,8 @@ struct ArticleElementView: View {
             return (pollSelection == nil || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
         case .multipleChoice:
             return (pollSelections.isEmpty || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
+        default:
+            return Color.clear
         }
     }
     
@@ -391,6 +401,8 @@ struct ArticleElementView: View {
             return (pollSelection == nil || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
         case .multipleChoice:
             return (pollSelections.isEmpty || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
+        default:
+            return Color.clear
         }
     }
     
@@ -403,6 +415,8 @@ struct ArticleElementView: View {
             return pollSelection == nil
         case .multipleChoice:
             return pollSelections.isEmpty
+        default:
+            return true
         }
     }
     

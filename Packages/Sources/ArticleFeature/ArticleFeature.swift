@@ -245,13 +245,7 @@ public struct ArticleFeature: Sendable {
                 return .run { [articleId = state.articlePreview.id,
                                replyComment = state.replyComment,
                                message = state.commentText] send in
-                    let parentId: Int
-                    if let replyComment {
-                        parentId = replyComment.id
-                    } else {
-                        parentId = 0
-                    }
-                    
+                    let parentId = replyComment?.id ?? 0
                     let result = await Result { try await apiClient.replyToComment(articleId, parentId, message) }
                     await send(._commentResponse(result))
                 }
@@ -281,6 +275,10 @@ public struct ArticleFeature: Sendable {
                 }
                 
                 state.article = article
+                
+                if let poll = article.poll {
+                    state.isShowingVoteResults = poll.type == .voted
+                }
                 
                 for (index, comment) in article.comments.enumerated() {
                     let commentFeature = CommentFeature.State(
@@ -354,7 +352,7 @@ public struct ArticleFeature: Sendable {
                 state.destination = .alert(.error)
                 return .none
                 
-            case let ._pollVoteResponse(.success(success)):
+            case ._pollVoteResponse(.success):
                 state.isUploadingPollVote = false
                 state.isShowingVoteResults = true
                 return .none

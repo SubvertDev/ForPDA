@@ -91,7 +91,6 @@ extension APIClient: DependencyKey {
             voteInPoll: { pollId, selections in
                 let rawString = try api.get(SiteCommand.vote(pollId: pollId, selections: selections))
                 let responseAsInt = Int(rawString.getLastNumber())!
-                // TODO: Always returns 3 (error)
                 return responseAsInt == 0
             },
             getCaptcha: {
