@@ -91,6 +91,16 @@
         }
       }
     },
+    "Hide comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть комментарий"
+          }
+        }
+      }
+    },
     "just now" : {
       "localizations" : {
         "ru" : {
@@ -141,6 +151,16 @@
         }
       }
     },
+    "Report" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожаловаться"
+          }
+        }
+      }
+    },
     "Share Link" : {
       "localizations" : {
         "ru" : {
@@ -167,6 +187,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Что-то пошло не так во время загрузки статьи :("
+          }
+        }
+      }
+    },
+    "Unhide comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Раскрыть комментарий"
           }
         }
       }

@@ -69,14 +69,6 @@ struct CommentView: View {
                         VStack(spacing: 6) {
                             Header()
                             
-                            if !store.comment.isHidden {
-                                Text(store.comment.text)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .textSelection(.enabled)
-                                
-                                Footer()
-                            }
-                            
                             if store.comment.isHidden {
                                 Button {
                                     store.send(.hiddenLabelTapped)
@@ -85,13 +77,20 @@ struct CommentView: View {
                                         .font(.subheadline)
                                         .foregroundStyle(Color.Labels.quaternary)
                                         .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.bottom, 16)
                                 }
                                 .buttonStyle(.plain)
+                            } else {
+                                Text(store.comment.text)
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color.Labels.primary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .textSelection(.enabled)
                             }
+                            
+                            Footer()
                         }
                         // TODO: Jumps when used in LazyVStack
-//                        .animation(.default, value: store.comment.isHidden)
+                        .animation(.default, value: store.comment.isHidden)
                         .padding(.bottom, 16)
                         .overlay(alignment: .topLeading) {
                             Rectangle()
@@ -115,6 +114,7 @@ struct CommentView: View {
                 }
                 .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
+            .background(Color.Background.primary)
             .alert($store.scope(state: \.alert, action: \.alert))
         }
     }
@@ -174,9 +174,7 @@ struct CommentView: View {
             
             Spacer()
             
-            ActionButton(symbol: .ellipsis) {
-                store.send(.contextMenuTapped)
-            }
+            MenuButton()
             
             if !store.isArticleExpired {
                 ActionButton(symbol: .arrowTurnUpLeft) {
@@ -190,6 +188,29 @@ struct CommentView: View {
                     .foregroundStyle(Color.Labels.teritary)
                     .padding(.trailing, 6)
             }
+        }
+    }
+    
+    // MARK: - Menu Button
+    
+    @ViewBuilder
+    private func MenuButton() -> some View {
+        Menu {
+            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+                store.send(.reportButtonTapped)
+            }
+            ContextButton(
+                text: store.comment.isHidden ? "Unhide comment" : "Hide comment",
+                symbol: store.comment.isHidden ? .eyeSlash : .eye,
+                bundle: .module
+            ) {
+                store.send(.hideButtonTapped)
+            }
+        } label: {
+            Image(systemSymbol: .ellipsis)
+                .font(.body)
+                .foregroundStyle(Color.Labels.teritary)
+                .frame(width: 32, height: 32)
         }
     }
     

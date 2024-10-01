@@ -20,6 +20,7 @@ public struct APIClient: Sendable {
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
     public var getArticle: @Sendable (_ id: Int, _ cache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
     public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
+    public var hideComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var replyToComment: @Sendable (_ articleId: Int, _ parentId: Int, _ message: String) async throws -> CommentResponseType
     public var voteInPoll: @Sendable (_ pollId: Int, _ selections: [Int]) async throws -> Bool
     public var getCaptcha: @Sendable () async throws -> URL
@@ -77,6 +78,11 @@ extension APIClient: DependencyKey {
             },
             likeComment: { articleId, commentId in
                 let rawString = try api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
+                return Int(rawString.getLastNumber()) == 0
+            },
+            hideComment: { articleId, commentId in
+                let rawString = try api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
+                // Getting 3 on liked comment
                 return Int(rawString.getLastNumber()) == 0
             },
             replyToComment: { articleId, parentId, message in
@@ -143,6 +149,9 @@ extension APIClient: DependencyKey {
                 AsyncThrowingStream { $0.yield(.mock) }
             },
             likeComment: { _, _ in
+                return true
+            },
+            hideComment: { _, _ in
                 return true
             },
             replyToComment: { _, _, _ in

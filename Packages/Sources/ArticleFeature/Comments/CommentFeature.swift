@@ -55,7 +55,8 @@ public struct CommentFeature: Sendable {
         case alert(PresentationAction<Never>)
         case profileTapped(userId: Int)
         case hiddenLabelTapped
-        case contextMenuTapped
+        case reportButtonTapped
+        case hideButtonTapped
         case replyButtonTapped
         case likeButtonTapped
         
@@ -81,9 +82,15 @@ public struct CommentFeature: Sendable {
                 state.comment.isHidden = false
                 return .none
                 
-            case .contextMenuTapped:
+            case .reportButtonTapped:
                 state.alert = .notImplemented
                 return .none
+                
+            case .hideButtonTapped:
+                state.comment.isHidden.toggle()
+                return .run { [articleId = state.articleId, commentId = state.comment.id] _ in
+                    let _ = try await apiClient.hideComment(articleId: articleId, commentId: commentId)
+                }
                 
             case .replyButtonTapped:
                 return .none
