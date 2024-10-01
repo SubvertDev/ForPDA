@@ -151,8 +151,9 @@ public struct ArticleFeature: Sendable {
             case let .comments(.element(id, action)):
                 if case .replyButtonTapped = action {
                     if let comment = state.comments[id: id]?.comment {
-                        state.focus = .comment
+                        state.commentText = "\(comment.authorName),\n"
                         state.replyComment = comment
+                        state.focus = .comment
                     }
                 }
                 return .none
@@ -251,6 +252,11 @@ public struct ArticleFeature: Sendable {
                 }
                 
             case .removeReplyCommentButtonTapped:
+                if let replyComment = state.replyComment,
+                   state.commentText == "\(replyComment.authorName),\n" {
+                    state.commentText = ""
+                    state.focus = nil
+                }
                 state.replyComment = nil
                 return .none
                 
