@@ -90,7 +90,8 @@ struct CommentView: View {
                                 .buttonStyle(.plain)
                             }
                         }
-                        .animation(.default, value: store.comment.isHidden)
+                        // TODO: Jumps when used in LazyVStack
+//                        .animation(.default, value: store.comment.isHidden)
                         .padding(.bottom, 16)
                         .overlay(alignment: .topLeading) {
                             Rectangle()

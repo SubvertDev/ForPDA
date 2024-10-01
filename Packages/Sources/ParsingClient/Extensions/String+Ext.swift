@@ -14,7 +14,7 @@ extension String {
         // raw html parse loses \n\t that are used in article tables
         text = text.replacingOccurrences(of: "\\n\\t", with: "/n/t", options: .regularExpression)
         // raw html parse loses \r\n that are used in article comments
-        text = text.replacingOccurrences(of: "\\r\\n\\s*", with: "/r/n", options: .regularExpression)
+        text = text.replacingOccurrences(of: "\\r\\n", with: "/r/n", options: .regularExpression)
         let attributedString = try! NSAttributedString(
             data: Data(text.utf8),
             options: [
