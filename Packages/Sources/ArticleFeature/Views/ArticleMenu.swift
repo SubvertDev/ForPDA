@@ -31,19 +31,20 @@ public struct ArticleMenu: View {
                 store.send(.menuActionTapped(.report))
             }
         } label: {
-            ZStack {
-                Circle()
-                    .fill(Color.clear)
-                    .background(.ultraThinMaterial)
-                    .frame(width: 32, height: 32)
-                    .clipShape(Circle())
-                
-                Image(systemSymbol: .ellipsis)
-                    .font(.body)
-                    .foregroundStyle(isDark ? Color.Labels.teritary : Color.Labels.primaryInvariably)
-                    .scaleEffect(0.8) // TODO: ?
-                    .animation(.default, value: isDark)
-            }
+            Image(systemSymbol: .ellipsis)
+                .font(.body)
+                .foregroundStyle(isDark ? Color.Labels.teritary : Color.Labels.primaryInvariably)
+                .scaleEffect(0.8) // TODO: ?
+                .background(
+                    Circle()
+                        .fill(Color.clear)
+                        .background(.ultraThinMaterial)
+                        .frame(width: 32, height: 32)
+                        .clipShape(Circle())
+                )
+                .animation(.default, value: isDark)
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
         }
     }
 }

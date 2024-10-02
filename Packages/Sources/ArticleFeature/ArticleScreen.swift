@@ -66,14 +66,20 @@ public struct ArticleScreen: View {
                 .navigationBarBackButtonHidden()
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar {
-                    ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
-                        store.send(.backButtonTapped)
+                    ToolbarItem(placement: .topBarLeading) {
+                        ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
+                            store.send(.backButtonTapped)
+                        }
                     }
-                    ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
-                        store.send(.bookmarkButtonTapped)
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        ArticleMenu(store: store, isDark: navBarFullyVisible)
+                    
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        HStack(spacing: 8) {
+                            ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
+                                store.send(.bookmarkButtonTapped)
+                            }
+                            
+                            ArticleMenu(store: store, isDark: navBarFullyVisible)
+                        }
                     }
                 }
                 .overlay(alignment: .top) {
@@ -320,31 +326,27 @@ public struct ArticleScreen: View {
     
     // MARK: - Toolbar Button
     
-    @ToolbarContentBuilder
     private func ToolbarButton(
         placement: ToolbarItemPlacement,
         symbol: SFSymbol,
         action: @escaping () -> Void
-    ) -> some ToolbarContent {
-        ToolbarItem(placement: placement) {
-            Button {
-                action()
-            } label: {
-                ZStack {
+    ) -> some View {
+        Button {
+            action()
+        } label: {
+            Image(systemSymbol: symbol)
+                .font(.body)
+                .foregroundStyle(navBarFullyVisible ? Color.Labels.teritary : Color.Labels.primaryInvariably)
+                .scaleEffect(0.8) // TODO: ?
+                .background(
                     Circle()
                         .fill(Color.clear)
                         .background(.ultraThinMaterial)
                         .frame(width: 32, height: 32)
                         .clipShape(Circle())
-                    
-                    Image(systemSymbol: symbol)
-                        .font(.body)
-                        .foregroundStyle(navBarFullyVisible ? Color.Labels.teritary : Color.Labels.primaryInvariably)
-                        .scaleEffect(0.8) // TODO: ?
-                }
-            }
-            .animation(.default, value: navBarFullyVisible)
+                )
         }
+        .animation(.default, value: navBarFullyVisible)
     }
     
     // MARK: - Article Loader
