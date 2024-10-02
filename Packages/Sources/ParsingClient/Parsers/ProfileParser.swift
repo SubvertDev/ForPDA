@@ -72,7 +72,8 @@ public struct ProfileParser {
                     replies: array[21] as! Int,
                     qmsMessages: (array[22] as! Int),
                     forumDevices: nil,
-                    email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 }
+                    email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
+                    achievements: parseUserAchievements(array[32] as! [[Any]])
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -88,6 +89,21 @@ public struct ProfileParser {
                 id: device[0] as! String,
                 name: device[1] as! String,
                 main: (device[2] as! Int == 1) ? true : false
+            )
+        }
+    }
+    
+    private static func parseUserAchievements(_ array: [[Any]]) -> [User.Achievement] {
+        return array.map { achievement in
+            return User.Achievement(
+                name: achievement[1] as! String,
+                description: achievement[2] as! String,
+                count: achievement[3] as! Int,
+                imageUrl: URL(string: (achievement[0] as! String))!,
+                forumUrl: URL(string: (achievement[5] as! String))!,
+                presentationDate: Date(
+                    timeIntervalSince1970: achievement[4] as! TimeInterval
+                )
             )
         }
     }

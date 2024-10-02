@@ -164,8 +164,11 @@ public struct ProfileScreen: View {
                 .tag(PickerSelection.general)
             Text("Statistics", bundle: .module)
                 .tag(PickerSelection.statistics)
-            Text("Achievements", bundle: .module)
-                .tag(PickerSelection.achievements)
+            
+            if !store.user!.achievements.isEmpty {
+                Text("Achievements", bundle: .module)
+                    .tag(PickerSelection.achievements)
+            }
         }
         .pickerStyle(.segmented)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -373,12 +376,69 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func AchievementsSegment(user: User) -> some View {
-        Section {
-            Text("In Development")
-                .font(.footnote)
-                .foregroundStyle(Color.Labels.teritary)
-                .frame(maxWidth: .infinity)
+        ForEach(user.achievements) { achievement in
+            AchievementsSection(achievement: achievement)
         }
+    }
+    
+    @ViewBuilder
+    private func AchievementsSection(achievement: User.Achievement) -> some View {
+        Section {
+            HStack(spacing: 0) {
+                HStack {
+                    LazyImage(url: achievement.imageUrl) { state in
+                        Group {
+                            if let image = state.image {
+                                image.resizable().scaledToFill()
+                            } else {
+                                Color(.systemBackground)
+                            }
+                        }
+                        .skeleton(with: state.isLoading, shape: .circle)
+                    }
+                    .frame(width: 82, height: 68)
+                    .padding(.trailing, 12)
+                    .overlay {
+                        if achievement.count != 1 {
+                            Text("\(achievement.count)")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .padding(6)
+                                .background(tintColor)
+                                .clipShape(Circle())
+                                .position(x: 70, y: 60)
+                        }
+                    }
+                }
+                
+                VStack {
+                    Text(achievement.name)
+                        .font(.headline)
+                        .foregroundStyle(Color.Labels.secondary)
+                        .padding(.bottom, 4)
+                    
+                    if !achievement.description.isEmpty {
+                        Text(achievement.description)
+                            .font(.footnote)
+                            .foregroundStyle(Color.Labels.teritary)
+                            .padding(.bottom, 4)
+                    }
+                    
+                    Text(achievement.presentationDate.formatted())
+                        .font(.footnote)
+                        .foregroundStyle(Color.Labels.teritary)
+                        .padding(.bottom, 4)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(
+                Color.Background.teritary
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            )
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
     }
     
