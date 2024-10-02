@@ -84,6 +84,7 @@ public struct ArticleScreen: View {
                 }
                 .overlay(alignment: .top) {
                     Color.Background.primaryAlpha
+                        .background(.ultraThinMaterial)
                         .opacity(navBarOpacity)
                         .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
                         .ignoresSafeArea()
@@ -287,7 +288,6 @@ public struct ArticleScreen: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 7)
                     .background(Color.Background.teritary)
-                    .background(Color.Background.primary)
                     .clipShape(RoundedRectangle(cornerRadius: 18))
                     .overlay {
                         RoundedRectangle(cornerRadius: 18)
@@ -321,6 +321,7 @@ public struct ArticleScreen: View {
         .padding(.top, 8)
         .padding(.bottom, 6)
         .background(Color.Background.primaryAlpha)
+        .background(.ultraThinMaterial)
         .animation(.default, value: store.replyComment)
     }
     
