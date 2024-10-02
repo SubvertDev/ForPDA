@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -59,6 +59,10 @@
 		B8D351F5293CABB6008A84EA /* ForPDA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ForPDA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8DEB2212BAB81CC00AD97C6 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		B8AB63BA2AA49F6100F2CEFF /* Frameworks */ = {
@@ -123,6 +127,7 @@
 		B8D351F7293CABB6008A84EA /* App */ = {
 			isa = PBXGroup;
 			children = (
+				13C9F9FA2CADCDFF003280F3 /* Fonts */,
 				B8DEB2212BAB81CC00AD97C6 /* App.swift */,
 				B88BDA872BF6BC0200E17268 /* Assets.xcassets */,
 				B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */,
@@ -172,6 +177,9 @@
 			);
 			dependencies = (
 				B8AB63D42AA49F6100F2CEFF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				13C9F9FA2CADCDFF003280F3 /* Fonts */,
 			);
 			name = ForPDA;
 			packageProductDependencies = (
