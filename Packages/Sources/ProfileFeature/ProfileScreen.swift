@@ -391,48 +391,46 @@ public struct ProfileScreen: View {
                             if let image = state.image {
                                 image.resizable().scaledToFill()
                             } else {
-                                Color(.systemBackground)
+                                Color.Background.teritary
                             }
                         }
                         .skeleton(with: state.isLoading, shape: .circle)
                     }
-                    .frame(width: 82, height: 68)
+                    .frame(width: UIScreen.main.bounds.width / 5,
+                           height: UIScreen.main.bounds.width / 5)
                     .padding(.trailing, 12)
-                    .overlay {
-                        if achievement.count != 1 {
+                    .overlay(alignment: .bottomTrailing) {
+                        if achievement.count > 1 {
                             Text("\(achievement.count)")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .padding(6)
                                 .background(tintColor)
                                 .clipShape(Circle())
-                                .position(x: 70, y: 60)
                         }
                     }
                 }
                 
-                VStack {
+                VStack(spacing: 8) {
                     Text(achievement.name)
                         .font(.headline)
                         .foregroundStyle(Color.Labels.secondary)
-                        .padding(.bottom, 4)
                     
                     if !achievement.description.isEmpty {
                         Text(achievement.description)
                             .font(.footnote)
                             .foregroundStyle(Color.Labels.teritary)
-                            .padding(.bottom, 4)
                     }
                     
-                    Text(achievement.presentationDate.formatted())
+                    Text(achievement.presentationDate.formatted(date: .numeric, time: .omitted))
                         .font(.footnote)
                         .foregroundStyle(Color.Labels.teritary)
-                        .padding(.bottom, 4)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(10)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
             .background(
                 Color.Background.teritary
                     .clipShape(RoundedRectangle(cornerRadius: 10))

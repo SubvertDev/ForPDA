@@ -275,6 +275,15 @@ public extension User {
         qmsMessages: nil,
         forumDevices: nil,
         email: "some@email.com",
-        achievements: []
+        achievements: [
+            .init(
+                name: "Призер Аллеи Славы",
+                description: "Описание награды",
+                count: 1,
+                imageUrl: URL(string: "https://4pda.to/static/img/member-rewards/alley.png")!,
+                forumUrl: URL(string: "/")!,
+                presentationDate: .now
+            )
+        ]
     )
 }
