@@ -63,7 +63,7 @@ public struct ProfileParser {
                     gender: User.Gender(rawValue: array[12] as! Int),
                     userTime: (array[13] as! Int),
                     city: (array[14] as? String).flatMap { ($0.isEmpty || $0 == "Нет") ? nil : $0 },
-                    devDBdevices: nil,
+                    devDBdevices: parseUserDevDBDevices(array[15] as! [[Any]]),
                     karma: ((array[16] as! Double) / 100).round(to: 2),
                     posts: array[17] as! Int,
                     comments: array[18] as! Int,
@@ -79,6 +79,16 @@ public struct ProfileParser {
             }
         } else {
             throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
+    private static func parseUserDevDBDevices(_ array: [[Any]]) -> [User.Device] {
+        return array.map { device in
+            return User.Device(
+                id: device[0] as! String,
+                name: device[1] as! String,
+                main: (device[2] as! Int == 1) ? true : false
+            )
         }
     }
 }
