@@ -31,6 +31,7 @@ public struct User: Sendable, Hashable, Codable {
     public let qmsMessages: Int?
     public let forumDevices: [Device]?
     public let email: String?
+    public let achievements: [Achievement]
     
     public var userTimeFormatted: String? {
         if let userTime {
@@ -70,7 +71,8 @@ public struct User: Sendable, Hashable, Codable {
         replies: Int,
         qmsMessages: Int?,
         forumDevices: [Device]?,
-        email: String?
+        email: String?,
+        achievements: [Achievement]
     ) {
         self.id = id
         self.nickname = nickname
@@ -95,6 +97,7 @@ public struct User: Sendable, Hashable, Codable {
         self.qmsMessages = qmsMessages
         self.forumDevices = forumDevices
         self.email = email
+        self.achievements = achievements
     }
 }
 
@@ -213,6 +216,36 @@ public extension User {
             self.main = main
         }
     }
+    
+    // MARK: Achievements
+    
+    struct Achievement: Codable, Hashable, Sendable, Identifiable {
+        public let id: Int
+        public let name: String
+        public let description: String
+        public let count: Int
+        public let imageUrl: URL
+        public let forumUrl: URL
+        public let presentationDate: Date
+        
+        public init(
+            name: String,
+            description: String,
+            count: Int,
+            imageUrl: URL,
+            forumUrl: URL,
+            presentationDate: Date
+        ) {
+            self.name = name
+            self.description = description
+            self.count = count
+            self.imageUrl = imageUrl
+            self.forumUrl = forumUrl
+            self.presentationDate = presentationDate
+            
+            self.id = name.hashValue
+        }
+    }
 }
 
 // MARK: - Mock
@@ -241,6 +274,7 @@ public extension User {
         replies: 82,
         qmsMessages: nil,
         forumDevices: nil,
-        email: "some@email.com"
+        email: "some@email.com",
+        achievements: []
     )
 }
