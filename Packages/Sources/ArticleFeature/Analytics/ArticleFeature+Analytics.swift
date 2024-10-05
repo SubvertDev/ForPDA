@@ -20,7 +20,7 @@ extension ArticleFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, ._commentResponse, ._pollVoteResponse, ._stopRefreshingIfFinished:
+                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, ._commentResponse, ._pollVoteResponse, ._stopRefreshingIfFinished, ._timerTicked:
                     break
                     
                 case .pollVoteButtonTapped:

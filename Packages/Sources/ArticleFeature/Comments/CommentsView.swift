@@ -116,6 +116,9 @@ struct CommentView: View {
             }
             .background(Color.Background.primary)
             .alert($store.scope(state: \.alert, action: \.alert))
+            .task {
+                await store.send(.onTask).finish()
+            }
         }
     }
     
@@ -151,6 +154,7 @@ struct CommentView: View {
             Group {
                 Text(String("·"))
                 Text(format(date: store.comment.date), bundle: .module)
+                    .id(store.dateUpdate)
             }
             .font(.footnote)
             .foregroundStyle(Color.Labels.teritary)

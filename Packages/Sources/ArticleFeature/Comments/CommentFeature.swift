@@ -38,6 +38,8 @@ public struct CommentFeature: Sendable {
             return userSession != nil
         }
         
+        var dateUpdate = false
+        
         init(
             alert: AlertState<Never>? = nil,
             comment: Comment,
@@ -56,6 +58,7 @@ public struct CommentFeature: Sendable {
     // MARK: - Action
     
     public enum Action {
+        case onTask
         case alert(PresentationAction<Never>)
         case profileTapped(userId: Int)
         case hiddenLabelTapped
@@ -65,18 +68,31 @@ public struct CommentFeature: Sendable {
         case likeButtonTapped
         
         case _likeResult(Bool)
+        case _timerTicked
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.hapticClient) private var hapticClient
+    @Dependency(\.continuousClock) private var clock
     
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .onTask:
+                return .run { send in
+                    for await _ in self.clock.timer(interval: .seconds(60)) {
+                        await send(._timerTicked)
+                    }
+                }
+                
+            case ._timerTicked:
+                state.dateUpdate.toggle()
+                return .none
+                
             case .alert:
                 return .none
                 
