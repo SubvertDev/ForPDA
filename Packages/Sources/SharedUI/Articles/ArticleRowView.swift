@@ -216,6 +216,7 @@ public struct ArticleRowView: View {
                 .padding(.horizontal, isShort ? 8 : 16) // Padding for tap area
                 .padding(.vertical, isShort ? 11 : 22)
         }
+        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 19, height: 22)
     }
 }
