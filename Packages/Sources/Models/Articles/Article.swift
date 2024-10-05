@@ -26,6 +26,12 @@ public struct Article: Sendable, Hashable, Codable {
     public var canComment: Bool {
         return flag & 16 != 0
     }
+    public var isExpired: Bool {
+        if let expiryDate = Calendar.current.date(byAdding: .day, value: -7, to: date) {
+            return date >= expiryDate
+        }
+        return true
+    }
     
     public init(
         id: Int,

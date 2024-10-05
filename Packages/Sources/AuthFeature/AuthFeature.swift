@@ -14,8 +14,8 @@ import PersistenceKeys
 import Models
 
 public enum AuthOpenReason: String, Sendable {
-    case like
-    case comment
+    case commentAction
+    case sendComment
     case profile
 }
 

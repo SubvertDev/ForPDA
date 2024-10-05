@@ -80,6 +80,10 @@ public struct AppFeature: Sendable {
             }
         }
         
+        public var isAuthorized: Bool {
+            return userSession != nil
+        }
+        
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
@@ -182,10 +186,10 @@ public struct AppFeature: Sendable {
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
                     if tab == .articlesList, state.articlesPath.isEmpty {
-                        state.articlesList.scrollToTop.toggle()
+                        state.articlesList.scrollToTop.toggle() // TODO: Not working anymore
                     }
                 } else {
-                    if tab == .profile && state.userSession == nil {
+                    if tab == .profile && !state.isAuthorized {
                         state.auth = AuthFeature.State(openReason: .profile)
                         // Opening tab only after auth via delegate action
                     } else {
@@ -321,9 +325,9 @@ public struct AppFeature: Sendable {
                 case let .profileTapped(userId: userId):
                     state.articlesPath.append(.profile(ProfileFeature.State(userId: userId)))
                     
-                case .likeButtonTapped:
-                    if state.userSession == nil {
-                        state.auth = AuthFeature.State(openReason: .like)
+                case .likeButtonTapped, .hideButtonTapped, .reportButtonTapped, .replyButtonTapped:
+                    if !state.isAuthorized {
+                        state.auth = AuthFeature.State(openReason: .commentAction)
                     }
                     
                 default:
@@ -332,8 +336,8 @@ public struct AppFeature: Sendable {
                 return .none
                 
             case .articlesPath(.element(id: _, action: .article(.sendCommentButtonTapped))):
-                if state.userSession == nil {
-                    state.auth = AuthFeature.State(openReason: .comment)
+                if !state.isAuthorized {
+                    state.auth = AuthFeature.State(openReason: .sendComment)
                 }
                 return .none
                 

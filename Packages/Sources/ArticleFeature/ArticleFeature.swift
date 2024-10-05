@@ -36,6 +36,7 @@ public struct ArticleFeature: Sendable {
     public struct State: Equatable {
         public enum Field: Sendable { case comment }
 
+        @Shared(.userSession) public var userSession: UserSession?
         @Presents public var destination: Destination.State?
         public var articlePreview: ArticlePreview
         public var article: Article?
@@ -53,9 +54,11 @@ public struct ArticleFeature: Sendable {
         public var canComment: Bool {
             return article?.canComment ?? false
         }
-        
         public var isArticleExpired: Bool {
-            return (article?.flag ?? 4) & 16 == 0
+            return article?.isExpired ?? false
+        }
+        public var isAuthorized: Bool {
+            return userSession != nil
         }
         
         var refreshRequestFinished = false
@@ -149,6 +152,7 @@ public struct ArticleFeature: Sendable {
         Reduce { state, action in
             switch action {
             case let .comments(.element(id, action)):
+                guard state.isAuthorized else { return .none }
                 if case .replyButtonTapped = action {
                     if let comment = state.comments[id: id]?.comment {
                         state.commentText = "\(comment.authorName),\n"
@@ -198,7 +202,11 @@ public struct ArticleFeature: Sendable {
                 guard state.article == nil else { return .none }
                 return .merge([
                     loadingIndicator(),
-                    getArticle(id: state.articlePreview.id)
+                    getArticle(id: state.articlePreview.id),
+                    .publisher {
+                        state.$userSession.publisher
+                            .map { _ in Action.onRefresh }
+                    }
                 ])
                 
             case .onRefresh:
@@ -409,7 +417,7 @@ public struct ArticleFeature: Sendable {
 
 // MARK: - Alert Extension
 
-public extension AlertState where Action == ArticleFeature.Destination.Alert {
+extension AlertState where Action == ArticleFeature.Destination.Alert {
     nonisolated(unsafe) static let error = Self {
         TextState("Whoops!", bundle: .module)
     } actions: {

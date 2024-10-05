@@ -51,7 +51,7 @@ public struct ArticleScreen: View {
             ArticleScrollView()
                 .safeAreaInset(edge: .bottom) {
                     Group {
-                        if store.canComment {
+                        if store.isAuthorized && store.canComment {
                             Keyboard()
                                 .transition(.push(from: .bottom))
                         }

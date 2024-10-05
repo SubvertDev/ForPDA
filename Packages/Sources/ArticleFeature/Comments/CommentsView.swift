@@ -143,7 +143,6 @@ struct CommentView: View {
                     .font(.footnote)
                     .bold()
                     .foregroundStyle(Color.Labels.teritary)
-                    .bold()
             }
             .onTapGesture {
                 store.send(.profileTapped(userId: store.comment.authorId))
@@ -176,18 +175,14 @@ struct CommentView: View {
             
             MenuButton()
             
-            if !store.isArticleExpired {
-                ActionButton(symbol: .arrowTurnUpLeft) {
-                    store.send(.replyButtonTapped)
-                }
-                
-                LikeButton()
-                
-                Text(String(store.comment.likesAmount))
-                    .font(.subheadline)
-                    .foregroundStyle(Color.Labels.teritary)
-                    .padding(.trailing, 6)
-            }
+            ReplyButton()
+            
+            LikeButton()
+            
+            Text(String(store.comment.likesAmount))
+                .font(.subheadline)
+                .foregroundStyle(Color.Labels.teritary)
+                .padding(.trailing, 6)
         }
     }
     
@@ -217,14 +212,11 @@ struct CommentView: View {
     // MARK: - Action Button
     
     @ViewBuilder
-    private func ActionButton(
-        symbol: SFSymbol,
-        action: @escaping () -> Void
-    ) -> some View {
+    private func ReplyButton() -> some View {
         Button {
-            action()
+            store.send(.replyButtonTapped)
         } label: {
-            Image(systemSymbol: symbol)
+            Image(systemSymbol: .arrowTurnUpLeft)
                 .font(.body)
                 .foregroundStyle(Color.Labels.teritary)
         }

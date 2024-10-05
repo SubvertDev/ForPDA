@@ -34,6 +34,10 @@ public struct CommentFeature: Sendable {
         public let isArticleExpired: Bool
         public var isLiked: Bool
         
+        public var isAuthorized: Bool {
+            return userSession != nil
+        }
+        
         init(
             alert: AlertState<Never>? = nil,
             comment: Comment,
@@ -84,10 +88,12 @@ public struct CommentFeature: Sendable {
                 return .none
                 
             case .reportButtonTapped:
+                guard state.isAuthorized else { return .none }
                 state.alert = .notImplemented
                 return .none
                 
             case .hideButtonTapped:
+                guard state.isAuthorized else { return .none }
                 state.comment.isHidden.toggle()
                 return .run { [articleId = state.articleId, commentId = state.comment.id] _ in
                     await hapticClient.play(.selection)
@@ -99,7 +105,7 @@ public struct CommentFeature: Sendable {
                 
             case .likeButtonTapped:
                 guard !state.isLiked else { return .none }
-                guard state.userSession != nil else { return .none }
+                guard state.isAuthorized else { return .none }
                 state.comment.likesAmount += 1
                 state.isLiked = true
                 return .run { [articleId = state.articleId, commentId = state.comment.id] send in
@@ -111,7 +117,7 @@ public struct CommentFeature: Sendable {
                 if success {
                     // TODO: Show toast
                 } else {
-//                    state.comment.likesAmount -= 1
+                    // state.comment.likesAmount -= 1
                 }
                 return .none
             }
