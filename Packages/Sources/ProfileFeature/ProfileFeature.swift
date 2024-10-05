@@ -90,7 +90,9 @@ public struct ProfileFeature: Sendable {
             case .logoutButtonTapped:
                 state.userSession = nil
                 state.isLoading = true
-                return .none
+                return .run { send in
+                    try await apiClient.logout()
+                }
                 
             case ._userResponse(.success(let user)):
                 state.isLoading = false

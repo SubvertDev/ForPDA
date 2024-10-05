@@ -25,6 +25,7 @@ public struct APIClient: Sendable {
     public var voteInPoll: @Sendable (_ pollId: Int, _ selections: [Int]) async throws -> Bool
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
+    public var logout: @Sendable () async throws -> Void
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
 }
 
@@ -113,6 +114,10 @@ extension APIClient: DependencyKey {
                 let authResponse = try await parsingClient.parseLoginResponse(rawString: rawString)
                 return authResponse
             },
+            logout: {
+                let request = AuthRequest(memberId: 0, token: "", hidden: false)
+                _ = try api.get(AuthCommand.auth(data: request))
+            },
             getUser: { userId in
                 AsyncThrowingStream { continuation in
                     Task {
@@ -166,6 +171,9 @@ extension APIClient: DependencyKey {
             },
             authorize: { _, _, _, _ in
                 return .success(userId: -1, token: "preview_token")
+            },
+            logout: {
+                
             },
             getUser: { _ in
                 AsyncThrowingStream { $0.yield(.mock) }
