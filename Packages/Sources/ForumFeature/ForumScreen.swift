@@ -2,13 +2,14 @@
 //  ForumScreen.swift
 //  ForPDA
 //
-//  Created by Ilia Lubianoi on 02.09.2024.
+//  Created by Xialtal on 25.10.24.
 //
 
 import SwiftUI
 import ComposableArchitecture
 import SFSafeSymbols
 import SharedUI
+import Models
 
 public struct ForumScreen: View {
     
@@ -25,26 +26,43 @@ public struct ForumScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                VStack(spacing: 0) {
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: 12))
-                        .padding(.bottom, 100)
-                    
-                    ForumIsInDevelopment()
-                    
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: -20))
-                        .padding(.top, 80)
+                if let forum = store.forum {
+                    List {
+                        if !forum.subforums.isEmpty {
+                            SubforumsSection(subforums: forum.subforums)
+                        }
+                        
+                        if !forum.announcements.isEmpty {
+                            AnnouncmentsSection(announcements: forum.announcements)
+                        }
+
+                        if !store.topicsPinned.isEmpty {
+                            TopicsSection(topics: store.topicsPinned, pinned: true)
+                        }
+                        
+                        TopicsSection(topics: store.topics, pinned: false)
+                    }
+                    .scrollContentBackground(.hidden)
+                } else {
+                    ProgressView().id(UUID())
                 }
             }
-            .navigationTitle(Text("Forum", bundle: .module))
+            .navigationTitle(Text(store.forumName))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        store.send(.settingsButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .gearshape)
+                    HStack {
+                        Button {
+                            // TODO: forum info
+                        } label: {
+                            Image(systemSymbol: .infoCircle)
+                        }
+                        
+                        Button {
+                            store.send(.settingsButtonTapped)
+                        } label: {
+                            Image(systemSymbol: .gearshape)
+                        }
                     }
                 }
             }
@@ -54,46 +72,123 @@ public struct ForumScreen: View {
         }
     }
     
-    // MARK: - Empty Screen
+    // MARK: - Topics
     
     @ViewBuilder
-    private func ForumIsInDevelopment() -> some View {
-        VStack(spacing: 0) {
-            Image(systemSymbol: .bubbleLeftAndBubbleRight)
-                .font(.title)
-                .foregroundStyle(tintColor)
-                .frame(width: 48, height: 48)
-                .padding(.bottom, 8)
-            
-            Text("Forum is coming soon", bundle: .module)
-                .font(.title3)
-                .bold()
-                .foregroundColor(Color.Labels.primary)
-                .padding(.bottom, 6)
-            
-            Text("While it is in development, you can stay tuned for updates in our telegram chat", bundle: .module)
-                .font(.footnote)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.Labels.teritary)
-                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+    private func TopicsSection(topics: [TopicInfo], pinned: Bool) -> some View {
+        Section {
+            ForEach(topics) { topic in
+                HStack(spacing: 25) {
+                    // TODO: Implement unread dot support.
+                    Row(title: topic.name, unread: false, action: {
+                        // TODO: topic page handler
+                    })
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                .buttonStyle(.plain)
+                .frame(height: 60)
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        } header: {
+            Header(title: pinned ? LocalizedStringKey("Pinned topics") : LocalizedStringKey("Topics"))
         }
+        .listRowBackground(Color.Background.teritary)
     }
     
-    // MARK: - Coming Soon Tape
+    // MARK: - Subforums section
     
     @ViewBuilder
-    private func ComingSoonTape() -> some View {
-        HStack(spacing: 8) {
-            ForEach(0..<6, id: \.self) { index in
-                Text("COMING SOON", bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(Color.Labels.primaryInvariably)
-                    .fixedSize(horizontal: true, vertical: false)
-                    .lineLimit(1)
+    private func SubforumsSection(subforums: [ForumInfo]) -> some View {
+        Section {
+            ForEach(subforums) { forum in
+                HStack(spacing: 25) {
+                    Row(title: forum.name, unread: forum.isUnread, action: {
+                        store.send(.subforumTapped(id: forum.id, name: forum.name))
+                    })
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                .buttonStyle(.plain)
+                .frame(height: 60)
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        } header: {
+            Header(title: LocalizedStringKey("Subforums"))
+        }
+        .listRowBackground(Color.Background.teritary)
+    }
+    
+    // MARK: - Announcements section
+    
+    @ViewBuilder
+    private func AnnouncmentsSection(announcements: [Announcement]) -> some View {
+        Section {
+            ForEach(announcements) { announcement in
+                HStack(spacing: 25) {
+                    Row(title: announcement.name, action: {
+                        // TODO: announcement page handler
+                    })
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                .buttonStyle(.plain)
+                .frame(height: 60)
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        } header: {
+            Header(title: LocalizedStringKey("Announcements"))
+        }
+        .listRowBackground(Color.Background.teritary)
+    }
+    
+    // MARK: - Row
+    
+    @ViewBuilder
+    private func Row(title: String, unread: Bool = false, action: @escaping () -> Void = {}) -> some View {
+        HStack(spacing: 0) { // Hacky HStack to enable tap animations
+            Button {
+                action()
+            } label: {
+                HStack(spacing: 0) {
+                    Text(title)
+                        .font(.body)
+                        .foregroundStyle(Color.Labels.primary)
+                    
+                    Spacer(minLength: 8)
+                    
+                    if unread {
+                        Circle()
+                            .font(.title2)
+                            .foregroundStyle(tintColor)
+                            .frame(width: 8)
+                            .padding(.trailing, 12)
+                    }
+                }
             }
         }
-        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-        .background(tintColor)
+        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        .buttonStyle(.plain)
+        .frame(height: 60)
+    }
+    
+    // MARK: - Header
+    
+    @ViewBuilder
+    private func Header(title: String) -> some View {
+        Text(title)
+            .font(.subheadline)
+            .foregroundStyle(Color.Labels.teritary)
+            .textCase(nil)
+            .offset(x: 0)
+            .padding(.bottom, 4)
+    }
+    
+    @ViewBuilder
+    private func Header(title: LocalizedStringKey) -> some View {
+        Text(title, bundle: .module)
+            .font(.subheadline)
+            .foregroundStyle(Color.Labels.teritary)
+            .textCase(nil)
+            .offset(x: 0)
+            .padding(.bottom, 4)
     }
 }
 
@@ -103,7 +198,7 @@ public struct ForumScreen: View {
     NavigationStack {
         ForumScreen(
             store: Store(
-                initialState: ForumFeature.State()
+                initialState: ForumFeature.State(forum: .mock)
             ) {
                 ForumFeature()
             }

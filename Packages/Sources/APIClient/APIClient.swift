@@ -27,6 +27,8 @@ public struct APIClient: Sendable {
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
     public var logout: @Sendable () async throws -> Void
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
+    public var getForumsList: @Sendable () async throws -> [ForumInfo]
+    public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
 }
 
 extension APIClient: DependencyKey {
@@ -139,6 +141,18 @@ extension APIClient: DependencyKey {
                         }
                     }
                 }
+            },
+            getForumsList: {
+                let rawString = try api.get(ForumCommand.list)
+                @Dependency(\.parsingClient) var parsingClient
+                let response = try await parsingClient.parseForumsList(rawString: rawString)
+                return response
+            },
+            getForum: { id, page, perPage in
+                let rawString = try api.get(ForumCommand.view(id: id, page: page, itemsPerPage: perPage))
+                @Dependency(\.parsingClient) var parsingClient
+                let response = try await parsingClient.parseForum(rawString: rawString)
+                return response
             }
         )
     }
@@ -177,6 +191,12 @@ extension APIClient: DependencyKey {
             },
             getUser: { _ in
                 AsyncThrowingStream { $0.yield(.mock) }
+            },
+            getForumsList: {
+                return [.mockCategory, .mock]
+            },
+            getForum: { _, _, _ in
+                return .mock
             }
         )
     }

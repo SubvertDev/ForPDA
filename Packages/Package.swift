@@ -13,6 +13,7 @@ let package = Package(
         .library(name: "ArticlesListFeature", targets: ["ArticlesListFeature"]),
         .library(name: "ArticleFeature", targets: ["ArticleFeature"]),
         .library(name: "BookmarksFeature", targets: ["BookmarksFeature"]),
+        .library(name: "ForumsListFeature", targets: ["ForumsListFeature"]),
         .library(name: "ForumFeature", targets: ["ForumFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
@@ -60,6 +61,7 @@ let package = Package(
                 "ArticlesListFeature",
                 "ArticleFeature",
                 "BookmarksFeature",
+                "ForumsListFeature",
                 "ForumFeature",
                 "MenuFeature",
                 "AuthFeature",
@@ -127,6 +129,19 @@ let package = Package(
         ),
         .target(
             name: "ForumFeature",
+            dependencies: [
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "CacheClient",
+                "AnalyticsClient",
+                "ParsingClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "ForumsListFeature",
             dependencies: [
                 "Models",
                 "SharedUI",

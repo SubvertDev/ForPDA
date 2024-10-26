@@ -5,7 +5,7 @@
 //  Created by Xialtal on 7.09.24.
 //
 
-public struct Announcement: Sendable, Hashable, Decodable {
+public struct Announcement: Sendable, Hashable, Codable, Identifiable {
     public let id: Int
     public let name: String
     

@@ -10,6 +10,7 @@ import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
 import BookmarksFeature
+import ForumsListFeature
 import ForumFeature
 import MenuFeature
 import AuthFeature
@@ -39,6 +40,7 @@ public struct AppFeature: Sendable {
     
     @Reducer(state: .equatable)
     public enum ForumPath {
+        case forum(ForumFeature)
         case settings(SettingsFeature)
     }
     
@@ -60,6 +62,7 @@ public struct AppFeature: Sendable {
         
         public var articlesList: ArticlesListFeature.State
         public var bookmarks: BookmarksFeature.State
+        public var forumsList: ForumsListFeature.State
         public var forum: ForumFeature.State
         public var profile: ProfileFeature.State
         
@@ -92,6 +95,7 @@ public struct AppFeature: Sendable {
             menuPath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
+            forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
             profile: ProfileFeature.State = ProfileFeature.State(),
             auth: AuthFeature.State? = nil,
@@ -110,6 +114,7 @@ public struct AppFeature: Sendable {
             
             self.articlesList = articlesList
             self.bookmarks = bookmarks
+            self.forumsList = forumsList
             self.forum = forum
             self.profile = profile
             
@@ -135,6 +140,7 @@ public struct AppFeature: Sendable {
         
         case articlesList(ArticlesListFeature.Action)
         case bookmarks(BookmarksFeature.Action)
+        case forumsList(ForumsListFeature.Action)
         case forum(ForumFeature.Action)
         case profile(ProfileFeature.Action)
         
@@ -165,6 +171,10 @@ public struct AppFeature: Sendable {
         
         Scope(state: \.bookmarks, action: \.bookmarks) {
             BookmarksFeature()
+        }
+        
+        Scope(state: \.forumsList, action: \.forumsList) {
+            ForumsListFeature()
         }
         
         Scope(state: \.forum, action: \.forum) {
@@ -253,7 +263,7 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .bookmarks, .forum, .profile:
+            case .articlesList, .bookmarks, .forumsList, .forum, .profile:
                 return .none
                 
             case .articlesPath, .bookmarksPath, .forumPath, .profilePath:
@@ -389,9 +399,24 @@ public struct AppFeature: Sendable {
         
         Reduce { state, action in
             switch action {
-            case .forum(.settingsButtonTapped):
+            case .forumsList(.settingsButtonTapped),
+                 .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
                 state.isShowingTabBar = false
                 state.forumPath.append(.settings(SettingsFeature.State()))
+                return .none
+                
+            case .forumsList(.forumTapped(let forumId, let forumName)):
+                state.forumPath.append(.forum(ForumFeature.State(
+                    forumId: forumId,
+                    forumName: forumName
+                )))
+                return .none
+                
+            case let .forumPath(.element(id: _, action: .forum(.subforumTapped(forumId, forumName)))):
+                state.forumPath.append(.forum(ForumFeature.State(
+                    forumId: forumId,
+                    forumName: forumName
+                )))
                 return .none
                 
             default:

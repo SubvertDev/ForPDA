@@ -1,22 +1,43 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "COMING SOON" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "COMING SOON"
-          }
-        }
-      }
-    },
-    "Forum" : {
+    "Announcements" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Форум"
+            "value" : "Объявления"
+          }
+        }
+      }
+    },
+    "Pinned topics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрепленные темы"
+          }
+        }
+      }
+    },
+    "Subforums" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подфорумы"
+          }
+        }
+      }
+    },
+    "Topics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Темы"
           }
         }
       }
