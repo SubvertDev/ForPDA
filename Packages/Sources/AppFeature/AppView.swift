@@ -24,7 +24,7 @@ public struct AppView: View {
     
     public enum Tab: Int, CaseIterable {
         case articlesList = 0
-        case bookmarks
+//        case bookmarks
         case forum
         case profile
         
@@ -32,8 +32,8 @@ public struct AppView: View {
             switch self {
             case .articlesList:
                 return "Feed"
-            case .bookmarks:
-                return "Bookmarks"
+//            case .bookmarks:
+//                return "Bookmarks"
             case .forum:
                 return "Forum"
             case .profile:
@@ -45,8 +45,8 @@ public struct AppView: View {
             switch self {
             case .articlesList:
                 return .docTextImage
-            case .bookmarks:
-                return .bookmark
+//            case .bookmarks:
+//                return .bookmark
             case .forum:
                 return .bubbleLeftAndBubbleRight
             case .profile:
@@ -73,7 +73,7 @@ public struct AppView: View {
             ZStack(alignment: .bottom) {
                 TabView(selection: $store.selectedTab) {
                     ArticlesListTab()
-                    BookmarksTab()
+//                    BookmarksTab()
                     ForumTab()
                     ProfileTab()
                 }
@@ -133,19 +133,19 @@ public struct AppView: View {
     
     // MARK: - Bookmarks Tab
     
-    @ViewBuilder
-    private func BookmarksTab() -> some View {
-        NavigationStack(path: $store.scope(state: \.bookmarksPath, action: \.bookmarksPath)) {
-            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-        } destination: { store in
-            switch store.case {
-            case let .settings(store):
-                SettingsScreen(store: store)
-            }
-        }
-        .tag(Tab.bookmarks)
-        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
-    }
+//    @ViewBuilder
+//    private func BookmarksTab() -> some View {
+//        NavigationStack(path: $store.scope(state: \.bookmarksPath, action: \.bookmarksPath)) {
+//            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
+//        } destination: { store in
+//            switch store.case {
+//            case let .settings(store):
+//                SettingsScreen(store: store)
+//            }
+//        }
+//        .tag(Tab.bookmarks)
+//        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
+//    }
     
     // MARK: - Forum Tab
     

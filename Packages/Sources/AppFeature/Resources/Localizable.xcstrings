@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Bookmarks" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
