@@ -125,6 +125,8 @@ public struct ArticleScreen: View {
                 
                 if store.isLoading {
                     ArticleLoader()
+                        .padding(.top, 32)
+                        
                 } else if let elements = store.elements {
                     ArticleView(elements: elements)
                         .background(Color.Background.primary)
@@ -460,6 +462,20 @@ extension UIApplication {
                 )
             ) {
                 ArticleFeature()
+            }
+        )
+    }
+}
+
+#Preview("Infinite loading") {
+    NavigationStack {
+        ArticleScreen(
+            store: Store(
+                initialState: ArticleFeature.State(articlePreview: .mock)
+            ) {
+                ArticleFeature()
+            } withDependencies: {
+                $0.apiClient.getArticle = { @Sendable _, _ in return try await Task.never() }
             }
         )
     }
