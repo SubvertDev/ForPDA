@@ -303,7 +303,7 @@ for target in package.targets where target.type != .binary {
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
     swiftSettings.append(
         .unsafeFlags(["-Xfrontend",
-                      "-warn-long-function-bodies=1000",
+                      "-warn-long-function-bodies=500",
                       "-Xfrontend",
                       "-warn-long-expression-type-checking=100"])
     )
