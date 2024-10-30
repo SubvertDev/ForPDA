@@ -9,12 +9,6 @@ import Foundation
 
 public struct ArticlePoll: Sendable, Hashable, Codable {
     
-    public enum PollType: Int, Sendable, Hashable, Codable {
-        case oneChoice = 1
-        case multipleChoice = 3
-        case voted = 5
-    }
-    
     public struct Option: Sendable, Hashable, Codable {
         public let id: Int
         public let text: String
@@ -33,20 +27,28 @@ public struct ArticlePoll: Sendable, Hashable, Codable {
     
     public let id: Int
     public let title: String
-    public let type: PollType
+    private let flag: Int
     public let totalVotes: Int
     public let options: [Option]
+    
+    public var singleChoice: Bool {
+        return flag & 1 != 0
+    }
+    
+    public var isVoted: Bool {
+        return flag & 4 != 0
+    }
     
     public init(
         id: Int,
         title: String,
-        type: PollType,
+        flag: Int,
         totalVotes: Int,
         options: [Option]
     ) {
         self.id = id
         self.title = title
-        self.type = type
+        self.flag = flag
         self.totalVotes = totalVotes
         self.options = options
     }

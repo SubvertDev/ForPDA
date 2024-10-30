@@ -21,6 +21,10 @@ struct ArticleElementView: View {
     @State private var pollSelection: ArticlePoll.Option?
     @State private var pollSelections: Set<ArticlePoll.Option> = .init()
     
+    private var hasSelection: Bool {
+        return pollSelection != nil || !pollSelections.isEmpty
+    }
+    
     // TODO: Is it good to send store here?
     let store: StoreOf<ArticleFeature>
     let element: ArticleElement
@@ -273,21 +277,17 @@ struct ArticleElementView: View {
                         HStack(spacing: 11) {
                             Button {
                                 withAnimation {
-                                    switch poll.type {
-                                    case .oneChoice:
+                                    if poll.singleChoice {
                                         pollSelection = (option == pollSelection) ? nil : option
-                                    case .multipleChoice:
+                                    } else {
                                         if !pollSelections.insert(option).inserted {
                                             pollSelections.remove(option)
                                         }
-                                    case .voted:
-                                        break
                                     }
                                 }
                             } label: {
                                 HStack(alignment: .top, spacing: 11) {
-                                    switch poll.type {
-                                    case .oneChoice:
+                                    if poll.singleChoice {
                                         if option == pollSelection {
                                             ZStack {
                                                 Circle()
@@ -305,7 +305,7 @@ struct ArticleElementView: View {
                                                 .frame(width: 22, height: 22)
                                         }
                                         
-                                    case .multipleChoice:
+                                    } else {
                                         if pollSelections.contains(option) {
                                             ZStack {
                                                 Circle()
@@ -323,9 +323,6 @@ struct ArticleElementView: View {
                                                 .strokeBorder(Color.Labels.quintuple)
                                                 .frame(width: 22, height: 22)
                                         }
-                                        
-                                    case .voted:
-                                        EmptyView()
                                     }
                                     
                                     Text(option.text)
@@ -343,18 +340,14 @@ struct ArticleElementView: View {
             if !store.isShowingVoteResults {
                 HStack {
                     Button {
-                        switch poll.type {
-                        case .oneChoice:
+                        if poll.singleChoice {
                             if let pollSelection {
                                 store.send(.pollVoteButtonTapped(poll.id, [pollSelection.id]))
                             }
-                        case .multipleChoice:
+                        } else {
                             if !pollSelections.isEmpty {
                                 store.send(.pollVoteButtonTapped(poll.id, Array(pollSelections.map { $0.id })))
                             }
-                            
-                        case .voted:
-                            break
                         }
                     } label: {
                         Text("Vote", bundle: .module)
@@ -367,7 +360,7 @@ struct ArticleElementView: View {
                     
                     Spacer()
                 }
-                .disabled(voteButtonDisabled(poll: poll))
+                .disabled(voteButtonDisabled())
             } else {
                 Text("\(poll.totalVotes) people voted", bundle: .module)
                     .font(.caption)
@@ -385,38 +378,18 @@ struct ArticleElementView: View {
     }
     
     private func voteButtonForegroundColor(poll: ArticlePoll) -> Color {
-        switch poll.type {
-        case .oneChoice:
-            return (pollSelection == nil || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
-        case .multipleChoice:
-            return (pollSelections.isEmpty || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
-        default:
-            return Color.clear
-        }
+        return (!hasSelection || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
     }
     
     private func voteButtonBackgroundColor(poll: ArticlePoll) -> Color {
-        switch poll.type {
-        case .oneChoice:
-            return (pollSelection == nil || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
-        case .multipleChoice:
-            return (pollSelections.isEmpty || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
-        default:
-            return Color.clear
-        }
+        return (!hasSelection || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
     }
     
-    private func voteButtonDisabled(poll: ArticlePoll) -> Bool {
+    private func voteButtonDisabled() -> Bool {
         if store.isUploadingPollVote {
             return true
-        }
-        switch poll.type {
-        case .oneChoice:
-            return pollSelection == nil
-        case .multipleChoice:
-            return pollSelections.isEmpty
-        default:
-            return true
+        } else {
+            return !hasSelection
         }
     }
     
@@ -480,7 +453,7 @@ struct ArticleElementView: View {
                 poll: ArticlePoll(
                     id: 1,
                     title: "Test",
-                    type: .oneChoice,
+                    flag: 1,
                     totalVotes: 1000,
                     options: [
                         ArticlePoll.Option(id: 1, text: "Test 1", votes: 1),
