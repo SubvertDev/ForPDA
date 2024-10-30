@@ -49,8 +49,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
 
 public extension AppSettings {
     static let `default` = AppSettings(
-        articlesListRowType: .normal,
-        bookmarksListRowType: .normal,
+        articlesListRowType: .short,
+        bookmarksListRowType: .short,
         appColorScheme: .system,
         backgroundTheme: .blue,
         appTintColor: .primary
