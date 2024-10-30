@@ -41,17 +41,6 @@
         }
       }
     },
-    "Error adding comment" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ошибка при добавлении комментария"
-          }
-        }
-      }
-    },
     "No comment text" : {
       "localizations" : {
         "ru" : {
