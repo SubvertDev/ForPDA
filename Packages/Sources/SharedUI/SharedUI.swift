@@ -168,6 +168,13 @@ extension Color {
 }
 
 extension Color {
+    public init(dynamicTuple: (String, String)) {
+        self.init(UIColor { traitCollection in
+            let hex = traitCollection.userInterfaceStyle == .dark ? dynamicTuple.1 : dynamicTuple.0
+            return UIColor(Color(hex: hex))
+        })
+    }
+
     public init(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")

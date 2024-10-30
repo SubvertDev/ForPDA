@@ -160,26 +160,26 @@ public extension User {
             }
         }
         
-        public var hexColor: String {
+        public var hexColor: (String, String) {
             switch self {
-            case .nonActivated:     return "0000ff"
-            case .guest:            return "0000ff"
-            case .beginning:        return "008000"
-            case .admin:            return "ff0000"
-            case .banned:           return "a0a0a0"
-            case .active:           return "008000"
-            case .regular:          return "ff9900"
-            case .moderator:        return "0099ff"
-            case .supermoderator:   return "0000ff"
-            case .moderatorHelper:  return "0099ff"
-            case .faqMaker:         return "32cd32"
-            case .honorary:         return "800080"
-            case .developer:        return "bc33ff"
-            case .router:           return "000000"
-            case .buisnessman:      return "b100bf"
-            case .specproject:      return "9a60ff"
-            case .moderatorSchool:  return "0099ff"
-            case .curator:          return "008b8b"
+            case .nonActivated:     return ("0000ff", "0000ff")
+            case .guest:            return ("0000ff", "0000ff")
+            case .beginning:        return ("008000", "20a020")
+            case .admin:            return ("ff0000", "ff0000")
+            case .banned:           return ("a0a0a0", "808080")
+            case .active:           return ("008000", "20a020")
+            case .regular:          return ("ff9900", "ff9900")
+            case .moderator:        return ("0099ff", "0099ff")
+            case .supermoderator:   return ("0000ff", "0000ff")
+            case .moderatorHelper:  return ("0099ff", "0099ff")
+            case .faqMaker:         return ("32cd32", "32cd32")
+            case .honorary:         return ("800080", "a020a0")
+            case .developer:        return ("bc33ff", "bc33ff")
+            case .router:           return ("000000", "b0b0b0")
+            case .buisnessman:      return ("b100bf", "b100bf")
+            case .specproject:      return ("9a60ff", "9a60ff")
+            case .moderatorSchool:  return ("0099ff", "0099ff")
+            case .curator:          return ("008b8b", "ff4500")
             }
         }
     }

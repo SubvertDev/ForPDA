@@ -202,7 +202,7 @@ public struct ProfileScreen: View {
                         Text(user.group.title)
                             .font(.body)
                             .multilineTextAlignment(.center)
-                            .foregroundStyle(Color(hex: user.group.hexColor))
+                            .foregroundStyle(Color(dynamicTuple: user.group.hexColor))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(12)
