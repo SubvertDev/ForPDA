@@ -49,50 +49,7 @@ public struct ArticleScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ArticleScrollView()
-                .safeAreaInset(edge: .bottom) {
-                    Group {
-                        if store.isAuthorized && store.canComment {
-                            Keyboard()
-                                .transition(.push(from: .bottom))
-                        }
-                    }
-                    .animation(.default, value: store.canComment)
-                }
-                .onTapGesture {
-                    focus = nil
-                }
                 .bind($store.focus, to: $focus)
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarBackButtonHidden()
-                .toolbarBackground(.hidden, for: .navigationBar)
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
-                            store.send(.backButtonTapped)
-                        }
-                    }
-                    
-                    ToolbarItemGroup(placement: .topBarTrailing) {
-                        HStack(spacing: 8) {
-                            ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
-                                store.send(.bookmarkButtonTapped)
-                            }
-                            
-                            ArticleMenu(store: store, isDark: navBarFullyVisible)
-                        }
-                    }
-                }
-                .overlay(alignment: .top) {
-                    Color.Background.primaryAlpha
-                        .background(.ultraThinMaterial)
-                        .opacity(navBarOpacity)
-                        .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
-                        .ignoresSafeArea()
-                }
-                .overlay {
-                    RefreshIndicator()
-                }
-                .background(Color.Background.primary)
                 .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .sheet(item: $store.destination.share, id: \.self) { url in
                     // FIXME: Perceptible warning despite tracking closure
@@ -103,10 +60,49 @@ public struct ArticleScreen: View {
                         .presentationDetents([.medium])
                     }
                 }
-                .task {
-                    store.send(.onTask)
-                }
+                .safeAreaInset(edge: .bottom) { KeyboardView() }
+                .onTapGesture { focus = nil }
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden()
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbar { Toolbar() }
+                .overlay(alignment: .top) { ToolbarOverlay() }
+                .overlay { RefreshIndicator() }
+                .background(Color.Background.primary)
+                .task { store.send(.onTask) }
         }
+    }
+    
+    // MARK: - Toolbar
+    
+    @ToolbarContentBuilder
+    private func Toolbar() -> some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
+                store.send(.backButtonTapped)
+            }
+        }
+        
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            HStack(spacing: 8) {
+                ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
+                    store.send(.bookmarkButtonTapped)
+                }
+                
+                ArticleMenu(store: store, isDark: navBarFullyVisible)
+            }
+        }
+    }
+    
+    // MARK: - Toolbar Overlay
+    
+    @ViewBuilder
+    private func ToolbarOverlay() -> some View {
+        Color.Background.primaryAlpha
+            .background(.ultraThinMaterial)
+            .opacity(navBarOpacity)
+            .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
+            .ignoresSafeArea()
     }
     
     // MARK: - Scroll View
@@ -125,6 +121,8 @@ public struct ArticleScreen: View {
                 
                 if store.isLoading {
                     ArticleLoader()
+                        .padding(.top, 32)
+                        
                 } else if let elements = store.elements {
                     ArticleView(elements: elements)
                         .background(Color.Background.primary)
@@ -231,6 +229,19 @@ public struct ArticleScreen: View {
             
             CommentsView(store: store)
         }
+    }
+    
+    // MARK: - Keyboard View
+    
+    @ViewBuilder
+    private func KeyboardView() -> some View {
+        Group {
+            if store.isAuthorized && store.canComment {
+                Keyboard()
+                    .transition(.push(from: .bottom))
+            }
+        }
+        .animation(.default, value: store.canComment)
     }
     
     // MARK: - Keyboard
@@ -460,6 +471,20 @@ extension UIApplication {
                 )
             ) {
                 ArticleFeature()
+            }
+        )
+    }
+}
+
+#Preview("Infinite loading") {
+    NavigationStack {
+        ArticleScreen(
+            store: Store(
+                initialState: ArticleFeature.State(articlePreview: .mock)
+            ) {
+                ArticleFeature()
+            } withDependencies: {
+                $0.apiClient.getArticle = { @Sendable _, _ in return try await Task.never() }
             }
         )
     }

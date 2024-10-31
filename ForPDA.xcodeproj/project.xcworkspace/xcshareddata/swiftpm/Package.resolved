@@ -1,5 +1,5 @@
 {
-  "originHash" : "49cf416b74e4157aeae8a3a75302a1d31504a2f7aa1efd5181b712ca9b2e8e25",
+  "originHash" : "886c6016ffd8a63340d46b2113e4e027675a5829d8c7feed6f8f53d0be400dc2",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "5575af93efb776414f243e93d6af9f6258dc539a",
-        "version" : "8.36.0"
+        "revision" : "0b8ba88f5fd70062887d55f87a970c59b1ceebcf",
+        "version" : "8.39.0"
       }
     },
     {
@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "8013f1a72af8ccb2b1735d7aed831a8dc07c6fd0",
-        "version" : "1.15.0"
+        "revision" : "56149436a3c3dbf605a89a204aaa904de8ba4580",
+        "version" : "1.15.2"
       }
     },
     {
@@ -132,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "bb5059bde9022d69ac516803f4f227d8ac967f71",
-        "version" : "1.1.0"
+        "revision" : "6054df64b55186f08b6d0fd87152081b8ad8d613",
+        "version" : "1.2.0"
       }
     },
     {
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "e834b3760731160d7d448509ee6a1408c8582a6b",
-        "version" : "2.2.0"
+        "revision" : "16a27ab7ae0abfefbbcba73581b3e2380b47a579",
+        "version" : "2.2.2"
       }
     },
     {

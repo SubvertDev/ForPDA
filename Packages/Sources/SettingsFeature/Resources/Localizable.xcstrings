@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "\"\""
-          }
-        }
-      }
-    },
     "About app" : {
       "localizations" : {
         "ru" : {

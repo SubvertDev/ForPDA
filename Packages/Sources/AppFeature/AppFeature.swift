@@ -56,12 +56,12 @@ public struct AppFeature: Sendable {
         public var appDelegate: AppDelegateFeature.State
 
         public var articlesPath: StackState<ArticlesPath.State>
-        public var bookmarksPath: StackState<BookmarksPath.State>
+//        public var bookmarksPath: StackState<BookmarksPath.State>
         public var forumPath: StackState<ForumPath.State>
         public var profilePath: StackState<ProfilePath.State>
         
         public var articlesList: ArticlesListFeature.State
-        public var bookmarks: BookmarksFeature.State
+//        public var bookmarks: BookmarksFeature.State
         public var forumsList: ForumsListFeature.State
         public var forum: ForumFeature.State
         public var profile: ProfileFeature.State
@@ -90,11 +90,11 @@ public struct AppFeature: Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
-            bookmarksPath: StackState<BookmarksPath.State> = StackState(),
+//            bookmarksPath: StackState<BookmarksPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
             menuPath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
-            bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
+//            bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
             profile: ProfileFeature.State = ProfileFeature.State(),
@@ -108,12 +108,12 @@ public struct AppFeature: Sendable {
             self.appDelegate = appDelegate
 
             self.articlesPath = articlesPath
-            self.bookmarksPath = bookmarksPath
+//            self.bookmarksPath = bookmarksPath
             self.forumPath = forumPath
             self.profilePath = menuPath
             
             self.articlesList = articlesList
-            self.bookmarks = bookmarks
+//            self.bookmarks = bookmarks
             self.forumsList = forumsList
             self.forum = forum
             self.profile = profile
@@ -134,12 +134,12 @@ public struct AppFeature: Sendable {
         case appDelegate(AppDelegateFeature.Action)
 
         case articlesPath(StackActionOf<ArticlesPath>)
-        case bookmarksPath(StackActionOf<BookmarksPath>)
+//        case bookmarksPath(StackActionOf<BookmarksPath>)
         case forumPath(StackActionOf<ForumPath>)
         case profilePath(StackActionOf<ProfilePath>)
         
         case articlesList(ArticlesListFeature.Action)
-        case bookmarks(BookmarksFeature.Action)
+//        case bookmarks(BookmarksFeature.Action)
         case forumsList(ForumsListFeature.Action)
         case forum(ForumFeature.Action)
         case profile(ProfileFeature.Action)
@@ -169,9 +169,9 @@ public struct AppFeature: Sendable {
             ArticlesListFeature()
         }
         
-        Scope(state: \.bookmarks, action: \.bookmarks) {
-            BookmarksFeature()
-        }
+//        Scope(state: \.bookmarks, action: \.bookmarks) {
+//            BookmarksFeature()
+//        }
         
         Scope(state: \.forumsList, action: \.forumsList) {
             ForumsListFeature()
@@ -263,10 +263,10 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .bookmarks, .forumsList, .forum, .profile:
+            case .articlesList, .forumsList, .forum, .profile:
                 return .none
                 
-            case .articlesPath, .bookmarksPath, .forumPath, .profilePath:
+            case .articlesPath, .forumPath, .profilePath:
                 return .none
             }
         }
@@ -371,29 +371,29 @@ public struct AppFeature: Sendable {
         
         // MARK: - Bookmarks Path
         
-        Reduce { state, action in
-            switch action {
-            case .bookmarks(.settingsButtonTapped):
-                state.isShowingTabBar = false
-                state.bookmarksPath.append(.settings(SettingsFeature.State()))
-                return .none
-                
-            default:
-                return .none
-            }
-        }
-        .forEach(\.bookmarksPath, action: \.bookmarksPath)
-        .onChange(of: \.bookmarksPath) { _, newValue in
-            // TODO: Another way?
-            Reduce { state, _ in
-                let hasSettings = newValue.contains(where: { screen in
-                    if case .settings = screen { return true }
-                    return false
-                })
-                state.isShowingTabBar = !hasSettings
-                return .none
-            }
-        }
+//        Reduce { state, action in
+//            switch action {
+//            case .bookmarks(.settingsButtonTapped):
+//                state.isShowingTabBar = false
+//                state.bookmarksPath.append(.settings(SettingsFeature.State()))
+//                return .none
+//                
+//            default:
+//                return .none
+//            }
+//        }
+//        .forEach(\.bookmarksPath, action: \.bookmarksPath)
+//        .onChange(of: \.bookmarksPath) { _, newValue in
+//            // TODO: Another way?
+//            Reduce { state, _ in
+//                let hasSettings = newValue.contains(where: { screen in
+//                    if case .settings = screen { return true }
+//                    return false
+//                })
+//                state.isShowingTabBar = !hasSettings
+//                return .none
+//            }
+//        }
         
         // MARK: - Forum Path
         

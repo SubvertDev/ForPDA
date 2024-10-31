@@ -202,7 +202,7 @@ public struct ProfileScreen: View {
                         Text(user.group.title)
                             .font(.body)
                             .multilineTextAlignment(.center)
-                            .foregroundStyle(Color(hex: user.group.hexColor))
+                            .foregroundStyle(Color(dynamicTuple: user.group.hexColor))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(12)
@@ -401,7 +401,7 @@ public struct ProfileScreen: View {
                     .padding(.trailing, 12)
                     .overlay(alignment: .bottomTrailing) {
                         if achievement.count > 1 {
-                            Text("\(achievement.count)")
+                            Text(String("\(achievement.count)"))
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .padding(6)
@@ -554,7 +554,7 @@ private extension Date {
         }
         
         formatter.dateFormat = "dd.MM.yy, HH:mm"
-        return LocalizedStringKey("Last seen " + formatter.string(from: self))
+        return LocalizedStringKey("Last seen \(formatter.string(from: self))")
     }
 }
 

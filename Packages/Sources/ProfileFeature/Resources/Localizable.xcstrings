@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld" : {
-
-    },
     "About me" : {
       "localizations" : {
         "ru" : {
@@ -124,23 +121,22 @@
         }
       }
     },
-    "In Development" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В разработке"
-          }
-        }
-      }
-    },
     "Karma" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Карма"
+          }
+        }
+      }
+    },
+    "Last seen %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Был в сети %@"
           }
         }
       }

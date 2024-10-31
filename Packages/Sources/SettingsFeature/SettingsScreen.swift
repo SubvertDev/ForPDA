@@ -95,7 +95,7 @@ public struct SettingsScreen: View {
                         
                     case .backgroundPicker:
                         Menu {
-                            Picker("", selection: $store.backgroundTheme) {
+                            Picker(String(""), selection: $store.backgroundTheme) {
                                 ForEach(BackgroundTheme.allCases, id: \.self) { theme in
                                     HStack(spacing: 0) {
                                         Text(theme.title, bundle: .module)
@@ -114,7 +114,7 @@ public struct SettingsScreen: View {
                         
                     case .themePicker:
                         Menu {
-                            Picker("", selection: $store.appTintColor) {
+                            Picker(String(""), selection: $store.appTintColor) {
                                 ForEach(AppTintColor.allCases, id: \.self) { tint in
                                     HStack(spacing: 0) {
                                         Text(tint.title, bundle: .module)

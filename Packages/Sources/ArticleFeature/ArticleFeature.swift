@@ -293,7 +293,7 @@ public struct ArticleFeature: Sendable {
                 state.article = article
                 
                 if let poll = article.poll {
-                    state.isShowingVoteResults = poll.type == .voted
+                    state.isShowingVoteResults = poll.isVoted
                 }
                 
                 for (index, comment) in article.comments.enumerated() {

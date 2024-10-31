@@ -1,28 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "App author" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Автор приложения"
-          }
-        }
-      }
-    },
-    "App discussion" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обсуждение приложения"
-          }
-        }
-      }
-    },
     "Bookmarks" : {
       "localizations" : {
         "ru" : {
