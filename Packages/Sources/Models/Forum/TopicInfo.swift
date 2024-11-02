@@ -14,6 +14,10 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public let flag: Int
     public let postsCount: Int
     public let lastPost: LastPost
+    
+    public var isUnread: Bool {
+        return (flag & 32) > 0
+    }
         
     public init(id: Int, name: String, description: String, flag: Int, postsCount: Int, lastPost: LastPost) {
         self.id = id

@@ -79,8 +79,7 @@ public struct ForumScreen: View {
         Section {
             ForEach(topics) { topic in
                 HStack(spacing: 25) {
-                    // TODO: Implement unread dot support.
-                    Row(title: topic.name, unread: false, action: {
+                    Row(title: topic.name, unread: topic.isUnread, action: {
                         // TODO: topic page handler
                     })
                 }
