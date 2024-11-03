@@ -51,6 +51,16 @@
         }
       }
     },
+    "Comment..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий..."
+          }
+        }
+      }
+    },
     "Comments (%@):" : {
       "localizations" : {
         "ru" : {
@@ -117,16 +127,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загружаем статью..."
-          }
-        }
-      }
-    },
-    "Message" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сообщение"
           }
         }
       }

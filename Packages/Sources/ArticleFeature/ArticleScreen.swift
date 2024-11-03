@@ -291,42 +291,49 @@ public struct ArticleScreen: View {
             }
             
             HStack(alignment: .bottom, spacing: 8) {
-                TextField("Message", text: $store.commentText.removeDuplicates(), axis: .vertical)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.Labels.primary)
-                    .lineLimit(1...10)
-                    .focused($focus, equals: ArticleFeature.State.Field.comment)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 7)
-                    .background(Color.Background.teritary)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 18)
-                            .stroke(Color.Separator.secondary, lineWidth: 0.33)
+                TextField(text: $store.commentText.removeDuplicates()) {
+                    Text("Comment...", bundle: .module)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.Labels.quintuple)
+                }
+                .font(.subheadline)
+                .foregroundStyle(Color.Labels.primary)
+                .lineLimit(1...10)
+                .focused($focus, equals: ArticleFeature.State.Field.comment)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 7)
+                .background(Color.Background.teritary)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 18)
+                        .stroke(Color.Separator.secondary, lineWidth: 0.33)
                     }
                 
-                Button {
-                    store.send(.sendCommentButtonTapped)
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(tintColor)
-                        
-                        if store.isUploadingComment {
-                            ProgressView()
-                                .progressViewStyle(.circular)
-                                .tint(Color.Labels.primaryInvariably)
-                        } else {
-                            Image(systemSymbol: .arrowUp)
-                                .font(.body)
-                                .fontWeight(.medium)
-                                .foregroundStyle(Color.Labels.primaryInvariably)
+                if !store.commentText.isEmpty {
+                    Button {
+                        store.send(.sendCommentButtonTapped)
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(tintColor)
+                            
+                            if store.isUploadingComment {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .tint(Color.Labels.primaryInvariably)
+                            } else {
+                                Image(systemSymbol: .arrowUp)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(Color.Labels.primaryInvariably)
+                            }
                         }
+                        .frame(width: 34, height: 34)
                     }
-                    .frame(width: 34, height: 34)
+                    .disabled(store.isUploadingComment)
                 }
-                .disabled(store.isUploadingComment)
             }
+            .animation(.default, value: store.commentText.isEmpty)
         }
         .padding(.horizontal, 12)
         .padding(.top, 8)
@@ -491,7 +498,9 @@ extension UIApplication {
 }
 
 #Preview("Test comments") {
-    NavigationStack {
+    @Shared(.userSession) var userSession
+    userSession = UserSession(userId: 1, token: "1", isHidden: false)
+    return NavigationStack {
         ArticleScreen(
             store: Store(
                 initialState: ArticleFeature.State(
