@@ -7,14 +7,101 @@
 
 import SwiftUI
 
+private struct TintKey: EnvironmentKey {
+    static let defaultValue: Color = Color.blue
+}
+
+public extension EnvironmentValues {
+    var tintColor: Color {
+        get { self[TintKey.self] }
+        set { self[TintKey.self] = newValue }
+    }
+}
+
 // MARK: - Images
 
 // TODO: 17+ change to ImageResource
 public extension Image {
+    static let logoLight = Image(.logoLight)
     static let avatarDefault = Image(.avatarDefault)
-    static let _4pda = Image(._4Pda)
     static let github = Image(.github)
     static let telegram = Image(.telegram)
+    static let quote = Image(.quote)
+    
+    struct Settings {
+        public static let lightThemeExample = Image(.Settings.lightThemeExample)
+        public static let darkThemeExample = Image(.Settings.darkThemeExample)
+        public static let systemThemeExample = Image(.Settings.systemThemeExample)
+        public static let circleBlue = Image(.Settings.circleBlue)
+        public static let circleDark = Image(.Settings.circleDark)
+        
+        public struct Theme {
+            public static let circleLettuce = Image(.Settings.Theme.circleLettuce)
+            public static let circleOrange = Image(.Settings.Theme.circleOrange)
+            public static let circlePink = Image(.Settings.Theme.circlePink)
+            public static let circlePrimary = Image(.Settings.Theme.circlePrimary)
+            public static let circlePurple = Image(.Settings.Theme.circlePurple)
+            public static let circleScarlet = Image(.Settings.Theme.circleScarlet)
+            public static let circleSky = Image(.Settings.Theme.circleSky)
+            public static let circleYellow = Image(.Settings.Theme.circleYellow)
+        }
+    }
+}
+
+public extension Color {
+    struct Main {
+        public static let green = Color(.Main.green)
+        public static let red = Color(.Main.red)
+        public static let greyAlpha = Color(.Main.greyAlpha)
+        public static let primaryAlpha = Color(.Main.primaryAlpha)
+    }
+    
+    struct Labels {
+        public static let primary = Color(.Labels.primary)
+        public static let primaryInvariably = Color(.Labels.primaryInvariably)
+        public static let secondary = Color(.Labels.secondary)
+        public static let secondaryInvariably = Color(.Labels.secondaryInvariably)
+        public static let teritary = Color(.Labels.teritary)
+        public static let quaternary = Color(.Labels.quaternary)
+        public static let quintuple = Color(.Labels.quintuple)
+        public static let forcedLight = Color(.Labels.forcedLight)
+    }
+    
+    struct Background {
+        public static let primary = Color(.Background.primary)
+        public static let primaryAlpha = Color(.Background.primaryAlpha)
+        public static let secondary = Color(.Background.secondary)
+        public static let teritary = Color(.Background.teritary)
+        public static let forcedDark = Color(.Background.forcedDark)
+    }
+    
+    struct Separator {
+        public static let primary = Color(.Separator.primary)
+        public static let secondary = Color(.Separator.secondary)
+    }
+    
+    struct Theme {
+        public static let primary = Color(.Theme.primary)
+        public static let lettuce = Color(.Theme.lettuce)
+        public static let orange = Color(.Theme.orange)
+        public static let pink = Color(.Theme.pink)
+        public static let purple = Color(.Theme.purple)
+        public static let scarlet = Color(.Theme.scarlet)
+        public static let sky = Color(.Theme.sky)
+        public static let yellow = Color(.Theme.yellow)
+    }
+}
+
+public extension Color {
+    init(hex: Int, opacity: Double = 1) {
+        self.init(
+            .sRGB,
+            red: Double((hex >> 16) & 0xff) / 255,
+            green: Double((hex >> 08) & 0xff) / 255,
+            blue: Double((hex >> 00) & 0xff) / 255,
+            opacity: opacity
+        )
+    }
 }
 
 extension Color {
@@ -81,6 +168,13 @@ extension Color {
 }
 
 extension Color {
+    public init(dynamicTuple: (String, String)) {
+        self.init(UIColor { traitCollection in
+            let hex = traitCollection.userInterfaceStyle == .dark ? dynamicTuple.1 : dynamicTuple.0
+            return UIColor(Color(hex: hex))
+        })
+    }
+
     public init(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")

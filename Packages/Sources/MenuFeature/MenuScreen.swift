@@ -59,13 +59,13 @@ public struct MenuScreen: View {
                 }
                 
                 Section {
-                    SettingRowView(title: "App author", type: .image(._4pda)) {
-                        store.send(.appAuthorButtonTapped)
-                    }
-                    SettingRowView(title: "App discussion", type: .image(._4pda)) {
-                        store.send(.notImplementedFeatureTapped)
-                    }
-                    .disabled(true)
+//                    SettingRowView(title: "App author", type: .image(._4pda)) {
+//                        store.send(.appAuthorButtonTapped)
+//                    }
+//                    SettingRowView(title: "App discussion", type: .image(._4pda)) {
+//                        store.send(.notImplementedFeatureTapped)
+//                    }
+//                    .disabled(true)
                     SettingRowView(title: "Changelog in Telegram", type: .image(.telegram)) {
                         store.send(.telegramChangelogButtonTapped)
                     }

@@ -20,7 +20,7 @@ extension AuthFeature {
         var body: some ReducerOf<Self> {
             Reduce { state, action in
                 switch action {
-                case .binding, .onTask, .onSubmit, ._captchaResponse, ._loginResponse, .alert:
+                case .binding, .onTask, .onSubmit, ._captchaResponse, ._loginResponse, .alert, .cancelButtonTapped:
                     break
                     
                 case .loginButtonTapped:
@@ -32,8 +32,8 @@ extension AuthFeature {
                 case ._wrongCaptcha:
                     analyticsClient.log(AuthEvent.wrongCaptcha)
                     
-                case let .delegate(.loginSuccess(userId: userId)):
-                    analyticsClient.log(AuthEvent.loginSuccess(userId))
+                case let .delegate(.loginSuccess(reason, userId)):
+                    analyticsClient.log(AuthEvent.loginSuccess(reason: reason.rawValue, userId: userId))
                     analyticsClient.identify(String(userId))
                 }
                 return .none

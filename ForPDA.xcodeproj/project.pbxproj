@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -59,6 +59,20 @@
 		B8D351F5293CABB6008A84EA /* ForPDA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ForPDA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8DEB2212BAB81CC00AD97C6 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		B8AB63BA2AA49F6100F2CEFF /* Frameworks */ = {
@@ -123,6 +137,7 @@
 		B8D351F7293CABB6008A84EA /* App */ = {
 			isa = PBXGroup;
 			children = (
+				13C9F9FA2CADCDFF003280F3 /* Fonts */,
 				B8DEB2212BAB81CC00AD97C6 /* App.swift */,
 				B88BDA872BF6BC0200E17268 /* Assets.xcassets */,
 				B84BC1E42C77DA4000C38BB2 /* LaunchScreen.storyboard */,
@@ -172,6 +187,9 @@
 			);
 			dependencies = (
 				B8AB63D42AA49F6100F2CEFF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				13C9F9FA2CADCDFF003280F3 /* Fonts */,
 			);
 			name = ForPDA;
 			packageProductDependencies = (
@@ -299,7 +317,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 244;
+				CURRENT_PROJECT_VERSION = 365;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -311,7 +329,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -335,7 +353,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 244;
+				CURRENT_PROJECT_VERSION = 365;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -347,7 +365,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -502,15 +520,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ForPDA/ForPDA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 244;
+				CURRENT_PROJECT_VERSION = 365;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ForPDA;
+				INFOPLIST_KEY_CFBundleDisplayName = "ForPDA Beta";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -521,7 +540,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -554,14 +573,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ForPDA/ForPDA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 244;
+				CURRENT_PROJECT_VERSION = 365;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = ForPDA;
+				INFOPLIST_KEY_CFBundleDisplayName = "ForPDA Beta";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -572,7 +592,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6.0;
+				MARKETING_VERSION = 0.7.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";

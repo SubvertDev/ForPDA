@@ -24,7 +24,8 @@ public struct ArticleElementParser {
                 "[size=3]",
                 "[attachment=",
                 "[table]",
-                "[list]"
+                "[list=1]",
+                "[list]",
             ] // Add new tags as needed
             
             let ranges = tags.compactMap { remainingText.range(of: $0) }
@@ -84,9 +85,14 @@ public struct ArticleElementParser {
                     let tableElement = try extractTableElement(text: parts.0)
                     result.append(.table(tableElement))
                     remainingText = parts.1 ?? ""
+                } else if nextTag == "[list=1]" {
+                    let parts = extractText(from: remainingText, startTag: "[list=1]", endTag: "[/list]")
+                    let bulletListElement = try extractBulletListElement(type: .numeric, text: parts.0)
+                    result.append(.bulletList(bulletListElement))
+                    remainingText = parts.1 ?? ""
                 } else if nextTag == "[list]" {
                     let parts = extractText(from: remainingText, startTag: "[list]", endTag: "[/list]")
-                    let bulletListElement = try extractBulletListElement(text: parts.0)
+                    let bulletListElement = try extractBulletListElement(type: .dotted, text: parts.0)
                     result.append(.bulletList(bulletListElement))
                     remainingText = parts.1 ?? ""
                 }
@@ -96,6 +102,10 @@ public struct ArticleElementParser {
                 }
                 break
             }
+        }
+        
+        if let poll = article.poll {
+            result.append(.poll(.init(poll: poll)))
         }
 
         return result
@@ -212,62 +222,69 @@ public struct ArticleElementParser {
     
     // MARK: - Bullet List
     
-    private static func extractBulletListElement(text: String) throws -> BulletListElement {
+    private static func extractBulletListElement(type: BulletListElement.BulletType, text: String) throws -> BulletListElement {
         let components = text
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .components(separatedBy: "[*]")
             .filter { !$0.isEmpty }
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         
-        return BulletListElement(elements: components)
+        return BulletListElement(type: type, elements: components)
     }
     
     // MARK: - Advertisement Element
     
-    private static func extractAdvertisementElement(text: String) throws -> AdvertisementElement {        
-        var pattern = /\[background=\#(\w+)\]/
-        let buttonBackgroundColorHex: String
-        if let match = text.firstMatch(of: pattern) {
-            buttonBackgroundColorHex = String(match.output.1)
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
-        }
+    private static func extractAdvertisementElement(text: String) throws -> [AdvertisementElement] {
+        let components = text.components(separatedBy: "/blockbg] [blockbg")
+        var elements: [AdvertisementElement] = []
         
-        pattern = /\[color=\#(\w+)\]/
-        let buttonForegroundColorHex: String
-        if let match = text.firstMatch(of: pattern) {
-            buttonForegroundColorHex = String(match.output.1)
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
-        }
-        
-        let buttonPattern = /color=#(\w+)\](.+)\[\/color/
-        let buttonText: String
-        if let match = text.firstMatch(of: buttonPattern) {
-            buttonText = String(match.output.2)
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
-        }
-        
-        pattern = /\[url=(.+)\]\[color/
-        let linkUrl: URL
-        if let match = text.firstMatch(of: pattern) {
-            if let url = URL(string: String(match.output.1)) {
-                linkUrl = url
+        for component in components {
+            var pattern = /\[background=\#(\w+)\]/
+            let buttonBackgroundColorHex: String
+            if let match = component.firstMatch(of: pattern) {
+                buttonBackgroundColorHex = String(match.output.1)
             } else {
                 throw ParsingError.failedToExtractAdvertisment
             }
-        } else {
-            throw ParsingError.failedToExtractAdvertisment
+            
+            pattern = /\[color=\#(\w+)\]/
+            let buttonForegroundColorHex: String
+            if let match = component.firstMatch(of: pattern) {
+                buttonForegroundColorHex = String(match.output.1)
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+            
+            let buttonPattern = /color=#(\w+)\](.+)\[\/color/
+            let buttonText: String
+            if let match = component.firstMatch(of: buttonPattern) {
+                buttonText = String(match.output.2)
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+            
+            pattern = /\[url=(.+)\]\[color/
+            let linkUrl: URL
+            if let match = component.firstMatch(of: pattern) {
+                if let url = URL(string: String(match.output.1)) {
+                    linkUrl = url
+                } else {
+                    throw ParsingError.failedToExtractAdvertisment
+                }
+            } else {
+                throw ParsingError.failedToExtractAdvertisment
+            }
+            
+            let element = AdvertisementElement(
+                buttonBackgroundColorHex: buttonBackgroundColorHex,
+                buttonForegroundColorHex: buttonForegroundColorHex,
+                buttonText: buttonText,
+                linkUrl: linkUrl
+            )
+            elements.append(element)
         }
         
-        let element = AdvertisementElement(
-            buttonBackgroundColorHex: buttonBackgroundColorHex,
-            buttonForegroundColorHex: buttonForegroundColorHex,
-            buttonText: buttonText,
-            linkUrl: linkUrl
-        )
-        return element
+        return elements
     }
 }
 

@@ -16,7 +16,8 @@ public enum ArticleElement: Sendable, Equatable, Hashable {
     case button(ButtonElement)
     case bulletList(BulletListElement)
     case table(TableElement)
-    case advertisement(AdvertisementElement)
+    case poll(PollElement)
+    case advertisement([AdvertisementElement])
 }
 
 // MARK: - Text
@@ -117,19 +118,28 @@ public struct ButtonElement: Sendable, Equatable, Hashable {
     }
 }
 
-// MARK: - BulletList
+// MARK: - Bullet List
 
 public struct BulletListElement: Sendable, Equatable, Hashable {
+    
+    public enum BulletType: Sendable, Equatable, Hashable {
+        case numeric
+        case dotted
+    }
+    
+    public let type: BulletType
     public let elements: [String]
     
     public init(
+        type: BulletType,
         elements: [String]
     ) {
+        self.type = type
         self.elements = elements
     }
 }
 
-// MARK: - BulletListSingle
+// MARK: - Bullet List Single
 
 public struct BulletListSingleElement: Sendable, Equatable, Hashable {
     public var title: String
@@ -144,7 +154,7 @@ public struct BulletListSingleElement: Sendable, Equatable, Hashable {
     }
 }
 
-// MARK: - TableElement
+// MARK: - Table Element
 
 public struct TableElement: Sendable, Equatable, Hashable {
     public var rows: [TableRowElement]
@@ -166,6 +176,18 @@ public struct TableRowElement: Sendable, Equatable, Hashable {
     ) {
         self.title = title
         self.description = description
+    }
+}
+
+// MARK: - Poll Element
+
+public struct PollElement: Sendable, Equatable, Hashable {
+    public let poll: ArticlePoll
+    
+    public init(
+        poll: ArticlePoll
+    ) {
+        self.poll = poll
     }
 }
 

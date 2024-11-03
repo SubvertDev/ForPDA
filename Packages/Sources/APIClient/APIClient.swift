@@ -18,9 +18,14 @@ public struct APIClient: Sendable {
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
-    public var getArticle: @Sendable (_ id: Int) async throws -> AsyncThrowingStream<Article, any Error>
+    public var getArticle: @Sendable (_ id: Int, _ cache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
+    public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
+    public var hideComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
+    public var replyToComment: @Sendable (_ articleId: Int, _ parentId: Int, _ message: String) async throws -> CommentResponseType
+    public var voteInPoll: @Sendable (_ pollId: Int, _ selections: [Int]) async throws -> Bool
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
+    public var logout: @Sendable () async throws -> Void
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
 }
 
@@ -48,13 +53,15 @@ extension APIClient: DependencyKey {
                 let articleList = try await parsingClient.parseArticlesList(rawString: rawString)
                 return articleList
             },
-            getArticle: { id in
+            getArticle: { id, cache in
                 AsyncThrowingStream { continuation in
                     Task {
                         do {
                             @Dependency(\.cacheClient) var cacheClient
-                            if let article = await cacheClient.getArticle(id) {
-                                continuation.yield(article)
+                            if cache {
+                                if let article = await cacheClient.getArticle(id) {
+                                    continuation.yield(article)
+                                }
                             }
                             
                             @Dependency(\.parsingClient) var parsingClient
@@ -70,6 +77,29 @@ extension APIClient: DependencyKey {
                     }
                 }
             },
+            likeComment: { articleId, commentId in
+                let rawString = try api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
+                return Int(rawString.getLastNumber()) == 0
+            },
+            hideComment: { articleId, commentId in
+                let rawString = try api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
+                // Getting 3 on liked comment
+                return Int(rawString.getLastNumber()) == 0
+            },
+            replyToComment: { articleId, parentId, message in
+                let rawString = try api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
+                let responseAsInt = Int(rawString.getLastNumber())!
+                if CommentResponseType.codes.contains(responseAsInt) {
+                    return CommentResponseType(rawValue: responseAsInt) ?? .unknown
+                } else {
+                    return CommentResponseType.success
+                }
+            },
+            voteInPoll: { pollId, selections in
+                let rawString = try api.get(SiteCommand.vote(pollId: pollId, selections: selections))
+                let responseAsInt = Int(rawString.getLastNumber())!
+                return responseAsInt == 0
+            },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
                 let rawString = try api.get(AuthCommand.login(data: request))
@@ -83,6 +113,10 @@ extension APIClient: DependencyKey {
                 @Dependency(\.parsingClient) var parsingClient
                 let authResponse = try await parsingClient.parseLoginResponse(rawString: rawString)
                 return authResponse
+            },
+            logout: {
+                let request = AuthRequest(memberId: 0, token: "", hidden: false)
+                _ = try api.get(AuthCommand.auth(data: request))
             },
             getUser: { userId in
                 AsyncThrowingStream { continuation in
@@ -116,20 +150,45 @@ extension APIClient: DependencyKey {
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
-            getArticle: { _ in
+            getArticle: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }
+            },
+            likeComment: { _, _ in
+                return true
+            },
+            hideComment: { _, _ in
+                return true
+            },
+            replyToComment: { _, _, _ in
+                return .success
+            },
+            voteInPoll: { _, _ in
+                return true
             },
             getCaptcha: {
                 try await Task.sleep(for: .seconds(2))
-                return URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/images/logo.png")!
+                return URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!
             },
             authorize: { _, _, _, _ in
                 return .success(userId: -1, token: "preview_token")
+            },
+            logout: {
+                
             },
             getUser: { _ in
                 AsyncThrowingStream { $0.yield(.mock) }
             }
         )
+    }
+}
+
+extension String {
+    func getLastNumber() -> String {
+        return self
+            .replacingOccurrences(of: "[", with: "")
+            .replacingOccurrences(of: "]", with: "")
+            .components(separatedBy: ",")
+            .last!
     }
 }
 

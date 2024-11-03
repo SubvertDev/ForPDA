@@ -10,17 +10,31 @@ import SwiftUI
 public struct ToastInfo: Equatable {
     public let screen: ToastScreen
     public let message: LocalizedStringKey
+    public let isError: Bool
     
     public init (
         screen: ToastScreen,
-        message: LocalizedStringKey
+        message: LocalizedStringKey,
+        isError: Bool
     ) {
         self.screen = screen
         self.message = message
+        self.isError = isError
+    }
+    
+    public init(
+        screen: ToastScreen,
+        message: String,
+        isError: Bool
+    ) {
+        self.screen = screen
+        self.message = LocalizedStringKey(message)
+        self.isError = isError
     }
 }
 
 public enum ToastScreen: Equatable {
     case articlesList
     case article
+    case comments
 }

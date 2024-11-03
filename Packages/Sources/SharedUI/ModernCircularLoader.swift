@@ -9,6 +9,7 @@ import SwiftUI
 
 public struct ModernCircularLoader: View {
     
+    @Environment(\.tintColor) private var tintColor
     @State private var trimEnd = 0.75
     @State private var animate = false
     private let lineWidth: Double
@@ -34,6 +35,7 @@ public struct ModernCircularLoader: View {
                     .repeatForever(autoreverses: false),
                 value: animate
             )
+            .foregroundStyle(tintColor)
             .onAppear {
                 Task { @MainActor in
                     animate = true

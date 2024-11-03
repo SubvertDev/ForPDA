@@ -1,22 +1,52 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "(Comment has been deleted)" : {
+    "%lld people voted" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(Комментарий удален)"
+            "value" : "Проголосовало %lld чел."
           }
         }
       }
     },
-    "(edited)" : {
+    "%lldh" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "(отредактирован)"
+            "value" : "%lldч"
+          }
+        }
+      }
+    },
+    "%lldm" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldм"
+          }
+        }
+      }
+    },
+    "Comment has been deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий удален"
+          }
+        }
+      }
+    },
+    "Comment is hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий скрыт"
           }
         }
       }
@@ -51,12 +81,52 @@
         }
       }
     },
+    "Edited" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отредактировано"
+          }
+        }
+      }
+    },
+    "Hide comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть комментарий"
+          }
+        }
+      }
+    },
+    "just now" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "только что"
+          }
+        }
+      }
+    },
     "Loading article..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загружаем статью..."
+          }
+        }
+      }
+    },
+    "Message" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщение"
           }
         }
       }
@@ -71,12 +141,22 @@
         }
       }
     },
-    "Problem with article?" : {
+    "Problems with article?" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проблема со статьей?"
+            "value" : "Проблемы со статьей?"
+          }
+        }
+      }
+    },
+    "Report" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пожаловаться"
           }
         }
       }
@@ -107,6 +187,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Что-то пошло не так во время загрузки статьи :("
+          }
+        }
+      }
+    },
+    "Unhide comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Раскрыть комментарий"
+          }
+        }
+      }
+    },
+    "Vote" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проголосовать"
           }
         }
       }

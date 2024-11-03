@@ -1,12 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "About App" : {
+    "About app" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "О приложении"
+          }
+        }
+      }
+    },
+    "Accent color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвет оттенка"
           }
         }
       }
@@ -21,22 +31,52 @@
         }
       }
     },
-    "Appearance" : {
+    "App discussion (4PDA)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Внешний вид"
+            "value" : "Обсуждение приложения (4PDA)"
           }
         }
       }
     },
-    "Auto" : {
+    "App discussion (Telegram)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Автоматически"
+            "value" : "Обсуждение приложения (Telegram)"
+          }
+        }
+      }
+    },
+    "Background color" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цвет фона"
+          }
+        }
+      }
+    },
+    "Basic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основные"
+          }
+        }
+      }
+    },
+    "Blue" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Синий"
           }
         }
       }
@@ -81,22 +121,54 @@
         }
       }
     },
-    "Copy debug ID" : {
+    "Copy Debug ID" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скопировать debug ID"
+            "value" : "Скопировать отладочный ID"
           }
         }
       }
     },
-    "General" : {
+    "Dark.Scheme" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Темная"
+          }
+        }
+      }
+    },
+    "Dark.Theme" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Черный"
+          }
+        }
+      }
+    },
+    "GitHub repository" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Общее"
+            "value" : "GitHub репозиторий"
           }
         }
       }
@@ -121,6 +193,46 @@
         }
       }
     },
+    "Lettuce" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Салатовый"
+          }
+        }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Светлая"
+          }
+        }
+      }
+    },
+    "Links" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылки"
+          }
+        }
+      }
+    },
+    "List of changes (Telegram)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Список изменений (Telegram)"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
         "ru" : {
@@ -141,6 +253,46 @@
         }
       }
     },
+    "Orange" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оранжевый"
+          }
+        }
+      }
+    },
+    "Pink" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розовый"
+          }
+        }
+      }
+    },
+    "Primary" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основной"
+          }
+        }
+      }
+    },
+    "Purple" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фиолетовый"
+          }
+        }
+      }
+    },
     "Safari extension" : {
       "localizations" : {
         "ru" : {
@@ -151,12 +303,52 @@
         }
       }
     },
+    "Scarlet" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Алый"
+          }
+        }
+      }
+    },
     "Settings" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "Sky" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Небесный"
+          }
+        }
+      }
+    },
+    "System" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Системная"
+          }
+        }
+      }
+    },
+    "Text size" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер текста"
           }
         }
       }
@@ -177,6 +369,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Версия %@"
+          }
+        }
+      }
+    },
+    "Yellow" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Желтый"
           }
         }
       }

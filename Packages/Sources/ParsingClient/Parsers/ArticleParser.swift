@@ -18,7 +18,7 @@ public struct ArticleParser {
     3. 1720354500 - timestamp
     4. 0 - ???
     5. [] - ???
-    6. 64 - ???
+    6. 80 - flag ?
     7. 11029883 - author id
     8. "Оксана Рубко" - author name
     9. 0 - comments amount
@@ -37,9 +37,12 @@ public struct ArticleParser {
                     throw ParsingError.failedToCastDataToAny
                 }
                 
+                let pollFields = fields.count > 16 ? fields[16] as! [[Any]] : []
+                
                 return Article(
                     id: fields[2] as! Int,
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
+                    flag: fields[6] as! Int,
                     authorId: fields[7] as! Int,
                     authorName: (fields[8] as! String).convertHtmlCodes(),
                     commentsAmount: fields[9] as! Int,
@@ -48,7 +51,8 @@ public struct ArticleParser {
                     description: (fields[12] as! String).convertHtmlCodes(),
                     attachments: extractAttachments(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
-                    comments: extractComments(from: fields[15] as! [[Any]])
+                    comments: extractComments(from: fields[15] as! [[Any]]),
+                    poll: extractPoll(from: pollFields)
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -97,7 +101,7 @@ public struct ArticleParser {
     /**
     0. 9425129 - id
     1. 1720355277 - date
-    2. 0 - ???
+    2. 0 - normal/deleted/edited/hidden
     3. 11393353 - author id
     4. "name" - author name
     5. 9425113 - parent id
@@ -116,7 +120,7 @@ public struct ArticleParser {
             return Comment(
                 id: fields[0] as! Int,
                 date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
-                type: CommentType(rawValue: fields[2] as! Int) ?? .normal,
+                flag: fields[2] as! Int,
                 authorId: fields[3] as! Int,
                 authorName: (fields[4] as! String).convertHtmlCodes(),
                 parentId: fields[5] as! Int,
@@ -131,6 +135,95 @@ public struct ArticleParser {
             comments[index].childIds = comments.filter { $0.parentId == comment.id }.map { $0.id }
         }
         
-        return comments
+        let intermediateComments = comments.map { IntermediateComment.from($0) }
+        let nested = nestComments(intermediateComments)
+        let flattened = flattenComments(nested)
+        
+        var result: [Comment] = []
+        for (intermediate, level) in flattened {
+            if var comment = comments.first(where: { $0.id == intermediate.id}) {
+                comment.nestLevel = level
+                result.append(comment)
+            }
+        }
+        
+        return result
+    }
+    
+    private static func extractPoll(from array: [[Any]]) -> ArticlePoll? {
+        guard !array.isEmpty else { return nil }
+        return ArticlePoll(
+            id: array[0][0] as! Int,
+            title: array[0][1] as! String,
+            flag: array[0][2] as! Int,
+            totalVotes: array[0][3] as! Int,
+            options: (array[0][4] as! [[Any]]).map {
+                ArticlePoll.Option(
+                    id: $0[0] as! Int,
+                    text: $0[1] as! String,
+                    votes: $0[2] as! Int
+                )
+            }
+        )
+    }
+    
+    struct IntermediateComment {
+        let id: Int
+        let parentId: Int
+        let childIds: [Int]
+        var children: [IntermediateComment]
+        
+        static func from(_ comment: Comment) -> IntermediateComment {
+            return IntermediateComment(
+                id: comment.id,
+                parentId: comment.parentId,
+                childIds: comment.childIds,
+                children: []
+            )
+        }
+    }
+    
+    private static func nestComments(_ comments: [IntermediateComment]) -> [IntermediateComment] {
+        // Create a dictionary to quickly access comments by ID
+        var commentMap = [Int: IntermediateComment]()
+        for comment in comments {
+            commentMap[comment.id] = comment
+        }
+        
+        // Helper function to build children recursively
+        func buildChildren(for comment: inout IntermediateComment) {
+            // For each childId, retrieve the child from the map, build its children, and append it
+            for childId in comment.childIds {
+                if var childComment = commentMap[childId] {
+                    buildChildren(for: &childComment) // Recursively build the child's children
+                    comment.children.append(childComment) // Append the built child
+                }
+            }
+        }
+        
+        // Step 2: Build the tree structure, starting from the root comments
+        var result: [IntermediateComment] = []
+        
+        for comment in comments {
+            if comment.parentId == 0 {
+                // This is a root comment, so we build its children recursively
+                var rootComment = commentMap[comment.id]!
+                buildChildren(for: &rootComment)
+                result.append(rootComment) // Append the fully built root comment
+            }
+        }
+        
+        return result
+    }
+
+    private static func flattenComments(_ comments: [IntermediateComment], level: Int = 0) -> [(comment: IntermediateComment, level: Int)] {
+        var result: [(IntermediateComment, Int)] = []
+        
+        for comment in comments {
+            result.append((comment, level)) // Add the current comment with its nesting level
+            result.append(contentsOf: flattenComments(comment.children, level: level + 1)) // Recursively flatten and add the children with incremented level
+        }
+        
+        return result
     }
 }

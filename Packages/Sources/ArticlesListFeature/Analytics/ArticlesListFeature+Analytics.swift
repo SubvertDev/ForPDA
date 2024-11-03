@@ -25,26 +25,33 @@ extension ArticlesListFeature {
                     
                 case .cellMenuOpened(let article, let action):
                     switch action {
-                    case .copyLink:
-                        analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
                     case .shareLink:
                         analyticsClient.log(ArticlesListEvent.linkShareOpened(article.url))
+                    case .copyLink:
+                        analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
+                    case .openInBrowser:
+                        analyticsClient.log(ArticlesListEvent.articleOpenedInBrowser(article.url))
                     case .report:
                         analyticsClient.log(ArticlesListEvent.linkReported(article.url))
                         analyticsClient.capture(AnalyticsError.brokenArticle(article.url))
+                    case .addToBookmarks:
+                        analyticsClient.log(ArticlesListEvent.articleAddedToBookmarks(article.url))
                     }
                     
                 case let .linkShared(success, url):
                     analyticsClient.log(ArticlesListEvent.linkShared(success, url))
+                    
+                case .listGridTypeButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.listGridTypeChanged(state.listRowType.rawValue))
+                    
+                case .settingsButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.settingsButtonTapped)
                     
                 case .onFirstAppear:
                     break // TODO: Make First App Open/App Session here?
                     
                 case .onRefresh:
                     analyticsClient.log(ArticlesListEvent.refreshTriggered)
-                    
-                case .onLoadMoreAppear:
-                    analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
                 case ._articlesResponse(.success):
                     analyticsClient.log(ArticlesListEvent.articlesHasLoaded)
@@ -53,7 +60,10 @@ extension ArticlesListFeature {
                     analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
                     analyticsClient.capture(AnalyticsError.apiFailure(error))
                     
-                case .binding, .onArticleAppear, ._articlesResponse, .destination:
+                case .loadMoreArticles:
+                    analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
+                    
+                case .binding, ._articlesResponse, .destination:
                     break
                     
                 case ._failedToConnect(let error):

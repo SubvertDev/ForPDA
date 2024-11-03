@@ -32,6 +32,7 @@ public struct ForumFeature: Sendable {
     
     public enum Action {
         case onTask
+        case settingsButtonTapped
         case forumTapped(id: Int)
         case _forumsListResponse(Result<[ForumInfo], any Error>)
     }
@@ -55,6 +56,9 @@ public struct ForumFeature: Sendable {
                 return .run { send in
 //                    let result = await Result { try await apiClient.getForumTopic(id: id, page: 0, itemsPerPage: 10) }
                 }
+                
+            case .settingsButtonTapped:
+                return .none
                 
             case let ._forumsListResponse(.success(forums)):
                 state.forums = forums

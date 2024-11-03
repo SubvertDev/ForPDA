@@ -13,6 +13,10 @@ public enum SettingsEvent: Event {
     case safariExtensionTapped
     case copyDebugIdTapped
     case clearCacheTapped
+    case appDiscussion4pdaTapped
+    case chatTelegramTapped
+    case changelogTelegramTapped
+    case githubTapped
     case checkVersionsTapped
     case somethingWentWrong(any Error)
     

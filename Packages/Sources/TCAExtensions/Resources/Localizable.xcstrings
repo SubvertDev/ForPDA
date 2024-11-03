@@ -1,12 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Not yet implemented :(" : {
+    "Not yet implemented, but will be soon!" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Еще не сделано :("
+            "value" : "Еще не сделано, но скоро будет!"
           }
         }
       }

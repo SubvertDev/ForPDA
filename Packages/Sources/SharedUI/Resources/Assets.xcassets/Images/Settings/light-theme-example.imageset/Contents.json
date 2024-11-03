@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "light-theme-example.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
