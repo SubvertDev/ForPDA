@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ArticlePreview: Sendable, Hashable {
+public struct ArticlePreview: Sendable, Hashable, Identifiable {
     
     public let id: Int
     public let date: Date
@@ -21,7 +21,7 @@ public struct ArticlePreview: Sendable, Hashable {
     
     public var formattedDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yy"
+        formatter.dateFormat = "dd MMM yyyy"
         return formatter.string(from: date)
     }
     
@@ -59,7 +59,7 @@ public struct ArticlePreview: Sendable, Hashable {
 public extension ArticlePreview {
     static let mock = ArticlePreview(
         id: 123456,
-        date: Date(timeIntervalSince1970: 1234567890),
+        date: Date.now,
         authorId: 123456,
         authorName: "Lorem Ipsum",
         commentsAmount: 69,

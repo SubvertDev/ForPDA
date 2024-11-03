@@ -1,0 +1,15 @@
+disabled_rules:
+  - cyclomatic_complexity
+  - file_length
+  - function_body_length
+  - identifier_name
+  - large_tuple
+  - nesting
+  - opening_brace
+  - todo
+  - type_name
+  - vertical_whitespace
+
+included:
+  - Sources
+  - Tests

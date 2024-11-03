@@ -1,5 +1,5 @@
 {
-  "originHash" : "4c9a75f0d85f113c19cdb7c9692bd05aa3e3975c9f9dbfa696fbda990b976c9b",
+  "originHash" : "6281cc16f50b2beeddd72c7e4fab17350bf0a296056ea8c7d46d0c5af445a791",
   "pins" : [
     {
       "identity" : "alerttoast",
@@ -47,12 +47,30 @@
       }
     },
     {
+      "identity" : "pdapi_spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
+      "state" : {
+        "revision" : "cdc5c665e4e5434697ac1c731b322b3e62dd508f",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "richtextkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SubvertDev/RichTextKit.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "9962cd5d95eb58dda1d6d67ead70736edc505683"
+      }
+    },
+    {
       "identity" : "sentry-cocoa",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "5575af93efb776414f243e93d6af9f6258dc539a",
-        "version" : "8.36.0"
+        "revision" : "0b8ba88f5fd70062887d55f87a970c59b1ceebcf",
+        "version" : "8.39.0"
       }
     },
     {
@@ -71,6 +89,15 @@
       "state" : {
         "revision" : "f025e9ba5d051374d7344efa8859df5b9399a181",
         "version" : "2.0.2"
+      }
+    },
+    {
+      "identity" : "smoothgradient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/raymondjavaxx/SmoothGradient.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "7f11f2e0f2e3c4466ec78087242be49f6e8b00cc"
       }
     },
     {
@@ -105,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "0d8980f5bcc5fe6941f1788758667ff2b8c10f03",
-        "version" : "1.14.0"
+        "revision" : "56149436a3c3dbf605a89a204aaa904de8ba4580",
+        "version" : "1.15.2"
       }
     },
     {
@@ -114,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-concurrency-extras",
       "state" : {
-        "revision" : "bb5059bde9022d69ac516803f4f227d8ac967f71",
-        "version" : "1.1.0"
+        "revision" : "6054df64b55186f08b6d0fd87152081b8ad8d613",
+        "version" : "1.2.0"
       }
     },
     {
@@ -132,8 +159,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "3ef38bb702a1a2f39c7e19fc0578403b8ee52b17",
-        "version" : "1.3.9"
+        "revision" : "fd1fb25b68fdb9756cd61d23dbd9e2614b340085",
+        "version" : "1.4.0"
       }
     },
     {
@@ -150,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "e834b3760731160d7d448509ee6a1408c8582a6b",
-        "version" : "2.2.0"
+        "revision" : "16a27ab7ae0abfefbbcba73581b3e2380b47a579",
+        "version" : "2.2.2"
       }
     },
     {
@@ -195,8 +222,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "96beb108a57f24c8476ae1f309239270772b2940",
-        "version" : "1.2.5"
+        "revision" : "bc2a151366f2cd0e347274544933bc2acb00c9fe",
+        "version" : "1.4.0"
       }
     },
     {
@@ -206,6 +233,24 @@
       "state" : {
         "revision" : "fe1c1ec340f6d79866131432ecaa190fd6bbc4cb",
         "version" : "1.9.0"
+      }
+    },
+    {
+      "identity" : "zmarkupparser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ZhgChgLi/ZMarkupParser.git",
+      "state" : {
+        "revision" : "c305a8be7d6c6fb96e4b387574dc16563d140c0e",
+        "version" : "1.11.0"
+      }
+    },
+    {
+      "identity" : "znstextattachment",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ZhgChgLi/ZNSTextAttachment",
+      "state" : {
+        "revision" : "8c6c34e82eb31ad373b209cb88c2a2aff76c6cdf",
+        "version" : "1.1.9"
       }
     }
   ],

@@ -22,23 +22,21 @@ public struct ProfileFeature: Sendable {
     public struct State: Equatable {
         @Presents public var alert: AlertState<Action.Alert>?
         @Shared(.userSession) public var userSession: UserSession?
-        public let userId: Int
+        public let userId: Int?
         public var isLoading: Bool
         public var user: User?
         
-        public var shouldShowLogoutButton: Bool {
-            return userSession?.userId == userId
+        public var shouldShowToolbarButtons: Bool {
+            return userSession != nil && user?.id == userSession?.userId
         }
         
         public init(
             alert: AlertState<Action.Alert>? = nil,
-            userSession: UserSession? = nil,
-            userId: Int,
+            userId: Int? = nil,
             isLoading: Bool = true,
             user: User? = nil
         ) {
             self.alert = alert
-            self._userSession = Shared(wrappedValue: userSession, .userSession)
             self.userId = userId
             self.isLoading = isLoading
             self.user = user
@@ -49,6 +47,7 @@ public struct ProfileFeature: Sendable {
     
     public enum Action {
         case onTask
+        case settingsButtonTapped
         case logoutButtonTapped
         
         case _userResponse(Result<User, any Error>)
@@ -73,7 +72,9 @@ public struct ProfileFeature: Sendable {
                 return .none
                 
             case .onTask:
-                return .run { [userId = state.userId] send in
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .run { send in
                     do {
                         for try await user in try await apiClient.getUser(userId) {
                             await send(._userResponse(.success(user)))
@@ -83,9 +84,15 @@ public struct ProfileFeature: Sendable {
                     }
                 }
                 
+            case .settingsButtonTapped:
+                return .none
+                
             case .logoutButtonTapped:
                 state.userSession = nil
-                return .run { _ in await dismiss() }
+                state.isLoading = true
+                return .run { send in
+                    try await apiClient.logout()
+                }
                 
             case ._userResponse(.success(let user)):
                 state.isLoading = false

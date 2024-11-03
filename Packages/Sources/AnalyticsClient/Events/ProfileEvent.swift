@@ -8,6 +8,7 @@
 import Foundation
 
 public enum ProfileEvent: Event {
+    case settingsTapped
     case logoutTapped
     case userLoaded(Int)
     case userLoadingFailed

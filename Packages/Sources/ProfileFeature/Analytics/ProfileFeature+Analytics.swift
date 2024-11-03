@@ -23,6 +23,9 @@ extension ProfileFeature {
                 case .onTask, .alert:
                     break
                     
+                case .settingsButtonTapped:
+                    analyticsClient.log(ProfileEvent.settingsTapped)
+                    
                 case .logoutButtonTapped:
                     analyticsClient.log(ProfileEvent.logoutTapped)
                     analyticsClient.logout()

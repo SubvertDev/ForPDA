@@ -9,8 +9,20 @@ import Foundation
 import ComposableArchitecture
 import TCAExtensions
 import APIClient
+import HapticClient
 import PersistenceKeys
 import Models
+
+public enum AuthOpenReason: String, Sendable {
+    case commentAction
+    case sendComment
+    case profile
+}
+
+public enum LoginErrorReason {
+    case wrongLoginOrPassword
+    case wrongCaptcha
+}
 
 @Reducer
 public struct AuthFeature: Sendable {
@@ -24,6 +36,7 @@ public struct AuthFeature: Sendable {
         public enum Field { case login, password, captcha }
         
         @Presents public var alert: AlertState<Action.Alert>?
+        public var openReason: AuthOpenReason
         public var isLoading: Bool
         public var login: String
         public var password: String
@@ -31,20 +44,24 @@ public struct AuthFeature: Sendable {
         public var captchaUrl: URL?
         public var captcha: String
         public var focus: Field?
+        public var loginErrorReason: LoginErrorReason?
         
         public var isLoginButtonDisabled: Bool {
             return login.isEmpty || password.isEmpty || captcha.count < 4 || isLoading
         }
         
         public init(
+            openReason: AuthOpenReason,
             isLoading: Bool = true,
             login: String = "",
             password: String = "",
             isHiddenEntry: Bool = false,
             captchaUrl: URL? = nil,
             captcha: String = "",
-            focus: Field? = nil
+            focus: Field? = nil,
+            loginErrorReason: LoginErrorReason? = nil
         ) {
+            self.openReason = openReason
             self.isLoading = isLoading
             self.login = login
             self.password = password
@@ -52,6 +69,7 @@ public struct AuthFeature: Sendable {
             self.captchaUrl = captchaUrl
             self.captcha = captcha
             self.focus = focus
+            self.loginErrorReason = loginErrorReason
         }
     }
     
@@ -59,6 +77,7 @@ public struct AuthFeature: Sendable {
     
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case cancelButtonTapped
         case loginButtonTapped
         case onTask
         case onSubmit(State.Field)
@@ -75,13 +94,15 @@ public struct AuthFeature: Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
-            case loginSuccess(userId: Int)
+            case loginSuccess(reason: AuthOpenReason, userId: Int)
         }
     }
     
     // MARK: - Dependencies
     
+    @Dependency(\.dismiss) private var dismiss
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.hapticClient) private var hapticClient
     
     // MARK: - Body
     
@@ -111,8 +132,12 @@ public struct AuthFeature: Sendable {
                 }
                 return .none
                 
+            case .cancelButtonTapped:
+                return .run { _ in await dismiss() }
+                
             case .loginButtonTapped:
                 state.isLoading = true
+                state.loginErrorReason = nil
                 return .run { [
                     login = state.login,
                     password = state.password,
@@ -142,20 +167,20 @@ public struct AuthFeature: Sendable {
                 switch response {
                 case .success(let url):
                     state.captchaUrl = url
-                case .failure(let error):
-                    print(error, #line)
+                case .failure:
+                    // TODO: Send error
                     state.alert = .failedToConnect
                 }
                 return .none
                 
             case ._loginResponse(.success(let loginState)):
                 state.isLoading = false
-                return .run { [isHidden = state.isHiddenEntry] send in
+                return .run { [isHidden = state.isHiddenEntry, reason = state.openReason] send in
                     switch loginState {
                     case .success(userId: let userId, token: let token):
                         @Shared(.userSession) var userSession
                         await $userSession.withLock { $0 = UserSession(userId: userId, token: token, isHidden: isHidden) }
-                        await send(.delegate(.loginSuccess(userId: userId)))
+                        await send(.delegate(.loginSuccess(reason: reason, userId: userId)))
                         
                     case .wrongPassword:
                         await send(._wrongPassword)
@@ -177,9 +202,10 @@ public struct AuthFeature: Sendable {
             case ._wrongPassword:
                 state.password = ""
                 state.captcha = ""
-                state.focus = .password
-                state.alert = .wrongPassword
+//                state.focus = .password
+                state.loginErrorReason = .wrongLoginOrPassword
                 return .run { send in
+                    await hapticClient.play(.error)
                     let result = await Result { try await apiClient.getCaptcha() }
                     await send(._captchaResponse(result))
                 }
@@ -188,8 +214,10 @@ public struct AuthFeature: Sendable {
                 state.captcha = ""
                 state.captchaUrl = url
                 state.focus = .captcha
-                state.alert = .wrongCaptcha
-                return .none
+                state.loginErrorReason = .wrongCaptcha
+                return .run { _ in
+                    await hapticClient.play(.error)
+                }
             }
         }
         
@@ -201,7 +229,7 @@ public struct AuthFeature: Sendable {
 
 extension AlertState where Action == AuthFeature.Action.Alert {
         
-    nonisolated(unsafe) static var wrongPassword: AlertState {
+    nonisolated(unsafe) static var wrongLoginOrPassword: AlertState {
         AlertState {
             TextState("Whoops!", bundle: .module)
         } actions: {

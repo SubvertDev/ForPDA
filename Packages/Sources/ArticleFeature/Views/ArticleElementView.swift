@@ -15,8 +15,15 @@ import Models
 
 struct ArticleElementView: View {
     
+    @Environment(\.tintColor) private var tintColor
     @Environment(\.openURL) private var openURL
     @State private var gallerySelection: Int = 0
+    @State private var pollSelection: ArticlePoll.Option?
+    @State private var pollSelections: Set<ArticlePoll.Option> = .init()
+    
+    private var hasSelection: Bool {
+        return pollSelection != nil || !pollSelections.isEmpty
+    }
     
     // TODO: Is it good to send store here?
     let store: StoreOf<ArticleFeature>
@@ -48,8 +55,11 @@ struct ArticleElementView: View {
         case let .table(element):
             table(element)
             
-        case let .advertisement(element):
-            advertisement(element)
+        case let .poll(element):
+            poll(element)
+            
+        case let .advertisement(elements):
+            advertisement(elements)
         }
     }
     
@@ -57,29 +67,33 @@ struct ArticleElementView: View {
     
     @ViewBuilder
     private func text(_ element: TextElement) -> some View {
-        HStack {
-            if element.isQuote {
-                Rectangle()
-                    .foregroundStyle(.gray.opacity(2/3))
-                    .frame(width: 16)
-                    .overlay(alignment: .top) {
-                        Image(systemSymbol: .quoteClosing)
+        Text(element.text.asMarkdown)
+            .font(element.isHeader ? .title3 : .callout)
+            .foregroundStyle(Color.Labels.primary)
+            .environment(\.openURL, OpenURLAction { url in
+                store.send(.linkInTextTapped(url))
+                return .handled
+            })
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, element.isQuote ? 46 : 0)
+            .padding(.top, element.isHeader ? 16 : 0)
+            .padding([.horizontal, .bottom], element.isQuote ? 12 : 0)
+            .overlay {
+                if element.isQuote {
+                    ZStack(alignment: .top) {
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.Separator.secondary, lineWidth: 0.67)
+                        
+                        Image.quote
                             .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(.white)
-                            .padding(1)
+                            .frame(width: 30, height: 20)
+                            .padding([.top, .leading], 12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundStyle(tintColor)
                     }
+                }
             }
-            
-            Text(element.text.asMarkdown)
-                .environment(\.openURL, OpenURLAction { url in
-                    store.send(.linkInTextTapped(url))
-                    return .handled
-                })
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .font(element.isHeader ? .title : .body)
-                .padding(.horizontal, 12)
-        }
+            .padding(.horizontal, 16)
     }
     
     // MARK: - Image
@@ -164,13 +178,24 @@ struct ArticleElementView: View {
     @ViewBuilder
     private func bulletList(_ element: BulletListElement) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(element.elements, id: \.self) { element in
+            ForEach(Array(element.elements.enumerated()), id: \.0) { index, singleElement in
                 HStack(alignment: .top, spacing: 8) {
-                    Circle()
-                        .frame(width: 4, height: 4)
-                        .padding(.top, 8)
+                    switch element.type {
+                    case .numeric:
+                        Text(String("\(index + 1)."))
+                            .font(.callout)
+                            .foregroundStyle(Color.Labels.primary)
+                        
+                    case .dotted:
+                        Circle()
+                            .foregroundStyle(Color.Labels.primary)
+                            .frame(width: 4, height: 4)
+                            .padding(.top, 8)
+                    }
                     
-                    Text(element.asMarkdown)
+                    Text(singleElement.asMarkdown)
+                        .font(.callout)
+                        .foregroundStyle(Color.Labels.primary)
                 }
             }
         }
@@ -202,22 +227,192 @@ struct ArticleElementView: View {
         .padding(.horizontal, 16)
     }
     
+    // MARK: - Poll
+    
+    @ViewBuilder
+    private func poll(_ element: PollElement) -> some View {
+        let poll = element.poll
+        VStack(spacing: 12) {
+            if !poll.title.isEmpty {
+                Text(poll.title)
+                    .font(.headline)
+                    .foregroundStyle(Color.Labels.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            
+            if store.isShowingVoteResults {
+                VStack(spacing: 12) {
+                    ForEach(poll.options, id: \.self) { option in
+                        VStack(spacing: 4) {
+                            Text(option.text)
+                                .font(.caption)
+                                .foregroundStyle(Color.Labels.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .foregroundStyle(Color.Background.teritary)
+                                    .frame(height: 18)
+                                
+                                HStack(spacing: 0) {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .foregroundStyle(tintColor)
+                                        .frame(width: (UIScreen.main.bounds.width - 32) * progressPercentage(option: option, poll: poll), height: 18)
+                                    
+                                    Spacer()
+                                }
+                                
+                                Text(String("\(Int(progressPercentage(option: option, poll: poll) * 100))%"))
+                                    .font(.caption2)
+                                    .foregroundStyle(Color.Labels.quaternary)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.trailing, 4)
+                            }
+                        }
+                    }
+                }
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(poll.options, id: \.self) { option in
+                        HStack(spacing: 11) {
+                            Button {
+                                withAnimation {
+                                    if poll.singleChoice {
+                                        pollSelection = (option == pollSelection) ? nil : option
+                                    } else {
+                                        if !pollSelections.insert(option).inserted {
+                                            pollSelections.remove(option)
+                                        }
+                                    }
+                                }
+                            } label: {
+                                HStack(alignment: .top, spacing: 11) {
+                                    if poll.singleChoice {
+                                        if option == pollSelection {
+                                            ZStack {
+                                                Circle()
+                                                    .strokeBorder(Color.Labels.quintuple)
+                                                    .frame(width: 22, height: 22)
+                                                
+                                                Circle()
+                                                    .foregroundStyle(tintColor)
+                                                    .frame(width: 12, height: 12)
+                                            }
+                                            .frame(width: 22, height: 22)
+                                        } else {
+                                            Circle()
+                                                .strokeBorder(Color.Labels.quintuple)
+                                                .frame(width: 22, height: 22)
+                                        }
+                                        
+                                    } else {
+                                        if pollSelections.contains(option) {
+                                            ZStack {
+                                                Circle()
+                                                    .foregroundStyle(tintColor)
+                                                    .frame(width: 22, height: 22)
+                                                
+                                                Image(systemSymbol: .checkmark)
+                                                    .font(.system(size: 13.5, weight: .semibold))
+                                                    .foregroundStyle(Color.Labels.primaryInvariably)
+                                                    .frame(width: 22, height: 22)
+                                            }
+                                            .frame(width: 22, height: 22)
+                                        } else {
+                                            Circle()
+                                                .strokeBorder(Color.Labels.quintuple)
+                                                .frame(width: 22, height: 22)
+                                        }
+                                    }
+                                    
+                                    Text(option.text)
+                                        .font(.callout)
+                                        .foregroundStyle(Color.Labels.secondary)
+                                        .multilineTextAlignment(.leading)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if !store.isShowingVoteResults {
+                HStack {
+                    Button {
+                        if poll.singleChoice {
+                            if let pollSelection {
+                                store.send(.pollVoteButtonTapped(poll.id, [pollSelection.id]))
+                            }
+                        } else {
+                            if !pollSelections.isEmpty {
+                                store.send(.pollVoteButtonTapped(poll.id, Array(pollSelections.map { $0.id })))
+                            }
+                        }
+                    } label: {
+                        Text("Vote", bundle: .module)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 9)
+                    }
+                    .foregroundStyle(voteButtonForegroundColor(poll: poll))
+                    .background(voteButtonBackgroundColor(poll: poll))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    
+                    Spacer()
+                }
+                .disabled(voteButtonDisabled())
+            } else {
+                Text("\(poll.totalVotes) people voted", bundle: .module)
+                    .font(.caption)
+                    .foregroundStyle(Color.Labels.teritary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .animation(.default, value: store.isShowingVoteResults)
+        .animation(.default, value: store.isUploadingPollVote)
+        .padding(.horizontal, 16)
+    }
+    
+    private func progressPercentage(option: ArticlePoll.Option, poll: ArticlePoll) -> CGFloat {
+        return CGFloat(option.votes) / CGFloat(poll.totalVotes)
+    }
+    
+    private func voteButtonForegroundColor(poll: ArticlePoll) -> Color {
+        return (!hasSelection || store.isUploadingPollVote) ? Color.Labels.quintuple : tintColor
+    }
+    
+    private func voteButtonBackgroundColor(poll: ArticlePoll) -> Color {
+        return (!hasSelection || store.isUploadingPollVote) ? Color.Main.greyAlpha : Color.Main.primaryAlpha
+    }
+    
+    private func voteButtonDisabled() -> Bool {
+        if store.isUploadingPollVote {
+            return true
+        } else {
+            return !hasSelection
+        }
+    }
+    
     // MARK: - Advertisement
     
     @ViewBuilder
-    private func advertisement(_ element: AdvertisementElement) -> some View {
-        Button {
-            store.send(.linkInTextTapped(element.linkUrl))
-        } label: {
-            Text(element.buttonText)
-                .font(.title3)
-                .padding(16)
-                .foregroundStyle(Color(hex: element.buttonForegroundColorHex))
-                .background(Color(hex: element.buttonBackgroundColorHex))
+    private func advertisement(_ elements: [AdvertisementElement]) -> some View {
+        VStack(spacing: 8) {
+            ForEach(elements, id: \.self) { element in
+                Button {
+                    store.send(.linkInTextTapped(element.linkUrl))
+                } label: {
+                    Text(element.buttonText)
+                        .font(.title3)
+                        .padding(16)
+                        .foregroundStyle(Color(hex: element.buttonForegroundColorHex))
+                        .frame(maxWidth: .infinity)
+                        .background(Color(hex: element.buttonBackgroundColorHex))
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .frame(maxWidth: .infinity)
-        .padding([.horizontal, .bottom], 16)
+        .padding(.horizontal, 16)
     }
 }
 
@@ -239,6 +434,39 @@ struct ArticleElementView: View {
     .frame(height: 100)
 }
 
+#Preview("Quote") {
+    ArticleElementView(
+        store: .init(initialState: ArticleFeature.State(articlePreview: .mock), reducer: {
+            ArticleFeature()
+        }),
+        element: .text(TextElement(text: "Adipisicing mollit pariatur magna ullamco mollit mollit sit quis. Pariatur irure fugiat consequat mollit aliqua pariatur cillum fugiat occaecat non fugiat id. Nostrud consequat enim elit veniam.", isQuote: true))
+    )
+}
+
+#Preview("Poll") {
+    ArticleElementView(
+        store: .init(initialState: ArticleFeature.State(articlePreview: .mock), reducer: {
+            ArticleFeature()
+        }),
+        element: .poll(
+            PollElement(
+                poll: ArticlePoll(
+                    id: 1,
+                    title: "Test",
+                    flag: 1,
+                    totalVotes: 1000,
+                    options: [
+                        ArticlePoll.Option(id: 1, text: "Test 1", votes: 1),
+                        ArticlePoll.Option(id: 2, text: "Test 2", votes: 2),
+                        ArticlePoll.Option(id: 3, text: "Test 3", votes: 3),
+                        ArticlePoll.Option(id: 4, text: "Test 4", votes: 4),
+                    ]
+                )
+            )
+        )
+    )
+}
+
 #Preview("Bullet List") {
     ArticleElementView(
         store: .init(
@@ -251,6 +479,7 @@ struct ArticleElementView: View {
         ),
         element: .bulletList(
             .init(
+                type: .dotted,
                 elements: ["First Element", "Second Element", "Third Element", "Fourth Element", "Fifth Element Fifth Element Fifth Element Fifth Element"]
             )
         )

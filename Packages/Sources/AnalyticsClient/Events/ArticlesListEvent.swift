@@ -11,9 +11,13 @@ public enum ArticlesListEvent: Event {
     // TODO: Add URL to Int?
     case articleTapped(Int)
     case linkCopied(URL)
-    case linkShareOpened(URL)
     case linkShared(Bool, URL)
+    case linkShareOpened(URL)
+    case articleOpenedInBrowser(URL)
     case linkReported(URL)
+    case articleAddedToBookmarks(URL)
+    case listGridTypeChanged(String)
+    case settingsButtonTapped
     case refreshTriggered
     case loadMoreTriggered
     case menuTapped
@@ -32,11 +36,16 @@ public enum ArticlesListEvent: Event {
             
         case .linkCopied(let url),
              .linkShareOpened(let url),
-             .linkReported(let url):
+             .linkReported(let url),
+             .articleOpenedInBrowser(let url),
+             .articleAddedToBookmarks(let url):
             return ["url": url.absoluteString]
             
         case let .linkShared(success, url):
             return ["url": url.absoluteString, "success": String(success)]
+            
+        case let .listGridTypeChanged(type):
+            return ["type": type]
             
         case .articlesHasNotLoaded(let errorMessage):
             return ["error": errorMessage]

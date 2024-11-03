@@ -12,6 +12,8 @@ import Models
 import APIClient
 import AnalyticsClient
 import PasteboardClient
+import HapticClient
+import PersistenceKeys
 
 @Reducer
 public struct ArticlesListFeature: Sendable {
@@ -32,15 +34,19 @@ public struct ArticlesListFeature: Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
+        @Shared(.appSettings) public var appSettings: AppSettings
         public var articles: [ArticlePreview]
         public var isLoading: Bool
-        public var loadAmount: Int = 30
+        public var loadAmount: Int = 15
         public var offset: Int = 0
+        public var listRowType: AppSettings.ArticleListRowType = .normal
         
         public var isScrollDisabled: Bool {
             // Disables scroll until first load
             return articles.isEmpty && isLoading
         }
+        
+        public var scrollToTop: Bool = false
         
         public init(
             destination: Destination.State? = nil,
@@ -50,6 +56,8 @@ public struct ArticlesListFeature: Sendable {
             self.destination = destination
             self.articles = articles
             self.isLoading = isLoading
+            
+            self.listRowType = $appSettings.articlesListRowType.wrappedValue
         }
     }
     
@@ -58,14 +66,14 @@ public struct ArticlesListFeature: Sendable {
     public enum Action: BindableAction {
         case destination(PresentationAction<Destination.Action>)
         case articleTapped(ArticlePreview)
-        case binding(BindingAction<State>) // TODO: Remove
-        case cellMenuOpened(ArticlePreview, ArticlesListRowMenuAction) // TODO: Should it be a delegate?
+        case binding(BindingAction<State>)
+        case cellMenuOpened(ArticlePreview, ContextMenuOptions)
         case linkShared(Bool, URL)
-        case menuTapped
+        case listGridTypeButtonTapped
+        case settingsButtonTapped
         case onFirstAppear
         case onRefresh
-        case onArticleAppear(ArticlePreview)
-        case onLoadMoreAppear
+        case loadMoreArticles
         
         case _failedToConnect(any Error)
         case _articlesResponse(Result<[ArticlePreview], any Error>)
@@ -76,6 +84,7 @@ public struct ArticlesListFeature: Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
+    @Dependency(\.hapticClient) private var hapticClient
     
     // MARK: - Body
     
@@ -84,14 +93,18 @@ public struct ArticlesListFeature: Sendable {
             switch action {
                 
                 // MARK: External
-            case .articleTapped, .binding, .menuTapped, .destination:
+            case .articleTapped, .binding, .destination:
                 return .none
                 
             case .cellMenuOpened(let article, let action):
                 switch action {
-                case .copyLink:  pasteboardClient.copy(string: article.url.absoluteString)
-                case .shareLink: state.destination = .share(article.url)
-                case .report:    break
+                case .shareLink:      state.destination = .share(article.url)
+                case .copyLink:       pasteboardClient.copy(string: article.url.absoluteString)
+                case .openInBrowser:  return .run { _ in await open(url: article.url) }
+                case .report:         break
+                case .addToBookmarks:
+                    state.destination = .alert(.notImplemented)
+                    return .run { _ in await hapticClient.play(.rigid) }
                 }
                 return .none
                 
@@ -123,45 +136,41 @@ public struct ArticlesListFeature: Sendable {
                     await send(._articlesResponse(result))
                 }
                 
-            case .onArticleAppear(let articlePreview):
-                // TODO: Revise performance-wise later
-                return .run { [articles = state.articles] _ in
-                    if let index = articles.firstIndex(where: { $0 == articlePreview }), index % 3 == 0 {
-                        var urls: [URL] = []
-                        let preloadIndex = index + 1
-                        let maxPreloadIndex = preloadIndex + 3
-                        if (preloadIndex <= articles.count - 1) && (maxPreloadIndex <= articles.count - 1) {
-                            for article in articles[preloadIndex..<maxPreloadIndex] {
-                                urls.append(article.imageUrl)
-                            }
-                            await cacheClient.preloadImages(urls)
-                        }
-                    }
+            case .listGridTypeButtonTapped:
+                state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
+                return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
+                    await hapticClient.play(.selection)
+                    await appSettings.withLock { $0.articlesListRowType = listRowType }
                 }
                 
-            case .onLoadMoreAppear:
-                state.offset += state.loadAmount
+            case .settingsButtonTapped:
+                return .none
+                
+                // MARK: Internal
+                
+            case .loadMoreArticles:
+                guard !state.isLoading else { return .none }
+                guard state.articles.count != 0 else { return .none }
+                state.isLoading = true
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     let result = await Result {
                         try await apiClient.getArticlesList(offset: offset, amount: amount)
                     }
                     await send(._articlesResponse(result))
                 }
-
-                // MARK: Internal
                 
             case ._failedToConnect:
                 state.destination = .alert(.failedToConnect)
                 return .none
                 
             case let ._articlesResponse(.success(articles)):
-                state.isLoading = false
                 if state.offset == 0 {
                     state.articles = articles
                 } else {
                     state.articles.append(contentsOf: articles)
                 }
                 state.offset += state.loadAmount
+                state.isLoading = false
                 return .none
                 
             case ._articlesResponse(.failure):

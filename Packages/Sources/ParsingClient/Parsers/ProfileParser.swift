@@ -53,16 +53,27 @@ public struct ProfileParser {
                     id: array[2] as! Int,
                     nickname: (array[3] as! String).convertHtmlCodes(),
                     imageUrl: URL(string: array[4] as! String),
+                    group: User.Group(rawValue: array[5] as! Int)!,
+                    status: (array[6] as? String).flatMap { $0.isEmpty ? nil : $0 }?.convertHtmlCodes(),
+                    signature: (array[7] as? String).flatMap { $0.isEmpty ? nil : $0 },
+                    aboutMe: (array[8] as? String).flatMap { $0.isEmpty ? nil : $0 }?.convertHtmlCodes(),
                     registrationDate: Date(timeIntervalSince1970: array[9] as! TimeInterval),
                     lastSeenDate: Date(timeIntervalSince1970: array[10] as! TimeInterval),
-                    userCity: array[14] as! String,
-                    karma: array[16] as! Int,
+                    birthdate: (array[11] as? String).flatMap { $0.isEmpty ? nil : $0 },
+                    gender: User.Gender(rawValue: array[12] as! Int),
+                    userTime: (array[13] as! Int),
+                    city: (array[14] as? String).flatMap { ($0.isEmpty || $0 == "Нет") ? nil : $0 },
+                    devDBdevices: parseUserDevDBDevices(array[15] as! [[Any]]),
+                    karma: ((array[16] as! Double) / 100).round(to: 2),
                     posts: array[17] as! Int,
                     comments: array[18] as! Int,
                     reputation: array[19] as! Int,
                     topics: array[20] as! Int,
                     replies: array[21] as! Int,
-                    email: array[25] as! String
+                    qmsMessages: (array[22] as! Int),
+                    forumDevices: nil,
+                    email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
+                    achievements: parseUserAchievements(array[32] as! [[Any]])
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -70,5 +81,37 @@ public struct ProfileParser {
         } else {
             throw ParsingError.failedToCreateDataFromString
         }
+    }
+    
+    private static func parseUserDevDBDevices(_ array: [[Any]]) -> [User.Device] {
+        return array.map { device in
+            return User.Device(
+                id: device[0] as! String,
+                name: device[1] as! String,
+                main: (device[2] as! Int == 1) ? true : false
+            )
+        }
+    }
+    
+    private static func parseUserAchievements(_ array: [[Any]]) -> [User.Achievement] {
+        return array.map { achievement in
+            return User.Achievement(
+                name: achievement[1] as! String,
+                description: achievement[2] as! String,
+                count: achievement[3] as! Int,
+                imageUrl: URL(string: (achievement[0] as! String))!,
+                forumUrl: URL(string: (achievement[5] as! String))!,
+                presentationDate: Date(
+                    timeIntervalSince1970: achievement[4] as! TimeInterval
+                )
+            )
+        }
+    }
+}
+
+private extension Double {
+    func round(to places: Int) -> Double {
+        let divisor = pow(10.0, Double(places))
+        return (self * divisor).rounded() / divisor
     }
 }
