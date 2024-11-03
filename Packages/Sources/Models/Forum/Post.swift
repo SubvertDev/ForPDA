@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Post: Sendable, Hashable, Decodable {
+public struct Post: Sendable, Hashable, Codable {
     public let id: Int
     public let first: Bool
     public let flag: Int
@@ -42,19 +42,19 @@ public struct Post: Sendable, Hashable, Decodable {
         self.lastEdit = lastEdit
     }
     
-    public struct Attachment: Sendable, Hashable, Decodable {
+    public struct Attachment: Sendable, Hashable, Codable {
         public let id: Int
         public let type: AttachmentType
         public let name: String
         public let size: Int
         public let metadata: Metadata?
         
-        public enum AttachmentType: Sendable, Hashable, Decodable {
+        public enum AttachmentType: Sendable, Hashable, Codable {
             case file
             case image
         }
         
-        public struct Metadata: Sendable, Hashable, Decodable {
+        public struct Metadata: Sendable, Hashable, Codable {
             public let url: String
             public let width: Int
             public let height: Int
@@ -81,7 +81,7 @@ public struct Post: Sendable, Hashable, Decodable {
         }
     }
     
-    public struct LastEdit: Sendable, Hashable, Decodable {
+    public struct LastEdit: Sendable, Hashable, Codable {
         public let userId: Int
         public let username: String
         public let reason: String
@@ -95,7 +95,7 @@ public struct Post: Sendable, Hashable, Decodable {
         }
     }
     
-    public struct Author: Sendable, Hashable, Decodable {
+    public struct Author: Sendable, Hashable, Codable {
         public let id: Int
         public let name: String
         public let avatarUrl: String

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Forum: Sendable, Hashable, Decodable {
+public struct Forum: Codable, Sendable, Hashable {
     public let id: Int
     public let name: String
     public let flag: Int
@@ -51,17 +51,8 @@ public extension Forum {
             .mock
         ],
         subforums: [
-            ForumInfo(
-                id: 21,
-                name: "First subforum",
-                flag: 5,
-                redirectUrl: "https://url..."
-            ),
-            ForumInfo(
-                id: 543,
-                name: "Second subforum",
-                flag: 64
-            )
+            .mockCategory,
+            .mock
         ],
         topicsCount: 1709,
         topics: [

@@ -10,6 +10,7 @@ import ComposableArchitecture
 import ArticlesListFeature
 import ArticleFeature
 import BookmarksFeature
+import ForumsListFeature
 import ForumFeature
 import MenuFeature
 import AuthFeature
@@ -152,9 +153,12 @@ public struct AppView: View {
     @ViewBuilder
     private func ForumTab() -> some View {
         NavigationStack(path: $store.scope(state: \.forumPath, action: \.forumPath)) {
-            ForumScreen(store: store.scope(state: \.forum, action: \.forum))
+            ForumsListScreen(store: store.scope(state: \.forumsList, action: \.forumsList))
         } destination: { store in
             switch store.case {
+            case let .forum(store):
+                ForumScreen(store: store)
+                
             case let .settings(store):
                 SettingsScreen(store: store)
             }
