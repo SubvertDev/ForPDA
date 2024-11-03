@@ -32,10 +32,10 @@ let package = Package(
         // Shared
         .library(name: "Models", targets: ["Models"]),
         .library(name: "SharedUI", targets: ["SharedUI"]),
-        .library(name: "TCAExtensions", targets: ["TCAExtensions"])
+        .library(name: "TCAExtensions", targets: ["TCAExtensions"]),
     ],
     dependencies: [
-        .package(path: "../../PDAPI"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.1.0"),
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.15.2"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
@@ -204,7 +204,7 @@ let package = Package(
                     "ParsingClient",
                     "CacheClient",
                     .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                    .product(name: "PDAPI", package: "PDAPI")
+                    .product(name: "PDAPI_SPM", package: "PDAPI_SPM")
                 ]
             ),
         .target(
