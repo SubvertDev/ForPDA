@@ -7,13 +7,17 @@
 
 import Foundation
 
-public struct TopicInfo: Sendable, Hashable, Decodable {
+public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public let id: Int
     public let name: String
     public let description: String
     public let flag: Int
     public let postsCount: Int
     public let lastPost: LastPost
+    
+    public var isUnread: Bool {
+        return (flag & 32) > 0
+    }
         
     public init(id: Int, name: String, description: String, flag: Int, postsCount: Int, lastPost: LastPost) {
         self.id = id
@@ -24,7 +28,7 @@ public struct TopicInfo: Sendable, Hashable, Decodable {
         self.lastPost = lastPost
     }
         
-    public struct LastPost: Sendable, Hashable, Decodable {
+    public struct LastPost: Sendable, Hashable, Codable {
         public let date: Date
         public let userId: Int
         public let username: String

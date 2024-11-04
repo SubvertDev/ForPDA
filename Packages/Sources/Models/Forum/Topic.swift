@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Topic: Sendable, Decodable {
+public struct Topic: Codable, Sendable, Identifiable {
     public let id: Int
     public let name: String
     public let description: String
@@ -22,7 +22,7 @@ public struct Topic: Sendable, Decodable {
     public let posts: [Post]
     public let navigation: [ForumInfo]
     
-    public struct Poll: Sendable, Decodable {
+    public struct Poll: Sendable, Codable {
         public let name: String
         public let voted: Bool
         public let totalVotes: Int

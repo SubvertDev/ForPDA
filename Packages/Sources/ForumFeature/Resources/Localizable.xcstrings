@@ -1,42 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "COMING SOON" : {
+    "Announcements" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "COMING SOON"
+            "value" : "Объявления"
           }
         }
       }
     },
-    "Forum" : {
+    "Pinned topics" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Форум"
+            "value" : "Закрепленные темы"
           }
         }
       }
     },
-    "Forum is coming soon" : {
+    "Subforums" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скоро появится форум"
+            "value" : "Подфорумы"
           }
         }
       }
     },
-    "While it is in development, you can stay tuned for updates in our telegram chat" : {
+    "Topics" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пока он находится в разработке, вы можете следить за обновлениями в нашем телеграм чате"
+            "value" : "Темы"
           }
         }
       }
