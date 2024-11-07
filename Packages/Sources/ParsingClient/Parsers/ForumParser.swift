@@ -18,7 +18,7 @@ public struct ForumParser {
                     name: array[4] as! String,
                     flag: array[5] as! Int,
                     description: array[6] as! String,
-                    announcements: parseAnnouncement(array[7] as! [[Any]]),
+                    announcements: parseAnnouncementInfo(array[7] as! [[Any]]),
                     subforums: parseForumInfo(array[8] as! [[Any]]),
                     topicsCount: array[9] as! Int,
                     topics: parseTopic(array[10] as! [[Any]]),
@@ -46,6 +46,23 @@ public struct ForumParser {
         }
     }
     
+    public static func parseAnnouncement(rawString string: String) throws -> Announcement {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                return Announcement(
+                    name: array[2] as! String,
+                    content: array[3] as! String
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
     internal static func parseNavigation(_ array: [[Any]]) -> [ForumInfo] {
         return array.map { navigation in
             return ForumInfo(
@@ -56,9 +73,9 @@ public struct ForumParser {
         }
     }
     
-    private static func parseAnnouncement(_ array: [[Any]]) -> [Announcement] {
+    private static func parseAnnouncementInfo(_ array: [[Any]]) -> [AnnouncementInfo] {
         return array.map { announcement in
-            return Announcement(
+            return AnnouncementInfo(
                 id: announcement[0] as! Int,
                 name: announcement[1] as! String
             )
