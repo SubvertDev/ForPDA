@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Topic: Codable, Sendable, Identifiable {
+public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let id: Int
     public let name: String
     public let description: String
@@ -22,7 +22,7 @@ public struct Topic: Codable, Sendable, Identifiable {
     public let posts: [Post]
     public let navigation: [ForumInfo]
     
-    public struct Poll: Sendable, Codable {
+    public struct Poll: Sendable, Codable, Hashable {
         public let name: String
         public let voted: Bool
         public let totalVotes: Int
@@ -35,7 +35,7 @@ public struct Topic: Codable, Sendable, Identifiable {
             self.options = options
         }
         
-        public struct Choice: Sendable, Codable {
+        public struct Choice: Sendable, Codable, Hashable {
             public let id: Int
             public let votes: Int
             public let name: String
@@ -47,7 +47,7 @@ public struct Topic: Codable, Sendable, Identifiable {
             }
         }
         
-        public struct Option: Sendable, Codable {
+        public struct Option: Sendable, Codable, Hashable {
             public let name: String
             public let several: Bool
             public let choices: [Choice]

@@ -15,6 +15,7 @@ let package = Package(
         .library(name: "BookmarksFeature", targets: ["BookmarksFeature"]),
         .library(name: "ForumsListFeature", targets: ["ForumsListFeature"]),
         .library(name: "ForumFeature", targets: ["ForumFeature"]),
+        .library(name: "TopicFeature", targets: ["TopicFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "ProfileFeature", targets: ["ProfileFeature"]),
@@ -63,6 +64,7 @@ let package = Package(
                 "BookmarksFeature",
                 "ForumsListFeature",
                 "ForumFeature",
+                "TopicFeature",
                 "MenuFeature",
                 "AuthFeature",
                 "ProfileFeature",
@@ -128,6 +130,19 @@ let package = Package(
             ]
         ),
         .target(
+            name: "ForumsListFeature",
+            dependencies: [
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "CacheClient",
+                "AnalyticsClient",
+                "ParsingClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
             name: "ForumFeature",
             dependencies: [
                 "Models",
@@ -141,7 +156,7 @@ let package = Package(
             ]
         ),
         .target(
-            name: "ForumsListFeature",
+            name: "TopicFeature",
             dependencies: [
                 "Models",
                 "SharedUI",
@@ -150,6 +165,7 @@ let package = Package(
                 "AnalyticsClient",
                 "ParsingClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "RichTextKit", package: "RichTextKit"),
                 .product(name: "NukeUI", package: "nuke")
             ]
         ),

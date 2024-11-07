@@ -12,6 +12,7 @@ import ArticleFeature
 import BookmarksFeature
 import ForumsListFeature
 import ForumFeature
+import TopicFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
@@ -41,6 +42,7 @@ public struct AppFeature: Sendable {
     @Reducer(state: .equatable)
     public enum ForumPath {
         case forum(ForumFeature)
+        case topic(TopicFeature)
         case settings(SettingsFeature)
     }
     
@@ -406,17 +408,15 @@ public struct AppFeature: Sendable {
                 return .none
                 
             case .forumsList(.forumTapped(let forumId, let forumName)):
-                state.forumPath.append(.forum(ForumFeature.State(
-                    forumId: forumId,
-                    forumName: forumName
-                )))
+                state.forumPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
                 return .none
                 
             case let .forumPath(.element(id: _, action: .forum(.subforumTapped(forumId, forumName)))):
-                state.forumPath.append(.forum(ForumFeature.State(
-                    forumId: forumId,
-                    forumName: forumName
-                )))
+                state.forumPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
+                return .none
+                
+            case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
+                state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
                 return .none
                 
             default:

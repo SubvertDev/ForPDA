@@ -12,6 +12,7 @@ import ArticleFeature
 import BookmarksFeature
 import ForumsListFeature
 import ForumFeature
+import TopicFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
@@ -158,6 +159,9 @@ public struct AppView: View {
             switch store.case {
             case let .forum(store):
                 ForumScreen(store: store)
+                
+            case let .topic(store):
+                TopicScreen(store: store)
                 
             case let .settings(store):
                 SettingsScreen(store: store)

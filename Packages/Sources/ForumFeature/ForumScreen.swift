@@ -79,9 +79,9 @@ public struct ForumScreen: View {
         Section {
             ForEach(topics) { topic in
                 HStack(spacing: 25) {
-                    Row(title: topic.name, unread: topic.isUnread, action: {
-                        // TODO: topic page handler
-                    })
+                    Row(title: topic.name, unread: topic.isUnread) {
+                        store.send(.topicTapped(id: topic.id))
+                    }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 .buttonStyle(.plain)

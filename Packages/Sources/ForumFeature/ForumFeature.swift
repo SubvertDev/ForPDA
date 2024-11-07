@@ -12,6 +12,7 @@ import Models
 
 @Reducer
 public struct ForumFeature: Sendable {
+    
     public init() {}
     
     // MARK: - State
@@ -61,21 +62,15 @@ public struct ForumFeature: Sendable {
             switch action {
             case .onTask:
                 return .run { [forumId = state.forumId] send in
-                    do {
+                    guard let forumId else { return }
                         // TODO: Implement normal pagination.
-                        let result = try await Result { try await apiClient.getForum(id: forumId!, page: 0, perPage: 10) }
+                        let result = await Result { try await apiClient.getForum(id: forumId, page: 0, perPage: 10) }
                         
-                        try await send(._forumResponse(.success(result.get())))
-                    } catch {
-                        // FIXME: Handle
-                    }
+                        await send(._forumResponse(result))
                 }
                 
             case .topicTapped(let id):
-                print("Sended topic id: \(id)")
-                return .run { send in
-//                    let result = await Result { try await apiClient.getForum(id: id, page: 0, perPage: 10) }
-                }
+                return .none
             
             case .subforumTapped(let id, let name):
                 return .none

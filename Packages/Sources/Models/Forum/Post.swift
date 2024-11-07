@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Post: Sendable, Hashable, Codable {
+public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let id: Int
     public let first: Bool
     public let flag: Int
