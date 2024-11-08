@@ -119,7 +119,7 @@ public struct ForumScreen: View {
     // MARK: - Announcements section
     
     @ViewBuilder
-    private func AnnouncmentsSection(announcements: [Announcement]) -> some View {
+    private func AnnouncmentsSection(announcements: [AnnouncementInfo]) -> some View {
         Section {
             ForEach(announcements) { announcement in
                 HStack(spacing: 25) {
