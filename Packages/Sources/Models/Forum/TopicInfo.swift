@@ -18,6 +18,10 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public var isUnread: Bool {
         return (flag & 32) > 0
     }
+    
+    public var isClosed: Bool {
+        return (flag & 4) == 0
+    }
         
     public init(id: Int, name: String, description: String, flag: Int, postsCount: Int, lastPost: LastPost) {
         self.id = id

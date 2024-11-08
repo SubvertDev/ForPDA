@@ -20,6 +20,7 @@ public struct ParsingClient: Sendable {
     public var parseForumsList: @Sendable (_ rawString: String) async throws -> [ForumInfo]
     public var parseForum: @Sendable (_ rawString: String) async throws -> Forum
     public var parseTopic: @Sendable (_ rawString: String) async throws -> Topic
+    public var parseAnnouncement: @Sendable (_ rawString: String) async throws -> Announcement
 }
 
 extension DependencyValues {
@@ -57,6 +58,9 @@ extension ParsingClient: DependencyKey {
         },
         parseTopic: { rawString in
             return try TopicParser.parse(rawString: rawString)
+        },
+        parseAnnouncement: { rawString in
+            return try ForumParser.parseAnnouncement(rawString: rawString)
         }
     )
 }

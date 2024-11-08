@@ -5,19 +5,19 @@
 //  Created by Xialtal on 7.09.24.
 //
 
-public struct Announcement: Sendable, Hashable, Codable, Identifiable {
-    public let id: Int
+public struct Announcement: Codable, Sendable, Hashable {
     public let name: String
+    public let content: String
     
-    public init(id: Int, name: String) {
-        self.id = id
+    public init(name: String, content: String) {
         self.name = name
+        self.content = content
     }
 }
 
 public extension Announcement {
     static let mock = Announcement(
-        id: 0,
-        name: "This is really announcement?!"
+        name: "FourPDA now support forum?",
+        content: "Yes, FourPDA now support forum."
     )
 }

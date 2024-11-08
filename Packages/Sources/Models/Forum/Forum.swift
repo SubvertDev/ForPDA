@@ -12,7 +12,7 @@ public struct Forum: Codable, Sendable, Hashable {
     public let name: String
     public let flag: Int
     public let description: String
-    public let announcements: [Announcement]
+    public let announcements: [AnnouncementInfo]
     public let subforums: [ForumInfo]
     public let topicsCount: Int
     public let topics: [TopicInfo]
@@ -23,7 +23,7 @@ public struct Forum: Codable, Sendable, Hashable {
         name: String,
         flag: Int,
         description: String,
-        announcements: [Announcement],
+        announcements: [AnnouncementInfo],
         subforums: [ForumInfo],
         topicsCount: Int,
         topics: [TopicInfo],
