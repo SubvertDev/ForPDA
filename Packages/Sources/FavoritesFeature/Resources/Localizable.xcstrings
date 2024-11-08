@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Bookmarks" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закладки"
-          }
-        }
-      }
-    },
     "Favorites" : {
       "localizations" : {
         "ru" : {
@@ -22,32 +11,22 @@
         }
       }
     },
-    "Feed" : {
+    "Important" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Лента"
+            "value" : "Важные"
           }
         }
       }
     },
-    "Forum" : {
+    "Topics / Forums" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Форум"
-          }
-        }
-      }
-    },
-    "Profile" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
+            "value" : "Темы / Форумы"
           }
         }
       }
