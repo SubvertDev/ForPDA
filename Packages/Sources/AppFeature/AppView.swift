@@ -13,6 +13,7 @@ import BookmarksFeature
 import ForumsListFeature
 import ForumFeature
 import TopicFeature
+import FavoritesFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
@@ -27,6 +28,7 @@ public struct AppView: View {
     public enum Tab: Int, CaseIterable {
         case articlesList = 0
 //        case bookmarks
+        case favorites
         case forum
         case profile
         
@@ -36,6 +38,8 @@ public struct AppView: View {
                 return "Feed"
 //            case .bookmarks:
 //                return "Bookmarks"
+            case .favorites:
+                return "Favorites"
             case .forum:
                 return "Forum"
             case .profile:
@@ -49,6 +53,8 @@ public struct AppView: View {
                 return .docTextImage
 //            case .bookmarks:
 //                return .bookmark
+            case .favorites:
+                return .star
             case .forum:
                 return .bubbleLeftAndBubbleRight
             case .profile:
@@ -76,6 +82,7 @@ public struct AppView: View {
                 TabView(selection: $store.selectedTab) {
                     ArticlesListTab()
 //                    BookmarksTab()
+                    FavoritesTab()
                     ForumTab()
                     ProfileTab()
                 }
@@ -148,6 +155,25 @@ public struct AppView: View {
 //        .tag(Tab.bookmarks)
 //        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
 //    }
+    
+    // MARK: - Favorites Tab
+    @ViewBuilder
+    private func FavoritesTab() -> some View {
+        NavigationStack(path: $store.scope(state: \.favoritesPath, action: \.favoritesPath)) {
+            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
+        } destination: { store in
+            switch store.case {
+            case let .forum(store):
+                ForumScreen(store: store)
+            case let .topic(store):
+                TopicScreen(store: store)
+            case let .settings(store):
+                SettingsScreen(store: store)
+            }
+        }
+        .tag(Tab.favorites)
+        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
+    }
     
     // MARK: - Forum Tab
     

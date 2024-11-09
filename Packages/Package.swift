@@ -16,6 +16,7 @@ let package = Package(
         .library(name: "ForumsListFeature", targets: ["ForumsListFeature"]),
         .library(name: "ForumFeature", targets: ["ForumFeature"]),
         .library(name: "TopicFeature", targets: ["TopicFeature"]),
+        .library(name: "FavoritesFeature", targets: ["FavoritesFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "ProfileFeature", targets: ["ProfileFeature"]),
@@ -65,6 +66,7 @@ let package = Package(
                 "ForumsListFeature",
                 "ForumFeature",
                 "TopicFeature",
+                "FavoritesFeature",
                 "MenuFeature",
                 "AuthFeature",
                 "ProfileFeature",
@@ -166,6 +168,19 @@ let package = Package(
                 "ParsingClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "RichTextKit", package: "RichTextKit"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "FavoritesFeature",
+            dependencies: [
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "CacheClient",
+                "AnalyticsClient",
+                "ParsingClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
             ]
         ),

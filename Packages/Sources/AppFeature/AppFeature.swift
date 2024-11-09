@@ -13,6 +13,7 @@ import BookmarksFeature
 import ForumsListFeature
 import ForumFeature
 import TopicFeature
+import FavoritesFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
@@ -40,6 +41,13 @@ public struct AppFeature: Sendable {
     }
     
     @Reducer(state: .equatable)
+    public enum FavoritesPath {
+        case forum(ForumFeature)
+        case topic(TopicFeature)
+        case settings(SettingsFeature)
+    }
+    
+    @Reducer(state: .equatable)
     public enum ForumPath {
         case forum(ForumFeature)
         case topic(TopicFeature)
@@ -59,11 +67,13 @@ public struct AppFeature: Sendable {
 
         public var articlesPath: StackState<ArticlesPath.State>
 //        public var bookmarksPath: StackState<BookmarksPath.State>
+        public var favoritesPath: StackState<FavoritesPath.State>
         public var forumPath: StackState<ForumPath.State>
         public var profilePath: StackState<ProfilePath.State>
         
         public var articlesList: ArticlesListFeature.State
 //        public var bookmarks: BookmarksFeature.State
+        public var favorites: FavoritesFeature.State
         public var forumsList: ForumsListFeature.State
         public var forum: ForumFeature.State
         public var profile: ProfileFeature.State
@@ -93,10 +103,12 @@ public struct AppFeature: Sendable {
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
 //            bookmarksPath: StackState<BookmarksPath.State> = StackState(),
+            favoritesPath: StackState<FavoritesPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
             menuPath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
 //            bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
+            favorites: FavoritesFeature.State = FavoritesFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(),
             profile: ProfileFeature.State = ProfileFeature.State(),
@@ -111,11 +123,13 @@ public struct AppFeature: Sendable {
 
             self.articlesPath = articlesPath
 //            self.bookmarksPath = bookmarksPath
+            self.favoritesPath = favoritesPath
             self.forumPath = forumPath
             self.profilePath = menuPath
             
             self.articlesList = articlesList
 //            self.bookmarks = bookmarks
+            self.favorites = favorites
             self.forumsList = forumsList
             self.forum = forum
             self.profile = profile
@@ -137,11 +151,13 @@ public struct AppFeature: Sendable {
 
         case articlesPath(StackActionOf<ArticlesPath>)
 //        case bookmarksPath(StackActionOf<BookmarksPath>)
+        case favoritesPath(StackActionOf<FavoritesPath>)
         case forumPath(StackActionOf<ForumPath>)
         case profilePath(StackActionOf<ProfilePath>)
         
         case articlesList(ArticlesListFeature.Action)
 //        case bookmarks(BookmarksFeature.Action)
+        case favorites(FavoritesFeature.Action)
         case forumsList(ForumsListFeature.Action)
         case forum(ForumFeature.Action)
         case profile(ProfileFeature.Action)
@@ -174,6 +190,10 @@ public struct AppFeature: Sendable {
 //        Scope(state: \.bookmarks, action: \.bookmarks) {
 //            BookmarksFeature()
 //        }
+        
+        Scope(state: \.favorites, action: \.favorites) {
+            FavoritesFeature()
+        }
         
         Scope(state: \.forumsList, action: \.forumsList) {
             ForumsListFeature()
@@ -265,10 +285,10 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .forumsList, .forum, .profile:
+            case .articlesList, .forumsList, .forum, .profile, .favorites:
                 return .none
                 
-            case .articlesPath, .forumPath, .profilePath:
+            case .articlesPath, .forumPath, .profilePath, .favoritesPath:
                 return .none
             }
         }
@@ -396,6 +416,47 @@ public struct AppFeature: Sendable {
 //                return .none
 //            }
 //        }
+        
+        // MARK: - Favorites Path
+        
+        Reduce { state, action in
+            switch action {
+            case .favorites(.settingsButtonTapped):
+                state.isShowingTabBar = false
+                state.favoritesPath.append(.settings(SettingsFeature.State()))
+                return .none
+
+            case .favorites(.favoriteTapped(let id, let name, let isForum)):
+                state.favoritesPath.append(isForum
+                    ? .forum(ForumFeature.State(forumId: id, forumName: name))
+                    : .topic(TopicFeature.State(topicId: id))
+                )
+                return .none
+            
+            case let .favoritesPath(.element(id: _, action: .forum(.subforumTapped(forumId, forumName)))):
+                state.favoritesPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
+                return .none
+                
+            case let .favoritesPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
+                state.favoritesPath.append(.topic(TopicFeature.State(topicId: id)))
+                return .none
+                
+            default:
+                return .none
+            }
+        }
+        .forEach(\.favoritesPath, action: \.favoritesPath)
+        .onChange(of: \.favoritesPath) { _, newValue in
+            // TODO: Another way?
+            Reduce { state, _ in
+                let hasSettings = newValue.contains(where: { screen in
+                    if case .settings = screen { return true }
+                    return false
+                })
+                state.isShowingTabBar = !hasSettings
+                return .none
+            }
+        }
         
         // MARK: - Forum Path
         
