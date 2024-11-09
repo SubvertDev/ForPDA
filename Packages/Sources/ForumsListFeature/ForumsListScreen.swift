@@ -25,13 +25,13 @@ public struct ForumsListScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                List(store.state.forums, id: \.id) { structure in
+                List(store.forums, id: \.id) { forumRow in
                     Section {
-                        ForEach(structure.forums) { forum in
+                        ForEach(forumRow.forums) { forum in
                             HStack(spacing: 25) {
-                                Row(title: forum.name, unread: forum.isUnread, action: {
+                                Row(title: forum.name, unread: forum.isUnread) {
                                     store.send(.forumTapped(id: forum.id, name: forum.name))
-                                })
+                                }
                             }
                             .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                             .buttonStyle(.plain)
@@ -39,7 +39,7 @@ public struct ForumsListScreen: View {
                         }
                         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                     } header: {
-                        Header(title: structure.title)
+                        Header(title: forumRow.title)
                     }
                     .listRowBackground(Color.Background.teritary)
                 }
@@ -65,7 +65,7 @@ public struct ForumsListScreen: View {
     // MARK: - Row
     
     @ViewBuilder
-    private func Row(title: String, unread: Bool, action: @escaping () -> Void = {}) -> some View {
+    private func Row(title: String, unread: Bool, action: @escaping () -> Void) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
                 action()
@@ -85,6 +85,7 @@ public struct ForumsListScreen: View {
                             .padding(.trailing, 12)
                     }
                 }
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))

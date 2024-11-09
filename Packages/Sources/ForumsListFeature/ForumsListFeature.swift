@@ -19,10 +19,10 @@ public struct ForumsListFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var forums: [ForumStructure] = []
+        public var forums: [ForumRow] = []
         
         public init(
-            forums: [ForumStructure] = []
+            forums: [ForumRow] = []
         ) {
             self.forums = forums
         }
@@ -34,6 +34,7 @@ public struct ForumsListFeature: Sendable {
         case onTask
         case settingsButtonTapped
         case forumTapped(id: Int, name: String)
+        
         case _forumsListResponse(Result<[ForumInfo], any Error>)
     }
     
@@ -56,18 +57,18 @@ public struct ForumsListFeature: Sendable {
                 return .none
                 
             case let ._forumsListResponse(.success(forums)):
-                var structures: [ForumStructure] = []
+                var rows: [ForumRow] = []
 
                 for forum in forums {
                     if forum.isCategory {
-                        let category = ForumStructure(id: forum.id, title: forum.name, forums: [])
-                        structures.append(category)
+                        let category = ForumRow(id: forum.id, title: forum.name, forums: [])
+                        rows.append(category)
                     } else {
-                        structures[structures.count - 1].forums.append(forum)
+                        rows[rows.count - 1].forums.append(forum)
                     }
                 }
                 
-                state.forums = structures
+                state.forums = rows
                 return .none
                 
             case let ._forumsListResponse(.failure(error)):
@@ -75,17 +76,5 @@ public struct ForumsListFeature: Sendable {
                 return .none
             }
         }
-    }
-}
-
-public struct ForumStructure: Equatable, Identifiable {
-    public let id: Int
-    public let title: String
-    public var forums: [ForumInfo]
-    
-    public init(id: Int, title: String, forums: [ForumInfo]) {
-        self.id = id
-        self.title = title
-        self.forums = forums
     }
 }
