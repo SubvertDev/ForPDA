@@ -7,10 +7,10 @@
 
 import SwiftUI
 import ComposableArchitecture
+import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
-import RichTextKit
 import ParsingClient
 
 public struct TopicScreen: View {
@@ -28,17 +28,18 @@ public struct TopicScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                if let topic = store.topic {
+                if let topic = store.topic, !store.isLoadingTopic {
                     List {
                         Group {
-                            PageNavigation()
+                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                             
                             VStack(spacing: 0) {
                                 ForEach(Array(topic.posts.enumerated()), id: \.0) { index, post in
                                     WithPerceptionTracking {
                                         Divider()
-                                        if store.currentPage != 1 && index == 0 {
+                                        if !store.isFirstPage && index == 0 {
                                             Text("Шапка Темы")
+                                                .padding(16)
                                         } else {
                                             Post(post)
                                                 .padding(.bottom, 16)
@@ -48,7 +49,7 @@ public struct TopicScreen: View {
                                 }
                             }
                             
-                            PageNavigation()
+                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -64,58 +65,6 @@ public struct TopicScreen: View {
                 store.send(.onTask)
             }
         }
-    }
-    
-    // MARK: - Navigation
-    
-    @ViewBuilder
-    private func PageNavigation() -> some View {
-        HStack(spacing: 16) {
-            Button {
-                store.send(.pageNavigationTapped(.first))
-            } label: {
-                NavigationArrow(symbol: .arrowLeftToLine)
-            }
-            .buttonStyle(.plain)
-            .disabled(store.currentPage == 1)
-            
-            Button {
-                store.send(.pageNavigationTapped(.previous))
-            } label: {
-                NavigationArrow(symbol: .arrowLeft)
-            }
-            .buttonStyle(.plain)
-            .disabled(store.currentPage == 1)
-            
-            Text("\(store.currentPage)/\(store.totalPages)")
-            
-            Button {
-                store.send(.pageNavigationTapped(.next))
-            } label: {
-                NavigationArrow(symbol: .arrowRight)
-            }
-            .buttonStyle(.plain)
-            .disabled(store.currentPage + 1 > store.totalPages)
-            
-            Button {
-                store.send(.pageNavigationTapped(.last))
-            } label: {
-                NavigationArrow(symbol: .arrowRightToLine)
-            }
-            .buttonStyle(.plain)
-            .disabled(store.currentPage + 1 > store.totalPages)
-        }
-        .frame(maxWidth: .infinity, maxHeight: 32)
-    }
-    
-    // MARK: - Navigation Arrow
-    
-    @ViewBuilder
-    private func NavigationArrow(symbol: SFSymbol) -> some View {
-        Image(systemSymbol: symbol)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 24, height: 24)
     }
     
     // MARK: - Post
@@ -146,11 +95,7 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func PostBody(_ post: Post) -> some View {
-        RichTextEditor(text: .constant(parseContent(post.content)), context: .init()) {
-            ($0 as? UITextView)?.backgroundColor = .clear
-            ($0 as? UITextView)?.isEditable = false
-            ($0 as? UITextView)?.isScrollEnabled = false
-        }
+        RichText(text: parseContent(post.content))
     }
 }
 

@@ -1,18 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld/%lld" : {
+    "Шапка Темы" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld/%2$lld"
+            "state" : "translated",
+            "value" : "Topic Post"
           }
         }
       }
-    },
-    "Шапка Темы" : {
-
     }
   },
   "version" : "1.0"

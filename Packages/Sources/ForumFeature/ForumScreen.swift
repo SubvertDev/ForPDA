@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
@@ -26,7 +27,7 @@ public struct ForumScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                if let forum = store.forum {
+                if let forum = store.forum, !store.isLoadingTopics {
                     List {
                         if !forum.subforums.isEmpty {
                             SubforumsSection(subforums: forum.subforums)
@@ -77,19 +78,23 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func TopicsSection(topics: [TopicInfo], pinned: Bool) -> some View {
         Section {
-            ForEach(topics) { topic in
-                HStack(spacing: 25) {
-                    Row(title: topic.name, unread: topic.isUnread) {
-                        store.send(.topicTapped(id: topic.id))
-                    }
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .buttonStyle(.plain)
-                .frame(height: 60)
+            if !pinned {
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
+            
+            ForEach(topics) { topic in
+                Row(title: topic.name, lastPost: topic.lastPost, closed: topic.isClosed, unread: topic.isUnread) {
+                    store.send(.topicTapped(id: topic.id))
+                }
+            }
+            .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            
+            if !pinned {
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            }
         } header: {
-            Header(title: pinned ? LocalizedStringKey("Pinned topics") : LocalizedStringKey("Topics"))
+            Header(title: pinned ? "Pinned topics" : "Topics")
         }
         .listRowBackground(Color.Background.teritary)
     }
@@ -100,18 +105,13 @@ public struct ForumScreen: View {
     private func SubforumsSection(subforums: [ForumInfo]) -> some View {
         Section {
             ForEach(subforums) { forum in
-                HStack(spacing: 25) {
-                    Row(title: forum.name, unread: forum.isUnread, action: {
-                        store.send(.subforumTapped(id: forum.id, name: forum.name))
-                    })
+                Row(title: forum.name, unread: forum.isUnread) {
+                    store.send(.subforumTapped(id: forum.id, name: forum.name))
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .buttonStyle(.plain)
-                .frame(height: 60)
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         } header: {
-            Header(title: LocalizedStringKey("Subforums"))
+            Header(title: "Subforums")
         }
         .listRowBackground(Color.Background.teritary)
     }
@@ -122,18 +122,13 @@ public struct ForumScreen: View {
     private func AnnouncmentsSection(announcements: [AnnouncementInfo]) -> some View {
         Section {
             ForEach(announcements) { announcement in
-                HStack(spacing: 25) {
-                    Row(title: announcement.name, action: {
-                        // TODO: announcement page handler
-                    })
+                Row(title: announcement.name) {
+                    store.send(.topicTapped(id: announcement.id))
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .buttonStyle(.plain)
-                .frame(height: 60)
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         } header: {
-            Header(title: LocalizedStringKey("Announcements"))
+            Header(title: "Announcements")
         }
         .listRowBackground(Color.Background.teritary)
     }
@@ -141,44 +136,71 @@ public struct ForumScreen: View {
     // MARK: - Row
     
     @ViewBuilder
-    private func Row(title: String, unread: Bool = false, action: @escaping () -> Void = {}) -> some View {
+    private func Row(
+        title: String,
+        lastPost: TopicInfo.LastPost? = nil,
+        closed: Bool = false,
+        unread: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
                 action()
             } label: {
-                HStack(spacing: 0) {
-                    Text(title)
-                        .font(.body)
-                        .foregroundStyle(Color.Labels.primary)
+                if closed {
+                    Image(systemSymbol: .lock)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+                        .foregroundStyle(Color.Labels.secondary)
+                }
+                
+                HStack(spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        RichText(
+                            text: NSAttributedString(string: title),
+                            font: .body,
+                            foregroundStyle: Color.Labels.primary
+                        )
+                        
+                        if let lastPost {
+                            HStack(spacing: 0) {
+                                Text(lastPost.formattedDate, bundle: Bundle.models)
+                                    .font(.caption)
+                                    .foregroundStyle(Color.Labels.secondary)
+                                    .padding(.trailing, 16)
+                                
+                                Image(systemSymbol: .person)
+                                    .padding(.trailing, 4)
+                                
+                                RichText(
+                                    text: NSAttributedString(string: lastPost.username),
+                                    font: .caption,
+                                    foregroundStyle: Color.Labels.secondary
+                                )
+                            }
+                        }
+                    }
                     
-                    Spacer(minLength: 8)
+                    Spacer()
                     
                     if unread {
                         Circle()
                             .font(.title2)
                             .foregroundStyle(tintColor)
                             .frame(width: 8)
-                            .padding(.trailing, 12)
                     }
                 }
+                .padding(.vertical, 8)
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
-        .frame(height: 60)
+        .frame(minHeight: 60)
     }
     
     // MARK: - Header
-    
-    @ViewBuilder
-    private func Header(title: String) -> some View {
-        Text(title)
-            .font(.subheadline)
-            .foregroundStyle(Color.Labels.teritary)
-            .textCase(nil)
-            .offset(x: 0)
-            .padding(.bottom, 4)
-    }
     
     @ViewBuilder
     private func Header(title: LocalizedStringKey) -> some View {
@@ -191,15 +213,30 @@ public struct ForumScreen: View {
     }
 }
 
+// MARK: - Extensions
+
+extension Bundle {
+    static var models: Bundle? {
+        return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+    }
+}
+
 // MARK: - Previews
 
 #Preview {
     NavigationStack {
         ForumScreen(
             store: Store(
-                initialState: ForumFeature.State(forum: .mock)
+                initialState: ForumFeature.State.init(
+                    forumId: 0,
+                    forumName: "Test name"
+                )
             ) {
                 ForumFeature()
+            } withDependencies: {
+                $0.apiClient.getForum = { @Sendable _, _, _ in
+                    return .mock
+                }
             }
         )
     }

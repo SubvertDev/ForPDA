@@ -15,7 +15,7 @@ public struct Forum: Codable, Sendable, Hashable {
     public let announcements: [AnnouncementInfo]
     public let subforums: [ForumInfo]
     public let topicsCount: Int
-    public let topics: [TopicInfo]
+    public var topics: [TopicInfo]
     public let navigation: [ForumInfo]
     
     public init(
@@ -54,10 +54,15 @@ public extension Forum {
             .mockCategory,
             .mock
         ],
-        topicsCount: 1709,
+        topicsCount: 35,
         topics: [
-            .mock
-        ],
+            [.mockPinned],
+            [.mockLong],
+            [.mockToday],
+            [.mockYesterday],
+            Array(repeating: .mockWeekAgo, count: 26)
+        ].flatMap { $0
+        },
         navigation: [
             ForumInfo(
                 id: 200,

@@ -22,19 +22,25 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var appColorScheme: AppColorScheme
     public var backgroundTheme: BackgroundTheme
     public var appTintColor: AppTintColor
+    public var forumPerPage: Int
+    public var topicPerPage: Int
     
     public init(
         articlesListRowType: ArticleListRowType,
         bookmarksListRowType: ArticleListRowType,
         appColorScheme: AppColorScheme,
         backgroundTheme: BackgroundTheme,
-        appTintColor: AppTintColor
+        appTintColor: AppTintColor,
+        forumPerPage: Int,
+        topicPerPage: Int
     ) {
         self.articlesListRowType = articlesListRowType
         self.bookmarksListRowType = bookmarksListRowType
         self.appColorScheme = appColorScheme
         self.backgroundTheme = backgroundTheme
         self.appTintColor = appTintColor
+        self.forumPerPage = forumPerPage
+        self.topicPerPage = topicPerPage
     }
     
     public init(from decoder: any Decoder) throws {
@@ -44,6 +50,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appColorScheme = try container.decodeIfPresent(AppColorScheme.self, forKey: .appColorScheme) ?? AppSettings.default.appColorScheme
         self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
+        self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
+        self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
     }
 }
 
@@ -53,6 +61,8 @@ public extension AppSettings {
         bookmarksListRowType: .short,
         appColorScheme: .system,
         backgroundTheme: .blue,
-        appTintColor: .primary
+        appTintColor: .primary,
+        forumPerPage: 30,
+        topicPerPage: 20
     )
 }

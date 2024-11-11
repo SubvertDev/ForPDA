@@ -7,15 +7,10 @@
 
 import Foundation
 import ComposableArchitecture
+import PageNavigationFeature
 import APIClient
 import Models
-
-public enum PageNavigationType {
-    case first
-    case previous
-    case next
-    case last
-}
+import PersistenceKeys
 
 @Reducer
 public struct TopicFeature: Sendable {
@@ -26,19 +21,15 @@ public struct TopicFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Shared(.appSettings) var appSettings: AppSettings
+
         let topicId: Int
         var topic: Topic?
         
-        var offset: Int = 0
-        let perPage: Int = 20
+        var isFirstPage = true
+        var isLoadingTopic = true
         
-        var currentPage: Int {
-            return offset / perPage + 1
-        }
-        
-        var totalPages: Int {
-            return topic == nil ? 0 : topic!.postsCount / 20 + 1
-        }
+        var pageNavigation = PageNavigationFeature.State(type: .topic)
         
         public init(
             topicId: Int,
@@ -53,9 +44,9 @@ public struct TopicFeature: Sendable {
     
     public enum Action {
         case onTask
-        case pageNavigationTapped(PageNavigationType)
+        case pageNavigation(PageNavigationFeature.Action)
         
-        case _loadTopic
+        case _loadTopic(offset: Int)
         case _topicResponse(Result<Topic, any Error>)
     }
     
@@ -66,38 +57,35 @@ public struct TopicFeature: Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
+        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+            PageNavigationFeature()
+        }
+        
         Reduce { state, action in
             switch action {
             case .onTask:
-                return .run { [id = state.topicId, offset = state.offset, perPage = state.perPage] send in
+                return .send(._loadTopic(offset: 0))
+
+            case let .pageNavigation(.offsetChanged(to: newOffset)):
+                state.isFirstPage = newOffset == 0
+                return .send(._loadTopic(offset: newOffset))
+                
+            case .pageNavigation:
+                return .none
+                
+            case let ._loadTopic(offset):
+                state.isLoadingTopic = true
+                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
                     let result = await Result { try await apiClient.getTopic(id: id, page: offset, perPage: perPage) }
                     await send(._topicResponse(result))
                 }
                 
-            case let .pageNavigationTapped(type):
-                switch type {
-                case .first:
-                    state.offset = 0
-                case .previous:
-                    state.offset -= state.perPage
-                case .next:
-                    state.offset += state.perPage
-                case .last:
-                    state.offset = state.topic!.postsCount - (state.topic!.postsCount % state.perPage)
-                }
-                // TODO: Remove later
-                state.topic = nil
-                return .run { [topicId = state.topicId, offset = state.offset, perPage = state.perPage] send in
-                    let result = await Result { try await apiClient.getTopic(id: topicId, page: offset, perPage: perPage) }
-                    await send(._topicResponse(result))
-                }
-                
-            case ._loadTopic:
-                return .none
-                
             case let ._topicResponse(.success(topic)):
                 customDump(topic)
                 state.topic = topic
+                // TODO: Is it ok?
+                state.pageNavigation.count = topic.postsCount
+                state.isLoadingTopic = false
                 return .none
                 
             case let ._topicResponse(.failure(error)):
@@ -105,6 +93,5 @@ public struct TopicFeature: Sendable {
                 return .none
             }
         }
-        ._printChanges()
     }
 }

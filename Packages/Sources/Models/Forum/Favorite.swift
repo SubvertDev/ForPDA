@@ -46,7 +46,7 @@ public struct Favorite: Codable, Hashable, Sendable {
 public extension Favorite {
     static let mock = Favorite(
         flag: 73,
-        topic: TopicInfo.mock,
+        topic: .mockToday,
         isForum: false
     )
 }

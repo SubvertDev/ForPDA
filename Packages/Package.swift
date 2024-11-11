@@ -147,6 +147,7 @@ let package = Package(
         .target(
             name: "ForumFeature",
             dependencies: [
+                "PageNavigationFeature",
                 "Models",
                 "SharedUI",
                 "APIClient",
@@ -160,12 +161,14 @@ let package = Package(
         .target(
             name: "TopicFeature",
             dependencies: [
+                "PageNavigationFeature",
                 "Models",
                 "SharedUI",
                 "APIClient",
                 "CacheClient",
                 "AnalyticsClient",
                 "ParsingClient",
+                "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "RichTextKit", package: "RichTextKit"),
                 .product(name: "NukeUI", package: "nuke")
@@ -309,6 +312,15 @@ let package = Package(
         // MARK: - Shared
         
         .target(
+            name: "PageNavigationFeature",
+            dependencies: [
+                "Models",
+                "PersistenceKeys",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+            ]
+        ),
+        .target(
             name: "Models",
             dependencies: [
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
@@ -320,7 +332,8 @@ let package = Package(
                 .product(name: "NukeUI", package: "nuke"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols"),
                 .product(name: "SwiftyGif", package: "SwiftyGif"),
-                .product(name: "SkeletonUI", package: "SkeletonUI")
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
+                .product(name: "RichTextKit", package: "RichTextKit")
             ]
         ),
         .target(
@@ -349,7 +362,7 @@ for target in package.targets where target.type != .binary {
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
     swiftSettings.append(
         .unsafeFlags(["-Xfrontend",
-                      "-warn-long-function-bodies=500",
+                      "-warn-long-function-bodies=550",
                       "-Xfrontend",
                       "-warn-long-expression-type-checking=100"])
     )

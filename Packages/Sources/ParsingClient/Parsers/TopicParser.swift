@@ -15,12 +15,12 @@ public struct TopicParser {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 return Topic(
                     id: array[3] as! Int,
-                    name: array[4] as! String,
+                    name: (array[4] as! String).convertHtmlCodes(),
                     description: array[5] as! String,
                     flag: array[6] as! Int,
                     createdAt: Date(timeIntervalSince1970: array[7] as! TimeInterval),
                     authorId: array[8] as! Int,
-                    authorName: array[9] as! String,
+                    authorName: (array[9] as! String).convertHtmlCodes(),
                     curatorId: array[10] as! Int,
                     curatorName: array[11] as! String,
                     poll: parsePoll(array[12] as! [Any]),
@@ -75,7 +75,7 @@ public struct TopicParser {
             let lastEdit: Post.LastEdit? = if post.count > 13 {
                 Post.LastEdit(
                     userId: post[16] as! Int,
-                    username: post[14] as! String,
+                    username: (post[14] as! String).convertHtmlCodes(),
                     reason: post[15] as! String,
                     date: Date(timeIntervalSince1970: post[13] as! TimeInterval)
                 )

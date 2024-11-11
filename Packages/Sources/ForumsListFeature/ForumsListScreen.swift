@@ -25,25 +25,29 @@ public struct ForumsListScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                List(store.forums, id: \.id) { forumRow in
-                    Section {
-                        ForEach(forumRow.forums) { forum in
-                            HStack(spacing: 25) {
-                                Row(title: forum.name, unread: forum.isUnread) {
-                                    store.send(.forumTapped(id: forum.id, name: forum.name))
+                if !store.forums.isEmpty {
+                    List(store.forums, id: \.id) { forumRow in
+                        Section {
+                            ForEach(forumRow.forums) { forum in
+                                HStack(spacing: 25) {
+                                    Row(title: forum.name, unread: forum.isUnread) {
+                                        store.send(.forumTapped(id: forum.id, name: forum.name))
+                                    }
                                 }
+                                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                                .buttonStyle(.plain)
+                                .frame(height: 60)
                             }
-                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                            .buttonStyle(.plain)
-                            .frame(height: 60)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        } header: {
+                            Header(title: forumRow.title)
                         }
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    } header: {
-                        Header(title: forumRow.title)
+                        .listRowBackground(Color.Background.teritary)
                     }
-                    .listRowBackground(Color.Background.teritary)
+                    .scrollContentBackground(.hidden)
+                } else {
+                    ProgressView().id(UUID())
                 }
-                .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Forum", bundle: .module))
             .navigationBarTitleDisplayMode(.large)

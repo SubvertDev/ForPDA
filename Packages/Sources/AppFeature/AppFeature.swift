@@ -89,9 +89,9 @@ public struct AppFeature: Sendable {
         public var toast: ToastInfo
         public var localizationBundle: Bundle? {
             switch toast.screen {
-            case .articlesList: return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticlesListFeature") })
-            case .article:      return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticleFeature") })
-            case .comments:     return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+            case .articlesList: return Bundle.articlesListFeature
+            case .article:      return Bundle.articleFeature
+            case .comments:     return Bundle.comments
             }
         }
         
@@ -110,7 +110,7 @@ public struct AppFeature: Sendable {
 //            bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             favorites: FavoritesFeature.State = FavoritesFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
-            forum: ForumFeature.State = ForumFeature.State(),
+            forum: ForumFeature.State = ForumFeature.State(forumId: 0, forumName: "Test"),
             profile: ProfileFeature.State = ProfileFeature.State(),
             auth: AuthFeature.State? = nil,
             selectedTab: AppView.Tab = .articlesList,
@@ -526,5 +526,21 @@ public struct AppFeature: Sendable {
                 return .none
             }
         }
+    }
+}
+
+// MARK: - Extensions
+
+private extension Bundle {
+    static var articlesListFeature: Bundle? {
+        return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticlesListFeature") })
+    }
+    
+    static var articleFeature: Bundle? {
+        Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticleFeature") })
+    }
+    
+    static var comments: Bundle? {
+        Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }

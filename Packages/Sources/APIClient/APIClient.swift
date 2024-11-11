@@ -150,14 +150,14 @@ extension APIClient: DependencyKey {
                 let response = try await parsingClient.parseForumsList(rawString: rawString)
                 return response
             },
-            getForum: { id, page, perPage in
-                let rawString = try api.get(ForumCommand.view(id: id, page: page, itemsPerPage: perPage))
+            getForum: { id, offset, perPage in
+                let rawString = try api.get(ForumCommand.view(id: id, page: offset, itemsPerPage: perPage))
                 @Dependency(\.parsingClient) var parsingClient
                 let response = try await parsingClient.parseForum(rawString: rawString)
                 return response
             },
-            getTopic: { id, page, perPage in
-                let request = TopicRequest(id: id, page: page, itemsPerPage: perPage, showPostMode: 1)
+            getTopic: { id, offset, perPage in
+                let request = TopicRequest(id: id, page: offset, itemsPerPage: perPage, showPostMode: 1)
                 let rawString = try api.get(ForumCommand.Topic.view(data: request))
                 @Dependency(\.parsingClient) var parsingClient
                 let response = try await parsingClient.parseTopic(rawString: rawString)
