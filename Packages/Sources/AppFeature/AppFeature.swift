@@ -42,8 +42,6 @@ public struct AppFeature: Sendable {
     
     @Reducer(state: .equatable)
     public enum FavoritesPath {
-        case forum(ForumFeature)
-        case topic(TopicFeature)
         case settings(SettingsFeature)
     }
     
@@ -427,18 +425,12 @@ public struct AppFeature: Sendable {
                 return .none
 
             case .favorites(.favoriteTapped(let id, let name, let isForum)):
-                state.favoritesPath.append(isForum
-                    ? .forum(ForumFeature.State(forumId: id, forumName: name))
-                    : .topic(TopicFeature.State(topicId: id))
-                )
-                return .none
-            
-            case let .favoritesPath(.element(id: _, action: .forum(.subforumTapped(forumId, forumName)))):
-                state.favoritesPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
-                return .none
-                
-            case let .favoritesPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
-                state.favoritesPath.append(.topic(TopicFeature.State(topicId: id)))
+                state.selectedTab = .forum
+                if isForum {
+                    state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: name)))
+                } else {
+                    state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                }
                 return .none
                 
             default:

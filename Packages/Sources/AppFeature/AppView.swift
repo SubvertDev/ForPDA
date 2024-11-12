@@ -163,10 +163,6 @@ public struct AppView: View {
             FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
         } destination: { store in
             switch store.case {
-            case let .forum(store):
-                ForumScreen(store: store)
-            case let .topic(store):
-                TopicScreen(store: store)
             case let .settings(store):
                 SettingsScreen(store: store)
             }
