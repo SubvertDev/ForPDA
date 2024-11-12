@@ -145,9 +145,15 @@ extension APIClient: DependencyKey {
                 }
             },
             getForumsList: {
+                // FIXME: Remove after fixing API
+                @Dependency(\.cacheClient) var cacheClient
+                let forums = await cacheClient.getForumsList()
+                if !forums.isEmpty { return forums }
+                
                 let rawString = try api.get(ForumCommand.list)
                 @Dependency(\.parsingClient) var parsingClient
                 let response = try await parsingClient.parseForumsList(rawString: rawString)
+                try? await cacheClient.cacheForumsList(response)
                 return response
             },
             getForum: { id, offset, perPage in

@@ -22,6 +22,9 @@ public struct CacheClient: Sendable {
     // Users
     public var cacheUser: @Sendable (User) async throws -> Void
     public var getUser: @Sendable (_ id: Int) async -> User?
+    // Forums List
+    public var cacheForumsList: @Sendable ([ForumInfo]) async throws -> Void
+    public var getForumsList: @Sendable () async -> [ForumInfo]
 }
 
 extension CacheClient: DependencyKey {
@@ -43,6 +46,16 @@ extension CacheClient: DependencyKey {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: User.self)
+        )
+    }
+    
+    private static var forumsListKey: String { "forumsListKey" }
+    private static var forumsListStorage: Storage<String, [ForumInfo]> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "ForumsList", expiry: .seconds(2592000), maxSize: 81920),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: [ForumInfo].self)
         )
     }
     
@@ -71,6 +84,12 @@ extension CacheClient: DependencyKey {
             },
             getUser: { userId in
                 return try? usersStorage.object(forKey: userId)
+            },
+            cacheForumsList: { forumsList in
+                try forumsListStorage.setObject(forumsList, forKey: forumsListKey)
+            },
+            getForumsList: {
+                return (try? forumsListStorage.object(forKey: forumsListKey)) ?? []
             }
         )
     }
