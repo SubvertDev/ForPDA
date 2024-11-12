@@ -38,8 +38,7 @@ let package = Package(
         .library(name: "TCAExtensions", targets: ["TCAExtensions"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.1.0"),
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.15.2"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.16.0"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
@@ -51,6 +50,7 @@ let package = Package(
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.11.0"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.1.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main")
     ],
     targets: [
