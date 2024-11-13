@@ -178,7 +178,7 @@ public struct ArticleRowView: View {
                 .foregroundStyle(Color.Labels.quaternary)
                 .padding(.trailing, 6)
             
-            Text(state.formattedDate)
+            Text(state.formattedDate, bundle: .module)
                 .font(.caption)
                 .foregroundStyle(Color.Labels.quaternary)
             
@@ -241,10 +241,18 @@ public extension ArticleRowView {
             self.date = date
         }
         
-        public var formattedDate: String {
+        public var formattedDate: LocalizedStringKey {
             let formatter = DateFormatter()
-            formatter.dateFormat = "dd MMM yyyy"
-            return formatter.string(from: date)
+            formatter.dateFormat = "HH:mm"
+
+            if Calendar.current.isDateInToday(date) {
+                return LocalizedStringKey("Today, \(formatter.string(from: date))")
+            } else if Calendar.current.isDateInYesterday(date) {
+                return LocalizedStringKey("Yesterday, \(formatter.string(from: date))")
+            } else {
+                formatter.dateFormat = "dd MMM yyyy"
+                return LocalizedStringKey(formatter.string(from: date))
+            }
         }
     }
 }
