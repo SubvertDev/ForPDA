@@ -63,6 +63,7 @@ public struct SettingsScreen: View {
         case navigation
         case backgroundPicker
         case themePicker
+        case startPagePicker
     }
         
     @ViewBuilder
@@ -126,6 +127,22 @@ public struct SettingsScreen: View {
                         } label: {
                             HStack(spacing: 9) {
                                 Text(store.appTintColor.title, bundle: .module)
+                                Image(systemSymbol: .chevronUpChevronDown)
+                            }
+                            .foregroundStyle(Color.Labels.teritary)
+                        }
+                        
+                    case .startPagePicker:
+                        Menu {
+                            Picker(String(""), selection: $store.startPage) {
+                                ForEach(AppTab.allCases, id: \.self) { tab in
+                                    Text(tab.title, bundle: .models)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                        } label: {
+                            HStack(spacing: 9) {
+                                Text(store.startPage.title, bundle: .models)
                                 Image(systemSymbol: .chevronUpChevronDown)
                             }
                             .foregroundStyle(Color.Labels.teritary)
@@ -204,6 +221,8 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func BasicSection() -> some View {
         Section {
+            Row(symbol: ._1Circle, title: "Starting page", type: .startPagePicker)
+            
             Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
             
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
@@ -350,6 +369,14 @@ extension AppTintColor {
         case .sky:      Image.Settings.Theme.circleSky
         case .yellow:   Image.Settings.Theme.circleYellow
         }
+    }
+}
+
+// MARK: - Extensions
+
+private extension Bundle {
+    static var models: Bundle? {
+        return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }
 

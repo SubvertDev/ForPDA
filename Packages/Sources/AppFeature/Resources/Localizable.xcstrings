@@ -1,57 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Articles" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Статьи"
-          }
-        }
-      }
-    },
-    "Bookmarks" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закладки"
-          }
-        }
-      }
-    },
-    "Favorites" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Избранное"
-          }
-        }
-      }
-    },
-    "Forum" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Форум"
-          }
-        }
-      }
-    },
-    "Profile" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
-          }
-        }
-      }
-    }
+
   },
   "version" : "1.0"
 }

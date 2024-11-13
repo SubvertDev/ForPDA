@@ -333,6 +333,16 @@
         }
       }
     },
+    "Starting page" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Стартовый экран"
+          }
+        }
+      }
+    },
     "System" : {
       "localizations" : {
         "ru" : {

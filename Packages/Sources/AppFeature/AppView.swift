@@ -25,44 +25,6 @@ import Models
 
 public struct AppView: View {
     
-    public enum Tab: Int, CaseIterable {
-        case articlesList = 0
-//        case bookmarks
-        case favorites
-        case forum
-        case profile
-        
-        var title: LocalizedStringKey {
-            switch self {
-            case .articlesList:
-                return "Articles"
-//            case .bookmarks:
-//                return "Bookmarks"
-            case .favorites:
-                return "Favorites"
-            case .forum:
-                return "Forum"
-            case .profile:
-                return "Profile"
-            }
-        }
-        
-        var iconSymbol: SFSymbol {
-            switch self {
-            case .articlesList:
-                return .docTextImage
-//            case .bookmarks:
-//                return .bookmark
-            case .favorites:
-                return .star
-            case .forum:
-                return .bubbleLeftAndBubbleRight
-            case .profile:
-                return .personCropCircle
-            }
-        }
-    }
-    
     @Perception.Bindable public var store: StoreOf<AppFeature>
     @Environment(\.tintColor) private var tintColor
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
@@ -140,7 +102,7 @@ public struct AppView: View {
                 SettingsScreen(store: store)
             }
         }
-        .tag(Tab.articlesList)
+        .tag(AppTab.articlesList)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
@@ -171,7 +133,7 @@ public struct AppView: View {
                 SettingsScreen(store: store)
             }
         }
-        .tag(Tab.favorites)
+        .tag(AppTab.favorites)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
@@ -193,7 +155,7 @@ public struct AppView: View {
                 SettingsScreen(store: store)
             }
         }
-        .tag(Tab.forum)
+        .tag(AppTab.forum)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
@@ -209,7 +171,7 @@ public struct AppView: View {
                 SettingsScreen(store: store)
             }
         }
-        .tag(Tab.profile)
+        .tag(AppTab.profile)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
@@ -219,7 +181,7 @@ public struct AppView: View {
     private func PDATabView() -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                ForEach(Tab.allCases, id: \.self) { tab in
+                ForEach(AppTab.allCases, id: \.self) { tab in
                     Button {
                         store.send(.didSelectTab(tab))
                         shouldAnimatedTabItem[tab.rawValue].toggle()

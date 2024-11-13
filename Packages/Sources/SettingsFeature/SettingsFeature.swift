@@ -29,8 +29,11 @@ public struct SettingsFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        @Presents public var destination: Destination.State?
         @Shared(.appSettings) public var appSettings: AppSettings
+        
+        @Presents public var destination: Destination.State?
+        
+        public var startPage: AppTab
         public var appColorScheme: AppColorScheme
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
@@ -55,15 +58,11 @@ public struct SettingsFeature: Sendable {
             destination: Destination.State? = nil
         ) {
             self.destination = destination
-            
-            // TODO: Two liners so I don't need to set default in state
-            self.appColorScheme = AppSettings.default.appColorScheme
-            self.backgroundTheme = AppSettings.default.backgroundTheme
-            self.appTintColor = AppSettings.default.appTintColor
 
-            self.appColorScheme = $appSettings.appColorScheme.wrappedValue
-            self.backgroundTheme = $appSettings.backgroundTheme.wrappedValue
-            self.appTintColor = $appSettings.appTintColor.wrappedValue
+            self.startPage = _appSettings.startPage.wrappedValue
+            self.appColorScheme = _appSettings.appColorScheme.wrappedValue
+            self.backgroundTheme = _appSettings.backgroundTheme.wrappedValue
+            self.appTintColor = _appSettings.appTintColor.wrappedValue
         }
     }
     
@@ -192,6 +191,12 @@ public struct SettingsFeature: Sendable {
                 state.backgroundTheme = .blue
                 state.destination = .alert(.notImplemented)
                 return .none
+                
+            case .binding(\.startPage):
+                return .run { [appSettings = state.$appSettings,
+                               page = state.startPage] _ in
+                    await appSettings.withLock { $0.startPage = page }
+                }
                 
             case .destination, .binding:
                 return .none
