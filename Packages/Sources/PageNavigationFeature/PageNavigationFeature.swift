@@ -24,10 +24,14 @@ public struct PageNavigationFeature: Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        
         let type: PageNavigationType
         public var count: Int = 0
         var offset: Int = 0
         var perPage: Int
+        public var shouldShow: Bool {
+            return count > perPage
+        }
         
         var currentPage: Int {
             return offset / perPage + 1

@@ -66,7 +66,7 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
         Section {
-            if !important {
+            if !important, store.pageNavigation.shouldShow {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
             
@@ -82,7 +82,7 @@ public struct FavoritesScreen: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            if !important {
+            if !important, store.pageNavigation.shouldShow {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
         } header: {

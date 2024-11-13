@@ -78,7 +78,7 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func TopicsSection(topics: [TopicInfo], pinned: Bool) -> some View {
         Section {
-            if !pinned {
+            if !pinned, store.pageNavigation.shouldShow {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
             
@@ -90,7 +90,7 @@ public struct ForumScreen: View {
             .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            if !pinned {
+            if !pinned, store.pageNavigation.shouldShow {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
         } header: {

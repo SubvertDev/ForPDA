@@ -31,7 +31,9 @@ public struct TopicScreen: View {
                 if let topic = store.topic, !store.isLoadingTopic {
                     List {
                         Group {
-                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                            if store.pageNavigation.shouldShow {
+                                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                            }
                             
                             VStack(spacing: 0) {
                                 ForEach(Array(topic.posts.enumerated()), id: \.0) { index, post in
@@ -49,7 +51,9 @@ public struct TopicScreen: View {
                                 }
                             }
                             
-                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                            if store.pageNavigation.shouldShow {
+                                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                            }
                         }
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
