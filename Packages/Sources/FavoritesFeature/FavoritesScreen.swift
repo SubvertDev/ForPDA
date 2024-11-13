@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
@@ -26,14 +27,18 @@ public struct FavoritesScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
 
-                List {
-                    if !store.favoritesImportant.isEmpty {
-                        FavoritesSection(favorites: store.favoritesImportant, important: true)
+                if !store.isLoading {
+                    List {
+                        if !store.favoritesImportant.isEmpty {
+                            FavoritesSection(favorites: store.favoritesImportant, important: true)
+                        }
+                        
+                        FavoritesSection(favorites: store.favorites, important: false)
                     }
-                    
-                    FavoritesSection(favorites: store.favorites, important: false)
+                    .scrollContentBackground(.hidden)
+                } else {
+                    ProgressView().id(UUID())
                 }
-                .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Favorites", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
@@ -59,8 +64,12 @@ public struct FavoritesScreen: View {
     // MARK: - Topics
     
     @ViewBuilder
-    private func FavoritesSection(favorites: [Favorite], important: Bool) -> some View {
+    private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
         Section {
+            if !important {
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            }
+            
             ForEach(favorites, id: \.hashValue) { fav in
                 HStack(spacing: 25) {
                     Row(title: fav.topic.name, unread: fav.topic.isUnread, notify: fav.notify) {
@@ -72,6 +81,10 @@ public struct FavoritesScreen: View {
                 .frame(height: 60)
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            
+            if !important {
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            }
         } header: {
             Header(title: important
                    ? LocalizedStringKey("Important")
@@ -83,7 +96,7 @@ public struct FavoritesScreen: View {
     // MARK: - Row
     
     @ViewBuilder
-    private func Row(title: String, unread: Bool = false, notify: Favorite.Notify, action: @escaping () -> Void = {}) -> some View {
+    private func Row(title: String, unread: Bool = false, notify: FavoriteInfo.Notify, action: @escaping () -> Void = {}) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
                 action()

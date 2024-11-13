@@ -21,7 +21,7 @@ public struct ParsingClient: Sendable {
     public var parseForum: @Sendable (_ rawString: String) async throws -> Forum
     public var parseTopic: @Sendable (_ rawString: String) async throws -> Topic
     public var parseAnnouncement: @Sendable (_ rawString: String) async throws -> Announcement
-    public var parseFavorites: @Sendable (_ rawString: String) async throws -> [Favorite]
+    public var parseFavorites: @Sendable (_ rawString: String) async throws -> Favorite
 }
 
 extension DependencyValues {

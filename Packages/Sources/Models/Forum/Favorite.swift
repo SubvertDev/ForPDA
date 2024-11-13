@@ -2,51 +2,25 @@
 //  Favorite.swift
 //  ForPDA
 //
-//  Created by Xialtal on 8.11.24.
+//  Created by Xialtal on 12.11.24.
 //
 
 public struct Favorite: Codable, Hashable, Sendable {
-    public let flag: Int
-    public let topic: TopicInfo
-    public let isForum: Bool
-    
-    public enum Notify {
-        case always
-        case once
-        case doNot
-    }
-    
-    public var notify: Notify {
-        return switch (flag & 3) {
-            case 0: .doNot
-            case 2: .once
-            default: .always
-        }
-    }
-    
-    public var isImportant: Bool {
-        return (topic.flag & 1) > 0
-    }
-    
-    public var isNotifyHatUpdate: Bool {
-        return ((flag & 3) & 4) > 0
-    }
+    public let favorites: [FavoriteInfo]
+    public let favoritesCount: Int
     
     public init(
-        flag: Int,
-        topic: TopicInfo,
-        isForum: Bool
+        favorites: [FavoriteInfo],
+        favoritesCount: Int
     ) {
-        self.flag = flag
-        self.topic = topic
-        self.isForum = isForum
+        self.favorites = favorites
+        self.favoritesCount = favoritesCount
     }
 }
 
 public extension Favorite {
     static let mock = Favorite(
-        flag: 73,
-        topic: .mockToday,
-        isForum: false
+        favorites: [.mock],
+        favoritesCount: 1
     )
 }
