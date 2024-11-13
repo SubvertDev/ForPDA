@@ -1,5 +1,5 @@
 //
-//  ModernCircularLoader.swift
+//  PDALoader.swift
 //
 //
 //  Created by Ilia Lubianoi on 19.05.2024.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct ModernCircularLoader: View {
+public struct PDALoader: View {
     
     @Environment(\.tintColor) private var tintColor
     @State private var trimEnd = 0.75
@@ -46,6 +46,6 @@ public struct ModernCircularLoader: View {
 }
 
 #Preview {
-    ModernCircularLoader()
+    PDALoader()
         .frame(width: 24, height: 24)
 }

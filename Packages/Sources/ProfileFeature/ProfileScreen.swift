@@ -57,7 +57,8 @@ public struct ProfileScreen: View {
                     .listSectionSpacingBackport(28)
                     .scrollContentBackground(.hidden)
                 } else {
-                    ProgressView().id(UUID())
+                    PDALoader()
+                        .frame(width: 24, height: 24)
                 }
             }
             .navigationTitle(Text("Profile", bundle: .module))

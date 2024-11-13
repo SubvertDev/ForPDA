@@ -92,8 +92,11 @@ public struct AuthScreen: View {
                                         }
                                     }
                                 } else {
-                                    HStack { ProgressView() }
-                                        .frame(maxWidth: .infinity)
+                                    HStack {
+                                        PDALoader()
+                                            .frame(width: 24, height: 24)
+                                    }
+                                    .frame(maxWidth: .infinity)
                                 }
                             }
                             .clipShape(RoundedRectangle(cornerRadius: 14))

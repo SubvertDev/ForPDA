@@ -31,7 +31,7 @@ public struct ArticlesListScreen: View {
                     }
                 
                 if store.isLoading && store.articles.isEmpty {
-                    ModernCircularLoader()
+                    PDALoader()
                         .frame(width: 24, height: 24)
                 }
             }
@@ -103,7 +103,7 @@ public struct ArticlesListScreen: View {
             }
             
             if !store.articles.isEmpty {
-                ModernCircularLoader()
+                PDALoader()
                     .frame(width: 24, height: 24)
                     .padding(.top, 14)
                     .padding(.bottom, 20)

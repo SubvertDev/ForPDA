@@ -373,7 +373,7 @@ public struct ArticleScreen: View {
     @ViewBuilder
     private func ArticleLoader() -> some View {
         VStack {
-            ModernCircularLoader()
+            PDALoader()
                 .frame(width: 24, height: 24)
             
             Text("Loading article...", bundle: .module)

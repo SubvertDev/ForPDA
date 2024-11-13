@@ -46,7 +46,8 @@ public struct ForumsListScreen: View {
                     }
                     .scrollContentBackground(.hidden)
                 } else {
-                    ProgressView().id(UUID())
+                    PDALoader()
+                        .frame(width: 24, height: 24)
                 }
             }
             .navigationTitle(Text("Forum", bundle: .module))

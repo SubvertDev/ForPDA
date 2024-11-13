@@ -60,7 +60,8 @@ public struct TopicScreen: View {
                     }
                     .listStyle(.plain)
                 } else {
-                    ProgressView().id(UUID())
+                    PDALoader()
+                        .frame(width: 24, height: 24)
                 }
             }
             .navigationTitle(Text(store.topic?.name ?? "Загружаем..."))
