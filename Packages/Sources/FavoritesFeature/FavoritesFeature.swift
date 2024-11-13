@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import PageNavigationFeature
 import APIClient
 import Models
 
@@ -19,12 +20,18 @@ public struct FavoritesFeature: Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var favorites: [Favorite] = []
-        public var favoritesImportant: [Favorite] = []
+        @Shared(.appSettings) var appSettings: AppSettings
+        
+        public var favorites: [FavoriteInfo] = []
+        public var favoritesImportant: [FavoriteInfo] = []
+        
+        public var isLoading = false
+        
+        public var pageNavigation = PageNavigationFeature.State(type: .forum)
         
         public init(
-            favorites: [Favorite] = [],
-            favoritesImportant: [Favorite] = []
+            favorites: [FavoriteInfo] = [],
+            favoritesImportant: [FavoriteInfo] = []
         ) {
             self.favorites = favorites
             self.favoritesImportant = favoritesImportant
@@ -38,7 +45,12 @@ public struct FavoritesFeature: Sendable {
         case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, isForum: Bool)
         
-        case _favoritesResponse(Result<[Favorite], any Error>)
+        case pageNavigation(PageNavigationFeature.Action)
+        
+        case _favoritesResponse(Result<Favorite, any Error>)
+        
+        // TODO: Implement unreadFirst setting
+        case _loadFavorites(unreadFirst: Bool = true, offset: Int)
     }
     
     // MARK: - Dependencies
@@ -48,23 +60,39 @@ public struct FavoritesFeature: Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
+        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+            PageNavigationFeature()
+        }
+        
         Reduce { state, action in
             switch action {
             case .onTask:
-                return .run { send in
-                    // TODO: Implement unreadFirst and perPage.
-                    let result = await Result { try await apiClient.getFavorites(unreadFirst: true, perPage: 10) }
-                    await send(._favoritesResponse(result))
-                }
+                return .send(._loadFavorites(unreadFirst: true, offset: 0))
+                
+            case let .pageNavigation(.offsetChanged(to: newOffset)):
+                // TODO: Implement unreadFirst setting
+                return .send(._loadFavorites(unreadFirst: true, offset: newOffset))
+                
+            case .pageNavigation:
+                return .none
                 
             case .settingsButtonTapped, .favoriteTapped(_, _, _):
                 return .none
                 
+            case let ._loadFavorites(unreadFirst, offset):
+                state.isLoading = true
+                return .run { [perPage = state.appSettings.forumPerPage] send in
+                    let result = await Result {
+                        try await apiClient.getFavorites(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
+                    }
+                    await send(._favoritesResponse(result))
+                }
+                
             case let ._favoritesResponse(.success(response)):
-                var favsImportant: [Favorite] = []
-                var favorites: [Favorite] = []
+                var favsImportant: [FavoriteInfo] = []
+                var favorites: [FavoriteInfo] = []
 
-                for favorite in response {
+                for favorite in response.favorites {
                     if favorite.isImportant {
                         favsImportant.append(favorite)
                     } else {
@@ -74,6 +102,12 @@ public struct FavoritesFeature: Sendable {
                 
                 state.favoritesImportant = favsImportant
                 state.favorites = favorites
+                
+                // TODO: Is it ok?
+                state.pageNavigation.count = response.favoritesCount
+                
+                state.isLoading = false
+                
                 return .none
                 
             case let ._favoritesResponse(.failure(error)):

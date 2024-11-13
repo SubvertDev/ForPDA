@@ -178,6 +178,7 @@ let package = Package(
         .target(
             name: "FavoritesFeature",
             dependencies: [
+                "PageNavigationFeature",
                 "Models",
                 "SharedUI",
                 "APIClient",
