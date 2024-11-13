@@ -35,7 +35,7 @@ public struct AppView: View {
         var title: LocalizedStringKey {
             switch self {
             case .articlesList:
-                return "Feed"
+                return "Articles"
 //            case .bookmarks:
 //                return "Bookmarks"
             case .favorites:

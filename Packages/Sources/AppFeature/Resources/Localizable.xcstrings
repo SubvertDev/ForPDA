@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Articles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статьи"
+          }
+        }
+      }
+    },
     "Bookmarks" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -18,16 +28,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Избранное"
-          }
-        }
-      }
-    },
-    "Feed" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Лента"
           }
         }
       }
