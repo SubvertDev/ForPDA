@@ -92,7 +92,7 @@ public struct AppFeature: Sendable {
             switch toast.screen {
             case .articlesList: return Bundle.articlesListFeature
             case .article:      return Bundle.articleFeature
-            case .comments:     return Bundle.comments
+            case .comments:     return Bundle.models
             }
         }
         
@@ -549,7 +549,7 @@ public struct AppFeature: Sendable {
 
 // MARK: - Extensions
 
-private extension Bundle {
+extension Bundle {
     static var articlesListFeature: Bundle? {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticlesListFeature") })
     }
@@ -558,7 +558,7 @@ private extension Bundle {
         Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticleFeature") })
     }
     
-    static var comments: Bundle? {
+    static var models: Bundle? {
         Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }

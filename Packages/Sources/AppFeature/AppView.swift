@@ -211,7 +211,7 @@ public struct AppView: View {
                 .font(.body)
                 .bounceUpByLayerEffect(value: shouldAnimatedTabItem[index])
                 .frame(width: 32, height: 32)
-            Text(title, bundle: .module)
+            Text(title, bundle: .models)
                 .font(.caption2)
         }
         .foregroundStyle(store.selectedTab.rawValue == index
