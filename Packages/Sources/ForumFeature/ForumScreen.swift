@@ -172,6 +172,7 @@ public struct ForumScreen: View {
                                     .padding(.trailing, 16)
                                 
                                 Image(systemSymbol: .person)
+                                    .font(.caption)
                                     .padding(.trailing, 4)
                                 
                                 RichText(
@@ -183,8 +184,8 @@ public struct ForumScreen: View {
                         }
                     }
                     
-                    Spacer()
-                    
+                    Spacer(minLength: 0)
+
                     if unread {
                         Circle()
                             .font(.title2)

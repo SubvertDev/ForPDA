@@ -71,15 +71,21 @@ public struct FavoritesScreen: View {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
             
-            ForEach(favorites, id: \.hashValue) { fav in
-                HStack(spacing: 25) {
-                    Row(title: fav.topic.name, unread: fav.topic.isUnread, notify: fav.notify) {
-                        store.send(.favoriteTapped(id: fav.topic.id, name: fav.topic.name, isForum: fav.isForum))
-                    }
+            ForEach(favorites, id: \.hashValue) { favorite in
+                Row(
+                    title: favorite.topic.name,
+                    lastPost: favorite.topic.lastPost,
+                    unread: favorite.topic.isUnread,
+                    notify: favorite.notify
+                ) {
+                    store.send(
+                        .favoriteTapped(
+                            id: favorite.topic.id,
+                            name: favorite.topic.name,
+                            isForum: favorite.isForum
+                        )
+                    )
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .buttonStyle(.plain)
-                .frame(height: 60)
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
@@ -97,50 +103,68 @@ public struct FavoritesScreen: View {
     // MARK: - Row
     
     @ViewBuilder
-    private func Row(title: String, unread: Bool = false, notify: FavoriteInfo.Notify, action: @escaping () -> Void = {}) -> some View {
+    private func Row(
+        title: String,
+        lastPost: TopicInfo.LastPost? = nil,
+        unread: Bool = false,
+        notify: FavoriteInfo.Notify,
+        action: @escaping () -> Void = {}
+    ) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
                 action()
             } label: {
-                HStack(spacing: 0) {
+                HStack(spacing: 8) {
                     // TODO: Add notify symbol.
                     // If notify - .all, and isNotifyHatUpdate == true,
                     // then display isNotifyHatUpdate symbol.
                     
-                    Text(title)
-                        .font(.body)
-                        .foregroundStyle(Color.Labels.primary)
+                    VStack(alignment: .leading, spacing: 4) {
+                        RichText(
+                            text: NSAttributedString(string: title),
+                            font: .body,
+                            foregroundStyle: Color.Labels.primary
+                        )
+                        
+                        if let lastPost {
+                            HStack(spacing: 0) {
+                                Text(lastPost.formattedDate, bundle: .models)
+                                    .font(.caption)
+                                    .foregroundStyle(Color.Labels.secondary)
+                                    .padding(.trailing, 16)
+                                
+                                Image(systemSymbol: .person)
+                                    .font(.caption)
+                                    .padding(.trailing, 4)
+                                
+                                RichText(
+                                    text: NSAttributedString(string: lastPost.username),
+                                    font: .caption,
+                                    foregroundStyle: Color.Labels.secondary
+                                )
+                            }
+                        }
+                    }
                     
-                    // TODO: Add last post info.
-                    
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 0)
                     
                     if unread {
                         Circle()
                             .font(.title2)
                             .foregroundStyle(tintColor)
                             .frame(width: 8)
-                            .padding(.trailing, 12)
                     }
                 }
+                .padding(.vertical, 8)
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
-        .frame(height: 60)
+        .frame(minHeight: 60)
     }
     
     // MARK: - Header
-    
-    @ViewBuilder
-    private func Header(title: String) -> some View {
-        Text(title)
-            .font(.subheadline)
-            .foregroundStyle(Color.Labels.teritary)
-            .textCase(nil)
-            .offset(x: 0)
-            .padding(.bottom, 4)
-    }
     
     @ViewBuilder
     private func Header(title: LocalizedStringKey) -> some View {
@@ -150,6 +174,14 @@ public struct FavoritesScreen: View {
             .textCase(nil)
             .offset(x: 0)
             .padding(.bottom, 4)
+    }
+}
+
+// MARK: - Extensions
+
+extension Bundle {
+    static var models: Bundle? {
+        return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }
 

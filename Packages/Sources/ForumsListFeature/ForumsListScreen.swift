@@ -80,14 +80,13 @@ public struct ForumsListScreen: View {
                         .font(.body)
                         .foregroundStyle(Color.Labels.primary)
                     
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 0)
                     
                     if unread {
                         Circle()
                             .font(.title2)
                             .foregroundStyle(tintColor)
                             .frame(width: 8)
-                            .padding(.trailing, 12)
                     }
                 }
                 .contentShape(Rectangle())
