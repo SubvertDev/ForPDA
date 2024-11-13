@@ -20,6 +20,7 @@ import ProfileFeature
 import SettingsFeature
 import APIClient
 import Models
+import TCAExtensions
 
 @Reducer
 public struct AppFeature: Sendable {
@@ -77,6 +78,7 @@ public struct AppFeature: Sendable {
         public var profile: ProfileFeature.State
         
         @Presents public var auth: AuthFeature.State?
+        @Presents public var alert: AlertState<Never>?
         
         @Shared(.userSession) public var userSession: UserSession?
         @Shared(.appSettings) public var appSettings: AppSettings
@@ -111,6 +113,7 @@ public struct AppFeature: Sendable {
             forum: ForumFeature.State = ForumFeature.State(forumId: 0, forumName: "Test"),
             profile: ProfileFeature.State = ProfileFeature.State(),
             auth: AuthFeature.State? = nil,
+            alert: AlertState<Never>? = nil,
             selectedTab: AppView.Tab = .articlesList,
             previousTab: AppView.Tab = .articlesList,
             isShowingTabBar: Bool = true,
@@ -133,6 +136,7 @@ public struct AppFeature: Sendable {
             self.profile = profile
             
             self.auth = auth
+            self.alert = alert
             
             self.selectedTab = selectedTab
             self.previousTab = previousTab
@@ -145,6 +149,8 @@ public struct AppFeature: Sendable {
     // MARK: - Action
     
     public enum Action: BindableAction {
+        case onAppear
+        
         case appDelegate(AppDelegateFeature.Action)
 
         case articlesPath(StackActionOf<ArticlesPath>)
@@ -161,11 +167,14 @@ public struct AppFeature: Sendable {
         case profile(ProfileFeature.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
+        case alert(PresentationAction<Never>)
         
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppView.Tab)
         case deeplink(URL)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
+        
+        case _failedToConnect(any Error)
     }
     
     // MARK: - Dependencies
@@ -210,7 +219,21 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - Common
                 
-            case .appDelegate, .binding:
+            case .onAppear:
+                return .run { send in
+                    do {
+                        await apiClient.setLogResponses(type: .none)
+                        try await apiClient.connect()
+                    } catch {
+                        await send(._failedToConnect(error))
+                    }
+                }
+                
+            case ._failedToConnect:
+                state.alert = .failedToConnect
+                return .none
+                
+            case .appDelegate, .binding, .alert:
                 return .none
                 
             case let .didSelectTab(tab):

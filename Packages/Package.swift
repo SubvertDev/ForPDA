@@ -50,7 +50,7 @@ let package = Package(
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.11.0"),
-        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.1.0"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.2.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main")
     ],
     targets: [
@@ -75,6 +75,7 @@ let package = Package(
                 "CacheClient",
                 "NotificationsClient",
                 "Models",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "AlertToast", package: "AlertToast")
             ]

@@ -38,7 +38,9 @@ extension APIClient: DependencyKey {
     private nonisolated(unsafe) static let api = try! PDAPI()
     
     public static var liveValue: APIClient {
-        APIClient(
+        @Dependency(\.parsingClient) var parsingClient
+
+        return APIClient(
             setLogResponses: { type in
                 api.setLogResponses(to: type)
             },
@@ -52,10 +54,8 @@ extension APIClient: DependencyKey {
                 }
             },
             getArticlesList: { offset, amount in
-                let rawString = try api.get(SiteCommand.articlesList(offset: offset, amount: amount))
-                @Dependency(\.parsingClient) var parsingClient
-                let articleList = try await parsingClient.parseArticlesList(rawString: rawString)
-                return articleList
+                let rawString = try await api.get(SiteCommand.articlesList(offset: offset, amount: amount))
+                return try await parsingClient.parseArticlesList(rawString: rawString)
             },
             getArticle: { id, cache in
                 AsyncThrowingStream { continuation in
@@ -69,7 +69,7 @@ extension APIClient: DependencyKey {
                             }
                             
                             @Dependency(\.parsingClient) var parsingClient
-                            let rawString = try api.get(SiteCommand.article(id: id))
+                            let rawString = try await api.get(SiteCommand.article(id: id))
                             let article = try await parsingClient.parseArticle(rawString: rawString)
                             
                             try await cacheClient.cacheArticle(article)
@@ -82,16 +82,16 @@ extension APIClient: DependencyKey {
                 }
             },
             likeComment: { articleId, commentId in
-                let rawString = try api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
+                let rawString = try await api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
                 return Int(rawString.getLastNumber()) == 0
             },
             hideComment: { articleId, commentId in
-                let rawString = try api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
+                let rawString = try await api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
                 // Getting 3 on liked comment
                 return Int(rawString.getLastNumber()) == 0
             },
             replyToComment: { articleId, parentId, message in
-                let rawString = try api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
+                let rawString = try await api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
                 let responseAsInt = Int(rawString.getLastNumber())!
                 if CommentResponseType.codes.contains(responseAsInt) {
                     return CommentResponseType(rawValue: responseAsInt) ?? .unknown
@@ -100,27 +100,23 @@ extension APIClient: DependencyKey {
                 }
             },
             voteInPoll: { pollId, selections in
-                let rawString = try api.get(SiteCommand.vote(pollId: pollId, selections: selections))
+                let rawString = try await api.get(SiteCommand.vote(pollId: pollId, selections: selections))
                 let responseAsInt = Int(rawString.getLastNumber())!
                 return responseAsInt == 0
             },
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
-                let rawString = try api.get(AuthCommand.login(data: request))
-                @Dependency(\.parsingClient) var parsingClient
-                let url = try await parsingClient.parseCaptchaUrl(rawString: rawString)
-                return url
+                let rawString = try await api.get(AuthCommand.login(data: request))
+                return try await parsingClient.parseCaptchaUrl(rawString: rawString)
             },
             authorize: { login, password, hidden, captcha in
                 let request = LoginRequest(name: login, password: password, hidden: hidden, captcha: captcha)
-                let rawString = try api.get(AuthCommand.login(data: request))
-                @Dependency(\.parsingClient) var parsingClient
-                let authResponse = try await parsingClient.parseLoginResponse(rawString: rawString)
-                return authResponse
+                let rawString = try await api.get(AuthCommand.login(data: request))
+                return try await parsingClient.parseLoginResponse(rawString: rawString)
             },
             logout: {
                 let request = AuthRequest(memberId: 0, token: "", hidden: false)
-                _ = try api.get(AuthCommand.auth(data: request))
+                _ = try await api.get(AuthCommand.auth(data: request))
             },
             getUser: { userId in
                 AsyncThrowingStream { continuation in
@@ -132,7 +128,7 @@ extension APIClient: DependencyKey {
                             }
                             
                             @Dependency(\.parsingClient) var parsingClient
-                            let rawString = try api.get(MemberCommand.info(memberId: userId))
+                            let rawString = try await api.get(MemberCommand.info(memberId: userId))
                             let user = try await parsingClient.parseUser(rawString: rawString)
                             
                             try await cacheClient.cacheUser(user)
@@ -145,35 +141,21 @@ extension APIClient: DependencyKey {
                 }
             },
             getForumsList: {
-                // FIXME: Remove after fixing API
-                @Dependency(\.cacheClient) var cacheClient
-                let forums = await cacheClient.getForumsList()
-                if !forums.isEmpty { return forums }
-                
-                let rawString = try api.get(ForumCommand.list)
-                @Dependency(\.parsingClient) var parsingClient
-                let response = try await parsingClient.parseForumsList(rawString: rawString)
-                try? await cacheClient.cacheForumsList(response)
-                return response
+                let rawString = try await api.get(ForumCommand.list)
+                return try await parsingClient.parseForumsList(rawString: rawString)
             },
             getForum: { id, offset, perPage in
-                let rawString = try api.get(ForumCommand.view(id: id, page: offset, itemsPerPage: perPage))
-                @Dependency(\.parsingClient) var parsingClient
-                let response = try await parsingClient.parseForum(rawString: rawString)
-                return response
+                let rawString = try await api.get(ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage))
+                return try await parsingClient.parseForum(rawString: rawString)
             },
             getTopic: { id, offset, perPage in
-                let request = TopicRequest(id: id, page: offset, itemsPerPage: perPage, showPostMode: 1)
-                let rawString = try api.get(ForumCommand.Topic.view(data: request))
-                @Dependency(\.parsingClient) var parsingClient
-                let response = try await parsingClient.parseTopic(rawString: rawString)
-                return response
+                let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
+                let rawString = try await api.get(ForumCommand.Topic.view(data: request))
+                return try await parsingClient.parseTopic(rawString: rawString)
             },
             getFavorites: { unreadFirst, perPage in
-                let rawString = try api.get(MemberCommand.Favorites.list(unreadFirst: unreadFirst, perPage: perPage))
-                @Dependency(\.parsingClient) var parsingClient
-                let response = try await parsingClient.parseFavorites(rawString: rawString)
-                return response
+                let rawString = try await api.get(MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: 0, perPage: perPage))
+                return try await parsingClient.parseFavorites(rawString: rawString)
             }
         )
     }

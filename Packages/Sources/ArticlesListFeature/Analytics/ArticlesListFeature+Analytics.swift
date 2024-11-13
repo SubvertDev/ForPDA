@@ -65,10 +65,6 @@ extension ArticlesListFeature {
                     
                 case .binding, ._articlesResponse, .destination:
                     break
-                    
-                case ._failedToConnect(let error):
-                    analyticsClient.log(ArticlesListEvent.failedToConnect)
-                    analyticsClient.capture(error)
                 }
                 return .none
             }

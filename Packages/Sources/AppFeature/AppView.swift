@@ -112,9 +112,13 @@ public struct AppView: View {
                     AuthScreen(store: store)
                 }
             }
+            .alert($store.scope(state: \.alert, action: \.alert))
             // Tint and environment should be after sheets/covers
             .tint(store.appSettings.appTintColor.asColor)
             .environment(\.tintColor, store.appSettings.appTintColor.asColor)
+            .onAppear {
+                store.send(.onAppear)
+            }
         }
     }
     

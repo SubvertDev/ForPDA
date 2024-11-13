@@ -75,7 +75,6 @@ public struct ArticlesListFeature: Sendable {
         case onRefresh
         case loadMoreArticles
         
-        case _failedToConnect(any Error)
         case _articlesResponse(Result<[ArticlePreview], any Error>)
     }
     
@@ -114,14 +113,8 @@ public struct ArticlesListFeature: Sendable {
                 
             case .onFirstAppear:
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
-                    do {
-                        await apiClient.setLogResponses(type: .none)
-                        try await apiClient.connect()
-                        let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
-                        await send(._articlesResponse(result))
-                    } catch {
-                        await send(._failedToConnect(error))
-                    }
+                    let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
+                    await send(._articlesResponse(result))
                 }
                 
             case .onRefresh:
@@ -158,10 +151,6 @@ public struct ArticlesListFeature: Sendable {
                     }
                     await send(._articlesResponse(result))
                 }
-                
-            case ._failedToConnect:
-                state.destination = .alert(.failedToConnect)
-                return .none
                 
             case let ._articlesResponse(.success(articles)):
                 if state.offset == 0 {
