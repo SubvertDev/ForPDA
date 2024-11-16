@@ -262,6 +262,11 @@ public struct SettingsScreen: View {
             }
         } header: {
             Header(title: "Advanced")
+                .onTapGesture {
+                    if isDebug {
+                        store.send(.onDeveloperMenuTapped)
+                    }
+                }
         }
         .listRowBackground(Color.Background.teritary)
     }
@@ -383,6 +388,17 @@ private extension Bundle {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }
+
+// MARK: - Helpers
+
+private var isDebug: Bool {
+    #if DEBUG
+        return true
+    #else
+        return false
+    #endif
+}
+
 
 // MARK: - Previews
 
