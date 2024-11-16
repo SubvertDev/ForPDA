@@ -331,7 +331,7 @@ public struct AppFeature: Sendable {
                         await notificationsClient.showUnreadNotifications(unread)
                         
                         let invokeTime = Date().timeIntervalSince1970
-                        await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
+                        try await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
                     } catch {
                         analyticsClient.capture(error)
                     }
