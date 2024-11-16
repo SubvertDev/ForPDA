@@ -34,22 +34,21 @@ public struct AppDelegateFeature: Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.notificationsClient) private var notificationsClient
+    @Dependency(\.apiClient) private var apiClient
     
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .didFinishLaunching(_):
+            case .didFinishLaunching:
                 analyticsClient.configure()
                 cacheClient.configure()
-                return .none
-//                return .run { send in
-//                    let granted = await notificationsClient.requestPermission()
-//                    if granted {
-//                        await application.registerForRemoteNotifications()
-//                    }
-//                }
+                return .run { send in
+                    let granted = try await notificationsClient.requestPermission()
+                    print("Notifications permission are granted: \(granted)")
+                    //if granted { await application.registerForRemoteNotifications() }
+                }
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)

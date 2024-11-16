@@ -292,6 +292,7 @@ let package = Package(
         .target(
             name: "NotificationsClient",
             dependencies: [
+                "AnalyticsClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),

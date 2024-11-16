@@ -25,11 +25,13 @@ public struct CacheClient: Sendable {
     // Forums List
     public var cacheForumsList: @Sendable ([ForumInfo]) async throws -> Void
     public var getForumsList: @Sendable () async -> [ForumInfo]
+    // Background Tasks
+    public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async throws -> Void
+    public var getLastBackgroundTaskInvokeTime: @Sendable () async -> TimeInterval?
 }
 
 extension CacheClient: DependencyKey {
     
-    private static var articlesKey: String { "articlesKey" }
     private static var articlesStorage: Storage<Int, Article> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Articles", expiry: .seconds(2592000), maxSize: 163840),
@@ -39,7 +41,6 @@ extension CacheClient: DependencyKey {
         )
     }
     
-    private static var usersKey: String { "usersKey" }
     private static var usersStorage: Storage<Int, User> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Users", expiry: .seconds(2592000), maxSize: 81920),
@@ -59,6 +60,16 @@ extension CacheClient: DependencyKey {
         )
     }
     
+    private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
+    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, TimeInterval> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .never),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: TimeInterval.self)
+        )
+    }
+    
     // TODO: Handle try/catch?
     public static var liveValue: CacheClient {
         CacheClient(
@@ -69,6 +80,8 @@ extension CacheClient: DependencyKey {
                 ImagePipeline.shared.cache.removeAll()
                 try await articlesStorage.async.removeAll()
                 try await usersStorage.async.removeAll()
+                try await forumsListStorage.async.removeAll()
+                try await lastBackgroundTaskInvokeTimeStorage.async.removeAll()
             },
             preloadImages: { urls in
                 urls.forEach { ImagePipeline.shared.loadImage(with: $0, completion: { _ in }) }
@@ -90,6 +103,12 @@ extension CacheClient: DependencyKey {
             },
             getForumsList: {
                 return (try? forumsListStorage.object(forKey: forumsListKey)) ?? []
+            },
+            setLastBackgroundTaskInvokeTime: { date in
+                try lastBackgroundTaskInvokeTimeStorage.setObject(date, forKey: lastBackgroundTaskInvokeTimeKey)
+            },
+            getLastBackgroundTaskInvokeTime: {
+                return try? lastBackgroundTaskInvokeTimeStorage.object(forKey: lastBackgroundTaskInvokeTimeKey)
             }
         )
     }

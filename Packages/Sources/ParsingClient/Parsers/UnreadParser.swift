@@ -1,0 +1,42 @@
+//
+//  UnreadParser.swift
+//  ForPDA
+//
+//  Created by Ilia Lubianoi on 15.11.2024.
+//
+
+import Foundation
+import Models
+
+public struct UnreadParser {
+    public static func parse(rawString string: String) throws -> Unread {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                return Unread(
+                    date: Date(timeIntervalSince1970: array[2] as! TimeInterval),
+                    unreadCount: array[3] as! Int,
+                    qms: parseQMS(array[6] as! [[Any]])
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
+    private static func parseQMS(_ array: [[Any]]) -> [Unread.QMS] {
+        return array.compactMap { unread in
+            if unread.isEmpty { return nil }
+            return Unread.QMS(
+                dialogId: unread[1] as! Int,
+                dialogName: unread[2] as! String,
+                partnerId: unread[3] as! Int,
+                partnerName: unread[4] as! String,
+                lastMessageId: unread[5] as! Int,
+                unreadCount: unread[7] as! Int
+            )
+        }
+    }
+}

@@ -131,6 +131,17 @@
         }
       }
     },
+    "Copy Push Token" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировать пуш токен"
+          }
+        }
+      }
+    },
     "Dark.Scheme" : {
       "localizations" : {
         "en" : {

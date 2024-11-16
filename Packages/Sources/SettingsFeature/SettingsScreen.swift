@@ -253,6 +253,10 @@ public struct SettingsScreen: View {
                 store.send(.copyDebugIdButtonTapped)
             }
             
+            // Row(symbol: .docOnDoc, title: "Copy Push Token", type: .navigation) {
+            //     store.send(.copyPushTokenButtonTapped)
+            // }
+            
             Row(symbol: .trash, title: "Clear cache", type: .navigation) {
                 store.send(.clearCacheButtonTapped)
             }

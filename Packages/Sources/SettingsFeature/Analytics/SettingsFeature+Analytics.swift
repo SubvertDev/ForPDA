@@ -34,6 +34,9 @@ extension SettingsFeature {
                     
                 case .copyDebugIdButtonTapped:
                     analyticsClient.log(SettingsEvent.copyDebugIdTapped)
+                    
+                // case .copyPushTokenButtonTapped:
+                //     return .none
 
                 case .clearCacheButtonTapped:
                     analyticsClient.log(SettingsEvent.clearCacheTapped)

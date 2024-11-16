@@ -53,7 +53,7 @@ extension AnalyticsClient: DependencyKey {
                 Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
             },
             capture: { error in
-                logger.error("\(error) >>> \(error.localizedDescription)")
+                logger.error("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
             }
         )

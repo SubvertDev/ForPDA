@@ -31,6 +31,7 @@ public struct APIClient: Sendable {
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> Favorite
+    public var getUnread: @Sendable () async throws -> Unread
 }
 
 extension APIClient: DependencyKey {
@@ -156,6 +157,10 @@ extension APIClient: DependencyKey {
             getFavorites: { unreadFirst, offset, perPage in
                 let rawString = try await api.get(MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage))
                 return try await parsingClient.parseFavorites(rawString: rawString)
+            },
+            getUnread: {
+                let rawString = try await api.get(CommonCommand.syncUnread)
+                return try await parsingClient.parseUnread(rawString: rawString)
             }
         )
     }
@@ -206,6 +211,9 @@ extension APIClient: DependencyKey {
             },
             getFavorites: { _, _, _ in
                 return .mock
+            },
+            getUnread: {
+                return Unread(date: .default, unreadCount: 0, qms: [])
             }
         )
     }

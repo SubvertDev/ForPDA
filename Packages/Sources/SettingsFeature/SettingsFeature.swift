@@ -74,6 +74,7 @@ public struct SettingsFeature: Sendable {
         case schemeButtonTapped(AppColorScheme)
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
+        // case copyPushTokenButtonTapped
         case clearCacheButtonTapped
         case appDiscussionButtonTapped
         case telegramChangelogButtonTapped
@@ -113,7 +114,6 @@ public struct SettingsFeature: Sendable {
                 
             case let .schemeButtonTapped(scheme):
                 state.appColorScheme = scheme
-//                state.destination = .alert(.notImplemented)
                 return .run { [appSettings = state.$appSettings,
                                scheme = state.appColorScheme] _ in
                     await appSettings.withLock { $0.appColorScheme = scheme }
@@ -129,6 +129,10 @@ public struct SettingsFeature: Sendable {
                 @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
                 pasteboardClient.copy(analyticsId)
                 return .none
+                
+            // case .copyPushTokenButtonTapped:
+            //     state.destination = .alert(.notImplemented)
+            //     return .none
                 
             case .clearCacheButtonTapped:
                 state.destination = .alert(.clearCache)

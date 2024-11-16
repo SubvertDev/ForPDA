@@ -21,9 +21,12 @@ import SettingsFeature
 import APIClient
 import Models
 import TCAExtensions
+import BackgroundTasks
+import NotificationsClient
 
 @Reducer
 public struct AppFeature: Sendable {
+    
     
     public init() {}
     
@@ -98,6 +101,11 @@ public struct AppFeature: Sendable {
         
         public var isAuthorized: Bool {
             return userSession != nil
+        }
+        
+        public var notificationsId: String {
+            let identifiers = Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String]
+            return identifiers?.first ?? ""
         }
         
         public init(
@@ -176,6 +184,7 @@ public struct AppFeature: Sendable {
         case didSelectTab(AppTab)
         case deeplink(URL)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
+        case syncUnreadTaskInvoked
         
         case _failedToConnect(any Error)
     }
@@ -183,6 +192,9 @@ public struct AppFeature: Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
@@ -298,13 +310,31 @@ public struct AppFeature: Sendable {
                 
                 // MARK: - ScenePhase
                 
-            case let .scenePhaseDidChange(from: from, to: to):
-                if from == .background && to == .inactive {
-                    return .run { _ in
-                        // TODO: Check for notifications?
+            case let .scenePhaseDidChange(from: _, to: newPhase):
+                if newPhase == .background {
+                    let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
+                    do {
+                        try BGTaskScheduler.shared.submit(request)
+                        // Set breakpoint here and run:
+                        // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
+                    } catch {
+                        analyticsClient.capture(error)
                     }
-                } else {
-                    return .none
+                }
+                return .none
+                
+            case .syncUnreadTaskInvoked:
+                return .run { _ in
+                    do {
+                        // try await apiClient.connect()
+                        let unread = try await apiClient.getUnread()
+                        await notificationsClient.showUnreadNotifications(unread)
+                        
+                        let invokeTime = Date().timeIntervalSince1970
+                        await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
+                    } catch {
+                        analyticsClient.capture(error)
+                    }
                 }
                 
                 // MARK: - Default
