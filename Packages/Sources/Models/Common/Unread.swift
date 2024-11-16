@@ -58,3 +58,21 @@ public struct Unread: Codable, Sendable, Hashable {
         }
     }
 }
+
+public extension Unread {
+    static let mock = Unread(
+        date: .now,
+        unreadCount: 2,
+        items: [
+            Item(
+                id: 12345677,
+                name: "ForPDA now with Notifications",
+                authorId: 1234536,
+                authorName: "ForPDA",
+                lastMessageId: 21315526,
+                unreadCount: 2,
+                category: Item.Category.qms
+            )
+        ]
+    )
+}
