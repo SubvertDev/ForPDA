@@ -42,16 +42,31 @@ extension NotificationsClient: DependencyKey {
             
         },
         showUnreadNotifications: { unread in
-            // QMS
-            for chat in unread.qms {
+            for item in unread.items {
                 let content = UNMutableNotificationContent()
-                content.title = chat.partnerName
-                content.body = "\(chat.dialogName): \(chat.unreadCount) нов\(chat.unreadCount == 1 ? "ое" : "ых") сообщения"
                 content.sound = .default
+                
+                switch item.category {
+                case .qms:
+                    content.title = item.authorName
+                    content.body = "\(item.name): \(item.unreadCount) нов\(item.unreadCount == 1 ? "ое" : "ых") сообщения"
+                case .forum:
+                    content.title = "Новое на форуме"
+                    content.body = item.name
+                case .topic:
+                    content.title = "\(item.authorName) в топике"
+                    content.body = item.name
+                case .forumMention:
+                    content.title = "Упоминание в топике \(item.name)"
+                    content.body = "\(item.authorName) ссылается на вас"
+                case .siteMention:
+                    content.title = "Упоминание в новости \(item.name)"
+                    content.body = "\(item.authorName) ссылается на вас"
+                }
                 
                 let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
                 
-                let request = UNNotificationRequest(identifier: "\(chat.dialogId)", content: content, trigger: trigger)
+                let request = UNNotificationRequest(identifier: "\(item.id)", content: content, trigger: trigger)
                 
                 do {
                     try await UNUserNotificationCenter.current().add(request)
