@@ -18,7 +18,7 @@ extension ArticlesListFeature {
         @Dependency(\.analyticsClient) var analyticsClient
         
         var body: some ReducerOf<Self> {
-            Reduce { state, action in
+            Reduce<State, Action> { state, action in
                 switch action {
                 case .articleTapped(let article):
                     analyticsClient.log(ArticlesListEvent.articleTapped(article.id))

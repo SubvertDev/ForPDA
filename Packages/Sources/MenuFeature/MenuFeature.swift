@@ -76,7 +76,7 @@ public struct MenuFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 // TODO: Is this ok?

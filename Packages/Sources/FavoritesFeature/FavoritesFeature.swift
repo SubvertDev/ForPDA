@@ -64,7 +64,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             PageNavigationFeature()
         }
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .send(._loadFavorites(unreadFirst: true, offset: 0))

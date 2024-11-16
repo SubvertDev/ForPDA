@@ -61,7 +61,7 @@ public struct TopicFeature: Reducer, Sendable {
             PageNavigationFeature()
         }
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .send(._loadTopic(offset: 0))

@@ -66,7 +66,7 @@ public struct ProfileFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .alert:
                 return .none

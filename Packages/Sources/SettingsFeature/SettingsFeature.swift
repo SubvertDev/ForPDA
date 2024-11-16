@@ -105,7 +105,7 @@ public struct SettingsFeature: Reducer, Sendable {
     public var body: some ReducerOf<Self> {
         BindingReducer()
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .languageButtonTapped:
                 return .run { _ in
