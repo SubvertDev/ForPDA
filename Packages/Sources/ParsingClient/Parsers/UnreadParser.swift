@@ -16,7 +16,7 @@ public struct UnreadParser {
                 return Unread(
                     date: Date(timeIntervalSince1970: array[2] as! TimeInterval),
                     unreadCount: array[3] as! Int,
-                    items: parseItem(array[6] as! [[Any]])
+                    items: parseItems(array[6] as! [[Any]])
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -26,7 +26,7 @@ public struct UnreadParser {
         }
     }
     
-    private static func parseItem(_ array: [[Any]]) -> [Unread.Item] {
+    private static func parseItems(_ array: [[Any]]) -> [Unread.Item] {
         return array.compactMap { unread in
             if unread.isEmpty { return nil }
             return Unread.Item(
@@ -36,18 +36,8 @@ public struct UnreadParser {
                 authorName: unread[4] as! String,
                 lastMessageId: unread[5] as! Int,
                 unreadCount: unread[7] as! Int,
-                category: itemCategory(unread[0] as! Int)
+                category: Unread.Item.Category(rawValue: unread[0] as! Int)!
             )
-        }
-    }
-    
-    private static func itemCategory(_ id: Int) -> Unread.Item.Category {
-        return switch id {
-        case 1:  Unread.Item.Category.qms
-        case 2:  Unread.Item.Category.forum
-        case 4:  Unread.Item.Category.forumMention
-        case 5:  Unread.Item.Category.siteMention
-        default: Unread.Item.Category.topic
         }
     }
 }

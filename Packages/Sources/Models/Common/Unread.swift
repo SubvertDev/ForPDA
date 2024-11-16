@@ -31,7 +31,7 @@ public struct Unread: Codable, Sendable, Hashable {
         public let unreadCount: Int
         public let category: Category
         
-        public enum Category: UInt8, Codable, Sendable {
+        public enum Category: Int, Codable, Sendable {
             case qms = 1
             case forum = 2
             case topic = 3
