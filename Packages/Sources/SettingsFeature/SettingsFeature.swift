@@ -72,6 +72,7 @@ public struct SettingsFeature: Sendable {
         case binding(BindingAction<State>)
         case languageButtonTapped
         case schemeButtonTapped(AppColorScheme)
+        case onDeveloperMenuTapped
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
         // case copyPushTokenButtonTapped
@@ -118,6 +119,9 @@ public struct SettingsFeature: Sendable {
                                scheme = state.appColorScheme] _ in
                     await appSettings.withLock { $0.appColorScheme = scheme }
                 }
+                
+            case .onDeveloperMenuTapped:
+                return .none
                 
             case .safariExtensionButtonTapped:
                 // TODO: Not working anymore, check other solutions

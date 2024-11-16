@@ -15,7 +15,7 @@ import OSLog
 
 @DependencyClient
 public struct AnalyticsClient: Sendable {
-    public var configure: @Sendable () -> Void
+    public var configure: @Sendable (AnalyticsConfiguration) -> Void
     public var identify: @Sendable (_ id: String) -> Void
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
@@ -35,10 +35,17 @@ extension AnalyticsClient: DependencyKey {
     
     public static var liveValue: Self {
         return AnalyticsClient(
-            configure: {
+            configure: { configuration in
                 @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
-                configureMixpanel(id: analyticsId)
-                configureSentry(id: analyticsId)
+                configureMixpanel(
+                    id: analyticsId,
+                    isEnabled: configuration.isAnalyticsEnabled
+                )
+                configureSentry(
+                    id: analyticsId,
+                    isEnabled: configuration.isCrashlyticsEnabled,
+                    isDebugEnabled: configuration.isCrashlyticsDebugEnabled
+                )
             },
             identify: { id in
                 logger.info("Identifying user with id: \(id)")
@@ -60,7 +67,7 @@ extension AnalyticsClient: DependencyKey {
     }
     
     public static let previewValue = Self(
-        configure: {},
+        configure: { _ in },
         identify: { _ in },
         logout: {},
         log: { event in
@@ -78,11 +85,11 @@ extension AnalyticsClient: DependencyKey {
 
 extension AnalyticsClient {
     
-    private static func configureMixpanel(id: String) {
+    private static func configureMixpanel(id: String, isEnabled: Bool) {
         Mixpanel.initialize(
             token: Secrets.mixpanelToken,
             trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
-            optOutTrackingByDefault: isDebug
+            optOutTrackingByDefault: !isEnabled
         )
         
         @Dependency(\.analyticsClient) var analytics
@@ -106,11 +113,11 @@ extension AnalyticsClient {
         }
     }
     
-    private static func configureSentry(id: String) {
+    private static func configureSentry(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         SentrySDK.start { options in
             options.dsn = Secrets.sentryDSN
-            options.debug = isDebug
-            options.enabled = !isDebug
+            options.debug = isDebugEnabled
+            options.enabled = isEnabled
             options.tracesSampleRate = 1.0
             options.profilesSampleRate = 1.0
             options.diagnosticLevel = .warning
@@ -125,13 +132,4 @@ extension AnalyticsClient {
 public enum AnalyticsError: Error {
     case brokenArticle(URL)
     case apiFailure(any Error)
-}
-
-// TODO: Move to another place
-private var isDebug: Bool {
-    #if DEBUG
-        return true
-    #else
-        return false
-    #endif
 }

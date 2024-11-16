@@ -18,6 +18,7 @@ import MenuFeature
 import AuthFeature
 import ProfileFeature
 import SettingsFeature
+import DeveloperFeature
 import APIClient
 import Models
 import TCAExtensions
@@ -25,7 +26,7 @@ import BackgroundTasks
 import NotificationsClient
 
 @Reducer
-public struct AppFeature: Sendable {
+public struct AppFeature: Reducer, Sendable {
     
     
     public init() {}
@@ -36,29 +37,35 @@ public struct AppFeature: Sendable {
     public enum ArticlesPath {
         case article(ArticleFeature)
         case profile(ProfileFeature)
-        case settings(SettingsFeature)
+        case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
-    @Reducer(state: .equatable)
-    public enum BookmarksPath {
-        case settings(SettingsFeature)
-    }
+//    @Reducer(state: .equatable)
+//    public enum BookmarksPath {
+//        case settingsPath(SettingsPath.Body = SettingsPath.body)
+//    }
     
     @Reducer(state: .equatable)
     public enum FavoritesPath {
-        case settings(SettingsFeature)
+        case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
     @Reducer(state: .equatable)
     public enum ForumPath {
         case forum(ForumFeature)
         case topic(TopicFeature)
-        case settings(SettingsFeature)
+        case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
     @Reducer(state: .equatable)
     public enum ProfilePath {
+        case settingsPath(SettingsPath.Body = SettingsPath.body)
+    }
+    
+    @Reducer(state: .equatable)
+    public enum SettingsPath {
         case settings(SettingsFeature)
+        case developer(DeveloperFeature)
     }
     
     // MARK: - State
@@ -221,10 +228,6 @@ public struct AppFeature: Sendable {
             ForumsListFeature()
         }
         
-        Scope(state: \.forum, action: \.forum) {
-            ForumFeature()
-        }
-        
         Scope(state: \.profile, action: \.profile) {
             ProfileFeature()
         }
@@ -331,7 +334,7 @@ public struct AppFeature: Sendable {
                         await notificationsClient.showUnreadNotifications(unread)
                         
                         let invokeTime = Date().timeIntervalSince1970
-                        await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
+                        try await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
                     } catch {
                         analyticsClient.capture(error)
                     }
@@ -358,7 +361,6 @@ public struct AppFeature: Sendable {
                 // MARK: - Articles List
                 
             case let .articlesList(.articleTapped(articlePreview)):
-                state.isShowingTabBar = false
                 state.articlesPath.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
                 return .none
                 
@@ -373,8 +375,7 @@ public struct AppFeature: Sendable {
                 return .none
                 
             case .articlesList(.settingsButtonTapped):
-                state.isShowingTabBar = false
-                state.articlesPath.append(.settings(SettingsFeature.State()))
+                state.articlesPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
                 
             case .articlesList:
@@ -433,14 +434,8 @@ public struct AppFeature: Sendable {
         }
         .forEach(\.articlesPath, action: \.articlesPath)
         .onChange(of: \.articlesPath) { _, newValue in
-            // TODO: Another way?
             Reduce { state, _ in
                 state.isShowingTabBar = newValue.count == 0
-                // let hasSettings = newValue.contains(where: { screen in
-                //     if case .settings = screen { return true }
-                //     return false
-                // })
-                // state.isShowingTabBar = !hasSettings
                 return .none
             }
         }
@@ -476,8 +471,7 @@ public struct AppFeature: Sendable {
         Reduce { state, action in
             switch action {
             case .favorites(.settingsButtonTapped):
-                state.isShowingTabBar = false
-                state.favoritesPath.append(.settings(SettingsFeature.State()))
+                state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
 
             case .favorites(.favoriteTapped(let id, let name, let isForum)):
@@ -495,13 +489,10 @@ public struct AppFeature: Sendable {
         }
         .forEach(\.favoritesPath, action: \.favoritesPath)
         .onChange(of: \.favoritesPath) { _, newValue in
-            // TODO: Another way?
             Reduce { state, _ in
-                let hasSettings = newValue.contains(where: { screen in
-                    if case .settings = screen { return true }
-                    return false
-                })
-                state.isShowingTabBar = !hasSettings
+                state.isShowingTabBar = !newValue.contains {
+                    if case .settingsPath = $0 { return true } else { return false }
+                }
                 return .none
             }
         }
@@ -512,8 +503,7 @@ public struct AppFeature: Sendable {
             switch action {
             case .forumsList(.settingsButtonTapped),
                  .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
-                state.isShowingTabBar = false
-                state.forumPath.append(.settings(SettingsFeature.State()))
+                state.forumPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
                 
             case .forumsList(.forumTapped(let forumId, let forumName)):
@@ -534,24 +524,20 @@ public struct AppFeature: Sendable {
         }
         .forEach(\.forumPath, action: \.forumPath)
         .onChange(of: \.forumPath) { _, newValue in
-            // TODO: Another way?
             Reduce { state, _ in
-                let hasSettings = newValue.contains(where: { screen in
-                    if case .settings = screen { return true }
-                    return false
-                })
-                state.isShowingTabBar = !hasSettings
+                state.isShowingTabBar = !newValue.contains {
+                    if case .settingsPath = $0 { return true } else { return false }
+                }
                 return .none
             }
         }
         
         // MARK: - Profile Path
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
-                
             case .profile(.settingsButtonTapped):
-                state.profilePath.append(.settings(SettingsFeature.State()))
+                state.profilePath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
                 
             case .profile(.logoutButtonTapped):
@@ -564,13 +550,35 @@ public struct AppFeature: Sendable {
         }
         .forEach(\.profilePath, action: \.profilePath)
         .onChange(of: \.profilePath) { _, newValue in
-            // TODO: Another way?
             Reduce { state, _ in
-                let hasSettings = newValue.contains(where: { screen in
-                    if case .settings = screen { return true }
-                    return false
-                })
-                state.isShowingTabBar = !hasSettings
+                state.isShowingTabBar = !newValue.contains {
+                    if case .settingsPath = $0 { return true } else { return false }
+                }
+                return .none
+            }
+        }
+        
+        // MARK: - Settings Path
+        
+        Reduce<State, Action> { state, action in
+            switch action {
+            case .articlesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
+                state.articlesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
+                return .none
+                
+            case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
+                state.favoritesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
+                return .none
+                
+            case .forumPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
+                state.forumPath.append(.settingsPath(.developer(DeveloperFeature.State())))
+                return .none
+                
+            case .profilePath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
+                state.profilePath.append(.settingsPath(.developer(DeveloperFeature.State())))
+                return .none
+                
+            default:
                 return .none
             }
         }

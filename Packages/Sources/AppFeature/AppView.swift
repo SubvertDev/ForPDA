@@ -18,6 +18,7 @@ import MenuFeature
 import AuthFeature
 import ProfileFeature
 import SettingsFeature
+import DeveloperFeature
 import AlertToast
 import SFSafeSymbols
 import SharedUI
@@ -88,7 +89,9 @@ public struct AppView: View {
     
     @ViewBuilder
     private func ArticlesListTab() -> some View {
-        NavigationStack(path: $store.scope(state: \.articlesPath, action: \.articlesPath)) {
+        NavigationStack(
+            path: $store.scope(state: \.articlesPath, action: \.articlesPath)
+        ) {
             ArticlesListScreen(store: store.scope(state: \.articlesList, action: \.articlesList))
         } destination: { store in
             switch store.case {
@@ -98,8 +101,8 @@ public struct AppView: View {
             case let .profile(store):
                 ProfileScreen(store: store)
                 
-            case let .settings(store):
-                SettingsScreen(store: store)
+            case let .settingsPath(path):
+                SettingsPath(path)
             }
         }
         .tag(AppTab.articlesList)
@@ -125,12 +128,14 @@ public struct AppView: View {
     // MARK: - Favorites Tab
     @ViewBuilder
     private func FavoritesTab() -> some View {
-        NavigationStack(path: $store.scope(state: \.favoritesPath, action: \.favoritesPath)) {
+        NavigationStack(
+            path: $store.scope(state: \.favoritesPath, action: \.favoritesPath)
+        ) {
             FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
         } destination: { store in
             switch store.case {
-            case let .settings(store):
-                SettingsScreen(store: store)
+            case let .settingsPath(path):
+                SettingsPath(path)
             }
         }
         .tag(AppTab.favorites)
@@ -141,38 +146,54 @@ public struct AppView: View {
     
     @ViewBuilder
     private func ForumTab() -> some View {
-        NavigationStack(path: $store.scope(state: \.forumPath, action: \.forumPath)) {
+        NavigationStack(
+            path: $store.scope(state: \.forumPath, action: \.forumPath)
+        ) {
             ForumsListScreen(store: store.scope(state: \.forumsList, action: \.forumsList))
         } destination: { store in
             switch store.case {
             case let .forum(store):
                 ForumScreen(store: store)
-                
+            
             case let .topic(store):
                 TopicScreen(store: store)
                 
-            case let .settings(store):
-                SettingsScreen(store: store)
+            case let .settingsPath(path):
+                SettingsPath(path)
             }
         }
         .tag(AppTab.forum)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
     
-    // MARK: - Menu Tab
+    // MARK: - Profile Tab
     
     @ViewBuilder
     private func ProfileTab() -> some View {
-        NavigationStack(path: $store.scope(state: \.profilePath, action: \.profilePath)) {
+        NavigationStack(
+            path: $store.scope(state: \.profilePath, action: \.profilePath)
+        ) {
             ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
         } destination: { store in
             switch store.case {
-            case let .settings(store):
-                SettingsScreen(store: store)
+            case let .settingsPath(store):
+                SettingsPath(store)
             }
         }
         .tag(AppTab.profile)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
+    }
+    
+    // MARK: - Settings Path
+    
+    @ViewBuilder
+    private func SettingsPath(_ store: StoreOf<AppFeature.SettingsPath.Body>) -> some View {
+        switch store.case {
+        case let .settings(store):
+            SettingsScreen(store: store)
+        case let .developer(store):
+            DeveloperScreen(store: store)
+        }
     }
     
     // MARK: - PDA Tab View

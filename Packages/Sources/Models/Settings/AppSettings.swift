@@ -25,6 +25,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var appTintColor: AppTintColor
     public var forumPerPage: Int
     public var topicPerPage: Int
+    public var analyticsConfigurationDebug: AnalyticsConfiguration
+    public var analyticsConfigurationRelease: AnalyticsConfiguration
     
     public init(
         articlesListRowType: ArticleListRowType,
@@ -34,7 +36,9 @@ public struct AppSettings: Sendable, Equatable, Codable {
         backgroundTheme: BackgroundTheme,
         appTintColor: AppTintColor,
         forumPerPage: Int,
-        topicPerPage: Int
+        topicPerPage: Int,
+        analyticsConfigurationDebug: AnalyticsConfiguration,
+        analyticsConfigurationRelease: AnalyticsConfiguration
     ) {
         self.articlesListRowType = articlesListRowType
         self.bookmarksListRowType = bookmarksListRowType
@@ -44,6 +48,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appTintColor = appTintColor
         self.forumPerPage = forumPerPage
         self.topicPerPage = topicPerPage
+        self.analyticsConfigurationDebug = analyticsConfigurationDebug
+        self.analyticsConfigurationRelease = analyticsConfigurationRelease
     }
     
     public init(from decoder: any Decoder) throws {
@@ -56,6 +62,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
+        self.analyticsConfigurationDebug = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationDebug) ?? AppSettings.default.analyticsConfigurationDebug
+        self.analyticsConfigurationRelease = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationRelease) ?? AppSettings.default.analyticsConfigurationRelease
     }
 }
 
@@ -68,6 +76,8 @@ public extension AppSettings {
         backgroundTheme: .blue,
         appTintColor: .primary,
         forumPerPage: 30,
-        topicPerPage: 20
+        topicPerPage: 20,
+        analyticsConfigurationDebug: .debug,
+        analyticsConfigurationRelease: .release
     )
 }

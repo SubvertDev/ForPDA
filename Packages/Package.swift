@@ -71,6 +71,7 @@ let package = Package(
                 "AuthFeature",
                 "ProfileFeature",
                 "SettingsFeature",
+                "DeveloperFeature",
                 "AnalyticsClient",
                 "CacheClient",
                 "NotificationsClient",
@@ -244,6 +245,15 @@ let package = Package(
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+            ]
+        ),
+        .target(
+            name: "DeveloperFeature",
+            dependencies: [
+                "SharedUI",
+                "CacheClient",
+                "AnalyticsClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         

@@ -29,6 +29,9 @@ extension SettingsFeature {
                 case .schemeButtonTapped:
                     analyticsClient.log(SettingsEvent.themeTapped)
                     
+                case .onDeveloperMenuTapped:
+                    return .none
+                    
                 case .safariExtensionButtonTapped:
                     analyticsClient.log(SettingsEvent.safariExtensionTapped)
                     
