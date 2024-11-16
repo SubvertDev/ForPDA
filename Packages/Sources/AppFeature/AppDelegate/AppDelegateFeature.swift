@@ -14,7 +14,7 @@ import PersistenceKeys
 import Models
 
 @Reducer
-public struct AppDelegateFeature: Sendable {
+public struct AppDelegateFeature: Reducer, Sendable {
     
     public init() {}
     

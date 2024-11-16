@@ -11,7 +11,7 @@ import APIClient
 import Models
 
 @Reducer
-public struct ForumsListFeature: Sendable {
+public struct ForumsListFeature: Reducer, Sendable {
     
     public init() {}
     

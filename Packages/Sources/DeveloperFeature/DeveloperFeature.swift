@@ -18,7 +18,7 @@ enum TestError: Error {
 }
 
 @Reducer
-public struct DeveloperFeature: Sendable {
+public struct DeveloperFeature: Reducer, Sendable {
     
     public init() {}
     

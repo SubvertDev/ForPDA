@@ -14,7 +14,7 @@ import PersistenceKeys
 import Models
 
 @Reducer
-public struct SettingsFeature: Sendable {
+public struct SettingsFeature: Reducer, Sendable {
     
     public init() {}
     

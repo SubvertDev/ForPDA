@@ -18,7 +18,7 @@ public enum CommentContextMenuOptions {
 }
 
 @Reducer
-public struct CommentFeature: Sendable {
+public struct CommentFeature: Reducer, Sendable {
     
     public init() {}
     

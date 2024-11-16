@@ -13,7 +13,7 @@ import TCAExtensions
 import Models
 
 @Reducer
-public struct MenuFeature: Sendable {
+public struct MenuFeature: Reducer, Sendable {
     
     public init() {}
     

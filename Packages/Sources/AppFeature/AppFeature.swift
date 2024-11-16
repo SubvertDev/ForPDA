@@ -28,7 +28,6 @@ import NotificationsClient
 @Reducer
 public struct AppFeature: Reducer, Sendable {
     
-    
     public init() {}
     
     // MARK: - Path

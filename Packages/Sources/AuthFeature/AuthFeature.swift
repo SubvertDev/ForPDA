@@ -25,7 +25,7 @@ public enum LoginErrorReason {
 }
 
 @Reducer
-public struct AuthFeature: Sendable {
+public struct AuthFeature: Reducer, Sendable {
     
     public init() {}
     

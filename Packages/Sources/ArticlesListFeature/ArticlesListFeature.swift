@@ -16,7 +16,7 @@ import HapticClient
 import PersistenceKeys
 
 @Reducer
-public struct ArticlesListFeature: Sendable {
+public struct ArticlesListFeature: Reducer, Sendable {
     
     public init() {}
     

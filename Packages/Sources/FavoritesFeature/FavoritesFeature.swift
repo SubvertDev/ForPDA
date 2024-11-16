@@ -12,7 +12,7 @@ import APIClient
 import Models
 
 @Reducer
-public struct FavoritesFeature: Sendable {
+public struct FavoritesFeature: Reducer, Sendable {
     
     public init() {}
     

@@ -13,7 +13,7 @@ import Models
 import PersistenceKeys
 
 @Reducer
-public struct TopicFeature: Sendable {
+public struct TopicFeature: Reducer, Sendable {
     
     public init() {}
     

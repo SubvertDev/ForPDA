@@ -15,7 +15,7 @@ import PasteboardClient
 import HapticClient
 
 @Reducer
-public struct ArticleFeature: Sendable {
+public struct ArticleFeature: Reducer, Sendable {
     
     public init() {}
     

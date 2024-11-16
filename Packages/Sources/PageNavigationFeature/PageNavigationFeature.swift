@@ -17,7 +17,7 @@ public enum PageNavigationType {
 }
 
 @Reducer
-public struct PageNavigationFeature: Sendable {
+public struct PageNavigationFeature: Reducer, Sendable {
     
     public init() {}
     

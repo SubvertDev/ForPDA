@@ -14,7 +14,7 @@ import Models
 import PersistenceKeys
 
 @Reducer
-public struct BookmarksFeature: Sendable {
+public struct BookmarksFeature: Reducer, Sendable {
     
     public init() {}
     
