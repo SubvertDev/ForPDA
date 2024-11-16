@@ -13,7 +13,7 @@ import Models
 import PersistenceKeys
 
 @Reducer
-public struct TopicFeature: Sendable {
+public struct TopicFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -61,7 +61,7 @@ public struct TopicFeature: Sendable {
             PageNavigationFeature()
         }
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .send(._loadTopic(offset: 0))

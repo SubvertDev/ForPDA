@@ -18,7 +18,7 @@ public enum CommentContextMenuOptions {
 }
 
 @Reducer
-public struct CommentFeature: Sendable {
+public struct CommentFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -80,7 +80,7 @@ public struct CommentFeature: Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .run { send in

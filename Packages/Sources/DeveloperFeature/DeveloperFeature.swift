@@ -18,7 +18,7 @@ enum TestError: Error {
 }
 
 @Reducer
-public struct DeveloperFeature: Sendable {
+public struct DeveloperFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -64,7 +64,7 @@ public struct DeveloperFeature: Sendable {
     public var body: some ReducerOf<Self> {
         BindingReducer()
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
                 return .run { send in

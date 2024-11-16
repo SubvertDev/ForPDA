@@ -28,7 +28,6 @@ import NotificationsClient
 @Reducer
 public struct AppFeature: Reducer, Sendable {
     
-    
     public init() {}
     
     // MARK: - Path
@@ -232,7 +231,7 @@ public struct AppFeature: Reducer, Sendable {
             ProfileFeature()
         }
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
                 
                 // MARK: - Common
@@ -355,7 +354,7 @@ public struct AppFeature: Reducer, Sendable {
         
         // MARK: - Article Path
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
                 
                 // MARK: - Articles List
@@ -434,7 +433,7 @@ public struct AppFeature: Reducer, Sendable {
         }
         .forEach(\.articlesPath, action: \.articlesPath)
         .onChange(of: \.articlesPath) { _, newValue in
-            Reduce { state, _ in
+            Reduce<State, Action> { state, _ in
                 state.isShowingTabBar = newValue.count == 0
                 return .none
             }
@@ -442,7 +441,7 @@ public struct AppFeature: Reducer, Sendable {
         
         // MARK: - Bookmarks Path
         
-        // Reduce { state, action in
+        // Reduce<State, Action> { state, action in
             // switch action {
             // case .bookmarks(.settingsButtonTapped):
                 // state.isShowingTabBar = false
@@ -456,7 +455,7 @@ public struct AppFeature: Reducer, Sendable {
         // .forEach(\.bookmarksPath, action: \.bookmarksPath)
         // .onChange(of: \.bookmarksPath) { _, newValue in
             // // TODO: Another way?
-            // Reduce { state, _ in
+            // Reduce<State, Action> { state, _ in
                 // let hasSettings = newValue.contains(where: { screen in
                     // if case .settings = screen { return true }
                     // return false
@@ -468,7 +467,7 @@ public struct AppFeature: Reducer, Sendable {
         
         // MARK: - Favorites Path
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .favorites(.settingsButtonTapped):
                 state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
@@ -489,7 +488,7 @@ public struct AppFeature: Reducer, Sendable {
         }
         .forEach(\.favoritesPath, action: \.favoritesPath)
         .onChange(of: \.favoritesPath) { _, newValue in
-            Reduce { state, _ in
+            Reduce<State, Action> { state, _ in
                 state.isShowingTabBar = !newValue.contains {
                     if case .settingsPath = $0 { return true } else { return false }
                 }
@@ -499,7 +498,7 @@ public struct AppFeature: Reducer, Sendable {
         
         // MARK: - Forum Path
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .forumsList(.settingsButtonTapped),
                  .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
@@ -524,7 +523,7 @@ public struct AppFeature: Reducer, Sendable {
         }
         .forEach(\.forumPath, action: \.forumPath)
         .onChange(of: \.forumPath) { _, newValue in
-            Reduce { state, _ in
+            Reduce<State, Action> { state, _ in
                 state.isShowingTabBar = !newValue.contains {
                     if case .settingsPath = $0 { return true } else { return false }
                 }
@@ -550,7 +549,7 @@ public struct AppFeature: Reducer, Sendable {
         }
         .forEach(\.profilePath, action: \.profilePath)
         .onChange(of: \.profilePath) { _, newValue in
-            Reduce { state, _ in
+            Reduce<State, Action> { state, _ in
                 state.isShowingTabBar = !newValue.contains {
                     if case .settingsPath = $0 { return true } else { return false }
                 }

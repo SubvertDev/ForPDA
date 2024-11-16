@@ -14,7 +14,7 @@ import PersistenceKeys
 import Models
 
 @Reducer
-public struct AppDelegateFeature: Sendable {
+public struct AppDelegateFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -42,7 +42,7 @@ public struct AppDelegateFeature: Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .didFinishLaunching:
                 analyticsClient.configure(

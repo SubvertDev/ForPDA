@@ -12,7 +12,7 @@ import PersistenceKeys
 import Models
 
 @Reducer
-public struct ProfileFeature: Sendable {
+public struct ProfileFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -66,7 +66,7 @@ public struct ProfileFeature: Sendable {
     // MARK: - Body
     
     public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .alert:
                 return .none

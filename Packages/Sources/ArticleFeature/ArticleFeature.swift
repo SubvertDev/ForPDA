@@ -15,7 +15,7 @@ import PasteboardClient
 import HapticClient
 
 @Reducer
-public struct ArticleFeature: Sendable {
+public struct ArticleFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -149,7 +149,7 @@ public struct ArticleFeature: Sendable {
     public var body: some ReducerOf<Self> {
         BindingReducer()
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case let .comments(.element(id, action)):
                 guard state.isAuthorized else { return .none }
