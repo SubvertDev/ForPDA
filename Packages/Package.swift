@@ -72,9 +72,10 @@ let package = Package(
                 "ProfileFeature",
                 "SettingsFeature",
                 "DeveloperFeature",
-                "AnalyticsClient",
-                "CacheClient",
                 "NotificationsClient",
+                "AnalyticsClient",
+                "LoggerClient",
+                "CacheClient",
                 "Models",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -280,6 +281,7 @@ let package = Package(
             dependencies: [
                 "Models",
                 "PersistenceKeys",
+                "LoggerClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Mixpanel", package: "mixpanel-swift"),
                 .product(name: "Sentry", package: "sentry-cocoa")
@@ -303,6 +305,8 @@ let package = Package(
             name: "NotificationsClient",
             dependencies: [
                 "AnalyticsClient",
+                "LoggerClient",
+                "CacheClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -319,6 +323,12 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Cache", package: "Cache"),
                 .product(name: "Nuke", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "LoggerClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         

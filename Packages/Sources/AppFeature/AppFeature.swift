@@ -23,6 +23,7 @@ import APIClient
 import Models
 import TCAExtensions
 import BackgroundTasks
+import LoggerClient
 import NotificationsClient
 
 @Reducer
@@ -197,6 +198,7 @@ public struct AppFeature: Reducer, Sendable {
     
     // MARK: - Dependencies
     
+    @Dependency(\.logger[.app]) private var logger
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.analyticsClient) private var analyticsClient
@@ -314,9 +316,11 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .scenePhaseDidChange(from: _, to: newPhase):
                 if newPhase == .background {
+                    // return .send(.syncUnreadTaskInvoked) // For test purposes
                     let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
                     do {
                         try BGTaskScheduler.shared.submit(request)
+                        logger.info("Successfully scheduled BGAppRefreshTaskRequest")
                         // Set breakpoint here and run:
                         // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
                     } catch {

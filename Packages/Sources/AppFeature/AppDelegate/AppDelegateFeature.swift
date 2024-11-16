@@ -8,6 +8,7 @@
 import UIKit
 import ComposableArchitecture
 import AnalyticsClient
+import LoggerClient
 import CacheClient
 import NotificationsClient
 import PersistenceKeys
@@ -38,6 +39,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.logger[.app]) private var logger
     
     // MARK: - Body
     
@@ -55,7 +57,11 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
                 return .run { send in
                     let granted = try await notificationsClient.requestPermission()
-                    print("Notifications permission are granted: \(granted)")
+                    if granted {
+                        logger.info("Notifications permission are granted")
+                    } else {
+                        logger.error("Notifications permission are not granted")
+                    }
                     //if granted { await application.registerForRemoteNotifications() }
                 }
                 

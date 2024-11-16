@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import PersistenceKeys
+import LoggerClient
 import Models
 import Mixpanel
 import Sentry
@@ -31,21 +32,25 @@ public extension DependencyValues {
 
 extension AnalyticsClient: DependencyKey {
     
-    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Analytics")
-    
     public static var liveValue: Self {
+        @Dependency(\.logger[.analytics]) var logger
+        
         return AnalyticsClient(
-            configure: { configuration in
+            configure: { config in
                 @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
+                
                 configureMixpanel(
                     id: analyticsId,
-                    isEnabled: configuration.isAnalyticsEnabled
+                    isEnabled: config.isAnalyticsEnabled
                 )
+                logger.info("Analytics has been succesfully configured. Enabled: \(config.isAnalyticsEnabled)")
+                
                 configureSentry(
                     id: analyticsId,
-                    isEnabled: configuration.isCrashlyticsEnabled,
-                    isDebugEnabled: configuration.isCrashlyticsDebugEnabled
+                    isEnabled: config.isCrashlyticsEnabled,
+                    isDebugEnabled: config.isCrashlyticsDebugEnabled
                 )
+                logger.info("Crashlytics has been successfully configured. Enabled: \(config.isCrashlyticsEnabled) / Debug: \(config.isCrashlyticsDebugEnabled)")
             },
             identify: { id in
                 logger.info("Identifying user with id: \(id)")
@@ -93,6 +98,7 @@ extension AnalyticsClient {
         )
         
         @Dependency(\.analyticsClient) var analytics
+        @Dependency(\.logger[.analytics]) var logger
         @Shared(.userSession) var userSession
         
         if let mixpanelUserId = Mixpanel.mainInstance().userId {
