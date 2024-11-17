@@ -23,6 +23,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var appColorScheme: AppColorScheme
     public var backgroundTheme: BackgroundTheme
     public var appTintColor: AppTintColor
+    public var notifications: NotificationsSettings
     public var forumPerPage: Int
     public var topicPerPage: Int
     public var analyticsConfigurationDebug: AnalyticsConfiguration
@@ -35,6 +36,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         appColorScheme: AppColorScheme,
         backgroundTheme: BackgroundTheme,
         appTintColor: AppTintColor,
+        notifications: NotificationsSettings,
         forumPerPage: Int,
         topicPerPage: Int,
         analyticsConfigurationDebug: AnalyticsConfiguration,
@@ -46,6 +48,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appColorScheme = appColorScheme
         self.backgroundTheme = backgroundTheme
         self.appTintColor = appTintColor
+        self.notifications = notifications
         self.forumPerPage = forumPerPage
         self.topicPerPage = topicPerPage
         self.analyticsConfigurationDebug = analyticsConfigurationDebug
@@ -60,6 +63,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appColorScheme = try container.decodeIfPresent(AppColorScheme.self, forKey: .appColorScheme) ?? AppSettings.default.appColorScheme
         self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
+        self.notifications = try container.decodeIfPresent(NotificationsSettings.self, forKey: .notifications) ?? AppSettings.default.notifications
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
         self.analyticsConfigurationDebug = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationDebug) ?? AppSettings.default.analyticsConfigurationDebug
@@ -75,6 +79,7 @@ public extension AppSettings {
         appColorScheme: .system,
         backgroundTheme: .blue,
         appTintColor: .primary,
+        notifications: .default,
         forumPerPage: 30,
         topicPerPage: 20,
         analyticsConfigurationDebug: .debug,

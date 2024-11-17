@@ -149,6 +149,7 @@ public struct SettingsScreen: View {
                         }
                     }
                 }
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -226,6 +227,10 @@ public struct SettingsScreen: View {
             Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
             
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
+            
+            Row(symbol: .bell, title: "Notifications", type: .navigation) {
+                store.send(.notificationsButtonTapped)
+            }
             
             Row(symbol: .textformatSize, title: "Text size", type: .navigation) {
                 store.send(.notImplementedFeatureTapped)

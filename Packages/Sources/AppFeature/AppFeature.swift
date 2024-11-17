@@ -18,6 +18,7 @@ import MenuFeature
 import AuthFeature
 import ProfileFeature
 import SettingsFeature
+import NotificationsFeature
 import DeveloperFeature
 import APIClient
 import Models
@@ -65,6 +66,7 @@ public struct AppFeature: Reducer, Sendable {
     @Reducer(state: .equatable)
     public enum SettingsPath {
         case settings(SettingsFeature)
+        case notifications(NotificationsFeature)
         case developer(DeveloperFeature)
     }
     
@@ -565,25 +567,40 @@ public struct AppFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+                
+                // Notifications screen
+                
+            case .articlesPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
+                state.articlesPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
+                
+            case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
+                state.favoritesPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
+                
+            case .forumPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
+                state.forumPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
+                
+            case .profilePath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
+                state.profilePath.append(.settingsPath(.notifications(NotificationsFeature.State())))
+                
+                // Developer screen
+                
             case .articlesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.articlesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
-                return .none
                 
             case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.favoritesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
-                return .none
                 
             case .forumPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.forumPath.append(.settingsPath(.developer(DeveloperFeature.State())))
-                return .none
                 
             case .profilePath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.profilePath.append(.settingsPath(.developer(DeveloperFeature.State())))
-                return .none
                 
             default:
                 return .none
             }
+            
+            return .none
         }
     }
 }

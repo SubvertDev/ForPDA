@@ -131,17 +131,6 @@
         }
       }
     },
-    "Copy Push Token" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скопировать пуш токен"
-          }
-        }
-      }
-    },
     "Dark.Scheme" : {
       "localizations" : {
         "en" : {
@@ -240,6 +229,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Список изменений (Telegram)"
+          }
+        }
+      }
+    },
+    "Notifications" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уведомления"
           }
         }
       }

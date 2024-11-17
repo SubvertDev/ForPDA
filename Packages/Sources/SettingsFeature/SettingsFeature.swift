@@ -72,6 +72,7 @@ public struct SettingsFeature: Reducer, Sendable {
         case binding(BindingAction<State>)
         case languageButtonTapped
         case schemeButtonTapped(AppColorScheme)
+        case notificationsButtonTapped
         case onDeveloperMenuTapped
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
@@ -119,6 +120,9 @@ public struct SettingsFeature: Reducer, Sendable {
                                scheme = state.appColorScheme] _ in
                     await appSettings.withLock { $0.appColorScheme = scheme }
                 }
+                
+            case .notificationsButtonTapped:
+                return .none
                 
             case .onDeveloperMenuTapped:
                 return .none

@@ -18,6 +18,7 @@ import MenuFeature
 import AuthFeature
 import ProfileFeature
 import SettingsFeature
+import NotificationsFeature
 import DeveloperFeature
 import AlertToast
 import SFSafeSymbols
@@ -193,6 +194,8 @@ public struct AppView: View {
             SettingsScreen(store: store)
         case let .developer(store):
             DeveloperScreen(store: store)
+        case let .notifications(store):
+            NotificationsScreen(store: store)
         }
     }
     

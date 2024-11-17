@@ -21,6 +21,8 @@ let package = Package(
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "ProfileFeature", targets: ["ProfileFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
+        .library(name: "NotificationsFeature", targets: ["NotificationsFeature"]),
+        .library(name: "DeveloperFeature", targets: ["DeveloperFeature"]),
         
         // Clients
         .library(name: "APIClient", targets: ["APIClient"]),
@@ -71,6 +73,7 @@ let package = Package(
                 "AuthFeature",
                 "ProfileFeature",
                 "SettingsFeature",
+                "NotificationsFeature",
                 "DeveloperFeature",
                 "NotificationsClient",
                 "AnalyticsClient",
@@ -249,6 +252,19 @@ let package = Package(
             ]
         ),
         .target(
+            name: "NotificationsFeature",
+            dependencies: [
+                "NotificationsClient",
+                "AnalyticsClient",
+                "CacheClient",
+                "Models",
+                "SharedUI",
+                "PersistenceKeys",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+            ]
+        ),
+        .target(
             name: "DeveloperFeature",
             dependencies: [
                 "SharedUI",
@@ -381,14 +397,17 @@ let package = Package(
 for target in package.targets where target.type != .binary {
     var swiftSettings = target.swiftSettings ?? []
     
+    swiftSettings.append(
+        .unsafeFlags([
+            "-Xfrontend",
+            "-warn-long-function-bodies=550",
+            "-Xfrontend",
+            "-warn-long-expression-type-checking=100"
+        ])
+    )
+    
     #if !hasFeature(ExistentialAny)
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
-    swiftSettings.append(
-        .unsafeFlags(["-Xfrontend",
-                      "-warn-long-function-bodies=550",
-                      "-Xfrontend",
-                      "-warn-long-expression-type-checking=100"])
-    )
     #endif
     
     target.swiftSettings = swiftSettings

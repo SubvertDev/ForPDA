@@ -30,7 +30,7 @@ struct ForPDAApp: App {
                 .tint(.Theme.primary)
         }
         .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
-            appDelegate.store.send(.syncUnreadTaskInvoked)
+            await appDelegate.store.send(.syncUnreadTaskInvoked)
         }
     }
 }
