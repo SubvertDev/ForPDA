@@ -90,7 +90,6 @@ public struct AppFeature: Reducer, Sendable {
         public var forumsList: ForumsListFeature.State
         public var forum: ForumFeature.State
         public var profile: ProfileFeature.State
-        public var history: HistoryFeature.State
         
         @Presents public var auth: AuthFeature.State?
         @Presents public var alert: AlertState<Never>?
@@ -133,7 +132,6 @@ public struct AppFeature: Reducer, Sendable {
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             forum: ForumFeature.State = ForumFeature.State(forumId: 0, forumName: "Test"),
             profile: ProfileFeature.State = ProfileFeature.State(),
-            history: HistoryFeature.State = HistoryFeature.State(),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articlesList,
@@ -156,7 +154,6 @@ public struct AppFeature: Reducer, Sendable {
             self.forumsList = forumsList
             self.forum = forum
             self.profile = profile
-            self.history = history
             
             self.auth = auth
             self.alert = alert
@@ -190,7 +187,6 @@ public struct AppFeature: Reducer, Sendable {
         case forumsList(ForumsListFeature.Action)
         case forum(ForumFeature.Action)
         case profile(ProfileFeature.Action)
-        case history(HistoryFeature.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
         case alert(PresentationAction<Never>)
@@ -240,11 +236,7 @@ public struct AppFeature: Reducer, Sendable {
         Scope(state: \.profile, action: \.profile) {
             ProfileFeature()
         }
-        
-        Scope(state: \.history, action: \.history) {
-            HistoryFeature()
-        }
-        
+
         Reduce<State, Action> { state, action in
             switch action {
                 
@@ -357,7 +349,7 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .forumsList, .forum, .profile, .favorites, .history:
+            case .articlesList, .forumsList, .forum, .profile, .favorites:
                 return .none
                 
             case .articlesPath, .forumPath, .profilePath, .favoritesPath:

@@ -26,7 +26,7 @@ public struct HistoryFeature: Sendable {
         
         public var isLoading = false
         
-        public var pageNavigation = PageNavigationFeature.State(type: .forum)
+        public var pageNavigation = PageNavigationFeature.State(type: .history)
         
         public init(
             history: [HistoryRow] = []
@@ -70,7 +70,7 @@ public struct HistoryFeature: Sendable {
             case .pageNavigation:
                 return .none
                 
-            case .settingsButtonTapped, .topicTapped(_):
+            case .settingsButtonTapped, .topicTapped:
                 return .none
                 
             case let ._loadHistory(offset):
@@ -116,6 +116,7 @@ public struct HistoryFeature: Sendable {
                 return .none
                 
             case let ._historyResponse(.failure(error)):
+                // TODO: Handle error
                 print(error)
                 return .none
             }
