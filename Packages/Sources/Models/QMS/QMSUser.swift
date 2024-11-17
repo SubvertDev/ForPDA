@@ -17,7 +17,7 @@ public struct QMSUser: Sendable, Codable, Hashable, Identifiable {
     public let lastSeenOnline: Date
     public let lastMessageDate: Date
     public let unreadCount: Int
-    public let chats: [QMSChatInfo]
+    public var chats: [QMSChatInfo]
     
     public init(
         userId: Int,

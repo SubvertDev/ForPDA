@@ -8,6 +8,31 @@
 import Foundation
 import Models
 
+public struct QMSUserParser {
+    public static func parse(_ rawString: String) throws -> QMSUser {
+        if let data = rawString.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                let user = (array[2] as! [[Any]])[0]
+                return QMSUser(
+                    userId: user[0] as! Int,
+                    name: user[1] as! String,
+                    flag: user[2] as! Int,
+                    avatarUrl: URL(string: user[3] as! String),
+                    lastSeenOnline: Date(timeIntervalSince1970: user[4] as! TimeInterval),
+                    lastMessageDate: Date(timeIntervalSince1970: user[5] as! TimeInterval),
+                    unreadCount: user[6] as! Int,
+                    chats: QMSListParser.parseChats(user[7] as! [[Any]])
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+}
+
 public struct QMSListParser {
     public static func parse(rawString string: String) throws -> QMSList {
         if let data = string.data(using: .utf8) {
@@ -37,7 +62,7 @@ public struct QMSListParser {
         }
     }
     
-    private static func parseChats(_ array: [[Any]]) -> [QMSChatInfo] {
+    public static func parseChats(_ array: [[Any]]) -> [QMSChatInfo] {
         return array.map { chat in
             return QMSChatInfo(
                 id: chat[0] as! Int,

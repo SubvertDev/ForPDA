@@ -33,6 +33,7 @@ public struct QMSListFeature: Sendable {
         case userRowTapped(Int)
         
         case _qmsLoaded(Result<QMSList, any Error>)
+        case _userLoaded(Result<QMSUser, any Error>)
     }
     
     // MARK: - Dependency
@@ -53,14 +54,32 @@ public struct QMSListFeature: Sendable {
             case .binding:
                 return .none
                 
-            case .chatRowTapped, .userRowTapped:
+            case .chatRowTapped:
                 return .none
+                
+            case let .userRowTapped(id):
+                return .run { send in
+                    let result = await Result { try await apiClient.loadQMSUser(id) }
+                    await send(._userLoaded(result))
+                }
                 
             case let ._qmsLoaded(result):
                 switch result {
                 case let .success(qms):
                     // customDump(qms)
                     state.qms = qms
+                    
+                case let .failure(error):
+                    print(error)
+                }
+                return .none
+                
+            case let ._userLoaded(result):
+                switch result {
+                case let .success(user):
+                    print("success")
+                    let index = state.qms!.users.firstIndex(where: { $0.id == user.id })!
+                    state.qms!.users[index].chats = user.chats
                     
                 case let .failure(error):
                     print(error)

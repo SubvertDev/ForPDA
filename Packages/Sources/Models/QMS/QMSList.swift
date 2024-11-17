@@ -8,7 +8,7 @@
 import Foundation
 
 public struct QMSList: Sendable, Codable, Hashable {
-    public let users: [QMSUser]
+    public var users: [QMSUser]
     
     public init(users: [QMSUser]) {
         self.users = users

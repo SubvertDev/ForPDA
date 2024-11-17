@@ -25,6 +25,7 @@ public struct ParsingClient: Sendable {
     public var parseHistory: @Sendable (_ rawString: String) async throws -> History
     public var parseUnread: @Sendable (_ rawString: String) async throws -> Unread
     public var parseQmsList: @Sendable (_ rawString: String) async throws -> QMSList
+    public var parseQmsUser: @Sendable (_ rawString: String) async throws -> QMSUser
     public var parseQmsChat: @Sendable (_ rawString: String) async throws -> QMSChat
 }
 
@@ -78,6 +79,9 @@ extension ParsingClient: DependencyKey {
         },
         parseQmsList: { rawString in
             return try QMSListParser.parse(rawString: rawString)
+        },
+        parseQmsUser: { rawString in
+            return try QMSUserParser.parse(rawString)
         },
         parseQmsChat: { rawString in
             return try QMSChatParser.parse(rawString: rawString)

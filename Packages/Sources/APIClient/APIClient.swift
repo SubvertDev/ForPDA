@@ -34,6 +34,7 @@ public struct APIClient: Sendable {
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var getUnread: @Sendable () async throws -> Unread
     public var loadQMSList: @Sendable () async throws -> QMSList
+    public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
     public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
 }
@@ -176,6 +177,10 @@ extension APIClient: DependencyKey {
 //                print("info: \(info)")
                 return try await parsingClient.parseQmsList(rawString: rawString)
             },
+            loadQMSUser: { id in
+                let rawString = try await api.get(QMSCommand.info(id: id))
+                return try await parsingClient.parseQmsUser(rawString: rawString)
+            },
             loadQMSChat: { id in
                 let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
                 let rawString = try await api.get(QMSCommand.Dialog.view(data: request))
@@ -244,6 +249,9 @@ extension APIClient: DependencyKey {
             },
             loadQMSList: {
                 return QMSList(users: [])
+            },
+            loadQMSUser: { _ in
+                return QMSUser(userId: 0, name: "", flag: 0, avatarUrl: nil, lastSeenOnline: .now, lastMessageDate: .now, unreadCount: 0, chats: [])
             },
             loadQMSChat: { _ in
                 return QMSChat(id: 0, creationDate: .now, lastMessageDate: .now, name: "", partnerId: 0, partnerName: "", flag: 0, avatarUrl: nil, unknownId1: 0, totalCount: 0, unknownId2: 0, lastMessageId: 0, unreadCount: 0, messages: [])

@@ -59,30 +59,35 @@ public struct QMSListScreen: View {
     
     @ViewBuilder
     private func UserRow(_ user: QMSUser) -> some View {
-        HStack(spacing: 8) {
-            LazyImage(url: user.avatarUrl) { state in
-                Group {
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Image.avatarDefault.resizable()
+        Button {
+            store.send(.userRowTapped(user.id))
+        } label: {
+            HStack(spacing: 8) {
+                LazyImage(url: user.avatarUrl) { state in
+                    Group {
+                        if let image = state.image {
+                            image.resizable().scaledToFill()
+                        } else {
+                            Image.avatarDefault.resizable()
+                        }
                     }
+                    .skeleton(with: state.isLoading, shape: .rectangle)
                 }
-                .skeleton(with: state.isLoading, shape: .rectangle)
-            }
-            .frame(width: 50, height: 50)
-            
-            Text(user.name)
-            
-            Spacer()
-            
-            if user.unreadCount > 0 {
-                Circle()
-                    .font(.title2)
-                    .foregroundStyle(tintColor)
-                    .frame(width: 8)
+                .frame(width: 50, height: 50)
+                
+                Text(user.name)
+                
+                Spacer()
+                
+                if user.unreadCount > 0 {
+                    Circle()
+                        .font(.title2)
+                        .foregroundStyle(tintColor)
+                        .frame(width: 8)
+                }
             }
         }
+        .buttonStyle(.plain)
         .listRowBackground(Color.Background.teritary)
     }
     
