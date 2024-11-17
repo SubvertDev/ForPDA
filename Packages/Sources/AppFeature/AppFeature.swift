@@ -86,7 +86,6 @@ public struct AppFeature: Reducer, Sendable {
         // public var bookmarks: BookmarksFeature.State
         public var favorites: FavoritesFeature.State
         public var forumsList: ForumsListFeature.State
-        public var forum: ForumFeature.State
         public var profile: ProfileFeature.State
         
         @Presents public var auth: AuthFeature.State?
@@ -128,7 +127,6 @@ public struct AppFeature: Reducer, Sendable {
             // bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             favorites: FavoritesFeature.State = FavoritesFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
-            forum: ForumFeature.State = ForumFeature.State(forumId: 0, forumName: "Test"),
             profile: ProfileFeature.State = ProfileFeature.State(),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
@@ -150,7 +148,6 @@ public struct AppFeature: Reducer, Sendable {
             // self.bookmarks = bookmarks
             self.favorites = favorites
             self.forumsList = forumsList
-            self.forum = forum
             self.profile = profile
             
             self.auth = auth
@@ -183,7 +180,6 @@ public struct AppFeature: Reducer, Sendable {
         // case bookmarks(BookmarksFeature.Action)
         case favorites(FavoritesFeature.Action)
         case forumsList(ForumsListFeature.Action)
-        case forum(ForumFeature.Action)
         case profile(ProfileFeature.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
@@ -347,7 +343,7 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .forumsList, .forum, .profile, .favorites:
+            case .articlesList, .forumsList, .profile, .favorites:
                 return .none
                 
             case .articlesPath, .forumPath, .profilePath, .favoritesPath:
