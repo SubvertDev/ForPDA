@@ -75,7 +75,7 @@ public struct MenuFeature: Reducer, Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
             case .onTask:

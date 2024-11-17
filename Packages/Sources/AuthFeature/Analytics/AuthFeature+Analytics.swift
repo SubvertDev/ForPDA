@@ -17,7 +17,7 @@ extension AuthFeature {
         
         @Dependency(\.analyticsClient) var analyticsClient
         
-        var body: some ReducerOf<Self> {
+        var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
                 case .binding, .onTask, .onSubmit, ._captchaResponse, ._loginResponse, .alert, .cancelButtonTapped:

@@ -102,7 +102,7 @@ public struct SettingsFeature: Reducer, Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         BindingReducer()
         
         Reduce<State, Action> { state, action in
