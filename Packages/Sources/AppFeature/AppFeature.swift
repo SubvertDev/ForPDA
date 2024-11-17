@@ -208,7 +208,7 @@ public struct AppFeature: Reducer, Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         BindingReducer()
         
         Scope(state: \.appDelegate, action: \.appDelegate) {

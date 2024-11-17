@@ -62,7 +62,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case offsetChanged(to: Int)
     }
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
             case .firstPageTapped:

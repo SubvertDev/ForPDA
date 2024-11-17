@@ -63,7 +63,7 @@ public struct ForumFeature: Reducer, Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         Scope(state: \.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
