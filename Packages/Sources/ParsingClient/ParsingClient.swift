@@ -23,6 +23,8 @@ public struct ParsingClient: Sendable {
     public var parseAnnouncement: @Sendable (_ rawString: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ rawString: String) async throws -> Favorite
     public var parseUnread: @Sendable (_ rawString: String) async throws -> Unread
+    public var parseQmsList: @Sendable (_ rawString: String) async throws -> QMSList
+    public var parseQmsChat: @Sendable (_ rawString: String) async throws -> QMSChat
 }
 
 extension DependencyValues {
@@ -69,6 +71,12 @@ extension ParsingClient: DependencyKey {
         },
         parseUnread: { rawString in
             return try UnreadParser.parse(rawString: rawString)
+        },
+        parseQmsList: { rawString in
+            return try QMSListParser.parse(rawString: rawString)
+        },
+        parseQmsChat: { rawString in
+            return try QMSChatParser.parse(rawString: rawString)
         }
     )
 }

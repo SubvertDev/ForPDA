@@ -47,6 +47,7 @@ public struct ProfileFeature: Reducer, Sendable {
     
     public enum Action {
         case onTask
+        case qmsButtonTapped
         case settingsButtonTapped
         case logoutButtonTapped
         
@@ -84,7 +85,7 @@ public struct ProfileFeature: Reducer, Sendable {
                     }
                 }
                 
-            case .settingsButtonTapped:
+            case .qmsButtonTapped, .settingsButtonTapped:
                 return .none
                 
             case .logoutButtonTapped:

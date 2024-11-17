@@ -17,6 +17,8 @@ import FavoritesFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
+import QMSListFeature
+import QMSFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature
@@ -60,6 +62,7 @@ public struct AppFeature: Reducer, Sendable {
     
     @Reducer(state: .equatable)
     public enum ProfilePath {
+        case qmsPath(QMSPath.Body = QMSPath.body)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
@@ -68,6 +71,12 @@ public struct AppFeature: Reducer, Sendable {
         case settings(SettingsFeature)
         case notifications(NotificationsFeature)
         case developer(DeveloperFeature)
+    }
+    
+    @Reducer(state: .equatable)
+    public enum QMSPath {
+        case qmsList(QMSListFeature)
+        case qms(QMSFeature)
     }
     
     // MARK: - State
@@ -537,6 +546,10 @@ public struct AppFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .profile(.qmsButtonTapped):
+                state.profilePath.append(.qmsPath(.qmsList(QMSListFeature.State())))
+                return .none
+                
             case .profile(.settingsButtonTapped):
                 state.profilePath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
@@ -553,8 +566,23 @@ public struct AppFeature: Reducer, Sendable {
         .onChange(of: \.profilePath) { _, newValue in
             Reduce<State, Action> { state, _ in
                 state.isShowingTabBar = !newValue.contains {
-                    if case .settingsPath = $0 { return true } else { return false }
+                    if case .qmsPath = $0 { return true }
+                    if case .settingsPath = $0 { return true }
+                    return false
                 }
+                return .none
+            }
+        }
+        
+        // MARK: - QMS Path
+        
+        Reduce<State, Action> { state, action in
+            switch action {
+            case let .profilePath(.element(id: _, action: .qmsPath(.qmsList(.chatRowTapped(chatId))))):
+                state.profilePath.append(.qmsPath(.qms(QMSFeature.State(chatId: chatId))))
+                return .none
+                
+            default:
                 return .none
             }
         }

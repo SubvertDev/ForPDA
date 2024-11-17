@@ -40,7 +40,7 @@ public struct ProfileScreen: View {
                 if let user = store.user {
                     List {
                         Header(user: user)
-//                        NavigationSection()
+                        NavigationSection()
                         SegmentPicker()
                         
                         switch pickerSelection {
@@ -149,7 +149,9 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func NavigationSection() -> some View {
         Section {
-            Row(symbol: .person2, title: "QMS", type: .navigation) {}
+            Row(symbol: .person2, title: "QMS", type: .navigation) {
+                store.send(.qmsButtonTapped)
+            }
             Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {}
         }
         .listRowBackground(Color.Background.teritary)
@@ -497,6 +499,7 @@ public struct ProfileScreen: View {
                             .foregroundStyle(Color.Labels.quintuple)
                     }
                 }
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))

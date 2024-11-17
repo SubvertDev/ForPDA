@@ -32,6 +32,9 @@ public struct APIClient: Sendable {
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> Favorite
     public var getUnread: @Sendable () async throws -> Unread
+    public var loadQMSList: @Sendable () async throws -> QMSList
+    public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
+    public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
 }
 
 extension APIClient: DependencyKey {
@@ -161,6 +164,22 @@ extension APIClient: DependencyKey {
             getUnread: {
                 let rawString = try await api.get(CommonCommand.syncUnread)
                 return try await parsingClient.parseUnread(rawString: rawString)
+            },
+            loadQMSList: {
+                let rawString = try await api.get(QMSCommand.list)
+//                let info = try await api.get(QMSCommand.info(id: 4056435))
+//                print("info: \(info)")
+                return try await parsingClient.parseQmsList(rawString: rawString)
+            },
+            loadQMSChat: { id in
+                let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
+                let rawString = try await api.get(QMSCommand.Dialog.view(data: request))
+                return try await parsingClient.parseQmsChat(rawString: rawString)
+            },
+            sendQMSMessage: { chatId, message in
+                let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
+                let _ = try await api.get(QMSCommand.Message.send(data: request))
+                // Returns chatId + new messageId
             }
         )
     }
@@ -214,6 +233,15 @@ extension APIClient: DependencyKey {
             },
             getUnread: {
                 return .mock
+            },
+            loadQMSList: {
+                return QMSList(users: [])
+            },
+            loadQMSChat: { _ in
+                return QMSChat(id: 0, creationDate: .now, lastMessageDate: .now, name: "", partnerId: 0, partnerName: "", flag: 0, avatarUrl: nil, unknownId1: 0, totalCount: 0, unknownId2: 0, lastMessageId: 0, unreadCount: 0, messages: [])
+            },
+            sendQMSMessage: { _, _ in
+                
             }
         )
     }
