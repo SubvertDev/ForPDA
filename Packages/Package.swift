@@ -17,10 +17,13 @@ let package = Package(
         .library(name: "ForumFeature", targets: ["ForumFeature"]),
         .library(name: "TopicFeature", targets: ["TopicFeature"]),
         .library(name: "FavoritesFeature", targets: ["FavoritesFeature"]),
+        .library(name: "HistoryFeature", targets: ["HistoryFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "ProfileFeature", targets: ["ProfileFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
+        .library(name: "NotificationsFeature", targets: ["NotificationsFeature"]),
+        .library(name: "DeveloperFeature", targets: ["DeveloperFeature"]),
         
         // Clients
         .library(name: "APIClient", targets: ["APIClient"]),
@@ -67,13 +70,17 @@ let package = Package(
                 "ForumFeature",
                 "TopicFeature",
                 "FavoritesFeature",
+                "HistoryFeature",
                 "MenuFeature",
                 "AuthFeature",
                 "ProfileFeature",
                 "SettingsFeature",
-                "AnalyticsClient",
-                "CacheClient",
+                "NotificationsFeature",
+                "DeveloperFeature",
                 "NotificationsClient",
+                "AnalyticsClient",
+                "LoggerClient",
+                "CacheClient",
                 "Models",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -190,6 +197,20 @@ let package = Package(
             ]
         ),
         .target(
+            name: "HistoryFeature",
+            dependencies: [
+                "PageNavigationFeature",
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "CacheClient",
+                "AnalyticsClient",
+                "ParsingClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
             name: "MenuFeature",
             dependencies: [
                 "APIClient",
@@ -246,6 +267,28 @@ let package = Package(
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
+        .target(
+            name: "NotificationsFeature",
+            dependencies: [
+                "NotificationsClient",
+                "AnalyticsClient",
+                "CacheClient",
+                "Models",
+                "SharedUI",
+                "PersistenceKeys",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
+            ]
+        ),
+        .target(
+            name: "DeveloperFeature",
+            dependencies: [
+                "SharedUI",
+                "CacheClient",
+                "AnalyticsClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
         
         // MARK: - Clients
         
@@ -270,6 +313,7 @@ let package = Package(
             dependencies: [
                 "Models",
                 "PersistenceKeys",
+                "LoggerClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Mixpanel", package: "mixpanel-swift"),
                 .product(name: "Sentry", package: "sentry-cocoa")
@@ -292,6 +336,9 @@ let package = Package(
         .target(
             name: "NotificationsClient",
             dependencies: [
+                "AnalyticsClient",
+                "LoggerClient",
+                "CacheClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -308,6 +355,12 @@ let package = Package(
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Cache", package: "Cache"),
                 .product(name: "Nuke", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "LoggerClient",
+            dependencies: [
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         
@@ -360,14 +413,17 @@ let package = Package(
 for target in package.targets where target.type != .binary {
     var swiftSettings = target.swiftSettings ?? []
     
+    swiftSettings.append(
+        .unsafeFlags([
+            "-Xfrontend",
+            "-warn-long-function-bodies=550",
+            "-Xfrontend",
+            "-warn-long-expression-type-checking=100"
+        ])
+    )
+    
     #if !hasFeature(ExistentialAny)
     swiftSettings.append(.enableUpcomingFeature("ExistentialAny"))
-    swiftSettings.append(
-        .unsafeFlags(["-Xfrontend",
-                      "-warn-long-function-bodies=550",
-                      "-Xfrontend",
-                      "-warn-long-expression-type-checking=100"])
-    )
     #endif
     
     target.swiftSettings = swiftSettings

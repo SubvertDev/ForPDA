@@ -7,13 +7,18 @@
 
 import UIKit
 import ComposableArchitecture
+import AnalyticsClient
+import LoggerClient
+import CacheClient
 import Models
 
 @DependencyClient
 public struct NotificationsClient: Sendable {
-    public var requestPermission: @Sendable () async -> Bool = { true }
+    public var requestPermission: @Sendable () async throws -> Bool
+    public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
     public var setNotificationsDelegate: @Sendable () -> Void
+    public var showUnreadNotifications: @Sendable (Unread) async -> Void
 }
 
 extension DependencyValues {
@@ -24,25 +29,67 @@ extension DependencyValues {
 }
 
 extension NotificationsClient: DependencyKey {
-    public static let liveValue = Self(
-        requestPermission: {
-            let center = UNUserNotificationCenter.current()
-            return await withCheckedContinuation { continuation in
-                center.requestAuthorization(options: [.badge, .alert, .sound]) { (granted, error) in
-                    if let error {
-                        continuation.resume(returning: false)
-                    } else {
-                        continuation.resume(returning: granted)
+    public static var liveValue: Self {
+        @Dependency(\.logger[.notifications]) var logger
+
+        return NotificationsClient(
+            requestPermission: {
+                return try await UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound])
+            },
+            registerForRemoteNotifications: {
+                await UIApplication.shared.registerForRemoteNotifications()
+            },
+            setDeviceToken: { deviceToken in
+                let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                print("Device token: \(token)")
+            },
+            setNotificationsDelegate: {
+                
+            },
+            showUnreadNotifications: { unread in
+                @Dependency(\.cacheClient) var cacheClient
+                
+                for item in unread.items {
+                    // customDump(item)
+                    
+                    if let messageId = cacheClient.getLastMessageOfUnreadItem(item.id), messageId == item.lastMessageId {
+                        logger.info("Skipping notification \(item.id) of type \(item.category.rawValue) because it's already processed")
+                        continue
+                    }
+                    logger.info("Processing notification \(item.id) of type \(item.category.rawValue)")
+                    try? cacheClient.setLastMessageOfUnreadItem(item.lastMessageId, item.id)
+                    
+                    let content = UNMutableNotificationContent()
+                    content.sound = .default
+                    
+                    switch item.category {
+                    case .qms:
+                        content.title = item.authorName
+                        content.body = "\(item.name): \(item.unreadCount) нов\(item.unreadCount == 1 ? "ое" : "ых") сообщения"
+                    case .forum:
+                        content.title = "Новое на форуме"
+                        content.body = item.name
+                    case .topic:
+                        content.title = "\(item.authorName) в топике"
+                        content.body = item.name
+                    case .forumMention:
+                        content.title = "Упоминание в топике \(item.name)"
+                        content.body = "\(item.authorName) ссылается на вас"
+                    case .siteMention:
+                        content.title = "Упоминание в новости \(item.name)"
+                        content.body = "\(item.authorName) ссылается на вас"
+                    }
+                    
+                    let request = UNNotificationRequest(identifier: "\(item.id)", content: content, trigger: nil)
+                    
+                    do {
+                        try await UNUserNotificationCenter.current().add(request)
+                    } catch {
+                        @Dependency(\.analyticsClient) var analyticsClient
+                        analyticsClient.capture(error)
                     }
                 }
             }
-        },
-        setDeviceToken: { deviceToken in
-
-        },
-        setNotificationsDelegate: {
-            
-        }
-    )
+        )
+    }
 }
-

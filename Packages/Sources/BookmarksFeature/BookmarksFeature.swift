@@ -14,7 +14,7 @@ import Models
 import PersistenceKeys
 
 @Reducer
-public struct BookmarksFeature: Sendable {
+public struct BookmarksFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -72,10 +72,10 @@ public struct BookmarksFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .none

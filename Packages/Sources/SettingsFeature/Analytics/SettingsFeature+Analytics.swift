@@ -17,8 +17,8 @@ extension SettingsFeature {
         
         @Dependency(\.analyticsClient) var analyticsClient
         
-        var body: some ReducerOf<Self> {
-            Reduce { state, action in
+        var body: some Reducer<State, Action> {
+            Reduce<State, Action> { state, action in
                 switch action {
                 case .destination, .binding:
                     break
@@ -29,11 +29,20 @@ extension SettingsFeature {
                 case .schemeButtonTapped:
                     analyticsClient.log(SettingsEvent.themeTapped)
                     
+                case .notificationsButtonTapped:
+                    analyticsClient.log(SettingsEvent.notificationsTapped)
+                    
+                case .onDeveloperMenuTapped:
+                    return .none
+                    
                 case .safariExtensionButtonTapped:
                     analyticsClient.log(SettingsEvent.safariExtensionTapped)
                     
                 case .copyDebugIdButtonTapped:
                     analyticsClient.log(SettingsEvent.copyDebugIdTapped)
+                    
+                // case .copyPushTokenButtonTapped:
+                //     return .none
 
                 case .clearCacheButtonTapped:
                     analyticsClient.log(SettingsEvent.clearCacheTapped)

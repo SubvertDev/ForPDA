@@ -25,11 +25,16 @@ public struct CacheClient: Sendable {
     // Forums List
     public var cacheForumsList: @Sendable ([ForumInfo]) async throws -> Void
     public var getForumsList: @Sendable () async -> [ForumInfo]
+    // Background Tasks
+    public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async throws -> Void
+    public var getLastBackgroundTaskInvokeTime: @Sendable () async -> TimeInterval?
+    // Notifications
+    public var setLastMessageOfUnreadItem: @Sendable (_ messageId: Int, _ dialogId: Int) throws -> Void
+    public var getLastMessageOfUnreadItem: @Sendable (_ messageId: Int) -> Int?
 }
 
 extension CacheClient: DependencyKey {
     
-    private static var articlesKey: String { "articlesKey" }
     private static var articlesStorage: Storage<Int, Article> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Articles", expiry: .seconds(2592000), maxSize: 163840),
@@ -39,7 +44,6 @@ extension CacheClient: DependencyKey {
         )
     }
     
-    private static var usersKey: String { "usersKey" }
     private static var usersStorage: Storage<Int, User> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Users", expiry: .seconds(2592000), maxSize: 81920),
@@ -59,6 +63,25 @@ extension CacheClient: DependencyKey {
         )
     }
     
+    private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
+    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, TimeInterval> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .never),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: TimeInterval.self)
+        )
+    }
+    
+    private static var notificationsStorage: Storage<Int, Int> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "Articles", expiry: .seconds(2592000), maxSize: 163840),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: Int.self)
+        )
+    }
+    
     // TODO: Handle try/catch?
     public static var liveValue: CacheClient {
         CacheClient(
@@ -67,8 +90,11 @@ extension CacheClient: DependencyKey {
             },
             removeAll: {
                 ImagePipeline.shared.cache.removeAll()
-                try await articlesStorage.async.removeAll()
-                try await usersStorage.async.removeAll()
+                try articlesStorage.removeAll()
+                try usersStorage.removeAll()
+                try forumsListStorage.removeAll()
+                try lastBackgroundTaskInvokeTimeStorage.removeAll()
+                try notificationsStorage.removeAll()
             },
             preloadImages: { urls in
                 urls.forEach { ImagePipeline.shared.loadImage(with: $0, completion: { _ in }) }
@@ -90,6 +116,18 @@ extension CacheClient: DependencyKey {
             },
             getForumsList: {
                 return (try? forumsListStorage.object(forKey: forumsListKey)) ?? []
+            },
+            setLastBackgroundTaskInvokeTime: { date in
+                try lastBackgroundTaskInvokeTimeStorage.setObject(date, forKey: lastBackgroundTaskInvokeTimeKey)
+            },
+            getLastBackgroundTaskInvokeTime: {
+                return try? lastBackgroundTaskInvokeTimeStorage.object(forKey: lastBackgroundTaskInvokeTimeKey)
+            },
+            setLastMessageOfUnreadItem: { messageId, dialogId in
+                try notificationsStorage.setObject(messageId, forKey: dialogId)
+            },
+            getLastMessageOfUnreadItem: { dialogId in
+                return try? notificationsStorage.object(forKey: dialogId)
             }
         )
     }

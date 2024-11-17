@@ -16,7 +16,7 @@ import HapticClient
 import PersistenceKeys
 
 @Reducer
-public struct ArticlesListFeature: Sendable {
+public struct ArticlesListFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -87,8 +87,8 @@ public struct ArticlesListFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+    public var body: some Reducer<State, Action> {
+        Reduce<State, Action> { state, action in
             switch action {
                 
                 // MARK: External

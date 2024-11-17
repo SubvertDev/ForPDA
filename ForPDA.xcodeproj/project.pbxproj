@@ -61,17 +61,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
+		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -317,7 +307,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 396;
+				CURRENT_PROJECT_VERSION = 407;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -353,7 +343,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 396;
+				CURRENT_PROJECT_VERSION = 407;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -523,7 +513,7 @@
 				CODE_SIGN_ENTITLEMENTS = ForPDA/ForPDA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 396;
+				CURRENT_PROJECT_VERSION = 407;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -563,7 +553,7 @@
 				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = YES;
 				SWIFT_UPCOMING_FEATURE_ISOLATED_DEFAULT_VALUES = YES;
 				SWIFT_UPCOMING_FEATURE_REGION_BASED_ISOLATION = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -576,7 +566,7 @@
 				CODE_SIGN_ENTITLEMENTS = ForPDA/ForPDA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 396;
+				CURRENT_PROJECT_VERSION = 407;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -615,7 +605,7 @@
 				SWIFT_UPCOMING_FEATURE_INTERNAL_IMPORTS_BY_DEFAULT = YES;
 				SWIFT_UPCOMING_FEATURE_ISOLATED_DEFAULT_VALUES = YES;
 				SWIFT_UPCOMING_FEATURE_REGION_BASED_ISOLATION = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

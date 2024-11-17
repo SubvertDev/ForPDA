@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import PersistenceKeys
+import LoggerClient
 import Models
 import Mixpanel
 import Sentry
@@ -15,7 +16,7 @@ import OSLog
 
 @DependencyClient
 public struct AnalyticsClient: Sendable {
-    public var configure: @Sendable () -> Void
+    public var configure: @Sendable (AnalyticsConfiguration) -> Void
     public var identify: @Sendable (_ id: String) -> Void
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
@@ -31,14 +32,25 @@ public extension DependencyValues {
 
 extension AnalyticsClient: DependencyKey {
     
-    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Analytics")
-    
     public static var liveValue: Self {
+        @Dependency(\.logger[.analytics]) var logger
+        
         return AnalyticsClient(
-            configure: {
+            configure: { config in
                 @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
-                configureMixpanel(id: analyticsId)
-                configureSentry(id: analyticsId)
+                
+                configureMixpanel(
+                    id: analyticsId,
+                    isEnabled: config.isAnalyticsEnabled
+                )
+                logger.info("Analytics has been succesfully configured. Enabled: \(config.isAnalyticsEnabled)")
+                
+                configureSentry(
+                    id: analyticsId,
+                    isEnabled: config.isCrashlyticsEnabled,
+                    isDebugEnabled: config.isCrashlyticsDebugEnabled
+                )
+                logger.info("Crashlytics has been successfully configured. Enabled: \(config.isCrashlyticsEnabled) / Debug: \(config.isCrashlyticsDebugEnabled)")
             },
             identify: { id in
                 logger.info("Identifying user with id: \(id)")
@@ -53,14 +65,14 @@ extension AnalyticsClient: DependencyKey {
                 Mixpanel.mainInstance().track(event: event.name, properties: event.properties)
             },
             capture: { error in
-                logger.error("\(error) >>> \(error.localizedDescription)")
+                logger.error("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
             }
         )
     }
     
     public static let previewValue = Self(
-        configure: {},
+        configure: { _ in },
         identify: { _ in },
         logout: {},
         log: { event in
@@ -78,14 +90,15 @@ extension AnalyticsClient: DependencyKey {
 
 extension AnalyticsClient {
     
-    private static func configureMixpanel(id: String) {
+    private static func configureMixpanel(id: String, isEnabled: Bool) {
         Mixpanel.initialize(
             token: Secrets.mixpanelToken,
             trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
-            optOutTrackingByDefault: isDebug
+            optOutTrackingByDefault: !isEnabled
         )
         
         @Dependency(\.analyticsClient) var analytics
+        @Dependency(\.logger[.analytics]) var logger
         @Shared(.userSession) var userSession
         
         if let mixpanelUserId = Mixpanel.mainInstance().userId {
@@ -106,11 +119,11 @@ extension AnalyticsClient {
         }
     }
     
-    private static func configureSentry(id: String) {
+    private static func configureSentry(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         SentrySDK.start { options in
             options.dsn = Secrets.sentryDSN
-            options.debug = isDebug
-            options.enabled = !isDebug
+            options.debug = isDebugEnabled
+            options.enabled = isEnabled
             options.tracesSampleRate = 1.0
             options.profilesSampleRate = 1.0
             options.diagnosticLevel = .warning
@@ -125,13 +138,4 @@ extension AnalyticsClient {
 public enum AnalyticsError: Error {
     case brokenArticle(URL)
     case apiFailure(any Error)
-}
-
-// TODO: Move to another place
-private var isDebug: Bool {
-    #if DEBUG
-        return true
-    #else
-        return false
-    #endif
 }

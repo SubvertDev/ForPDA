@@ -11,7 +11,7 @@ import APIClient
 import Models
 
 @Reducer
-public struct ForumsListFeature: Sendable {
+public struct ForumsListFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -44,8 +44,8 @@ public struct ForumsListFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+    public var body: some Reducer<State, Action> {
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .run { send in

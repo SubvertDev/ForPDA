@@ -233,6 +233,16 @@
         }
       }
     },
+    "Notifications" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уведомления"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
         "ru" : {

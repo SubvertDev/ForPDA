@@ -12,7 +12,7 @@ import APIClient
 import Models
 
 @Reducer
-public struct FavoritesFeature: Sendable {
+public struct FavoritesFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -59,12 +59,12 @@ public struct FavoritesFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         Scope(state: \.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 return .send(._loadFavorites(unreadFirst: true, offset: 0))

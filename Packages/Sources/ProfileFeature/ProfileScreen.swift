@@ -40,7 +40,7 @@ public struct ProfileScreen: View {
                 if let user = store.user {
                     List {
                         Header(user: user)
-//                        NavigationSection()
+                        NavigationSection()
                         SegmentPicker()
                         
                         switch pickerSelection {
@@ -148,12 +148,18 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func NavigationSection() -> some View {
-        Section {
-            Row(symbol: .person2, title: "QMS", type: .navigation) {}
-            Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {}
+        // TODO: Think about renaming.
+        // Also When QMS been added, place this condition only for history.
+        if store.shouldShowToolbarButtons {
+            Section {
+                //Row(symbol: .person2, title: "QMS", type: .navigation) {}
+                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
+                    store.send(.historyButtonTapped)
+                }
+            }
+            .listRowBackground(Color.Background.teritary)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         }
-        .listRowBackground(Color.Background.teritary)
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Segment Picker

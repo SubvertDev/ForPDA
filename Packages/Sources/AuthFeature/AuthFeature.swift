@@ -25,7 +25,7 @@ public enum LoginErrorReason {
 }
 
 @Reducer
-public struct AuthFeature: Sendable {
+public struct AuthFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -106,10 +106,10 @@ public struct AuthFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
+    public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Reduce { state, action in
+        Reduce<State, Action> { state, action in
             switch action {
                 
                 // MARK: - External

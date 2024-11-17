@@ -17,8 +17,8 @@ extension ArticleFeature {
         
         @Dependency(\.analyticsClient) var analyticsClient
         
-        var body: some ReducerOf<Self> {
-            Reduce { state, action in
+        var body: some Reducer<State, Action> {
+            Reduce<State, Action> { state, action in
                 switch action {
                 case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, ._commentResponse, ._pollVoteResponse, ._stopRefreshingIfFinished:
                     break

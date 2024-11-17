@@ -149,6 +149,7 @@ public struct SettingsScreen: View {
                         }
                     }
                 }
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
@@ -227,6 +228,10 @@ public struct SettingsScreen: View {
             
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
             
+            Row(symbol: .bell, title: "Notifications", type: .navigation) {
+                store.send(.notificationsButtonTapped)
+            }
+            
             Row(symbol: .textformatSize, title: "Text size", type: .navigation) {
                 store.send(.notImplementedFeatureTapped)
             }
@@ -253,11 +258,20 @@ public struct SettingsScreen: View {
                 store.send(.copyDebugIdButtonTapped)
             }
             
+            // Row(symbol: .docOnDoc, title: "Copy Push Token", type: .navigation) {
+            //     store.send(.copyPushTokenButtonTapped)
+            // }
+            
             Row(symbol: .trash, title: "Clear cache", type: .navigation) {
                 store.send(.clearCacheButtonTapped)
             }
         } header: {
             Header(title: "Advanced")
+                .onTapGesture {
+                    if isDebug {
+                        store.send(.onDeveloperMenuTapped)
+                    }
+                }
         }
         .listRowBackground(Color.Background.teritary)
     }
@@ -379,6 +393,17 @@ private extension Bundle {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }
+
+// MARK: - Helpers
+
+private var isDebug: Bool {
+    #if DEBUG
+        return true
+    #else
+        return false
+    #endif
+}
+
 
 // MARK: - Previews
 

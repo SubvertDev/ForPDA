@@ -13,7 +13,7 @@ import TCAExtensions
 import Models
 
 @Reducer
-public struct MenuFeature: Sendable {
+public struct MenuFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -75,8 +75,8 @@ public struct MenuFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+    public var body: some Reducer<State, Action> {
+        Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
                 // TODO: Is this ok?

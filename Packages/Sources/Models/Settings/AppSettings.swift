@@ -23,8 +23,12 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var appColorScheme: AppColorScheme
     public var backgroundTheme: BackgroundTheme
     public var appTintColor: AppTintColor
+    public var notifications: NotificationsSettings
     public var forumPerPage: Int
     public var topicPerPage: Int
+    public var historyPerPage: Int
+    public var analyticsConfigurationDebug: AnalyticsConfiguration
+    public var analyticsConfigurationRelease: AnalyticsConfiguration
     
     public init(
         articlesListRowType: ArticleListRowType,
@@ -33,8 +37,12 @@ public struct AppSettings: Sendable, Equatable, Codable {
         appColorScheme: AppColorScheme,
         backgroundTheme: BackgroundTheme,
         appTintColor: AppTintColor,
+        notifications: NotificationsSettings,
         forumPerPage: Int,
-        topicPerPage: Int
+        topicPerPage: Int,
+        historyPerPage: Int,
+        analyticsConfigurationDebug: AnalyticsConfiguration,
+        analyticsConfigurationRelease: AnalyticsConfiguration
     ) {
         self.articlesListRowType = articlesListRowType
         self.bookmarksListRowType = bookmarksListRowType
@@ -42,8 +50,12 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appColorScheme = appColorScheme
         self.backgroundTheme = backgroundTheme
         self.appTintColor = appTintColor
+        self.notifications = notifications
         self.forumPerPage = forumPerPage
         self.topicPerPage = topicPerPage
+        self.historyPerPage = historyPerPage
+        self.analyticsConfigurationDebug = analyticsConfigurationDebug
+        self.analyticsConfigurationRelease = analyticsConfigurationRelease
     }
     
     public init(from decoder: any Decoder) throws {
@@ -54,8 +66,12 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appColorScheme = try container.decodeIfPresent(AppColorScheme.self, forKey: .appColorScheme) ?? AppSettings.default.appColorScheme
         self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
+        self.notifications = try container.decodeIfPresent(NotificationsSettings.self, forKey: .notifications) ?? AppSettings.default.notifications
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
+        self.historyPerPage = try container.decodeIfPresent(Int.self, forKey: .historyPerPage) ?? AppSettings.default.historyPerPage
+        self.analyticsConfigurationDebug = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationDebug) ?? AppSettings.default.analyticsConfigurationDebug
+        self.analyticsConfigurationRelease = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationRelease) ?? AppSettings.default.analyticsConfigurationRelease
     }
 }
 
@@ -67,7 +83,11 @@ public extension AppSettings {
         appColorScheme: .system,
         backgroundTheme: .blue,
         appTintColor: .primary,
+        notifications: .default,
         forumPerPage: 30,
-        topicPerPage: 20
+        topicPerPage: 20,
+        historyPerPage: 20,
+        analyticsConfigurationDebug: .debug,
+        analyticsConfigurationRelease: .release
     )
 }

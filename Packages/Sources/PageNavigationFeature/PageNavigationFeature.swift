@@ -14,10 +14,11 @@ import Models
 public enum PageNavigationType {
     case forum
     case topic
+    case history
 }
 
 @Reducer
-public struct PageNavigationFeature: Sendable {
+public struct PageNavigationFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -49,6 +50,7 @@ public struct PageNavigationFeature: Sendable {
             switch type {
             case .forum: self.perPage = _appSettings.forumPerPage.wrappedValue
             case .topic: self.perPage = _appSettings.topicPerPage.wrappedValue
+            case .history: self.perPage = _appSettings.historyPerPage.wrappedValue
             }
         }
     }
@@ -62,8 +64,8 @@ public struct PageNavigationFeature: Sendable {
         case offsetChanged(to: Int)
     }
     
-    public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+    public var body: some Reducer<State, Action> {
+        Reduce<State, Action> { state, action in
             switch action {
             case .firstPageTapped:
                 state.offset = 0

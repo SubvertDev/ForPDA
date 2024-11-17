@@ -17,8 +17,8 @@ extension ProfileFeature {
         
         @Dependency(\.analyticsClient) var analyticsClient
         
-        var body: some ReducerOf<Self> {
-            Reduce { state, action in
+        var body: some Reducer<State, Action> {
+            Reduce<State, Action> { state, action in
                 switch action {
                 case .onTask, .alert:
                     break
@@ -29,6 +29,9 @@ extension ProfileFeature {
                 case .logoutButtonTapped:
                     analyticsClient.log(ProfileEvent.logoutTapped)
                     analyticsClient.logout()
+                    
+                case .historyButtonTapped:
+                    analyticsClient.log(ProfileEvent.historyTapped)
                     
                 case let ._userResponse(.success(user)):
                     analyticsClient.log(ProfileEvent.userLoaded(user.id))

@@ -12,7 +12,7 @@ import PersistenceKeys
 import Models
 
 @Reducer
-public struct ProfileFeature: Sendable {
+public struct ProfileFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -49,6 +49,7 @@ public struct ProfileFeature: Sendable {
         case onTask
         case settingsButtonTapped
         case logoutButtonTapped
+        case historyButtonTapped
         
         case _userResponse(Result<User, any Error>)
         
@@ -65,8 +66,8 @@ public struct ProfileFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+    public var body: some Reducer<State, Action> {
+        Reduce<State, Action> { state, action in
             switch action {
             case .alert:
                 return .none
@@ -84,7 +85,7 @@ public struct ProfileFeature: Sendable {
                     }
                 }
                 
-            case .settingsButtonTapped:
+            case .settingsButtonTapped, .historyButtonTapped:
                 return .none
                 
             case .logoutButtonTapped:

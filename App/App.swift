@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import AppFeature
+import BackgroundTasks
 
 // MARK: - Main View
 
@@ -28,27 +29,12 @@ struct ForPDAApp: App {
                 }
                 .tint(.Theme.primary)
         }
+        .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
+            await appDelegate.store.send(.syncUnreadTaskInvoked)
+        }
     }
 }
 
 #Preview {
     AppView(store: Store(initialState: AppFeature.State()) { AppFeature() })
-}
-
-// MARK: - App Delegate
-
-final class AppDelegate: UIResponder, UIApplicationDelegate {
-    
-    let store = Store(initialState: AppFeature.State()) {
-        AppFeature()
-    }
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        store.send(.appDelegate(.didFinishLaunching(application)))
-        return true
-    }
-    
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        store.send(.appDelegate(.didRegisterForRemoteNotifications(deviceToken)))
-    }
 }

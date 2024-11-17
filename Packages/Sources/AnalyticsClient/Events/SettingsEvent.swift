@@ -10,6 +10,7 @@ import Foundation
 public enum SettingsEvent: Event {
     case languageTapped
     case themeTapped
+    case notificationsTapped
     case safariExtensionTapped
     case copyDebugIdTapped
     case clearCacheTapped
