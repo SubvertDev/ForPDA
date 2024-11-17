@@ -7,9 +7,8 @@
 
 import UIKit
 import ComposableArchitecture
-import BackgroundTasks
 
-public final class AppDelegate: UIResponder, UIApplicationDelegate {
+public final class AppDelegate: UIResponder, UIApplicationDelegate, Sendable {
     
     public let store = Store(initialState: AppFeature.State()) {
         AppFeature()
