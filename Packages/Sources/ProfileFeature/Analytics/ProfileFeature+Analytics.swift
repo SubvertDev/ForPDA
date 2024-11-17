@@ -30,6 +30,9 @@ extension ProfileFeature {
                     analyticsClient.log(ProfileEvent.logoutTapped)
                     analyticsClient.logout()
                     
+                case .historyButtonTapped:
+                    analyticsClient.log(ProfileEvent.historyTapped)
+                    
                 case let ._userResponse(.success(user)):
                     analyticsClient.log(ProfileEvent.userLoaded(user.id))
                     

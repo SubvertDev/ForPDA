@@ -14,6 +14,7 @@ import ForumsListFeature
 import ForumFeature
 import TopicFeature
 import FavoritesFeature
+import HistoryFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
@@ -177,6 +178,9 @@ public struct AppView: View {
             ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
         } destination: { store in
             switch store.case {
+            case let .history(store):
+                HistoryScreen(store: store)
+                
             case let .settingsPath(store):
                 SettingsPath(store)
             }
