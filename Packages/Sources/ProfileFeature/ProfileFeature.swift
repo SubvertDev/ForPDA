@@ -49,6 +49,7 @@ public struct ProfileFeature: Reducer, Sendable {
         case onTask
         case settingsButtonTapped
         case logoutButtonTapped
+        case historyButtonTapped
         
         case _userResponse(Result<User, any Error>)
         
@@ -84,7 +85,7 @@ public struct ProfileFeature: Reducer, Sendable {
                     }
                 }
                 
-            case .settingsButtonTapped:
+            case .settingsButtonTapped, .historyButtonTapped:
                 return .none
                 
             case .logoutButtonTapped:
