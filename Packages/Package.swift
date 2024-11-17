@@ -21,6 +21,8 @@ let package = Package(
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "ProfileFeature", targets: ["ProfileFeature"]),
+        .library(name: "QMSListFeature", targets: ["QMSListFeature"]),
+        .library(name: "QMSFeature", targets: ["QMSFeature"]),
         .library(name: "SettingsFeature", targets: ["SettingsFeature"]),
         .library(name: "NotificationsFeature", targets: ["NotificationsFeature"]),
         .library(name: "DeveloperFeature", targets: ["DeveloperFeature"]),
@@ -54,7 +56,9 @@ let package = Package(
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.11.0"),
         .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.2.0"),
-        .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main")
+        .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
+//        .package(url: "https://github.com/exyte/Chat.git", from: "2.0.7") // Re-add when PR is merged
+            .package(url: "https://github.com/SubvertDev/Chat.git", branch: "bugfix/didSendMessage")
     ],
     targets: [
         
@@ -74,6 +78,8 @@ let package = Package(
                 "MenuFeature",
                 "AuthFeature",
                 "ProfileFeature",
+                "QMSListFeature",
+                "QMSFeature",
                 "SettingsFeature",
                 "NotificationsFeature",
                 "DeveloperFeature",
@@ -254,6 +260,33 @@ let package = Package(
             ]
         ),
         .target(
+            name: "QMSListFeature",
+            dependencies: [
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "AnalyticsClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "QMSFeature",
+            dependencies: [
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "AnalyticsClient",
+                "PersistenceKeys",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+//                .product(name: "MessageKit", package: "MessageKit"),
+                .product(name: "ExyteChat", package: "Chat"),
+                .product(name: "SkeletonUI", package: "SkeletonUI"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
             name: "SettingsFeature",
             dependencies: [
                 "AnalyticsClient",
@@ -416,7 +449,7 @@ for target in package.targets where target.type != .binary {
     swiftSettings.append(
         .unsafeFlags([
             "-Xfrontend",
-            "-warn-long-function-bodies=550",
+            "-warn-long-function-bodies=600",
             "-Xfrontend",
             "-warn-long-expression-type-checking=100"
         ])

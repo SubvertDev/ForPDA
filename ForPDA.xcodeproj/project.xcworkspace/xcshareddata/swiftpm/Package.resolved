@@ -1,6 +1,15 @@
 {
-  "originHash" : "c2b863cb17640f1b28a004cae238e7f5705700cf33c50ec1375af940267f2bf1",
+  "originHash" : "c77bb67dc032023401796c2d3ac8bebfda4b987f09e9e6bf01bf3154677ca9da",
   "pins" : [
+    {
+      "identity" : "activityindicatorview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/ActivityIndicatorView",
+      "state" : {
+        "revision" : "9970fd0bb7a05dad0b6566ae1f56937716686b24",
+        "version" : "1.1.1"
+      }
+    },
     {
       "identity" : "alerttoast",
       "kind" : "remoteSourceControl",
@@ -20,12 +29,39 @@
       }
     },
     {
+      "identity" : "chat",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SubvertDev/Chat.git",
+      "state" : {
+        "branch" : "bugfix/didSendMessage",
+        "revision" : "ae9672d4e1886f49698435c65b6ab524c1834c8e"
+      }
+    },
+    {
       "identity" : "combine-schedulers",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
       "state" : {
         "revision" : "9fa31f4403da54855f1e2aeaeff478f4f0e40b13",
         "version" : "1.0.2"
+      }
+    },
+    {
+      "identity" : "floatingbutton",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/FloatingButton",
+      "state" : {
+        "revision" : "cf77c2f124df1423d90a9a1985e9b9ccfa4b9b3e",
+        "version" : "1.3.0"
+      }
+    },
+    {
+      "identity" : "mediapicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/exyte/MediaPicker.git",
+      "state" : {
+        "revision" : "88769b1b69c2b5e5fa5b65522c08bc7b667a6cb8",
+        "version" : "2.2.3"
       }
     },
     {
@@ -206,6 +242,15 @@
       "state" : {
         "revision" : "0687f71944021d616d34d922343dcef086855920",
         "version" : "600.0.1"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/swiftui-introspect",
+      "state" : {
+        "revision" : "807f73ce09a9b9723f12385e592b4e0aaebd3336",
+        "version" : "1.3.0"
       }
     },
     {

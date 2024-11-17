@@ -18,6 +18,8 @@ import HistoryFeature
 import MenuFeature
 import AuthFeature
 import ProfileFeature
+import QMSListFeature
+import QMSFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature
@@ -180,13 +182,26 @@ public struct AppView: View {
             switch store.case {
             case let .history(store):
                 HistoryScreen(store: store)
-                
-            case let .settingsPath(store):
-                SettingsPath(store)
+            case let .qmsPath(path):
+                QMSPath(path)
+            case let .settingsPath(path):
+                SettingsPath(path)
             }
         }
         .tag(AppTab.profile)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
+    }
+    
+    // MARK: - QMS Path
+    
+    @ViewBuilder
+    private func QMSPath(_ store: StoreOf<AppFeature.QMSPath.Body>) -> some View {
+        switch store.case {
+        case let .qmsList(store):
+            QMSListScreen(store: store)
+        case let .qms(store):
+            QMSScreen(store: store)
+        }
     }
     
     // MARK: - Settings Path

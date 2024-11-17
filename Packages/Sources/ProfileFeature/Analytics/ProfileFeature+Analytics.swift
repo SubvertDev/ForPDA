@@ -23,6 +23,9 @@ extension ProfileFeature {
                 case .onTask, .alert:
                     break
                     
+                case .qmsButtonTapped:
+                    analyticsClient.log(ProfileEvent.qmsTapped)
+                    
                 case .settingsButtonTapped:
                     analyticsClient.log(ProfileEvent.settingsTapped)
                     

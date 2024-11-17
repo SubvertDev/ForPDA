@@ -8,6 +8,7 @@
 import Foundation
 
 public enum ProfileEvent: Event {
+    case qmsTapped
     case settingsTapped
     case logoutTapped
     case historyTapped

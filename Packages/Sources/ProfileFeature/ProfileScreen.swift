@@ -148,18 +148,21 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func NavigationSection() -> some View {
-        // TODO: Think about renaming.
-        // Also When QMS been added, place this condition only for history.
-        if store.shouldShowToolbarButtons {
-            Section {
-                //Row(symbol: .person2, title: "QMS", type: .navigation) {}
-                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
-                    store.send(.historyButtonTapped)
+        Section {
+            Row(symbol: .person2, title: "QMS", type: .navigation) {
+                store.send(.qmsButtonTapped)
+            }
+            
+            if store.shouldShowToolbarButtons {
+                Section {
+                    Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
+                        store.send(.historyButtonTapped)
+                    }
                 }
             }
-            .listRowBackground(Color.Background.teritary)
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-        }
+		}
+        .listRowBackground(Color.Background.teritary)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Segment Picker
@@ -503,6 +506,7 @@ public struct ProfileScreen: View {
                             .foregroundStyle(Color.Labels.quintuple)
                     }
                 }
+                .contentShape(Rectangle())
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
