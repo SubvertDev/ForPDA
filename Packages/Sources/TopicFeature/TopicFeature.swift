@@ -81,7 +81,7 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 
             case let ._topicResponse(.success(topic)):
-                customDump(topic)
+//                customDump(topic)
                 state.topic = topic
                 // TODO: Is it ok?
                 state.pageNavigation.count = topic.postsCount

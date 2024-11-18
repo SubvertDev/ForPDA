@@ -10,6 +10,7 @@ import ComposableArchitecture
 import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
+import NukeUI
 import Models
 import ParsingClient
 
@@ -30,33 +31,25 @@ public struct TopicScreen: View {
                 
                 if let topic = store.topic, !store.isLoadingTopic {
                     List {
-                        Group {
-                            if store.pageNavigation.shouldShow {
-                                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                            }
-                            
-                            VStack(spacing: 0) {
-                                ForEach(Array(topic.posts.enumerated()), id: \.0) { index, post in
-                                    WithPerceptionTracking {
-                                        Divider()
-                                        if !store.isFirstPage && index == 0 {
-                                            Text("Шапка Темы")
-                                                .padding(16)
-                                        } else {
-                                            Post(post)
-                                                .padding(.bottom, 16)
-                                        }
-                                        Divider()
-                                    }
+                        if store.pageNavigation.shouldShow {
+                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                        }
+                        
+                        ForEach(topic.posts) { post in
+                            WithPerceptionTracking {
+                                if !store.isFirstPage && post.first {
+                                    Text("Шапка Темы")
+                                        .padding(16)
+                                } else {
+                                    Post(post)
+                                        .padding(.bottom, 16)
                                 }
                             }
-                            
-                            if store.pageNavigation.shouldShow {
-                                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                            }
                         }
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
+                        
+                        if store.pageNavigation.shouldShow {
+                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                        }
                     }
                     .listStyle(.plain)
                 } else {
@@ -76,10 +69,12 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func Post(_ post: Post) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 16) {
             PostHeader(post)
             PostBody(post)
         }
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
     
     // MARK: - Post Header
@@ -87,13 +82,39 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostHeader(_ post: Post) -> some View {
         HStack {
-            Text(post.author.name)
+            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
+                if let image = state.image { image.resizable().scaledToFill() }
+            }
+            .frame(width: 50, height: 50)
+            .clipped()
+            
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 4) {
+                    Text(post.author.name)
+                        .font(.body)
+                        .bold()
+                    
+                    Text("(\(post.author.reputationCount))")
+                        .font(.caption)
+                        .foregroundStyle(Color.Labels.secondary)
+                }
+                
+                Spacer(minLength: 4)
+                
+                Text(User.Group(rawValue: post.author.groupId)!.title)
+                    .font(.caption)
+                    .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
+            }
+            .padding(.vertical, 8)
             
             Spacer()
             
             Text(post.createdAt.formatted())
+                .font(.caption)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .padding(.vertical, 8)
         }
-        .padding()
+        .frame(height: 50)
     }
     
     // MARK: - Post Body

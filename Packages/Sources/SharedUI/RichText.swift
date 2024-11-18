@@ -28,7 +28,7 @@ public struct RichText: View {
     }
     
     public var body: some View {
-        RichTextEditor(text: .constant(text), context: .init()) {
+        RichTextEditor(text: .constant(text), context: .init(), textKit2Enabled: false) {
             ($0 as? UITextView)?.backgroundColor = .clear
             ($0 as? UITextView)?.isEditable = false
             ($0 as? UITextView)?.isScrollEnabled = false
