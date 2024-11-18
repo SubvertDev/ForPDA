@@ -28,16 +28,18 @@ public struct QMSListScreen: View {
                 
                 if let qms = store.qms {
                     List {
-                        ForEach(qms.users) { user in
-                            if user.chats.isEmpty {
-                                UserRow(user)
-                            } else {
-                                DisclosureGroup {
-                                    ChatList(user.chats)
-                                } label: {
+                        ForEach(Array(qms.users.enumerated()), id: \.0) { index, user in
+                            WithPerceptionTracking {
+                                if user.chats.isEmpty {
                                     UserRow(user)
+                                } else {
+                                    DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
+                                        ChatList(user.chats)
+                                    } label: {
+                                        UserRow(user)
+                                    }
+                                    .listRowBackground(Color.Background.teritary)
                                 }
-                                .listRowBackground(Color.Background.teritary)
                             }
                         }
                     }
@@ -49,6 +51,7 @@ public struct QMSListScreen: View {
             }
             .navigationTitle("QMS")
             .navigationBarTitleDisplayMode(.inline)
+            .animation(.default, value: store.expandedGroups)
             .onAppear {
                 store.send(.onAppear)
             }
@@ -86,6 +89,7 @@ public struct QMSListScreen: View {
                         .frame(width: 8)
                 }
             }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .listRowBackground(Color.Background.teritary)

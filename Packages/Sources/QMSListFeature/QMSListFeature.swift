@@ -11,7 +11,7 @@ import APIClient
 import Models
 
 @Reducer
-public struct QMSListFeature: Sendable {
+public struct QMSListFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -20,6 +20,7 @@ public struct QMSListFeature: Sendable {
     @ObservableState
     public struct State: Equatable {
         public var qms: QMSList?
+        public var expandedGroups: [Bool] = []
         public init() {}
     }
     
@@ -42,8 +43,10 @@ public struct QMSListFeature: Sendable {
     
     // MARK: - Body
     
-    public var body: some ReducerOf<Self> {
-        Reduce { state, action in
+    public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
+        Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
                 return .run { send in
@@ -58,15 +61,32 @@ public struct QMSListFeature: Sendable {
                 return .none
                 
             case let .userRowTapped(id):
-                return .run { send in
-                    let result = await Result { try await apiClient.loadQMSUser(id) }
-                    await send(._userLoaded(result))
+                // Refactor later
+                if let qms = state.qms,
+                   let user = qms.users.first(where: { $0.id == id }) {
+                    if user.chats.isEmpty {
+                        return .run { send in
+                            let result = await Result { try await apiClient.loadQMSUser(id) }
+                            await send(._userLoaded(result))
+                        }
+                    } else if let index = qms.users.firstIndex(of: user) {
+                        state.expandedGroups[index].toggle()
+                    }
                 }
+                return .none
                 
             case let ._qmsLoaded(result):
                 switch result {
                 case let .success(qms):
                     // customDump(qms)
+                    
+                    // Populating expandedGroups on first load
+                    // Refactor later
+                    if qms.users.count > state.qms?.users.count ?? 0 {
+                        state.expandedGroups.removeAll()
+                        qms.users.forEach { _ in state.expandedGroups.append(false) }
+                    }
+                    
                     state.qms = qms
                     
                 case let .failure(error):
@@ -77,9 +97,13 @@ public struct QMSListFeature: Sendable {
             case let ._userLoaded(result):
                 switch result {
                 case let .success(user):
-                    print("success")
-                    let index = state.qms!.users.firstIndex(where: { $0.id == user.id })!
-                    state.qms!.users[index].chats = user.chats
+                    
+                    // Refactor later
+                    if var qms = state.qms,
+                       let index = qms.users.firstIndex(where: { $0.id == user.id }) {
+                        qms.users[index].chats = user.chats
+                        state.qms = qms
+                    }
                     
                 case let .failure(error):
                     print(error)
