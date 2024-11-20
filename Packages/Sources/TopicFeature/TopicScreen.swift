@@ -30,28 +30,33 @@ public struct TopicScreen: View {
                     .ignoresSafeArea()
                 
                 if let topic = store.topic, !store.isLoadingTopic {
-                    List {
-                        if store.pageNavigation.shouldShow {
-                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                        }
-                        
-                        ForEach(topic.posts) { post in
-                            WithPerceptionTracking {
-                                if !store.isFirstPage && post.first {
-                                    Text("Шапка Темы")
-                                        .padding(16)
-                                } else {
-                                    Post(post)
-                                        .padding(.bottom, 16)
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            Navigation()
+                            
+                            ForEach(topic.posts) { post in
+                                WithPerceptionTracking {
+                                    VStack(spacing: 0) {
+                                        if !store.isFirstPage && topic.posts.first == post {
+                                            Text("Шапка Темы")
+                                                .padding(16)
+                                        } else {
+                                            Post(post)
+                                                .padding(.horizontal, 16)
+                                                .padding(.bottom, 16)
+                                        }
+                                        
+                                        Rectangle()
+                                            .foregroundStyle(Color.Separator.post)
+                                            .frame(height: 10)
+                                    }
                                 }
                             }
+                            
+                            Navigation()
                         }
-                        
-                        if store.pageNavigation.shouldShow {
-                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                        }
+                        .padding(.bottom, 16)
                     }
-                    .listStyle(.plain)
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
@@ -62,6 +67,15 @@ public struct TopicScreen: View {
             .task {
                 store.send(.onTask)
             }
+        }
+    }
+    
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation() -> some View {
+        if store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
         }
     }
     
@@ -94,7 +108,7 @@ public struct TopicScreen: View {
                         .font(.body)
                         .bold()
                     
-                    Text("(\(post.author.reputationCount))")
+                    Text(String(post.author.reputationCount))
                         .font(.caption)
                         .foregroundStyle(Color.Labels.secondary)
                 }
@@ -121,7 +135,12 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func PostBody(_ post: Post) -> some View {
-        RichText(text: parseContent(post.content))
+        VStack(spacing: 8) {
+            let types = try! TopicBuilder.build(from: parseContent(post.content))
+            ForEach(types, id: \.self) { type in
+                TopicView(type: type, attachments: post.attachments)
+            }
+        }
     }
 }
 

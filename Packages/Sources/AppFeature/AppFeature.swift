@@ -487,6 +487,8 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
 
             case .favorites(.favoriteTapped(let id, let name, let isForum)):
+                // FIXME: Update NavigationRequestObserver tried to update multiple times per frame.
+                // Appears if forum tab was not loaded before switching due to pushing of new screen
                 state.selectedTab = .forum
                 if isForum {
                     state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: name)))
