@@ -22,6 +22,9 @@ public struct CacheClient: Sendable {
     // Users
     public var cacheUser: @Sendable (User) async throws -> Void
     public var getUser: @Sendable (_ id: Int) async -> User?
+    // Favorites
+    public var cacheFavorites: @Sendable ([FavoriteInfo]) async throws -> Void
+    public var getFavorites: @Sendable () async -> [FavoriteInfo]?
     // Forums List
     public var cacheForumsList: @Sendable ([ForumInfo]) async throws -> Void
     public var getForumsList: @Sendable () async -> [ForumInfo]
@@ -50,6 +53,16 @@ extension CacheClient: DependencyKey {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: User.self)
+        )
+    }
+    
+    private static var favoritesKey: String { "favoritesKey" }
+    private static var favoritesStorage: Storage<String, [FavoriteInfo]> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "Favorites", expiry: .seconds(2592000), maxSize: 81920),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: [FavoriteInfo].self)
         )
     }
     
@@ -110,6 +123,12 @@ extension CacheClient: DependencyKey {
             },
             getUser: { userId in
                 return try? usersStorage.object(forKey: userId)
+            },
+            cacheFavorites: { favorites in
+                try favoritesStorage.setObject(favorites, forKey: favoritesKey)
+            },
+            getFavorites: {
+                return try? favoritesStorage.object(forKey: favoritesKey)
             },
             cacheForumsList: { forumsList in
                 try forumsListStorage.setObject(forumsList, forKey: forumsListKey)

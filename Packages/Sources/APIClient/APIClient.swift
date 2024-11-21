@@ -30,7 +30,7 @@ public struct APIClient: Sendable {
     public var getForumsList: @Sendable () async throws -> [ForumInfo]
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
-    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> Favorite
+    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var getUnread: @Sendable () async throws -> Unread
     public var loadQMSList: @Sendable () async throws -> QMSList
@@ -160,8 +160,27 @@ extension APIClient: DependencyKey {
                 return try await parsingClient.parseTopic(rawString: rawString)
             },
             getFavorites: { unreadFirst, offset, perPage in
-                let rawString = try await api.get(MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage))
-                return try await parsingClient.parseFavorites(rawString: rawString)
+                AsyncThrowingStream { continuation in
+                    Task {
+                        do {
+                            @Dependency(\.cacheClient) var cacheClient
+                            if let favorites = await cacheClient.getFavorites() {
+                                continuation.yield(favorites)
+                            }
+                            
+                            @Dependency(\.parsingClient) var parsingClient
+                            let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
+                            let rawString = try await api.get(command)
+                            let favorites = try await parsingClient.parseFavorites(rawString: rawString)
+                            
+                            try await cacheClient.cacheFavorites(favorites.favorites)
+                            continuation.yield(favorites.favorites)
+                            continuation.finish()
+                        } catch {
+                            continuation.finish(throwing: error)
+                        }
+                    }
+                }
             },
 			getHistory: { offset, perPage in
                 let rawString = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
@@ -239,7 +258,7 @@ extension APIClient: DependencyKey {
                 return .mock
             },
             getFavorites: { _, _, _ in
-                return .mock
+                .finished()
             },
 			getHistory: { _, _ in
                 return .mock
