@@ -15,7 +15,7 @@ public struct QuoteInfo: Hashable {
     public let postId: Int
 }
 
-public enum TopicType: Hashable {
+public enum TopicType: Hashable, Equatable {
     case text(NSAttributedString)
     case image(Int)
     case center([TopicType])

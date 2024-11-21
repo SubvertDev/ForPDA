@@ -11,6 +11,7 @@ import PageNavigationFeature
 import APIClient
 import Models
 import PersistenceKeys
+import ParsingClient
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -25,6 +26,8 @@ public struct TopicFeature: Reducer, Sendable {
 
         let topicId: Int
         var topic: Topic?
+        
+        var types: [[TopicType]] = []
         
         var isFirstPage = true
         var isLoadingTopic = true
@@ -47,12 +50,18 @@ public struct TopicFeature: Reducer, Sendable {
         case pageNavigation(PageNavigationFeature.Action)
         
         case _loadTopic(offset: Int)
+        case _loadTypes([[TopicType]])
         case _topicResponse(Result<Topic, any Error>)
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.cacheClient) private var cacheClient
+    
+    // MARK: - Cancellable
+    
+    private enum CancelID { case loading }
     
     // MARK: - Body
     
@@ -68,7 +77,10 @@ public struct TopicFeature: Reducer, Sendable {
 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isFirstPage = newOffset == 0
-                return .send(._loadTopic(offset: newOffset))
+                return .concatenate([
+                    .cancel(id: CancelID.loading),
+                    .send(._loadTopic(offset: newOffset))
+                ])
                 
             case .pageNavigation:
                 return .none
@@ -79,12 +91,35 @@ public struct TopicFeature: Reducer, Sendable {
                     let result = await Result { try await apiClient.getTopic(id: id, page: offset, perPage: perPage) }
                     await send(._topicResponse(result))
                 }
+                .cancellable(id: CancelID.loading)
                 
             case let ._topicResponse(.success(topic)):
 //                customDump(topic)
                 state.topic = topic
+                
                 // TODO: Is it ok?
                 state.pageNavigation.count = topic.postsCount
+                
+                return .run { send in
+                    var topicTypes: [[TopicType]] = []
+                    for post in topic.posts {
+                        if let content = cacheClient.getParsedPostContent(post.id) {
+                            let types = try! TopicBuilder.build(from: content)
+                            topicTypes.append(types)
+                        } else {
+                            let parsedContent = BBCodeParser.parse(post.content)!
+                            try? cacheClient.cacheParsedPostContent(post.id, parsedContent)
+                            let types = try! TopicBuilder.build(from: parsedContent)
+                            topicTypes.append(types)
+                        }
+                    }
+                    
+                    await send(._loadTypes(topicTypes))
+                }
+                .cancellable(id: CancelID.loading)
+                
+            case let ._loadTypes(types):
+                state.types = types
                 state.isLoadingTopic = false
                 return .none
                 

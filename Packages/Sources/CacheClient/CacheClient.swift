@@ -28,6 +28,9 @@ public struct CacheClient: Sendable {
     // Forums List
     public var cacheForumsList: @Sendable ([ForumInfo]) async throws -> Void
     public var getForumsList: @Sendable () async -> [ForumInfo]
+    // Topics
+    public var cacheParsedPostContent: @Sendable (_ id: Int, _ content: NSAttributedString) throws -> Void
+    public var getParsedPostContent: @Sendable (_ id: Int) -> NSAttributedString?
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async throws -> Void
     public var getLastBackgroundTaskInvokeTime: @Sendable () async -> TimeInterval?
@@ -76,6 +79,15 @@ extension CacheClient: DependencyKey {
         )
     }
     
+    private static var parsedPostsContentStorage: Storage<Int, AttributedString> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "Posts Contents", expiry: .seconds(2592000), maxSize: 163840),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: AttributedString.self)
+        )
+    }
+    
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
     private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, TimeInterval> {
         return try! Storage(
@@ -105,7 +117,9 @@ extension CacheClient: DependencyKey {
                 ImagePipeline.shared.cache.removeAll()
                 try articlesStorage.removeAll()
                 try usersStorage.removeAll()
+                try favoritesStorage.removeAll()
                 try forumsListStorage.removeAll()
+                try parsedPostsContentStorage.removeAll()
                 try lastBackgroundTaskInvokeTimeStorage.removeAll()
                 try notificationsStorage.removeAll()
             },
@@ -135,6 +149,17 @@ extension CacheClient: DependencyKey {
             },
             getForumsList: {
                 return (try? forumsListStorage.object(forKey: forumsListKey)) ?? []
+            },
+            cacheParsedPostContent: { id, content in
+                let codable = AttributedString(content)
+                try! parsedPostsContentStorage.setObject(codable, forKey: id)
+            },
+            getParsedPostContent: { id in
+                if let codable = try? parsedPostsContentStorage.object(forKey: id) {
+                    return NSAttributedString(codable)
+                } else {
+                    return nil
+                }
             },
             setLastBackgroundTaskInvokeTime: { date in
                 try lastBackgroundTaskInvokeTimeStorage.setObject(date, forKey: lastBackgroundTaskInvokeTimeKey)
