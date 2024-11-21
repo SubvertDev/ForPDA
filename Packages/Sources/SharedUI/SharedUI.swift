@@ -27,6 +27,7 @@ public extension Image {
     static let github = Image(.github)
     static let telegram = Image(.telegram)
     static let quote = Image(.quote)
+    static let snapback = UIImage(resource: .snapback)
     
     struct Settings {
         public static let lightThemeExample = Image(.Settings.lightThemeExample)

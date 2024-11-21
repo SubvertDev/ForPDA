@@ -5,7 +5,8 @@
 //  Created by Ilia Lubianoi on 18.11.2024.
 //
 
-import Foundation
+import SwiftUI
+import SharedUI
 import ComposableArchitecture
 
 public struct QuoteInfo: Hashable {
@@ -57,7 +58,9 @@ public struct TopicBuilder {
                     
                     // Check if the plain text (string) of the prefix is non-empty after trimming
                     if !prefixText.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        result.append(.text(prefixText.trimmedAttributedString()))
+                        let trimmedText = remainingText.trimmedAttributedString()
+                        let text = extractSnapback(in: trimmedText)
+                        result.append(.text(text))
                     }
                 }
                 
@@ -101,7 +104,9 @@ public struct TopicBuilder {
                 }
             } else {
                 if remainingText.length > 0 {
-                    result.append(.text(remainingText.trimmedAttributedString()))
+                    let trimmedText = remainingText.trimmedAttributedString()
+                    let text = extractSnapback(in: trimmedText)
+                    result.append(.text(text))
                 }
                 break
             }
@@ -147,6 +152,58 @@ public struct TopicBuilder {
             result.append(string)
         }
         return result
+    }
+    
+    // MARK: - Extract Snapback
+    
+    private static func extractSnapback(in attributedString: NSAttributedString) -> (NSAttributedString) {
+        let plainText = attributedString.string
+        let pattern = #"\[snapback\](\d+)\[/snapback\]"#
+        
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            fatalError()
+        }
+        
+        let matches = regex.matches(in: plainText, options: [], range: NSRange(location: 0, length: plainText.utf16.count))
+        
+        // Prepare to collect extracted data
+        var extractedNumbers = [Int]()
+        var positions = [Int]()
+        
+        // Create a mutable copy of the attributed string
+        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+        
+        // Prepare image attachment
+        let image = Image.snapback
+        let attachment = NSTextAttachment(image: image)
+        attachment.bounds = CGRect(x: 0, y: -2, width: 16, height: 16)
+        let snapbackAttributedString = NSAttributedString(attachment: attachment)
+        
+        // Adjust offset to account for text removal
+        var offset = 0
+        
+        for match in matches {
+            // Extract the number
+            let numberRange = match.range(at: 1)
+            let number = Int((plainText as NSString).substring(with: numberRange))!
+            extractedNumbers.append(number)
+            
+            // Record the adjusted position
+            let startPosition = match.range.location - offset
+            positions.append(startPosition)
+            
+            // Remove the `[snapback]...[/snapback]` tags
+            let fullRange = NSRange(location: match.range.location - offset, length: match.range.length)
+            mutableAttributedString.replaceCharacters(in: fullRange, with: "")
+            
+            // Insert the snapback image at the recorded position
+            mutableAttributedString.insert(snapbackAttributedString, at: startPosition)
+            
+            // Update the offset to account for the removed range
+            offset += match.range.length
+        }
+        
+        return mutableAttributedString
     }
     
     // MARK: - Extract Spoiler

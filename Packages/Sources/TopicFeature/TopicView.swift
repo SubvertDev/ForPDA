@@ -146,7 +146,7 @@ struct SpoilerView: View {
 
 #Preview {
     VStack(spacing: 8) {
-        TopicView(type: .text(NSAttributedString(string: "test")), attachments: [])
+//        TopicView(type: .text(NSAttributedString(string: "test")), attachments: [])
 //        
 //        TopicView(type: .image(URL(string: "https://4pda.to/s/Zy0hVVliEZZvbylgfQy11QiIjvDIhLJBjheakj4yIz2ohhN2F.jpg")!))
 //            .frame(width: 100, height: 100)
