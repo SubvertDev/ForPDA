@@ -1,5 +1,5 @@
 {
-  "originHash" : "cc62d0e058e5ab96fa03ca0e35e4dba1839c17c827c4ccf105e5c6d369029346",
+  "originHash" : "145404a32629fc9781a578dcb11c115553168340661e4986e64845bad4d82a6c",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -31,10 +31,10 @@
     {
       "identity" : "chat",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/Chat.git",
+      "location" : "https://github.com/exyte/Chat.git",
       "state" : {
-        "branch" : "bugfix/didSendMessage",
-        "revision" : "ae9672d4e1886f49698435c65b6ab524c1834c8e"
+        "revision" : "479b145a3d24ef926c9a3c502fcdc6acbd6f46ea",
+        "version" : "2.0.8"
       }
     },
     {

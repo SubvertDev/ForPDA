@@ -57,8 +57,7 @@ let package = Package(
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.11.0"),
         .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.2.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
-//        .package(url: "https://github.com/exyte/Chat.git", from: "2.0.7") // Re-add when PR is merged
-            .package(url: "https://github.com/SubvertDev/Chat.git", branch: "bugfix/didSendMessage")
+        .package(url: "https://github.com/exyte/Chat.git", from: "2.0.8")
     ],
     targets: [
         
