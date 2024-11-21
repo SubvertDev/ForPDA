@@ -58,7 +58,7 @@ public struct TopicBuilder {
                     
                     // Check if the plain text (string) of the prefix is non-empty after trimming
                     if !prefixText.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        let trimmedText = remainingText.trimmedAttributedString()
+                        let trimmedText = prefixText.trimmedAttributedString()
                         let text = extractSnapback(in: trimmedText)
                         result.append(.text(text))
                     }
@@ -96,7 +96,9 @@ public struct TopicBuilder {
                     let parts = extractText(from: remainingText, startTag: "[quote ", endTag: "[/quote]")
                     let quoteParts = parts.0.components(separatedBy: "]")
                     let quoteInfo = parseQuoteInfo(quoteParts[0])
-                    result.append(.quote(dropAndJoinAttributedStrings(quoteParts), quoteInfo))
+                    let joined = dropAndJoinAttributedStrings(quoteParts)
+                    let text = joined.trimmedAttributedString()
+                    result.append(.quote(text, quoteInfo))
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
                 default:
