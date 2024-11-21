@@ -15,62 +15,74 @@ extension ArticleFeature {
         typealias State = ArticleFeature.State
         typealias Action = ArticleFeature.Action
         
-        @Dependency(\.analyticsClient) var analyticsClient
+        @Dependency(\.analyticsClient) var analytics
         
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .binding, .delegate, ._checkLoading, .destination, .backButtonTapped, .comments, .notImplementedButtonTapped, ._commentResponse, ._pollVoteResponse, ._stopRefreshingIfFinished:
+                case .binding,
+                        .comments,
+                        .delegate,
+                        .destination,
+                        .notImplementedButtonTapped,
+                        .onTask,
+                        ._checkLoading,
+                        ._commentResponse,
+                        ._pollVoteResponse,
+                        ._stopRefreshingIfFinished:
                     break
                     
+                case .backButtonTapped:
+                    analytics.log(ArticleEvent.backButtonTapped)
+                    
                 case .pollVoteButtonTapped:
-                    analyticsClient.log(ArticleEvent.pollVoteTapped)
+                    analytics.log(ArticleEvent.pollVoteTapped)
                     
                 case .removeReplyCommentButtonTapped:
-                    analyticsClient.log(ArticleEvent.removeReplyCommentTapped)
+                    analytics.log(ArticleEvent.removeReplyCommentTapped)
                     
                 case .sendCommentButtonTapped:
-                    analyticsClient.log(ArticleEvent.sendCommentTapped)
+                    analytics.log(ArticleEvent.sendCommentTapped)
                     
                 case .linkInTextTapped(let url):
-                    analyticsClient.log(ArticleEvent.inlineLinkTapped(url))
+                    analytics.log(ArticleEvent.inlineLinkTapped(url))
                     
                 case .menuActionTapped(let action):
                     switch action {
                     case .copyLink:
-                        analyticsClient.log(ArticleEvent.linkCopied(state.articlePreview.url))
+                        analytics.log(ArticleEvent.linkCopied(state.articlePreview.url))
                     case .shareLink:
-                        analyticsClient.log(ArticleEvent.linkShareOpened(state.articlePreview.url))
+                        analytics.log(ArticleEvent.linkShareOpened(state.articlePreview.url))
                     case .report:
-                        analyticsClient.log(ArticleEvent.linkReported(state.articlePreview.url))
-                        analyticsClient.capture(AnalyticsError.brokenArticle(state.articlePreview.url))
+                        analytics.log(ArticleEvent.linkReported(state.articlePreview.url))
+                        analytics.capture(AnalyticsError.brokenArticle(state.articlePreview.url))
                     }
                     
                 case let .linkShared(success, url):
-                    analyticsClient.log(ArticleEvent.linkShared(success, url))
-                    
-                case .onTask:
-                    break // TODO: Log?
+                    analytics.log(ArticleEvent.linkShared(success, url))
                     
                 case .onRefresh:
-                    analyticsClient.log(ArticleEvent.onRefresh)
+                    analytics.log(ArticleEvent.onRefresh)
                     
                 case .bookmarkButtonTapped:
-                    analyticsClient.log(ArticleEvent.bookmarkButtonTapped(state.articlePreview.url))
+                    analytics.log(ArticleEvent.bookmarkButtonTapped(state.articlePreview.url))
                     
                 case ._articleResponse(.success):
-                    analyticsClient.log(ArticleEvent.loadingSuccess)
+                    // Send only first success event (skip cached opening)
+                    if state.article == nil {
+                        analytics.log(ArticleEvent.loadingSuccess)
+                    }
                     
                 case ._articleResponse(.failure(let error)):
-                    analyticsClient.log(ArticleEvent.loadingFailure(error))
-                    analyticsClient.capture(error)
+                    analytics.log(ArticleEvent.loadingFailure(error))
+                    analytics.capture(error)
                     
                 case ._parseArticleElements(.success):
                     break
                     
                 case ._parseArticleElements(.failure(let error)):
-                    analyticsClient.log(ArticleEvent.loadingFailure(error))
-                    analyticsClient.capture(error)
+                    analytics.log(ArticleEvent.loadingFailure(error))
+                    analytics.capture(error)
                 }
                 
                 return .none
