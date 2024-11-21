@@ -44,6 +44,7 @@ extension APIClient: DependencyKey {
     private nonisolated(unsafe) static let api = try! PDAPI()
     
     public static var liveValue: APIClient {
+        @Dependency(\.cacheClient) var cacheClient
         @Dependency(\.parsingClient) var parsingClient
 
         return APIClient(
@@ -64,28 +65,15 @@ extension APIClient: DependencyKey {
                 return try await parsingClient.parseArticlesList(rawString: rawString)
             },
             getArticle: { id, cache in
-                AsyncThrowingStream { continuation in
-                    Task {
-                        do {
-                            @Dependency(\.cacheClient) var cacheClient
-                            if cache {
-                                if let article = await cacheClient.getArticle(id) {
-                                    continuation.yield(article)
-                                }
-                            }
-                            
-                            @Dependency(\.parsingClient) var parsingClient
-                            let rawString = try await api.get(SiteCommand.article(id: id))
-                            let article = try await parsingClient.parseArticle(rawString: rawString)
-                            
-                            try await cacheClient.cacheArticle(article)
-                            continuation.yield(article)
-                            continuation.finish()
-                        } catch {
-                            continuation.finish(throwing: error)
-                        }
+                fetchWithCache(
+                    cache: { await cacheClient.getArticle(id) },
+                    remote: {
+                        let rawString = try await api.get(SiteCommand.article(id: id))
+                        let article = try await parsingClient.parseArticle(rawString: rawString)
+                        try await cacheClient.cacheArticle(article)
+                        return article
                     }
-                }
+                )
             },
             likeComment: { articleId, commentId in
                 let rawString = try await api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
@@ -125,26 +113,15 @@ extension APIClient: DependencyKey {
                 _ = try await api.get(AuthCommand.auth(data: request))
             },
             getUser: { userId in
-                AsyncThrowingStream { continuation in
-                    Task {
-                        do {
-                            @Dependency(\.cacheClient) var cacheClient
-                            if let user = await cacheClient.getUser(userId) {
-                                continuation.yield(user)
-                            }
-                            
-                            @Dependency(\.parsingClient) var parsingClient
-                            let rawString = try await api.get(MemberCommand.info(memberId: userId))
-                            let user = try await parsingClient.parseUser(rawString: rawString)
-                            
-                            try await cacheClient.cacheUser(user)
-                            continuation.yield(user)
-                            continuation.finish()
-                        } catch {
-                            continuation.finish(throwing: error)
-                        }
+                fetchWithCache(
+                    cache: { await cacheClient.getUser(userId) },
+                    remote: {
+                        let rawString = try await api.get(MemberCommand.info(memberId: userId))
+                        let user = try await parsingClient.parseUser(rawString: rawString)
+                        try await cacheClient.cacheUser(user)
+                        return user
                     }
-                }
+                )
             },
             getForumsList: {
                 let rawString = try await api.get(ForumCommand.list)
@@ -160,27 +137,16 @@ extension APIClient: DependencyKey {
                 return try await parsingClient.parseTopic(rawString: rawString)
             },
             getFavorites: { unreadFirst, offset, perPage in
-                AsyncThrowingStream { continuation in
-                    Task {
-                        do {
-                            @Dependency(\.cacheClient) var cacheClient
-                            if let favorites = await cacheClient.getFavorites() {
-                                continuation.yield(favorites)
-                            }
-                            
-                            @Dependency(\.parsingClient) var parsingClient
-                            let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
-                            let rawString = try await api.get(command)
-                            let favorites = try await parsingClient.parseFavorites(rawString: rawString)
-                            
-                            try await cacheClient.cacheFavorites(favorites.favorites)
-                            continuation.yield(favorites.favorites)
-                            continuation.finish()
-                        } catch {
-                            continuation.finish(throwing: error)
-                        }
+                fetchWithCache(
+                    cache: { await cacheClient.getFavorites() },
+                    remote: {
+                        let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
+                        let rawString = try await api.get(command)
+                        let favorites = try await parsingClient.parseFavorites(rawString: rawString)
+                        try await cacheClient.cacheFavorites(favorites.favorites)
+                        return favorites.favorites
                     }
-                }
+                )
             },
 			getHistory: { offset, perPage in
                 let rawString = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
@@ -192,8 +158,6 @@ extension APIClient: DependencyKey {
             },
             loadQMSList: {
                 let rawString = try await api.get(QMSCommand.list)
-//                let info = try await api.get(QMSCommand.info(id: 4056435))
-//                print("info: \(info)")
                 return try await parsingClient.parseQmsList(rawString: rawString)
             },
             loadQMSUser: { id in
@@ -279,6 +243,29 @@ extension APIClient: DependencyKey {
                 
             }
         )
+    }
+    
+    // MARK: - Helper methods
+    
+    private static func fetchWithCache<T>(
+        cache: @Sendable @escaping () async -> T?,
+        remote: @Sendable @escaping () async throws -> T
+    ) -> AsyncThrowingStream<T, any Error> {
+        AsyncThrowingStream { continuation in
+            Task {
+                do {
+                    if let cached = await cache() {
+                        continuation.yield(cached)
+                    }
+                    let remoteData = try await remote()
+                    continuation.yield(remoteData)
+                } catch {
+                    continuation.finish(throwing: error)
+                    return
+                }
+                continuation.finish()
+            }
+        }
     }
 }
 
