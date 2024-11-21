@@ -9,82 +9,102 @@ import Foundation
 import ComposableArchitecture
 import Models
 
+// MARK: - Client
+
 @DependencyClient
 public struct ParsingClient: Sendable {
-    public var parseArticlesList: @Sendable (_ rawString: String) async throws -> [ArticlePreview]
-    public var parseArticle: @Sendable (_ rawString: String) async throws -> Article
+    // Articles
+    public var parseArticlesList: @Sendable (_ response: String) async throws -> [ArticlePreview]
+    public var parseArticle: @Sendable (_ response: String) async throws -> Article
     public var parseArticleElements: @Sendable (_ article: Article) async throws -> [ArticleElement]
-    public var parseCaptchaUrl: @Sendable (_ rawString: String) async throws -> URL
-    public var parseLoginResponse: @Sendable (_ rawString: String) async throws -> AuthResponse
-    public var parseUser: @Sendable (_ rawString: String) async throws -> User
-    public var parseForumsList: @Sendable (_ rawString: String) async throws -> [ForumInfo]
-    public var parseForum: @Sendable (_ rawString: String) async throws -> Forum
-    public var parseTopic: @Sendable (_ rawString: String) async throws -> Topic
-    public var parseAnnouncement: @Sendable (_ rawString: String) async throws -> Announcement
-    public var parseFavorites: @Sendable (_ rawString: String) async throws -> Favorite
-    public var parseHistory: @Sendable (_ rawString: String) async throws -> History
-    public var parseUnread: @Sendable (_ rawString: String) async throws -> Unread
-    public var parseQmsList: @Sendable (_ rawString: String) async throws -> QMSList
-    public var parseQmsUser: @Sendable (_ rawString: String) async throws -> QMSUser
-    public var parseQmsChat: @Sendable (_ rawString: String) async throws -> QMSChat
+    
+    // Auth
+    public var parseCaptchaUrl: @Sendable (_ response: String) async throws -> URL
+    public var parseLogin: @Sendable (_ response: String) async throws -> AuthResponse
+    
+    // User
+    public var parseUser: @Sendable (_ response: String) async throws -> User
+    
+    // Forum
+    public var parseForumsList: @Sendable (_ response: String) async throws -> [ForumInfo]
+    public var parseForum: @Sendable (_ response: String) async throws -> Forum
+    public var parseTopic: @Sendable (_ response: String) async throws -> Topic
+    public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
+    public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
+    public var parseHistory: @Sendable (_ response: String) async throws -> History
+    
+    // Extra
+    public var parseUnread: @Sendable (_ response: String) async throws -> Unread
+    
+    // QMS
+    public var parseQmsList: @Sendable (_ response: String) async throws -> QMSList
+    public var parseQmsUser: @Sendable (_ response: String) async throws -> QMSUser
+    public var parseQmsChat: @Sendable (_ response: String) async throws -> QMSChat
 }
+
+// MARK: - Dependency Key
+
+extension ParsingClient: DependencyKey {
+    
+    // MARK: - Live Value
+    
+    public static let liveValue = Self(
+        parseArticlesList: { response in
+            return try ArticlesListParser.parse(from: response)
+        },
+        parseArticle: { response in
+            return try ArticleParser.parse(from: response)
+        },
+        parseArticleElements: { article in
+            return try ArticleElementParser.parse(from: article)
+        },
+        parseCaptchaUrl: { response in
+            return try AuthParser.parseCaptchaUrl(from: response)
+        },
+        parseLogin: { response in
+            return try AuthParser.parseLoginResponse(from: response)
+        },
+        parseUser: { response in
+            return try ProfileParser.parseUser(from: response)
+        },
+        parseForumsList: { response in
+            return try ForumParser.parseForumList(from: response)
+        },
+        parseForum: { response in
+            return try ForumParser.parse(from: response)
+        },
+        parseTopic: { response in
+            return try TopicParser.parse(from: response)
+        },
+        parseAnnouncement: { response in
+            return try ForumParser.parseAnnouncement(from: response)
+        },
+        parseFavorites: { response in
+            return try FavoriteParser.parse(from: response)
+        },
+        parseHistory: { response in
+            return try HistoryParser.parse(from: response)
+        },
+        parseUnread: { response in
+            return try UnreadParser.parse(from: response)
+        },
+        parseQmsList: { response in
+            return try QMSListParser.parse(from: response)
+        },
+        parseQmsUser: { response in
+            return try QMSUserParser.parse(from: response)
+        },
+        parseQmsChat: { response in
+            return try QMSChatParser.parse(from: response)
+        }
+    )
+}
+
+// MARK: - Extensions
 
 extension DependencyValues {
     public var parsingClient: ParsingClient {
         get { self[ParsingClient.self] }
         set { self[ParsingClient.self] = newValue }
     }
-}
-
-extension ParsingClient: DependencyKey {
-    public static let liveValue = Self(
-        parseArticlesList: { rawString in
-            return try ArticlesListParser.parse(from: rawString)
-        },
-        parseArticle: { rawString in
-            return try ArticleParser.parse(from: rawString)
-        },
-        parseArticleElements: { article in
-            return try ArticleElementParser.parse(from: article)
-        },
-        parseCaptchaUrl: { rawString in
-            return try AuthParser.parseCaptchaUrl(rawString: rawString)
-        },
-        parseLoginResponse: { rawString in
-            return try AuthParser.parseLoginResponse(rawString: rawString)
-        },
-        parseUser: { rawString in
-            return try ProfileParser.parseUser(rawString: rawString)
-        },
-        parseForumsList: { rawString in
-            return try ForumParser.parseForumList(rawString: rawString)
-        },
-        parseForum: { rawString in
-            return try ForumParser.parse(rawString: rawString)
-        },
-        parseTopic: { rawString in
-            return try TopicParser.parse(rawString: rawString)
-        },
-        parseAnnouncement: { rawString in
-            return try ForumParser.parseAnnouncement(rawString: rawString)
-        },
-        parseFavorites: { rawString in
-            return try FavoriteParser.parse(rawString: rawString)
-        },
-        parseHistory: { rawString in
-            return try HistoryParser.parse(rawString: rawString)
-        },
-        parseUnread: { rawString in
-            return try UnreadParser.parse(rawString: rawString)
-        },
-        parseQmsList: { rawString in
-            return try QMSListParser.parse(rawString: rawString)
-        },
-        parseQmsUser: { rawString in
-            return try QMSUserParser.parse(rawString)
-        },
-        parseQmsChat: { rawString in
-            return try QMSChatParser.parse(rawString: rawString)
-        }
-    )
 }

@@ -17,7 +17,7 @@ public struct AuthParser {
     /// 0. 71642 - request id
     /// 1. 4 - login failed
     /// 2. https://4pda.to/static/captcha/679cb0ca4a09ff1bd20908c179411a47.gif - captcha url
-    public static func parseCaptchaUrl(rawString string: String) throws -> URL {
+    public static func parseCaptchaUrl(from string: String) throws -> URL {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
@@ -35,7 +35,7 @@ public struct AuthParser {
     /// 1.  0 - login success
     /// 2. 3640948 - user id
     /// 3. 514b1b86eda2bd571b3252fed474adf8 - token
-    public static func parseLoginResponse(rawString string: String) throws -> AuthResponse {
+    public static func parseLoginResponse(from string: String) throws -> AuthResponse {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }

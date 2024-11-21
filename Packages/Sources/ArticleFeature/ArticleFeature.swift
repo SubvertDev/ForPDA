@@ -218,7 +218,7 @@ public struct ArticleFeature: Reducer, Sendable {
                         try await Task.sleep(for: .seconds(1.5))
                         await send(._stopRefreshingIfFinished)
                     },
-                    getArticle(id: state.articlePreview.id, cache: false)
+                    getArticle(id: state.articlePreview.id, useCache: false)
                 ])
                 
             case ._stopRefreshingIfFinished:
@@ -338,7 +338,7 @@ public struct ArticleFeature: Reducer, Sendable {
                     state.replyComment = nil
                     state.focus = nil
                     return .concatenate([
-                        getArticle(id: state.articlePreview.id, cache: false),
+                        getArticle(id: state.articlePreview.id, useCache: false),
                         .run { send in
                             await hapticClient.play(.success)
                             await send(.delegate(.showToast(type)))
@@ -399,11 +399,11 @@ public struct ArticleFeature: Reducer, Sendable {
         .cancellable(id: CancelID.loading)
     }
     
-    private func getArticle(id: Int, cache: Bool = true) -> EffectOf<Self> {
+    private func getArticle(id: Int, useCache: Bool = true) -> EffectOf<Self> {
         return .concatenate([
             .run { send in
                 do {
-                    for try await article in try await apiClient.getArticle(id: id, cache: cache) {
+                    for try await article in try await apiClient.getArticle(id: id, useCache: useCache) {
                         await send(._articleResponse(.success(article)))
                     }
                 } catch {

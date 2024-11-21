@@ -13,41 +13,63 @@ import CacheClient
 import ComposableArchitecture
 import PersistenceKeys
 
+// MARK: - Client
+
 @DependencyClient
 public struct APIClient: Sendable {
+    // Common
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
+    
+    // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
-    public var getArticle: @Sendable (_ id: Int, _ cache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
+    public var getArticle: @Sendable (_ id: Int, _ useCache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
     public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var hideComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var replyToComment: @Sendable (_ articleId: Int, _ parentId: Int, _ message: String) async throws -> CommentResponseType
     public var voteInPoll: @Sendable (_ pollId: Int, _ selections: [Int]) async throws -> Bool
+    
+    // Auth
     public var getCaptcha: @Sendable () async throws -> URL
     public var authorize: @Sendable (_ login: String, _ password: String, _ hidden: Bool, _ captcha: Int) async throws -> AuthResponse
     public var logout: @Sendable () async throws -> Void
+    
+    // User
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
+    
+    // Forum
     public var getForumsList: @Sendable () async throws -> [ForumInfo]
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
+    
+    // Extra
     public var getUnread: @Sendable () async throws -> Unread
+    
+    // QMS
     public var loadQMSList: @Sendable () async throws -> QMSList
     public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
     public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
 }
 
+// MARK: - Dependency Key
+
 extension APIClient: DependencyKey {
     
     private nonisolated(unsafe) static let api = try! PDAPI()
     
+    // MARK: - Live Value
+    
     public static var liveValue: APIClient {
-        @Dependency(\.cacheClient) var cacheClient
-        @Dependency(\.parsingClient) var parsingClient
+        @Dependency(\.cacheClient) var cache
+        @Dependency(\.parsingClient) var parser
 
         return APIClient(
+            
+            // MARK: - Common
+            
             setLogResponses: { type in
                 api.setLogResponses(to: type)
             },
@@ -60,33 +82,36 @@ extension APIClient: DependencyKey {
                     try api.connect(as: .anonymous)
                 }
             },
+            
+            // MARK: - Articles
+            
             getArticlesList: { offset, amount in
-                let rawString = try await api.get(SiteCommand.articlesList(offset: offset, amount: amount))
-                return try await parsingClient.parseArticlesList(rawString: rawString)
+                let response = try await api.get(SiteCommand.articlesList(offset: offset, amount: amount))
+                return try await parser.parseArticlesList(response)
             },
-            getArticle: { id, cache in
+            getArticle: { id, useCache in
                 fetchWithCache(
-                    cache: { await cacheClient.getArticle(id) },
+                    cache: { if useCache { await cache.getArticle(id) } else { nil } },
                     remote: {
-                        let rawString = try await api.get(SiteCommand.article(id: id))
-                        let article = try await parsingClient.parseArticle(rawString: rawString)
-                        await cacheClient.cacheArticle(article)
+                        let response = try await api.get(SiteCommand.article(id: id))
+                        let article = try await parser.parseArticle(response)
+                        await cache.cacheArticle(article)
                         return article
                     }
                 )
             },
             likeComment: { articleId, commentId in
-                let rawString = try await api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
-                return Int(rawString.getLastNumber()) == 0
+                let response = try await api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
+                return Int(response.getLastNumber()) == 0
             },
             hideComment: { articleId, commentId in
-                let rawString = try await api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
+                let response = try await api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
                 // Getting 3 on liked comment
-                return Int(rawString.getLastNumber()) == 0
+                return Int(response.getLastNumber()) == 0
             },
             replyToComment: { articleId, parentId, message in
-                let rawString = try await api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
-                let responseAsInt = Int(rawString.getLastNumber())!
+                let response = try await api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
+                let responseAsInt = Int(response.getLastNumber())!
                 if CommentResponseType.codes.contains(responseAsInt) {
                     return CommentResponseType(rawValue: responseAsInt) ?? .unknown
                 } else {
@@ -94,80 +119,95 @@ extension APIClient: DependencyKey {
                 }
             },
             voteInPoll: { pollId, selections in
-                let rawString = try await api.get(SiteCommand.vote(pollId: pollId, selections: selections))
-                let responseAsInt = Int(rawString.getLastNumber())!
+                let response = try await api.get(SiteCommand.vote(pollId: pollId, selections: selections))
+                let responseAsInt = Int(response.getLastNumber())!
                 return responseAsInt == 0
             },
+            
+            // MARK: - Auth
+            
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
-                let rawString = try await api.get(AuthCommand.login(data: request))
-                return try await parsingClient.parseCaptchaUrl(rawString: rawString)
+                let response = try await api.get(AuthCommand.login(data: request))
+                return try await parser.parseCaptchaUrl(response)
             },
             authorize: { login, password, hidden, captcha in
                 let request = LoginRequest(name: login, password: password, hidden: hidden, captcha: captcha)
-                let rawString = try await api.get(AuthCommand.login(data: request))
-                return try await parsingClient.parseLoginResponse(rawString: rawString)
+                let response = try await api.get(AuthCommand.login(data: request))
+                return try await parser.parseLogin(response)
             },
             logout: {
                 let request = AuthRequest(memberId: 0, token: "", hidden: false)
                 _ = try await api.get(AuthCommand.auth(data: request))
             },
+            
+            // MARK: - User
+            
             getUser: { userId in
                 fetchWithCache(
-                    cache: { await cacheClient.getUser(userId) },
+                    cache: { await cache.getUser(userId) },
                     remote: {
-                        let rawString = try await api.get(MemberCommand.info(memberId: userId))
-                        let user = try await parsingClient.parseUser(rawString: rawString)
-                        await cacheClient.cacheUser(user)
+                        let response = try await api.get(MemberCommand.info(memberId: userId))
+                        let user = try await parser.parseUser(response)
+                        await cache.cacheUser(user)
                         return user
                     }
                 )
             },
+            
+            // MARK: - Forum
+            
             getForumsList: {
-                let rawString = try await api.get(ForumCommand.list)
-                return try await parsingClient.parseForumsList(rawString: rawString)
+                let response = try await api.get(ForumCommand.list)
+                return try await parser.parseForumsList(response)
             },
             getForum: { id, offset, perPage in
-                let rawString = try await api.get(ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage))
-                return try await parsingClient.parseForum(rawString: rawString)
+                let response = try await api.get(ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage))
+                return try await parser.parseForum(response)
             },
             getTopic: { id, offset, perPage in
                 let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
-                let rawString = try await api.get(ForumCommand.Topic.view(data: request))
-                return try await parsingClient.parseTopic(rawString: rawString)
+                let response = try await api.get(ForumCommand.Topic.view(data: request))
+                return try await parser.parseTopic(response)
             },
             getFavorites: { unreadFirst, offset, perPage in
                 fetchWithCache(
-                    cache: { await cacheClient.getFavorites() },
+                    cache: { await cache.getFavorites() },
                     remote: {
                         let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
-                        let rawString = try await api.get(command)
-                        let favorites = try await parsingClient.parseFavorites(rawString: rawString)
-                        await cacheClient.cacheFavorites(favorites.favorites)
+                        let response = try await api.get(command)
+                        let favorites = try await parser.parseFavorites(response)
+                        await cache.cacheFavorites(favorites.favorites)
                         return favorites.favorites
                     }
                 )
             },
 			getHistory: { offset, perPage in
-                let rawString = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
-                return try await parsingClient.parseHistory(rawString: rawString)
+                let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
+                return try await parser.parseHistory(response)
             },
+            
+            // MARK: - Extra
+            
             getUnread: {
-                let rawString = try await api.get(CommonCommand.syncUnread)
-                return try await parsingClient.parseUnread(rawString: rawString)
+                let response = try await api.get(CommonCommand.syncUnread)
+                return try await parser.parseUnread(response)
             },
+            
+            // MARK: - QMS
+            
             loadQMSList: {
-                let rawString = try await api.get(QMSCommand.list)
-                return try await parsingClient.parseQmsList(rawString: rawString)
+                let response = try await api.get(QMSCommand.list)
+                return try await parser.parseQmsList(response)
             },
             loadQMSUser: { id in
-                let rawString = try await api.get(QMSCommand.info(id: id))
-                return try await parsingClient.parseQmsUser(rawString: rawString)
+                let response = try await api.get(QMSCommand.info(id: id))
+                return try await parser.parseQmsUser(response)
             },
             loadQMSChat: { id in
                 let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
-                let rawString = try await api.get(QMSCommand.Dialog.view(data: request))
-                return try await parsingClient.parseQmsChat(rawString: rawString)
+                let response = try await api.get(QMSCommand.Dialog.view(data: request))
+                return try await parser.parseQmsChat(response)
             },
             sendQMSMessage: { chatId, message in
                 let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
@@ -176,6 +216,8 @@ extension APIClient: DependencyKey {
 			}
         )
     }
+    
+    // MARK: - Preview Value
     
     public static var previewValue: APIClient {
         APIClient(
@@ -269,6 +311,16 @@ extension APIClient: DependencyKey {
     }
 }
 
+// MARK: - Extensions
+
+extension DependencyValues {
+    public var apiClient: APIClient {
+        get { self[APIClient.self] }
+        set { self[APIClient.self] = newValue }
+    }
+}
+
+
 extension String {
     func getLastNumber() -> String {
         return self
@@ -276,12 +328,5 @@ extension String {
             .replacingOccurrences(of: "]", with: "")
             .components(separatedBy: ",")
             .last!
-    }
-}
-
-extension DependencyValues {
-    public var apiClient: APIClient {
-        get { self[APIClient.self] }
-        set { self[APIClient.self] = newValue }
     }
 }

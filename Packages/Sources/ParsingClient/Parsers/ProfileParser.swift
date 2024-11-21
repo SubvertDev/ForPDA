@@ -45,7 +45,7 @@ public struct ProfileParser {
     /// 32. [] - rewards list
     /// 33. "" - ???
     
-    public static func parseUser(rawString string: String) throws -> User {
+    public static func parseUser(from string: String) throws -> User {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }

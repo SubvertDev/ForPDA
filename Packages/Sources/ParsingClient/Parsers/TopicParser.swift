@@ -9,7 +9,7 @@ import Foundation
 import Models
 
 public struct TopicParser {
-    public static func parse(rawString string: String) throws -> Topic {
+    public static func parse(from string: String) throws -> Topic {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
