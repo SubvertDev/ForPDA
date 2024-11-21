@@ -8,12 +8,19 @@
 import Foundation
 import ComposableArchitecture
 
+public struct QuoteInfo: Hashable {
+    public let name: String
+    public let date: Date
+    public let postId: Int
+}
+
 public enum TopicType: Hashable {
     case text(NSAttributedString)
     case image(Int)
     case center([TopicType])
     case right([TopicType])
     case spoiler([TopicType], NSAttributedString?)
+    case quote(NSAttributedString, QuoteInfo)
 }
 
 public struct TopicBuilder {
@@ -28,7 +35,8 @@ public struct TopicBuilder {
                 "[spoiler]",
                 "[center]",
                 "[right]",
-                "[attachment="
+                "[attachment=",
+                "[quote "
             ] // Add new tags as needed
             
             let ranges: [NSRange] = tags.compactMap { tag in
@@ -81,6 +89,13 @@ public struct TopicBuilder {
                     result.append(.image(Int(imageId)!))
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
+                case "[quote ":
+                    let parts = extractText(from: remainingText, startTag: "[quote ", endTag: "[/quote]")
+                    let quoteParts = parts.0.components(separatedBy: "]")
+                    let quoteInfo = parseQuoteInfo(quoteParts[0])
+                    result.append(.quote(dropAndJoinAttributedStrings(quoteParts), quoteInfo))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
                 default:
                     break
                 }
@@ -95,9 +110,48 @@ public struct TopicBuilder {
         return result
     }
     
+    // MARK: - Extract Quote Info
+    
+    private static func parseQuoteInfo(_ attributedString: NSAttributedString) -> QuoteInfo {
+        let plainText = attributedString.string
+        
+        let pattern = #"name="([^"]+)" date="([^"]+)" post=(\d+)"#
+        
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            fatalError("Invalid regex pattern")
+        }
+        
+        let range = NSRange(location: 0, length: plainText.utf16.count)
+        if let match = regex.firstMatch(in: plainText, options: [], range: range) {
+            let name = match.range(at: 1).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 1)) : nil
+            let date = match.range(at: 2).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 2)) : nil
+            let post = match.range(at: 3).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 3)) : nil
+            
+            return QuoteInfo(name: name!, date: convertToDate(from: date!)!, postId: Int(post!)!)
+        } else {
+            fatalError()
+        }
+    }
+    
+    private static  func convertToDate(from dateString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy, HH:mm"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter.date(from: dateString)
+    }
+    
+    private static func dropAndJoinAttributedStrings(_ attributedStrings: [NSAttributedString]) -> NSAttributedString {
+        let remainingStrings = attributedStrings.dropFirst()
+        let result = NSMutableAttributedString()
+        for string in remainingStrings {
+            result.append(string)
+        }
+        return result
+    }
+    
     // MARK: - Extract Spoiler
     
-    struct Spoiler {
+    private struct Spoiler {
         let text: NSAttributedString
         let additionalInfo: NSAttributedString?
         let remainingText: NSAttributedString?
@@ -233,5 +287,21 @@ extension NSAttributedString {
 
         let trimmedRange = startLocation...endLocation
         return attributedSubstring(from: NSRange(trimmedRange, in: string))
+    }
+}
+
+
+private extension NSAttributedString {
+    func components(separatedBy separator: String) -> [NSAttributedString] {
+        var result = [NSAttributedString]()
+        let separatedStrings = string.components(separatedBy: separator)
+        var range = NSRange(location: 0, length: 0)
+        for string in separatedStrings {
+            range.length = string.utf16.count
+            let attributedString = attributedSubstring(from: range)
+            result.append(attributedString)
+            range.location += range.length + separator.utf16.count
+        }
+        return result
     }
 }

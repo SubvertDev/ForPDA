@@ -67,7 +67,33 @@ struct TopicView: View {
             
         case let .spoiler(types, info):
             SpoilerView(types: types, info: info, attachments: attachments)
+            
+        case let .quote(text, info):
+            QuoteView(text: text, info: info)
         }
+    }
+}
+
+// MARK: - Quote View
+
+struct QuoteView: View {
+    
+    let text: NSAttributedString
+    let info: QuoteInfo
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Text("Цитата: \(info.name) @ \(info.date.formatted())", bundle: .module)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.Main.primaryAlpha)
+            
+            RichText(text: text)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
+        }
+        .border(Color.Main.primaryAlpha)
     }
 }
 
@@ -113,7 +139,7 @@ struct SpoilerView: View {
                 .padding(8)
             }
         }
-        .border(.gray)
+        .border(Color.Main.primaryAlpha)
         .animation(.default, value: isExpanded)
     }
 }
