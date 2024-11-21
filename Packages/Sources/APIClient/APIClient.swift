@@ -70,7 +70,7 @@ extension APIClient: DependencyKey {
                     remote: {
                         let rawString = try await api.get(SiteCommand.article(id: id))
                         let article = try await parsingClient.parseArticle(rawString: rawString)
-                        try await cacheClient.cacheArticle(article)
+                        await cacheClient.cacheArticle(article)
                         return article
                     }
                 )
@@ -118,7 +118,7 @@ extension APIClient: DependencyKey {
                     remote: {
                         let rawString = try await api.get(MemberCommand.info(memberId: userId))
                         let user = try await parsingClient.parseUser(rawString: rawString)
-                        try await cacheClient.cacheUser(user)
+                        await cacheClient.cacheUser(user)
                         return user
                     }
                 )
@@ -143,7 +143,7 @@ extension APIClient: DependencyKey {
                         let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
                         let rawString = try await api.get(command)
                         let favorites = try await parsingClient.parseFavorites(rawString: rawString)
-                        try await cacheClient.cacheFavorites(favorites.favorites)
+                        await cacheClient.cacheFavorites(favorites.favorites)
                         return favorites.favorites
                     }
                 )

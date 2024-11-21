@@ -103,12 +103,12 @@ public struct TopicFeature: Reducer, Sendable {
                 return .run { send in
                     var topicTypes: [[TopicType]] = []
                     for post in topic.posts {
-                        if let content = cacheClient.getParsedPostContent(post.id) {
+                        if let content = await cacheClient.getParsedPostContent(post.id) {
                             let types = try! TopicBuilder.build(from: content)
                             topicTypes.append(types)
                         } else {
                             let parsedContent = BBCodeParser.parse(post.content)!
-                            try? cacheClient.cacheParsedPostContent(post.id, parsedContent)
+                            await cacheClient.cacheParsedPostContent(post.id, parsedContent)
                             let types = try! TopicBuilder.build(from: parsedContent)
                             topicTypes.append(types)
                         }

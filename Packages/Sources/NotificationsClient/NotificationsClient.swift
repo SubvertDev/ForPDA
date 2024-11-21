@@ -52,12 +52,13 @@ extension NotificationsClient: DependencyKey {
                 for item in unread.items {
                     // customDump(item)
                     
-                    if let messageId = cacheClient.getLastMessageOfUnreadItem(item.id), messageId == item.lastMessageId {
+                    if let messageId = await cacheClient.getLastMessageOfUnreadItem(item.id), messageId == item.lastMessageId {
                         logger.info("Skipping notification \(item.id) of type \(item.category.rawValue) because it's already processed")
                         continue
                     }
+                    
                     logger.info("Processing notification \(item.id) of type \(item.category.rawValue)")
-                    try? cacheClient.setLastMessageOfUnreadItem(item.lastMessageId, item.id)
+                    await cacheClient.setLastMessageOfUnreadItem(item.lastMessageId, item.id)
                     
                     let content = UNMutableNotificationContent()
                     content.sound = .default
