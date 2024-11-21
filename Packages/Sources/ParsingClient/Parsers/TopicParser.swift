@@ -9,7 +9,7 @@ import Foundation
 import Models
 
 public struct TopicParser {
-    public static func parse(rawString string: String) throws -> Topic {
+    public static func parse(from string: String) throws -> Topic {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
@@ -84,11 +84,11 @@ public struct TopicParser {
             return Post(
                 id: post[0] as! Int,
                 first: post[1] as! Int == 1 ? true : false,
-                flag: post[4] as! Int,
                 content: post[8] as! String,
                 author: Post.Author(
                     id: post[2] as! Int,
                     name: post[3] as! String,
+                    groupId: post[4] as! Int,
                     avatarUrl: post[9] as! String,
                     lastSeenDate: Date(timeIntervalSince1970: post[5] as! TimeInterval),
                     signature: post[10] as! String,

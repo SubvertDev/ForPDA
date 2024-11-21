@@ -97,7 +97,7 @@
       "location" : "https://github.com/SubvertDev/RichTextKit.git",
       "state" : {
         "branch" : "main",
-        "revision" : "9962cd5d95eb58dda1d6d67ead70736edc505683"
+        "revision" : "be15182e607ae63a6e02cede1681ab824fd338fc"
       }
     },
     {
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "a952dde0bf2b13048843c8dcc72cf21737d67b0c",
-        "version" : "1.16.0"
+        "revision" : "69247baf7be2fd6f5820192caef0082d01849cd0",
+        "version" : "1.16.1"
       }
     },
     {
@@ -195,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "28f82715ccd6799d7ed46c0720c23c768ef6b55c",
-        "version" : "1.5.1"
+        "revision" : "96eecd47660e8307877acb8c41cc5295ba7350a7",
+        "version" : "1.5.2"
       }
     },
     {
@@ -222,8 +222,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-perception",
       "state" : {
-        "revision" : "bc67aa8e461351c97282c2419153757a446ae1c9",
-        "version" : "1.3.5"
+        "revision" : "dccdf5aed1db969afa11d6fbd36b96a4932ebe8c",
+        "version" : "1.4.0"
       }
     },
     {

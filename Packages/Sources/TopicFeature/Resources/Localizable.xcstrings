@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Цитата: %@ @ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Цитата: %1$@ @ %2$@"
+          }
+        }
+      }
+    },
     "Шапка Темы" : {
       "localizations" : {
         "ru" : {

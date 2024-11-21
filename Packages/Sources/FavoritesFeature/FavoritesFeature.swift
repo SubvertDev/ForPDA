@@ -47,7 +47,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case pageNavigation(PageNavigationFeature.Action)
         
-        case _favoritesResponse(Result<Favorite, any Error>)
+        case _favoritesResponse(Result<[FavoriteInfo], any Error>)
         
         // TODO: Implement unreadFirst setting
         case _loadFavorites(unreadFirst: Bool = true, offset: Int)
@@ -82,17 +82,20 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let ._loadFavorites(unreadFirst, offset):
                 state.isLoading = true
                 return .run { [perPage = state.appSettings.forumPerPage] send in
-                    let result = await Result {
-                        try await apiClient.getFavorites(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
+                    do {
+                        for try await favorites in try await apiClient.getFavorites(unreadFirst: unreadFirst, offset: offset, perPage: perPage) {
+                            await send(._favoritesResponse(.success(favorites)))
+                        }
+                    } catch {
+                        await send(._favoritesResponse(.failure(error)))
                     }
-                    await send(._favoritesResponse(result))
                 }
                 
             case let ._favoritesResponse(.success(response)):
                 var favsImportant: [FavoriteInfo] = []
                 var favorites: [FavoriteInfo] = []
 
-                for favorite in response.favorites {
+                for favorite in response {
                     if favorite.isImportant {
                         favsImportant.append(favorite)
                     } else {
@@ -104,7 +107,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.favorites = favorites
                 
                 // TODO: Is it ok?
-                state.pageNavigation.count = response.favoritesCount
+                state.pageNavigation.count = response.count
                 
                 state.isLoading = false
                 

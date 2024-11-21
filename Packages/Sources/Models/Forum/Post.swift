@@ -10,7 +10,6 @@ import Foundation
 public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let id: Int
     public let first: Bool
-    public let flag: Int
     public let content: String
     public let author: Author
     public let karma: Int
@@ -23,7 +22,6 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public init(
         id: Int,
         first: Bool,
-        flag: Int,
         content: String,
         author: Author,
         karma: Int,
@@ -33,7 +31,6 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     ) {
         self.id = id
         self.first = first
-        self.flag = flag
         self.content = content
         self.author = author
         self.karma = karma
@@ -98,6 +95,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public struct Author: Sendable, Hashable, Codable {
         public let id: Int
         public let name: String
+        public let groupId: Int
         public let avatarUrl: String
         public let lastSeenDate: Date
         public let signature: String
@@ -106,6 +104,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         public init(
             id: Int,
             name: String,
+            groupId: Int,
             avatarUrl: String,
             lastSeenDate: Date,
             signature: String,
@@ -113,6 +112,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         ) {
             self.id = id
             self.name = name
+            self.groupId = groupId
             self.avatarUrl = avatarUrl
             self.lastSeenDate = lastSeenDate
             self.signature = signature
@@ -125,12 +125,12 @@ extension Post {
     static let mock = Post(
         id: 12,
         first: false,
-        flag: 8,
         content: "Lorem ipsum...",
         author: Author(
             id: 6176341,
             name: "AirFlare",
-            avatarUrl: "https://4pda.to/s/qirtgbz15jFlUN6eSvTuZz0ONRHsD2iINxx7kHnM6ZC7MBrlcF.png",
+            groupId: 8,
+            avatarUrl: "https://4pda.to/s/Zy0hVVliEZZvbylgfQy11QiIjvDIhLJBjheakj4yIz2ohhN2F.jpg",
             lastSeenDate: Date(timeIntervalSince1970: 1725706883),
             signature: "",
             reputationCount: 312
@@ -139,7 +139,7 @@ extension Post {
         attachments: [
             Attachment(
                 id: 14308454,
-                type: Attachment.AttachmentType.image,
+                type: .image,
                 name: "IMG_2369.png",
                 size: 62246,
                 metadata: Attachment.Metadata(

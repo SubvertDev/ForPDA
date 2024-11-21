@@ -9,8 +9,8 @@ import Foundation
 import Models
 
 public struct QMSUserParser {
-    public static func parse(_ rawString: String) throws -> QMSUser {
-        if let data = rawString.data(using: .utf8) {
+    public static func parse(from string: String) throws -> QMSUser {
+        if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 let user = (array[2] as! [[Any]])[0]
@@ -34,7 +34,7 @@ public struct QMSUserParser {
 }
 
 public struct QMSListParser {
-    public static func parse(rawString string: String) throws -> QMSList {
+    public static func parse(from string: String) throws -> QMSList {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }

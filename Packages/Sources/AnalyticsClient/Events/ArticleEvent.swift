@@ -8,9 +8,8 @@
 import Foundation
 
 public enum ArticleEvent: Event {
-    // case opened // ?
     case onRefresh
-    case closed // TODO: Do I need this?
+    case backButtonTapped
     case linkCopied(URL)
     case linkShareOpened(URL)
     case linkShared(Bool, URL)

@@ -10,6 +10,7 @@ import ComposableArchitecture
 import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
+import NukeUI
 import Models
 import ParsingClient
 
@@ -28,38 +29,23 @@ public struct TopicScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                if let topic = store.topic, !store.isLoadingTopic {
-                    List {
-                        Group {
-                            if store.pageNavigation.shouldShow {
-                                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                            }
+                if let topic = store.topic {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            Navigation()
                             
-                            VStack(spacing: 0) {
-                                ForEach(Array(topic.posts.enumerated()), id: \.0) { index, post in
-                                    WithPerceptionTracking {
-                                        Divider()
-                                        if !store.isFirstPage && index == 0 {
-                                            Text("Шапка Темы")
-                                                .padding(16)
-                                        } else {
-                                            Post(post)
-                                                .padding(.bottom, 16)
-                                        }
-                                        Divider()
-                                    }
-                                }
-                            }
-                            
-                            if store.pageNavigation.shouldShow {
-                                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                            if !store.isLoadingTopic {
+                                PostList(topic: topic)
+                                
+                                Navigation()
                             }
                         }
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
+                        .padding(.bottom, 16)
                     }
-                    .listStyle(.plain)
-                } else {
+                }
+            }
+            .overlay {
+                if store.topic == nil || store.isLoadingTopic {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
@@ -72,14 +58,49 @@ public struct TopicScreen: View {
         }
     }
     
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation() -> some View {
+        if store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+        }
+    }
+    
+    // MARK: - Post List
+    
+    @ViewBuilder
+    private func PostList(topic: Topic) -> some View {
+        ForEach(topic.posts) { post in
+            WithPerceptionTracking {
+                VStack(spacing: 0) {
+                    if !store.isFirstPage && topic.posts.first == post {
+                        Text("Шапка Темы")
+                            .padding(16)
+                    } else {
+                        Post(post)
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 16)
+                    }
+                    
+                    Rectangle()
+                        .foregroundStyle(Color.Separator.post)
+                        .frame(height: 10)
+                }
+            }
+        }
+    }
+    
     // MARK: - Post
     
     @ViewBuilder
     private func Post(_ post: Post) -> some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 16) {
             PostHeader(post)
             PostBody(post)
         }
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
     
     // MARK: - Post Header
@@ -87,26 +108,56 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostHeader(_ post: Post) -> some View {
         HStack {
-            Text(post.author.name)
+            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
+                if let image = state.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    Image.avatarDefault.resizable().scaledToFill()
+                }
+            }
+            .frame(width: 50, height: 50)
+            .clipped()
+            
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 4) {
+                    Text(post.author.name)
+                        .font(.body)
+                        .bold()
+                    
+                    Text(String(post.author.reputationCount))
+                        .font(.caption)
+                        .foregroundStyle(Color.Labels.secondary)
+                }
+                
+                Spacer(minLength: 4)
+                
+                Text(User.Group(rawValue: post.author.groupId)!.title)
+                    .font(.caption)
+                    .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
+            }
+            .padding(.vertical, 8)
             
             Spacer()
             
             Text(post.createdAt.formatted())
+                .font(.caption)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .padding(.vertical, 8)
         }
-        .padding()
+        .frame(height: 50)
     }
     
     // MARK: - Post Body
     
     @ViewBuilder
     private func PostBody(_ post: Post) -> some View {
-        RichText(text: parseContent(post.content))
-    }
-}
-
-extension TopicScreen {
-    func parseContent(_ content: String) -> NSAttributedString {
-        return BBCodeParser.parse(content)!
+        VStack(spacing: 8) {
+            if let postIndex = store.topic?.posts.firstIndex(of: post) {
+                ForEach(store.types[postIndex], id: \.self) { type in
+                    TopicView(type: type, attachments: post.attachments)
+                }
+            }
+        }
     }
 }
 

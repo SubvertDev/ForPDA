@@ -27,6 +27,7 @@ public extension Image {
     static let github = Image(.github)
     static let telegram = Image(.telegram)
     static let quote = Image(.quote)
+    static let snapback = UIImage(resource: .snapback)
     
     struct Settings {
         public static let lightThemeExample = Image(.Settings.lightThemeExample)
@@ -78,6 +79,7 @@ public extension Color {
     struct Separator {
         public static let primary = Color(.Separator.primary)
         public static let secondary = Color(.Separator.secondary)
+        public static let post = Color(.Separator.post)
     }
     
     struct Theme {

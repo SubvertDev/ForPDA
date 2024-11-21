@@ -9,7 +9,7 @@ import Foundation
 import Models
 
 public struct ForumParser {
-    public static func parse(rawString string: String) throws -> Forum {
+    public static func parse(from string: String) throws -> Forum {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
@@ -32,7 +32,7 @@ public struct ForumParser {
         }
     }
     
-    public static func parseForumList(rawString string: String) throws -> [ForumInfo] {
+    public static func parseForumList(from string: String) throws -> [ForumInfo] {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
@@ -46,7 +46,7 @@ public struct ForumParser {
         }
     }
     
-    public static func parseAnnouncement(rawString string: String) throws -> Announcement {
+    public static func parseAnnouncement(from string: String) throws -> Announcement {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }

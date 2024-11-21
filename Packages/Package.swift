@@ -384,6 +384,7 @@ let package = Package(
         .target(
             name: "CacheClient",
             dependencies: [
+                "AnalyticsClient",
                 "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "Cache", package: "Cache"),

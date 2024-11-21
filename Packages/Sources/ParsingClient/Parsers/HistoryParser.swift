@@ -9,7 +9,7 @@ import Foundation
 import Models
 
 public struct HistoryParser {
-    public static func parse(rawString string: String) throws -> History {
+    public static func parse(from string: String) throws -> History {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
