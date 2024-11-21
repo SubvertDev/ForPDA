@@ -97,7 +97,11 @@ public struct TopicScreen: View {
     private func PostHeader(_ post: Post) -> some View {
         HStack {
             LazyImage(url: URL(string: post.author.avatarUrl)) { state in
-                if let image = state.image { image.resizable().scaledToFill() }
+                if let image = state.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    Image.avatarDefault.resizable().scaledToFill()
+                }
             }
             .frame(width: 50, height: 50)
             .clipped()
