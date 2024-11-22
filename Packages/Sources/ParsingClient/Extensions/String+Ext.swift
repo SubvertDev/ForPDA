@@ -28,4 +28,8 @@ extension String {
         editedString = editedString.replacingOccurrences(of: "/r/n", with: "\r\n")
         return editedString
     }
+    
+    func convertCodes() -> String {
+        BBCodeParser.fastParse(self)
+    }
 }

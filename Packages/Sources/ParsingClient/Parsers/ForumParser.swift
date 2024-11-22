@@ -88,7 +88,7 @@ public struct ForumParser {
             
             return ForumInfo(
                 id: forum[0] as! Int,
-                name: (forum[1] as! String).convertHtmlCodes(),
+                name: (forum[1] as! String).convertCodes(),
                 flag: forum[2] as! Int,
                 redirectUrl: redirectUrl
             )
@@ -104,14 +104,14 @@ public struct ForumParser {
     internal static func parseTopic(_ topic: [Any]) -> TopicInfo {
         return TopicInfo(
             id: topic[0] as! Int,
-            name: (topic[1] as! String).convertHtmlCodes(),
-            description: (topic[2] as! String).convertHtmlCodes(),
+            name: (topic[1] as! String).convertCodes(),
+            description: (topic[2] as! String).convertCodes(),
             flag: topic[3] as! Int,
             postsCount: topic[4] as! Int,
             lastPost: TopicInfo.LastPost(
                 date: Date(timeIntervalSince1970: topic[5] as! TimeInterval),
                 userId: topic[6] as! Int,
-                username: (topic[7] as! String).convertHtmlCodes()
+                username: (topic[7] as! String).convertCodes()
             )
         )
     }

@@ -10,6 +10,8 @@ import ZMarkupParser
 
 public final class BBCodeParser {
     
+    // MARK: - Default Parsing
+    
     public static func parse(_ text: String?, fontStyle: UIFont.TextStyle = .body) -> NSAttributedString? {
         guard let inputText = text else { return nil }
         var text = inputText
@@ -67,5 +69,13 @@ public final class BBCodeParser {
         }
         
         return NSAttributedString(attributedString: mutableString)
+    }
+    
+    // MARK: - Fast Parsing
+    
+    nonisolated(unsafe) public static var fastParser = ZHTMLParserBuilder.initWithDefault().build()
+    
+    public static func fastParse(_ text: String) -> String {
+        return fastParser.render(text).string
     }
 }
