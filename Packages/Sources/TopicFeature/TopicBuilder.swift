@@ -343,12 +343,11 @@ public struct TopicBuilder {
 
         // Extract attributed substrings
         let extractedRange = NSRange(location: startTagEndIndex, length: endTagStartIndex - startTagEndIndex)
-        let additionalLength = if fullText.contains("quote") { 1 } else { 0 } // FIXME: Quickfix for quotes
-        let remainingRange = NSRange(location: endTagEndIndex + additionalLength, length: text.length - endTagEndIndex - additionalLength)
+        let remainingRange = NSRange(location: endTagEndIndex, length: text.length - endTagEndIndex)
 
         let extractedText = text.attributedSubstring(from: extractedRange)
         let remainingText = remainingRange.length > 0 ? text.attributedSubstring(from: remainingRange) : nil
-        
+
         return (extractedText, remainingText)
     }
 }
