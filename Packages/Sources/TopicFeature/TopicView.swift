@@ -68,8 +68,11 @@ struct TopicView: View {
         case let .spoiler(types, info):
             SpoilerView(types: types, info: info, attachments: attachments)
             
-        case let .quote(text, info):
-            QuoteView(text: text, info: info)
+        case let .quote(text, type):
+            QuoteView(text: text, type: type)
+            
+        case let .mergetime(date):
+            RichText(text: "Добавлено: \(date.formatted())".asNSAttributedString(font: .footnote))
         }
     }
 }
@@ -79,15 +82,26 @@ struct TopicView: View {
 struct QuoteView: View {
     
     let text: NSAttributedString
-    let info: QuoteInfo
+    let type: QuoteType
     
     var body: some View {
         VStack(spacing: 8) {
-            Text("Цитата: \(info.name) @ \(info.date.formatted())", bundle: .module)
-                .padding(.vertical, 4)
-                .padding(.horizontal, 8)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.Main.primaryAlpha)
+            Group {
+                switch type {
+                case .none:
+                    Text("Quote")
+                    
+                case let .title(title):
+                    Text("Quote: \(title)")
+                    
+                case let .user(user):
+                    Text("Quote: \(user.name) @ \(user.date)", bundle: .module)
+                }
+            }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.Main.primaryAlpha)
             
             RichText(text: text)
                 .padding(.horizontal, 8)
@@ -167,13 +181,13 @@ func + (left: NSAttributedString, right: NSAttributedString) -> NSAttributedStri
 // TODO: Move to Extensions?
 extension String {
     func asNSAttributedString(
-        font: UIFont = UIFont.preferredFont(forTextStyle: .body),
+        font: UIFont.TextStyle = .body,
         color: UIColor = UIColor.label
     ) -> NSAttributedString {
         NSAttributedString(
             string: self,
             attributes: [
-                .font: font,
+                .font: UIFont.preferredFont(forTextStyle: font),
                 .foregroundColor: color
             ]
         )

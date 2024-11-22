@@ -9,9 +9,15 @@ import SwiftUI
 import SharedUI
 import ComposableArchitecture
 
-public struct QuoteInfo: Hashable {
+public enum QuoteType: Hashable {
+    case none
+    case title(String)
+    case user(UserQuote)
+}
+
+public struct UserQuote: Hashable {
     public let name: String
-    public let date: Date
+    public let date: String
     public let postId: Int
 }
 
@@ -21,7 +27,8 @@ public enum TopicType: Hashable, Equatable {
     case center([TopicType])
     case right([TopicType])
     case spoiler([TopicType], NSAttributedString?)
-    case quote(NSAttributedString, QuoteInfo)
+    case quote(NSAttributedString, QuoteType)
+    case mergetime(Date)
 }
 
 public struct TopicBuilder {
@@ -37,7 +44,10 @@ public struct TopicBuilder {
                 "[center]",
                 "[right]",
                 "[attachment=",
-                "[quote "
+                "[quote]", // plain quote
+                "[quote=", // quoute="text"
+                "[quote ", // quote name="name"...
+                "Добавлено [mergetime]"
             ] // Add new tags as needed
             
             let ranges: [NSRange] = tags.compactMap { tag in
@@ -92,13 +102,29 @@ public struct TopicBuilder {
                     result.append(.image(Int(imageId)!))
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
+                case "[quote]":
+                    let parts = extractText(from: remainingText, startTag: "[quote]", endTag: "[/quote]")
+                    result.append(.quote(parts.0.trimmedAttributedString(), .none))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
+                case "[quote=":
+                    let parts = extractText(from: remainingText, startTag: "[quote=", endTag: "[/quote]")
+                    result.append(.quote(parts.0.trimmedAttributedString(), .title("Заголовок")))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
                 case "[quote ":
                     let parts = extractText(from: remainingText, startTag: "[quote ", endTag: "[/quote]")
                     let quoteParts = parts.0.components(separatedBy: "]")
-                    let quoteInfo = parseQuoteInfo(quoteParts[0])
+                    let userInfo = parseQuoteInfo(quoteParts[0])
                     let joined = dropAndJoinAttributedStrings(quoteParts)
                     let text = joined.trimmedAttributedString()
-                    result.append(.quote(text, quoteInfo))
+                    result.append(.quote(text, .user(userInfo)))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
+                case "Добавлено [mergetime]":
+                    let parts = extractText(from: remainingText, startTag: "Добавлено [mergetime]", endTag: "[/mergetime]")
+                    let date = Date(timeIntervalSince1970: TimeInterval(parts.0.string) ?? 0)
+                    result.append(.mergetime(date))
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
                 default:
@@ -119,7 +145,7 @@ public struct TopicBuilder {
     
     // MARK: - Extract Quote Info
     
-    private static func parseQuoteInfo(_ attributedString: NSAttributedString) -> QuoteInfo {
+    private static func parseQuoteInfo(_ attributedString: NSAttributedString) -> UserQuote {
         let plainText = attributedString.string
         
         let pattern = #"name="([^"]+)" date="([^"]+)" post=(\d+)"#
@@ -134,17 +160,10 @@ public struct TopicBuilder {
             let date = match.range(at: 2).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 2)) : nil
             let post = match.range(at: 3).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 3)) : nil
             
-            return QuoteInfo(name: name!, date: convertToDate(from: date!)!, postId: Int(post!)!)
+            return UserQuote(name: name!, date: date!, postId: Int(post!)!)
         } else {
             fatalError()
         }
-    }
-    
-    private static  func convertToDate(from dateString: String) -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy, HH:mm"
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        return formatter.date(from: dateString)
     }
     
     private static func dropAndJoinAttributedStrings(_ attributedStrings: [NSAttributedString]) -> NSAttributedString {
