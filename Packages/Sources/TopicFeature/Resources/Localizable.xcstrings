@@ -37,6 +37,16 @@
         }
       }
     },
+    "Whoops, something went wrong while parsing this post :(" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс, что-то пошло не так во время загрузки этого поста :("
+          }
+        }
+      }
+    },
     "Шапка Темы" : {
       "localizations" : {
         "ru" : {

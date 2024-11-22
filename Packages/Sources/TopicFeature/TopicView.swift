@@ -30,6 +30,12 @@ struct TopicView: View {
     
     var body: some View {
         switch type {
+        case .error:
+            Text("Whoops, something went wrong while parsing this post :(", bundle: .module)
+                .foregroundStyle(.background)
+                .padding(16)
+                .background(Color(uiColor: .label))
+            
         case let .text(text):
             RichText(text: text) {
                 if let textAlignment {
@@ -89,10 +95,10 @@ struct QuoteView: View {
             Group {
                 switch type {
                 case .none:
-                    Text("Quote")
+                    Text("Quote", bundle: .module)
                     
                 case let .title(title):
-                    Text("Quote: \(title)")
+                    Text("Quote: \(title)", bundle: .module)
                     
                 case let .user(user):
                     Text("Quote: \(user.name) @ \(user.date)", bundle: .module)

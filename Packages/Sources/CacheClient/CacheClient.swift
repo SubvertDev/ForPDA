@@ -154,6 +154,8 @@ extension CacheClient: DependencyKey {
             // MARK: - Post Content
             
             cacheParsedPostContent: { id, content in
+                return
+                
                 do {
                     try await parsedPostsContentStorage.async.setObject(AttributedString(content), forKey: id)
                 } catch {
@@ -161,6 +163,8 @@ extension CacheClient: DependencyKey {
                 }
             },
             getParsedPostContent: { id in
+                return nil
+                
                 do {
                     let attributedString = try await parsedPostsContentStorage.async.object(forKey: id)
                     return NSAttributedString(attributedString)

@@ -22,6 +22,7 @@ public struct UserQuote: Hashable {
 }
 
 public enum TopicType: Hashable, Equatable {
+    case error
     case text(NSAttributedString)
     case image(Int)
     case center([TopicType])
@@ -128,7 +129,8 @@ public struct TopicBuilder {
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
                 default:
-                    break
+                    result.append(.error)
+                    remainingText = NSAttributedString(string: "")
                 }
             } else {
                 if remainingText.length > 0 {
