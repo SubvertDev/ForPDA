@@ -37,8 +37,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
         @Shared(.appSettings) public var appSettings: AppSettings
         public var articles: [ArticlePreview]
         public var isLoading: Bool
-        public var loadAmount: Int = 15
-        public var offset: Int = 0
+        public var loadAmount: Int
+        public var offset: Int
         public var listRowType: AppSettings.ArticleListRowType = .normal
         
         public var isScrollDisabled: Bool {
@@ -50,12 +50,18 @@ public struct ArticlesListFeature: Reducer, Sendable {
         
         public init(
             destination: Destination.State? = nil,
+            appSettings: AppSettings = .default,
             articles: [ArticlePreview] = [],
-            isLoading: Bool = true
+            isLoading: Bool = true,
+            loadAmount: Int = 15,
+            offset: Int = 0
         ) {
             self.destination = destination
+            self._appSettings = Shared(wrappedValue: appSettings, .appSettings)
             self.articles = articles
             self.isLoading = isLoading
+            self.loadAmount = loadAmount
+            self.offset = offset
             
             self.listRowType = $appSettings.articlesListRowType.wrappedValue
         }
@@ -64,6 +70,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action: BindableAction {
+        case onAppear
         case destination(PresentationAction<Destination.Action>)
         case articleTapped(ArticlePreview)
         case binding(BindingAction<State>)
@@ -71,7 +78,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case linkShared(Bool, URL)
         case listGridTypeButtonTapped
         case settingsButtonTapped
-        case onFirstAppear
         case onRefresh
         case loadMoreArticles
         
@@ -84,6 +90,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.hapticClient) private var hapticClient
+    @Dependency(\.continuousClock) private var clock
     
     // MARK: - Body
     
@@ -111,7 +118,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 state.destination = nil
                 return .none
                 
-            case .onFirstAppear:
+            case .onAppear:
+                guard state.articles.isEmpty else { return .none }
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
                     await send(._articlesResponse(result))
@@ -125,7 +133,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                     let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
                     let endTime = DispatchTime.now()
                     let timeInterval = Int(Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds))
-                    try await Task.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
+                    try await clock.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
                     await send(._articlesResponse(result))
                 }
                 

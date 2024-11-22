@@ -86,6 +86,14 @@ extension AnalyticsClient: DependencyKey {
             print("[Sentry] \(error)")
         }
     )
+    
+    public static let testValue = Self(
+        configure: { _ in },
+        identify: { _ in },
+        logout: { },
+        log: { _ in },
+        capture: { _ in }
+    )
 }
 
 extension AnalyticsClient {

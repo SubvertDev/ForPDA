@@ -20,14 +20,16 @@ struct ForPDAApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AppView(store: appDelegate.store)
-                .onChange(of: scenePhase) { newScenePhase in
-                    appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
-                }
-                .onOpenURL { url in
-                    appDelegate.store.send(.deeplink(url))
-                }
-                .tint(.Theme.primary)
+            if TestContext.current == nil {
+                AppView(store: appDelegate.store)
+                    .onChange(of: scenePhase) { newScenePhase in
+                        appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
+                    }
+                    .onOpenURL { url in
+                        appDelegate.store.send(.deeplink(url))
+                    }
+                    .tint(.Theme.primary)
+            }
         }
         .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
             await appDelegate.store.send(.syncUnreadTaskInvoked)

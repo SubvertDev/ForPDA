@@ -53,8 +53,8 @@ public struct ArticlesListScreen: View {
                     .presentationDetents([.medium])
                 }
             }
-            .onFirstAppear {
-                store.send(.onFirstAppear)
+            .onAppear {
+                store.send(.onAppear)
             }
         }
     }
