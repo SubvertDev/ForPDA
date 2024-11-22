@@ -10,21 +10,29 @@ import ZMarkupParser
 
 public final class BBCodeParser {
     
+    // MARK: - Default Parsing
+    
     public static func parse(_ text: String?, fontStyle: UIFont.TextStyle = .body) -> NSAttributedString? {
         guard let inputText = text else { return nil }
         var text = inputText
         
-        text = text.replacingOccurrences(of: "\n", with: "<br>") // New line / line break
-        text = text.replacingOccurrences(of: "\\[b\\](.*?)\\[\\/b\\]", with: "<b>$1</b>", options: .regularExpression) // Bold
-        text = text.replacingOccurrences(of: "\\[i\\](.*?)\\[\\/i\\]", with: "<i>$1</i>", options: .regularExpression) // Italic
-        text = text.replacingOccurrences(of: "\\[s\\](.*?)\\[\\/s\\]", with: "<s>$1</s>", options: .regularExpression) // Strikethrough
-        text = text.replacingOccurrences(of: "\\[u\\](.*?)\\[\\/u\\]", with: "<u>$1</u>", options: .regularExpression) // Underline
-        text = text.replacingOccurrences(of: "\\[color=\"?(.*?)\"?\\](.*?)\\[\\/color\\]", with: "<font color=\"$1\">$2</font>", options: .regularExpression) // Text color
-        text = text.replacingOccurrences(of: "\\[size=\"?(.*?)\"?\\](.*?)\\[\\/size\\]", with: "<span style=\"font-size:$1\">$2</span>", options: .regularExpression) // Text size
-        text = text.replacingOccurrences(of: "\\[background=\"?(.*?)\"?\\](.*?)\\[\\/background\\]", with: "<span style=\"background-color:$1\">$2</span>", options: .regularExpression) // Text background
-        text = text.replacingOccurrences(of: "\\[font=\"?(.*?)\"?\\](.*?)\\[\\/font\\]", with: "<span style=\"font-family:$1\">$2</span>", options: .regularExpression) // Text font
-        text = text.replacingOccurrences(of: "\\[url\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$1</a>", options: .regularExpression) // URL links without text
-        text = text.replacingOccurrences(of: "\\[url=\"?(.*?)\"?\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression) // URL links with text
+        func replaceCodes(from text: inout String) {
+            text = text.replacingOccurrences(of: "\n", with: "<br>") // New line / line break
+            text = text.replacingOccurrences(of: "\\[b\\](.*?)\\[\\/b\\]", with: "<b>$1</b>", options: .regularExpression) // Bold
+            text = text.replacingOccurrences(of: "\\[i\\](.*?)\\[\\/i\\]", with: "<i>$1</i>", options: .regularExpression) // Italic
+            text = text.replacingOccurrences(of: "\\[s\\](.*?)\\[\\/s\\]", with: "<s>$1</s>", options: .regularExpression) // Strikethrough
+            text = text.replacingOccurrences(of: "\\[u\\](.*?)\\[\\/u\\]", with: "<u>$1</u>", options: .regularExpression) // Underline
+            text = text.replacingOccurrences(of: "\\[color=\"?(.*?)\"?\\](.*?)\\[\\/color\\]", with: "<font color=\"$1\">$2</font>", options: .regularExpression) // Text color
+            text = text.replacingOccurrences(of: "\\[size=\"?(.*?)\"?\\](.*?)\\[\\/size\\]", with: "<span style=\"font-size:$1\">$2</span>", options: .regularExpression) // Text size
+            text = text.replacingOccurrences(of: "\\[background=\"?(.*?)\"?\\](.*?)\\[\\/background\\]", with: "<span style=\"background-color:$1\">$2</span>", options: .regularExpression) // Text background
+            text = text.replacingOccurrences(of: "\\[font=\"?(.*?)\"?\\](.*?)\\[\\/font\\]", with: "<span style=\"font-family:$1\">$2</span>", options: .regularExpression) // Text font
+            text = text.replacingOccurrences(of: "\\[url\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$1</a>", options: .regularExpression) // URL links without text
+            text = text.replacingOccurrences(of: "\\[url=\"?(.*?)\"?\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression) // URL links with text
+        }
+        
+        replaceCodes(from: &text)
+        replaceCodes(from: &text) // For nested tags
+        // TODO: Find better approach instead of two functions
                 
         let parser = ZHTMLParserBuilder.initWithDefault()
             .set(rootStyle: MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: fontStyle))))
@@ -61,5 +69,13 @@ public final class BBCodeParser {
         }
         
         return NSAttributedString(attributedString: mutableString)
+    }
+    
+    // MARK: - Fast Parsing
+    
+    nonisolated(unsafe) public static var fastParser = ZHTMLParserBuilder.initWithDefault().build()
+    
+    public static func fastParse(_ text: String) -> String {
+        return fastParser.render(text).string
     }
 }

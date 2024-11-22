@@ -43,6 +43,8 @@ public struct FavoritesScreen: View {
             }
             .navigationTitle(Text("Favorites", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
+            .animation(.default, value: store.favoritesImportant)
+            .animation(.default, value: store.favorites)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
