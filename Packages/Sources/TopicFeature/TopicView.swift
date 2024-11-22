@@ -59,7 +59,7 @@ struct TopicView: View {
         case let .center(types):
             VStack(alignment: .center) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, attachments: attachments)
+                    TopicView(type: type, attachments: attachments, alignment: .center)
                 }
             }
             .frame(maxWidth: .infinity)
