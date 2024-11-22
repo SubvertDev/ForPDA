@@ -128,21 +128,22 @@ public struct TopicScreen: View {
                         .font(.caption)
                         .foregroundStyle(Color.Labels.secondary)
                 }
+                .padding(.top, 4)
                 
-                Spacer(minLength: 4)
-                
-                Text(User.Group(rawValue: post.author.groupId)!.title)
-                    .font(.caption)
-                    .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
+                HStack(spacing: 4) {
+                    Text(User.Group(rawValue: post.author.groupId)!.title)
+                        .font(.caption)
+                        .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
+                    
+                    Spacer()
+                    
+                    Text(post.createdAt.formatted())
+                        .font(.caption)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .padding(.vertical, 8)
+                }
             }
             .padding(.vertical, 8)
-            
-            Spacer()
-            
-            Text(post.createdAt.formatted())
-                .font(.caption)
-                .frame(maxHeight: .infinity, alignment: .bottom)
-                .padding(.vertical, 8)
         }
         .frame(height: 50)
     }
