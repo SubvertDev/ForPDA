@@ -148,21 +148,21 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func NavigationSection() -> some View {
-        Section {
-            Row(symbol: .person2, title: "QMS", type: .navigation) {
-                store.send(.qmsButtonTapped)
-            }
-            
-            if store.shouldShowToolbarButtons {
+        if store.shouldShowToolbarButtons {
+            Section {
+                Row(symbol: .person2, title: "QMS", type: .navigation) {
+                    store.send(.qmsButtonTapped)
+                }
+                
                 Section {
                     Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
                         store.send(.historyButtonTapped)
                     }
                 }
             }
-		}
-        .listRowBackground(Color.Background.teritary)
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.Background.teritary)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        }
     }
     
     // MARK: - Segment Picker
