@@ -58,6 +58,7 @@ public struct AppFeature: Reducer, Sendable {
     public enum ForumPath {
         case forum(ForumFeature)
         case topic(TopicFeature)
+        case profile(ProfileFeature)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
@@ -515,11 +516,6 @@ public struct AppFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .forumsList(.settingsButtonTapped),
-                 .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
-                state.forumPath.append(.settingsPath(.settings(SettingsFeature.State())))
-                return .none
-                
             case .forumsList(.forumTapped(let forumId, let forumName)):
                 state.forumPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
                 return .none
@@ -530,6 +526,15 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
                 state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                return .none
+                
+            case let .forumPath(.element(id: _, action: .topic(.userAvatarTapped(userId: userId)))):
+                state.forumPath.append(.profile(ProfileFeature.State(userId: userId)))
+                return .none
+                
+            case .forumsList(.settingsButtonTapped),
+                 .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
+                state.forumPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
                 
             default:

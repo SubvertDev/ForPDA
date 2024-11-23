@@ -47,6 +47,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     public enum Action {
         case onTask
+        case userAvatarTapped(userId: Int)
         case pageNavigation(PageNavigationFeature.Action)
         
         case _loadTopic(offset: Int)
@@ -74,6 +75,9 @@ public struct TopicFeature: Reducer, Sendable {
             switch action {
             case .onTask:
                 return .send(._loadTopic(offset: 0))
+                
+            case let .userAvatarTapped(userId: userId):
+                return .none
 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isFirstPage = newOffset == 0

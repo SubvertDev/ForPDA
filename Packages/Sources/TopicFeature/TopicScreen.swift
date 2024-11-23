@@ -108,15 +108,19 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostHeader(_ post: Post) -> some View {
         HStack {
-            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
-                if let image = state.image {
-                    image.resizable().scaledToFill()
-                } else {
-                    Image.avatarDefault.resizable().scaledToFill()
+            Button {
+                store.send(.userAvatarTapped(userId: post.author.id))
+            } label: {
+                LazyImage(url: URL(string: post.author.avatarUrl)) { state in
+                    if let image = state.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Image.avatarDefault.resizable().scaledToFill()
+                    }
                 }
+                .frame(width: 50, height: 50)
+                .clipped()
             }
-            .frame(width: 50, height: 50)
-            .clipped()
             
             VStack(alignment: .leading, spacing: 0) {
                 HStack(spacing: 4) {

@@ -162,6 +162,9 @@ public struct AppView: View {
             case let .topic(store):
                 TopicScreen(store: store)
                 
+            case let .profile(store):
+                ProfileScreen(store: store)
+                
             case let .settingsPath(path):
                 SettingsPath(path)
             }
