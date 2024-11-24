@@ -63,7 +63,13 @@ public final class BBCodeParser {
         let mutableString = NSMutableAttributedString(attributedString: renderedText)
         let fullRange = NSRange(location: 0, length: mutableString.length)
         mutableString.enumerateAttributes(in: fullRange, options: []) { attributes, range, _ in
-            if attributes[.foregroundColor] == nil {
+            if let color = attributes[.foregroundColor] as? UIColor {
+                if let hex = color.toHexString() {
+                    if let matchColor = ForumColors.allCases.first(where: { $0.hexColor.0 == hex }) {
+                        mutableString.addAttribute(.foregroundColor, value: UIColor(dynamicTuple: matchColor.hexColor), range: range)
+                    }
+                }
+            } else if attributes[.foregroundColor] == nil {
                 mutableString.addAttribute(.foregroundColor, value: UIColor.label, range: range)
             }
         }
@@ -77,5 +83,108 @@ public final class BBCodeParser {
     
     public static func fastParse(_ text: String) -> String {
         return fastParser.render(text).string
+    }
+}
+
+// MARK: - Forum Colors
+
+public enum ForumColors: CaseIterable {
+    case black
+    case white
+    case skyblue
+    case royalblue
+    case blue
+    case darkblue
+    case orange
+    case orangered
+    case crimson
+    case red
+    case darkred
+    case green
+    case limegreen
+    case seagreen
+    case deeppink
+    case tomato
+    case coral
+    case purple
+    case indigo
+    case burlywood
+    case sandybrown
+    case sienna
+    case chocolate
+    case teal
+    case silver
+    
+    public var hexColor: (String, String) {
+        switch self {
+        case .black:        return ("000000", "909090")
+        case .white:        return ("FFFFFF", "FFFFFF")
+        case .skyblue:      return ("87CEEB", "87CEEB")
+        case .royalblue:    return ("4169E1", "4169E1")
+        case .blue:         return ("0000FF", "0000FF")
+        case .darkblue:     return ("00008B", "00008B")
+        case .orange:       return ("FFA500", "FFA500")
+        case .orangered:    return ("FF4500", "FF4500")
+        case .crimson:      return ("DC143C", "DC143C")
+        case .red:          return ("FF0000", "FF0000")
+        case .darkred:      return ("8B0000", "CB4040")
+        case .green:        return ("008001", "20A020")
+        case .limegreen:    return ("33CD32", "32CD32")
+        case .seagreen:     return ("2E8B58", "2E8B57")
+        case .deeppink:     return ("FF1393", "FF1493")
+        case .tomato:       return ("FF6348", "FF6347")
+        case .coral:        return ("FF7F50", "FF7F50")
+        case .purple:       return ("800080", "A020A0")
+        case .indigo:       return ("4B0082", "6B20A2")
+        case .burlywood:    return ("DEB887", "DEB887")
+        case .sandybrown:   return ("F4A361", "F4A460")
+        case .sienna:       return ("A0522D", "A0522D")
+        case .chocolate:    return ("D3691E", "D2691E")
+        case .teal:         return ("008080", "008080")
+        case .silver:       return ("C0C0C0", "C0C0C0")
+        }
+    }
+}
+
+extension UIColor {
+    convenience init(dynamicTuple: (String, String)) {
+        self.init(dynamicProvider: { traits in
+            let hex = traits.userInterfaceStyle == .dark ? dynamicTuple.1 : dynamicTuple.0
+            return UIColor(hex: hex) ?? .label
+        })
+    }
+}
+
+extension UIColor {
+    convenience init?(hex: String) {
+        guard hex.count == 6, let hexNumber = UInt32(hex, radix: 16) else {
+            return nil
+        }
+        
+        let r = CGFloat((hexNumber & 0xFF0000) >> 16) / 255.0
+        let g = CGFloat((hexNumber & 0x00FF00) >> 8) / 255.0
+        let b = CGFloat(hexNumber & 0x0000FF) / 255.0
+        
+        self.init(red: r, green: g, blue: b, alpha: 1.0)
+    }
+}
+
+extension UIColor {
+    func toHexString() -> String? {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        guard self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+            // The color must be in the RGB color space to extract components
+            return nil
+        }
+        
+        let r = Int(red * 255)
+        let g = Int(green * 255)
+        let b = Int(blue * 255)
+        
+        return String(format: "%02X%02X%02X", r, g, b)
     }
 }

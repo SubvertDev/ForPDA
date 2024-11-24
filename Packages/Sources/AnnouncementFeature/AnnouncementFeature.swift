@@ -69,6 +69,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 return .none
                    
             case let ._announcementResponse(.success(announcement)):
+                // customDump(announcement)
                 state.announcement = announcement
 
                 return .run { send in
