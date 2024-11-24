@@ -83,135 +83,71 @@ extension CacheClient: DependencyKey {
                 urls.forEach { ImagePipeline.shared.loadImage(with: $0, completion: { _ in }) }
             },
             cacheArticle: { article in
-                do {
-                    try await articlesStorage.async.setObject(article, forKey: article.id)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await articlesStorage.async.setObject(article, forKey: article.id)
             },
             getArticle: { articleId in
-                do {
-                    return try await articlesStorage.async.object(forKey: articleId)
-                } catch {
-                    analytics.capture(error)
-                    return nil
-                }
+                return try? await articlesStorage.async.object(forKey: articleId)
             },
             
             // MARK: - User
             
             cacheUser: { user in
-                do {
-                    try await usersStorage.async.setObject(user, forKey: user.id)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await usersStorage.async.setObject(user, forKey: user.id)
             },
             getUser: { userId in
-                do {
-                    return try await usersStorage.async.object(forKey: userId)
-                } catch {
-                    analytics.capture(error)
-                    return nil
-                }
+                return try? await usersStorage.async.object(forKey: userId)
             },
             
             // MARK: - Favorites
             
             cacheFavorites: { favorites in
-                do {
-                    try await favoritesStorage.async.setObject(favorites, forKey: favoritesKey)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await favoritesStorage.async.setObject(favorites, forKey: favoritesKey)
             },
             getFavorites: {
-                do {
-                    return try await favoritesStorage.async.object(forKey: favoritesKey)
-                } catch {
-                    analytics.capture(error)
-                    return nil
-                }
+                return try? await favoritesStorage.async.object(forKey: favoritesKey)
             },
             
             // MARK: - Forums List
             
             cacheForumsList: { forumsList in
-                do {
-                    try forumsListStorage.setObject(forumsList, forKey: forumsListKey)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? forumsListStorage.setObject(forumsList, forKey: forumsListKey)
             },
             getForumsList: {
-                do {
-                    return try await forumsListStorage.async.object(forKey: forumsListKey)
-                } catch {
-                    analytics.capture(error)
-                    return []
-                }
+                return (try? await forumsListStorage.async.object(forKey: forumsListKey)) ?? []
             },
             
             // MARK: - Post Content
             
             cacheParsedPostContent: { id, content in
-                do {
-                    try await parsedPostsContentStorage.async.setObject(AttributedString(content), forKey: id)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await parsedPostsContentStorage.async.setObject(AttributedString(content), forKey: id)
             },
             getParsedPostContent: { id in
-                do {
-                    let attributedString = try await parsedPostsContentStorage.async.object(forKey: id)
+                if let attributedString = try? await parsedPostsContentStorage.async.object(forKey: id) {
                     return NSAttributedString(attributedString)
-                } catch {
-                    analytics.capture(error)
+                } else {
                     return nil
                 }
             },
             removeAllParsedPostContent: {
-                do {
-                    try await parsedPostsContentStorage.async.removeAll()
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await parsedPostsContentStorage.async.removeAll()
             },
             
             // MARK: - Background Tasks
             
             setLastBackgroundTaskInvokeTime: { date in
-                do {
-                    try await lastBackgroundTaskInvokeTimeStorage.async.setObject(date, forKey: lastBackgroundTaskInvokeTimeKey)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await lastBackgroundTaskInvokeTimeStorage.async.setObject(date, forKey: lastBackgroundTaskInvokeTimeKey)
             },
             getLastBackgroundTaskInvokeTime: {
-                do {
-                    return try await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)
-                } catch {
-                    analytics.capture(error)
-                    return nil
-                }
+                return try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)
             },
             
             // MARK: - Notifications
             
             setLastTimestampOfUnreadItem: { timestamp, itemId in
-                do {
-                    try await notificationsStorage.async.setObject(timestamp, forKey: itemId)
-                } catch {
-                    analytics.capture(error)
-                }
+                try? await notificationsStorage.async.setObject(timestamp, forKey: itemId)
             },
             getLastTimestampOfUnreadItem: { itemId in
-                do {
-                    return try await notificationsStorage.async.object(forKey: itemId)
-                } catch {
-                    analytics.capture(error)
-                    return nil
-                }
+                return try? await notificationsStorage.async.object(forKey: itemId)
             }
         )
     }
