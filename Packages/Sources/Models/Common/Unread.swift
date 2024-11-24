@@ -27,7 +27,7 @@ public struct Unread: Codable, Sendable, Hashable {
         public let name: String
         public let authorId: Int
         public let authorName: String
-        public let lastMessageId: Int
+        public let timestamp: Int
         public let unreadCount: Int
         public let category: Category
         
@@ -44,7 +44,7 @@ public struct Unread: Codable, Sendable, Hashable {
             name: String,
             authorId: Int,
             authorName: String,
-            lastMessageId: Int,
+            timestamp: Int,
             unreadCount: Int,
             category: Category
         ) {
@@ -52,7 +52,7 @@ public struct Unread: Codable, Sendable, Hashable {
             self.name = name
             self.authorId = authorId
             self.authorName = authorName
-            self.lastMessageId = lastMessageId
+            self.timestamp = timestamp
             self.unreadCount = unreadCount
             self.category = category
         }
@@ -69,7 +69,7 @@ public extension Unread {
                 name: "ForPDA now with Notifications",
                 authorId: 1234536,
                 authorName: "ForPDA",
-                lastMessageId: 21315526,
+                timestamp: 21315526,
                 unreadCount: 2,
                 category: Item.Category.qms
             )

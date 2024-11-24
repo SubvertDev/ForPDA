@@ -45,8 +45,8 @@ public struct CacheClient: Sendable {
     public var getLastBackgroundTaskInvokeTime: @Sendable () async -> TimeInterval?
     
     // Notifications
-    public var setLastMessageOfUnreadItem: @Sendable (_ messageId: Int, _ dialogId: Int) async -> Void
-    public var getLastMessageOfUnreadItem: @Sendable (_ messageId: Int) async -> Int?
+    public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
+    public var getLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int) async -> Int?
 }
 
 // MARK: - Dependency Key
@@ -190,16 +190,16 @@ extension CacheClient: DependencyKey {
             
             // MARK: - Notifications
             
-            setLastMessageOfUnreadItem: { messageId, dialogId in
+            setLastTimestampOfUnreadItem: { timestamp, itemId in
                 do {
-                    try await notificationsStorage.async.setObject(messageId, forKey: dialogId)
+                    try await notificationsStorage.async.setObject(timestamp, forKey: itemId)
                 } catch {
                     analytics.capture(error)
                 }
             },
-            getLastMessageOfUnreadItem: { dialogId in
+            getLastTimestampOfUnreadItem: { itemId in
                 do {
-                    return try await notificationsStorage.async.object(forKey: dialogId)
+                    return try await notificationsStorage.async.object(forKey: itemId)
                 } catch {
                     analytics.capture(error)
                     return nil
