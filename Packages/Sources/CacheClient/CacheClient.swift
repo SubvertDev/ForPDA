@@ -39,6 +39,7 @@ public struct CacheClient: Sendable {
     // Post Content
     public var cacheParsedPostContent: @Sendable (_ id: Int, _ content: NSAttributedString) async -> Void
     public var getParsedPostContent: @Sendable (_ id: Int) async -> NSAttributedString?
+    public var removeAllParsedPostContent: @Sendable () async -> Void
     
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
@@ -167,6 +168,13 @@ extension CacheClient: DependencyKey {
                 } catch {
                     analytics.capture(error)
                     return nil
+                }
+            },
+            removeAllParsedPostContent: {
+                do {
+                    try await parsedPostsContentStorage.async.removeAll()
+                } catch {
+                    analytics.capture(error)
                 }
             },
             

@@ -24,7 +24,8 @@ public struct UserQuote: Hashable {
 public enum TopicType: Hashable, Equatable {
     case error
     case text(NSAttributedString)
-    case image(Int)
+    case attachment(Int)
+    case image(URL)
     case center([TopicType])
     case right([TopicType])
     case spoiler([TopicType], NSAttributedString?)
@@ -45,6 +46,7 @@ public struct TopicBuilder {
                 "[center]",
                 "[right]",
                 "[attachment=",
+                "[img]",
                 "[quote]", // plain quote
                 "[quote=", // quoute="text"
                 "[quote ", // quote name="name"...
@@ -100,7 +102,13 @@ public struct TopicBuilder {
                 case "[attachment=":
                     let parts = extractText(from: remainingText, startTag: "[attachment=\"", endTag: "\"]")
                     let imageId = parts.0.string.split(separator: ":")[0]
-                    result.append(.image(Int(imageId)!))
+                    result.append(.attachment(Int(imageId)!))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
+                case "[img]":
+                    let parts = extractText(from: remainingText, startTag: "[img]", endTag: "[/img]")
+                    let imageUrl = parts.0.string
+                    result.append(.image(URL(string: imageUrl)!))
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
                 case "[quote]":

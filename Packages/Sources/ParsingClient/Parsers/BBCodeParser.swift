@@ -10,6 +10,8 @@ import ZMarkupParser
 
 public final class BBCodeParser {
     
+    public static let version = 2
+    
     // MARK: - Default Parsing
     
     public static func parse(_ text: String?, fontStyle: UIFont.TextStyle = .body) -> NSAttributedString? {

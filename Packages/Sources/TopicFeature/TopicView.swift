@@ -43,18 +43,30 @@ public struct TopicView: View {
                 }
             }
             
-        case let .image(imageId):
+        case let .attachment(imageId):
             if let attachment = attachments.first(where: { $0.id == imageId }),
                let metadata = attachment.metadata,
                let url = URL(string: metadata.url) {
                 LazyImage(url: url) { state in
-                    if let image = state.image { image.resizable().scaledToFill() }
+                    Group {
+                        if let image = state.image { image.resizable().scaledToFill() }
+                    }
+                    .skeleton(with: state.isLoading, shape: .rectangle)
                 }
                 .frame(
-                    width: UIScreen.main.bounds.width / 2,
-                    height: CGFloat(metadata.height) / CGFloat(metadata.width) * UIScreen.main.bounds.width / 2
+                    width: UIScreen.main.bounds.width / 1.5,
+                    height: CGFloat(metadata.height) / CGFloat(metadata.width) * UIScreen.main.bounds.width / 1.5
                 )
             }
+            
+        case let .image(url):
+            LazyImage(url: url) { state in
+                Group {
+                    if let image = state.image { image.resizable().scaledToFill() }
+                }
+                .skeleton(with: state.isLoading, shape: .rectangle)
+            }
+            .frame(width: UIScreen.main.bounds.width / 1.5)
             
         case let .center(types):
             VStack(alignment: .center) {

@@ -23,6 +23,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.appStorage(ParserSettings.key)) var parserVersion: Int = 1
         public init() {}
     }
     
@@ -55,7 +56,12 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
                 cacheClient.configure()
                 
-                return .run { send in
+                return .run { [parserVersion = state.parserVersion] send in
+                    if ParserSettings.version > parserVersion {
+                        logger.warning("Parser version outdated, removing posts cache")
+                        await cacheClient.removeAllParsedPostContent()
+                    }
+                    
                     let granted = try await notificationsClient.requestPermission()
                     if granted {
                         logger.info("Notifications permission are granted")
