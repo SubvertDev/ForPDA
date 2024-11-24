@@ -71,10 +71,10 @@ extension NotificationsClient: DependencyKey {
                         content.title = "Новое на форуме"
                         content.body = item.name
                     case .topic:
-                        content.title = "\(item.authorName) в топике"
+                        content.title = "\(item.authorName) в теме"
                         content.body = item.name
                     case .forumMention:
-                        content.title = "Упоминание в топике \(item.name)"
+                        content.title = "Упоминание в теме \(item.name)"
                         content.body = "\(item.authorName) ссылается на вас"
                     case .siteMention:
                         content.title = "Упоминание в новости \(item.name)"
