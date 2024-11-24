@@ -76,7 +76,7 @@ public struct TopicFeature: Reducer, Sendable {
             case .onTask:
                 return .send(._loadTopic(offset: 0))
                 
-            case let .userAvatarTapped(userId: userId):
+            case .userAvatarTapped:
                 return .none
 
             case let .pageNavigation(.offsetChanged(to: newOffset)):

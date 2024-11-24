@@ -61,17 +61,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
+		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +111,6 @@
 				B8133B4A2C7FA3C800506430 /* Packages */,
 				B8AB63BE2AA49F6100F2CEFF /* OpenInAppExtension */,
 				B8D351F6293CABB6008A84EA /* Products */,
-				B8DEB2282BAB839300AD97C6 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -144,13 +133,6 @@
 				B82B2EFE2A8942E900CB067C /* Info.plist */,
 			);
 			path = App;
-			sourceTree = "<group>";
-		};
-		B8DEB2282BAB839300AD97C6 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
