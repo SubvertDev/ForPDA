@@ -13,6 +13,7 @@ import BookmarksFeature
 import ForumsListFeature
 import ForumFeature
 import TopicFeature
+import AnnouncementFeature
 import FavoritesFeature
 import HistoryFeature
 import MenuFeature
@@ -164,6 +165,9 @@ public struct AppView: View {
                 
             case let .profile(store):
                 ProfileScreen(store: store)
+                
+            case let .announcement(store):
+                AnnouncementScreen(store: store)
                 
             case let .settingsPath(path):
                 SettingsPath(path)

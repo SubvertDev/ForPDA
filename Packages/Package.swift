@@ -16,6 +16,7 @@ let package = Package(
         .library(name: "ForumsListFeature", targets: ["ForumsListFeature"]),
         .library(name: "ForumFeature", targets: ["ForumFeature"]),
         .library(name: "TopicFeature", targets: ["TopicFeature"]),
+        .library(name: "AnnouncementFeature", targets: ["AnnouncementFeature"]),
         .library(name: "FavoritesFeature", targets: ["FavoritesFeature"]),
         .library(name: "HistoryFeature", targets: ["HistoryFeature"]),
         .library(name: "MenuFeature", targets: ["MenuFeature"]),
@@ -72,6 +73,7 @@ let package = Package(
                 "ForumsListFeature",
                 "ForumFeature",
                 "TopicFeature",
+                "AnnouncementFeature",
                 "FavoritesFeature",
                 "HistoryFeature",
                 "MenuFeature",
@@ -182,6 +184,23 @@ let package = Package(
                 "AnalyticsClient",
                 "ParsingClient",
                 "PersistenceKeys",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+                .product(name: "RichTextKit", package: "RichTextKit"),
+                .product(name: "NukeUI", package: "nuke")
+            ]
+        ),
+        .target(
+            name: "AnnouncementFeature",
+            dependencies: [
+                "PageNavigationFeature",
+                "Models",
+                "SharedUI",
+                "APIClient",
+                "CacheClient",
+                "AnalyticsClient",
+                "ParsingClient",
+                "PersistenceKeys",
+                "TopicFeature", // for BB codes
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "RichTextKit", package: "RichTextKit"),
                 .product(name: "NukeUI", package: "nuke")

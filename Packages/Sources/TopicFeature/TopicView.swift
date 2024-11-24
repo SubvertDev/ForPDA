@@ -12,13 +12,13 @@ import SFSafeSymbols
 import Models
 import RichTextKit
 
-struct TopicView: View {
+public struct TopicView: View {
         
     let type: TopicType
     let attachments: [Post.Attachment]
     let textAlignment: NSTextAlignment?
     
-    init(
+    public init(
         type: TopicType,
         attachments: [Post.Attachment],
         alignment: NSTextAlignment? = nil
@@ -28,7 +28,7 @@ struct TopicView: View {
         self.textAlignment = alignment
     }
     
-    var body: some View {
+    public var body: some View {
         switch type {
         case .error:
             Text("Whoops, something went wrong while parsing this post :(", bundle: .module)
