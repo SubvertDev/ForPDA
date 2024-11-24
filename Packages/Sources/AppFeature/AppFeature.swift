@@ -13,6 +13,7 @@ import BookmarksFeature
 import ForumsListFeature
 import ForumFeature
 import TopicFeature
+import AnnouncementFeature
 import FavoritesFeature
 import HistoryFeature
 import MenuFeature
@@ -59,6 +60,7 @@ public struct AppFeature: Reducer, Sendable {
         case forum(ForumFeature)
         case topic(TopicFeature)
         case profile(ProfileFeature)
+        case announcement(AnnouncementFeature)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
@@ -526,6 +528,10 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
                 state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                return .none
+                
+            case let .forumPath(.element(id: _, action: .forum(.announcementTapped(id, name)))):
+                state.forumPath.append(.announcement(AnnouncementFeature.State(announcementId: id, announcementName: name)))
                 return .none
                 
             case let .forumPath(.element(id: _, action: .topic(.userAvatarTapped(userId: userId)))):

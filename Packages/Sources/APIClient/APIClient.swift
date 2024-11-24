@@ -43,6 +43,7 @@ public struct APIClient: Sendable {
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
+    public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
@@ -186,6 +187,10 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
             },
+            getAnnouncement: { id in
+                let response = try await api.get(ForumCommand.announcement(linkId: id))
+                return try await parser.parseAnnouncement(response)
+            },
             
             // MARK: - Extra
             
@@ -269,6 +274,9 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
+            getAnnouncement: { _ in
+                return .mock
+            },
             getUnread: {
                 return .mock
             },

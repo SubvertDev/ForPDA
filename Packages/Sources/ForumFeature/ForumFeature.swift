@@ -50,6 +50,7 @@ public struct ForumFeature: Reducer, Sendable {
         case settingsButtonTapped
         case topicTapped(id: Int)
         case subforumTapped(id: Int, name: String)
+        case announcementTapped(id: Int, name: String)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -93,6 +94,9 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
             
             case .subforumTapped:
+                return .none
+                
+            case .announcementTapped:
                 return .none
                 
             case let ._forumResponse(.success(forum)):

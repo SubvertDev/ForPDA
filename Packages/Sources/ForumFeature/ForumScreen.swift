@@ -124,7 +124,7 @@ public struct ForumScreen: View {
         Section {
             ForEach(announcements) { announcement in
                 Row(title: announcement.name) {
-                    store.send(.topicTapped(id: announcement.id))
+                    store.send(.announcementTapped(id: announcement.id, name: announcement.name))
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
