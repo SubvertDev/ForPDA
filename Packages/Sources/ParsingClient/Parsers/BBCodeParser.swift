@@ -16,6 +16,14 @@ public final class BBCodeParser {
         guard let inputText = text else { return nil }
         var text = inputText
         
+        let pattern = #"\[font=([^\]]+)\]\[size=([^\]]+)\](.*?)\[/size\]\[/font\]"#
+        let replacement = "[size=$2][font=$1]$3[/font][/size]"
+        
+        // Quickfix for font disappearing problem
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            text = regex.stringByReplacingMatches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count), withTemplate: replacement)
+        }
+        
         func replaceCodes(from text: inout String) {
             text = text.replacingOccurrences(of: "\n", with: "<br>") // New line / line break
             text = text.replacingOccurrences(of: "\\[b\\](.*?)\\[\\/b\\]", with: "<b>$1</b>", options: .regularExpression) // Bold
