@@ -56,10 +56,13 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
                 cacheClient.configure()
                 
-                return .run { [parserVersion = state.parserVersion] send in
-                    if ParserSettings.version > parserVersion {
+                return .run { [parserVersion = state.$parserVersion] send in
+                    if ParserSettings.version > parserVersion.wrappedValue {
                         logger.warning("Parser version outdated, removing posts cache")
                         await cacheClient.removeAllParsedPostContent()
+                        await parserVersion.withLock { $0 = ParserSettings.version }
+                    } else {
+                        logger.info("Parser version match (\(parserVersion.wrappedValue))")
                     }
                     
                     let granted = try await notificationsClient.requestPermission()
