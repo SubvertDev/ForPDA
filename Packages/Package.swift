@@ -41,7 +41,7 @@ let package = Package(
         // Shared
         .library(name: "Models", targets: ["Models"]),
         .library(name: "SharedUI", targets: ["SharedUI"]),
-        .library(name: "TCAExtensions", targets: ["TCAExtensions"]),
+        .library(name: "TCAExtensions", targets: ["TCAExtensions"])
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.16.0"),
@@ -456,6 +456,14 @@ let package = Package(
             name: "AppFeatureTests",
             dependencies: [
                 "AppFeature",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .testTarget(
+            name: "ArticlesListFeatureTests",
+            dependencies: [
+                "ArticlesListFeature",
+                "Models",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         )

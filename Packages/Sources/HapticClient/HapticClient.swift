@@ -76,4 +76,8 @@ extension HapticClient: DependencyKey {
             }
         }
     )
+    
+    public static let testValue = Self(
+        play: { _ in }
+    )
 }

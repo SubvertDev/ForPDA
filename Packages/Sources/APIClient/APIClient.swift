@@ -295,6 +295,10 @@ extension APIClient: DependencyKey {
         )
     }
     
+    // MARK: - Test Value
+    
+    public static let testValue = Self()
+    
     // MARK: - Helper methods
     
     private static func fetchWithCache<T>(

@@ -47,7 +47,7 @@ extension ArticlesListFeature {
                 case .settingsButtonTapped:
                     analyticsClient.log(ArticlesListEvent.settingsButtonTapped)
                     
-                case .onFirstAppear:
+                case .onAppear:
                     break // TODO: Make First App Open/App Session here?
                     
                 case .onRefresh:

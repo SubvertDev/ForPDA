@@ -26,4 +26,8 @@ extension PasteboardClient: DependencyKey {
             UIPasteboard.general.string = string
         }
     )
+    
+    public static let testValue = Self(
+        copy: { _ in }
+    )
 }

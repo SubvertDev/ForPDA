@@ -1,28 +1,42 @@
-import XCTest
-import ComposableArchitecture
-import AppFeature
-import ArticlesListFeature
-import NewsFeature
+import Foundation
+import Testing
 import Models
+import ComposableArchitecture
 
-final class AppFeatureTests: XCTestCase {
+@testable import AppFeature
+
+import ArticleFeature
+import SettingsFeature
+
+@MainActor
+@Suite("App Tests")
+struct AppFeatureTest {
     
-    @MainActor
-    func testOpenNews() async {
-        let news = NewsPreview.mock
-        
-        let store = TestStore(
-            initialState: AppFeature.State(
-                articlesList: ArticlesListFeature.State(
-                    articles: []
-                )
-            )
-        ) {
+    init() { uncheckedUseMainSerialExecutor = true }
+    
+    @Test("Open article")
+    func openArticle() async throws {
+        let store = TestStore(initialState: AppFeature.State()) {
             AppFeature()
         }
         
-        await store.send(\.articlesList.articleTapped, article.id) {
-            $0.path[id: 0] = .news(NewsFeature.State(news: news))
+        let preview: ArticlePreview = .mock
+        
+        await store.send(.articlesList(.articleTapped(preview))) {
+            $0.isShowingTabBar = false
+            $0.articlesPath[id: 0] = .article(ArticleFeature.State(articlePreview: preview))
+        }
+    }
+    
+    @Test("Open settings")
+    func openSettings() async throws {
+        let store = TestStore(initialState: AppFeature.State()) {
+            AppFeature()
+        }
+        
+        await store.send(.articlesList(.settingsButtonTapped)) {
+            $0.isShowingTabBar = false
+            $0.articlesPath[id: 0] = .settingsPath(.settings(SettingsFeature.State()))
         }
     }
 }
