@@ -29,19 +29,19 @@ public struct AnnouncementScreen: View {
                     .ignoresSafeArea()
                 
                 if let announcement = store.announcement {
-                    List {
+                    ScrollView {
                         AnnouncementBody(announcement)
                     }
-                    .scrollContentBackground(.hidden)
+                    .padding(16)
                 }
             }
             .overlay {
-                if store.announcement == nil || store.isLoading {
+                if store.announcement == nil {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.announcementName))
+            .navigationTitle(Text(store.name))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 // TODO: Announcement Info?
@@ -73,8 +73,8 @@ public struct AnnouncementScreen: View {
         AnnouncementScreen(
             store: Store(
                 initialState: AnnouncementFeature.State(
-                    announcementId: 0,
-                    announcementName: "Name"
+                    id: 0,
+                    name: "Name"
                 )
             ) {
                 AnnouncementFeature()

@@ -58,9 +58,9 @@ public struct AppFeature: Reducer, Sendable {
     @Reducer(state: .equatable)
     public enum ForumPath {
         case forum(ForumFeature)
+        case announcement(AnnouncementFeature)
         case topic(TopicFeature)
         case profile(ProfileFeature)
-        case announcement(AnnouncementFeature)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
@@ -526,12 +526,12 @@ public struct AppFeature: Reducer, Sendable {
                 state.forumPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
                 return .none
                 
-            case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
-                state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+            case let .forumPath(.element(id: _, action: .forum(.announcementTapped(id, name)))):
+                state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: name)))
                 return .none
                 
-            case let .forumPath(.element(id: _, action: .forum(.announcementTapped(id, name)))):
-                state.forumPath.append(.announcement(AnnouncementFeature.State(announcementId: id, announcementName: name)))
+            case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
+                state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
                 return .none
                 
             case let .forumPath(.element(id: _, action: .topic(.userAvatarTapped(userId: userId)))):

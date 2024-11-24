@@ -40,10 +40,10 @@ public struct APIClient: Sendable {
     // Forum
     public var getForumsList: @Sendable () async throws -> [ForumInfo]
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
+    public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
-    public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
@@ -166,6 +166,10 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage))
                 return try await parser.parseForum(response)
             },
+            getAnnouncement: { id in
+                let response = try await api.get(ForumCommand.announcement(linkId: id))
+                return try await parser.parseAnnouncement(response)
+            },
             getTopic: { id, offset, perPage in
                 let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
                 let response = try await api.get(ForumCommand.Topic.view(data: request))
@@ -186,10 +190,6 @@ extension APIClient: DependencyKey {
 			getHistory: { offset, perPage in
                 let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
-            },
-            getAnnouncement: { id in
-                let response = try await api.get(ForumCommand.announcement(linkId: id))
-                return try await parser.parseAnnouncement(response)
             },
             
             // MARK: - Extra
@@ -265,6 +265,9 @@ extension APIClient: DependencyKey {
             getForum: { _, _, _ in
                 return .mock
             },
+            getAnnouncement: { _ in
+                return .mock
+            },
             getTopic: { _, _, _ in
                 return .mock
             },
@@ -274,9 +277,6 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
-            getAnnouncement: { _ in
-                return .mock
-            },
             getUnread: {
                 return .mock
             },

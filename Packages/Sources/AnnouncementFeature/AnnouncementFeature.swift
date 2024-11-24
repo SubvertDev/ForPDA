@@ -22,23 +22,16 @@ public struct AnnouncementFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        @Shared(.appSettings) var appSettings: AppSettings
-
-        public var announcementId: Int
-        public var announcementName: String
+        public var id: Int
+        public var name: String
         
         public var announcement: Announcement?
         
         var types: [[TopicType]] = []
-
-        public var isLoading = false
-        
-        public init(
-            announcementId: Int,
-            announcementName: String
-        ) {
-            self.announcementId = announcementId
-            self.announcementName = announcementName
+       
+        public init(id: Int, name: String) {
+            self.id = id
+            self.name = name
         }
     }
     
@@ -57,10 +50,6 @@ public struct AnnouncementFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     
-    // MARK: - Cancellable
-    
-    private enum CancelID { case loading }
-    
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
@@ -70,8 +59,8 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 return .send(._loadAnnouncement)
                 
             case ._loadAnnouncement:
-                state.isLoading = true
-                return .run { [id = state.announcementId] send in
+                guard state.announcement == nil else { return .none }
+                return .run { [id = state.id] send in
                     let result = await Result { try await apiClient.getAnnouncement(id: id) }
                     await send(._announcementResponse(result))
                 }
@@ -91,11 +80,9 @@ public struct AnnouncementFeature: Reducer, Sendable {
                     
                     await send(._loadTypes(topicTypes))
                 }
-                .cancellable(id: CancelID.loading)
                 
             case let ._loadTypes(types):
                 state.types = types
-                state.isLoading = false
                 return .none
                 
             case let ._announcementResponse(.failure(error)):
