@@ -14,6 +14,8 @@ import Mixpanel
 import Sentry
 import OSLog
 
+// MARK: - Client
+
 @DependencyClient
 public struct AnalyticsClient: Sendable {
     public var configure: @Sendable (AnalyticsConfiguration) -> Void
@@ -23,12 +25,7 @@ public struct AnalyticsClient: Sendable {
     public var capture: @Sendable (any Error) -> Void
 }
 
-public extension DependencyValues {
-    var analyticsClient: AnalyticsClient {
-        get { self[AnalyticsClient.self] }
-        set { self[AnalyticsClient.self] = newValue }
-    }
-}
+// MARK: - Dependency Keys
 
 extension AnalyticsClient: DependencyKey {
     
@@ -37,20 +34,19 @@ extension AnalyticsClient: DependencyKey {
         
         return AnalyticsClient(
             configure: { config in
-                @Shared(.appStorage("analytics_id")) var analyticsId = UUID().uuidString
+                @Shared(.appStorage(AppStorageKeys.analyticsId)) var analyticsId = UUID().uuidString
                 
-                configureMixpanel(
+                configureAnalytics(
                     id: analyticsId,
-                    isEnabled: config.isAnalyticsEnabled
+                    isEnabled: config.isAnalyticsEnabled,
+                    isDebugEnabled: config.isAnalyticsDebugEnabled
                 )
-                logger.info("Analytics has been succesfully configured. Enabled: \(config.isAnalyticsEnabled)")
                 
-                configureSentry(
+                configureCrashlytics(
                     id: analyticsId,
                     isEnabled: config.isCrashlyticsEnabled,
                     isDebugEnabled: config.isCrashlyticsDebugEnabled
                 )
-                logger.info("Crashlytics has been successfully configured. Enabled: \(config.isCrashlyticsEnabled) / Debug: \(config.isCrashlyticsDebugEnabled)")
             },
             identify: { id in
                 logger.info("Identifying user with id: \(id)")
@@ -74,7 +70,7 @@ extension AnalyticsClient: DependencyKey {
     public static let previewValue = Self(
         configure: { _ in },
         identify: { _ in },
-        logout: {},
+        logout: { },
         log: { event in
             if let properties = event.properties {
                 print("[Analytics] \(event.name) (\(properties))")
@@ -96,38 +92,68 @@ extension AnalyticsClient: DependencyKey {
     )
 }
 
+// MARK: - Configurations
+
 extension AnalyticsClient {
     
-    private static func configureMixpanel(id: String, isEnabled: Bool) {
+    private static func configureAnalytics(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         Mixpanel.initialize(
             token: Secrets.mixpanelToken,
-            trackAutomaticEvents: true, // FIXME: LEGACY, REMOVE. https://docs.mixpanel.com/docs/tracking-methods/sdks/swift#legacy-automatically-tracked-events
-            optOutTrackingByDefault: !isEnabled
+            trackAutomaticEvents: false,
+            useUniqueDistinctId: false
         )
+        
+        Mixpanel.mainInstance().loggingEnabled = isDebugEnabled
+        
+        // Checking for opt out
+        let isOptedOut = Mixpanel.mainInstance().hasOptedOutTracking()
+        if isEnabled && isOptedOut {
+            Mixpanel.mainInstance().optInTracking(distinctId: id, properties: nil)
+        } else if !isEnabled && !isOptedOut {
+            Mixpanel.mainInstance().optOutTracking()
+        }
         
         @Dependency(\.analyticsClient) var analytics
         @Dependency(\.logger[.analytics]) var logger
         @Shared(.userSession) var userSession
         
-        if let mixpanelUserId = Mixpanel.mainInstance().userId {
-            if let userId = userSession?.userId {
-                if String(userId) != mixpanelUserId {
-                    logger.warning("Mixpanel user ID mismatch, changing to \(userId)")
-                    analytics.identify(id: String(userId))
-                } else {
-                    logger.info("Analytics configured successfully")
-                }
+        // Check if we have a current user session and id
+        if let userId = userSession?.userId {
+            // Check if user ID is the same as Mixpanel ID
+            if String(userId) == Mixpanel.mainInstance().userId {
+                // If there's no mismatch, we're configured
+                logger.info("Analytics has been succesfully configured. Enabled: \(isEnabled) / Debug: \(isDebugEnabled)")
             } else {
-                logger.warning("Mixpanel user ID found without user session, logging out")
-                analytics.logout()
+                // If there's mismatch, we're doomed (jk)
+                logger.warning("Mixpanel user ID & user session ID mismatch, identifying as \(userId)")
+                analytics.identify(String(userId))
             }
         } else {
-            logger.info("Mixpanel user ID not found, defaulting to \(id)")
+            logger.info("User session not found, defaulting Mixpanel ID to \(id)")
             Mixpanel.mainInstance().distinctId = id
+        }
+        
+        let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+        let currentAppBuild = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "unknown"
+        
+        // Check if we're opening the app for the first time
+        @Shared(.appStorage(AppStorageKeys.firstTimeOpened)) var firstTimeOpened: Bool = false
+        if !firstTimeOpened && !didOpenForFirstTimeInMixpanel() {
+            firstTimeOpened = true
+            analytics.log(AppEvent.firstTimeOpened)
+        }
+        
+        // Check if we've updated the app since last open
+        @Shared(.appStorage(AppStorageKeys.lastAppVersion)) var lastAppVersion: String?
+        @Shared(.appStorage(AppStorageKeys.lastAppBuild)) var lastAppBuild: String?
+        if currentAppVersion != lastAppVersion || currentAppBuild != lastAppBuild {
+            lastAppVersion = currentAppVersion
+            lastAppBuild = currentAppBuild
+            analytics.log(AppEvent.appUpdated(appVersion: currentAppVersion, buildVersion: currentAppBuild))
         }
     }
     
-    private static func configureSentry(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
+    private static func configureCrashlytics(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         SentrySDK.start { options in
             options.dsn = Secrets.sentryDSN
             options.debug = isDebugEnabled
@@ -140,10 +166,33 @@ extension AnalyticsClient {
             options.swiftAsyncStacktraces = true
         }
         SentrySDK.setUser(User(userId: id))
+        
+        @Dependency(\.logger[.analytics]) var logger
+        logger.info("Crashlytics has been successfully configured. Enabled: \(isEnabled) / Debug: \(isDebugEnabled)")
     }
 }
 
-public enum AnalyticsError: Error {
-    case brokenArticle(URL)
-    case apiFailure(any Error)
+// MARK: - Extensions
+
+extension AnalyticsClient {
+    // For backward compatibility to now spawn lots of first opens after disabling legacy automatic events
+    private static func didOpenForFirstTimeInMixpanel() -> Bool {
+        if let preferencesPath = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first?.appendingPathComponent("Preferences/Mixpanel.plist") {
+            if let data = try? Data(contentsOf: preferencesPath) {
+                if let plist = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] {
+                    for (key, value) in plist where key.contains("MPFirstOpen") {
+                        return value as? Bool ?? false
+                    }
+                }
+            }
+        }
+        return false
+    }
+}
+
+public extension DependencyValues {
+    var analyticsClient: AnalyticsClient {
+        get { self[AnalyticsClient.self] }
+        set { self[AnalyticsClient.self] = newValue }
+    }
 }

@@ -33,7 +33,6 @@ extension ArticlesListFeature {
                         analyticsClient.log(ArticlesListEvent.articleOpenedInBrowser(article.url))
                     case .report:
                         analyticsClient.log(ArticlesListEvent.linkReported(article.url))
-                        analyticsClient.capture(AnalyticsError.brokenArticle(article.url))
                     case .addToBookmarks:
                         analyticsClient.log(ArticlesListEvent.articleAddedToBookmarks(article.url))
                     }
@@ -58,7 +57,7 @@ extension ArticlesListFeature {
                 
                 case ._articlesResponse(.failure(let error)):
                     analyticsClient.log(ArticlesListEvent.articlesHasNotLoaded(error.localizedDescription))
-                    analyticsClient.capture(AnalyticsError.apiFailure(error))
+                    analyticsClient.capture(error)
                     
                 case .loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)

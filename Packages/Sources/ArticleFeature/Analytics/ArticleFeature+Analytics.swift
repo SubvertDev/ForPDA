@@ -55,7 +55,6 @@ extension ArticleFeature {
                         analytics.log(ArticleEvent.linkShareOpened(state.articlePreview.url))
                     case .report:
                         analytics.log(ArticleEvent.linkReported(state.articlePreview.url))
-                        analytics.capture(AnalyticsError.brokenArticle(state.articlePreview.url))
                     }
                     
                 case let .linkShared(success, url):

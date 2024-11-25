@@ -23,7 +23,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
-        @Shared(.appStorage(ParserSettings.key)) var parserVersion: Int = 1
+        @Shared(.appStorage(AppStorageKeys.parserVersion)) var parserVersion: Int = 1
         public init() {}
     }
     
