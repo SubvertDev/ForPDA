@@ -48,7 +48,7 @@ let package = Package(
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "5.3.0"),
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.3.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
-        .package(url: "https://github.com/mixpanel/mixpanel-swift.git", from: "4.3.0"),
+        .package(url: "https://github.com/PostHog/posthog-ios", from: "3.15.7"),
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.39.0"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", branch: "main"),
@@ -366,7 +366,7 @@ let package = Package(
                 "PersistenceKeys",
                 "LoggerClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "Mixpanel", package: "mixpanel-swift"),
+                .product(name: "PostHog", package: "posthog-ios"),
                 .product(name: "Sentry", package: "sentry-cocoa")
             ]
         ),

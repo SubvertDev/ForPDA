@@ -1,5 +1,5 @@
 {
-  "originHash" : "145404a32629fc9781a578dcb11c115553168340661e4986e64845bad4d82a6c",
+  "originHash" : "3580a01713e3fb93d6f541eef67a3531bba4e9e22d37a6eac5473f8e0ae8e9d9",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -65,15 +65,6 @@
       }
     },
     {
-      "identity" : "mixpanel-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mixpanel/mixpanel-swift.git",
-      "state" : {
-        "revision" : "48d6668ceaaefc338f94e2b084c3cf77b90182f8",
-        "version" : "4.3.0"
-      }
-    },
-    {
       "identity" : "nuke",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke.git",
@@ -89,6 +80,15 @@
       "state" : {
         "revision" : "71b7bcc6aa015eb9674395451fa39461a7b4ba6a",
         "version" : "0.2.0"
+      }
+    },
+    {
+      "identity" : "posthog-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PostHog/posthog-ios",
+      "state" : {
+        "revision" : "f87a1922cbb65f63d3a0dc6491ee3de7da898e15",
+        "version" : "3.15.7"
       }
     },
     {

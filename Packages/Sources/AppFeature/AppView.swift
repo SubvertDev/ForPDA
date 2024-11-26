@@ -98,13 +98,16 @@ public struct AppView: View {
             path: $store.scope(state: \.articlesPath, action: \.articlesPath)
         ) {
             ArticlesListScreen(store: store.scope(state: \.articlesList, action: \.articlesList))
+                .trackAnalytics("Articles List Screen")
         } destination: { store in
             switch store.case {
             case let .article(store):
                 ArticleScreen(store: store)
+                    .trackAnalytics("Article Screen")
                 
             case let .profile(store):
                 ProfileScreen(store: store)
+                    .trackAnalytics("Profile Screen")
                 
             case let .settingsPath(path):
                 SettingsPath(path)
@@ -137,6 +140,7 @@ public struct AppView: View {
             path: $store.scope(state: \.favoritesPath, action: \.favoritesPath)
         ) {
             FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
+                .trackAnalytics("Favorites Screen")
         } destination: { store in
             switch store.case {
             case let .settingsPath(path):
@@ -155,19 +159,24 @@ public struct AppView: View {
             path: $store.scope(state: \.forumPath, action: \.forumPath)
         ) {
             ForumsListScreen(store: store.scope(state: \.forumsList, action: \.forumsList))
+                .trackAnalytics("Forums List Screen")
         } destination: { store in
             switch store.case {
             case let .forum(store):
                 ForumScreen(store: store)
+                    .trackAnalytics("Forum Screen")
             
             case let .topic(store):
                 TopicScreen(store: store)
+                    .trackAnalytics("Topic Screen")
                 
             case let .profile(store):
                 ProfileScreen(store: store)
+                    .trackAnalytics("Profile Screen")
                 
             case let .announcement(store):
                 AnnouncementScreen(store: store)
+                    .trackAnalytics("Announcement Screen")
                 
             case let .settingsPath(path):
                 SettingsPath(path)
@@ -185,10 +194,12 @@ public struct AppView: View {
             path: $store.scope(state: \.profilePath, action: \.profilePath)
         ) {
             ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
+                .trackAnalytics("Profile Screen")
         } destination: { store in
             switch store.case {
             case let .history(store):
                 HistoryScreen(store: store)
+                    .trackAnalytics("History Screen")
             case let .qmsPath(path):
                 QMSPath(path)
             case let .settingsPath(path):
@@ -206,8 +217,10 @@ public struct AppView: View {
         switch store.case {
         case let .qmsList(store):
             QMSListScreen(store: store)
+                .trackAnalytics("QMS List Screen")
         case let .qms(store):
             QMSScreen(store: store)
+                .trackAnalytics("QMS Screen")
         }
     }
     
@@ -218,10 +231,13 @@ public struct AppView: View {
         switch store.case {
         case let .settings(store):
             SettingsScreen(store: store)
+                .trackAnalytics("Settings Screen")
         case let .developer(store):
             DeveloperScreen(store: store)
+                .trackAnalytics("Developer Screen")
         case let .notifications(store):
             NotificationsScreen(store: store)
+                .trackAnalytics("Notifications Settings Screen")
         }
     }
     

@@ -30,16 +30,16 @@ public struct DeveloperFeature: Reducer, Sendable {
         @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
         
         public var lastBackgroundTaskInvokeTime: TimeInterval?
-        public var isMixpanelEnabled: Bool
-        public var isSentryEnabled: Bool
+        public var isAnalyticsEnabled: Bool
+        public var isCrashlyticsEnabled: Bool
         
         public init() {
             if isDebug {
-                self.isMixpanelEnabled = _appSettings.analyticsConfigurationDebug.isAnalyticsEnabled.wrappedValue
-                self.isSentryEnabled = _appSettings.analyticsConfigurationDebug.isCrashlyticsEnabled.wrappedValue
+                self.isAnalyticsEnabled = _appSettings.analyticsConfigurationDebug.isAnalyticsEnabled.wrappedValue
+                self.isCrashlyticsEnabled = _appSettings.analyticsConfigurationDebug.isCrashlyticsEnabled.wrappedValue
             } else {
-                self.isMixpanelEnabled = _appSettings.analyticsConfigurationRelease.isAnalyticsEnabled.wrappedValue
-                self.isSentryEnabled = _appSettings.analyticsConfigurationRelease.isCrashlyticsEnabled.wrappedValue
+                self.isAnalyticsEnabled = _appSettings.analyticsConfigurationRelease.isAnalyticsEnabled.wrappedValue
+                self.isCrashlyticsEnabled = _appSettings.analyticsConfigurationRelease.isCrashlyticsEnabled.wrappedValue
             }
         }
     }
@@ -77,19 +77,19 @@ public struct DeveloperFeature: Reducer, Sendable {
                     analyticsClient.capture(TestError.test("This is a test error"))
                 }
                 
-            case .binding(\.isMixpanelEnabled):
+            case .binding(\.isAnalyticsEnabled):
                 if isDebug {
-                    state.appSettings.analyticsConfigurationDebug.isAnalyticsEnabled = state.isMixpanelEnabled
+                    state.appSettings.analyticsConfigurationDebug.isAnalyticsEnabled = state.isAnalyticsEnabled
                 } else {
-                    state.appSettings.analyticsConfigurationRelease.isAnalyticsEnabled = state.isMixpanelEnabled
+                    state.appSettings.analyticsConfigurationRelease.isAnalyticsEnabled = state.isAnalyticsEnabled
                 }
                 return .none
                 
-            case .binding(\.isSentryEnabled):
+            case .binding(\.isCrashlyticsEnabled):
                 if isDebug {
-                    state.appSettings.analyticsConfigurationDebug.isCrashlyticsEnabled = state.isSentryEnabled
+                    state.appSettings.analyticsConfigurationDebug.isCrashlyticsEnabled = state.isCrashlyticsEnabled
                 } else {
-                    state.appSettings.analyticsConfigurationRelease.isCrashlyticsEnabled = state.isSentryEnabled
+                    state.appSettings.analyticsConfigurationRelease.isCrashlyticsEnabled = state.isCrashlyticsEnabled
                 }
                 return .none
                 
@@ -132,12 +132,12 @@ public struct DeveloperScreen: View {
                     
                     HStack(spacing: 8) {
                         Text("Is Mixpanel enabled: ")
-                        Toggle("", isOn: $store.isMixpanelEnabled)
+                        Toggle("", isOn: $store.isAnalyticsEnabled)
                     }
                     
                     HStack(spacing: 8) {
                         Text("Is Sentry enabled: ")
-                        Toggle("", isOn: $store.isSentryEnabled)
+                        Toggle("", isOn: $store.isCrashlyticsEnabled)
                     }
                     
                     Button("Send test crash to Sentry") {
