@@ -15,6 +15,11 @@ public enum QuoteType: Hashable {
     case user(UserQuote)
 }
 
+public enum CodeType: Hashable {
+    case none
+    case title(String)
+}
+
 public struct UserQuote: Hashable {
     public let name: String
     public let date: String
@@ -26,10 +31,12 @@ public enum TopicType: Hashable, Equatable {
     case text(NSAttributedString)
     case attachment(Int)
     case image(URL)
+    case left([TopicType])
     case center([TopicType])
     case right([TopicType])
     case spoiler([TopicType], NSAttributedString?)
     case quote(NSAttributedString, QuoteType)
+    case code(NSAttributedString, CodeType)
     case mergetime(Date)
 }
 
@@ -43,13 +50,16 @@ public struct TopicBuilder {
             let tags = [
                 "[spoiler=",
                 "[spoiler]",
+                "[left]",
                 "[center]",
                 "[right]",
                 "[attachment=",
                 "[img]",
-                "[quote]", // plain quote
+                "[quote]",
                 "[quote=", // quoute="text"
                 "[quote ", // quote name="name"...
+                "[code]",
+                "[code=", // code="text"
                 "Добавлено [mergetime]"
             ] // Add new tags as needed
             
@@ -87,6 +97,12 @@ public struct TopicBuilder {
                     result.append(.spoiler(types, spoiler.additionalInfo))
                     remainingText = spoiler.remainingText ?? NSAttributedString(string: "")
                     
+                case "[left]":
+                    let parts = extractText(from: remainingText, startTag: "[left]", endTag: "[/left]")
+                    let types = try! TopicBuilder.build(from: parts.0)
+                    result.append(.center(types))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
                 case "[center]":
                     let parts = extractText(from: remainingText, startTag: "[center]", endTag: "[/center]")
                     let types = try! TopicBuilder.build(from: parts.0)
@@ -118,7 +134,10 @@ public struct TopicBuilder {
                     
                 case "[quote=":
                     let parts = extractText(from: remainingText, startTag: "[quote=", endTag: "[/quote]")
-                    result.append(.quote(parts.0.trimmedAttributedString(), .title("Заголовок")))
+                    let splitted = parts.0.string.split(separator: "]")
+                    let title = String(splitted[0].dropFirst().dropLast(2))
+                    let text = parts.0.removingFirstNCharacters(title.count + 3)
+                    result.append(.quote(text.trimmedAttributedString(), .title("Заголовок"))) // FIXME: Заголовок недоделан
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
                 case "[quote ":
@@ -128,6 +147,19 @@ public struct TopicBuilder {
                     let joined = dropAndJoinAttributedStrings(quoteParts)
                     let text = joined.trimmedAttributedString()
                     result.append(.quote(text, .user(userInfo)))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
+                case "[code]":
+                    let parts = extractText(from: remainingText, startTag: "[code]", endTag: "[/code]")
+                    result.append(.code(parts.0.trimmedAttributedString(), .none))
+                    remainingText = parts.1 ?? NSAttributedString(string: "")
+                    
+                case "[code=":
+                    let parts = extractText(from: remainingText, startTag: "[code=", endTag: "[/code]")
+                    let splitted = parts.0.string.split(separator: "]")
+                    let title = String(splitted[0].dropFirst().dropLast(2))
+                    let text = parts.0.removingFirstNCharacters(title.count + 3)
+                    result.append(.code(text.trimmedAttributedString(), .title(title)))
                     remainingText = parts.1 ?? NSAttributedString(string: "")
                     
                 case "Добавлено [mergetime]":
@@ -376,10 +408,7 @@ extension NSAttributedString {
         let trimmedRange = startLocation...endLocation
         return attributedSubstring(from: NSRange(trimmedRange, in: string))
     }
-}
 
-
-private extension NSAttributedString {
     func components(separatedBy separator: String) -> [NSAttributedString] {
         var result = [NSAttributedString]()
         let separatedStrings = string.components(separatedBy: separator)
@@ -391,5 +420,11 @@ private extension NSAttributedString {
             range.location += range.length + separator.utf16.count
         }
         return result
+    }
+
+    func removingFirstNCharacters(_ n: Int) -> NSAttributedString {
+        guard n < self.length else { fatalError() }
+        let rangeToKeep = NSRange(location: n, length: self.length - n)
+        return self.attributedSubstring(from: rangeToKeep)
     }
 }

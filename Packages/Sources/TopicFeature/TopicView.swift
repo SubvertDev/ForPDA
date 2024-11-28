@@ -74,6 +74,13 @@ public struct TopicView: View {
             }
             .frame(width: UIScreen.main.bounds.width / 1.5)
             
+        case let .left(types):
+            VStack(alignment: .leading) {
+                ForEach(types, id: \.self) { type in
+                    TopicView(type: type, attachments: attachments, alignment: .left, onUrlTap: onUrlTap)
+                }
+            }
+            
         case let .center(types):
             VStack(alignment: .center) {
                 ForEach(types, id: \.self) { type in
@@ -95,44 +102,12 @@ public struct TopicView: View {
         case let .quote(text, type):
             QuoteView(text: text, type: type, onUrlTap: onUrlTap)
             
+        case let .code(text, type):
+            CodeView(text: text, type: type, onUrlTap: onUrlTap)
+            
         case let .mergetime(date):
             RichText(text: "Добавлено: \(date.formatted())".asNSAttributedString(font: .footnote))
         }
-    }
-}
-
-// MARK: - Quote View
-
-struct QuoteView: View {
-    
-    let text: NSAttributedString
-    let type: QuoteType
-    let onUrlTap: URLTapHandler?
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Group {
-                switch type {
-                case .none:
-                    Text("Quote", bundle: .module)
-                    
-                case let .title(title):
-                    Text("Quote: \(title)", bundle: .module)
-                    
-                case let .user(user):
-                    Text("Quote: \(user.name) @ \(user.date)", bundle: .module)
-                }
-            }
-            .padding(.vertical, 4)
-            .padding(.horizontal, 8)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.Main.primaryAlpha)
-            
-            RichText(text: text, onUrlTap: onUrlTap)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
-        }
-        .border(Color.Main.primaryAlpha)
     }
 }
 
@@ -181,6 +156,73 @@ struct SpoilerView: View {
         }
         .border(Color.Main.primaryAlpha)
         .animation(.default, value: isExpanded)
+    }
+}
+
+// MARK: - Quote View
+
+struct QuoteView: View {
+    
+    let text: NSAttributedString
+    let type: QuoteType
+    let onUrlTap: URLTapHandler?
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Group {
+                switch type {
+                case .none:
+                    Text("Quote", bundle: .module)
+                    
+                case let .title(title):
+                    Text("Quote: \(title)", bundle: .module)
+                    
+                case let .user(user):
+                    Text("Quote: \(user.name) @ \(user.date)", bundle: .module)
+                }
+            }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.Main.primaryAlpha)
+            
+            RichText(text: text, onUrlTap: onUrlTap)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
+        }
+        .border(Color.Main.primaryAlpha)
+    }
+}
+
+// MARK: - Code View
+
+struct CodeView: View {
+    
+    let text: NSAttributedString
+    let type: CodeType
+    let onUrlTap: URLTapHandler?
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Group {
+                switch type {
+                case .none:
+                    Text("Code", bundle: .module)
+                    
+                case let .title(title):
+                    Text("Code: \(title)", bundle: .module)
+                }
+            }
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.Main.red.opacity(0.5)) // TODO: Change color
+            
+            RichText(text: text, onUrlTap: onUrlTap)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
+        }
+        .border(Color.Main.red)
     }
 }
 

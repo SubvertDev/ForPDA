@@ -10,7 +10,13 @@ import ZMarkupParser
 
 public final class BBCodeParser {
     
-    public static let version = 2
+    // MARK: - Fast Parsing
+    
+    nonisolated(unsafe) public static var fastParser = ZHTMLParserBuilder.initWithDefault().build()
+    
+    public static func fastParse(_ text: String) -> String {
+        return fastParser.render(text).string
+    }
     
     // MARK: - Default Parsing
     
@@ -24,6 +30,11 @@ public final class BBCodeParser {
         // Quickfix for font disappearing problem
         if let regex = try? NSRegularExpression(pattern: pattern) {
             text = regex.stringByReplacingMatches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count), withTemplate: replacement)
+        }
+        
+        // Quickfix for code that contains parsable string - MIUI page 20
+        if text.contains("[code]") {
+            text = transformCodeTags(in: text)
         }
         
         func replaceCodes(from text: inout String) {
@@ -67,7 +78,12 @@ public final class BBCodeParser {
             }))
             .build()
         
-        let renderedText = parser.render(text)
+        var renderedText = parser.render(text)
+        
+        // Quickfix for code that contains parsable string - MIUI page 20
+        if text.contains("[code]") {
+            renderedText = reverseTransformCodeTags(in: renderedText)
+        }
         
         // Making text color adapt to dark mode
         let mutableString = NSMutableAttributedString(attributedString: renderedText)
@@ -87,12 +103,57 @@ public final class BBCodeParser {
         return NSAttributedString(attributedString: mutableString)
     }
     
-    // MARK: - Fast Parsing
+    // MARK: - Helpers
     
-    nonisolated(unsafe) public static var fastParser = ZHTMLParserBuilder.initWithDefault().build()
+    private static func transformCodeTags(in string: String) -> String {
+        let pattern = "\\[code\\](.*?)\\[/code\\]"
+        let regex = try! NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators)
+
+        let range = NSRange(string.startIndex..<string.endIndex, in: string)
+        var transformedString = string
+
+        regex.enumerateMatches(in: string, options: [], range: range) { match, _, _ in
+            guard let match = match,
+                  let matchRange = Range(match.range(at: 1), in: string) else { return }
+
+            let codeContent = string[matchRange]
+            let transformedCodeContent = codeContent
+                .replacingOccurrences(of: "&lt;", with: "≤")
+                .replacingOccurrences(of: "%gt;", with: "≥")
+            
+            transformedString = transformedString.replacingOccurrences(of: String(codeContent), with: transformedCodeContent)
+        }
+
+        return transformedString
+    }
     
-    public static func fastParse(_ text: String) -> String {
-        return fastParser.render(text).string
+    private static func reverseTransformCodeTags(in attributedString: NSAttributedString) -> NSAttributedString {
+        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
+        let fullRange = NSRange(location: 0, length: mutableAttributedString.length)
+        
+        // Define regex to find [code]...[/code]
+        let pattern = "\\[code\\](.*?)\\[/code\\]"
+        let regex = try! NSRegularExpression(pattern: pattern, options: .dotMatchesLineSeparators)
+        
+        // Enumerate matches to find ranges of `[code]` blocks
+        regex.enumerateMatches(in: mutableAttributedString.string, options: [], range: fullRange) { match, _, _ in
+            guard let match = match else { return }
+            let codeRange = match.range(at: 1) // Captured content inside [code]...[/code]
+
+            // Extract the text within the range
+            let codeContent = mutableAttributedString.attributedSubstring(from: codeRange).string
+
+            // Replace ≤ with < and ≥ with >
+            let transformedText = codeContent
+                .replacingOccurrences(of: "≤", with: "<")
+                .replacingOccurrences(of: "≥", with: ">")
+
+            // Replace the range in the attributed string
+            let transformedAttributedString = NSAttributedString(string: transformedText, attributes: mutableAttributedString.attributes(at: codeRange.location, effectiveRange: nil))
+            mutableAttributedString.replaceCharacters(in: codeRange, with: transformedAttributedString)
+        }
+        
+        return mutableAttributedString
     }
 }
 
