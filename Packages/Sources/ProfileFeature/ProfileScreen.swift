@@ -125,6 +125,7 @@ public struct ProfileScreen: View {
             }
             
             if let signature = user.signatureAttributed {
+                // FIXME: Change to local RichText
                 RichTextEditor(text: .constant(signature), context: .init()) {
                     ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
@@ -226,6 +227,7 @@ public struct ProfileScreen: View {
                             Text("Status", bundle: .module)
                                 .font(.footnote)
                                 .foregroundStyle(Color.Labels.teritary)
+                            // FIXME: Change to local RichText
                             RichTextEditor(text: .constant(status), context: .init()) {
                                 ($0 as? UITextView)?.backgroundColor = .clear
                                 ($0 as? UITextView)?.textAlignment = .center

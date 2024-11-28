@@ -159,7 +159,9 @@ public struct TopicScreen: View {
         VStack(spacing: 8) {
             if let postIndex = store.topic?.posts.firstIndex(of: post) {
                 ForEach(store.types[postIndex], id: \.self) { type in
-                    TopicView(type: type, attachments: post.attachments)
+                    TopicView(type: type, attachments: post.attachments) { url in
+                        store.send(.urlTapped(url))
+                    }
                 }
             }
         }
