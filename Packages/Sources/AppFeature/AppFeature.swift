@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import DeeplinkHandler
 import ArticlesListFeature
 import ArticleFeature
 import BookmarksFeature
@@ -253,7 +254,7 @@ public struct AppFeature: Reducer, Sendable {
             case .onAppear:
                 return .run { send in
                     do {
-                        await apiClient.setLogResponses(type: .none)
+                        await apiClient.setLogResponses(.none)
                         try await apiClient.connect()
                     } catch {
                         await send(._failedToConnect(error))
@@ -297,30 +298,20 @@ public struct AppFeature: Reducer, Sendable {
                 // MARK: - Deeplink
                 
             case .deeplink(let url):
-                switch url.host {
-                case "news":
-                    // TODO: Make DeeplinkHandlerClient?
-                    guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else { fatalError() }
-                    urlComponents.scheme = "https"
-                    urlComponents.host =   "4pda.to"
-                    
-                    // TODO: Refactor. Add crashlytics?
-                    let url            = urlComponents.url ?? URL(string: "/")!
-                    let titleEncoded   = urlComponents.queryItems?.first?.value ?? ""
-                    let title          = titleEncoded.removingPercentEncoding ?? ""
-                    let imageUrlString = urlComponents.queryItems?[1].value
-                    let imageUrl       = URL(string: imageUrlString ?? "/")!
-                    
-                    // TODO: Has duplicate in ArticleFeature
-                    let regex = #//([\d]{6})//#
-                    let match = url.absoluteString.firstMatch(of: regex)
-                    let id = Int(match!.output.1)!
-                    
-                    let articlePreview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                    state.articlesPath.append(.article(ArticleFeature.State(articlePreview: articlePreview)))
-                    
-                default: // For new deeplink usage cases
-                    break
+                do {
+                    let deeplink = try DeeplinkHandler().handleOuterURL(url)
+                    switch deeplink.tab {
+                    case let .articles(.article(id, title, imageUrl)):
+                        let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
+                        state.articlesPath.append(.article(ArticleFeature.State(articlePreview: preview)))
+                        
+                    default:
+                        // TODO: Add other handlers later
+                        break
+                    }
+                } catch {
+                    analyticsClient.capture(error)
+                    // TODO: Show error in UI?
                 }
                 return .none
                 
@@ -537,6 +528,22 @@ public struct AppFeature: Reducer, Sendable {
             case let .forumPath(.element(id: _, action: .topic(.userAvatarTapped(userId: userId)))):
                 state.forumPath.append(.profile(ProfileFeature.State(userId: userId)))
                 return .none
+            
+            case let .forumPath(.element(id: _, action: .topic(.urlTapped(url)))):
+                do {
+                    if let deeplink = try DeeplinkHandler().handleInnerURL(url), case let .forum(screen) = deeplink.tab {
+                        switch screen {
+                        case let .forum(id: id):
+                            state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: "Error")))
+                        case let .topic(id: id):
+                            state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                        }
+                        return .none
+                    }
+                } catch {
+                    analyticsClient.capture(error)
+                }
+                return .run { _ in await open(url: url) }
                 
             case .forumsList(.settingsButtonTapped),
                  .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):

@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 public enum LoggerCategory: String, Sendable {
     case app
+    case deeplink
     case analytics
     case notifications
 }

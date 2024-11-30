@@ -48,6 +48,7 @@ public struct TopicFeature: Reducer, Sendable {
     public enum Action {
         case onTask
         case userAvatarTapped(userId: Int)
+        case urlTapped(URL)
         case pageNavigation(PageNavigationFeature.Action)
         
         case _loadTopic(offset: Int)
@@ -77,6 +78,11 @@ public struct TopicFeature: Reducer, Sendable {
                 return .send(._loadTopic(offset: 0))
                 
             case .userAvatarTapped:
+                // TODO: Wrap into Delegate action?
+                return .none
+                
+            case .urlTapped:
+                // TODO: Wrap into Delegate action?
                 return .none
 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
@@ -92,7 +98,7 @@ public struct TopicFeature: Reducer, Sendable {
             case let ._loadTopic(offset):
                 state.isLoadingTopic = true
                 return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
-                    let result = await Result { try await apiClient.getTopic(id: id, page: offset, perPage: perPage) }
+                    let result = await Result { try await apiClient.getTopic(id, offset, perPage) }
                     await send(._topicResponse(result))
                 }
                 .cancellable(id: CancelID.loading)

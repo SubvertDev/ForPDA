@@ -10,6 +10,7 @@ let package = Package(
     products: [
         // Features
         .library(name: "AppFeature", targets: ["AppFeature"]),
+        .library(name: "DeeplinkHandler", targets: ["DeeplinkHandler"]),
         .library(name: "ArticlesListFeature", targets: ["ArticlesListFeature"]),
         .library(name: "ArticleFeature", targets: ["ArticleFeature"]),
         .library(name: "BookmarksFeature", targets: ["BookmarksFeature"]),
@@ -67,6 +68,7 @@ let package = Package(
         .target(
             name: "AppFeature",
             dependencies: [
+                "DeeplinkHandler",
                 "ArticlesListFeature",
                 "ArticleFeature",
                 "BookmarksFeature",
@@ -92,6 +94,14 @@ let package = Package(
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "AlertToast", package: "AlertToast")
+            ]
+        ),
+        .target(
+            name: "DeeplinkHandler",
+            dependencies: [
+                "LoggerClient",
+                "AnalyticsClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
             ]
         ),
         .target(

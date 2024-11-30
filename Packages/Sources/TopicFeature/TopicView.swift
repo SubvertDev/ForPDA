@@ -10,22 +10,24 @@ import SharedUI
 import NukeUI
 import SFSafeSymbols
 import Models
-import RichTextKit
 
 public struct TopicView: View {
         
     let type: TopicType
     let attachments: [Post.Attachment]
     let textAlignment: NSTextAlignment?
+    let onUrlTap: URLTapHandler?
     
     public init(
         type: TopicType,
         attachments: [Post.Attachment],
-        alignment: NSTextAlignment? = nil
+        alignment: NSTextAlignment? = nil,
+        onUrlTap: URLTapHandler? = nil
     ) {
         self.type = type
         self.attachments = attachments
         self.textAlignment = alignment
+        self.onUrlTap = onUrlTap
     }
     
     public var body: some View {
@@ -37,11 +39,15 @@ public struct TopicView: View {
                 .background(Color(uiColor: .label))
             
         case let .text(text):
-            RichText(text: text) {
-                if let textAlignment {
-                    ($0 as? UITextView)?.textAlignment = textAlignment
+            RichText(
+                text: text,
+                onUrlTap: onUrlTap,
+                configuration: {
+                    if let textAlignment {
+                        ($0 as? UITextView)?.textAlignment = textAlignment
+                    }
                 }
-            }
+            )
             
         case let .attachment(imageId):
             if let attachment = attachments.first(where: { $0.id == imageId }),
@@ -68,10 +74,17 @@ public struct TopicView: View {
             }
             .frame(width: UIScreen.main.bounds.width / 1.5)
             
+        case let .left(types):
+            VStack(alignment: .leading) {
+                ForEach(types, id: \.self) { type in
+                    TopicView(type: type, attachments: attachments, alignment: .left, onUrlTap: onUrlTap)
+                }
+            }
+            
         case let .center(types):
             VStack(alignment: .center) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, attachments: attachments, alignment: .center)
+                    TopicView(type: type, attachments: attachments, alignment: .center, onUrlTap: onUrlTap)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -79,19 +92,70 @@ public struct TopicView: View {
         case let .right(types):
             VStack(alignment: .trailing) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, attachments: attachments, alignment: .right)
+                    TopicView(type: type, attachments: attachments, alignment: .right, onUrlTap: onUrlTap)
                 }
             }
             
         case let .spoiler(types, info):
-            SpoilerView(types: types, info: info, attachments: attachments)
+            SpoilerView(types: types, info: info, attachments: attachments, onUrlTap: onUrlTap)
             
         case let .quote(text, type):
-            QuoteView(text: text, type: type)
+            QuoteView(text: text, type: type, onUrlTap: onUrlTap)
+            
+        case let .code(text, type):
+            CodeView(text: text, type: type, onUrlTap: onUrlTap)
             
         case let .mergetime(date):
             RichText(text: "Добавлено: \(date.formatted())".asNSAttributedString(font: .footnote))
         }
+    }
+}
+
+// MARK: - Spoiler View
+
+struct SpoilerView: View {
+    
+    @State private var isExpanded = false
+    
+    let types: [TopicType]
+    let info: NSAttributedString?
+    let attachments: [Post.Attachment]
+    let onUrlTap: URLTapHandler?
+    
+    var body: some View {
+        VStack {
+            HStack {
+                if let info {
+                    RichText(text: "Спойлер: ".asNSAttributedString() + info, onUrlTap: onUrlTap, configuration: {
+                        ($0 as? UITextView)?.isSelectable = false
+                    })
+                } else {
+                    RichText(text: "Спойлер".asNSAttributedString(), onUrlTap: onUrlTap, configuration: {
+                        ($0 as? UITextView)?.isSelectable = false
+                    })
+                }
+                
+                Spacer()
+                
+                Image(systemSymbol: isExpanded ? .chevronUp : .chevronDown)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .contentShape(Rectangle())
+            .background(Color.Main.primaryAlpha)
+            .onTapGesture {
+                isExpanded.toggle()
+            }
+            
+            if isExpanded {
+                ForEach(types, id: \.self) { type in
+                    TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                }
+                .padding(8)
+            }
+        }
+        .border(Color.Main.primaryAlpha)
+        .animation(.default, value: isExpanded)
     }
 }
 
@@ -101,6 +165,7 @@ struct QuoteView: View {
     
     let text: NSAttributedString
     let type: QuoteType
+    let onUrlTap: URLTapHandler?
     
     var body: some View {
         VStack(spacing: 8) {
@@ -121,7 +186,7 @@ struct QuoteView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.Main.primaryAlpha)
             
-            RichText(text: text)
+            RichText(text: text, onUrlTap: onUrlTap)
                 .padding(.horizontal, 8)
                 .padding(.bottom, 8)
         }
@@ -129,50 +194,35 @@ struct QuoteView: View {
     }
 }
 
-// MARK: - Spoiler View
+// MARK: - Code View
 
-struct SpoilerView: View {
+struct CodeView: View {
     
-    @State private var isExpanded = false
-    
-    let types: [TopicType]
-    let info: NSAttributedString?
-    let attachments: [Post.Attachment]
+    let text: NSAttributedString
+    let type: CodeType
+    let onUrlTap: URLTapHandler?
     
     var body: some View {
-        VStack {
-            HStack {
-                if let info {
-                    RichText(text: "Спойлер: ".asNSAttributedString() + info) {
-                        ($0 as? UITextView)?.isSelectable = false
-                    }
-                } else {
-                    RichText(text: "Спойлер".asNSAttributedString()) {
-                        ($0 as? UITextView)?.isSelectable = false
-                    }
+        VStack(spacing: 8) {
+            Group {
+                switch type {
+                case .none:
+                    Text("Code", bundle: .module)
+                    
+                case let .title(title):
+                    Text("Code: \(title)", bundle: .module)
                 }
-                
-                Spacer()
-                
-                Image(systemSymbol: isExpanded ? .chevronUp : .chevronDown)
             }
-            .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .contentShape(Rectangle())
-            .background(Color.Main.primaryAlpha)
-            .onTapGesture {
-                isExpanded.toggle()
-            }
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.Main.red.opacity(0.5)) // TODO: Change color
             
-            if isExpanded {
-                ForEach(types, id: \.self) { type in
-                    TopicView(type: type, attachments: attachments)
-                }
-                .padding(8)
-            }
+            RichText(text: text, onUrlTap: onUrlTap)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
         }
-        .border(Color.Main.primaryAlpha)
-        .animation(.default, value: isExpanded)
+        .border(Color.Main.red)
     }
 }
 
