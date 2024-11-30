@@ -41,7 +41,7 @@ public struct AnnouncementScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.name))
+            .navigationTitle(Text(store.name ?? "Загружаем..."))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 // TODO: Announcement Info?
@@ -59,7 +59,9 @@ public struct AnnouncementScreen: View {
         VStack(spacing: 0) {
             ForEach(store.types, id: \.self) { main in
                 ForEach(main, id: \.self) { type in
-                    TopicView(type: type, attachments: []) // TODO: attachments
+                    TopicView(type: type, attachments: []) { url in
+                        store.send(.urlTapped(url))
+                    } // TODO: attachments
                 }
             }
         }

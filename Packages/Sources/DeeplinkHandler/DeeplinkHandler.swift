@@ -24,6 +24,7 @@ public struct Deeplink {
         public enum Forum {
             case forum(id: Int)
             case topic(id: Int)
+            case announcement(id: Int)
         }
     }
 }
@@ -77,18 +78,29 @@ public struct DeeplinkHandler {
     }
     
     public func handleInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink? {
-        let regex = /=(\d+)/
-        
-        guard let match = url.absoluteString.firstMatch(of: regex) else { throw .noRegexMatch }
-        guard let id = Int(match.output.1) else { throw .badIdOnMatch }
+        let regex = /[?&](\w+)=([^&]+)/
+        let matches = url.absoluteString.matches(of: regex)
         
         switch DeeplinkUrlType.unwrap(from: url) {
         case .topic:
+            guard let id = Int(matches[0].output.2) else { throw .badIdOnMatch }
             return Deeplink(tab: .forum(.topic(id: id)))
         case .forum:
+            guard let id = Int(matches[0].output.2) else { throw .badIdOnMatch }
             return Deeplink(tab: .forum(.forum(id: id)))
         case .profile:
+            guard let id = Int(matches[0].output.2) else { throw .badIdOnMatch }
             return Deeplink(tab: .profile(id))
+        case .action:
+            switch (matches[0].output.2) {
+            case "announce":
+                guard let id = Int(matches[2].output.2) else { throw .badIdOnMatch }
+                return Deeplink(tab: .forum(.announcement(id: id)))
+            case "boardrules":
+                return Deeplink(tab: .forum(.announcement(id: 0)))
+            default:
+                return nil
+            }
         case .unknown:
             return nil
         }
@@ -98,6 +110,7 @@ public struct DeeplinkHandler {
         case topic = "showtopic"
         case forum = "showforum"
         case profile = "showuser"
+        case action = "act"
         case unknown
         
         static func unwrap(from url: URL) -> DeeplinkUrlType {
