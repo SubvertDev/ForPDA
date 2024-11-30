@@ -37,6 +37,9 @@ public struct APIClient: Sendable {
     // User
     public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
     
+    // Bookmarks
+    public var getBookmarksList: @Sendable () async throws -> [Bookmark]
+    
     // Forum
     public var getForumsList: @Sendable () async throws -> [ForumInfo]
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
@@ -156,6 +159,12 @@ extension APIClient: DependencyKey {
                 )
             },
             
+            // MARK: - Bookmarks
+            getBookmarksList: {
+                let response = try await api.get(MemberCommand.Bookmarks.list)
+                return try await parser.parseBookmarksList(response)
+            },
+            
             // MARK: - Forum
             
             getForumsList: {
@@ -258,6 +267,9 @@ extension APIClient: DependencyKey {
             },
             getUser: { _ in
                 AsyncThrowingStream { $0.yield(.mock) }
+            },
+            getBookmarksList: {
+                return [.mockArticle, .mockForum, .mockUser]
             },
             getForumsList: {
                 return [.mockCategory, .mock]

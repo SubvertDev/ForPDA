@@ -25,6 +25,9 @@ public struct ParsingClient: Sendable {
     // User
     public var parseUser: @Sendable (_ response: String) async throws -> User
     
+    // Bookmarks
+    public var parseBookmarksList: @Sendable (_ response: String) async throws -> [Bookmark]
+    
     // Forum
     public var parseForumsList: @Sendable (_ response: String) async throws -> [ForumInfo]
     public var parseForum: @Sendable (_ response: String) async throws -> Forum
@@ -66,6 +69,9 @@ extension ParsingClient: DependencyKey {
         },
         parseUser: { response in
             return try ProfileParser.parseUser(from: response)
+        },
+        parseBookmarksList: { response in
+            return try BookmarksParser.parse(from: response)
         },
         parseForumsList: { response in
             return try ForumParser.parseForumList(from: response)
