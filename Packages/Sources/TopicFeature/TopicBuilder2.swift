@@ -57,9 +57,9 @@ public enum TopicType2: Hashable, Equatable {
     case text(String, Metadata)
 //    case attachment(Int)
 //    case image(URL)
-//    case left([TopicType])
+    case left([TopicType2])
     case center([TopicType2])
-//    case right([TopicType])
+    case right([TopicType2])
     case spoiler([TopicType2], String?)
     case quote([TopicType2], QuoteType2?)
 //    case code(NSAttributedString, CodeType)
@@ -70,7 +70,9 @@ public enum TopicType2: Hashable, Equatable {
 
 public enum TopicTypeUI: Hashable, Equatable {
     case text(AttributedString)
+    case left([TopicTypeUI])
     case center([TopicTypeUI])
+    case right([TopicTypeUI])
     case spoiler([TopicTypeUI], String?)
     case quote([TopicTypeUI], QuoteType2?)
     case list([TopicTypeUI])
@@ -82,7 +84,6 @@ public class TopicBuilder2 {
     var spoilerCount = 0
     
     func build2(from content: NSAttributedString) throws -> [TopicTypeUI] {
-        //let content = BBCodeParser.parse("[center][color=red]some text[/color][/center]")! // [center]some text[/center]
         let attributedString = AttributedString(content)
         let scanner = Scanner(string: String(attributedString.characters[...]))
         let types = parse(with: scanner)
@@ -129,9 +130,15 @@ public class TopicBuilder2 {
                     }
                 }
                 
+            case let .left(array):
+                types[index] = .left(applyAttributes(attributedRun, of: attributedString, to: array))
+                
             case let .center(array):
                 types[index] = .center(applyAttributes(attributedRun, of: attributedString, to: array))
                 
+            case let .right(array):
+                types[index] = .right(applyAttributes(attributedRun, of: attributedString, to: array))
+
             case let .spoiler(array, info):
                 types[index] = .spoiler(applyAttributes(attributedRun, of: attributedString, to: array), info)
                 
@@ -160,12 +167,26 @@ public class TopicBuilder2 {
                 return .text(attrStr)
             }
             
+        case .left(let array):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .left(results)
+            
         case .center(let array):
             var results: [TopicTypeUI] = []
             for item in array {
                 results.append(twoToUI(item))
             }
             return .center(results)
+            
+        case .right(let array):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .right(results)
             
         case .spoiler(let array, let string):
             var results: [TopicTypeUI] = []
@@ -194,6 +215,8 @@ public class TopicBuilder2 {
         }
     }
     
+    let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]"]
+    
     func parse(with scanner: Scanner) -> [TopicType2] {
         print("[SCANNER] New instance called")
         var results: [TopicType2] = []
@@ -214,8 +237,8 @@ public class TopicBuilder2 {
             
             print("[SCANNER] Got tag \(nextTag) at \(index) >>> \"\(remainingString(scanner).prefix(100))\"")
             
-            // Don't consume spoiler/quote closing tag so it can finish itself
-            let hasEndingTags = nextTag == "[/spoiler]" || nextTag == "[/quote]" || nextTag == "[/center]"
+            // Don't consume closing tags so they can finish
+            let hasEndingTags = closingTags.contains(nextTag)
             // Don't consume tags with metadata so it can be parsed later
             let hasAttributedTags = nextTag.contains("[quote ") || nextTag.contains("[quote=") || nextTag.contains("[spoiler=")
             
@@ -252,9 +275,17 @@ public class TopicBuilder2 {
             print("[SCANNER] Starting to switch on \(nextTag)")
             
             switch nextTag {
+            case "[left]":
+                let left = parseLeft(from: scanner)
+                if case .left = left { results.append(left) } else { fatalError("non left return") }
+                
             case "[center]":
                 let center = parseCenter(from: scanner)
                 if case .center = center { results.append(center) } else { fatalError("non center return") }
+                
+            case "[right]":
+                let right = parseRight(from: scanner)
+                if case .right = right { results.append(right) } else { fatalError("non right return") }
                 
             case "[spoiler]":
                 spoilerCount += 1
@@ -288,6 +319,10 @@ public class TopicBuilder2 {
                 print("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
+            case "[/right]":
+                print("[SCANNER] Closing tag \(nextTag), returning results")
+                return results
+                
             default:
                 if nextTag.contains("/") {
                     print("[SCANNER] Possibly closing tag (\(nextTag)), do nothing >>> \(remainingString(scanner).prefix(100))")
@@ -301,6 +336,31 @@ public class TopicBuilder2 {
         return results
     }
     
+    // MARK: - Left
+    
+    func parseLeft(from scanner: Scanner) -> TopicType2 {
+        var results: [TopicType2] = []
+        
+        while !scanner.isAtEnd {
+            print("[LEFT] New iteration: \(remainingString(scanner).prefix(100))")
+            if scanner.scanString("[left]") != nil {
+                // TODO: Can it actually find it since it's consumed in parse(with:)?
+                print("[LEFT] Found left")
+                let types = parse(with: scanner)
+                results.append(.center(types))
+            } else if scanner.scanString("[/left]") != nil {
+                print("[LEFT] Found end of left")
+                break
+            } else {
+                print("[LEFT] Found no left tag >>> \(remainingString(scanner).prefix(100))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .right(results)
+    }
+    
     // MARK: - Center
     
     func parseCenter(from scanner: Scanner) -> TopicType2 {
@@ -310,7 +370,7 @@ public class TopicBuilder2 {
             print("[CENTER] New iteration: \(remainingString(scanner).prefix(100))")
             if scanner.scanString("[center]") != nil {
                 // TODO: Can it actually find it since it's consumed in parse(with:)?
-                print("[CENTER] Found center (plain mode)")
+                print("[CENTER] Found center")
                 let types = parse(with: scanner)
                 results.append(.center(types))
             } else if scanner.scanString("[/center]") != nil {
@@ -324,6 +384,31 @@ public class TopicBuilder2 {
         }
         
         return .center(results)
+    }
+    
+    // MARK: - Right
+    
+    func parseRight(from scanner: Scanner) -> TopicType2 {
+        var results: [TopicType2] = []
+        
+        while !scanner.isAtEnd {
+            print("[RIGHT] New iteration: \(remainingString(scanner).prefix(100))")
+            if scanner.scanString("[right]") != nil {
+                // TODO: Can it actually find it since it's consumed in parse(with:)?
+                print("[RIGHT] Found right")
+                let types = parse(with: scanner)
+                results.append(.center(types))
+            } else if scanner.scanString("[/right]") != nil {
+                print("[RIGHT] Found end of right")
+                break
+            } else {
+                print("[RIGHT] Found no right tag >>> \(remainingString(scanner).prefix(100))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .right(results)
     }
     
     // MARK: - Quote
@@ -545,7 +630,20 @@ public class TopicBuilder2 {
 
     private func firstFoundTagAndIndex(in string: String) -> (tag: String, attributes: String?, index: Int)? {
         // Define valid tags
-        let validTags: Set<String> = ["quote", "/quote", "spoiler", "/spoiler", "list", "/list", "center", "/center"]
+        let validTags: Set<String> = [
+            "quote",
+            "/quote",
+            "spoiler",
+            "/spoiler",
+            "list",
+            "/list",
+            "left",
+            "/left",
+            "center",
+            "/center",
+            "right",
+            "/right"
+        ]
 
         // Define tags directly in the regex pattern
         let pattern = /\[([a-zA-Z\/]+)([^\]]*)\]/
