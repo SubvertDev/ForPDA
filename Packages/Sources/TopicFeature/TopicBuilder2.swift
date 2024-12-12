@@ -55,7 +55,7 @@ public struct UserQuote2: Hashable {
 public enum TopicType2: Hashable, Equatable {
 //    case error
     case text(String, Metadata)
-//    case attachment(Int)
+    case attachment(Int)
 //    case image(URL)
     case left([TopicType2])
     case center([TopicType2])
@@ -70,6 +70,7 @@ public enum TopicType2: Hashable, Equatable {
 
 public enum TopicTypeUI: Hashable, Equatable {
     case text(AttributedString)
+    case attachment(Int)
     case left([TopicTypeUI])
     case center([TopicTypeUI])
     case right([TopicTypeUI])
@@ -91,7 +92,7 @@ public class TopicBuilder2 {
         var attributedRanges: [(Range<AttributedString.Index>, AttributeContainer)] = []
         for run in attributedString.runs {
             let attributes = (run.range, run.attributes)
-            print("[RUN] \(attributes)")
+            //print("[RUN] \(attributes)")
             attributedRanges.append(attributes)
         }
 
@@ -148,8 +149,11 @@ public class TopicBuilder2 {
             case let .list(array):
                 types[index] = .list(applyAttributes(attributedRun, of: attributedString, to: array))
                 
-            case let .bullet(string):
-                types[index] = .bullet(string)
+            case .bullet:
+                break
+
+            case .attachment:
+                break
             }
         }
         return types
@@ -159,13 +163,16 @@ public class TopicBuilder2 {
         switch type {
         case .text(let string, let metadata):
             if let attributed = metadata.attributed {
-                print("[CONVERTER] Returning meta-attributed: \(attributed)")
+                //print("[CONVERTER] Returning meta-attributed: \(attributed)")
                 return .text(attributed)
             } else {
                 let attrStr = AttributedString(string)
-                print("[CONVERTER] Returning plain-attributed: \(attrStr)")
+                //print("[CONVERTER] Returning plain-attributed: \(attrStr)")
                 return .text(attrStr)
             }
+            
+        case .attachment(let id):
+            return .attachment(id)
             
         case .left(let array):
             var results: [TopicTypeUI] = []
@@ -216,18 +223,23 @@ public class TopicBuilder2 {
     }
     
     let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]"]
+    let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment="]
+    
+    private func printRemaining(_ scanner: Scanner) -> String {
+        return remainingString(scanner).prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: "")
+    }
     
     func parse(with scanner: Scanner) -> [TopicType2] {
         print("[SCANNER] New instance called")
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
-            print("[SCANNER] New iteration >>> \"\(remainingString(scanner).prefix(100))\"")
+            print("[SCANNER] New iteration >>> \"\(printRemaining(scanner))\"")
             
             guard var (nextTag, attributes, index) = firstFoundTagAndIndex(in: remainingString(scanner)) else {
-                print("[SCANNER] No more tags >>> \"\(remainingString(scanner))\"")
+                print("[SCANNER] No more tags >>> \"\(printRemaining(scanner))\"")
                 if !remainingString(scanner).isEmpty {
-                    print("[SCANNER] Got remaining text: \(remainingString(scanner).prefix(100))")
+                    print("[SCANNER] Got remaining text: \(printRemaining(scanner))")
                     let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
                     results.append(.text(remainingString(scanner), metadata))
                 }
@@ -235,26 +247,26 @@ public class TopicBuilder2 {
                 return results
             }
             
-            print("[SCANNER] Got tag \(nextTag) at \(index) >>> \"\(remainingString(scanner).prefix(100))\"")
+            print("[SCANNER] Got tag \(nextTag) at \(index) >>> \"\(printRemaining(scanner))\"")
             
             // Don't consume closing tags so they can finish
             let hasEndingTags = closingTags.contains(nextTag)
             // Don't consume tags with metadata so it can be parsed later
-            let hasAttributedTags = nextTag.contains("[quote ") || nextTag.contains("[quote=") || nextTag.contains("[spoiler=")
+            let hasTagsWithInfo = tagsWithInfo.contains(nextTag)
             
             if let text = scanner.scanUpToString(nextTag) {
-                print("[SCANNER] Got text \"\(text)\" before \(nextTag) >>> \"\(remainingString(scanner).prefix(100))\"")
+                print("[SCANNER] Got text \"\(text.prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: ""))\" before \(nextTag) >>> \"\(printRemaining(scanner))\"")
                 let attributes = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
                 results.append(.text(text, attributes))
 
-                if !hasEndingTags && !hasAttributedTags {
+                if !hasEndingTags && !hasTagsWithInfo {
                     print("[SCANNER] Consuming \(nextTag)")
                     _ = scanner.scanString(nextTag)
                 } else {
                     print("[SCANNER] Did not consume \(nextTag)")
                 }
             } else {
-                if !hasEndingTags && !hasAttributedTags {
+                if !hasEndingTags && !hasTagsWithInfo {
                     print("[SCANNER] No text before \(nextTag), consume & continue")
                     _ = scanner.scanString(nextTag)
                 } else {
@@ -272,6 +284,11 @@ public class TopicBuilder2 {
                 nextTag = "[spoiler]"
             }
             
+            if nextTag.contains("[attachment=") {
+                print("[SCANNER] Swizzled from \(nextTag) to [attachment]")
+                nextTag = "[attachment]"
+            }
+            
             print("[SCANNER] Starting to switch on \(nextTag)")
             
             switch nextTag {
@@ -286,6 +303,10 @@ public class TopicBuilder2 {
             case "[right]":
                 let right = parseRight(from: scanner)
                 if case .right = right { results.append(right) } else { fatalError("non right return") }
+                
+            case "[attachment]":
+                let attachment = parseAttachment(from: scanner, attributes: attributes!)
+                if case .attachment = attachment { results.append(attachment) } else { fatalError("non attachment return") }
                 
             case "[spoiler]":
                 spoilerCount += 1
@@ -325,7 +346,7 @@ public class TopicBuilder2 {
                 
             default:
                 if nextTag.contains("/") {
-                    print("[SCANNER] Possibly closing tag (\(nextTag)), do nothing >>> \(remainingString(scanner).prefix(100))")
+                    print("[SCANNER] Possibly closing tag (\(nextTag)), do nothing >>> \(printRemaining(scanner))")
                 } else {
                     fatalError("3")
                 }
@@ -342,7 +363,7 @@ public class TopicBuilder2 {
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
-            print("[LEFT] New iteration: \(remainingString(scanner).prefix(100))")
+            print("[LEFT] New iteration: \(printRemaining(scanner))")
             if scanner.scanString("[left]") != nil {
                 // TODO: Can it actually find it since it's consumed in parse(with:)?
                 print("[LEFT] Found left")
@@ -352,7 +373,7 @@ public class TopicBuilder2 {
                 print("[LEFT] Found end of left")
                 break
             } else {
-                print("[LEFT] Found no left tag >>> \(remainingString(scanner).prefix(100))")
+                print("[LEFT] Found no left tag >>> \(printRemaining(scanner))")
                 let types = parse(with: scanner)
                 results.append(contentsOf: types)
             }
@@ -367,7 +388,7 @@ public class TopicBuilder2 {
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
-            print("[CENTER] New iteration: \(remainingString(scanner).prefix(100))")
+            print("[CENTER] New iteration: \(printRemaining(scanner))")
             if scanner.scanString("[center]") != nil {
                 // TODO: Can it actually find it since it's consumed in parse(with:)?
                 print("[CENTER] Found center")
@@ -377,7 +398,7 @@ public class TopicBuilder2 {
                 print("[CENTER] Found end of center")
                 break
             } else {
-                print("[CENTER] Found no center tag >>> \(remainingString(scanner).prefix(100))")
+                print("[CENTER] Found no center tag >>> \(printRemaining(scanner))")
                 let types = parse(with: scanner)
                 results.append(contentsOf: types)
             }
@@ -392,7 +413,7 @@ public class TopicBuilder2 {
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
-            print("[RIGHT] New iteration: \(remainingString(scanner).prefix(100))")
+            print("[RIGHT] New iteration: \(printRemaining(scanner))")
             if scanner.scanString("[right]") != nil {
                 // TODO: Can it actually find it since it's consumed in parse(with:)?
                 print("[RIGHT] Found right")
@@ -402,7 +423,7 @@ public class TopicBuilder2 {
                 print("[RIGHT] Found end of right")
                 break
             } else {
-                print("[RIGHT] Found no right tag >>> \(remainingString(scanner).prefix(100))")
+                print("[RIGHT] Found no right tag >>> \(printRemaining(scanner))")
                 let types = parse(with: scanner)
                 results.append(contentsOf: types)
             }
@@ -446,7 +467,7 @@ public class TopicBuilder2 {
         let attributes = parseQuoteAttributes(attributes)
         
         while !scanner.isAtEnd {
-            print("[QUOTE] New iteration: \(remainingString(scanner).prefix(100))")
+            print("[QUOTE] New iteration: \(printRemaining(scanner))")
             
             if let attributes {
                 var title = "title"
@@ -472,7 +493,7 @@ public class TopicBuilder2 {
                     print("[QUOTE] Found end of quote (had attributes)")
                     break
                 } else {
-                    print("[QUOTE] Found no quote tag >>> \(remainingString(scanner).prefix(100))")
+                    print("[QUOTE] Found no quote tag >>> \(printRemaining(scanner))")
                     let types = parse(with: scanner)
                     results.append(contentsOf: types)
                 }
@@ -486,7 +507,7 @@ public class TopicBuilder2 {
                     print("[QUOTE] Found end of quote (had no attributes)")
                     break
                 } else {
-                    print("[QUOTE] Found no quote tag >>> \(remainingString(scanner).prefix(100))")
+                    print("[QUOTE] Found no quote tag >>> \(printRemaining(scanner))")
                     let types = parse(with: scanner)
                     results.append(contentsOf: types)
                 }
@@ -495,6 +516,22 @@ public class TopicBuilder2 {
         
         print("[QUOTE] Finished with \(results.count) results")
         return .quote(results, nil)
+    }
+    
+    // MARK: - Attachment
+    
+    func parseAttachmentAttributes(_ string: String) -> Int {
+        let pattern = /=\"(\d+):/
+        if let match = string.firstMatch(of: pattern) {
+            return Int(match.output.1) ?? 0
+        } else {
+            return 0
+        }
+    }
+    
+    func parseAttachment(from scanner: Scanner, attributes: String) -> TopicType2 {
+        let attachmentId = parseAttachmentAttributes(attributes)
+        return .attachment(attachmentId)
     }
 
     // MARK: - Spoiler
@@ -529,18 +566,18 @@ public class TopicBuilder2 {
         while !scanner.isAtEnd {
             if let attributes {
                 if scanner.scanString("[spoiler=\"\(attributes)\"]") != nil {
-                    print("[SPOILER] Found spoiler tag (title mode, with quotes) >>> \(remainingString(scanner).prefix(100))")
+                    print("[SPOILER] Found spoiler tag (title mode, with quotes) >>> \(printRemaining(scanner))")
                     let types = parse(with: scanner)
                     results.append(contentsOf: types)
                 } else if scanner.scanString("[spoiler=\(attributes)]") != nil {
-                    print("[SPOILER] Found spoiler tag (title mode, no quotes) >>> \(remainingString(scanner).prefix(100))")
+                    print("[SPOILER] Found spoiler tag (title mode, no quotes) >>> \(printRemaining(scanner))")
                     let types = parse(with: scanner)
                     results.append(contentsOf: types)
                 } else if scanner.scanString("[/spoiler]") != nil {
                     print("[SPOILER] Found end of spoiler (had attributes)")
                     break
                 } else {
-                    print("[SPOILER] No more spoiler tag >>> \(remainingString(scanner).prefix(100))")
+                    print("[SPOILER] No more spoiler tag >>> \(printRemaining(scanner))")
                     let types = parse(with: scanner)
                     results.append(contentsOf: types)
                 }
@@ -553,7 +590,7 @@ public class TopicBuilder2 {
                     print("[SPOILER] Found end of spoiler (had no attributes)")
                     break
                 } else {
-                    print("[SPOILER] No more spoiler tag >>> \(remainingString(scanner).prefix(100))")
+                    print("[SPOILER] No more spoiler tag >>> \(printRemaining(scanner))")
                     let types = parse(with: scanner)
                     results.append(contentsOf: types)
                 }
@@ -570,10 +607,10 @@ public class TopicBuilder2 {
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
-            print("[LIST] New iteration >>> \(remainingString(scanner).prefix(100))")
+            print("[LIST] New iteration >>> \(printRemaining(scanner))")
             if scanner.scanString("[*]") != nil {
                 if let (nextTag, index) = firstTagInList(in: remainingString(scanner)) {
-                    print("[LIST] Next tag is \(nextTag): \(remainingString(scanner).prefix(100))")
+                    print("[LIST] Next tag is \(nextTag): \(printRemaining(scanner))")
                     if let content = scanner.scanUpToString(nextTag) {
                         let type: TopicType2 = .bullet(content)
                         results.append(type)
@@ -642,7 +679,9 @@ public class TopicBuilder2 {
             "center",
             "/center",
             "right",
-            "/right"
+            "/right",
+            
+            "attachment"
         ]
 
         // Define tags directly in the regex pattern
@@ -656,7 +695,7 @@ public class TopicBuilder2 {
                 continue
             }
             
-            print("[VALIDATOR] String: \"\(string.prefix(100))\" -> Tag: \(tag)")
+            print("[VALIDATOR] String: \"\(string.prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: ""))\" -> Tag: \(tag)")
             
             // Extract attributes string, if present
             let attributes = String(match.output.2)
