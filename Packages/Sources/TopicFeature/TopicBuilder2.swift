@@ -60,7 +60,7 @@ public enum TopicType2: Hashable, Equatable {
     case left([TopicType2])
     case center([TopicType2])
     case right([TopicType2])
-    case spoiler([TopicType2], String?)
+    case spoiler([TopicType2], String?, AttributedString?)
     case quote([TopicType2], QuoteType2?)
 //    case code(NSAttributedString, CodeType)
     case list([TopicType2])
@@ -74,7 +74,7 @@ public enum TopicTypeUI: Hashable, Equatable {
     case left([TopicTypeUI])
     case center([TopicTypeUI])
     case right([TopicTypeUI])
-    case spoiler([TopicTypeUI], String?)
+    case spoiler([TopicTypeUI], AttributedString?)
     case quote([TopicTypeUI], QuoteType2?)
     case list([TopicTypeUI])
     case bullet(AttributedString)
@@ -87,6 +87,7 @@ public class TopicBuilder2 {
     func build2(from content: NSAttributedString) throws -> [TopicTypeUI] {
         let attributedString = AttributedString(content)
         let scanner = Scanner(string: String(attributedString.characters[...]))
+        scanner.caseSensitive = true
         let types = parse(with: scanner)
         
         var attributedRanges: [(Range<AttributedString.Index>, AttributeContainer)] = []
@@ -98,6 +99,23 @@ public class TopicBuilder2 {
 
         let attributedTypes = applyAttributes(attributedRanges, of: attributedString, to: types)
         return attributedTypes.map { twoToUI($0) }
+    }
+    
+    private func applyAttributes(_ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)], of attributedString: AttributedString, to string: String) -> AttributedString? {
+        guard let attributedTextRange = attributedString.range(of: string) else { fatalError("no string match found") }
+        for (attributedRunRange, attributeContainer) in attributedRun {
+            if attributedTextRange.overlaps(attributedRunRange) {
+                var newAttributedString = AttributedString(string)
+                let originalTextInRange = attributedString[attributedRunRange]
+                if let newTextRange = newAttributedString.range(of: String(originalTextInRange.characters)) {
+                    newAttributedString[newTextRange].mergeAttributes(attributeContainer)
+                    return newAttributedString
+                } else {
+                    // No overlap
+                }
+            }
+        }
+        return nil
     }
     
     private func applyAttributes(_ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)], of attributedString: AttributedString, to types: [TopicType2]) -> [TopicType2] {
@@ -140,8 +158,10 @@ public class TopicBuilder2 {
             case let .right(array):
                 types[index] = .right(applyAttributes(attributedRun, of: attributedString, to: array))
 
-            case let .spoiler(array, info):
-                types[index] = .spoiler(applyAttributes(attributedRun, of: attributedString, to: array), info)
+            case let .spoiler(array, info, attrStr):
+                var attrStr = attrStr
+                if let info { attrStr = applyAttributes(attributedRun, of: attributedString, to: info) }
+                types[index] = .spoiler(applyAttributes(attributedRun, of: attributedString, to: array), info, attrStr)
                 
             case let .quote(array, info):
                 types[index] = .quote(applyAttributes(attributedRun, of: attributedString, to: array), info)
@@ -195,12 +215,12 @@ public class TopicBuilder2 {
             }
             return .right(results)
             
-        case .spoiler(let array, let string):
+        case .spoiler(let array, _, let attrStr):
             var results: [TopicTypeUI] = []
             for item in array {
                 results.append(twoToUI(item))
             }
-            return .spoiler(results, string)
+            return .spoiler(results, attrStr)
             
         case .quote(let array, let quoteType2):
             var results: [TopicTypeUI] = []
@@ -585,7 +605,7 @@ public class TopicBuilder2 {
                 if scanner.scanString("[spoiler]") != nil {
                     print("[SPOILER] Found spoiler tag (plain mode)")
                     let types = parse(with: scanner)
-                    results.append(.spoiler(types, attributes))
+                    results.append(.spoiler(types, nil, nil))
                 } else if scanner.scanString("[/spoiler]") != nil {
                     print("[SPOILER] Found end of spoiler (had no attributes)")
                     break
@@ -598,7 +618,7 @@ public class TopicBuilder2 {
         }
         
         print("[SPOILER] Finished with \(results.count)")
-        return .spoiler(results, attributes)
+        return .spoiler(results, attributes, nil)
     }
 
     // MARK: - List
