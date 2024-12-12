@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import SwiftUI
+import SharedUI
 import ZMarkupParser
 
 public final class BBCodeParser {
@@ -20,7 +22,7 @@ public final class BBCodeParser {
     
     // MARK: - Default Parsing
     
-    public static func parse(_ text: String?, fontStyle: UIFont.TextStyle = .body) -> NSAttributedString? {
+    public static func parse(_ text: String?, fontStyle: UIFont.TextStyle = .callout) -> NSAttributedString? {
         guard let inputText = text else { return nil }
         var text = inputText
         
@@ -56,17 +58,20 @@ public final class BBCodeParser {
         // TODO: Find better approach instead of two functions
                 
         let parser = ZHTMLParserBuilder.initWithDefault()
-            .set(rootStyle: MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: fontStyle))))
+            .set(rootStyle: MarkupStyle(
+                font: MarkupStyleFont(.preferredFont(forTextStyle: fontStyle)),
+                foregroundColor: MarkupStyleColor(color: UIColor(Color.Labels.primary))
+            ))
             .add(ExtendHTMLTagStyleAttribute(styleName: "font-size", render: { value in
                 switch Int(value)! {
                 case 1: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .caption2)))
                 case 2: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .footnote)))
-                case 3: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .body)))
-                case 4: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .title3)))
-                case 5: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .title2)))
-                case 6: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .title1)))
-                case 7: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .largeTitle)))
-                default: return nil
+                case 3: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .callout)))
+                case 4: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .body)))
+                case 5: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .title3)))
+                case 6: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .title2)))
+                case 7: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .title1)))
+                default: return MarkupStyle(font: MarkupStyleFont(.preferredFont(forTextStyle: .callout)))
                 }
             }))
             .add(ExtendHTMLTagStyleAttribute(styleName: "font-family", render: { value in
