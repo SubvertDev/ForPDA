@@ -56,7 +56,7 @@ public struct UserQuote2: Hashable {
     public let postId: Int
 }
 
-public enum TopicType2: Hashable, Equatable {
+public indirect enum TopicType2: Hashable, Equatable {
 //    case error
     case text(String, Metadata)
     case attachment(Int)
@@ -66,13 +66,13 @@ public enum TopicType2: Hashable, Equatable {
     case right([TopicType2])
     case spoiler([TopicType2], String?, AttributedString?)
     case quote([TopicType2], QuoteType2?)
-//    case code(NSAttributedString, CodeType)
+    case code(TopicType2, CodeType)
     case list([TopicType2])
     case bullet(String)
 //    case mergetime(Date)
 }
 
-public enum TopicTypeUI: Hashable, Equatable {
+public indirect enum TopicTypeUI: Hashable, Equatable {
     case text(AttributedString)
     case attachment(Int)
     case left([TopicTypeUI])
@@ -80,6 +80,7 @@ public enum TopicTypeUI: Hashable, Equatable {
     case right([TopicTypeUI])
     case spoiler([TopicTypeUI], AttributedString?)
     case quote([TopicTypeUI], QuoteType2?)
+    case code(TopicTypeUI, CodeType)
     case list([TopicTypeUI])
     case bullet(AttributedString)
 }
@@ -178,6 +179,10 @@ public class TopicBuilder2 {
             case let .list(array):
                 types[index] = .list(applyAttributes(attributedRun, of: attributedString, to: array))
                 
+            case let .code(text, info):
+                let text = applyAttributes(attributedRun, of: attributedString, to: [text]).first!
+                types[index] = .code(text, info)
+                
             case .bullet:
                 break
 
@@ -238,6 +243,9 @@ public class TopicBuilder2 {
             }
             return .quote(results, quoteType2)
             
+        case .code(let text, let codeType):
+            return .code(twoToUI(text), codeType)
+            
         case .list(let array):
             var results: [TopicTypeUI] = []
             for item in array {
@@ -251,8 +259,8 @@ public class TopicBuilder2 {
         }
     }
     
-    let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]"]
-    let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment="]
+    let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]", "[/code]"]
+    let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code="]
     
     private func printRemaining(_ scanner: Scanner, isEnabled: Bool = true) -> String {
         return isEnabled
@@ -323,6 +331,11 @@ public class TopicBuilder2 {
                 nextTag = "[attachment]"
             }
             
+            if nextTag.contains("[code=") {
+                print("[SCANNER] Swizzled from \(nextTag) to [code]")
+                nextTag = "[code]"
+            }
+            
             print("[SCANNER] Starting to switch on \(nextTag)")
             
             switch nextTag {
@@ -355,6 +368,10 @@ public class TopicBuilder2 {
                 let quote = parseQuote(from: scanner, attributes: attributes)
                 if case .quote = quote { results.append(quote) } else { fatalError("non quote return") }
                 
+            case "[code]":
+                let code = parseCode(from: scanner, attributes: attributes)
+                if case .code = code { results.append(code) } else { fatalError("non code return") }
+                
             case "[/spoiler]":
                 spoilerCount -= 1
                 if spoilerCount < 0 {
@@ -367,6 +384,10 @@ public class TopicBuilder2 {
                 }
                 
             case "[/quote]":
+                print("[SCANNER] Closing tag \(nextTag), returning results")
+                return results
+                
+            case "[/code]":
                 print("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
@@ -468,6 +489,41 @@ public class TopicBuilder2 {
         }
         
         return .right(results)
+    }
+    
+    // MARK: - Code
+    
+    func parseCodeAttributes(_ string: String?) -> CodeType {
+        guard let string else { return .none }
+        
+        if string.first == "=" {
+            let title = String(string.dropFirst().dropLast()) // Removing " "
+            return .title(title)
+        } else {
+            fatalError("[CODE PARSER] Unrecognized pattern")
+        }
+    }
+    
+    func parseCode(from scanner: Scanner, attributes: String?) -> TopicType2 {
+        var results: [TopicType2] = []
+        let attributes = parseCodeAttributes(attributes)
+        
+        while !scanner.isAtEnd {
+            if let string = scanner.scanUpToString("[/code]") {
+                let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                let text: TopicType2 = .text(string.trimmingCharacters(in: .whitespacesAndNewlines), metadata)
+                results.append(text)
+            } else if scanner.scanString("[/code]") != nil {
+                print("[QUOTE] Found end of code (\(attributes != .none ? "had" : "no") attributes)")
+                break
+            } else {
+                print("[QUOTE] Found no code tag >>> \(printRemaining(scanner))")
+                fatalError("[QUOTE] Unrecognized pattern")
+
+            }
+        }
+        
+        return .code(results.first!, attributes)
     }
     
     // MARK: - Quote
@@ -714,6 +770,8 @@ public class TopicBuilder2 {
             "/spoiler",
             "list",
             "/list",
+            "code",
+            "/code",
             "left",
             "/left",
             "center",
