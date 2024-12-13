@@ -370,6 +370,10 @@ public class TopicBuilder2 {
                 print("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
+            case "[/left]":
+                print("[SCANNER] Closing tag \(nextTag), returning results")
+                return results
+                
             case "[/center]":
                 print("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
@@ -413,7 +417,7 @@ public class TopicBuilder2 {
             }
         }
         
-        return .right(results)
+        return .left(results)
     }
     
     // MARK: - Center
@@ -749,36 +753,6 @@ public class TopicBuilder2 {
         
         print("[VALIDATOR] Found no more matches")
         return nil
-
-//        if let match = string.firstMatch(of: pattern) {
-//            // Extract the tag name
-//            let tag = String(match.output.1)
-//            
-//            // Check if the tag is in the whitelist
-//            guard validTags.contains(tag) else {
-//                print("[VALIDATOR] Non-valid tag: \(tag)")
-//                return nil
-//            }
-//            
-//            print("[VALIDATOR] \(string) -> \(tag)")
-//            
-//            // Extract attributes string, if present
-//            let attributes = String(match.output.2)
-//            
-//            // Find the starting index of the match
-//            let index = string.distance(from: string.startIndex, to: match.range.lowerBound)
-//            
-//            if !attributes.isEmpty {
-//                print("[VALIDATOR] Returning with attributes")
-//                return (tag: "[\(tag)\(attributes)]", attributes: attributes, index: index)
-//            } else {
-//                return (tag: "[\(tag)]", attributes: nil, index: index)
-//            }
-//        } else {
-//            print("[VALIDATOR] Found no more matches")
-//        }
-//        
-//        return nil
     }
 
     private func firstTagInList(in string: String) -> (tag: String, index: Int)? {
