@@ -13,10 +13,14 @@ import ParsingClient
 public struct QuoteMetadata: Hashable, Equatable {
     public var name: String
     public var date: String
-    public var postId: String
+    public var postId: Int?
     
     var plain: String {
-        return "name=\"\(name)\" date=\"\(date)\" post=\(postId)"
+        if let postId {
+            return "name=\"\(name)\" date=\"\(date)\" post=\(postId)"
+        } else {
+            return "name=\"\(name)\" date=\"\(date)\""
+        }
     }
 }
 
@@ -106,13 +110,15 @@ public class TopicBuilder2 {
         for (attributedRunRange, attributeContainer) in attributedRun {
             if attributedTextRange.overlaps(attributedRunRange) {
                 var newAttributedString = AttributedString(string)
+                // TODO: Move to defaults somewhere else
+                newAttributedString.foregroundColor = UIColor(Color.Labels.primary)
+                newAttributedString.font = UIFont.preferredFont(forTextStyle: .callout)
                 let originalTextInRange = attributedString[attributedRunRange]
                 if let newTextRange = newAttributedString.range(of: String(originalTextInRange.characters)) {
                     newAttributedString[newTextRange].mergeAttributes(attributeContainer)
                     return newAttributedString
-                } else {
-                    // No overlap
                 }
+                return newAttributedString
             }
         }
         return nil
@@ -131,6 +137,9 @@ public class TopicBuilder2 {
                         // We store modified attributed string into metadata, so we need to extract it each time we
                         // run this to not overwrite any of the attributes (not very optimal, but works for now)
                         var newAttributedString = AttributedString(string)
+                        // TODO: Move to defaults somewhere else
+                        newAttributedString.font = UIFont.preferredFont(forTextStyle: .callout)
+                        newAttributedString.foregroundColor = UIColor(Color.Labels.primary)
                         if case let .text(_, modifiedMetadata) = types[index] {
                             if let savedAttributedString = modifiedMetadata.attributed {
                                 newAttributedString = savedAttributedString
@@ -141,9 +150,9 @@ public class TopicBuilder2 {
                         let originalTextInRange = attributedString[attributedRunRange]
                         if let newTextRange = newAttributedString.range(of: String(originalTextInRange.characters)) {
                             newAttributedString[newTextRange].mergeAttributes(attributeContainer)
-                            let newMetadata = Metadata(range: metadata.range, attributed: newAttributedString)
-                            types[index] = .text(string, newMetadata)
                         }
+                        let newMetadata = Metadata(range: metadata.range, attributed: newAttributedString)
+                        types[index] = .text(string, newMetadata)
                     } else {
                         // No overlap
                     }
@@ -245,8 +254,13 @@ public class TopicBuilder2 {
     let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]"]
     let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment="]
     
-    private func printRemaining(_ scanner: Scanner) -> String {
-        return remainingString(scanner).prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: "")
+    private func printRemaining(_ scanner: Scanner, isEnabled: Bool = true) -> String {
+        return isEnabled
+            ? remainingString(scanner)
+                .prefix(100)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "\n", with: "")
+            : ""
     }
     
     func parse(with scanner: Scanner) -> [TopicType2] {
@@ -465,12 +479,12 @@ public class TopicBuilder2 {
             print("[QUOTE PARSER] Found title attributes: \"\(title)\"")
             return .title(title)
         } else if string.first == " " {
-            let pattern = /name="([^"]+)" date="([^"]+)" post=(\d+)/
+            let pattern = /name=\"([^\"]+)\" date=\"([^\"]+)\"(?: post=(\d+))?/
             if let match = string.firstMatch(of: pattern) {
                 let metadata = QuoteMetadata(
                     name: String(match.output.1),
                     date: String(match.output.2),
-                    postId: String(match.output.3)
+                    postId: Int(String(match.output.3 ?? ""))
                 )
                 print("[QUOTE PARSER] Found metadata attributes: \"\(metadata)\"")
                 return .metadata(metadata)
@@ -492,7 +506,7 @@ public class TopicBuilder2 {
             if let attributes {
                 var title = "title"
                 if case let .title(text) = attributes { title = text }
-                var metadata = QuoteMetadata(name: "", date: "", postId: "")
+                var metadata = QuoteMetadata(name: "", date: "", postId: nil)
                 if case let .metadata(quoteMetadata) = attributes {
                     metadata.name = quoteMetadata.name
                     metadata.date = quoteMetadata.date
@@ -502,10 +516,12 @@ public class TopicBuilder2 {
                 // TODO: Instead of making scanString correct, maybe just retract some of text after parse?
                 
                 if scanner.scanString("[quote " + metadata.plain + "]") != nil {
+                    // TODO: Is this even working?
                     print("[QUOTE] Found quote (metadata mode)")
                     let types = parse(with: scanner)
                     results.append(.quote(types, attributes))
                 } else if scanner.scanString("[quote=\"" + title + "\"]") != nil {
+                    // TODO: Is this even working?
                     print("[QUOTE] Found quote (title mode)")
                     let types = parse(with: scanner)
                     results.append(.quote(types, attributes))
@@ -522,7 +538,7 @@ public class TopicBuilder2 {
                     // TODO: Can it actually find it since it's consumed in parse(with:)?
                     print("[QUOTE] Found quote (plain mode)")
                     let types = parse(with: scanner)
-                    results.append(.quote(types, nil))
+                    results.append(.quote(types, attributes))
                 } else if scanner.scanString("[/quote]") != nil {
                     print("[QUOTE] Found end of quote (had no attributes)")
                     break
@@ -535,7 +551,7 @@ public class TopicBuilder2 {
         }
         
         print("[QUOTE] Finished with \(results.count) results")
-        return .quote(results, nil)
+        return .quote(results, attributes)
     }
     
     // MARK: - Attachment
