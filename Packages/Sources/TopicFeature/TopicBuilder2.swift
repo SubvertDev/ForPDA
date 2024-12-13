@@ -29,6 +29,28 @@ public enum QuoteType2: Hashable, Equatable {
     case metadata(QuoteMetadata)
 }
 
+public enum NoticeType: String, Hashable, Equatable {
+    case curator = "cur"
+    case moderator = "mod"
+    case admin = "ex"
+    
+    var title: String {
+        switch self {
+        case .curator:   return "Куратор"
+        case .moderator: return "Модератор"
+        case .admin:     return "Администратор"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .curator:   return Color.Main.green
+        case .moderator: return Color.Theme.primary
+        case .admin:     return Color.Main.red
+        }
+    }
+}
+
 public struct Metadata: Hashable, Equatable {
     let range: Range<String.Index>
     var attributes: AttributeContainer?
@@ -68,8 +90,8 @@ public indirect enum TopicType2: Hashable, Equatable {
     case quote([TopicType2], QuoteType2?)
     case code(TopicType2, CodeType)
     case list([TopicType2])
+    case notice([TopicType2], NoticeType)
     case bullet(String)
-//    case mergetime(Date)
 }
 
 public indirect enum TopicTypeUI: Hashable, Equatable {
@@ -82,6 +104,7 @@ public indirect enum TopicTypeUI: Hashable, Equatable {
     case quote([TopicTypeUI], QuoteType2?)
     case code(TopicTypeUI, CodeType)
     case list([TopicTypeUI])
+    case notice([TopicTypeUI], NoticeType)
     case bullet(AttributedString)
 }
 
@@ -180,8 +203,11 @@ public class TopicBuilder2 {
                 types[index] = .list(applyAttributes(attributedRun, of: attributedString, to: array))
                 
             case let .code(text, info):
-                let text = applyAttributes(attributedRun, of: attributedString, to: [text]).first!
-                types[index] = .code(text, info)
+                let text = applyAttributes(attributedRun, of: attributedString, to: [text])
+                types[index] = .code(text.first!, info)
+                
+            case let .notice(array, info):
+                types[index] = .notice(applyAttributes(attributedRun, of: attributedString, to: array), info)
                 
             case .bullet:
                 break
@@ -246,6 +272,9 @@ public class TopicBuilder2 {
         case .code(let text, let codeType):
             return .code(twoToUI(text), codeType)
             
+        case .notice(let types, let noticeType):
+            return .notice(types.map { twoToUI($0) }, noticeType)
+            
         case .list(let array):
             var results: [TopicTypeUI] = []
             for item in array {
@@ -259,7 +288,7 @@ public class TopicBuilder2 {
         }
     }
     
-    let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]", "[/code]"]
+    let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]", "[/code]", "[/cur]", "[/mod]", "[/ex]"]
     let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code="]
     
     private func printRemaining(_ scanner: Scanner, isEnabled: Bool = true) -> String {
@@ -372,6 +401,10 @@ public class TopicBuilder2 {
                 let code = parseCode(from: scanner, attributes: attributes)
                 if case .code = code { results.append(code) } else { fatalError("non code return") }
                 
+            case "[cur]", "[mod]", "[ex]":
+                let notice = parseNotice(from: scanner, tag: nextTag)
+                if case .notice = notice { results.append(notice) } else { fatalError("non notice return") }
+                
             case "[/spoiler]":
                 spoilerCount -= 1
                 if spoilerCount < 0 {
@@ -383,23 +416,7 @@ public class TopicBuilder2 {
                     return results
                 }
                 
-            case "[/quote]":
-                print("[SCANNER] Closing tag \(nextTag), returning results")
-                return results
-                
-            case "[/code]":
-                print("[SCANNER] Closing tag \(nextTag), returning results")
-                return results
-                
-            case "[/left]":
-                print("[SCANNER] Closing tag \(nextTag), returning results")
-                return results
-                
-            case "[/center]":
-                print("[SCANNER] Closing tag \(nextTag), returning results")
-                return results
-                
-            case "[/right]":
+            case "[/quote]", "[/code]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]":
                 print("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
@@ -414,6 +431,27 @@ public class TopicBuilder2 {
         
         print("[SCANNER] Finished with \(results.count) results")
         return results
+    }
+    
+    // MARK: - Notice
+    
+    func parseNotice(from scanner: Scanner, tag: String) -> TopicType2 {
+        var closingTag = tag
+        closingTag.insert("/", at: closingTag.index(closingTag.startIndex, offsetBy: 1))
+        var results: [TopicType2] = []
+        
+        while !scanner.isAtEnd {
+            if scanner.scanString(closingTag) != nil {
+                print("[NOTICE] Found end of \(closingTag)")
+                break
+            } else {
+                print("[NOTICE] Found no end tag >>> \(printRemaining(scanner))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .notice(results, NoticeType(rawValue: String(tag.dropFirst().dropLast()))!)
     }
     
     // MARK: - Left
@@ -519,7 +557,6 @@ public class TopicBuilder2 {
             } else {
                 print("[QUOTE] Found no code tag >>> \(printRemaining(scanner))")
                 fatalError("[QUOTE] Unrecognized pattern")
-
             }
         }
         
@@ -778,6 +815,12 @@ public class TopicBuilder2 {
             "/center",
             "right",
             "/right",
+            "cur",
+            "/cur",
+            "mod",
+            "/mod",
+            "ex",
+            "/ex",
             
             "attachment"
         ]
