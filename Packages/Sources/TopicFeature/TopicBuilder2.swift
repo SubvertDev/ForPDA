@@ -275,7 +275,7 @@ public class TopicBuilder2 {
                 if !remainingString(scanner).isEmpty {
                     print("[SCANNER] Got remaining text: \(printRemaining(scanner))")
                     let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
-                    results.append(.text(remainingString(scanner), metadata))
+                    results.append(.text(remainingString(scanner).trimmingCharacters(in: .whitespacesAndNewlines), metadata))
                 }
                 print("[SCANNER] Finished with \(results.count) results")
                 return results
@@ -291,7 +291,7 @@ public class TopicBuilder2 {
             if let text = scanner.scanUpToString(nextTag) {
                 print("[SCANNER] Got text \"\(text.prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: ""))\" before \(nextTag) >>> \"\(printRemaining(scanner))\"")
                 let attributes = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
-                results.append(.text(text, attributes))
+                results.append(.text(text.trimmingCharacters(in: .whitespacesAndNewlines), attributes))
 
                 if !hasEndingTags && !hasTagsWithInfo {
                     print("[SCANNER] Consuming \(nextTag)")
