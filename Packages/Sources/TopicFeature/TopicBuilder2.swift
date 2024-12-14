@@ -91,7 +91,7 @@ public indirect enum TopicType2: Hashable, Equatable {
     case code(TopicType2, CodeType)
     case list([TopicType2])
     case notice([TopicType2], NoticeType)
-    case bullet(String)
+    case bullet([TopicType2])
 }
 
 public indirect enum TopicTypeUI: Hashable, Equatable {
@@ -105,7 +105,7 @@ public indirect enum TopicTypeUI: Hashable, Equatable {
     case code(TopicTypeUI, CodeType)
     case list([TopicTypeUI])
     case notice([TopicTypeUI], NoticeType)
-    case bullet(AttributedString)
+    case bullet([TopicTypeUI])
 }
 
 public class TopicBuilder2 {
@@ -209,8 +209,8 @@ public class TopicBuilder2 {
             case let .notice(array, info):
                 types[index] = .notice(applyAttributes(attributedRun, of: attributedString, to: array), info)
                 
-            case .bullet:
-                break
+            case let .bullet(array):
+                types[index] = .bullet(applyAttributes(attributedRun, of: attributedString, to: array))
 
             case .attachment:
                 break
@@ -282,13 +282,12 @@ public class TopicBuilder2 {
             }
             return .list(results)
             
-        case .bullet(let string):
-            let attrStr = AttributedString(string)
-            return .bullet(attrStr)
+        case .bullet(let types):
+            return .bullet(types.map { twoToUI($0) })
         }
     }
     
-    let closingTags = ["[/spoiler]", "[/quote]", "[/left]", "[/center]", "[/right]", "[/code]", "[/cur]", "[/mod]", "[/ex]"]
+    let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/cur]", "[/mod]", "[/ex]"]
     let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code="]
     
     private func printRemaining(_ scanner: Scanner, isEnabled: Bool = true) -> String {
@@ -300,14 +299,39 @@ public class TopicBuilder2 {
             : ""
     }
     
-    func parse(with scanner: Scanner) -> [TopicType2] {
-        print("[SCANNER] New instance called")
+    enum ClosestListTagIndex {
+        case newline(Int)
+        case bullet(Int)
+        case none
+    }
+    
+    private func closestListTagsIndexes(_ scanner: Scanner) -> ClosestListTagIndex {
+        let newlineIndex = remainingString(scanner).firstIndex(of: "\n")
+        let bulletIndex = remainingString(scanner).firstRange(of: "[*]")?.lowerBound
+        let remainingString = remainingString(scanner)
+        if let newlineIndex, let bulletIndex {
+            if newlineIndex < bulletIndex {
+                return .newline(newlineIndex.utf16Offset(in: remainingString))
+            } else {
+                return .bullet(bulletIndex.utf16Offset(in: remainingString))
+            }
+        } else if let newlineIndex {
+            return .newline(newlineIndex.utf16Offset(in: remainingString))
+        } else if let bulletIndex {
+            return .bullet(bulletIndex.utf16Offset(in: remainingString))
+        } else {
+            return .none
+        }
+    }
+    
+    func parse(with scanner: Scanner, inList: Bool = false) -> [TopicType2] {
+        // print("[SCANNER] New instance called")
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
             print("[SCANNER] New iteration >>> \"\(printRemaining(scanner))\"")
             
-            guard var (nextTag, attributes, index) = firstFoundTagAndIndex(in: remainingString(scanner)) else {
+            guard let (tag, attributes, nextTagIndex) = firstFoundTagAndIndex(in: remainingString(scanner)) else {
                 print("[SCANNER] No more tags >>> \"\(printRemaining(scanner))\"")
                 if !remainingString(scanner).isEmpty {
                     print("[SCANNER] Got remaining text: \(printRemaining(scanner))")
@@ -318,7 +342,61 @@ public class TopicBuilder2 {
                 return results
             }
             
-            print("[SCANNER] Got tag \(nextTag) at \(index) >>> \"\(printRemaining(scanner))\"")
+            var nextTag = tag
+            
+            scanner.charactersToBeSkipped = inList ? nil : .whitespacesAndNewlines
+            
+            // List parsing aka bullets and nested stuff
+            if inList {
+                let indexes = closestListTagsIndexes(scanner)
+                //print(indexes)
+                //print(printRemaining(scanner))
+                // TODO: Merge into one case?
+                switch indexes {
+                case .newline(let newline):
+                    if newline < nextTagIndex {
+                        if let string = scanner.scanUpToString("\n") {
+                            print("[SCANNER] List newline parsed string: \(string)")
+                            let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                            results.append(.bullet([.text(string, metadata)])) // TODO: Not sure if putting text is enough
+                            _ = scanner.scanString("\n")
+                            continue
+                        } else {
+                            _ = scanner.scanString("\n")
+                            continue
+                        }
+                    } else if let string = scanner.scanUpToString(nextTag) {
+                        // Last bullet before nested list case
+                        let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                        results.append(.bullet([.text(string, metadata)]))
+                    }
+                    
+                case .bullet(let bullet):
+                    if bullet < nextTagIndex {
+                        if let string = scanner.scanUpToString("[*]") {
+                            print("[SCANNER] List bullet parsed string: \(string)")
+                            if string.isEmpty {
+                                _ = scanner.scanString("[*]")
+                                continue
+                            }
+                            let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                            results.append(.bullet([.text(string, metadata)])) // TODO: Not sure if putting text is enough
+                            _ = scanner.scanString("[*]")
+                            continue
+                        } else {
+                            _ = scanner.scanString("[*]")
+                            continue
+                        }
+                    }
+                    
+                case .none:
+                    break
+                }
+            }
+            
+            scanner.charactersToBeSkipped = inList ? nil : .whitespacesAndNewlines
+            
+            print("[SCANNER] Got tag \(nextTag) at \(nextTagIndex) >>> \"\(printRemaining(scanner))\"")
             
             // Don't consume closing tags so they can finish
             let hasEndingTags = closingTags.contains(nextTag)
@@ -416,7 +494,7 @@ public class TopicBuilder2 {
                     return results
                 }
                 
-            case "[/quote]", "[/code]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]":
+            case "[/quote]", "[/code]", "[/list]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]":
                 print("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
@@ -740,32 +818,23 @@ public class TopicBuilder2 {
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
-            print("[LIST] New iteration >>> \(printRemaining(scanner))")
             if scanner.scanString("[*]") != nil {
-                if let (nextTag, index) = firstTagInList(in: remainingString(scanner)) {
-                    print("[LIST] Next tag is \(nextTag): \(printRemaining(scanner))")
-                    if let content = scanner.scanUpToString(nextTag) {
-                        let type: TopicType2 = .bullet(content)
-                        results.append(type)
-                    } else {
-                        fatalError("[LIST] Found no content in bullet")
-                    }
-                } else {
-                    print("[LIST] No next tag found")
-                }
+                print("[LIST] Found [*] tag")
+                let types = parse(with: scanner, inList: true)
+                results.append(.list(types))
             } else if scanner.scanString("[list]") != nil {
                 print("[LIST] Found nested list")
                 let list = parseList(from: scanner)
                 results.append(list)
             } else if scanner.scanString("[/list]") != nil {
                 break
+            } else if scanner.scanString("\n") != nil {
+                // TODO: Nested list case. Remove \n's in parsing instead?
+                continue
             } else {
-                if let content = scanner.scanUpToString("[*]") {
-                    let metadata = Metadata(range: getRange(for: content, from: scanner))
-                    results.append(.text(content, metadata))
-                }
-                // looks like i can get just a newline instead of [*]
-                // fatalError("[LIST] Unhandled case >>> \(remainingString(scanner).prefix(100))")
+                // Non-list tags?
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
             }
         }
         
@@ -821,6 +890,7 @@ public class TopicBuilder2 {
             "/mod",
             "ex",
             "/ex",
+            "*",
             
             "attachment"
         ]
@@ -853,19 +923,6 @@ public class TopicBuilder2 {
         }
         
         print("[VALIDATOR] Found no more matches")
-        return nil
-    }
-
-    private func firstTagInList(in string: String) -> (tag: String, index: Int)? {
-        // Define tags directly in the regex pattern
-        let pattern = /\[\*\]|\[list\]|\[\/list\]/
-        
-        // Use the first match of the regex
-        if let match = string.firstMatch(of: pattern) {
-            let tag = String(match.output)
-            let index = string.distance(from: string.startIndex, to: match.startIndex)
-            return (tag: tag, index: index)
-        }
         return nil
     }
 }
