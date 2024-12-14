@@ -154,7 +154,11 @@ public class TopicBuilder2 {
             switch types[index] {
             case let .text(string, metadata):
                 // Trying to find same range of text in original string
-                guard let attributedTextRange = attributedString.range(of: string) else { fatalError("no string match found") }
+                guard let attributedTextRange = attributedString.range(of: string) else {
+                    print("[ATTRIBUTES] No range found for string")
+                    continue
+                }
+                
                 // When found, iterating over attributed runs to find overlaps
                 for (attributedRunRange, attributeContainer) in attributedRun {
                     if attributedTextRange.overlaps(attributedRunRange) {
@@ -290,6 +294,31 @@ public class TopicBuilder2 {
     let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/cur]", "[/mod]", "[/ex]"]
     let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code="]
     
+    enum CurrentTag {
+        case spoiler
+        case quote
+        case list
+        case left
+        case center
+        case right
+        case code
+        case notice
+        case none
+    }
+    var currentTag: CurrentTag = .none {
+        didSet { calculate()}
+    }
+    
+    var listCount = 0 {
+        didSet { calculate() }
+    }
+    var inList = false
+    
+    private func calculate() {
+        inList = listCount > 0
+        print("[COUNTER] List: \(listCount)")
+    }
+    
     private func printRemaining(_ scanner: Scanner, isEnabled: Bool = true) -> String {
         return isEnabled
             ? remainingString(scanner)
@@ -324,7 +353,7 @@ public class TopicBuilder2 {
         }
     }
     
-    func parse(with scanner: Scanner, inList: Bool = false) -> [TopicType2] {
+    func parse(with scanner: Scanner) -> [TopicType2] {
         // print("[SCANNER] New instance called")
         var results: [TopicType2] = []
         
@@ -336,7 +365,8 @@ public class TopicBuilder2 {
                 if !remainingString(scanner).isEmpty {
                     print("[SCANNER] Got remaining text: \(printRemaining(scanner))")
                     let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
-                    results.append(.text(remainingString(scanner).trimmingCharacters(in: .whitespacesAndNewlines), metadata))
+                    let text = remainingString(scanner).trimmingCharacters(in: .whitespacesAndNewlines)
+                    results.append(.text(text, metadata))
                 }
                 print("[SCANNER] Finished with \(results.count) results")
                 return results
@@ -347,14 +377,17 @@ public class TopicBuilder2 {
             scanner.charactersToBeSkipped = inList ? nil : .whitespacesAndNewlines
             
             // List parsing aka bullets and nested stuff
-            if inList {
+            if inList, currentTag == .list {
+                print("[SCANNER] In list check (\(currentTag))")
                 let indexes = closestListTagsIndexes(scanner)
                 //print(indexes)
                 //print(printRemaining(scanner))
                 // TODO: Merge into one case?
                 switch indexes {
                 case .newline(let newline):
-                    if newline < nextTagIndex {
+                    if newline < nextTagIndex, currentTag == .list {
+                        print("[SCANNER] Newline \(newline) < nextTagIndex \(nextTagIndex)")
+                        // If we have newline before next tag, just parsing it
                         if let string = scanner.scanUpToString("\n") {
                             print("[SCANNER] List newline parsed string: \(string)")
                             let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
@@ -365,14 +398,17 @@ public class TopicBuilder2 {
                             _ = scanner.scanString("\n")
                             continue
                         }
-                    } else if let string = scanner.scanUpToString(nextTag) {
-                        // Last bullet before nested list case
+                    } else if nextTag == "[/list]", let string = scanner.scanUpToString("[/list]") {
+                        print("[SCANNER] List newline list ending parsed string: \(string)")
                         let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
-                        results.append(.bullet([.text(string, metadata)]))
+                        results.append(.bullet([.text(string, metadata)])) // TODO: Not sure if putting text is enough
+                    } else {
+                        print("[SCANNER] Newline edge case")
                     }
                     
                 case .bullet(let bullet):
-                    if bullet < nextTagIndex {
+                    if bullet < nextTagIndex, currentTag == .list {
+                        print("[SCANNER] Bullet \(bullet) < nextTagIndex \(nextTagIndex)")
                         if let string = scanner.scanUpToString("[*]") {
                             print("[SCANNER] List bullet parsed string: \(string)")
                             if string.isEmpty {
@@ -387,6 +423,8 @@ public class TopicBuilder2 {
                             _ = scanner.scanString("[*]")
                             continue
                         }
+                    } else {
+                        print("[SCANNER] STOP CASE BULLET")
                     }
                     
                 case .none:
@@ -514,6 +552,8 @@ public class TopicBuilder2 {
     // MARK: - Notice
     
     func parseNotice(from scanner: Scanner, tag: String) -> TopicType2 {
+        currentTag = .notice
+        
         var closingTag = tag
         closingTag.insert("/", at: closingTag.index(closingTag.startIndex, offsetBy: 1))
         var results: [TopicType2] = []
@@ -535,6 +575,9 @@ public class TopicBuilder2 {
     // MARK: - Left
     
     func parseLeft(from scanner: Scanner) -> TopicType2 {
+        defer { if inList { currentTag = .list } }
+        currentTag = .left
+        
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
@@ -558,8 +601,11 @@ public class TopicBuilder2 {
     }
     
     // MARK: - Center
-    
+        
     func parseCenter(from scanner: Scanner) -> TopicType2 {
+        defer { if inList { currentTag = .list } }
+        currentTag = .center
+        
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
@@ -585,6 +631,9 @@ public class TopicBuilder2 {
     // MARK: - Right
     
     func parseRight(from scanner: Scanner) -> TopicType2 {
+        defer { if inList { currentTag = .list } }
+        currentTag = .right
+        
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
@@ -621,14 +670,17 @@ public class TopicBuilder2 {
     }
     
     func parseCode(from scanner: Scanner, attributes: String?) -> TopicType2 {
+        currentTag = .code
+        
         var results: [TopicType2] = []
         let attributes = parseCodeAttributes(attributes)
         
         while !scanner.isAtEnd {
             if let string = scanner.scanUpToString("[/code]") {
                 let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
-                let text: TopicType2 = .text(string.trimmingCharacters(in: .whitespacesAndNewlines), metadata)
-                results.append(text)
+                let text = string.trimmingCharacters(in: .whitespacesAndNewlines)
+                let type: TopicType2 = .text(text, metadata)
+                results.append(type)
             } else if scanner.scanString("[/code]") != nil {
                 print("[QUOTE] Found end of code (\(attributes != .none ? "had" : "no") attributes)")
                 break
@@ -672,6 +724,8 @@ public class TopicBuilder2 {
     }
 
     func parseQuote(from scanner: Scanner, attributes: String? = nil) -> TopicType2 {
+        currentTag = .quote
+        
         var results: [TopicType2] = []
         let attributes = parseQuoteAttributes(attributes)
         
@@ -771,6 +825,8 @@ public class TopicBuilder2 {
     }
 
     func parseSpoiler(from scanner: Scanner, attributes: String? = nil) -> TopicType2 {
+        currentTag = .spoiler
+        
         var results: [TopicType2] = []
         let attributes = parseSpoilerAttributes(attributes)
         
@@ -813,14 +869,18 @@ public class TopicBuilder2 {
     }
 
     // MARK: - List
-
+    
     func parseList(from scanner: Scanner) -> TopicType2 {
+        defer { listCount -= 1 }
+        currentTag = .list
+        listCount += 1
+        
         var results: [TopicType2] = []
         
         while !scanner.isAtEnd {
             if scanner.scanString("[*]") != nil {
                 print("[LIST] Found [*] tag")
-                let types = parse(with: scanner, inList: true)
+                let types = parse(with: scanner)
                 results.append(.list(types))
             } else if scanner.scanString("[list]") != nil {
                 print("[LIST] Found nested list")
@@ -890,8 +950,6 @@ public class TopicBuilder2 {
             "/mod",
             "ex",
             "/ex",
-            "*",
-            
             "attachment"
         ]
 
