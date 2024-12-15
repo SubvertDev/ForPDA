@@ -1,5 +1,5 @@
 {
-  "originHash" : "b4f98cfb04cc4782fa1b2b1fa044f30b7ec0517c5be52c1cdfa2ec3e90646357",
+  "originHash" : "4ea40ca6ea6dd761a6d0b07911134da48a9d51d34395644c240423703267688f",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/Chat.git",
       "state" : {
-        "revision" : "479b145a3d24ef926c9a3c502fcdc6acbd6f46ea",
-        "version" : "2.0.8"
+        "revision" : "be0910b293ec8183c210a6014c93582764092d58",
+        "version" : "2.0.10"
       }
     },
     {
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "f87a1922cbb65f63d3a0dc6491ee3de7da898e15",
-        "version" : "3.15.7"
+        "revision" : "c60e1773f0c9ff30636990ebb4ac6a428fa1fd09",
+        "version" : "3.17.0"
       }
     },
     {
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "0ffc3c6287461962cb2a81e57fc0ee0335d8d56a",
-        "version" : "8.40.1"
+        "revision" : "56bfb7e723c76614be4c0861ee820ccbaed14c6d",
+        "version" : "8.41.0"
       }
     },
     {
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "69247baf7be2fd6f5820192caef0082d01849cd0",
-        "version" : "1.16.1"
+        "revision" : "d602618c628e5123f66643437151079d3664970d",
+        "version" : "1.17.0"
       }
     },
     {
@@ -195,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "96eecd47660e8307877acb8c41cc5295ba7350a7",
-        "version" : "1.5.2"
+        "revision" : "5526c8a27675dc7b18d6fa643abfb64bcb200b77",
+        "version" : "1.6.2"
       }
     },
     {
@@ -222,8 +222,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-perception",
       "state" : {
-        "revision" : "dccdf5aed1db969afa11d6fbd36b96a4932ebe8c",
-        "version" : "1.4.0"
+        "revision" : "8d52279b9809ef27eabe7d5420f03734528f19da",
+        "version" : "1.4.1"
+      }
+    },
+    {
+      "identity" : "swift-sharing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-sharing",
+      "state" : {
+        "revision" : "b68bf99b05cb974392f6ffa380351e9b7391e233",
+        "version" : "1.1.0"
       }
     },
     {
@@ -267,8 +276,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "770f990d3e4eececb57ac04a6076e22f8c97daeb",
-        "version" : "1.4.2"
+        "revision" : "a3f634d1a409c7979cabc0a71b3f26ffa9fc8af1",
+        "version" : "1.4.3"
       }
     },
     {
@@ -285,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ZhgChgLi/ZMarkupParser.git",
       "state" : {
-        "revision" : "c305a8be7d6c6fb96e4b387574dc16563d140c0e",
-        "version" : "1.11.0"
+        "revision" : "f25c9838e9e77ae49cc3f434ee26e669cb4043c7",
+        "version" : "1.12.0"
       }
     },
     {
