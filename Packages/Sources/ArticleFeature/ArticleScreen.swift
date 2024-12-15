@@ -428,18 +428,22 @@ extension ArticleScreen {
                         .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
                 })
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    let percentage = 0.8
-                    let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
-                    let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
-                    let opacity = min(coefficient, 1)
-                    if lastValue != opacity {
-                        navBarOpacity = opacity
+                    Task { @MainActor in
+                        let percentage = 0.8
+                        let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
+                        let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
+                        let opacity = min(coefficient, 1)
+                        if lastValue != opacity {
+                            navBarOpacity = opacity
+                        }
+                        lastValue = opacity
                     }
-                    lastValue = opacity
                 }
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    if value.y > 0 {
-                        onRefreshTriggered()
+                    Task { @MainActor in
+                        if value.y > 0 {
+                            onRefreshTriggered()
+                        }
                     }
                 }
         }
