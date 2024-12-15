@@ -150,10 +150,11 @@ public struct FavoritesScreen: View {
                     Spacer(minLength: 0)
 
                     if unread {
-                        Circle()
-                            .font(.title2)
+                        Image(systemSymbol: .circleFill)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
                             .foregroundStyle(tintColor)
-                            .frame(width: 8)
                     }
                     
                     if closed {
@@ -181,7 +182,7 @@ public struct FavoritesScreen: View {
             .font(.subheadline)
             .foregroundStyle(Color.Labels.teritary)
             .textCase(nil)
-            .offset(x: 0)
+            .offset(x: -16)
             .padding(.bottom, 4)
     }
 }

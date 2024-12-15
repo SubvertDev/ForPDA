@@ -194,10 +194,11 @@ public struct ForumScreen: View {
                     Spacer(minLength: 0)
 
                     if unread {
-                        Circle()
-                            .font(.title2)
+                        Image(systemSymbol: .circleFill)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
                             .foregroundStyle(tintColor)
-                            .frame(width: 8)
                     }
                     
                     if closed {

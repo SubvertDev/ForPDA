@@ -84,7 +84,9 @@ public struct ForumsListScreen: View {
                     
                     if unread {
                         Image(systemSymbol: .circleFill)
-                            .font(.caption)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
                             .foregroundStyle(tintColor)
                     }
                 }

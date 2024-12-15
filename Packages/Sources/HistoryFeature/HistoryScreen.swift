@@ -111,11 +111,11 @@ public struct HistoryScreen: View {
                     Spacer(minLength: 0)
                     
                     if unread {
-                        Circle()
-                            .font(.title2)
+                        Image(systemSymbol: .circleFill)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
                             .foregroundStyle(tintColor)
-                            .frame(width: 8)
-                            .padding(.trailing, 12)
                     }
                 }
                 .padding(.vertical, 8)
@@ -135,7 +135,7 @@ public struct HistoryScreen: View {
             .font(.subheadline)
             .foregroundStyle(Color.Labels.teritary)
             .textCase(nil)
-            .offset(x: 0)
+            .offset(x: -16)
             .padding(.bottom, 4)
     }
 }
