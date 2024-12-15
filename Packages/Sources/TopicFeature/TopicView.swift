@@ -13,18 +13,22 @@ import Models
 
 public struct TopicView: View {
         
-    let type: TopicType
+    let type: TopicTypeUI
+    let isTopLevel: Bool
     let attachments: [Post.Attachment]
     let textAlignment: NSTextAlignment?
     let onUrlTap: URLTapHandler?
     
     public init(
-        type: TopicType,
-        attachments: [Post.Attachment],
+        type: TopicTypeUI,
+        isTopLevel: Bool = true,
+        attachments: [Post.Attachment] = [],
         alignment: NSTextAlignment? = nil,
+        lineLimit: Int? = nil,
         onUrlTap: URLTapHandler? = nil
     ) {
         self.type = type
+        self.isTopLevel = isTopLevel
         self.attachments = attachments
         self.textAlignment = alignment
         self.onUrlTap = onUrlTap
@@ -32,12 +36,6 @@ public struct TopicView: View {
     
     public var body: some View {
         switch type {
-        case .error:
-            Text("Whoops, something went wrong while parsing this post :(", bundle: .module)
-                .foregroundStyle(.background)
-                .padding(16)
-                .background(Color(uiColor: .label))
-            
         case let .text(text):
             RichText(
                 text: text,
@@ -99,14 +97,38 @@ public struct TopicView: View {
         case let .spoiler(types, info):
             SpoilerView(types: types, info: info, attachments: attachments, onUrlTap: onUrlTap)
             
-        case let .quote(text, type):
-            QuoteView(text: text, type: type, onUrlTap: onUrlTap)
+        case let .quote(types, info):
+            QuoteView(types: types, info: info, attachments: attachments, onUrlTap: onUrlTap)
             
-        case let .code(text, type):
-            CodeView(text: text, type: type, onUrlTap: onUrlTap)
+        case let .code(type, info):
+            CodeView(type: type, info: info, onUrlTap: onUrlTap)
             
-        case let .mergetime(date):
-            RichText(text: "Добавлено: \(date.formatted())".asNSAttributedString(font: .footnote))
+        case let .list(types):
+            VStack(spacing: 8) {
+                ForEach(types, id: \.self) { type in
+                    TopicView(type: type, isTopLevel: false, attachments: attachments)
+                        .padding(.leading, isTopLevel ? 0 : 8)
+                }
+            }
+            
+        case let .notice(types, info):
+            NoticeView(types: types, info: info, attachments: attachments, onUrlTap: onUrlTap)
+            
+        case let .bullet(types):
+            HStack(alignment: .top, spacing: 6) {
+                Image(systemSymbol: .circleFill)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(Color.Labels.primary)
+                    .frame(width: 6, height: 6)
+                    .padding(.top, 7)
+                
+                VStack(spacing: 8) {
+                    ForEach(types, id: \.self) { type in
+                        TopicView(type: type, attachments: attachments)
+                    }
+                }
+            }
         }
     }
 }
@@ -117,44 +139,74 @@ struct SpoilerView: View {
     
     @State private var isExpanded = false
     
-    let types: [TopicType]
-    let info: NSAttributedString?
+    let types: [TopicTypeUI]
+    let info: AttributedString?
     let attachments: [Post.Attachment]
     let onUrlTap: URLTapHandler?
+    private let text: AttributedString
+    
+    private static var defaultAttributes: AttributeContainer {
+        var container = AttributeContainer()
+        container.foregroundColor = UIColor(Color.Labels.primary)
+        container.font = UIFont.preferredFont(forTextStyle: .callout)
+        return container
+    }
+    
+    init(types: [TopicTypeUI], info: AttributedString?, attachments: [Post.Attachment], onUrlTap: URLTapHandler?) {
+        self.types = types
+        self.info = info
+        self.attachments = attachments
+        self.onUrlTap = onUrlTap
+        
+        var attrString = AttributedString("Спойлер\(info != nil ? ": " : "")")
+        attrString.setAttributes(SpoilerView.defaultAttributes)
+        if let info {
+            attrString.foregroundColor = UIColor(Color.Labels.teritary)
+            attrString.append(info)
+        }
+        self.text = attrString
+    }
     
     var body: some View {
-        VStack {
-            HStack {
-                if let info {
-                    RichText(text: "Спойлер: ".asNSAttributedString() + info, onUrlTap: onUrlTap, configuration: {
-                        ($0 as? UITextView)?.isSelectable = false
-                    })
-                } else {
-                    RichText(text: "Спойлер".asNSAttributedString(), onUrlTap: onUrlTap, configuration: {
-                        ($0 as? UITextView)?.isSelectable = false
-                    })
-                }
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                RichText(text: text, onUrlTap: onUrlTap, configuration: {
+                    ($0 as? UITextView)?.isSelectable = false
+                })
                 
                 Spacer()
                 
                 Image(systemSymbol: isExpanded ? .chevronUp : .chevronDown)
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(Color.Labels.quaternary)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(12)
             .contentShape(Rectangle())
-            .background(Color.Main.primaryAlpha)
+            .overlay(alignment: .bottom) {
+                if isExpanded {
+                    Rectangle()
+                        .fill(Color.Separator.secondary)
+                        .frame(height: 1)
+                        .padding(.horizontal, 12)
+                }
+            }
             .onTapGesture {
                 isExpanded.toggle()
             }
             
             if isExpanded {
-                ForEach(types, id: \.self) { type in
-                    TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                VStack(spacing: 8) {
+                    ForEach(types, id: \.self) { type in
+                        TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                    }
                 }
-                .padding(8)
+                .padding(12)
             }
         }
-        .border(Color.Main.primaryAlpha)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
+        )
         .animation(.default, value: isExpanded)
     }
 }
@@ -163,34 +215,84 @@ struct SpoilerView: View {
 
 struct QuoteView: View {
     
-    let text: NSAttributedString
-    let type: QuoteType
+    let types: [TopicTypeUI]
+    let info: QuoteType?
+    let attachments: [Post.Attachment]
     let onUrlTap: URLTapHandler?
+    private let text: AttributedString
+    private var date: String?
+    
+    private static var defaultAttributes: AttributeContainer {
+        var container = AttributeContainer()
+        container.foregroundColor = Color.Labels.primary
+        container.font = .callout
+        return container
+    }
+    
+    init(types: [TopicTypeUI], info: QuoteType?, attachments: [Post.Attachment], onUrlTap: URLTapHandler?) {
+        self.types = types
+        self.info = info
+        self.attachments = attachments
+        self.onUrlTap = onUrlTap
+        self.date = nil
+        
+        var text = AttributedString("Цитата\(info != nil ? ": " : "")")
+        if let info {
+            text.foregroundColor = Color.Labels.teritary
+            text.font = .callout
+            
+            switch info {
+            case .title(let string):
+                var infoText = AttributedString(string)
+                infoText.setAttributes(QuoteView.defaultAttributes)
+                text.append(infoText)
+            case .metadata(let metadata):
+                var infoText = AttributedString(metadata.name)
+                infoText.setAttributes(QuoteView.defaultAttributes)
+                text.append(infoText)
+                self.date = metadata.date
+            }
+        } else {
+            text.setAttributes(QuoteView.defaultAttributes)
+        }
+        self.text = text
+    }
     
     var body: some View {
-        VStack(spacing: 8) {
-            Group {
-                switch type {
-                case .none:
-                    Text("Quote", bundle: .module)
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                Text(text)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                if let date {
+                    Spacer(minLength: 8)
                     
-                case let .title(title):
-                    Text("Quote: \(title)", bundle: .module)
-                    
-                case let .user(user):
-                    Text("Quote: \(user.name) @ \(user.date)", bundle: .module)
+                    Text(date)
+                        .foregroundStyle(Color.Labels.quaternary)
+                        .font(.caption2)
                 }
             }
-            .padding(.vertical, 4)
-            .padding(.horizontal, 8)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.Main.primaryAlpha)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+            .padding(.horizontal, 12)
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(Color.Separator.secondary)
+                    .frame(height: 1)
+                    .padding(.horizontal, 12)
+            }
             
-            RichText(text: text, onUrlTap: onUrlTap)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
+            VStack(spacing: 8) {
+                ForEach(types, id: \.self) { type in
+                    TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                }
+            }
+            .padding(12)
         }
-        .border(Color.Main.primaryAlpha)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
+        )
     }
 }
 
@@ -198,66 +300,164 @@ struct QuoteView: View {
 
 struct CodeView: View {
     
-    let text: NSAttributedString
-    let type: CodeType
+    @State private var isExpanded = false
+    
+    let type: TopicTypeUI
+    let info: CodeType
     let onUrlTap: URLTapHandler?
     
     var body: some View {
-        VStack(spacing: 8) {
-            Group {
-                switch type {
-                case .none:
-                    Text("Code", bundle: .module)
-                    
-                case let .title(title):
-                    Text("Code: \(title)", bundle: .module)
+        VStack(spacing: 0) {
+            HStack {
+                Group {
+                    switch info {
+                    case .none:
+                        Text("Код")
+                            .foregroundStyle(Color.Labels.primary)
+                        
+                    case let .title(title):
+                        HStack {
+                            Text("Код: ")
+                                .foregroundStyle(Color.Labels.teritary)
+                            Text(title)
+                                .foregroundStyle(Color.Labels.primary)
+                        }
+                    }
+                }
+                .font(.callout)
+                
+                Spacer()
+                
+                Image(systemSymbol: isExpanded ? .chevronUp : .chevronDown)
+                    .font(.body)
+                    .foregroundStyle(Color.Labels.quaternary)
+                    .frame(width: 20, height: 20)
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .bottom) {
+                if isExpanded {
+                    Rectangle()
+                        .fill(Color.Separator.secondary)
+                        .frame(height: 1)
+                        .padding(.horizontal, 12)
                 }
             }
-            .padding(.vertical, 4)
-            .padding(.horizontal, 8)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.Main.red.opacity(0.5)) // TODO: Change color
+            .onTapGesture {
+                isExpanded.toggle()
+            }
             
-            RichText(text: text, onUrlTap: onUrlTap)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 8)
+            if isExpanded {
+                if case .text = type {
+                    TopicView(type: type)
+                        .padding(12)
+                } else {
+                    fatalError("Non text type in CodeView")
+                }
+            }
         }
-        .border(Color.Main.red)
-    }
-}
-
-#Preview {
-    VStack(spacing: 8) {
-//        TopicView(type: .text(NSAttributedString(string: "test")), attachments: [])
-//        
-//        TopicView(type: .image(URL(string: "https://4pda.to/s/Zy0hVVliEZZvbylgfQy11QiIjvDIhLJBjheakj4yIz2ohhN2F.jpg")!))
-//            .frame(width: 100, height: 100)
-//            .clipped()
-//        
-//        TopicView(type: .spoiler([.text(NSAttributedString(string: "123"))]))
-    }
-}
-
-// TODO: Move to Extensions?
-func + (left: NSAttributedString, right: NSAttributedString) -> NSAttributedString {
-    let result = NSMutableAttributedString()
-    result.append(left)
-    result.append(right)
-    return result
-}
-
-// TODO: Move to Extensions?
-extension String {
-    func asNSAttributedString(
-        font: UIFont.TextStyle = .body,
-        color: UIColor = UIColor.label
-    ) -> NSAttributedString {
-        NSAttributedString(
-            string: self,
-            attributes: [
-                .font: UIFont.preferredFont(forTextStyle: font),
-                .foregroundColor: color
-            ]
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(Color.Main.greyAlpha)
+                        .frame(width: 4)
+                }
         )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .animation(.default, value: isExpanded)
+    }
+}
+
+// MARK: - Notice View
+
+struct NoticeView: View {
+    
+    let types: [TopicTypeUI]
+    let info: NoticeType
+    let attachments: [Post.Attachment]
+    let onUrlTap: URLTapHandler?
+    
+    var body: some View {
+        VStack(spacing: 0) {
+//            HStack(spacing: 0) {
+//                Text(info.title)
+//                    .font(.callout)
+//                    .foregroundStyle(info.color)
+//                    .frame(maxWidth: .infinity, alignment: .leading)
+//            }
+//            .padding([.top, .horizontal], 12)
+//            .padding(.bottom, 8)
+//            .overlay(alignment: .bottom) {
+//                Rectangle()
+//                    .fill(Color.Separator.secondary)
+//                    .frame(height: 1)
+//                    .padding(.horizontal, 12)
+//            }
+//            
+            VStack(spacing: 8) {
+                ForEach(types, id: \.self) { type in
+                    TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                }
+            }
+            .padding(12)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
+                .overlay(alignment: .leading) {
+                    Rectangle()
+                        .fill(info.color)
+                        .frame(width: 4)
+                }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - Previews
+
+#Preview("Code View") {
+    let string = Array(repeating: "New Line!", count: 15).joined(separator: "\n")
+    VStack {
+        CodeView(
+            type: .text(AttributedString(string)),
+            info: .none,
+            onUrlTap: nil
+        )
+        Color.white
+    }
+    .padding(.horizontal, 16)
+}
+
+#Preview("Notice View") {
+    let string = Array(repeating: "Some text!", count: 15).joined(separator: "\n")
+    VStack {
+        NoticeView(
+            types: [.text(AttributedString(string))],
+            info: .moderator,
+            attachments: [],
+            onUrlTap: nil
+        )
+        Color.white
+    }
+    .padding(.horizontal, 16)
+}
+
+// TODO: Move to SharedUI
+extension Shape {
+    func fill<Fill: ShapeStyle, Stroke: ShapeStyle>(_ fillStyle: Fill, strokeBorder strokeStyle: Stroke, lineWidth: Double = 1) -> some View {
+        self
+            .stroke(strokeStyle, lineWidth: lineWidth)
+            .background(self.fill(fillStyle))
+    }
+}
+
+extension InsettableShape {
+    func fill<Fill: ShapeStyle, Stroke: ShapeStyle>(_ fillStyle: Fill, strokeBorder strokeStyle: Stroke, lineWidth: Double = 1) -> some View {
+        self
+            .strokeBorder(strokeStyle, lineWidth: lineWidth)
+            .background(self.fill(fillStyle))
     }
 }

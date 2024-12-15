@@ -193,6 +193,7 @@ let package = Package(
                 "CacheClient",
                 "AnalyticsClient",
                 "ParsingClient",
+                "LoggerClient",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "RichTextKit", package: "RichTextKit"),

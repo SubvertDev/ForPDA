@@ -44,6 +44,7 @@ public struct TopicScreen: View {
                     }
                 }
             }
+            .animation(.default, value: store.isLoadingTopic)
             .overlay {
                 if store.topic == nil || store.isLoadingTopic {
                     PDALoader()
@@ -158,9 +159,11 @@ public struct TopicScreen: View {
     private func PostBody(_ post: Post) -> some View {
         VStack(spacing: 8) {
             if let postIndex = store.topic?.posts.firstIndex(of: post) {
-                ForEach(store.types[postIndex], id: \.self) { type in
-                    TopicView(type: type, attachments: post.attachments) { url in
-                        store.send(.urlTapped(url))
+                if store.types.count - 1 >= postIndex {
+                    ForEach(store.types[postIndex], id: \.self) { type in
+                        TopicView(type: type, attachments: post.attachments) { url in
+                            store.send(.urlTapped(url))
+                        }
                     }
                 }
             }
@@ -170,14 +173,28 @@ public struct TopicScreen: View {
 
 // MARK: - Previews
 
+//#Preview {
+//    NavigationStack {
+//        TopicScreen(
+//            store: Store(
+//                initialState: TopicFeature.State(topicId: 0)
+//            ) {
+//                TopicFeature()
+//            }
+//        )
+//    }
+//}
+
 #Preview {
-    NavigationStack {
-        TopicScreen(
-            store: Store(
-                initialState: TopicFeature.State(topicId: 0)
-            ) {
-                TopicFeature()
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(topicId: 0)
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.getTopic = { @Sendable _, _, _ in
+                return .mock
             }
-        )
-    }
+        }
+    )
 }

@@ -27,7 +27,7 @@ public struct TopicFeature: Reducer, Sendable {
         let topicId: Int
         var topic: Topic?
         
-        var types: [[TopicType]] = []
+        var types: [[TopicTypeUI]] = []
         
         var isFirstPage = true
         var isLoadingTopic = true
@@ -52,7 +52,7 @@ public struct TopicFeature: Reducer, Sendable {
         case pageNavigation(PageNavigationFeature.Action)
         
         case _loadTopic(offset: Int)
-        case _loadTypes([[TopicType]])
+        case _loadTypes([[TopicTypeUI]])
         case _topicResponse(Result<Topic, any Error>)
     }
     
@@ -60,6 +60,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.logger) var logger
     
     // MARK: - Cancellable
     
@@ -104,26 +105,32 @@ public struct TopicFeature: Reducer, Sendable {
                 .cancellable(id: CancelID.loading)
                 
             case let ._topicResponse(.success(topic)):
-//                customDump(topic)
+                // customDump(topic)
                 state.topic = topic
                 
                 // TODO: Is it ok?
                 state.pageNavigation.count = topic.postsCount
                 
                 return .run { send in
-                    var topicTypes: [[TopicType]] = []
+                    var topicTypes: [[TopicTypeUI]] = []
+                    let builder = TopicBuilder()
+                    logger.error("[LOG] Start processing topic: \(Date.now)")
                     for post in topic.posts {
-                        if let content = await cacheClient.getParsedPostContent(post.id) {
-                            let types = try! TopicBuilder.build(from: content)
+                        logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
+                        if let types = await cacheClient.getParsedPostContent(post.id) {
                             topicTypes.append(types)
                         } else {
+                            logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
                             let parsedContent = BBCodeParser.parse(post.content)!
-                            await cacheClient.cacheParsedPostContent(post.id, parsedContent)
-                            let types = try! TopicBuilder.build(from: parsedContent)
+                            logger.error("[LOG] Start building \(post.id): \(Date.now)")
+                            let types = try! builder.build(from: parsedContent)
+                            logger.error("[LOG] Start caching \(post.id): \(Date.now)")
+                            await cacheClient.cacheParsedPostContent(post.id, types)
                             topicTypes.append(types)
                         }
+                        logger.error("[LOG] Stop processing \(post.id): \(Date.now)")
                     }
-                    
+                    logger.error("[LOG] Finish processing topic: \(Date.now)")
                     await send(._loadTypes(topicTypes))
                 }
                 .cancellable(id: CancelID.loading)

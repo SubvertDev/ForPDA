@@ -8,16 +8,24 @@
 import SwiftUI
 import SharedUI
 import ComposableArchitecture
+import ParsingClient
+import Models
+import OSLog
 
-public enum QuoteType: Hashable {
-    case none
-    case title(String)
-    case user(UserQuote)
-}
-
-public enum CodeType: Hashable {
-    case none
-    case title(String)
+public struct Metadata: Hashable, Equatable {
+    let range: Range<String.Index>
+    var attributes: AttributeContainer?
+    var attributed: AttributedString?
+    
+    init(
+        range: Range<String.Index>,
+        attributes: AttributeContainer? = nil,
+        attributed: AttributedString? = nil
+    ) {
+        self.range = range
+        self.attributes = attributes
+        self.attributed = attributed
+    }
 }
 
 public struct UserQuote: Hashable {
@@ -26,405 +34,930 @@ public struct UserQuote: Hashable {
     public let postId: Int
 }
 
-public enum TopicType: Hashable, Equatable {
-    case error
-    case text(NSAttributedString)
+public indirect enum TopicType: Hashable, Equatable {
+    case text(String, Metadata)
     case attachment(Int)
     case image(URL)
     case left([TopicType])
     case center([TopicType])
     case right([TopicType])
-    case spoiler([TopicType], NSAttributedString?)
-    case quote(NSAttributedString, QuoteType)
-    case code(NSAttributedString, CodeType)
-    case mergetime(Date)
+    case spoiler([TopicType], String?, AttributedString?)
+    case quote([TopicType], QuoteType?)
+    case code(TopicType, CodeType)
+    case list([TopicType])
+    case notice([TopicType], NoticeType)
+    case bullet([TopicType])
 }
 
-public struct TopicBuilder {
+public class TopicBuilder {
     
-    public static func build(from content: NSAttributedString) throws -> [TopicType] {
-        var result: [TopicType] = []
-        var remainingText = content
-        
-        while remainingText.length > 0 {
-            let tags = [
-                "[spoiler=",
-                "[spoiler]",
-                "[left]",
-                "[center]",
-                "[right]",
-                "[attachment=",
-                "[img]",
-                "[quote]",
-                "[quote=", // quoute="text"
-                "[quote ", // quote name="name"...
-                "[code]",
-                "[code=", // code="text"
-                "Добавлено [mergetime]"
-            ] // Add new tags as needed
-            
-            let ranges: [NSRange] = tags.compactMap { tag in
-                if let range = remainingText.string.range(of: tag) {
-                    let location = remainingText.string.distance(from: remainingText.string.startIndex, to: range.lowerBound)
-                    return NSRange(location: location, length: tag.count)
+    let isLoggerEnabled = false
+    lazy var logger = isLoggerEnabled ? Logger() : Logger(.disabled)
+    
+    public init() {}
+    
+    public func build(from content: NSAttributedString) throws -> [TopicTypeUI] {
+        let attributedString = AttributedString(content)
+        let scanner = Scanner(string: String(attributedString.characters[...]))
+        scanner.caseSensitive = true
+        Logger().error("Preparse: \(Date.now)")
+        let types = parse(with: scanner)
+        Logger().error("PostParse: \(Date.now)")
+        var attributedRanges: [(Range<AttributedString.Index>, AttributeContainer)] = []
+        for run in attributedString.runs {
+            let attributes = (run.range, run.attributes)
+            //logger.log("[RUN] \(attributes)")
+            attributedRanges.append(attributes)
+        }
+
+        Logger().error("Preapply: \(Date.now)")
+        let attributedTypes = applyAttributes(attributedRanges, of: attributedString, to: types)
+        Logger().error("Postapply: \(Date.now)")
+        return attributedTypes.map { twoToUI($0) }
+    }
+    
+    private func applyAttributes(_ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)], of attributedString: AttributedString, to string: String) -> AttributedString? {
+        guard let attributedTextRange = attributedString.range(of: string) else { fatalError("no string match found") }
+        for (attributedRunRange, attributeContainer) in attributedRun {
+            if attributedTextRange.overlaps(attributedRunRange) {
+                var newAttributedString = AttributedString(string)
+                // TODO: Move to defaults somewhere else
+                newAttributedString.foregroundColor = UIColor(Color.Labels.primary)
+                newAttributedString.font = UIFont.preferredFont(forTextStyle: .callout)
+                let originalTextInRange = attributedString[attributedRunRange]
+                if let newTextRange = newAttributedString.range(of: String(originalTextInRange.characters)) {
+                    newAttributedString[newTextRange].mergeAttributes(attributeContainer)
+                    return newAttributedString
                 }
-                return nil
+                return newAttributedString
             }
-
-            // Find the earliest tag
-            let nextTagRange = ranges.min { $0.location < $1.location }
-
-            if let nextTagRange {
-                let prefixRange = NSRange(location: 0, length: nextTagRange.location)
-                if prefixRange.length > 0 {
-                    let prefixText = remainingText.attributedSubstring(from: prefixRange)
-                    
-                    // Check if the plain text (string) of the prefix is non-empty after trimming
-                    if !prefixText.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        let trimmedText = prefixText.trimmedAttributedString()
-                        let text = extractSnapback(in: trimmedText)
-                        result.append(.text(text))
+        }
+        return nil
+    }
+    
+    private func applyAttributes(_ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)], of attributedString: AttributedString, to types: [TopicType]) -> [TopicType] {
+        var types = types
+        for index in types.indices {
+            switch types[index] {
+            case let .text(string, metadata):
+                // Trying to find same range of text in original string
+                guard let attributedTextRange = attributedString.range(of: string) else {
+                    logger.log("[ATTRIBUTES] No range found for string")
+                    continue
+                }
+                
+                // When found, iterating over attributed runs to find overlaps
+                for (attributedRunRange, attributeContainer) in attributedRun {
+                    if attributedTextRange.overlaps(attributedRunRange) {
+                        // We store modified attributed string into metadata, so we need to extract it each time we
+                        // run this to not overwrite any of the attributes (not very optimal, but works for now)
+                        var newAttributedString = AttributedString(string)
+                        // TODO: Move to defaults somewhere else
+                        newAttributedString.font = UIFont.preferredFont(forTextStyle: .callout)
+                        newAttributedString.foregroundColor = UIColor(Color.Labels.primary)
+                        if case let .text(_, modifiedMetadata) = types[index] {
+                            if let savedAttributedString = modifiedMetadata.attributed {
+                                newAttributedString = savedAttributedString
+                            }
+                        }
+                        
+                        // If we have a text match, update our text with its metadata
+                        let originalTextInRange = attributedString[attributedRunRange]
+                        if let newTextRange = newAttributedString.range(of: String(originalTextInRange.characters)) {
+                            newAttributedString[newTextRange].mergeAttributes(attributeContainer)
+                        }
+                        let newMetadata = Metadata(range: metadata.range, attributed: newAttributedString)
+                        types[index] = .text(string, newMetadata)
+                    } else {
+                        // No overlap
                     }
                 }
                 
-                // Extract the tag (with attributes preserved)
-                let nextTag = remainingText.attributedSubstring(from: nextTagRange).string
+            case let .left(array):
+                types[index] = .left(applyAttributes(attributedRun, of: attributedString, to: array))
                 
-                switch nextTag {
-                case "[spoiler=", "[spoiler]":
-                    let spoiler = extractSpoiler(from: remainingText, baseStartTag: "[spoiler]", endTag: "[/spoiler]")
-                    let types = try! TopicBuilder.build(from: spoiler.text)
-                    result.append(.spoiler(types, spoiler.additionalInfo))
-                    remainingText = spoiler.remainingText ?? NSAttributedString(string: "")
-                    
-                case "[left]":
-                    let parts = extractText(from: remainingText, startTag: "[left]", endTag: "[/left]")
-                    let types = try! TopicBuilder.build(from: parts.0)
-                    result.append(.center(types))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[center]":
-                    let parts = extractText(from: remainingText, startTag: "[center]", endTag: "[/center]")
-                    let types = try! TopicBuilder.build(from: parts.0)
-                    result.append(.center(types))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[right]":
-                    let parts = extractText(from: remainingText, startTag: "[right]", endTag: "[/right]")
-                    let types = try! TopicBuilder.build(from: parts.0)
-                    result.append(.right(types))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[attachment=":
-                    let parts = extractText(from: remainingText, startTag: "[attachment=\"", endTag: "\"]")
-                    let imageId = parts.0.string.split(separator: ":")[0]
-                    result.append(.attachment(Int(imageId)!))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[img]":
-                    let parts = extractText(from: remainingText, startTag: "[img]", endTag: "[/img]")
-                    let imageUrl = parts.0.string
-                    result.append(.image(URL(string: imageUrl)!))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[quote]":
-                    let parts = extractText(from: remainingText, startTag: "[quote]", endTag: "[/quote]")
-                    result.append(.quote(parts.0.trimmedAttributedString(), .none))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[quote=":
-                    let parts = extractText(from: remainingText, startTag: "[quote=", endTag: "[/quote]")
-                    let splitted = parts.0.string.split(separator: "]")
-                    let title = String(splitted[0].dropFirst().dropLast(2))
-                    let text = parts.0.removingFirstNCharacters(title.count + 3)
-                    result.append(.quote(text.trimmedAttributedString(), .title("Заголовок"))) // FIXME: Заголовок недоделан
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[quote ":
-                    let parts = extractText(from: remainingText, startTag: "[quote ", endTag: "[/quote]")
-                    let quoteParts = parts.0.components(separatedBy: "]")
-                    let userInfo = parseQuoteInfo(quoteParts[0])
-                    let joined = dropAndJoinAttributedStrings(quoteParts)
-                    let text = joined.trimmedAttributedString()
-                    result.append(.quote(text, .user(userInfo)))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[code]":
-                    let parts = extractText(from: remainingText, startTag: "[code]", endTag: "[/code]")
-                    result.append(.code(parts.0.trimmedAttributedString(), .none))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "[code=":
-                    let parts = extractText(from: remainingText, startTag: "[code=", endTag: "[/code]")
-                    let splitted = parts.0.string.split(separator: "]")
-                    let title = String(splitted[0].dropFirst().dropLast(2))
-                    let text = parts.0.removingFirstNCharacters(title.count + 3)
-                    result.append(.code(text.trimmedAttributedString(), .title(title)))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                case "Добавлено [mergetime]":
-                    let parts = extractText(from: remainingText, startTag: "Добавлено [mergetime]", endTag: "[/mergetime]")
-                    let date = Date(timeIntervalSince1970: TimeInterval(parts.0.string) ?? 0)
-                    result.append(.mergetime(date))
-                    remainingText = parts.1 ?? NSAttributedString(string: "")
-                    
-                default:
-                    result.append(.error)
-                    remainingText = NSAttributedString(string: "")
-                }
-            } else {
-                if remainingText.length > 0 {
-                    let trimmedText = remainingText.trimmedAttributedString()
-                    let text = extractSnapback(in: trimmedText)
-                    result.append(.text(text))
-                }
+            case let .center(array):
+                types[index] = .center(applyAttributes(attributedRun, of: attributedString, to: array))
+                
+            case let .right(array):
+                types[index] = .right(applyAttributes(attributedRun, of: attributedString, to: array))
+
+            case let .spoiler(array, info, attrStr):
+                var attrStr = attrStr
+                if let info { attrStr = applyAttributes(attributedRun, of: attributedString, to: info) }
+                types[index] = .spoiler(applyAttributes(attributedRun, of: attributedString, to: array), info, attrStr)
+                
+            case let .quote(array, info):
+                types[index] = .quote(applyAttributes(attributedRun, of: attributedString, to: array), info)
+                
+            case let .list(array):
+                types[index] = .list(applyAttributes(attributedRun, of: attributedString, to: array))
+                
+            case let .code(text, info):
+                let text = applyAttributes(attributedRun, of: attributedString, to: [text])
+                types[index] = .code(text.first!, info)
+                
+            case let .notice(array, info):
+                types[index] = .notice(applyAttributes(attributedRun, of: attributedString, to: array), info)
+                
+            case let .bullet(array):
+                types[index] = .bullet(applyAttributes(attributedRun, of: attributedString, to: array))
+
+            case .attachment, .image:
                 break
             }
         }
-
-        return result
+        return types
     }
     
-    // MARK: - Extract Quote Info
-    
-    private static func parseQuoteInfo(_ attributedString: NSAttributedString) -> UserQuote {
-        let plainText = attributedString.string
-        
-        let pattern = #"name="([^"]+)" date="([^"]+)" post=(\d+)"#
-        
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
-            fatalError("Invalid regex pattern")
-        }
-        
-        let range = NSRange(location: 0, length: plainText.utf16.count)
-        if let match = regex.firstMatch(in: plainText, options: [], range: range) {
-            let name = match.range(at: 1).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 1)) : nil
-            let date = match.range(at: 2).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 2)) : nil
-            let post = match.range(at: 3).location != NSNotFound ? (plainText as NSString).substring(with: match.range(at: 3)) : nil
-            
-            return UserQuote(name: name!, date: date!, postId: Int(post!)!)
-        } else {
-            fatalError()
-        }
-    }
-    
-    private static func dropAndJoinAttributedStrings(_ attributedStrings: [NSAttributedString]) -> NSAttributedString {
-        let remainingStrings = attributedStrings.dropFirst()
-        let result = NSMutableAttributedString()
-        for string in remainingStrings {
-            result.append(string)
-        }
-        return result
-    }
-    
-    // MARK: - Extract Snapback
-    
-    private static func extractSnapback(in attributedString: NSAttributedString) -> (NSAttributedString) {
-        let plainText = attributedString.string
-        let pattern = #"\[snapback\](\d+)\[/snapback\]"#
-        
-        guard let regex = try? NSRegularExpression(pattern: pattern) else {
-            fatalError()
-        }
-        
-        let matches = regex.matches(in: plainText, options: [], range: NSRange(location: 0, length: plainText.utf16.count))
-        
-        // Prepare to collect extracted data
-        var extractedNumbers = [Int]()
-        var positions = [Int]()
-        
-        // Create a mutable copy of the attributed string
-        let mutableAttributedString = NSMutableAttributedString(attributedString: attributedString)
-        
-        // Prepare image attachment
-        let image = Image.snapback
-        let attachment = NSTextAttachment(image: image)
-        attachment.bounds = CGRect(x: 0, y: -2, width: 16, height: 16)
-        let snapbackAttributedString = NSAttributedString(attachment: attachment)
-        
-        // Adjust offset to account for text removal
-        var offset = 0
-        
-        for match in matches {
-            // Extract the number
-            let numberRange = match.range(at: 1)
-            let number = Int((plainText as NSString).substring(with: numberRange))!
-            extractedNumbers.append(number)
-            
-            // Record the adjusted position
-            let startPosition = match.range.location - offset
-            positions.append(startPosition)
-            
-            // Remove the `[snapback]...[/snapback]` tags
-            let fullRange = NSRange(location: match.range.location - offset, length: match.range.length)
-            mutableAttributedString.replaceCharacters(in: fullRange, with: "")
-            
-            // Insert the snapback image at the recorded position
-            mutableAttributedString.insert(snapbackAttributedString, at: startPosition)
-            
-            // Update the offset to account for the removed range
-            offset += match.range.length
-        }
-        
-        return mutableAttributedString
-    }
-    
-    // MARK: - Extract Spoiler
-    
-    private struct Spoiler {
-        let text: NSAttributedString
-        let additionalInfo: NSAttributedString?
-        let remainingText: NSAttributedString?
-    }
-    
-    private static func extractSpoiler(from text: NSAttributedString, baseStartTag: String, endTag: String) -> Spoiler {
-        let fullText = text.string
-        var stack: [(String.Index, NSAttributedString?)] = [] // Stack to track nested start tags and their additional info
-        var currentIndex = fullText.startIndex
-
-        while let nextTag = findNextTag(in: fullText, startTagRegex: try! NSRegularExpression(pattern: "\\[spoiler(=[^\\]]+)?\\]", options: []), endTag: endTag, from: currentIndex) {
-            if nextTag.isStartTag {
-                // Extract full tag as attributed string
-                let fullTag = text.attributedSubstring(from: NSRange(nextTag.range, in: fullText))
-                
-                // Extract additional info (if available)
-                let additionalInfo = extractAdditionalInfo(from: fullTag, baseStartTag: baseStartTag)
-
-                // Push the start tag and its additional info onto the stack
-                stack.append((nextTag.range.lowerBound, additionalInfo))
-                currentIndex = nextTag.range.upperBound
-            } else if let (start, additionalInfo) = stack.popLast() {
-                // Found an end tag with a matching start tag on the stack
-                let startTagEndIndex = fullText.distance(from: fullText.startIndex, to: fullText.index(start, offsetBy: baseStartTag.count))
-                let endTagStartIndex = fullText.distance(from: fullText.startIndex, to: nextTag.range.lowerBound)
-                let endTagEndIndex = fullText.distance(from: fullText.startIndex, to: nextTag.range.upperBound)
-
-                // If the stack is empty, this is the outermost matched pair
-                if stack.isEmpty {
-                    var location = startTagEndIndex
-                    var length = endTagStartIndex - startTagEndIndex
-                    if let additionalInfo {
-                        location += additionalInfo.length + 1
-                        length -= additionalInfo.length + 1
-                    }
-                    let matchedRange = NSRange(location: location, length: length)
-                    let remainingRange = NSRange(location: endTagEndIndex, length: text.length - endTagEndIndex)
-
-                    let extractedText = text.attributedSubstring(from: matchedRange)
-                    let remainingText = remainingRange.length > 0 ? text.attributedSubstring(from: remainingRange) : nil
-
-//                    return (extractedText, additionalInfo, remainingText)
-                    return Spoiler(
-                        text: extractedText,
-                        additionalInfo: additionalInfo,
-                        remainingText: remainingText
-                    )
-                }
-                currentIndex = nextTag.range.upperBound
+    func twoToUI(_ type: TopicType) -> TopicTypeUI {
+        switch type {
+        case .text(let string, let metadata):
+            if let attributed = metadata.attributed {
+                //logger.log("[CONVERTER] Returning meta-attributed: \(attributed)")
+                return .text(attributed)
             } else {
-                // Not a valid tag, move to the next character
-                currentIndex = fullText.index(after: nextTag.range.lowerBound)
+                let attrStr = AttributedString(string)
+                //logger.log("[CONVERTER] Returning plain-attributed: \(attrStr)")
+                return .text(attrStr)
+            }
+            
+        case .attachment(let id):
+            return .attachment(id)
+            
+        case .left(let array):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .left(results)
+            
+        case .center(let array):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .center(results)
+            
+        case .right(let array):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .right(results)
+            
+        case .spoiler(let array, _, let attrStr):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .spoiler(results, attrStr)
+            
+        case .quote(let array, let quoteType2):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .quote(results, quoteType2)
+            
+        case .code(let text, let codeType):
+            return .code(twoToUI(text), codeType)
+            
+        case .notice(let types, let noticeType):
+            return .notice(types.map { twoToUI($0) }, noticeType)
+            
+        case .image(let url):
+            return .image(url)
+            
+        case .list(let array):
+            var results: [TopicTypeUI] = []
+            for item in array {
+                results.append(twoToUI(item))
+            }
+            return .list(results)
+            
+        case .bullet(let types):
+            return .bullet(types.map { twoToUI($0) })
+        }
+    }
+    
+    let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/cur]", "[/mod]", "[/ex]", "[/img]"]
+    let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code="]
+    
+    enum CurrentTag {
+        case spoiler
+        case quote
+        case list
+        case left
+        case center
+        case right
+        case code
+        case notice
+        case image
+        case none
+    }
+    var currentTag: CurrentTag = .none {
+        didSet { calculate()}
+    }
+    
+    var spoilerCount = 0
+    var listCount = 0 {
+        didSet { calculate() }
+    }
+    var inList = false
+    
+    private func calculate() {
+        inList = listCount > 0
+        logger.log("[COUNTER] List: \(self.listCount)")
+    }
+    
+    private func printRemaining(_ scanner: Scanner, isEnabled: Bool = true) -> String {
+        return isEnabled
+            ? remainingString(scanner)
+                .prefix(100)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .replacingOccurrences(of: "\n", with: "")
+            : ""
+    }
+    
+    enum ClosestListTagIndex {
+        case newline(Int)
+        case bullet(Int)
+        case none
+    }
+    
+    private func closestListTagsIndexes(_ scanner: Scanner) -> ClosestListTagIndex {
+        let newlineIndex = remainingString(scanner).firstIndex(of: "\n")
+        let bulletIndex = remainingString(scanner).firstRange(of: "[*]")?.lowerBound
+        let remainingString = remainingString(scanner)
+        if let newlineIndex, let bulletIndex {
+            if newlineIndex < bulletIndex {
+                return .newline(newlineIndex.utf16Offset(in: remainingString))
+            } else {
+                return .bullet(bulletIndex.utf16Offset(in: remainingString))
+            }
+        } else if let newlineIndex {
+            return .newline(newlineIndex.utf16Offset(in: remainingString))
+        } else if let bulletIndex {
+            return .bullet(bulletIndex.utf16Offset(in: remainingString))
+        } else {
+            return .none
+        }
+    }
+    
+    func parse(with scanner: Scanner) -> [TopicType] {
+        // logger.log("[SCANNER] New instance called")
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            logger.log("[SCANNER] New iteration >>> \"\(self.printRemaining(scanner))\"")
+            
+            guard let (tag, attributes, nextTagIndex) = firstFoundTagAndIndex(in: remainingString(scanner)) else {
+                logger.log("[SCANNER] No more tags >>> \"\(self.printRemaining(scanner))\"")
+                if !remainingString(scanner).isEmpty {
+                    logger.log("[SCANNER] Got remaining text: \(self.printRemaining(scanner))")
+                    let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                    let text = remainingString(scanner).trimmingCharacters(in: .whitespacesAndNewlines)
+                    results.append(.text(text, metadata))
+                }
+                logger.log("[SCANNER] Finished with \(results.count) results")
+                return results
+            }
+            
+            var nextTag = tag
+            
+            scanner.charactersToBeSkipped = inList ? nil : .whitespacesAndNewlines
+            
+            // List parsing aka bullets and nested stuff
+            if inList, currentTag == .list {
+                logger.log("[SCANNER] In list check")
+                let indexes = closestListTagsIndexes(scanner)
+                //print(indexes)
+                //print(printRemaining(scanner))
+                // TODO: Merge into one case?
+                switch indexes {
+                case .newline(let newline):
+                    if newline < nextTagIndex, currentTag == .list {
+                        logger.log("[SCANNER] Newline \(newline) < nextTagIndex \(nextTagIndex)")
+                        // If we have newline before next tag, just parsing it
+                        if let string = scanner.scanUpToString("\n") {
+                            logger.log("[SCANNER] List newline parsed string: \(string)")
+                            let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                            results.append(.bullet([.text(string, metadata)])) // TODO: Not sure if putting text is enough
+                            _ = scanner.scanString("\n")
+                            continue
+                        } else {
+                            _ = scanner.scanString("\n")
+                            continue
+                        }
+                    } else if nextTag == "[/list]", let string = scanner.scanUpToString("[/list]") {
+                        logger.log("[SCANNER] List newline list ending parsed string: \(string)")
+                        let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                        results.append(.bullet([.text(string, metadata)])) // TODO: Not sure if putting text is enough
+                    } else {
+                        logger.log("[SCANNER] Newline edge case")
+                    }
+                    
+                case .bullet(let bullet):
+                    if bullet < nextTagIndex, currentTag == .list {
+                        logger.log("[SCANNER] Bullet \(bullet) < nextTagIndex \(nextTagIndex)")
+                        if let string = scanner.scanUpToString("[*]") {
+                            logger.log("[SCANNER] List bullet parsed string: \(string)")
+                            if string.isEmpty {
+                                _ = scanner.scanString("[*]")
+                                continue
+                            }
+                            let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                            results.append(.bullet([.text(string, metadata)])) // TODO: Not sure if putting text is enough
+                            _ = scanner.scanString("[*]")
+                            continue
+                        } else {
+                            _ = scanner.scanString("[*]")
+                            continue
+                        }
+                    } else {
+                        logger.log("[SCANNER] STOP CASE BULLET")
+                    }
+                    
+                case .none:
+                    break
+                }
+            }
+            
+            scanner.charactersToBeSkipped = inList ? nil : .whitespacesAndNewlines
+            
+            logger.log("[SCANNER] Got tag \(nextTag) at \(nextTagIndex) >>> \"\(self.printRemaining(scanner))\"")
+            
+            // Don't consume closing tags so they can finish
+            let hasEndingTags = closingTags.contains(nextTag)
+            // Don't consume tags with metadata so it can be parsed later
+            let hasTagsWithInfo = tagsWithInfo.contains(nextTag)
+            
+            if let text = scanner.scanUpToString(nextTag) {
+                logger.log("[SCANNER] Got text \"\(text.prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: ""))\" before \(nextTag) >>> \"\(self.printRemaining(scanner))\"")
+                let attributes = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                results.append(.text(text.trimmingCharacters(in: .whitespacesAndNewlines), attributes))
+
+                if !hasEndingTags && !hasTagsWithInfo {
+                    logger.log("[SCANNER] Consuming \(nextTag)")
+                    _ = scanner.scanString(nextTag)
+                } else {
+                    logger.log("[SCANNER] Did not consume \(nextTag)")
+                }
+            } else {
+                if !hasEndingTags && !hasTagsWithInfo {
+                    logger.log("[SCANNER] No text before \(nextTag), consume & continue")
+                    _ = scanner.scanString(nextTag)
+                } else {
+                    logger.log("[SCANNER] No text before \(nextTag), did not consume")
+                }
+            }
+            
+            if nextTag.contains("[quote ") || nextTag.contains("[quote=") {
+                logger.log("[SCANNER] Swizzled from \(nextTag) to [quote]")
+                nextTag = "[quote]"
+            }
+            
+            if nextTag.contains("[spoiler=") {
+                logger.log("[SCANNER] Swizzled from \(nextTag) to [spoiler]")
+                nextTag = "[spoiler]"
+            }
+            
+            if nextTag.contains("[attachment=") {
+                logger.log("[SCANNER] Swizzled from \(nextTag) to [attachment]")
+                nextTag = "[attachment]"
+            }
+            
+            if nextTag.contains("[code=") {
+                logger.log("[SCANNER] Swizzled from \(nextTag) to [code]")
+                nextTag = "[code]"
+            }
+            
+            logger.log("[SCANNER] Starting to switch on \(nextTag)")
+            
+            switch nextTag {
+            case "[left]":
+                let left = parseLeft(from: scanner)
+                if case .left = left { results.append(left) } else { fatalError("non left return") }
+                
+            case "[center]":
+                let center = parseCenter(from: scanner)
+                if case .center = center { results.append(center) } else { fatalError("non center return") }
+                
+            case "[right]":
+                let right = parseRight(from: scanner)
+                if case .right = right { results.append(right) } else { fatalError("non right return") }
+                
+            case "[attachment]":
+                let attachment = parseAttachment(from: scanner, attributes: attributes!)
+                if case .attachment = attachment { results.append(attachment) } else { fatalError("non attachment return") }
+                
+            case "[spoiler]":
+                spoilerCount += 1
+                let spoiler = parseSpoiler(from: scanner, attributes: attributes)
+                if case .spoiler = spoiler { results.append(spoiler) } else { fatalError("non spoiler return") }
+                
+            case "[list]":
+                let list = parseList(from: scanner)
+                if case .list = list { results.append(list) } else { fatalError("non list return") }
+                
+            case "[quote]":
+                let quote = parseQuote(from: scanner, attributes: attributes)
+                if case .quote = quote { results.append(quote) } else { fatalError("non quote return") }
+                
+            case "[code]":
+                let code = parseCode(from: scanner, attributes: attributes)
+                if case .code = code { results.append(code) } else { fatalError("non code return") }
+                
+            case "[img]":
+                let image = parseImage(from: scanner)
+                if case .image = image { results.append(image) } else { fatalError("non image return") }
+                
+            case "[cur]", "[mod]", "[ex]":
+                let notice = parseNotice(from: scanner, tag: nextTag)
+                if case .notice = notice { results.append(notice) } else { fatalError("non notice return") }
+                
+            case "[/spoiler]":
+                spoilerCount -= 1
+                if spoilerCount < 0 {
+                    logger.log("wrong amount of spoilers, consume & skip")
+                    _ = scanner.scanString(nextTag)
+                    spoilerCount = 0
+                } else {
+                    logger.log("[SCANNER] Closing tag \(nextTag), returning results")
+                    return results
+                }
+                
+            case "[/quote]", "[/code]", "[/list]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]", "[/img]":
+                logger.log("[SCANNER] Closing tag \(nextTag), returning results")
+                return results
+                
+            default:
+                if nextTag.contains("/") {
+                    logger.log("[SCANNER] Possibly closing tag (\(nextTag)), do nothing >>> \(self.printRemaining(scanner))")
+                } else {
+                    fatalError("3")
+                }
             }
         }
+        
+        logger.log("[SCANNER] Finished with \(results.count) results")
+        return results
+    }
+    
+    // MARK: - Image
+    
+    func parseImage(from scanner: Scanner) -> TopicType {
+        currentTag = .image
+        var url: URL!
+        
+        while !scanner.isAtEnd {
+            if let urlString = scanner.scanUpToString("[/img]") {
+                url = URL(string: urlString)!
+            } else if scanner.scanString("[/img]") != nil {
+                break
+            } else {
+                fatalError("[IMAGE] Unrecognized pattern")
+            }
+        }
+        
+        return .image(url)
+    }
+    
+    // MARK: - Notice
+    
+    func parseNotice(from scanner: Scanner, tag: String) -> TopicType {
+        currentTag = .notice
+        
+        var closingTag = tag
+        closingTag.insert("/", at: closingTag.index(closingTag.startIndex, offsetBy: 1))
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            if scanner.scanString(closingTag) != nil {
+                logger.log("[NOTICE] Found end of \(closingTag)")
+                break
+            } else {
+                logger.log("[NOTICE] Found no end tag >>> \(self.printRemaining(scanner))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .notice(results, NoticeType(rawValue: String(tag.dropFirst().dropLast()))!)
+    }
+    
+    // MARK: - Left
+    
+    func parseLeft(from scanner: Scanner) -> TopicType {
+        defer { if inList { currentTag = .list } }
+        currentTag = .left
+        
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            logger.log("[LEFT] New iteration: \(self.printRemaining(scanner))")
+            if scanner.scanString("[left]") != nil {
+                // TODO: Can it actually find it since it's consumed in parse(with:)?
+                logger.log("[LEFT] Found left")
+                let types = parse(with: scanner)
+                results.append(.center(types))
+            } else if scanner.scanString("[/left]") != nil {
+                logger.log("[LEFT] Found end of left")
+                break
+            } else {
+                logger.log("[LEFT] Found no left tag >>> \(self.printRemaining(scanner))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .left(results)
+    }
+    
+    // MARK: - Center
+        
+    func parseCenter(from scanner: Scanner) -> TopicType {
+        defer { if inList { currentTag = .list } }
+        currentTag = .center
+        
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            logger.log("[CENTER] New iteration: \(self.printRemaining(scanner))")
+            if scanner.scanString("[center]") != nil {
+                // TODO: Can it actually find it since it's consumed in parse(with:)?
+                logger.log("[CENTER] Found center")
+                let types = parse(with: scanner)
+                results.append(.center(types))
+            } else if scanner.scanString("[/center]") != nil {
+                logger.log("[CENTER] Found end of center")
+                break
+            } else {
+                logger.log("[CENTER] Found no center tag >>> \(self.printRemaining(scanner))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .center(results)
+    }
+    
+    // MARK: - Right
+    
+    func parseRight(from scanner: Scanner) -> TopicType {
+        defer { if inList { currentTag = .list } }
+        currentTag = .right
+        
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            logger.log("[RIGHT] New iteration: \(self.printRemaining(scanner))")
+            if scanner.scanString("[right]") != nil {
+                // TODO: Can it actually find it since it's consumed in parse(with:)?
+                logger.log("[RIGHT] Found right")
+                let types = parse(with: scanner)
+                results.append(.center(types))
+            } else if scanner.scanString("[/right]") != nil {
+                logger.log("[RIGHT] Found end of right")
+                break
+            } else {
+                logger.log("[RIGHT] Found no right tag >>> \(self.printRemaining(scanner))")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .right(results)
+    }
+    
+    // MARK: - Code
+    
+    func parseCodeAttributes(_ string: String?) -> CodeType {
+        guard let string else { return .none }
+        
+        if string.first == "=" {
+            let title = String(string.dropFirst().dropLast()) // Removing " "
+            return .title(title)
+        } else {
+            fatalError("[CODE PARSER] Unrecognized pattern")
+        }
+    }
+    
+    func parseCode(from scanner: Scanner, attributes: String?) -> TopicType {
+        currentTag = .code
+        
+        var results: [TopicType] = []
+        let attributes = parseCodeAttributes(attributes)
+        
+        while !scanner.isAtEnd {
+            if let string = scanner.scanUpToString("[/code]") {
+                let metadata = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                let text = string.trimmingCharacters(in: .whitespacesAndNewlines)
+                let type: TopicType = .text(text, metadata)
+                results.append(type)
+            } else if scanner.scanString("[/code]") != nil {
+                logger.log("[QUOTE] Found end of code (\(attributes != .none ? "had" : "no") attributes)")
+                break
+            } else {
+                logger.log("[QUOTE] Found no code tag >>> \(self.printRemaining(scanner))")
+                fatalError("[QUOTE] Unrecognized pattern")
+            }
+        }
+        
+        return .code(results.first!, attributes)
+    }
+    
+    // MARK: - Quote
 
-        // If no match is found, return empty results
-        return Spoiler(
-            text: NSAttributedString(string: ""),
-            additionalInfo: nil,
-            remainingText: nil
-        )
+    func parseQuoteAttributes(_ string: String?) -> QuoteType? {
+        guard let string else {
+            logger.log("[QUOTE PARSER] No attributes found")
+            return nil
+        }
+        
+        if string.first == "=" {
+            let title = string.components(separatedBy: "\"")[1]
+            logger.log("[QUOTE PARSER] Found title attributes: \"\(title)\"")
+            return .title(title)
+        } else if string.first == " " {
+            let pattern = /name=\"([^\"]+)\" date=\"([^\"]+)\"(?: post=(\d+))?/
+            if let match = string.firstMatch(of: pattern) {
+                let metadata = QuoteMetadata(
+                    name: String(match.output.1),
+                    date: String(match.output.2),
+                    postId: Int(String(match.output.3 ?? ""))
+                )
+                logger.log("[QUOTE PARSER] Found metadata attributes: \"\(metadata.name)\" + \"\(metadata.date)\" + \"\(metadata.postId ?? -1)\"")
+                return .metadata(metadata)
+            } else {
+                fatalError("[QUOTE PARSER] Unrecognized pattern")
+            }
+        } else {
+            return nil
+        }
     }
 
-    private static func findNextTag(in text: String, startTagRegex: NSRegularExpression, endTag: String, from currentIndex: String.Index) -> (range: Range<String.Index>, isStartTag: Bool)? {
-        let searchRange = NSRange(currentIndex..<text.endIndex, in: text)
+    func parseQuote(from scanner: Scanner, attributes: String? = nil) -> TopicType {
+        currentTag = .quote
+        
+        var results: [TopicType] = []
+        let attributes = parseQuoteAttributes(attributes)
+        
+        while !scanner.isAtEnd {
+            logger.log("[QUOTE] New iteration: \(self.printRemaining(scanner))")
+            
+            if let attributes {
+                var title = "title"
+                if case let .title(text) = attributes { title = text }
+                var metadata = QuoteMetadata(name: "", date: "", postId: nil)
+                if case let .metadata(quoteMetadata) = attributes {
+                    metadata.name = quoteMetadata.name
+                    metadata.date = quoteMetadata.date
+                    metadata.postId = quoteMetadata.postId
+                }
+                
+                // TODO: Instead of making scanString correct, maybe just retract some of text after parse?
+                
+                if scanner.scanString("[quote " + metadata.plain + "]") != nil {
+                    // TODO: Is this even working?
+                    logger.log("[QUOTE] Found quote (metadata mode)")
+                    let types = parse(with: scanner)
+                    results.append(.quote(types, attributes))
+                } else if scanner.scanString("[quote=\"" + title + "\"]") != nil {
+                    // TODO: Is this even working?
+                    logger.log("[QUOTE] Found quote (title mode)")
+                    let types = parse(with: scanner)
+                    results.append(.quote(types, attributes))
+                } else if scanner.scanString("[/quote]") != nil {
+                    logger.log("[QUOTE] Found end of quote (had attributes)")
+                    break
+                } else {
+                    logger.log("[QUOTE] Found no quote tag >>> \(self.printRemaining(scanner))")
+                    let types = parse(with: scanner)
+                    results.append(contentsOf: types)
+                }
+            } else {
+                if scanner.scanString("[quote]") != nil {
+                    // TODO: Can it actually find it since it's consumed in parse(with:)?
+                    logger.log("[QUOTE] Found quote (plain mode)")
+                    let types = parse(with: scanner)
+                    results.append(.quote(types, attributes))
+                } else if scanner.scanString("[/quote]") != nil {
+                    logger.log("[QUOTE] Found end of quote (had no attributes)")
+                    break
+                } else {
+                    logger.log("[QUOTE] Found no quote tag >>> \(self.printRemaining(scanner))")
+                    let types = parse(with: scanner)
+                    results.append(contentsOf: types)
+                }
+            }
+        }
+        
+        logger.log("[QUOTE] Finished with \(results.count) results")
+        return .quote(results, attributes)
+    }
+    
+    // MARK: - Attachment
+    
+    func parseAttachmentAttributes(_ string: String) -> Int {
+        let pattern = /=\"(\d+):/
+        if let match = string.firstMatch(of: pattern) {
+            return Int(match.output.1) ?? 0
+        } else {
+            return 0
+        }
+    }
+    
+    func parseAttachment(from scanner: Scanner, attributes: String) -> TopicType {
+        let attachmentId = parseAttachmentAttributes(attributes)
+        return .attachment(attachmentId)
+    }
 
-        // Find the next start tag
-        let startMatch = startTagRegex.firstMatch(in: text, options: [], range: searchRange)
-        let startTagRange = startMatch.flatMap { Range($0.range, in: text) }
+    // MARK: - Spoiler
 
-        // Find the next end tag
-        let endTagRange = text.range(of: endTag, range: currentIndex..<text.endIndex)
+    func parseSpoilerAttributes(_ string: String?) -> String? {
+        guard let string else {
+            logger.log("[SPOILER PARSER] Found no attributes")
+            return nil
+        }
+        
+        let pattern = /=(?:"([^"]+)"|([^\]]+))/
+        if let match = string.firstMatch(of: pattern) {
+            if let output1 = match.output.1 {
+                logger.log("[SPOILER PARSER] Found title: \(output1)")
+                return String(output1)
+            } else if let output2 = match.output.2 {
+                logger.log("[SPOILER PARSER] Found title: \(output2)")
+                return String(output2)
+            } else {
+                fatalError("[SPOILER PARSER] Unrecognized pattern")
+            }
+        } else {
+            logger.log("[SPOILER PARSER] Found no attributes")
+            return nil
+        }
+    }
 
-        // Compare positions of the start and end tags
-        if let start = startTagRange, let end = endTagRange {
-            return start.lowerBound < end.lowerBound ? (range: start, isStartTag: true) : (range: end, isStartTag: false)
-        } else if let start = startTagRange {
-            return (range: start, isStartTag: true)
-        } else if let end = endTagRange {
-            return (range: end, isStartTag: false)
+    func parseSpoiler(from scanner: Scanner, attributes: String? = nil) -> TopicType {
+        currentTag = .spoiler
+        
+        var results: [TopicType] = []
+        let attributes = parseSpoilerAttributes(attributes)
+        
+        while !scanner.isAtEnd {
+            if let attributes {
+                if scanner.scanString("[spoiler=\"\(attributes)\"]") != nil {
+                    logger.log("[SPOILER] Found spoiler tag (title mode, with quotes) >>> \(self.printRemaining(scanner))")
+                    let types = parse(with: scanner)
+                    results.append(contentsOf: types)
+                } else if scanner.scanString("[spoiler=\(attributes)]") != nil {
+                    logger.log("[SPOILER] Found spoiler tag (title mode, no quotes) >>> \(self.printRemaining(scanner))")
+                    let types = parse(with: scanner)
+                    results.append(contentsOf: types)
+                } else if scanner.scanString("[/spoiler]") != nil {
+                    logger.log("[SPOILER] Found end of spoiler (had attributes)")
+                    break
+                } else {
+                    logger.log("[SPOILER] No more spoiler tag >>> \(self.printRemaining(scanner))")
+                    let types = parse(with: scanner)
+                    results.append(contentsOf: types)
+                }
+            } else {
+                if scanner.scanString("[spoiler]") != nil {
+                    logger.log("[SPOILER] Found spoiler tag (plain mode)")
+                    let types = parse(with: scanner)
+                    results.append(.spoiler(types, nil, nil))
+                } else if scanner.scanString("[/spoiler]") != nil {
+                    logger.log("[SPOILER] Found end of spoiler (had no attributes)")
+                    break
+                } else {
+                    logger.log("[SPOILER] No more spoiler tag >>> \(self.printRemaining(scanner))")
+                    let types = parse(with: scanner)
+                    results.append(contentsOf: types)
+                }
+            }
+        }
+        
+        logger.log("[SPOILER] Finished with \(results.count)")
+        return .spoiler(results, attributes, nil)
+    }
+
+    // MARK: - List
+    
+    func parseList(from scanner: Scanner) -> TopicType {
+        defer { listCount -= 1 }
+        currentTag = .list
+        listCount += 1
+        
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            if scanner.scanString("[*]") != nil {
+                logger.log("[LIST] Found [*] tag")
+                let types = parse(with: scanner)
+                results.append(.list(types))
+            } else if scanner.scanString("[list]") != nil {
+                logger.log("[LIST] Found nested list")
+                let list = parseList(from: scanner)
+                results.append(list)
+            } else if scanner.scanString("[/list]") != nil {
+                break
+            } else if scanner.scanString("\n") != nil {
+                // TODO: Nested list case. Remove \n's in parsing instead?
+                continue
+            } else {
+                // Non-list tags?
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        logger.log("[LIST] Finished with \(results.count) results")
+        return .list(results)
+    }
+    
+    // MARK: - Helpers
+
+    private func remainingString(_ scanner: Scanner) -> String {
+        let currentIndex = scanner.currentIndex
+        return String(scanner.string[currentIndex...])
+    }
+    
+    func getRange(for text: String, from scanner: Scanner) -> Range<String.Index> {
+        let string = scanner.string
+
+        // Get the scanner's current index
+        let currentIndex = scanner.currentIndex
+
+        // Calculate start and end indices
+        let startIndex = string.index(currentIndex, offsetBy: -text.count, limitedBy: string.startIndex) ?? string.startIndex
+        let endIndex = string.index(startIndex, offsetBy: text.count, limitedBy: string.endIndex) ?? string.endIndex
+
+        // Ensure the range is valid
+        guard startIndex >= string.startIndex, endIndex <= string.endIndex else {
+            fatalError("how???")
         }
 
+        return startIndex..<endIndex
+    }
+
+    private func firstFoundTagAndIndex(in string: String) -> (tag: String, attributes: String?, index: Int)? {
+        // Define valid tags
+        let validTags: Set<String> = [
+            "quote",
+            "/quote",
+            "spoiler",
+            "/spoiler",
+            "list",
+            "/list",
+            "code",
+            "/code",
+            "left",
+            "/left",
+            "center",
+            "/center",
+            "right",
+            "/right",
+            "cur",
+            "/cur",
+            "mod",
+            "/mod",
+            "ex",
+            "/ex",
+            "img",
+            "/img",
+            "attachment"
+        ]
+
+        // Define tags directly in the regex pattern
+        let pattern = /\[([a-zA-Z\/]+)([^\]]*)\]/
+        
+        for match in string.matches(of: pattern) {
+            let tag = String(match.output.1)
+
+            guard validTags.contains(tag) else {
+                logger.log("[VALIDATOR] Non-valid tag: \(tag)")
+                continue
+            }
+            
+            logger.log("[VALIDATOR] String: \"\(string.prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: ""))\" -> Tag: \(tag)")
+            
+            // Extract attributes string, if present
+            let attributes = String(match.output.2)
+            
+            // Find the starting index of the match
+            let index = string.distance(from: string.startIndex, to: match.range.lowerBound)
+            
+            if !attributes.isEmpty {
+                logger.log("[VALIDATOR] Returning with attributes")
+                return (tag: "[\(tag)\(attributes)]", attributes: attributes, index: index)
+            } else {
+                return (tag: "[\(tag)]", attributes: nil, index: index)
+            }
+        }
+        
+        logger.log("[VALIDATOR] Found no more matches")
         return nil
-    }
-
-    private static func extractAdditionalInfo(from tag: NSAttributedString, baseStartTag: String) -> NSAttributedString? {
-        let fullTag = tag.string
-        guard let equalSignRange = fullTag.range(of: "=") else { return nil }
-        
-        let start = tag.string.index(after: equalSignRange.lowerBound)
-        let end = tag.string.index(before: fullTag.endIndex)
-        
-        let attributedRange = NSRange(location: fullTag.distance(from: fullTag.startIndex, to: start),
-                                      length: fullTag.distance(from: start, to: end))
-        return tag.attributedSubstring(from: attributedRange)
-    }
-    
-    // MARK: - Extract Text
-    
-    private static func extractText(from text: NSAttributedString, startTag: String, endTag: String) -> (NSAttributedString, NSAttributedString?) {
-        let fullText = text.string
-        guard let startRange = fullText.range(of: startTag),
-              let endRange = fullText.range(of: endTag, range: startRange.upperBound..<fullText.endIndex) else {
-            return (NSAttributedString(string: ""), nil)
-        }
-
-        // Calculate the NSRange equivalents for the attributed string
-        let startTagEndIndex = fullText.distance(from: fullText.startIndex, to: startRange.upperBound)
-        let endTagStartIndex = fullText.distance(from: fullText.startIndex, to: endRange.lowerBound)
-        let endTagEndIndex = fullText.distance(from: fullText.startIndex, to: endRange.upperBound)
-
-        // Extract attributed substrings
-        let extractedRange = NSRange(location: startTagEndIndex, length: endTagStartIndex - startTagEndIndex)
-        let remainingRange = NSRange(location: endTagEndIndex, length: text.length - endTagEndIndex)
-
-        let extractedText = text.attributedSubstring(from: extractedRange)
-        let remainingText = remainingRange.length > 0 ? text.attributedSubstring(from: remainingRange) : nil
-
-        return (extractedText, remainingText)
-    }
-}
-
-extension NSAttributedString {
-
-    /// Trims new lines and whitespaces off the beginning and the end of attributed strings
-    func trimmedAttributedString() -> NSAttributedString {
-        let invertedSet = CharacterSet.whitespacesAndNewlines.inverted
-        let startRange = string.rangeOfCharacter(from: invertedSet)
-        let endRange = string.rangeOfCharacter(from: invertedSet, options: .backwards)
-        guard let startLocation = startRange?.lowerBound, let endLocation = endRange?.lowerBound else {
-            return NSAttributedString(string: string)
-        }
-
-        let trimmedRange = startLocation...endLocation
-        return attributedSubstring(from: NSRange(trimmedRange, in: string))
-    }
-
-    func components(separatedBy separator: String) -> [NSAttributedString] {
-        var result = [NSAttributedString]()
-        let separatedStrings = string.components(separatedBy: separator)
-        var range = NSRange(location: 0, length: 0)
-        for string in separatedStrings {
-            range.length = string.utf16.count
-            let attributedString = attributedSubstring(from: range)
-            result.append(attributedString)
-            range.location += range.length + separator.utf16.count
-        }
-        return result
-    }
-
-    func removingFirstNCharacters(_ n: Int) -> NSAttributedString {
-        guard n < self.length else { fatalError() }
-        let rangeToKeep = NSRange(location: n, length: self.length - n)
-        return self.attributedSubstring(from: rangeToKeep)
     }
 }

@@ -51,6 +51,11 @@ public final class BBCodeParser {
             text = text.replacingOccurrences(of: "\\[font=\"?(.*?)\"?\\](.*?)\\[\\/font\\]", with: "<span style=\"font-family:$1\">$2</span>", options: .regularExpression) // Text font
             text = text.replacingOccurrences(of: "\\[url\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$1</a>", options: .regularExpression) // URL links without text
             text = text.replacingOccurrences(of: "\\[url=\"?(.*?)\"?\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression) // URL links with text
+            let pattern = /\[mergetime\](\d+)\[\/mergetime\]/
+            if let match = text.firstMatch(of: pattern), let interval = TimeInterval(match.output.1) {
+                let date = Date(timeIntervalSince1970: interval)
+                text = text.replacingOccurrences(of: "\\[mergetime\\](.*?)\\[\\/mergetime\\]", with: date.formatted(), options: .regularExpression)
+            }
         }
         
         replaceCodes(from: &text)

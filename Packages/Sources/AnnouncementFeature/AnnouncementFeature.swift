@@ -27,7 +27,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
         
         public var announcement: Announcement?
         
-        var types: [[TopicType]] = []
+        var types: [[TopicTypeUI]] = []
        
         public init(id: Int, name: String) {
             self.id = id
@@ -42,7 +42,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
         case settingsButtonTapped
 
         case _loadAnnouncement
-        case _loadTypes([[TopicType]])
+        case _loadTypes([[TopicTypeUI]])
         case _announcementResponse(Result<Announcement, any Error>)
     }
     
@@ -73,10 +73,10 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 state.announcement = announcement
 
                 return .run { send in
-                    var topicTypes: [[TopicType]] = []
+                    var topicTypes: [[TopicTypeUI]] = []
                     
                     let parsedContent = BBCodeParser.parse(announcement.content)!
-                    let types = try! TopicBuilder.build(from: parsedContent)
+                    let types = try! TopicBuilder().build(from: parsedContent)
                     topicTypes.append(types)
                     
                     await send(._loadTypes(topicTypes))

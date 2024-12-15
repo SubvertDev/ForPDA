@@ -37,8 +37,8 @@ public struct CacheClient: Sendable {
     public var getForumsList: @Sendable () async -> [ForumInfo]
     
     // Post Content
-    public var cacheParsedPostContent: @Sendable (_ id: Int, _ content: NSAttributedString) async -> Void
-    public var getParsedPostContent: @Sendable (_ id: Int) async -> NSAttributedString?
+    public var cacheParsedPostContent: @Sendable (_ id: Int, _ content: [TopicTypeUI]) async -> Void
+    public var getParsedPostContent: @Sendable (_ id: Int) async -> [TopicTypeUI]?
     public var removeAllParsedPostContent: @Sendable () async -> Void
     
     // Background Tasks
@@ -119,14 +119,10 @@ extension CacheClient: DependencyKey {
             // MARK: - Post Content
             
             cacheParsedPostContent: { id, content in
-                try? await parsedPostsContentStorage.async.setObject(AttributedString(content), forKey: id)
+                try? await parsedPostsContentStorage.async.setObject(content, forKey: id)
             },
             getParsedPostContent: { id in
-                if let attributedString = try? await parsedPostsContentStorage.async.object(forKey: id) {
-                    return NSAttributedString(attributedString)
-                } else {
-                    return nil
-                }
+                return try? await parsedPostsContentStorage.async.object(forKey: id)
             },
             removeAllParsedPostContent: {
                 try? await parsedPostsContentStorage.async.removeAll()
@@ -195,12 +191,12 @@ private extension CacheClient {
         )
     }
     
-    private static var parsedPostsContentStorage: Storage<Int, AttributedString> {
+    private static var parsedPostsContentStorage: Storage<Int, [TopicTypeUI]> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Posts Contents", expiry: .date(.days(30)), maxSize: .megabytes(16)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: AttributedString.self)
+            transformer: TransformerFactory.forCodable(ofType: [TopicTypeUI].self)
         )
     }
     

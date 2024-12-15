@@ -19,6 +19,7 @@ public struct RichText: View {
     public let configuration: (any RichTextViewComponent) -> Void
     @State private var delegate: TextViewDelegate
     
+    // TODO: Deprecated
     public init(
         text: NSAttributedString,
         font: Font? = nil,
@@ -28,6 +29,23 @@ public struct RichText: View {
         configuration: @escaping (any RichTextViewComponent) -> Void = { _ in }
     ) {
         self.text = text
+        self.font = font
+        self.foregroundStyle = foregroundStyle
+        self.onUrlTap = onUrlTap
+        self.configuration = configuration
+        
+        self.delegate = TextViewDelegate(onUrlTap: onUrlTap)
+    }
+    
+    public init(
+        text: AttributedString,
+        font: Font? = nil,
+        foregroundStyle: Color? = nil,
+        captureUrlTaps: Bool = false,
+        onUrlTap: URLTapHandler? = nil,
+        configuration: @escaping (any RichTextViewComponent) -> Void = { _ in }
+    ) {
+        self.text = NSAttributedString(text)
         self.font = font
         self.foregroundStyle = foregroundStyle
         self.onUrlTap = onUrlTap
