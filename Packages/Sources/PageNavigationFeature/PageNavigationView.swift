@@ -24,51 +24,67 @@ public struct PageNavigation: View {
     
     @ViewBuilder
     private func PageNavigation() -> some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 0) {
             Button {
                 store.send(.firstPageTapped)
             } label: {
-                NavigationArrow(symbol: .arrowLeftToLine)
+                NavigationArrow(symbol: .chevronLeft2)
             }
             .buttonStyle(.plain)
             .disabled(store.currentPage == 1)
+            
+            Spacer()
             
             Button {
                 store.send(.previousPageTapped)
             } label: {
-                NavigationArrow(symbol: .arrowLeft)
+                NavigationArrow(symbol: .chevronLeft)
             }
             .buttonStyle(.plain)
             .disabled(store.currentPage == 1)
             
-            Text(String("\(store.currentPage)/\(store.totalPages)"))
+            Spacer()
+            
+            Text(String("\(store.currentPage) / \(store.totalPages)"))
+                .font(.subheadline)
+                .foregroundStyle(Color.Labels.secondary)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .foregroundStyle(Color.Background.teritary)
+                )
+            
+            Spacer()
             
             Button {
                 store.send(.nextPageTapped)
             } label: {
-                NavigationArrow(symbol: .arrowRight)
+                NavigationArrow(symbol: .chevronRight)
             }
             .buttonStyle(.plain)
             .disabled(store.currentPage + 1 > store.totalPages)
             
+            Spacer()
+            
             Button {
                 store.send(.lastPageTapped)
             } label: {
-                NavigationArrow(symbol: .arrowRightToLine)
+                NavigationArrow(symbol: .chevronRight2)
             }
             .buttonStyle(.plain)
             .disabled(store.currentPage + 1 > store.totalPages)
         }
-        .frame(maxWidth: .infinity, maxHeight: 32)
         .listRowSeparator(.hidden)
+        .animation(.default, value: store.currentPage)
+        .frame(maxWidth: .infinity, maxHeight: 32)
     }
     
     @ViewBuilder
     private func NavigationArrow(symbol: SFSymbol) -> some View {
         Image(systemSymbol: symbol)
-            .resizable()
-            .scaledToFit()
-            .frame(width: 24, height: 24)
+            .font(.body)
+            .frame(width: 32, height: 32)
     }
 }
 

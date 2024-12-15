@@ -343,6 +343,7 @@ struct CodeView: View {
                         .padding(.horizontal, 12)
                 }
             }
+            .contentShape(Rectangle())
             .onTapGesture {
                 isExpanded.toggle()
             }

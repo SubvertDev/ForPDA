@@ -17,6 +17,7 @@ let package = Package(
         .library(name: "ForumsListFeature", targets: ["ForumsListFeature"]),
         .library(name: "ForumFeature", targets: ["ForumFeature"]),
         .library(name: "TopicFeature", targets: ["TopicFeature"]),
+        .library(name: "PageNavigationFeature", targets: ["PageNavigationFeature"]),
         .library(name: "AnnouncementFeature", targets: ["AnnouncementFeature"]),
         .library(name: "FavoritesFeature", targets: ["FavoritesFeature"]),
         .library(name: "HistoryFeature", targets: ["HistoryFeature"]),

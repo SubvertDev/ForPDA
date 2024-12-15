@@ -77,6 +77,7 @@ public struct FavoritesScreen: View {
                 Row(
                     title: favorite.topic.name,
                     lastPost: favorite.topic.lastPost,
+                    closed: favorite.topic.isClosed,
                     unread: favorite.topic.isUnread,
                     notify: favorite.notify
                 ) {
@@ -108,6 +109,7 @@ public struct FavoritesScreen: View {
     private func Row(
         title: String,
         lastPost: TopicInfo.LastPost? = nil,
+        closed: Bool = false,
         unread: Bool = false,
         notify: FavoriteInfo.Notify,
         action: @escaping () -> Void = {}
@@ -116,31 +118,28 @@ public struct FavoritesScreen: View {
             Button {
                 action()
             } label: {
-                HStack(spacing: 8) {
-                    // TODO: Add notify symbol.
-                    // If notify - .all, and isNotifyHatUpdate == true,
-                    // then display isNotifyHatUpdate symbol.
-                    
-                    VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 10) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if let lastPost {
+                            Text(lastPost.formattedDate, bundle: Bundle.models)
+                                .font(.caption)
+                                .foregroundStyle(Color.Labels.teritary)
+                        }
+                        
                         RichText(
-                            text: NSAttributedString(string: title),
+                            text: AttributedString(title),
                             font: .body,
                             foregroundStyle: Color.Labels.primary
                         )
                         
                         if let lastPost {
-                            HStack(spacing: 0) {
-                                Text(lastPost.formattedDate, bundle: .models)
+                            HStack(spacing: 4) {
+                                Image(systemSymbol: .personCircle)
                                     .font(.caption)
                                     .foregroundStyle(Color.Labels.secondary)
-                                    .padding(.trailing, 16)
-                                
-                                Image(systemSymbol: .person)
-                                    .font(.caption)
-                                    .padding(.trailing, 4)
                                 
                                 RichText(
-                                    text: NSAttributedString(string: lastPost.username),
+                                    text: AttributedString(lastPost.username),
                                     font: .caption,
                                     foregroundStyle: Color.Labels.secondary
                                 )
@@ -149,12 +148,20 @@ public struct FavoritesScreen: View {
                     }
                     
                     Spacer(minLength: 0)
-                    
+
                     if unread {
                         Circle()
                             .font(.title2)
                             .foregroundStyle(tintColor)
                             .frame(width: 8)
+                    }
+                    
+                    if closed {
+                        Image(systemSymbol: .lock)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(Color.Labels.secondary)
                     }
                 }
                 .padding(.vertical, 8)

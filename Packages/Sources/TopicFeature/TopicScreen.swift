@@ -44,7 +44,6 @@ public struct TopicScreen: View {
                     }
                 }
             }
-            .animation(.default, value: store.isLoadingTopic)
             .overlay {
                 if store.topic == nil || store.isLoadingTopic {
                     PDALoader()
@@ -65,6 +64,7 @@ public struct TopicScreen: View {
     private func Navigation() -> some View {
         if store.pageNavigation.shouldShow {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                .padding(.horizontal, 16)
         }
     }
     
@@ -96,9 +96,12 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func Post(_ post: Post) -> some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 8) {
             PostHeader(post)
             PostBody(post)
+            if let lastEdit = post.lastEdit {
+                PostFooter(lastEdit)
+            }
         }
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
@@ -108,7 +111,7 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func PostHeader(_ post: Post) -> some View {
-        HStack {
+        HStack(spacing: 8) {
             Button {
                 store.send(.userAvatarTapped(userId: post.author.id))
             } label: {
@@ -119,38 +122,50 @@ public struct TopicScreen: View {
                         Image.avatarDefault.resizable().scaledToFill()
                     }
                 }
-                .frame(width: 50, height: 50)
-                .clipped()
+                .frame(width: 32, height: 32)
+                .clipShape(Circle())
             }
             
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 4) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
                     Text(post.author.name)
-                        .font(.body)
+                        .font(.subheadline)
                         .bold()
+                        .foregroundStyle(Color.Labels.primary)
                     
                     Text(String(post.author.reputationCount))
                         .font(.caption)
                         .foregroundStyle(Color.Labels.secondary)
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6)
+                                .foregroundStyle(Color.Background.teritary)
+                        )
                 }
-                .padding(.top, 4)
                 
-                HStack(spacing: 4) {
-                    Text(User.Group(rawValue: post.author.groupId)!.title)
-                        .font(.caption)
-                        .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
-                    
-                    Spacer()
-                    
-                    Text(post.createdAt.formatted())
-                        .font(.caption)
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                        .padding(.vertical, 8)
-                }
+                Text(User.Group(rawValue: post.author.groupId)!.title)
+                    .font(.caption)
+                    .foregroundStyle(Color.Labels.teritary)
+                    // .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
             }
-            .padding(.vertical, 8)
+            
+            Spacer()
+            
+            VStack(alignment: .trailing, spacing: 6) {
+                if post.karma != 0 {
+                    Text(String(post.karma))
+                        .font(.caption)
+                        .foregroundStyle(Color.Labels.primary)
+                        .padding(.top, 2)
+                }
+                
+                Text(post.createdAt.formatted())
+                    .font(.caption)
+                    .foregroundStyle(Color.Labels.quaternary)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+            }
         }
-        .frame(height: 50)
     }
     
     // MARK: - Post Body
@@ -168,6 +183,22 @@ public struct TopicScreen: View {
                 }
             }
         }
+    }
+    
+    // MARK: - Post Footer
+    
+    @ViewBuilder
+    private func PostFooter(_ lastEdit: Post.LastEdit) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Отредактировал: \(lastEdit.username) • \(lastEdit.date.formatted())")
+            if !lastEdit.reason.isEmpty {
+                Text("Причина: \(lastEdit.reason)")
+            }
+        }
+        .font(.caption2)
+        .foregroundStyle(Color.Labels.teritary)
+        .padding(.top, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

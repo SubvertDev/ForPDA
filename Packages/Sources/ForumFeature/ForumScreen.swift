@@ -79,25 +79,39 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func TopicsSection(topics: [TopicInfo], pinned: Bool) -> some View {
         Section {
-            if !pinned, store.pageNavigation.shouldShow {
-                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-            }
+            Navigation(pinned: pinned)
             
-            ForEach(topics) { topic in
+            ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
                 Row(title: topic.name, lastPost: topic.lastPost, closed: topic.isClosed, unread: topic.isUnread) {
                     store.send(.topicTapped(id: topic.id))
                 }
+                .listRowBackground(
+                    Color.Background.teritary
+                        .clipShape(.rect(
+                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == topics.count - 1 ? 10 : 0,
+                            bottomTrailingRadius: index == topics.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
+                        ))
+                )
             }
             .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            if !pinned, store.pageNavigation.shouldShow {
-                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-            }
+            Navigation(pinned: pinned)
         } header: {
             Header(title: pinned ? "Pinned topics" : "Topics")
         }
         .listRowBackground(Color.Background.teritary)
+    }
+    
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation(pinned: Bool) -> some View {
+        if !pinned, store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                .listRowBackground(Color.clear)
+                .padding(.bottom, 4)
+        }
     }
     
     // MARK: - Subforums section
@@ -148,35 +162,28 @@ public struct ForumScreen: View {
             Button {
                 action()
             } label: {
-                if closed {
-                    Image(systemSymbol: .lock)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-                        .foregroundStyle(Color.Labels.secondary)
-                }
-                
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 10) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        if let lastPost {
+                            Text(lastPost.formattedDate, bundle: Bundle.models)
+                                .font(.caption)
+                                .foregroundStyle(Color.Labels.teritary)
+                        }
+                        
                         RichText(
-                            text: NSAttributedString(string: title),
+                            text: AttributedString(title),
                             font: .body,
                             foregroundStyle: Color.Labels.primary
                         )
                         
                         if let lastPost {
-                            HStack(spacing: 0) {
-                                Text(lastPost.formattedDate, bundle: Bundle.models)
+                            HStack(spacing: 4) {
+                                Image(systemSymbol: .personCircle)
                                     .font(.caption)
                                     .foregroundStyle(Color.Labels.secondary)
-                                    .padding(.trailing, 16)
-                                
-                                Image(systemSymbol: .person)
-                                    .font(.caption)
-                                    .padding(.trailing, 4)
                                 
                                 RichText(
-                                    text: NSAttributedString(string: lastPost.username),
+                                    text: AttributedString(lastPost.username),
                                     font: .caption,
                                     foregroundStyle: Color.Labels.secondary
                                 )
@@ -191,6 +198,14 @@ public struct ForumScreen: View {
                             .font(.title2)
                             .foregroundStyle(tintColor)
                             .frame(width: 8)
+                    }
+                    
+                    if closed {
+                        Image(systemSymbol: .lock)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(Color.Labels.secondary)
                     }
                 }
                 .padding(.vertical, 8)
@@ -210,8 +225,7 @@ public struct ForumScreen: View {
             .font(.subheadline)
             .foregroundStyle(Color.Labels.teritary)
             .textCase(nil)
-            .offset(x: 0)
-            .padding(.bottom, 4)
+            .offset(x: -16)
     }
 }
 

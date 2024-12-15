@@ -57,20 +57,28 @@ public enum CodeType: Hashable, Codable {
 
 public struct QuoteMetadata: Hashable, Equatable, Codable {
     public var name: String
-    public var date: String
+    public var date: String?
     public var postId: Int?
     
-    public init(name: String, date: String, postId: Int? = nil) {
+    public init(
+        name: String,
+        date: String?,
+        postId: Int? = nil
+    ) {
         self.name = name
         self.date = date
         self.postId = postId
     }
     
     public var plain: String {
-        if let postId {
+        if let postId, let date {
             return "name=\"\(name)\" date=\"\(date)\" post=\(postId)"
-        } else {
+        } else if let postId {
+            return "name=\"\(name)\" post=\(postId)"
+        } else if let date {
             return "name=\"\(name)\" date=\"\(date)\""
+        } else {
+            return "name=\"\(name)\""
         }
     }
 }

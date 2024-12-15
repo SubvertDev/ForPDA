@@ -83,10 +83,9 @@ public struct ForumsListScreen: View {
                     Spacer(minLength: 0)
                     
                     if unread {
-                        Circle()
-                            .font(.title2)
+                        Image(systemSymbol: .circleFill)
+                            .font(.caption)
                             .foregroundStyle(tintColor)
-                            .frame(width: 8)
                     }
                 }
                 .contentShape(Rectangle())
@@ -105,8 +104,7 @@ public struct ForumsListScreen: View {
             .font(.subheadline)
             .foregroundStyle(Color.Labels.teritary)
             .textCase(nil)
-            .offset(x: 0)
-            .padding(.bottom, 4)
+            .offset(x: -16)
     }
 }
 

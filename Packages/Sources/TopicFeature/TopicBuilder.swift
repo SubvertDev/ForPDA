@@ -681,14 +681,14 @@ public class TopicBuilder {
             logger.log("[QUOTE PARSER] Found title attributes: \"\(title)\"")
             return .title(title)
         } else if string.first == " " {
-            let pattern = /name=\"([^\"]+)\" date=\"([^\"]+)\"(?: post=(\d+))?/
+            let pattern = /name=\"([^\"]+)\"(?: date=\"([^\"]+)\")?(?: post=(\d+))?/
             if let match = string.firstMatch(of: pattern) {
                 let metadata = QuoteMetadata(
                     name: String(match.output.1),
-                    date: String(match.output.2),
-                    postId: Int(String(match.output.3 ?? ""))
+                    date: match.output.2.map(String.init),
+                    postId: match.output.3.flatMap { Int($0) }
                 )
-                logger.log("[QUOTE PARSER] Found metadata attributes: \"\(metadata.name)\" + \"\(metadata.date)\" + \"\(metadata.postId ?? -1)\"")
+                logger.log("[QUOTE PARSER] Found metadata attributes: \"\(metadata.name)\" + \"\(metadata.date ?? "none")\" + \"\(metadata.postId ?? -1)\"")
                 return .metadata(metadata)
             } else {
                 fatalError("[QUOTE PARSER] Unrecognized pattern")

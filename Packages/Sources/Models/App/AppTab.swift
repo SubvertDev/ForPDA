@@ -10,7 +10,6 @@ import SFSafeSymbols
 
 public enum AppTab: Int, CaseIterable, Sendable, Codable {
     case articlesList = 0
-    //case bookmarks
     case favorites
     case forum
     case profile
@@ -19,8 +18,6 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
         switch self {
         case .articlesList:
             return "Articles"
-        //case .bookmarks:
-            //return "Bookmarks"
         case .favorites:
             return "Favorites"
         case .forum:
@@ -34,10 +31,8 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
         switch self {
         case .articlesList:
             return .docTextImage
-        //case .bookmarks:
-            //return .bookmark
         case .favorites:
-            return .star
+            return .starBubble
         case .forum:
             return .bubbleLeftAndBubbleRight
         case .profile:
