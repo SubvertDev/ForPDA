@@ -79,17 +79,17 @@ public struct DeveloperFeature: Reducer, Sendable {
                 
             case .binding(\.isAnalyticsEnabled):
                 if isDebug {
-                    state.appSettings.analyticsConfigurationDebug.isAnalyticsEnabled = state.isAnalyticsEnabled
+                    state.$appSettings.analyticsConfigurationDebug.isAnalyticsEnabled.withLock { $0 = state.isAnalyticsEnabled }
                 } else {
-                    state.appSettings.analyticsConfigurationRelease.isAnalyticsEnabled = state.isAnalyticsEnabled
+                    state.$appSettings.analyticsConfigurationRelease.isAnalyticsEnabled.withLock { $0 = state.isAnalyticsEnabled }
                 }
                 return .none
                 
             case .binding(\.isCrashlyticsEnabled):
                 if isDebug {
-                    state.appSettings.analyticsConfigurationDebug.isCrashlyticsEnabled = state.isCrashlyticsEnabled
+                    state.$appSettings.analyticsConfigurationDebug.isCrashlyticsEnabled.withLock { $0 = state.isCrashlyticsEnabled }
                 } else {
-                    state.appSettings.analyticsConfigurationRelease.isCrashlyticsEnabled = state.isCrashlyticsEnabled
+                    state.$appSettings.analyticsConfigurationRelease.isCrashlyticsEnabled.withLock { $0 = state.isCrashlyticsEnabled }
                 }
                 return .none
                 

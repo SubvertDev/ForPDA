@@ -90,7 +90,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .none
                 
             case .logoutButtonTapped:
-                state.userSession = nil
+                state.$userSession.withLock { $0 = nil }
                 state.isLoading = true
                 return .run { send in
                     try await apiClient.logout()

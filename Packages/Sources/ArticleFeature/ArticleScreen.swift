@@ -503,7 +503,7 @@ extension UIApplication {
 
 #Preview("Test comments") {
     @Shared(.userSession) var userSession
-    userSession = UserSession(userId: 1, token: "1", isHidden: false)
+    $userSession.withLock { $0 = UserSession(userId: 1, token: "1", isHidden: false) }
     return NavigationStack {
         ArticleScreen(
             store: Store(

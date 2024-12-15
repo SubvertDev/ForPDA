@@ -78,23 +78,23 @@ public struct NotificationsFeature: Reducer, Sendable {
                 return .none
                 
             case .binding(\.isQmsEnabled):
-                state.appSettings.notifications.isQmsEnabled = state.isQmsEnabled
+                state.$appSettings.notifications.isQmsEnabled.withLock { $0 = state.isQmsEnabled }
                 return .none
                 
             case .binding(\.isForumEnabled):
-                state.appSettings.notifications.isForumEnabled = state.isForumEnabled
+                state.$appSettings.notifications.isForumEnabled.withLock { $0 = state.isForumEnabled }
                 return .none
                 
             case .binding(\.isTopicsEnabled):
-                state.appSettings.notifications.isTopicsEnabled = state.isTopicsEnabled
+                state.$appSettings.notifications.isTopicsEnabled.withLock { $0 = state.isTopicsEnabled }
                 return .none
                 
             case .binding(\.isForumMentionsEnabled):
-                state.appSettings.notifications.isForumMentionsEnabled = state.isForumMentionsEnabled
+                state.$appSettings.notifications.isForumMentionsEnabled.withLock { $0 = state.isForumMentionsEnabled }
                 return .none
                 
             case .binding(\.isSiteMentionsEnabled):
-                state.appSettings.notifications.isSiteMentionsEnabled = state.isSiteMentionsEnabled
+                state.$appSettings.notifications.isSiteMentionsEnabled.withLock { $0 = state.isSiteMentionsEnabled }
                 return .none
                 
             case .binding:
