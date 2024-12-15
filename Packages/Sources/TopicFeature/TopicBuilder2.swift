@@ -79,10 +79,9 @@ public struct UserQuote2: Hashable {
 }
 
 public indirect enum TopicType2: Hashable, Equatable {
-//    case error
     case text(String, Metadata)
     case attachment(Int)
-//    case image(URL)
+    case image(URL)
     case left([TopicType2])
     case center([TopicType2])
     case right([TopicType2])
@@ -97,6 +96,7 @@ public indirect enum TopicType2: Hashable, Equatable {
 public indirect enum TopicTypeUI: Hashable, Equatable {
     case text(AttributedString)
     case attachment(Int)
+    case image(URL)
     case left([TopicTypeUI])
     case center([TopicTypeUI])
     case right([TopicTypeUI])
