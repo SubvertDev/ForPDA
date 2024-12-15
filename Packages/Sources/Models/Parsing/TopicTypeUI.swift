@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SharedUI
 
 public indirect enum TopicTypeUI: Hashable, Equatable, Codable {
     case text(AttributedString)
@@ -33,14 +32,6 @@ public enum NoticeType: String, Hashable, Equatable, Codable {
         case .curator:   return "Куратор"
         case .moderator: return "Модератор"
         case .admin:     return "Администратор"
-        }
-    }
-    
-    public var color: Color {
-        switch self {
-        case .curator:   return Color.Main.green
-        case .moderator: return Color.Theme.primary
-        case .admin:     return Color.Main.red
         }
     }
 }

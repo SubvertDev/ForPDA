@@ -434,6 +434,7 @@ let package = Package(
             name: "PageNavigationFeature",
             dependencies: [
                 "Models",
+                "SharedUI",
                 "PersistenceKeys",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "SFSafeSymbols", package: "SFSafeSymbols")

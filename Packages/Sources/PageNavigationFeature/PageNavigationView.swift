@@ -8,19 +8,30 @@
 import SwiftUI
 import ComposableArchitecture
 import SFSafeSymbols
+import Models
+import SharedUI
 
 public struct PageNavigation: View {
+    
+    // MARK: - Properties
+    
     public var store: StoreOf<PageNavigationFeature>
+    
+    // MARK: - Init
     
     public init(store: StoreOf<PageNavigationFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
             PageNavigation()
         }
     }
+    
+    // MARK: - Page Navigation
     
     @ViewBuilder
     private func PageNavigation() -> some View {
@@ -80,6 +91,8 @@ public struct PageNavigation: View {
         .frame(maxWidth: .infinity, maxHeight: 32)
     }
     
+    // MARK: - Navigation Arrow
+    
     @ViewBuilder
     private func NavigationArrow(symbol: SFSymbol) -> some View {
         Image(systemSymbol: symbol)
@@ -87,6 +100,20 @@ public struct PageNavigation: View {
             .frame(width: 32, height: 32)
     }
 }
+
+// MARK: - Extensions
+
+extension NoticeType {
+    public var color: Color {
+        switch self {
+        case .curator:   return Color.Main.green
+        case .moderator: return Color.Theme.primary
+        case .admin:     return Color.Main.red
+        }
+    }
+}
+
+// MARK: - Previews
 
 #Preview {
     PageNavigation(
