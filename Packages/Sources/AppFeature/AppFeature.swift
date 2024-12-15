@@ -46,13 +46,9 @@ public struct AppFeature: Reducer, Sendable {
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
-//    @Reducer(state: .equatable)
-//    public enum BookmarksPath {
-//        case settingsPath(SettingsPath.Body = SettingsPath.body)
-//    }
-    
     @Reducer(state: .equatable)
     public enum FavoritesPath {
+        case forumPath(ForumPath.Body = ForumPath.body)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
     
@@ -446,32 +442,6 @@ public struct AppFeature: Reducer, Sendable {
             }
         }
         
-        // MARK: - Bookmarks Path
-        
-        // Reduce<State, Action> { state, action in
-            // switch action {
-            // case .bookmarks(.settingsButtonTapped):
-                // state.isShowingTabBar = false
-                // state.bookmarksPath.append(.settings(SettingsFeature.State()))
-                // return .none
-                //
-            // default:
-                // return .none
-            // }
-        // }
-        // .forEach(\.bookmarksPath, action: \.bookmarksPath)
-        // .onChange(of: \.bookmarksPath) { _, newValue in
-            // // TODO: Another way?
-            // Reduce<State, Action> { state, _ in
-                // let hasSettings = newValue.contains(where: { screen in
-                    // if case .settings = screen { return true }
-                    // return false
-                // })
-                // state.isShowingTabBar = !hasSettings
-                // return .none
-            // }
-        // }
-        
         // MARK: - Favorites Path
         
         Reduce<State, Action> { state, action in
@@ -481,13 +451,10 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
 
             case .favorites(.favoriteTapped(let id, let name, let isForum)):
-                // FIXME: Update NavigationRequestObserver tried to update multiple times per frame.
-                // Appears if forum tab was not loaded before switching due to pushing of new screen
-                state.selectedTab = .forum
                 if isForum {
-                    state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: name)))
+                    state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: name))))
                 } else {
-                    state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                    state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
                 }
                 return .none
                 

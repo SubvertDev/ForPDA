@@ -143,6 +143,9 @@ public struct AppView: View {
                 .trackAnalytics("Favorites Screen")
         } destination: { store in
             switch store.case {
+            case let .forumPath(path):
+                ForumPath(path)
+                
             case let .settingsPath(path):
                 SettingsPath(path)
             }
@@ -161,26 +164,7 @@ public struct AppView: View {
             ForumsListScreen(store: store.scope(state: \.forumsList, action: \.forumsList))
                 .trackAnalytics("Forums List Screen")
         } destination: { store in
-            switch store.case {
-            case let .forum(store):
-                ForumScreen(store: store)
-                    .trackAnalytics("Forum Screen")
-            
-            case let .topic(store):
-                TopicScreen(store: store)
-                    .trackAnalytics("Topic Screen")
-                
-            case let .profile(store):
-                ProfileScreen(store: store)
-                    .trackAnalytics("Profile Screen")
-                
-            case let .announcement(store):
-                AnnouncementScreen(store: store)
-                    .trackAnalytics("Announcement Screen")
-                
-            case let .settingsPath(path):
-                SettingsPath(path)
-            }
+            ForumPath(store)
         }
         .tag(AppTab.forum)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
@@ -221,6 +205,32 @@ public struct AppView: View {
         case let .qms(store):
             QMSScreen(store: store)
                 .trackAnalytics("QMS Screen")
+        }
+    }
+    
+    // MARK: - Forum Path
+    
+    @ViewBuilder
+    private func ForumPath(_ store: StoreOf<AppFeature.ForumPath.Body>) -> some View {
+        switch store.case {
+        case let .forum(store):
+            ForumScreen(store: store)
+                .trackAnalytics("Forum Screen")
+        
+        case let .topic(store):
+            TopicScreen(store: store)
+                .trackAnalytics("Topic Screen")
+            
+        case let .profile(store):
+            ProfileScreen(store: store)
+                .trackAnalytics("Profile Screen")
+            
+        case let .announcement(store):
+            AnnouncementScreen(store: store)
+                .trackAnalytics("Announcement Screen")
+            
+        case let .settingsPath(path):
+            SettingsPath(path)
         }
     }
     
