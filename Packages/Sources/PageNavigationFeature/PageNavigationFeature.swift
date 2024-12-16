@@ -77,7 +77,12 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 state.offset += state.perPage
                 
             case .lastPageTapped:
-                state.offset = state.count - (state.count % state.perPage)
+                let targetOffset = state.count - (state.count % state.perPage)
+                if targetOffset == state.count && state.count > 0 {
+                    state.offset = targetOffset - state.perPage
+                } else {
+                    state.offset = targetOffset
+                }
                 
             case .offsetChanged:
                 return .none
