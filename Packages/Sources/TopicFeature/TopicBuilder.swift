@@ -937,7 +937,7 @@ public class TopicBuilder {
         ]
 
         // Define tags directly in the regex pattern
-        let pattern = /\[([a-zA-Z\/]+)([^\]]*)\]/
+        let pattern = /\[([a-zA-Z\/]+)([^\[\]]*)\]/
         
         for match in string.matches(of: pattern) {
             let tag = String(match.output.1)
