@@ -428,7 +428,7 @@ extension ArticleScreen {
                         .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
                 })
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    Task { @MainActor in
+                    MainActor.assumeIsolated {
                         let percentage = 0.8
                         let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
                         let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
@@ -440,7 +440,7 @@ extension ArticleScreen {
                     }
                 }
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    Task { @MainActor in
+                    MainActor.assumeIsolated {
                         if value.y > 0 {
                             onRefreshTriggered()
                         }
