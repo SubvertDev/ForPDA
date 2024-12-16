@@ -35,7 +35,7 @@ public struct PageNavigation: View {
     
     @ViewBuilder
     private func PageNavigation() -> some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 32) {
             Button {
                 store.send(.firstPageTapped)
             } label: {
@@ -43,8 +43,6 @@ public struct PageNavigation: View {
             }
             .buttonStyle(.plain)
             .disabled(store.currentPage == 1)
-            
-            Spacer()
             
             Button {
                 store.send(.previousPageTapped)
@@ -56,6 +54,23 @@ public struct PageNavigation: View {
             
             Spacer()
             
+            Button {
+                store.send(.nextPageTapped)
+            } label: {
+                NavigationArrow(symbol: .chevronRight)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.currentPage + 1 > store.totalPages)
+            
+            Button {
+                store.send(.lastPageTapped)
+            } label: {
+                NavigationArrow(symbol: .chevronRight2)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.currentPage + 1 > store.totalPages)
+        }
+        .overlay {
             Text(String("\(store.currentPage) / \(store.totalPages)"))
                 .font(.subheadline)
                 .foregroundStyle(Color.Labels.secondary)
@@ -65,26 +80,7 @@ public struct PageNavigation: View {
                     RoundedRectangle(cornerRadius: 8)
                         .foregroundStyle(Color.Background.teritary)
                 )
-            
-            Spacer()
-            
-            Button {
-                store.send(.nextPageTapped)
-            } label: {
-                NavigationArrow(symbol: .chevronRight)
-            }
-            .buttonStyle(.plain)
-            .disabled(store.currentPage + 1 > store.totalPages)
-            
-            Spacer()
-            
-            Button {
-                store.send(.lastPageTapped)
-            } label: {
-                NavigationArrow(symbol: .chevronRight2)
-            }
-            .buttonStyle(.plain)
-            .disabled(store.currentPage + 1 > store.totalPages)
+                .contentTransition(.numericText())
         }
         .listRowSeparator(.hidden)
         .animation(.default, value: store.currentPage)
@@ -101,7 +97,7 @@ public struct PageNavigation: View {
     }
 }
 
-// MARK: - Extensions
+// MARK: - Model Extensions
 
 extension NoticeType {
     public var color: Color {
