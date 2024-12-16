@@ -88,13 +88,11 @@ public struct AppFeature: Reducer, Sendable {
         public var appDelegate: AppDelegateFeature.State
 
         public var articlesPath: StackState<ArticlesPath.State>
-        // public var bookmarksPath: StackState<BookmarksPath.State>
         public var favoritesPath: StackState<FavoritesPath.State>
         public var forumPath: StackState<ForumPath.State>
         public var profilePath: StackState<ProfilePath.State>
         
         public var articlesList: ArticlesListFeature.State
-        // public var bookmarks: BookmarksFeature.State
         public var favorites: FavoritesFeature.State
         public var forumsList: ForumsListFeature.State
         public var profile: ProfileFeature.State
@@ -130,12 +128,10 @@ public struct AppFeature: Reducer, Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
-            // bookmarksPath: StackState<BookmarksPath.State> = StackState(),
             favoritesPath: StackState<FavoritesPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
             menuPath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
-            // bookmarks: BookmarksFeature.State = BookmarksFeature.State(),
             favorites: FavoritesFeature.State = FavoritesFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             profile: ProfileFeature.State = ProfileFeature.State(),
@@ -150,13 +146,11 @@ public struct AppFeature: Reducer, Sendable {
             self.appDelegate = appDelegate
 
             self.articlesPath = articlesPath
-            // self.bookmarksPath = bookmarksPath
             self.favoritesPath = favoritesPath
             self.forumPath = forumPath
             self.profilePath = menuPath
             
             self.articlesList = articlesList
-            // self.bookmarks = bookmarks
             self.favorites = favorites
             self.forumsList = forumsList
             self.profile = profile
@@ -182,13 +176,11 @@ public struct AppFeature: Reducer, Sendable {
         case appDelegate(AppDelegateFeature.Action)
 
         case articlesPath(StackActionOf<ArticlesPath>)
-        // case bookmarksPath(StackActionOf<BookmarksPath>)
         case favoritesPath(StackActionOf<FavoritesPath>)
         case forumPath(StackActionOf<ForumPath>)
         case profilePath(StackActionOf<ProfilePath>)
         
         case articlesList(ArticlesListFeature.Action)
-        // case bookmarks(BookmarksFeature.Action)
         case favorites(FavoritesFeature.Action)
         case forumsList(ForumsListFeature.Action)
         case profile(ProfileFeature.Action)
@@ -200,6 +192,7 @@ public struct AppFeature: Reducer, Sendable {
         case didSelectTab(AppTab)
         case deeplink(URL)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
+        case registerBackgroundTask
         case syncUnreadTaskInvoked
         
         case _failedToConnect(any Error)
@@ -225,10 +218,6 @@ public struct AppFeature: Reducer, Sendable {
         Scope(state: \.articlesList, action: \.articlesList) {
             ArticlesListFeature()
         }
-        
-        // Scope(state: \.bookmarks, action: \.bookmarks) {
-            // BookmarksFeature()
-        // }
         
         Scope(state: \.favorites, action: \.favorites) {
             FavoritesFeature()
@@ -315,31 +304,38 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .scenePhaseDidChange(from: _, to: newPhase):
                 if newPhase == .background {
-                    // return .send(.syncUnreadTaskInvoked) // For test purposes
-                    let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
-                    do {
-                        try BGTaskScheduler.shared.submit(request)
-                        logger.info("Successfully scheduled BGAppRefreshTaskRequest")
-                        // Set breakpoint here and run:
-                        // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
-                    } catch {
-                        analyticsClient.capture(error)
-                    }
+                    return .send(.registerBackgroundTask)
+                }
+                return .none
+                
+            case .registerBackgroundTask:
+                // return .send(.syncUnreadTaskInvoked) // For test purposes
+                let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
+                do {
+                    try BGTaskScheduler.shared.submit(request)
+                    logger.info("Successfully scheduled BGAppRefreshTaskRequest")
+                    // Set breakpoint here and run:
+                    // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
+                } catch {
+                    analyticsClient.capture(error)
                 }
                 return .none
                 
             case .syncUnreadTaskInvoked:
-                return .run { _ in
+                return .run { send in
                     do {
-                        // try await apiClient.connect()
+                        // try await apiClient.connect() // TODO: Do I need this?
                         let unread = try await apiClient.getUnread()
                         await notificationsClient.showUnreadNotifications(unread)
                         
+                        // TODO: Make at an array?
                         let invokeTime = Date().timeIntervalSince1970
                         await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
                     } catch {
                         analyticsClient.capture(error)
                     }
+                    
+                    await send(.registerBackgroundTask)
                 }
                 
                 // MARK: - Default
