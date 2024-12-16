@@ -16,7 +16,6 @@ import TopicFeature
 import AnnouncementFeature
 import FavoritesFeature
 import HistoryFeature
-import MenuFeature
 import AuthFeature
 import ProfileFeature
 import QMSListFeature

@@ -17,7 +17,6 @@ import TopicFeature
 import AnnouncementFeature
 import FavoritesFeature
 import HistoryFeature
-import MenuFeature
 import AuthFeature
 import ProfileFeature
 import QMSListFeature
@@ -130,7 +129,7 @@ public struct AppFeature: Reducer, Sendable {
             articlesPath: StackState<ArticlesPath.State> = StackState(),
             favoritesPath: StackState<FavoritesPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
-            menuPath: StackState<ProfilePath.State> = StackState(),
+            profilePath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
             favorites: FavoritesFeature.State = FavoritesFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
@@ -148,7 +147,7 @@ public struct AppFeature: Reducer, Sendable {
             self.articlesPath = articlesPath
             self.favoritesPath = favoritesPath
             self.forumPath = forumPath
-            self.profilePath = menuPath
+            self.profilePath = profilePath
             
             self.articlesList = articlesList
             self.favorites = favorites

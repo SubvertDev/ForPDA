@@ -21,7 +21,6 @@ let package = Package(
         .library(name: "AnnouncementFeature", targets: ["AnnouncementFeature"]),
         .library(name: "FavoritesFeature", targets: ["FavoritesFeature"]),
         .library(name: "HistoryFeature", targets: ["HistoryFeature"]),
-        .library(name: "MenuFeature", targets: ["MenuFeature"]),
         .library(name: "AuthFeature", targets: ["AuthFeature"]),
         .library(name: "ProfileFeature", targets: ["ProfileFeature"]),
         .library(name: "QMSListFeature", targets: ["QMSListFeature"]),
@@ -79,7 +78,6 @@ let package = Package(
                 "AnnouncementFeature",
                 "FavoritesFeature",
                 "HistoryFeature",
-                "MenuFeature",
                 "AuthFeature",
                 "ProfileFeature",
                 "QMSListFeature",
@@ -244,20 +242,6 @@ let package = Package(
                 "ParsingClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
-            ]
-        ),
-        .target(
-            name: "MenuFeature",
-            dependencies: [
-                "APIClient",
-                "PersistenceKeys",
-                "AnalyticsClient",
-                "CacheClient",
-                "SharedUI",
-                "TCAExtensions",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-                .product(name: "SkeletonUI", package: "SkeletonUI"),
-                .product(name: "SFSafeSymbols", package: "SFSafeSymbols")
             ]
         ),
         .target(
