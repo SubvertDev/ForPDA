@@ -23,13 +23,13 @@ public struct AnnouncementFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         public var id: Int
-        public var name: String
+        public var name: String?
         
         public var announcement: Announcement?
         
         var types: [[TopicTypeUI]] = []
        
-        public init(id: Int, name: String) {
+        public init(id: Int, name: String?) {
             self.id = id
             self.name = name
         }
@@ -39,6 +39,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
     
     public enum Action {
         case onTask
+        case urlTapped(URL)
         case settingsButtonTapped
 
         case _loadAnnouncement
@@ -65,12 +66,16 @@ public struct AnnouncementFeature: Reducer, Sendable {
                     await send(._announcementResponse(result))
                 }
                 
+            case .urlTapped:
+                return .none
+                
             case .settingsButtonTapped:
                 return .none
                    
             case let ._announcementResponse(.success(announcement)):
                 // customDump(announcement)
                 state.announcement = announcement
+                state.name = state.name ?? announcement.name
 
                 return .run { send in
                     var topicTypes: [[TopicTypeUI]] = []

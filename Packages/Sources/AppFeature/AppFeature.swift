@@ -496,7 +496,8 @@ public struct AppFeature: Reducer, Sendable {
                 state.forumPath.append(.profile(ProfileFeature.State(userId: userId)))
                 return .none
             
-            case let .forumPath(.element(id: _, action: .topic(.urlTapped(url)))):
+            case .forumPath(.element(id: _, action: .topic(.urlTapped(let url)))),
+                 .forumPath(.element(id: _, action: .announcement(.urlTapped(let url)))):
                 do {
                     if let deeplink = try DeeplinkHandler().handleInnerURL(url), case let .forum(screen) = deeplink.tab {
                         switch screen {
@@ -504,6 +505,8 @@ public struct AppFeature: Reducer, Sendable {
                             state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: "Error")))
                         case let .topic(id: id):
                             state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                        case let .announcement(id: id):
+                            state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: nil)))
                         }
                         return .none
                     }
