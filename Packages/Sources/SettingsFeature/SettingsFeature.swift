@@ -116,10 +116,8 @@ public struct SettingsFeature: Reducer, Sendable {
                 
             case let .schemeButtonTapped(scheme):
                 state.appColorScheme = scheme
-                return .run { [appSettings = state.$appSettings,
-                               scheme = state.appColorScheme] _ in
-                    await appSettings.withLock { $0.appColorScheme = scheme }
-                }
+                state.$appSettings.withLock { $0.appColorScheme = scheme }
+                return .none
                 
             case .notificationsButtonTapped:
                 return .none
@@ -194,10 +192,8 @@ public struct SettingsFeature: Reducer, Sendable {
                 }
                 
             case .binding(\.appTintColor):
-                return .run { [appSettings = state.$appSettings,
-                               tint = state.appTintColor] _ in
-                    await appSettings.withLock { $0.appTintColor = tint }
-                }
+                state.$appSettings.withLock { $0.appTintColor = state.appTintColor }
+                return .none
                 
             case .binding(\.backgroundTheme):
                 state.backgroundTheme = .blue
@@ -205,10 +201,8 @@ public struct SettingsFeature: Reducer, Sendable {
                 return .none
                 
             case .binding(\.startPage):
-                return .run { [appSettings = state.$appSettings,
-                               page = state.startPage] _ in
-                    await appSettings.withLock { $0.startPage = page }
-                }
+                state.$appSettings.withLock { $0.startPage = state.startPage }
+                return .none
                 
             case .destination, .binding:
                 return .none

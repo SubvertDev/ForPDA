@@ -139,9 +139,9 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 
             case .listGridTypeButtonTapped:
                 state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
-                return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
+                state.$appSettings.withLock { $0.articlesListRowType = state.listRowType }
+                return .run { _ in
                     await hapticClient.play(.selection)
-                    await appSettings.withLock { $0.articlesListRowType = listRowType }
                 }
                 
             case .settingsButtonTapped:

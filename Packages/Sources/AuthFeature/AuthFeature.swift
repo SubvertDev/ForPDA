@@ -179,7 +179,7 @@ public struct AuthFeature: Reducer, Sendable {
                     switch loginState {
                     case .success(userId: let userId, token: let token):
                         @Shared(.userSession) var userSession
-                        await $userSession.withLock { $0 = UserSession(userId: userId, token: token, isHidden: isHidden) }
+                        $userSession.withLock { $0 = UserSession(userId: userId, token: token, isHidden: isHidden) }
                         await send(.delegate(.loginSuccess(reason: reason, userId: userId)))
                         
                     case .wrongPassword:

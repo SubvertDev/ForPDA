@@ -85,9 +85,8 @@ public struct BookmarksFeature: Reducer, Sendable {
                 
             case .listGridTypeButtonTapped:
                 state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
-                return .run { [appSettings = state.$appSettings, listRowType = state.listRowType] _ in
-                    await appSettings.withLock { $0.articlesListRowType = listRowType }
-                }
+                state.$appSettings.withLock { $0.articlesListRowType = state.listRowType }
+                return .none
                 
             case .settingsButtonTapped:
                 return .none

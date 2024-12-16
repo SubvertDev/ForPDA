@@ -60,7 +60,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                     if ParserSettings.version > parserVersion.wrappedValue {
                         logger.warning("Parser version outdated, removing posts cache")
                         await cacheClient.removeAllParsedPostContent()
-                        await parserVersion.withLock { $0 = ParserSettings.version }
+                        parserVersion.withLock { $0 = ParserSettings.version }
                     } else {
                         logger.info("Parser version match (\(parserVersion.wrappedValue))")
                     }

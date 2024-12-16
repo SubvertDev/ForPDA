@@ -8,6 +8,8 @@
 import UIKit
 import ComposableArchitecture
 
+// TODO: I don't think I need this as a dependency
+
 public enum HapticType {
     case success
     case warning
