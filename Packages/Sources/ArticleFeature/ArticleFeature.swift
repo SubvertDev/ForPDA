@@ -204,7 +204,7 @@ public struct ArticleFeature: Reducer, Sendable {
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id),
                     .publisher {
-                        state.$userSession.publisher
+                        state.$userSession.publisher.dropFirst()
                             .map { _ in Action.onRefresh }
                     }
                 ])
