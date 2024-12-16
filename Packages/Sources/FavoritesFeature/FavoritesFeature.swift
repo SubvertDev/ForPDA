@@ -49,8 +49,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case _favoritesResponse(Result<[FavoriteInfo], any Error>)
         
-        // TODO: Implement unreadFirst setting
-        case _loadFavorites(unreadFirst: Bool = true, offset: Int)
+        case _loadFavorites(unreadFirst: Bool, offset: Int)
     }
     
     // MARK: - Dependencies
@@ -67,11 +66,10 @@ public struct FavoritesFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
-                return .send(._loadFavorites(unreadFirst: true, offset: 0))
+                return .send(._loadFavorites(unreadFirst: false, offset: 0))
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
-                // TODO: Implement unreadFirst setting
-                return .send(._loadFavorites(unreadFirst: true, offset: newOffset))
+                return .send(._loadFavorites(unreadFirst: false, offset: newOffset))
                 
             case .pageNavigation:
                 return .none
@@ -103,8 +101,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                 }
                 
-                state.favoritesImportant = favsImportant
-                state.favorites = favorites
+                state.favoritesImportant = favsImportant.sorted(by: { $0.topic.lastPost.date > $1.topic.lastPost.date })
+                state.favorites = favorites.sorted(by: { $0.topic.lastPost.date > $1.topic.lastPost.date })
                 
                 // TODO: Is it ok?
                 state.pageNavigation.count = response.count
