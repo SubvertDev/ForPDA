@@ -17,9 +17,14 @@ public indirect enum TopicTypeUI: Hashable, Equatable, Codable {
     case spoiler([TopicTypeUI], AttributedString?)
     case quote([TopicTypeUI], QuoteType?)
     case code(TopicTypeUI, CodeType)
-    case list([TopicTypeUI])
+    case list([TopicTypeUI], ListType)
     case notice([TopicTypeUI], NoticeType)
     case bullet([TopicTypeUI])
+}
+
+public enum ListType: Hashable, Equatable, Codable {
+    case bullet
+    case numeric
 }
 
 public enum NoticeType: String, Hashable, Equatable, Codable {

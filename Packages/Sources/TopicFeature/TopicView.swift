@@ -103,7 +103,7 @@ public struct TopicView: View {
         case let .code(type, info):
             CodeView(type: type, info: info, onUrlTap: onUrlTap)
             
-        case let .list(types):
+        case let .list(types, _):
             VStack(spacing: 8) {
                 ForEach(types, id: \.self) { type in
                     TopicView(type: type, isTopLevel: false, attachments: attachments)

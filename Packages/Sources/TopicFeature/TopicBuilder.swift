@@ -44,7 +44,7 @@ public indirect enum TopicType: Hashable, Equatable {
     case spoiler([TopicType], String?, AttributedString?)
     case quote([TopicType], QuoteType?)
     case code(TopicType, CodeType)
-    case list([TopicType])
+    case list([TopicType], ListType)
     case notice([TopicType], NoticeType)
     case bullet([TopicType])
 }
@@ -150,8 +150,8 @@ public class TopicBuilder {
             case let .quote(array, info):
                 types[index] = .quote(applyAttributes(attributedRun, of: attributedString, to: array), info)
                 
-            case let .list(array):
-                types[index] = .list(applyAttributes(attributedRun, of: attributedString, to: array))
+            case let .list(array, listType):
+                types[index] = .list(applyAttributes(attributedRun, of: attributedString, to: array), listType)
                 
             case let .code(text, info):
                 let text = applyAttributes(attributedRun, of: attributedString, to: [text])
@@ -229,12 +229,12 @@ public class TopicBuilder {
         case .image(let url):
             return .image(url)
             
-        case .list(let array):
+        case .list(let array, let listType):
             var results: [TopicTypeUI] = []
             for item in array {
                 results.append(twoToUI(item))
             }
-            return .list(results)
+            return .list(results, listType)
             
         case .bullet(let types):
             return .bullet(types.map { twoToUI($0) })
@@ -457,8 +457,8 @@ public class TopicBuilder {
                 let spoiler = parseSpoiler(from: scanner, attributes: attributes)
                 if case .spoiler = spoiler { results.append(spoiler) } else { fatalError("non spoiler return") }
                 
-            case "[list]":
-                let list = parseList(from: scanner)
+            case "[list]", "[list=1]":
+                let list = parseList(from: scanner, listType: nextTag == "[list]" ? .bullet : .numeric)
                 if case .list = list { results.append(list) } else { fatalError("non list return") }
                 
             case "[quote]":
@@ -845,7 +845,7 @@ public class TopicBuilder {
 
     // MARK: - List
     
-    func parseList(from scanner: Scanner) -> TopicType {
+    func parseList(from scanner: Scanner, listType: ListType) -> TopicType {
         defer { listCount -= 1 }
         currentTag = .list
         listCount += 1
@@ -856,10 +856,14 @@ public class TopicBuilder {
             if scanner.scanString("[*]") != nil {
                 logger.log("[LIST] Found [*] tag")
                 let types = parse(with: scanner)
-                results.append(.list(types))
+                results.append(.list(types, listType))
             } else if scanner.scanString("[list]") != nil {
-                logger.log("[LIST] Found nested list")
-                let list = parseList(from: scanner)
+                logger.log("[LIST] Found nested bullet list")
+                let list = parseList(from: scanner, listType: .bullet)
+                results.append(list)
+            } else if scanner.scanString("[list=1]") != nil {
+                logger.log("[LIST] Found nested numeric list")
+                let list = parseList(from: scanner, listType: .numeric)
                 results.append(list)
             } else if scanner.scanString("[/list]") != nil {
                 break
@@ -874,7 +878,7 @@ public class TopicBuilder {
         }
         
         logger.log("[LIST] Finished with \(results.count) results")
-        return .list(results)
+        return .list(results, listType)
     }
     
     // MARK: - Helpers
@@ -909,6 +913,8 @@ public class TopicBuilder {
             "/quote",
             "spoiler",
             "/spoiler",
+            "list=1",
+            "/list=1",
             "list",
             "/list",
             "code",
