@@ -54,11 +54,11 @@ public struct ForumScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        Button {
-                            // TODO: forum info
-                        } label: {
-                            Image(systemSymbol: .infoCircle)
-                        }
+//                        Button {
+//                            // TODO: forum info
+//                        } label: {
+//                            Image(systemSymbol: .infoCircle)
+//                        }
                         
                         Button {
                             store.send(.settingsButtonTapped)

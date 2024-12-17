@@ -31,6 +31,7 @@ public struct HistoryScreen: View {
                     VStack(spacing: 1) {
                         if store.pageNavigation.shouldShow {
                             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                                .padding(.horizontal, 16)
                         }
                         
                         List(store.history, id: \.hashValue) { history in
@@ -82,25 +83,26 @@ public struct HistoryScreen: View {
             } label: {
                 HStack(spacing: 8) {
                     VStack(alignment: .leading, spacing: 4) {
+                        if let lastPost {
+                            Text(lastPost.formattedDate, bundle: Bundle.models)
+                                .font(.caption)
+                                .foregroundStyle(Color.Labels.teritary)
+                        }
+                        
                         RichText(
-                            text: NSAttributedString(string: title),
+                            text: AttributedString(title),
                             font: .body,
                             foregroundStyle: Color.Labels.primary
                         )
                         
                         if let lastPost {
-                            HStack(spacing: 0) {
-                                Text(lastPost.formattedDate, bundle: .models)
+                            HStack(spacing: 4) {
+                                Image(systemSymbol: .personCircle)
                                     .font(.caption)
                                     .foregroundStyle(Color.Labels.secondary)
-                                    .padding(.trailing, 16)
-                                
-                                Image(systemSymbol: .person)
-                                    .font(.caption)
-                                    .padding(.trailing, 4)
                                 
                                 RichText(
-                                    text: NSAttributedString(string: lastPost.username),
+                                    text: AttributedString(lastPost.username),
                                     font: .caption,
                                     foregroundStyle: Color.Labels.secondary
                                 )
