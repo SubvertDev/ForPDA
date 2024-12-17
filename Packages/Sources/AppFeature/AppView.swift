@@ -48,7 +48,6 @@ public struct AppView: View {
             ZStack(alignment: .bottom) {
                 TabView(selection: $store.selectedTab) {
                     ArticlesListTab()
-//                    BookmarksTab()
                     FavoritesTab()
                     ForumTab()
                     ProfileTab()
@@ -115,22 +114,6 @@ public struct AppView: View {
         .tag(AppTab.articlesList)
         .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
     }
-    
-    // MARK: - Bookmarks Tab
-    
-//    @ViewBuilder
-//    private func BookmarksTab() -> some View {
-//        NavigationStack(path: $store.scope(state: \.bookmarksPath, action: \.bookmarksPath)) {
-//            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-//        } destination: { store in
-//            switch store.case {
-//            case let .settings(store):
-//                SettingsScreen(store: store)
-//            }
-//        }
-//        .tag(Tab.bookmarks)
-//        .toolbar(store.isShowingTabBar ? .visible : .hidden, for: .tabBar)
-//    }
     
     // MARK: - Favorites Tab
     @ViewBuilder

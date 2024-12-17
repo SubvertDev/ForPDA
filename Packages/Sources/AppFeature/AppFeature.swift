@@ -441,21 +441,39 @@ public struct AppFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .favorites(.settingsButtonTapped):
+            case .favorites(.settingsButtonTapped),
+                .favoritesPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
                 state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
 
             case .favorites(.favoriteTapped(let id, let name, let isForum)):
-                if isForum {
-                    state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: name))))
-                } else {
-                    state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
-                }
+                let forumPath: FavoritesPath.State = isForum
+                    ? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
+                    : .forumPath(.topic(TopicFeature.State(topicId: id)))
+                state.favoritesPath.append(forumPath)
                 return .none
                 
+            case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.urlTapped(url))))),
+                let .favoritesPath(.element(id: _, action: .forumPath(.announcement(.urlTapped(url))))):
+                return handleDeeplink(url: url, state: &state)
+                
+            case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.userAvatarTapped(userId: userId))))):
+                state.favoritesPath.append(.forumPath(.profile(ProfileFeature.State(userId: userId))))
+                
+            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id))))):
+                state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
+                
+            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.announcementTapped(id: id, name: name))))):
+                state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: name))))
+                
+            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.subforumTapped(id: id, name: name))))):
+                state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: name))))
+                
             default:
-                return .none
+                break
             }
+            
+            return .none
         }
         .forEach(\.favoritesPath, action: \.favoritesPath)
         .onChange(of: \.favoritesPath) { _, newValue in
@@ -493,22 +511,7 @@ public struct AppFeature: Reducer, Sendable {
             
             case .forumPath(.element(id: _, action: .topic(.urlTapped(let url)))),
                  .forumPath(.element(id: _, action: .announcement(.urlTapped(let url)))):
-                do {
-                    if let deeplink = try DeeplinkHandler().handleInnerURL(url), case let .forum(screen) = deeplink.tab {
-                        switch screen {
-                        case let .forum(id: id):
-                            state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: "Error")))
-                        case let .topic(id: id):
-                            state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
-                        case let .announcement(id: id):
-                            state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: nil)))
-                        }
-                        return .none
-                    }
-                } catch {
-                    analyticsClient.capture(error)
-                }
-                return .run { _ in await open(url: url) }
+                return handleDeeplink(url: url, state: &state)
                 
             case .forumsList(.settingsButtonTapped),
                  .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
@@ -623,6 +626,45 @@ public struct AppFeature: Reducer, Sendable {
             
             return .none
         }
+    }
+    
+    private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
+        do {
+            if let deeplink = try DeeplinkHandler().handleInnerURL(url),
+                case let .forum(screen) = deeplink.tab {
+                
+                if state.selectedTab == .favorites {
+                    switch screen {
+                    case let .forum(id: id):
+                        state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: ""))))
+                        
+                    case let .topic(id: id):
+                        state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
+                        
+                    case let .announcement(id: id):
+                        state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: nil))))
+                    }
+                }
+                
+                if state.selectedTab == .forum {
+                    switch screen {
+                    case let .forum(id: id):
+                        state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: "")))
+                        
+                    case let .topic(id: id):
+                        state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                        
+                    case let .announcement(id: id):
+                        state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: nil)))
+                    }
+                }
+
+                return .none
+            }
+        } catch {
+            analyticsClient.capture(error)
+        }
+        return .run { _ in await open(url: url) }
     }
 }
 
