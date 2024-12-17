@@ -29,7 +29,7 @@ public struct DeveloperFeature: Reducer, Sendable {
         @Shared(.appSettings) public var appSettings: AppSettings
         @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
         
-        public var lastBackgroundTaskInvokeTime: TimeInterval?
+        public var lastBackgroundTaskInvokeTime: [TimeInterval] = []
         public var isAnalyticsEnabled: Bool
         public var isCrashlyticsEnabled: Bool
         
@@ -51,7 +51,7 @@ public struct DeveloperFeature: Reducer, Sendable {
         case sendCrashButtonTapped
         case binding(BindingAction<State>)
         
-        case _onCacheLoad(TimeInterval?)
+        case _onCacheLoad([TimeInterval])
     }
     
     // MARK: - Dependency
@@ -68,8 +68,8 @@ public struct DeveloperFeature: Reducer, Sendable {
             switch action {
             case .onAppear:
                 return .run { send in
-                    let timeInterval = await cacheClient.getLastBackgroundTaskInvokeTime()
-                    await send(._onCacheLoad(timeInterval))
+                    let timeIntervals = await cacheClient.getLastBackgroundTaskInvokeTime()
+                    await send(._onCacheLoad(timeIntervals))
                 }
                 
             case .sendCrashButtonTapped:
@@ -96,8 +96,8 @@ public struct DeveloperFeature: Reducer, Sendable {
             case .binding:
                 return .none
                 
-            case let ._onCacheLoad(timeInterval):
-                state.lastBackgroundTaskInvokeTime = timeInterval
+            case let ._onCacheLoad(timeIntervals):
+                state.lastBackgroundTaskInvokeTime = timeIntervals
                 return .none
             }
         }
@@ -123,11 +123,8 @@ public struct DeveloperScreen: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("ID: \(store.analyticsId)")
                     
-                    if let lastTime = store.lastBackgroundTaskInvokeTime {
-                        let date = Date(timeIntervalSince1970: lastTime)
-                        Text("Last background refresh: \(date.formatted())")
-                    } else {
-                        Text("Last background refresh: never")
+                    ForEach(store.lastBackgroundTaskInvokeTime, id: \.self) { date in
+                        Text("Refresh on \(date.formatted())")
                     }
                     
                     HStack(spacing: 8) {

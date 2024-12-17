@@ -43,7 +43,7 @@ public struct CacheClient: Sendable {
     
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
-    public var getLastBackgroundTaskInvokeTime: @Sendable () async -> TimeInterval?
+    public var getLastBackgroundTaskInvokeTime: @Sendable () async -> [TimeInterval]
     
     // Notifications
     public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
@@ -131,10 +131,12 @@ extension CacheClient: DependencyKey {
             // MARK: - Background Tasks
             
             setLastBackgroundTaskInvokeTime: { date in
-                try? await lastBackgroundTaskInvokeTimeStorage.async.setObject(date, forKey: lastBackgroundTaskInvokeTimeKey)
+                var invokes = (try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
+                invokes.append(date)
+                try? await lastBackgroundTaskInvokeTimeStorage.async.setObject(invokes, forKey: lastBackgroundTaskInvokeTimeKey)
             },
             getLastBackgroundTaskInvokeTime: {
-                return try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)
+                return (try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
             },
             
             // MARK: - Notifications
@@ -201,12 +203,12 @@ private extension CacheClient {
     }
     
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
-    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, TimeInterval> {
+    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [TimeInterval]> {
         return try! Storage(
             diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .never),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: TimeInterval.self)
+            transformer: TransformerFactory.forCodable(ofType: [TimeInterval].self)
         )
     }
     
