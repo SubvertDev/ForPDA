@@ -194,6 +194,8 @@ let package = Package(
                 "ParsingClient",
                 "LoggerClient",
                 "PersistenceKeys",
+                "PasteboardClient",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "RichTextKit", package: "RichTextKit"),
                 .product(name: "NukeUI", package: "nuke")

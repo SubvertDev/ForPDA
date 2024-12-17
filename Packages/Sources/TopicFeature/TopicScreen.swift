@@ -52,9 +52,28 @@ public struct TopicScreen: View {
             }
             .navigationTitle(Text(store.topic?.name ?? "Загружаем..."))
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                OptionsMenu()
+            }
             .task {
                 store.send(.onTask)
             }
+        }
+    }
+    
+    // MARK: - Options Menu
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                store.send(.copyLinkMenuTapped)
+            }
+            ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
+                store.send(.openInBrowserMenuTapped)
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
         }
     }
     

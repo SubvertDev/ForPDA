@@ -12,6 +12,8 @@ import APIClient
 import Models
 import PersistenceKeys
 import ParsingClient
+import PasteboardClient
+import TCAExtensions
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -51,6 +53,10 @@ public struct TopicFeature: Reducer, Sendable {
         case urlTapped(URL)
         case pageNavigation(PageNavigationFeature.Action)
         
+        // TODO: Move to its own actions
+        case copyLinkMenuTapped
+        case openInBrowserMenuTapped
+        
         case _loadTopic(offset: Int)
         case _loadTypes([[TopicTypeUI]])
         case _topicResponse(Result<Topic, any Error>)
@@ -60,6 +66,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.logger) var logger
     
     // MARK: - Cancellable
@@ -96,6 +103,18 @@ public struct TopicFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
+                // TODO: Refactor out
+            case .copyLinkMenuTapped:
+                guard let topic = state.topic else { return .none }
+                pasteboardClient.copy(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")
+                return .none
+                
+                // TODO: Refactor out
+            case .openInBrowserMenuTapped:
+                guard let topic = state.topic else { return .none }
+                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
+                return .run { _ in await open(url: url) }
+                
             case let ._loadTopic(offset):
                 state.isLoadingTopic = true
                 return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
@@ -105,7 +124,7 @@ public struct TopicFeature: Reducer, Sendable {
                 .cancellable(id: CancelID.loading)
                 
             case let ._topicResponse(.success(topic)):
-                // customDump(topic)
+                customDump(topic)
                 state.topic = topic
                 
                 // TODO: Is it ok?
