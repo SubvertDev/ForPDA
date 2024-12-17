@@ -13,5 +13,5 @@ public struct AppStorageKeys {
 }
 
 public struct ParserSettings {
-    public static let version = 4
+    public static let version = 5
 }
