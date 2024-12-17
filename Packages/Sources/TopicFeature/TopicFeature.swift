@@ -83,6 +83,7 @@ public struct TopicFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
+                guard state.topic == nil else { return .none }
                 return .send(._loadTopic(offset: 0))
                 
             case .userAvatarTapped:
