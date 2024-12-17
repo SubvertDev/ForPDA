@@ -11,5 +11,5 @@ public enum AuthResponse: Sendable {
     case success(userId: Int, token: String) // 0
     case wrongPassword // 3
     case wrongCaptcha(url: URL) // 4
-    case unknown
+    case unknown(Int)
 }

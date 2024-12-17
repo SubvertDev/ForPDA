@@ -52,7 +52,7 @@ public struct AuthParser {
                     let url = URL(string: urlString)!
                     return .wrongCaptcha(url: url)
                 default:
-                    return .unknown
+                    return .unknown(responseTypeId)
                 }
             } catch {
                 throw ParsingError.failedToSerializeData(error)

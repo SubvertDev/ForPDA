@@ -32,6 +32,10 @@ extension AuthFeature {
                 case ._wrongCaptcha:
                     analyticsClient.log(AuthEvent.wrongCaptcha)
                     
+                case ._somethingWentWrong(let id):
+                    analyticsClient.log(AuthEvent.somethingWentWrong(id: id))
+                    analyticsClient.capture(NSError(domain: "Auth unknown response", code: id))
+                    
                 case let .delegate(.loginSuccess(reason, userId)):
                     analyticsClient.log(AuthEvent.loginSuccess(reason: reason.rawValue, userId: userId))
                     analyticsClient.identify(String(userId))

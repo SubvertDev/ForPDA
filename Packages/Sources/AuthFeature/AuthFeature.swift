@@ -86,6 +86,7 @@ public struct AuthFeature: Reducer, Sendable {
         case _loginResponse(Result<AuthResponse, any Error>)
         case _wrongPassword
         case _wrongCaptcha(url: URL)
+        case _somethingWentWrong(Int)
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
@@ -188,8 +189,8 @@ public struct AuthFeature: Reducer, Sendable {
                     case .wrongCaptcha(let url):
                         await send(._wrongCaptcha(url: url))
                         
-                    case .unknown:
-                        fatalError("unknown login response type")
+                    case .unknown(let id):
+                        await send(._somethingWentWrong(id))
                     }
                 }
                 
@@ -218,6 +219,12 @@ public struct AuthFeature: Reducer, Sendable {
                 return .run { _ in
                     await hapticClient.play(.error)
                 }
+                
+            case ._somethingWentWrong:
+                state.password = ""
+                state.captcha = ""
+                state.alert = .somethingWentWrong
+                return .none
             }
         }
         

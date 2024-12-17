@@ -293,3 +293,27 @@ public struct AuthScreen: View {
     }
     .environment(\.tintColor, Color.Theme.primary)
 }
+
+#Preview("Alert On Error") {
+    NavigationStack {
+        AuthScreen(
+            store: Store(
+                initialState: AuthFeature.State.init(
+                    openReason: .profile,
+                    login: "TestLogin",
+                    password: "TestPassword",
+                    captcha: "1234"
+                )
+            ) {
+                AuthFeature()
+            } withDependencies: {
+                $0.apiClient.getCaptcha = { return URL(string: "/")! }
+                $0.apiClient.authorize = { @Sendable _, _, _, _ in
+                    try? await Task.sleep(for: .seconds(1))
+                    return .unknown(1)
+                }
+            }
+        )
+    }
+    .environment(\.tintColor, Color.Theme.primary)
+}
