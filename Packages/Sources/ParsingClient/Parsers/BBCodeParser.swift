@@ -69,7 +69,7 @@ public final class BBCodeParser {
         let parser = ZHTMLParserBuilder.initWithDefault()
             .set(rootStyle: MarkupStyle(
                 font: MarkupStyleFont(.preferredFont(forTextStyle: fontStyle)),
-                foregroundColor: MarkupStyleColor(color: UIColor(Color.Labels.primary))
+                foregroundColor: MarkupStyleColor(color: UIColor.primaryLabel)
             ))
             .add(ExtendHTMLTagStyleAttribute(styleName: "font-size", render: { value in
                 switch Int(value)! {
