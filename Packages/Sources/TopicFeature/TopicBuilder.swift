@@ -12,6 +12,9 @@ import ParsingClient
 import Models
 import OSLog
 
+// MARK: - !WARNING! -
+// This is WIP draft until this comment is here
+
 public struct Metadata: Hashable, Equatable {
     let range: Range<String.Index>
     var attributes: AttributeContainer?
@@ -49,6 +52,33 @@ public indirect enum TopicType: Hashable, Equatable {
     case bullet([TopicType])
 }
 
+extension StringProtocol {
+
+    func ranges<T: StringProtocol>(
+        of stringToFind: T,
+        options: String.CompareOptions = [],
+        locale: Locale? = nil
+    ) -> [Range<AttributedString.Index>] {
+
+        var ranges: [Range<String.Index>] = []
+        var attributedRanges: [Range<AttributedString.Index>] = []
+        let attributedString = AttributedString(self)
+
+        while let result = range(
+            of: stringToFind,
+            options: options,
+            range: (ranges.last?.upperBound ?? startIndex)..<endIndex,
+            locale: locale
+        ) {
+            ranges.append(result)
+            let start = AttributedString.Index(result.lowerBound, within: attributedString)!
+            let end = AttributedString.Index(result.upperBound, within: attributedString)!
+            attributedRanges.append(start..<end)
+        }
+        return attributedRanges
+    }
+}
+
 public class TopicBuilder {
     
     let isLoggerEnabled = false
@@ -73,7 +103,8 @@ public class TopicBuilder {
         Logger().error("Preapply: \(Date.now)")
         let attributedTypes = applyAttributes(attributedRanges, of: attributedString, to: types)
         Logger().error("Postapply: \(Date.now)")
-        return attributedTypes.map { twoToUI($0) }
+        let uiTypes = attributedTypes.map { twoToUI($0) }
+        return uiTypes
     }
     
     private func applyAttributes(_ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)], of attributedString: AttributedString, to string: String) -> AttributedString? {
@@ -95,43 +126,25 @@ public class TopicBuilder {
         return nil
     }
     
-    private func applyAttributes(_ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)], of attributedString: AttributedString, to types: [TopicType]) -> [TopicType] {
+    private func applyAttributes(
+        _ attributedRun: [(Range<AttributedString.Index>, AttributeContainer)],
+        of attributedString: AttributedString,
+        to types: [TopicType]
+    ) -> [TopicType] {
         var types = types
         for index in types.indices {
             switch types[index] {
             case let .text(string, metadata):
-                // Trying to find same range of text in original string
-                guard let attributedTextRange = attributedString.range(of: string) else {
-                    logger.log("[ATTRIBUTES] No range found for string")
-                    continue
-                }
                 
-                // When found, iterating over attributed runs to find overlaps
-                for (attributedRunRange, attributeContainer) in attributedRun {
-                    if attributedTextRange.overlaps(attributedRunRange) {
-                        // We store modified attributed string into metadata, so we need to extract it each time we
-                        // run this to not overwrite any of the attributes (not very optimal, but works for now)
-                        var newAttributedString = AttributedString(string)
-                        // TODO: Move to defaults somewhere else
-                        newAttributedString.font = UIFont.preferredFont(forTextStyle: .callout)
-                        newAttributedString.foregroundColor = UIColor(Color.Labels.primary)
-                        if case let .text(_, modifiedMetadata) = types[index] {
-                            if let savedAttributedString = modifiedMetadata.attributed {
-                                newAttributedString = savedAttributedString
-                            }
-                        }
-                        
-                        // If we have a text match, update our text with its metadata
-                        let originalTextInRange = attributedString[attributedRunRange]
-                        if let newTextRange = newAttributedString.range(of: String(originalTextInRange.characters)) {
-                            newAttributedString[newTextRange].mergeAttributes(attributeContainer)
-                        }
-                        let newMetadata = Metadata(range: metadata.range, attributed: newAttributedString)
-                        types[index] = .text(string, newMetadata)
-                    } else {
-                        // No overlap
+                var newString = AttributedString(string)
+                if case let .text(_, modifiedMetadata) = types[index] {
+                    if let savedString = modifiedMetadata.attributed {
+                        newString = savedString
                     }
                 }
+                let newAttributed = transferAttributes(from: attributedString, to: newString)
+                let newMetadata = Metadata(range: metadata.range, attributed: newAttributed)
+                types[index] = .text(string, newMetadata)
                 
             case let .left(array):
                 types[index] = .left(applyAttributes(attributedRun, of: attributedString, to: array))
@@ -168,6 +181,39 @@ public class TopicBuilder {
             }
         }
         return types
+    }
+    
+    private func transferAttributes(from source: AttributedString, to target: AttributedString) -> AttributedString {
+        var result = target
+        
+        // Find the range of the target text in the source string
+        guard let matchRange = source.range(of: String(target.characters[...])) else {
+            // If target text is not found in the source, return the target as-is
+            return result
+        }
+        
+        // Iterate through all attribute runs in the source string
+        for run in source.runs {
+            let rangeInSource = run.range
+            
+            // Check if the run intersects with the matched range
+            if rangeInSource.overlaps(matchRange) {
+                // Calculate the overlapping range within the matched range
+                let intersection = rangeInSource.clamped(to: matchRange)
+                
+                // Calculate the corresponding range in the target string
+                let offsetStart = source.characters.distance(from: matchRange.lowerBound, to: intersection.lowerBound)
+                let offsetEnd = source.characters.distance(from: intersection.lowerBound, to: intersection.upperBound)
+                
+                let startInTarget = result.characters.index(result.startIndex, offsetBy: offsetStart)
+                let endInTarget = result.characters.index(startInTarget, offsetBy: offsetEnd)
+                
+                // Apply the attributes to the target string
+                result[startInTarget..<endInTarget].setAttributes(run.attributes)
+            }
+        }
+        
+        return result
     }
     
     func twoToUI(_ type: TopicType) -> TopicTypeUI {
