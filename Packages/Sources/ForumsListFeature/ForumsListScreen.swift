@@ -31,7 +31,11 @@ public struct ForumsListScreen: View {
                             ForEach(forumRow.forums) { forum in
                                 HStack(spacing: 25) {
                                     Row(title: forum.name, unread: forum.isUnread) {
-                                        store.send(.forumTapped(id: forum.id, name: forum.name))
+                                        if let redirectUrl = forum.redirectUrl {
+                                            store.send(.forumRedirectTapped(redirectUrl))
+                                        } else {
+                                            store.send(.forumTapped(id: forum.id, name: forum.name))
+                                        }
                                     }
                                 }
                                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))

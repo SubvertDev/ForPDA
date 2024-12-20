@@ -493,9 +493,15 @@ public struct AppFeature: Reducer, Sendable {
                 state.forumPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
                 return .none
                 
+            case .forumsList(.forumRedirectTapped(let url)):
+                return handleDeeplink(url: url, state: &state)
+                
             case let .forumPath(.element(id: _, action: .forum(.subforumTapped(forumId, forumName)))):
                 state.forumPath.append(.forum(ForumFeature.State(forumId: forumId, forumName: forumName)))
                 return .none
+                
+            case let .forumPath(.element(id: _, action: .forum(.subforumRedirectTapped(url)))):
+                return handleDeeplink(url: url, state: &state)
                 
             case let .forumPath(.element(id: _, action: .forum(.announcementTapped(id, name)))):
                 state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: name)))
@@ -636,7 +642,7 @@ public struct AppFeature: Reducer, Sendable {
                 if state.selectedTab == .favorites {
                     switch screen {
                     case let .forum(id: id):
-                        state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: ""))))
+                        state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: nil))))
                         
                     case let .topic(id: id):
                         state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
@@ -649,7 +655,7 @@ public struct AppFeature: Reducer, Sendable {
                 if state.selectedTab == .forum {
                     switch screen {
                     case let .forum(id: id):
-                        state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: "")))
+                        state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: nil)))
                         
                     case let .topic(id: id):
                         state.forumPath.append(.topic(TopicFeature.State(topicId: id)))

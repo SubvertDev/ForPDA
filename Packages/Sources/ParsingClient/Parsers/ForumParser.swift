@@ -84,7 +84,7 @@ public struct ForumParser {
     
     private static func parseForumInfo(_ array: [[Any]]) -> [ForumInfo] {
         return array.map { forum in
-            let redirectUrl = forum.count > 3 ? forum[3] as? String : nil
+            let redirectUrl = forum.count > 3 ? URL(string: forum[3] as! String) : nil
             
             return ForumInfo(
                 id: forum[0] as! Int,

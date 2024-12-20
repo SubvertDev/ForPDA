@@ -10,7 +10,9 @@ import ComposableArchitecture
 import PageNavigationFeature
 import APIClient
 import Models
+import PasteboardClient
 import PersistenceKeys
+import TCAExtensions
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -24,7 +26,7 @@ public struct ForumFeature: Reducer, Sendable {
         @Shared(.appSettings) var appSettings: AppSettings
 
         public var forumId: Int
-        public var forumName: String
+        public var forumName: String?
         
         public var forum: Forum?
         public var topics: [TopicInfo] = []
@@ -36,7 +38,7 @@ public struct ForumFeature: Reducer, Sendable {
         
         public init(
             forumId: Int,
-            forumName: String
+            forumName: String?
         ) {
             self.forumId = forumId
             self.forumName = forumName
@@ -49,8 +51,11 @@ public struct ForumFeature: Reducer, Sendable {
         case onTask
         case settingsButtonTapped
         case topicTapped(id: Int)
+        case subforumRedirectTapped(URL)
         case subforumTapped(id: Int, name: String)
         case announcementTapped(id: Int, name: String)
+        
+        case contextMenu(ForumContextMenuAction)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -61,6 +66,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.pasteboardClient) private var pasteboardClient
     
     // MARK: - Body
     
@@ -99,6 +105,38 @@ public struct ForumFeature: Reducer, Sendable {
             case .announcementTapped:
                 return .none
                 
+            case .subforumRedirectTapped:
+                return .none
+                
+            case .contextMenu(let action):
+                switch action {
+                case .openInBrowser:
+                    guard let forum = state.forum else { return .none }
+                    let url = URL(string: "https://4pda.to/forum/index.php?showforum=\(forum.id)")!
+                    return .run { _ in await open(url: url) }
+                    
+                case .copyLink:
+                    guard let forum = state.forum else { return .none }
+                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?showforum=\(forum.id)")
+                    return .none
+                
+                case .setFavorite:
+                    return .run { [id = state.forumId, inFavorite = state.forum?.isFavorite] send in
+                        let result = await Result {
+                            if inFavorite! {
+                                try await apiClient.removeFavorite(id, true)
+                            } else {
+                                try await apiClient.addFavorite(id, true)
+                            }
+                        }
+                        
+                        // TODO: Display toast on success/error.
+                    }
+                
+                // TODO: sort, to bookmarks
+                default: return .none
+                }
+                
             case let ._forumResponse(.success(forum)):
                 var topics: [TopicInfo] = []
                 var pinnedTopics: [TopicInfo] = []
@@ -113,6 +151,7 @@ public struct ForumFeature: Reducer, Sendable {
                 
                 state.forum = forum
                 state.topics = topics
+                state.forumName = state.forumName ?? forum.name
                 
                 if !pinnedTopics.isEmpty {
                     state.topicsPinned = pinnedTopics

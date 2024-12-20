@@ -22,6 +22,10 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let posts: [Post]
     public let navigation: [ForumInfo]
     
+    public var isFavorite: Bool {
+        return (flag & 8) != 0
+    }
+    
     public struct Poll: Sendable, Codable, Hashable {
         public let name: String
         public let voted: Bool

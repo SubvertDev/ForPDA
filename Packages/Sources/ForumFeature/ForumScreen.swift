@@ -41,7 +41,9 @@ public struct ForumScreen: View {
                             TopicsSection(topics: store.topicsPinned, pinned: true)
                         }
                         
-                        TopicsSection(topics: store.topics, pinned: false)
+                        if !store.topics.isEmpty {
+                            TopicsSection(topics: store.topics, pinned: false)
+                        }
                     }
                     .scrollContentBackground(.hidden)
                 } else {
@@ -49,28 +51,42 @@ public struct ForumScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.forumName))
+            .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-//                        Button {
-//                            // TODO: forum info
-//                        } label: {
-//                            Image(systemSymbol: .infoCircle)
-//                        }
-                        
-                        Button {
-                            store.send(.settingsButtonTapped)
-                        } label: {
-                            Image(systemSymbol: .gearshape)
-                        }
-                    }
-                }
+                OptionsMenu()
             }
             .task {
                 store.send(.onTask)
             }
+        }
+    }
+    
+    // MARK: - Options Menu
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                store.send(.contextMenu(.copyLink))
+            }
+            ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
+                store.send(.contextMenu(.openInBrowser))
+            }
+            
+            if let forum = store.forum {
+                Section {
+                    ContextButton(
+                        text: forum.isFavorite ? "Remove from favorites" : "Add to favorites",
+                        symbol: forum.isFavorite ? .starFill : .star,
+                        bundle: .module
+                    ) {
+                        store.send(.contextMenu(.setFavorite))
+                    }
+                }
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
         }
     }
     
@@ -121,7 +137,11 @@ public struct ForumScreen: View {
         Section {
             ForEach(subforums) { forum in
                 Row(title: forum.name, unread: forum.isUnread) {
-                    store.send(.subforumTapped(id: forum.id, name: forum.name))
+                    if let redirectUrl = forum.redirectUrl {
+                        store.send(.subforumRedirectTapped(redirectUrl))
+                    } else {
+                        store.send(.subforumTapped(id: forum.id, name: forum.name))
+                    }
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
