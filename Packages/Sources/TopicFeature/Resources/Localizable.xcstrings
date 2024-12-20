@@ -4,6 +4,16 @@
     "[*]" : {
 
     },
+    "Add to favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В избранное"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
@@ -20,6 +30,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть в браузере"
+          }
+        }
+      }
+    },
+    "Remove from favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить из избранного"
           }
         }
       }

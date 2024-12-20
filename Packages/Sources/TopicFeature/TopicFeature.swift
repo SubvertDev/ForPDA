@@ -53,9 +53,7 @@ public struct TopicFeature: Reducer, Sendable {
         case urlTapped(URL)
         case pageNavigation(PageNavigationFeature.Action)
         
-        // TODO: Move to its own actions
-        case copyLinkMenuTapped
-        case openInBrowserMenuTapped
+        case contextMenu(TopicContextMenuAction)
         
         case _loadTopic(offset: Int)
         case _loadTypes([[TopicTypeUI]])
@@ -104,17 +102,35 @@ public struct TopicFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
-                // TODO: Refactor out
-            case .copyLinkMenuTapped:
-                guard let topic = state.topic else { return .none }
-                pasteboardClient.copy(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")
-                return .none
-                
-                // TODO: Refactor out
-            case .openInBrowserMenuTapped:
-                guard let topic = state.topic else { return .none }
-                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
-                return .run { _ in await open(url: url) }
+            case .contextMenu(let action):
+                switch action {
+                case .openInBrowser:
+                    guard let topic = state.topic else { return .none }
+                    let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
+                    return .run { _ in await open(url: url) }
+                    
+                case .copyLink:
+                    guard let topic = state.topic else { return .none }
+                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")
+                    return .none
+                    
+                case .setFavorite:
+                    return .run { [id = state.topicId, inFavorite = state.topic?.isFavorite] send in
+                        let result = await Result {
+                            if inFavorite! {
+                                try await apiClient.removeFavorite(id, false)
+                            } else {
+                                try await apiClient.addFavorite(id, false)
+                            }
+                        }
+                        
+                        // TODO: Display toast on success/error.
+                    }
+                    
+                case .goToEnd:
+                    // TODO: Implement.
+                    return .none
+                }
                 
             case let ._loadTopic(offset):
                 state.isLoadingTopic = true

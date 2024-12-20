@@ -33,6 +33,7 @@ public struct ForumsListFeature: Reducer, Sendable {
     public enum Action {
         case onTask
         case settingsButtonTapped
+        case forumRedirectTapped(URL)
         case forumTapped(id: Int, name: String)
         
         case _forumsListResponse(Result<[ForumInfo], any Error>)
@@ -53,7 +54,7 @@ public struct ForumsListFeature: Reducer, Sendable {
                     await send(._forumsListResponse(result))
                 }
                 
-            case .forumTapped, .settingsButtonTapped:
+            case .forumTapped, .settingsButtonTapped, .forumRedirectTapped:
                 return .none
                 
             case let ._forumsListResponse(.success(forums)):

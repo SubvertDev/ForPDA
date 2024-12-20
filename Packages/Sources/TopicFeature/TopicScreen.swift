@@ -67,10 +67,22 @@ public struct TopicScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
-                store.send(.copyLinkMenuTapped)
+                store.send(.contextMenu(.copyLink))
             }
             ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
-                store.send(.openInBrowserMenuTapped)
+                store.send(.contextMenu(.openInBrowser))
+            }
+            
+            if let topic = store.topic {
+                Section {
+                    ContextButton(
+                        text: topic.isFavorite ? "Remove from favorites" : "Add to favorites",
+                        symbol: topic.isFavorite ? .starFill : .star,
+                        bundle: .module
+                    ) {
+                        store.send(.contextMenu(.setFavorite))
+                    }
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)

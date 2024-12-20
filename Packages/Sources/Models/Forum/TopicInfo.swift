@@ -27,6 +27,10 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public var isPinned: Bool {
         return (flag & 1) != 0
     }
+    
+    public var isFavorite: Bool {
+        return (flag & 8) != 0
+    }
         
     public init(id: Int, name: String, description: String, flag: Int, postsCount: Int, lastPost: LastPost) {
         self.id = id

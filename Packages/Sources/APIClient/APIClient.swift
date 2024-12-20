@@ -45,8 +45,12 @@ public struct APIClient: Sendable {
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
-    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
+    
+    // Favorites
+    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
+    public var addFavorite: @Sendable (_ id: Int, _ isForum: Bool) async throws -> Bool
+    public var removeFavorite: @Sendable (_ id: Int, _ isForum: Bool) async throws -> Bool
     
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
@@ -106,16 +110,16 @@ extension APIClient: DependencyKey {
             },
             likeComment: { articleId, commentId in
                 let response = try await api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
-                return Int(response.getLastNumber()) == 0
+                return Int(response.getResponseStatus()) == 0
             },
             hideComment: { articleId, commentId in
                 let response = try await api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
                 // Getting 3 on liked comment
-                return Int(response.getLastNumber()) == 0
+                return Int(response.getResponseStatus()) == 0
             },
             replyToComment: { articleId, parentId, message in
                 let response = try await api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
-                let responseAsInt = Int(response.getLastNumber())!
+                let responseAsInt = Int(response.getResponseStatus())!
                 if CommentResponseType.codes.contains(responseAsInt) {
                     return CommentResponseType(rawValue: responseAsInt) ?? .unknown
                 } else {
@@ -124,7 +128,7 @@ extension APIClient: DependencyKey {
             },
             voteInPoll: { pollId, selections in
                 let response = try await api.get(SiteCommand.vote(pollId: pollId, selections: selections))
-                let responseAsInt = Int(response.getLastNumber())!
+                let responseAsInt = Int(response.getResponseStatus())!
                 return responseAsInt == 0
             },
             
@@ -184,6 +188,13 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
+			getHistory: { offset, perPage in
+                let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
+                return try await parser.parseHistory(response)
+            },
+            
+            // MARK: - Favorites
+            
             getFavorites: { unreadFirst, offset, perPage in
                 fetchWithCache(
                     cache: { await cache.getFavorites() },
@@ -196,9 +207,17 @@ extension APIClient: DependencyKey {
                     }
                 )
             },
-			getHistory: { offset, perPage in
-                let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
-                return try await parser.parseHistory(response)
+            addFavorite: { id, isForum in
+                let command = MemberCommand.Favorites.add(id: id, type: isForum ? .forum : .topic)
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            removeFavorite: { id, isForum in
+                let command = MemberCommand.Favorites.delete(id: id, type: isForum ? .forum : .topic)
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Extra
@@ -283,12 +302,18 @@ extension APIClient: DependencyKey {
             getTopic: { _, _, _ in
                 return .mock
             },
-            getFavorites: { _, _, _ in
-                .finished()
-            },
 			getHistory: { _, _ in
                 return .mock
 			},
+            getFavorites: { _, _, _ in
+                .finished()
+            },
+            addFavorite: { _, _ in
+                return true
+            },
+            removeFavorite: { _, _ in
+                return true
+            },
             getUnread: {
                 return .mock
             },
@@ -346,11 +371,10 @@ extension DependencyValues {
 
 
 extension String {
-    func getLastNumber() -> String {
+    func getResponseStatus() -> String {
         return self
             .replacingOccurrences(of: "[", with: "")
             .replacingOccurrences(of: "]", with: "")
-            .components(separatedBy: ",")
-            .last!
+            .components(separatedBy: ",")[1]
     }
 }
