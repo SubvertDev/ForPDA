@@ -36,6 +36,9 @@ public struct FavoritesScreen: View {
                         FavoritesSection(favorites: store.favorites, important: false)
                     }
                     .scrollContentBackground(.hidden)
+                    .refreshable {
+                        await store.send(.onRefresh).finish()
+                    }
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
@@ -58,8 +61,8 @@ public struct FavoritesScreen: View {
                     }
                 }
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                store.send(.onAppear)
             }
         }
     }

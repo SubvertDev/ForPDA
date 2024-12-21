@@ -19,10 +19,10 @@ public struct ForumsListFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var forums: [ForumRow] = []
+        public var forums: [ForumRow]?
         
         public init(
-            forums: [ForumRow] = []
+            forums: [ForumRow]? = nil
         ) {
             self.forums = forums
         }
@@ -31,7 +31,7 @@ public struct ForumsListFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
-        case onTask
+        case onAppear
         case settingsButtonTapped
         case forumRedirectTapped(URL)
         case forumTapped(id: Int, name: String)
@@ -48,10 +48,14 @@ public struct ForumsListFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .onTask:
+            case .onAppear:
+                guard state.forums == nil else { return .none }
                 return .run { send in
-                    let result = await Result { try await apiClient.getForumsList() }
-                    await send(._forumsListResponse(result))
+                    for try await forumList in try await apiClient.getForumsList(policy: .cacheOrLoad) {
+                        await send(._forumsListResponse(.success(forumList)))
+                    }
+                } catch: { error, send in
+                    await send(._forumsListResponse(.failure(error)))
                 }
                 
             case .forumTapped, .settingsButtonTapped, .forumRedirectTapped:

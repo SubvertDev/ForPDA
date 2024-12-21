@@ -21,20 +21,24 @@ public struct CacheClient: Sendable {
     
     // Articles
     public var preloadImages: @Sendable ([URL]) async -> Void
-    public var cacheArticle: @Sendable (Article) async -> Void
+    public var setArticle: @Sendable (Article) async -> Void
     public var getArticle: @Sendable (_ id: Int) async -> Article?
     
     // Users
-    public var cacheUser: @Sendable (User) async -> Void
+    public var setUser: @Sendable (User) async -> Void
     public var getUser: @Sendable (_ id: Int) async -> User?
     
     // Favorites
-    public var cacheFavorites: @Sendable ([FavoriteInfo]) async -> Void
+    public var setFavorites: @Sendable ([FavoriteInfo]) async -> Void
     public var getFavorites: @Sendable () async -> [FavoriteInfo]?
     
     // Forums List
-    public var cacheForumsList: @Sendable ([ForumInfo]) async -> Void
-    public var getForumsList: @Sendable () async -> [ForumInfo]
+    public var setForumsList: @Sendable ([ForumInfo]) async -> Void
+    public var getForumsList: @Sendable () async -> [ForumInfo]?
+    
+    // Forums
+    public var setForum: @Sendable (_ id: Int, _ forums: Forum) async -> Void
+    public var getForum: @Sendable (_ id: Int) async -> Forum?
     
     // Post Content
     public var cacheParsedPostContent: @Sendable (_ id: Int, _ content: [TopicTypeUI]) async -> Void
@@ -72,6 +76,7 @@ extension CacheClient: DependencyKey {
                 try await usersStorage.async.removeAll()
                 try await favoritesStorage.async.removeAll()
                 try await forumsListStorage.async.removeAll()
+                try await forumsStorage.async.removeAll()
                 try await parsedPostsContentStorage.async.removeAll()
                 try await lastBackgroundTaskInvokeTimeStorage.async.removeAll()
                 try await notificationsStorage.async.removeAll()
@@ -82,7 +87,7 @@ extension CacheClient: DependencyKey {
             preloadImages: { urls in
                 urls.forEach { ImagePipeline.shared.loadImage(with: $0, completion: { _ in }) }
             },
-            cacheArticle: { article in
+            setArticle: { article in
                 try? await articlesStorage.async.setObject(article, forKey: article.id)
             },
             getArticle: { articleId in
@@ -91,7 +96,7 @@ extension CacheClient: DependencyKey {
             
             // MARK: - User
             
-            cacheUser: { user in
+            setUser: { user in
                 try? await usersStorage.async.setObject(user, forKey: user.id)
             },
             getUser: { userId in
@@ -100,7 +105,7 @@ extension CacheClient: DependencyKey {
             
             // MARK: - Favorites
             
-            cacheFavorites: { favorites in
+            setFavorites: { favorites in
                 try? await favoritesStorage.async.setObject(favorites, forKey: favoritesKey)
             },
             getFavorites: {
@@ -109,11 +114,20 @@ extension CacheClient: DependencyKey {
             
             // MARK: - Forums List
             
-            cacheForumsList: { forumsList in
+            setForumsList: { forumsList in
                 try? forumsListStorage.setObject(forumsList, forKey: forumsListKey)
             },
             getForumsList: {
-                return (try? await forumsListStorage.async.object(forKey: forumsListKey)) ?? []
+                return try? await forumsListStorage.async.object(forKey: forumsListKey)
+            },
+            
+            // MARK: - Forums
+            
+            setForum: { id, forum in
+                try? forumsStorage.setObject(forum, forKey: id)
+            },
+            getForum: { id in
+                return try? await forumsStorage.async.object(forKey: id)
             },
             
             // MARK: - Post Content
@@ -157,7 +171,7 @@ private extension CacheClient {
     
     private static var articlesStorage: Storage<Int, Article> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Articles", expiry: .date(.days(7)), maxSize: .megabytes(16)),
+            diskConfig: DiskConfig(name: "Articles", expiry: .date(.days(7)), maxSize: .megabytes(2)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Article.self)
@@ -166,7 +180,7 @@ private extension CacheClient {
     
     private static var usersStorage: Storage<Int, User> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Users", expiry: .date(.days(30)), maxSize: .megabytes(16)),
+            diskConfig: DiskConfig(name: "Users", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: User.self)
@@ -176,7 +190,7 @@ private extension CacheClient {
     private static var favoritesKey: String { "favoritesKey" }
     private static var favoritesStorage: Storage<String, [FavoriteInfo]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .megabytes(16)),
+            diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [FavoriteInfo].self)
@@ -186,16 +200,25 @@ private extension CacheClient {
     private static var forumsListKey: String { "forumsListKey" }
     private static var forumsListStorage: Storage<String, [ForumInfo]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "ForumsList", expiry: .date(.days(30)), maxSize: .megabytes(16)),
+            diskConfig: DiskConfig(name: "ForumsList", expiry: .date(.days(30)), maxSize: .megabytes(1)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [ForumInfo].self)
         )
     }
     
+    private static var forumsStorage: Storage<Int, Forum> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "Forums", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: Forum.self)
+        )
+    }
+    
     private static var parsedPostsContentStorage: Storage<Int, [TopicTypeUI]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Posts Contents", expiry: .date(.days(30)), maxSize: .megabytes(16)),
+            diskConfig: DiskConfig(name: "Posts Contents", expiry: .date(.days(30))),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [TopicTypeUI].self)
@@ -205,7 +228,7 @@ private extension CacheClient {
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
     private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [TimeInterval]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .never),
+            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30))),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [TimeInterval].self)
@@ -214,7 +237,7 @@ private extension CacheClient {
     
     private static var notificationsStorage: Storage<Int, Int> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .megabytes(16)),
+            diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Int.self)
@@ -238,6 +261,9 @@ extension Date {
 }
 
 extension UInt {
+    static func kilobytes(_ bytes: UInt) -> UInt {
+        return bytes * 1024
+    }
     static func megabytes(_ megabytes: UInt) -> UInt {
         return megabytes * 1024 * 1024
     }

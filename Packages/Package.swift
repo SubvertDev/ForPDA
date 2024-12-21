@@ -178,6 +178,7 @@ let package = Package(
                 "CacheClient",
                 "AnalyticsClient",
                 "ParsingClient",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
             ]
@@ -228,6 +229,7 @@ let package = Package(
                 "CacheClient",
                 "AnalyticsClient",
                 "ParsingClient",
+                "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
             ]

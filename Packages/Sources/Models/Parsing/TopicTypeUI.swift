@@ -25,6 +25,7 @@ public indirect enum TopicTypeUI: Hashable, Equatable, Codable {
 public enum ListType: Hashable, Equatable, Codable {
     case bullet
     case numeric
+    case roman
 }
 
 public enum NoticeType: String, Hashable, Equatable, Codable {

@@ -46,18 +46,22 @@ public struct ForumScreen: View {
                         }
                     }
                     .scrollContentBackground(.hidden)
+                    .refreshable {
+                        await store.send(.onRefresh).finish()
+                    }
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
             }
+            .animation(.default, value: store.forum)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 OptionsMenu()
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                store.send(.onAppear)
             }
         }
     }
@@ -271,8 +275,8 @@ extension Bundle {
             ) {
                 ForumFeature()
             } withDependencies: {
-                $0.apiClient.getForum = { @Sendable _, _, _ in
-                    return .mock
+                $0.apiClient.getForum = { @Sendable _, _, _, _ in
+                    return .finished()
                 }
             }
         )

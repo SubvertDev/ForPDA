@@ -23,7 +23,7 @@ public struct APIClient: Sendable {
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
-    public var getArticle: @Sendable (_ id: Int, _ useCache: Bool) async throws -> AsyncThrowingStream<Article, any Error>
+    public var getArticle: @Sendable (_ id: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Article, any Error>
     public var likeComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var hideComment: @Sendable (_ articleId: Int, _ commentId: Int) async throws -> Bool
     public var replyToComment: @Sendable (_ articleId: Int, _ parentId: Int, _ message: String) async throws -> CommentResponseType
@@ -35,20 +35,20 @@ public struct APIClient: Sendable {
     public var logout: @Sendable () async throws -> Void
     
     // User
-    public var getUser: @Sendable (_ userId: Int) async throws -> AsyncThrowingStream<User, any Error>
+    public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
     
     // Forum
-    public var getForumsList: @Sendable () async throws -> [ForumInfo]
-    public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Forum
+    public var getForumsList: @Sendable (_ policy: CachePolicy) async throws -> AsyncThrowingStream<[ForumInfo], any Error>
+    public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Forum, any Error>
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     
     // Favorites
-    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
+    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
     public var addFavorite: @Sendable (_ id: Int, _ isForum: Bool) async throws -> Bool
     public var removeFavorite: @Sendable (_ id: Int, _ isForum: Bool) async throws -> Bool
     
@@ -97,15 +97,16 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(SiteCommand.articlesList(offset: offset, amount: amount))
                 return try await parser.parseArticlesList(response)
             },
-            getArticle: { id, useCache in
-                fetchWithCache(
-                    cache: { if useCache { await cache.getArticle(id) } else { nil } },
+            getArticle: { id, policy in
+                fetch(
+                    getCache: { await cache.getArticle(id) },
+                    setCache: { await cache.setArticle($0) },
                     remote: {
-                        let response = try await api.get(SiteCommand.article(id: id))
-                        let article = try await parser.parseArticle(response)
-                        await cache.cacheArticle(article)
-                        return article
-                    }
+                        let command = SiteCommand.article(id: id)
+                        let response = try await api.get(command)
+                        return try await parser.parseArticle(response)
+                    },
+                    policy: policy
                 )
             },
             likeComment: { articleId, commentId in
@@ -151,15 +152,16 @@ extension APIClient: DependencyKey {
             
             // MARK: - User
             
-            getUser: { userId in
-                fetchWithCache(
-                    cache: { await cache.getUser(userId) },
+            getUser: { userId, policy in
+                fetch(
+                    getCache: { await cache.getUser(userId) },
+                    setCache: { await cache.setUser($0) },
                     remote: {
-                        let response = try await api.get(MemberCommand.info(memberId: userId))
-                        let user = try await parser.parseUser(response)
-                        await cache.cacheUser(user)
-                        return user
-                    }
+                        let command = MemberCommand.info(memberId: userId)
+                        let response = try await api.get(command)
+                        return try await parser.parseUser(response: response)
+                    },
+                    policy: policy
                 )
             },
             
@@ -171,13 +173,28 @@ extension APIClient: DependencyKey {
             
             // MARK: - Forum
             
-            getForumsList: {
-                let response = try await api.get(ForumCommand.list)
-                return try await parser.parseForumsList(response)
+            getForumsList: { policy in
+                fetch(
+                    getCache: { await cache.getForumsList() },
+                    setCache: { await cache.setForumsList($0) },
+                    remote: {
+                        let response = try await api.get(ForumCommand.list)
+                        return try await parser.parseForumsList(response: response)
+                    },
+                    policy: policy
+                )
             },
-            getForum: { id, offset, perPage in
-                let response = try await api.get(ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage))
-                return try await parser.parseForum(response)
+            getForum: { id, offset, perPage, policy in
+                fetch(
+                    getCache: { await cache.getForum(id) },
+                    setCache: { await cache.setForum(id, $0) },
+                    remote: {
+                        let command = ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage)
+                        let response = try await api.get(command)
+                        return try await parser.parseForum(response: response)
+                    },
+                    policy: policy
+                )
             },
             getAnnouncement: { id in
                 let response = try await api.get(ForumCommand.announcement(linkId: id))
@@ -195,16 +212,18 @@ extension APIClient: DependencyKey {
             
             // MARK: - Favorites
             
-            getFavorites: { unreadFirst, offset, perPage in
-                fetchWithCache(
-                    cache: { await cache.getFavorites() },
+            getFavorites: { unreadFirst, offset, perPage, policy in
+                fetch(
+                    getCache: { await cache.getFavorites() },
+                    setCache: { await cache.setFavorites($0) },
                     remote: {
                         let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
                         let response = try await api.get(command)
                         let favorites = try await parser.parseFavorites(response)
-                        await cache.cacheFavorites(favorites.favorites)
+                        await cache.setFavorites(favorites.favorites)
                         return favorites.favorites
-                    }
+                    },
+                    policy: policy
                 )
             },
             addFavorite: { id, isForum in
@@ -284,17 +303,17 @@ extension APIClient: DependencyKey {
             logout: {
                 
             },
-            getUser: { _ in
+            getUser: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
             },
-            getForumsList: {
-                return [.mockCategory, .mock]
+            getForumsList: { _ in
+                return .finished()
             },
-            getForum: { _, _, _ in
-                return .mock
+            getForum: { _, _, _, _ in
+                return .finished()
             },
             getAnnouncement: { _ in
                 return .mock
@@ -305,7 +324,7 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
-            getFavorites: { _, _, _ in
+            getFavorites: { _, _, _, _ in
                 .finished()
             },
             addFavorite: { _, _ in
@@ -338,23 +357,52 @@ extension APIClient: DependencyKey {
     
     // MARK: - Helper methods
     
-    private static func fetchWithCache<T>(
-        cache: @Sendable @escaping () async -> T?,
-        remote: @Sendable @escaping () async throws -> T
+    private static func fetch<T>(
+        getCache: @Sendable @escaping () async -> T?,
+        setCache: @Sendable @escaping (T) async -> Void,
+        remote: @Sendable @escaping () async throws ->T,
+        policy: CachePolicy
     ) -> AsyncThrowingStream<T, any Error> {
-        AsyncThrowingStream { continuation in
-            Task {
+        return AsyncThrowingStream { continuation in
+            let task = Task {
                 do {
-                    if let cached = await cache() {
-                        continuation.yield(cached)
+                    switch policy {
+                    case .skipCache:
+                        let remote = try await remote()
+                        await setCache(remote)
+                        continuation.yield(remote)
+                        
+                    case .cacheOrLoad:
+                        if let cache = await getCache() {
+                            continuation.yield(cache)
+                        } else {
+                            let remote = try await remote()
+                            await setCache(remote)
+                            continuation.yield(remote)
+                        }
+                        
+                    case .cacheAndLoad:
+                        if let cache = await getCache() {
+                            continuation.yield(cache)
+                        }
+                        let remote = try await remote()
+                        await setCache(remote)
+                        continuation.yield(remote)
+                        
+                    case .cacheNoLoad:
+                        if let cache = await getCache() {
+                            continuation.yield(cache)
+                        }
                     }
-                    let remoteData = try await remote()
-                    continuation.yield(remoteData)
                 } catch {
                     continuation.finish(throwing: error)
                     return
                 }
+                
                 continuation.finish()
+            }
+            continuation.onTermination = { _ in
+                task.cancel()
             }
         }
     }

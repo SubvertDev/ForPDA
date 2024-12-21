@@ -78,7 +78,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 guard let userId else { return .none }
                 return .run { send in
                     do {
-                        for try await user in try await apiClient.getUser(userId) {
+                        for try await user in try await apiClient.getUser(userId: userId, policy: .cacheAndLoad) {
                             await send(._userResponse(.success(user)))
                         }
                     } catch {

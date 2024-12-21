@@ -57,3 +57,13 @@ public func open(url: URL) async {
         await openURL(url)
     }
 }
+
+// MARK: - Delay
+
+public func delayUntilTimePassed(_ time: TimeInterval, since startTime: Date) async {
+    let elapsedTime = Date().timeIntervalSince(startTime)
+    if elapsedTime < time {
+        let remainingTime = time - elapsedTime
+        try? await Task.sleep(nanoseconds: UInt64(remainingTime * 1_000_000_000))
+    }
+}

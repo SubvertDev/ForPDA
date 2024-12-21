@@ -116,12 +116,10 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .setFavorite:
                     return .run { [id = state.topicId, inFavorite = state.topic?.isFavorite] send in
-                        let result = await Result {
-                            if inFavorite! {
-                                try await apiClient.removeFavorite(id, false)
-                            } else {
-                                try await apiClient.addFavorite(id, false)
-                            }
+                        if inFavorite! {
+                            _ = try await apiClient.removeFavorite(id, false)
+                        } else {
+                            _ = try await apiClient.addFavorite(id, false)
                         }
                         
                         // TODO: Display toast on success/error.

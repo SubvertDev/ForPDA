@@ -10,6 +10,7 @@ import ComposableArchitecture
 import PageNavigationFeature
 import APIClient
 import Models
+import TCAExtensions
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -26,6 +27,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         public var favoritesImportant: [FavoriteInfo] = []
         
         public var isLoading = false
+        public var isRefreshing = false
         
         public var pageNavigation = PageNavigationFeature.State(type: .forum)
         
@@ -41,7 +43,8 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
-        case onTask
+        case onAppear
+        case onRefresh
         case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, isForum: Bool)
         
@@ -65,8 +68,15 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onTask:
+            case .onAppear:
+                guard state.favorites.isEmpty && state.favoritesImportant.isEmpty else { return .none }
                 return .send(._loadFavorites(unreadFirst: false, offset: 0))
+                
+            case .onRefresh:
+                state.isRefreshing = true
+                return .run { send in
+                    await send(._loadFavorites(unreadFirst: false, offset: 0))
+                }
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadFavorites(unreadFirst: false, offset: newOffset))
@@ -78,15 +88,22 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .none
                 
             case let ._loadFavorites(unreadFirst, offset):
-                state.isLoading = true
-                return .run { [perPage = state.appSettings.forumPerPage] send in
-                    do {
-                        for try await favorites in try await apiClient.getFavorites(unreadFirst: unreadFirst, offset: offset, perPage: perPage) {
-                            await send(._favoritesResponse(.success(favorites)))
-                        }
-                    } catch {
-                        await send(._favoritesResponse(.failure(error)))
+                if !state.isRefreshing {
+                    state.isLoading = true
+                }
+                return .run { [perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
+                    let startTime = Date()
+                    for try await favorites in try await apiClient.getFavorites(
+                        unreadFirst: unreadFirst,
+                        offset: offset,
+                        perPage: perPage,
+                        policy: isRefreshing ? .skipCache : .cacheAndLoad
+                    ) {
+                        if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
+                        await send(._favoritesResponse(.success(favorites)))
                     }
+                } catch: { error, send in
+                    await send(._favoritesResponse(.failure(error)))
                 }
                 
             case let ._favoritesResponse(.success(response)):
@@ -108,6 +125,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.pageNavigation.count = response.count
                 
                 state.isLoading = false
+                state.isRefreshing = false
                 
                 return .none
                 
@@ -118,4 +136,3 @@ public struct FavoritesFeature: Reducer, Sendable {
         }
     }
 }
-

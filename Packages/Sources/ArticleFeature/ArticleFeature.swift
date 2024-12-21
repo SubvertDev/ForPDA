@@ -403,7 +403,7 @@ public struct ArticleFeature: Reducer, Sendable {
         return .concatenate([
             .run { send in
                 do {
-                    for try await article in try await apiClient.getArticle(id: id, useCache: useCache) {
+                    for try await article in try await apiClient.getArticle(id: id, policy: .cacheAndLoad) {
                         await send(._articleResponse(.success(article)))
                     }
                 } catch {

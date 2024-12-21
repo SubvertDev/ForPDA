@@ -33,6 +33,7 @@ public struct ForumFeature: Reducer, Sendable {
         public var topicsPinned: [TopicInfo] = []
         
         public var isLoadingTopics = false
+        public var isRefreshing = false
         
         public var pageNavigation = PageNavigationFeature.State(type: .forum)
         
@@ -48,7 +49,8 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
-        case onTask
+        case onAppear
+        case onRefresh
         case settingsButtonTapped
         case topicTapped(id: Int)
         case subforumRedirectTapped(URL)
@@ -77,8 +79,15 @@ public struct ForumFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onTask:
+            case .onAppear:
+                guard state.forum == nil else { return .none }
                 return .send(._loadForum(offset: 0))
+                
+            case .onRefresh:
+                state.isRefreshing = true
+                return .run { send in
+                    await send(._loadForum(offset: 0))
+                }
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadForum(offset: newOffset))
@@ -87,10 +96,17 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
                 
             case let ._loadForum(offset):
-                state.isLoadingTopics = true
-                return .run { [id = state.forumId, perPage = state.appSettings.forumPerPage] send in
-                    let result = await Result { try await apiClient.getForum(id: id, page: offset, perPage: perPage) }
-                    await send(._forumResponse(result))
+                if !state.isRefreshing {
+                    state.isLoadingTopics = true
+                }
+                return .run { [id = state.forumId, perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
+                    let startTime = Date()
+                    for try await forum in try await apiClient.getForum(id: id, page: offset, perPage: perPage, policy: isRefreshing ? .skipCache : .cacheAndLoad) {
+                        if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
+                        await send(._forumResponse(.success(forum)))
+                    }
+                } catch: { error, send in
+                    await send(._forumResponse(.failure(error)))
                 }
                 
             case .settingsButtonTapped:
@@ -122,12 +138,10 @@ public struct ForumFeature: Reducer, Sendable {
                 
                 case .setFavorite:
                     return .run { [id = state.forumId, inFavorite = state.forum?.isFavorite] send in
-                        let result = await Result {
-                            if inFavorite! {
-                                try await apiClient.removeFavorite(id, true)
-                            } else {
-                                try await apiClient.addFavorite(id, true)
-                            }
+                        if inFavorite! {
+                            _ = try await apiClient.removeFavorite(id, true)
+                        } else {
+                            _ = try await apiClient.addFavorite(id, true)
                         }
                         
                         // TODO: Display toast on success/error.
@@ -161,6 +175,7 @@ public struct ForumFeature: Reducer, Sendable {
                 state.pageNavigation.count = forum.topicsCount
                 
                 state.isLoadingTopics = false
+                state.isRefreshing = false
                 
                 return .none
                 

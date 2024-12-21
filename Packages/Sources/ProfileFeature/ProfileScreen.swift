@@ -614,7 +614,7 @@ extension User {
                 ProfileFeature()
             } withDependencies: {
                 $0.apiClient = .previewValue
-                $0.apiClient.getUser = { @Sendable _ in
+                $0.apiClient.getUser = { @Sendable _, _ in
                     return AsyncThrowingStream { continuation in
                         Task {
                             continuation.yield(User.mock)

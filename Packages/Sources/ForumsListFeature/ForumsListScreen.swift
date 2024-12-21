@@ -25,8 +25,8 @@ public struct ForumsListScreen: View {
                 Color.Background.primary
                     .ignoresSafeArea()
                 
-                if !store.forums.isEmpty {
-                    List(store.forums, id: \.id) { forumRow in
+                if let forums = store.forums {
+                    List(forums, id: \.id) { forumRow in
                         Section {
                             ForEach(forumRow.forums) { forum in
                                 HStack(spacing: 25) {
@@ -54,6 +54,7 @@ public struct ForumsListScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
+            .animation(.default, value: store.forums)
             .navigationTitle(Text("Forum", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -65,8 +66,8 @@ public struct ForumsListScreen: View {
                     }
                 }
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                store.send(.onAppear)
             }
         }
     }
