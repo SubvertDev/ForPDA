@@ -723,9 +723,18 @@ public class TopicBuilder {
         }
         
         if string.first == "=" {
-            let title = string.components(separatedBy: "\"")[1]
-            logger.log("[QUOTE PARSER] Found title attributes: \"\(title)\"")
-            return .title(title)
+            let componentsQuote = string.components(separatedBy: "\"")
+            if componentsQuote.count > 1 {
+                let title = string.components(separatedBy: "\"")[1]
+                logger.log("[QUOTE PARSER] Found title attributes: \"\(title)\"")
+                return .title(title)
+            }
+            if string.contains("@") {
+                let title = string.components(separatedBy: "@")[0]
+                logger.log("[QUOTE PARSER] Found title attributes (non-quote): \"\(title)\"")
+                return .title(String(title.dropFirst()))
+            }
+            return .title(String(string.dropFirst()))
         } else if string.first == " " {
             let pattern = /name=\"([^\"]+)\"(?: date=\"([^\"]+)\")?(?: post=(\d+))?/
             if let match = string.firstMatch(of: pattern) {
