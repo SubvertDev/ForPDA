@@ -157,12 +157,13 @@ public struct TopicScreen: View {
                 .clipShape(Circle())
             }
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(spacing: 4) {
                 HStack(spacing: 8) {
                     Text(post.author.name)
                         .font(.subheadline)
                         .bold()
                         .foregroundStyle(Color.Labels.primary)
+                        .lineLimit(1)
                     
                     Text(String(post.author.reputationCount))
                         .font(.caption)
@@ -173,28 +174,28 @@ public struct TopicScreen: View {
                             RoundedRectangle(cornerRadius: 6)
                                 .foregroundStyle(Color.Background.teritary)
                         )
+                    
+                    Spacer()
+                    
+                    if post.karma != 0 {
+                        Text(String(post.karma))
+                            .font(.caption)
+                            .foregroundStyle(Color.Labels.primary)
+                    }
                 }
                 
-                Text(User.Group(rawValue: post.author.groupId)!.title)
-                    .font(.caption)
-                    .foregroundStyle(Color.Labels.teritary)
-                    // .foregroundStyle(Color(dynamicTuple: User.Group(rawValue: post.author.groupId)!.hexColor))
-            }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 6) {
-                if post.karma != 0 {
-                    Text(String(post.karma))
+                HStack(spacing: 8) {
+                    Text(User.Group(rawValue: post.author.groupId)!.title)
                         .font(.caption)
-                        .foregroundStyle(Color.Labels.primary)
-                        .padding(.top, 2)
+                        .foregroundStyle(Color.Labels.teritary)
+                    
+                    Spacer()
+                    
+                    Text(post.createdAt.formatted())
+                        .font(.caption)
+                        .foregroundStyle(Color.Labels.quaternary)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
                 }
-                
-                Text(post.createdAt.formatted())
-                    .font(.caption)
-                    .foregroundStyle(Color.Labels.quaternary)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
             }
         }
     }
@@ -234,18 +235,6 @@ public struct TopicScreen: View {
 }
 
 // MARK: - Previews
-
-//#Preview {
-//    NavigationStack {
-//        TopicScreen(
-//            store: Store(
-//                initialState: TopicFeature.State(topicId: 0)
-//            ) {
-//                TopicFeature()
-//            }
-//        )
-//    }
-//}
 
 #Preview {
     TopicScreen(

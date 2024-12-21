@@ -135,7 +135,7 @@ extension Post {
             signature: "",
             reputationCount: 312
         ),
-        karma: 0,
+        karma: 1,
         attachments: [
             Attachment(
                 id: 14308454,
