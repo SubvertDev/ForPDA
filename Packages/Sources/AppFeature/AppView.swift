@@ -98,17 +98,19 @@ public struct AppView: View {
             ArticlesListScreen(store: store.scope(state: \.articlesList, action: \.articlesList))
                 .trackAnalytics("Articles List Screen")
         } destination: { store in
-            switch store.case {
-            case let .article(store):
-                ArticleScreen(store: store)
-                    .trackAnalytics("Article Screen")
-                
-            case let .profile(store):
-                ProfileScreen(store: store)
-                    .trackAnalytics("Profile Screen")
-                
-            case let .settingsPath(path):
-                SettingsPath(path)
+            WithPerceptionTracking {
+                switch store.case {
+                case let .article(store):
+                    ArticleScreen(store: store)
+                        .trackAnalytics("Article Screen", ["id": store.articlePreview.id])
+                    
+                case let .profile(store):
+                    ProfileScreen(store: store)
+                        .trackAnalytics("Profile Screen", ["id": store.userId ?? 0])
+                    
+                case let .settingsPath(path):
+                    SettingsPath(path)
+                }
             }
         }
         .tag(AppTab.articlesList)
@@ -194,25 +196,27 @@ public struct AppView: View {
     
     @ViewBuilder
     private func ForumPath(_ store: StoreOf<AppFeature.ForumPath.Body>) -> some View {
-        switch store.case {
-        case let .forum(store):
-            ForumScreen(store: store)
-                .trackAnalytics("Forum Screen")
-        
-        case let .topic(store):
-            TopicScreen(store: store)
-                .trackAnalytics("Topic Screen")
-            
-        case let .profile(store):
-            ProfileScreen(store: store)
-                .trackAnalytics("Profile Screen")
-            
-        case let .announcement(store):
-            AnnouncementScreen(store: store)
-                .trackAnalytics("Announcement Screen")
-            
-        case let .settingsPath(path):
-            SettingsPath(path)
+        WithPerceptionTracking {
+            switch store.case {
+            case let .forum(store):
+                ForumScreen(store: store)
+                    .trackAnalytics("Forum Screen", ["id": store.forumId])
+                
+            case let .topic(store):
+                TopicScreen(store: store)
+                    .trackAnalytics("Topic Screen", ["id": store.topicId])
+                
+            case let .profile(store):
+                ProfileScreen(store: store)
+                    .trackAnalytics("Profile Screen", ["id": store.userId ?? 0])
+                
+            case let .announcement(store):
+                AnnouncementScreen(store: store)
+                    .trackAnalytics("Announcement Screen", ["id": store.announcementId])
+                
+            case let .settingsPath(path):
+                SettingsPath(path)
+            }
         }
     }
     

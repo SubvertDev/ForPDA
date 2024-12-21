@@ -27,7 +27,7 @@ struct AnalyticsModifier: ViewModifier {
 public extension View {
     func trackAnalytics(
         _ screenName: String? = nil,
-        _ isScreen: Bool = true,
+        isScreen: Bool = true,
         _ properties: [String: Any]? = nil
     ) -> some View {
         let viewEventName = screenName ?? "\(type(of: self))"

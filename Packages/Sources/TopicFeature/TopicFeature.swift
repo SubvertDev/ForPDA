@@ -27,7 +27,7 @@ public struct TopicFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
 
-        let topicId: Int
+        public let topicId: Int
         var topic: Topic?
         
         var types: [[TopicTypeUI]] = []

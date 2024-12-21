@@ -22,7 +22,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var id: Int
+        public var announcementId: Int
         public var name: String?
         
         public var announcement: Announcement?
@@ -30,7 +30,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
         var types: [[TopicTypeUI]] = []
        
         public init(id: Int, name: String?) {
-            self.id = id
+            self.announcementId = id
             self.name = name
         }
     }
@@ -61,7 +61,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 
             case ._loadAnnouncement:
                 guard state.announcement == nil else { return .none }
-                return .run { [id = state.id] send in
+                return .run { [id = state.announcementId] send in
                     let result = await Result { try await apiClient.getAnnouncement(id: id) }
                     await send(._announcementResponse(result))
                 }
