@@ -11,6 +11,7 @@ import PageNavigationFeature
 import APIClient
 import Models
 import TCAExtensions
+import NotificationCenterClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -58,6 +59,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.notificationCenter) private var notificationCenter
     
     // MARK: - Body
     
@@ -70,7 +72,14 @@ public struct FavoritesFeature: Reducer, Sendable {
             switch action {
             case .onAppear:
                 guard state.favorites.isEmpty && state.favoritesImportant.isEmpty else { return .none }
-                return .send(._loadFavorites(unreadFirst: false, offset: 0))
+                return .merge([
+                    .send(._loadFavorites(unreadFirst: false, offset: 0)),
+                    .run { send in
+                        for await _ in notificationCenter.observe(.favoritesUpdated) {
+                            await send(._loadFavorites(unreadFirst: false, offset: 0))
+                        }
+                    }
+                ])
                 
             case .onRefresh:
                 state.isRefreshing = true

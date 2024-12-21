@@ -49,8 +49,7 @@ public struct APIClient: Sendable {
     
     // Favorites
     public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
-    public var addFavorite: @Sendable (_ id: Int, _ isForum: Bool) async throws -> Bool
-    public var removeFavorite: @Sendable (_ id: Int, _ isForum: Bool) async throws -> Bool
+    public var setFavorite: @Sendable (_ request: SetFavoriteRequest) async throws -> Void
     
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
@@ -226,17 +225,20 @@ extension APIClient: DependencyKey {
                     policy: policy
                 )
             },
-            addFavorite: { id, isForum in
-                let command = MemberCommand.Favorites.add(id: id, type: isForum ? .forum : .topic)
-                let response = try await api.get(command)
-                let status = Int(response.getResponseStatus())!
-                return status == 0
-            },
-            removeFavorite: { id, isForum in
-                let command = MemberCommand.Favorites.delete(id: id, type: isForum ? .forum : .topic)
-                let response = try await api.get(command)
-                let status = Int(response.getResponseStatus())!
-                return status == 0
+            setFavorite: { request in
+                // TODO: Make Command generic?
+                switch request.action {
+                case .add:
+                    let command = MemberCommand.Favorites.add(id: request.id, type: request.transferType)
+                    _ = try await api.get(command)
+                case .delete:
+                    let command = MemberCommand.Favorites.delete(id: request.id, type: request.transferType)
+                    _ = try await api.get(command)
+                }
+
+                // TODO: Check response statuses for toasts?
+                // let status = Int(response.getResponseStatus())!
+                // return status == 0
             },
             
             // MARK: - Extra
@@ -327,11 +329,8 @@ extension APIClient: DependencyKey {
             getFavorites: { _, _, _, _ in
                 .finished()
             },
-            addFavorite: { _, _ in
-                return true
-            },
-            removeFavorite: { _, _ in
-                return true
+            setFavorite: { _ in
+                
             },
             getUnread: {
                 return .mock

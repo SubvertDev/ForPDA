@@ -36,6 +36,7 @@ let package = Package(
         .library(name: "AnalyticsClient", targets: ["AnalyticsClient"]),
         .library(name: "PasteboardClient", targets: ["PasteboardClient"]),
         .library(name: "NotificationsClient", targets: ["NotificationsClient"]),
+        .library(name: "NotificationCenterClient", targets: ["NotificationCenterClient"]),
         .library(name: "HapticClient", targets: ["HapticClient"]),
         .library(name: "PersistenceKeys", targets: ["PersistenceKeys"]),
         
@@ -194,8 +195,9 @@ let package = Package(
                 "AnalyticsClient",
                 "ParsingClient",
                 "LoggerClient",
-                "PersistenceKeys",
                 "PasteboardClient",
+                "NotificationCenterClient",
+                "PersistenceKeys",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "RichTextKit", package: "RichTextKit"),
@@ -229,6 +231,7 @@ let package = Package(
                 "CacheClient",
                 "AnalyticsClient",
                 "ParsingClient",
+                "NotificationCenterClient",
                 "TCAExtensions",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
                 .product(name: "NukeUI", package: "nuke")
@@ -390,6 +393,13 @@ let package = Package(
                 "AnalyticsClient",
                 "LoggerClient",
                 "CacheClient",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .target(
+            name: "NotificationCenterClient",
+            dependencies: [
+                "LoggerClient",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),

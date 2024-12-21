@@ -13,6 +13,7 @@ import Models
 import PersistenceKeys
 import ParsingClient
 import PasteboardClient
+import NotificationCenterClient
 import TCAExtensions
 
 @Reducer
@@ -58,6 +59,7 @@ public struct TopicFeature: Reducer, Sendable {
         case _loadTopic(offset: Int)
         case _loadTypes([[TopicTypeUI]])
         case _topicResponse(Result<Topic, any Error>)
+        case _setFavoriteResponse(Bool)
     }
     
     // MARK: - Dependencies
@@ -65,6 +67,7 @@ public struct TopicFeature: Reducer, Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
+    @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.logger) var logger
     
     // MARK: - Cancellable
@@ -115,14 +118,15 @@ public struct TopicFeature: Reducer, Sendable {
                     return .none
                     
                 case .setFavorite:
-                    return .run { [id = state.topicId, inFavorite = state.topic?.isFavorite] send in
-                        if inFavorite! {
-                            _ = try await apiClient.removeFavorite(id, false)
-                        } else {
-                            _ = try await apiClient.addFavorite(id, false)
-                        }
+                    guard let topic = state.topic else { return .none }
+                    return .run { [id = state.topicId] send in
+                        let request = SetFavoriteRequest(id: id, action: topic.isFavorite ? .delete : .add, type: .topic)
+                        try await apiClient.setFavorite(request)
+                        await send(._setFavoriteResponse(!topic.isFavorite))
                         
                         // TODO: Display toast on success/error.
+                    } catch: { error, send in
+                        logger.error("Failed to set favorite: \(error)")
                     }
                     
                 case .goToEnd:
@@ -176,6 +180,11 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let ._topicResponse(.failure(error)):
                 print(error)
+                return .none
+                
+            case let ._setFavoriteResponse(isFavorite):
+                state.topic?.isFavorite = isFavorite
+                notificationCenter.send(.favoritesUpdated)
                 return .none
             }
         }

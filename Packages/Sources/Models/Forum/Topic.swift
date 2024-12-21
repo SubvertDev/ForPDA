@@ -22,9 +22,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let posts: [Post]
     public let navigation: [ForumInfo]
     
-    public var isFavorite: Bool {
-        return (flag & 8) != 0
-    }
+    public var isFavorite: Bool
     
     public struct Poll: Sendable, Codable, Hashable {
         public let name: String
@@ -92,6 +90,8 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         self.postsCount = postsCount
         self.posts = posts
         self.navigation = navigation
+        
+        self.isFavorite = (flag & 8) != 0
     }
 }
 
