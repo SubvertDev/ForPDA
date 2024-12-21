@@ -503,7 +503,7 @@ public class TopicBuilder {
                 let spoiler = parseSpoiler(from: scanner, attributes: attributes)
                 if case .spoiler = spoiler { results.append(spoiler) } else { fatalError("non spoiler return") }
                 
-            case "[list]", "[list=1]":
+            case "[list]", "[list=1]", "[list=I]", "[list=i]", "[list=A]":
                 let list = parseList(from: scanner, listType: nextTag == "[list]" ? .bullet : .numeric)
                 if case .list = list { results.append(list) } else { fatalError("non list return") }
                 
@@ -920,6 +920,18 @@ public class TopicBuilder {
                 logger.log("[LIST] Found nested numeric list")
                 let list = parseList(from: scanner, listType: .numeric)
                 results.append(list)
+            } else if scanner.scanString("[list=I]") != nil {
+                logger.log("[LIST] Found nested roman upper list")
+                let list = parseList(from: scanner, listType: .roman)
+                results.append(list)
+            } else if scanner.scanString("[list=i]") != nil {
+                logger.log("[LIST] Found nested roman lower list")
+                let list = parseList(from: scanner, listType: .roman)
+                results.append(list)
+            } else if scanner.scanString("[list=A]") != nil {
+                logger.log("[LIST] Found nested roman A list")
+                let list = parseList(from: scanner, listType: .roman)
+                results.append(list)
             } else if scanner.scanString("[/list]") != nil {
                 break
             } else if scanner.scanString("\n") != nil {
@@ -969,7 +981,9 @@ public class TopicBuilder {
             "spoiler",
             "/spoiler",
             "list=1",
-            "/list=1",
+            "list=I",
+            "list=A",
+            "list=i",
             "list",
             "/list",
             "code",
