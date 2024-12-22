@@ -514,6 +514,9 @@ public struct AppFeature: Reducer, Sendable {
             case let .forumPath(.element(id: _, action: .topic(.userAvatarTapped(userId: userId)))):
                 state.forumPath.append(.profile(ProfileFeature.State(userId: userId)))
                 return .none
+                
+            case let .forumPath(.element(id: _, action: .profile(.achievementTapped(url)))):
+                return handleDeeplink(url: url, state: &state)
             
             case .forumPath(.element(id: _, action: .topic(.urlTapped(let url)))),
                  .forumPath(.element(id: _, action: .announcement(.urlTapped(let url)))):
@@ -557,6 +560,9 @@ public struct AppFeature: Reducer, Sendable {
             case .profile(.historyButtonTapped):
                 state.profilePath.append(.history(HistoryFeature.State()))
                 return .none
+                
+            case .profile(.achievementTapped(let url)):
+                return handleDeeplink(url: url, state: &state)
                             
             case let .profilePath(.element(id: _, action: .history(.topicTapped(id)))):
                 state.selectedTab = .forum
@@ -662,6 +668,16 @@ public struct AppFeature: Reducer, Sendable {
                         
                     case let .announcement(id: id):
                         state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: nil)))
+                    }
+                }
+                
+                if state.selectedTab == .profile {
+                    switch screen {
+                    case let .topic(id: id):
+                        state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+                        state.selectedTab = .forum
+                        
+                    default: return .none
                     }
                 }
 

@@ -14,6 +14,7 @@ public enum ProfileEvent: Event {
     case historyTapped
     case userLoaded(Int)
     case userLoadingFailed
+    case achievementTapped
     
     public var name: String {
         return "Profile " + eventName(for: self).inProperCase
