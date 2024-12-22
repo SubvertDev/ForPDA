@@ -515,7 +515,7 @@ public struct AppFeature: Reducer, Sendable {
                 state.forumPath.append(.profile(ProfileFeature.State(userId: userId)))
                 return .none
                 
-            case let .forumPath(.element(id: _, action: .profile(.achievementTapped(url)))):
+            case let .forumPath(.element(id: _, action: .profile(.deeplinkTapped(url, _)))):
                 return handleDeeplink(url: url, state: &state)
             
             case .forumPath(.element(id: _, action: .topic(.urlTapped(let url)))),
@@ -561,7 +561,7 @@ public struct AppFeature: Reducer, Sendable {
                 state.profilePath.append(.history(HistoryFeature.State()))
                 return .none
                 
-            case .profile(.achievementTapped(let url)):
+            case .profile(.deeplinkTapped(let url, _)):
                 return handleDeeplink(url: url, state: &state)
                             
             case let .profilePath(.element(id: _, action: .history(.topicTapped(id)))):

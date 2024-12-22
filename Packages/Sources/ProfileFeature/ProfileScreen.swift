@@ -125,8 +125,9 @@ public struct ProfileScreen: View {
             }
             
             if let signature = user.signatureAttributed {
-                // FIXME: Change to local RichText
-                RichTextEditor(text: .constant(signature), context: .init()) {
+                RichText(text: signature, onUrlTap: { url in
+                    store.send(.deeplinkTapped(url, .signature))
+                }) {
                     ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
                     ($0 as? UITextView)?.isEditable = false
@@ -227,13 +228,13 @@ public struct ProfileScreen: View {
                             Text("Status", bundle: .module)
                                 .font(.footnote)
                                 .foregroundStyle(Color.Labels.teritary)
-                            // FIXME: Change to local RichText
-                            RichTextEditor(text: .constant(status), context: .init()) {
+                            
+                            RichText(text: status, configuration: {
                                 ($0 as? UITextView)?.backgroundColor = .clear
                                 ($0 as? UITextView)?.textAlignment = .center
                                 ($0 as? UITextView)?.isEditable = false
                                 ($0 as? UITextView)?.isScrollEnabled = false
-                            }
+                            })
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(12)
@@ -302,13 +303,9 @@ public struct ProfileScreen: View {
     private func AboutSection(user: User) -> some View {
         Section {
             if let aboutMe = user.aboutMeAttributed {
-                // FIXME: Change to local RichText
-                RichTextEditor(text: .constant(aboutMe), context: .init()) {
-                    ($0 as? UITextView)?.backgroundColor = .clear
-                    ($0 as? UITextView)?.textAlignment = .natural
-                    ($0 as? UITextView)?.isEditable = false
-                    ($0 as? UITextView)?.isScrollEnabled = false
-                }
+                RichText(text: aboutMe, onUrlTap: { url in
+                    store.send(.deeplinkTapped(url, .about))
+                })
                 .font(.body)
                 .foregroundStyle(Color.Labels.primary)
                 .padding(.horizontal, 16)
@@ -405,7 +402,7 @@ public struct ProfileScreen: View {
     private func AchievementsSection(achievement: User.Achievement) -> some View {
         Section {
             Button {
-                store.send(.achievementTapped(achievement.forumUrl))
+                store.send(.deeplinkTapped(achievement.forumUrl, .achievement))
             } label: {
                 HStack(spacing: 0) {
                     HStack {

@@ -36,8 +36,15 @@ extension ProfileFeature {
                 case .historyButtonTapped:
                     analyticsClient.log(ProfileEvent.historyTapped)
                     
-                case .achievementTapped:
-                    analyticsClient.log(ProfileEvent.achievementTapped)
+                case .deeplinkTapped(_, let type):
+                    switch type {
+                    case .about:
+                        analyticsClient.log(ProfileEvent.linkInAboutTapped)
+                    case .signature:
+                        analyticsClient.log(ProfileEvent.linkInSignatureTapped)
+                    case .achievement:
+                        analyticsClient.log(ProfileEvent.achievementTapped)
+                    }
                     
                 case let ._userResponse(.success(user)):
                     analyticsClient.log(ProfileEvent.userLoaded(user.id))

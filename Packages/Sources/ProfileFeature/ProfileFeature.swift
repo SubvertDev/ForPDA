@@ -52,7 +52,7 @@ public struct ProfileFeature: Reducer, Sendable {
         case logoutButtonTapped
         case historyButtonTapped
         
-        case achievementTapped(URL)
+        case deeplinkTapped(URL, ProfileDeeplinkType)
         
         case _userResponse(Result<User, any Error>)
         
@@ -88,7 +88,7 @@ public struct ProfileFeature: Reducer, Sendable {
                     }
                 }
                 
-            case .historyButtonTapped, .qmsButtonTapped, .settingsButtonTapped, .achievementTapped:
+            case .historyButtonTapped, .qmsButtonTapped, .settingsButtonTapped, .deeplinkTapped:
                 return .none
                 
             case .logoutButtonTapped:
