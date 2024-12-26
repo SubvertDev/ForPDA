@@ -39,6 +39,7 @@ public struct UserQuote: Hashable {
 
 public indirect enum TopicType: Hashable, Equatable {
     case text(String, Metadata)
+    case offtop(String, AttributedString?)
     case attachment(Int)
     case image(URL)
     case left([TopicType])
@@ -136,7 +137,6 @@ public class TopicBuilder {
         for index in types.indices {
             switch types[index] {
             case let .text(string, metadata):
-                
                 var newString = AttributedString(string)
                 if case let .text(_, modifiedMetadata) = types[index] {
                     if let savedString = modifiedMetadata.attributed {
@@ -146,6 +146,20 @@ public class TopicBuilder {
                 let newAttributed = transferAttributes(from: attributedString, to: newString)
                 let newMetadata = Metadata(range: metadata.range, attributed: newAttributed)
                 types[index] = .text(string, newMetadata)
+                
+            case let .offtop(string, _):
+                var newAttributedString = AttributedString(string)
+                if case let .offtop(_, modifiedAttributedString) = types[index] {
+                    if let modifiedAttributedString {
+                        newAttributedString = modifiedAttributedString
+                    } else {
+                        var attributes = AttributeContainer()
+                        attributes.foregroundColor = UIColor(Color.Labels.quaternary)
+                        attributes.font = UIFont.preferredFont(forTextStyle: .caption2)
+                        newAttributedString.mergeAttributes(attributes)
+                    }
+                }
+                types[index] = .offtop(string, newAttributedString)
                 
             case let .left(array):
                 types[index] = .left(applyAttributes(attributedRun, of: attributedString, to: array))
@@ -232,6 +246,13 @@ public class TopicBuilder {
                 return .text(attrStr)
             }
             
+        case .offtop(let string, let attributedString):
+            if let attributedString {
+                return .text(attributedString)
+            } else {
+                return .text(AttributedString(string))
+            }
+            
         case .attachment(let id):
             return .attachment(id)
             
@@ -294,7 +315,7 @@ public class TopicBuilder {
         }
     }
     
-    let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/hide]", "[/cur]", "[/mod]", "[/ex]", "[/img]"]
+    let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/hide]", "[/cur]", "[/mod]", "[/ex]", "[/img]", "[/offtop]"]
     let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code=", "[hide="]
     
     enum CurrentTag {
@@ -306,6 +327,7 @@ public class TopicBuilder {
         case right
         case code
         case hide
+        case offtop
         case notice
         case image
         case none
@@ -449,8 +471,12 @@ public class TopicBuilder {
             
             if let text = scanner.scanUpToString(nextTag) {
                 logger.log("[SCANNER] Got text \"\(text.prefix(100).trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: "\n", with: ""))\" before \(nextTag) >>> \"\(self.printRemaining(scanner))\"")
-                let attributes = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
-                results.append(.text(text.trimmingCharacters(in: .whitespacesAndNewlines), attributes))
+                if currentTag != .offtop {
+                    let attributes = Metadata(range: getRange(for: remainingString(scanner), from: scanner))
+                    results.append(.text(text.trimmingCharacters(in: .whitespacesAndNewlines), attributes))
+                } else {
+                    results.append(.offtop(text.trimmingCharacters(in: .whitespacesAndNewlines), nil))
+                }
 
                 if !hasEndingTags && !hasTagsWithInfo {
                     logger.log("[SCANNER] Consuming \(nextTag)")
@@ -532,6 +558,10 @@ public class TopicBuilder {
                 let hide = parseHide(from: scanner, attributes: attributes)
                 if case .hide = hide { results.append(hide) } else { fatalError("non hide return") }
                 
+            case "[offtop]":
+                let offtop = parseOfftop(from: scanner)
+                results.append(contentsOf: offtop)
+                
             case "[img]":
                 let image = parseImage(from: scanner)
                 if case .image = image { results.append(image) } else { fatalError("non image return") }
@@ -551,7 +581,7 @@ public class TopicBuilder {
                     return results
                 }
                 
-            case "[/quote]", "[/code]", "[/hide]", "[/list]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]", "[/img]":
+            case "[/quote]", "[/code]", "[/hide]", "[/list]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]", "[/img]", "[/offtop]":
                 logger.log("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
@@ -765,6 +795,28 @@ public class TopicBuilder {
         }
         
         return .hide(results, attributes)
+    }
+    
+    // MARK: - Offtop
+    
+    func parseOfftop(from scanner: Scanner) -> [TopicType] {
+        currentTag = .offtop
+        
+        var results: [TopicType] = []
+        
+        while !scanner.isAtEnd {
+            logger.log("[OFFTOP] New iteration")
+            if scanner.scanString("[/offtop]") != nil {
+                logger.log("[OFFTOP] Found end of offtop")
+                break
+            } else {
+                logger.log("[OFFTOP] Found no offtop tag, parsing insides")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return results
     }
     
     // MARK: - Quote
@@ -1049,6 +1101,8 @@ public class TopicBuilder {
             "/right",
             "hide",
             "/hide",
+            "offtop",
+            "/offtop",
             "cur",
             "/cur",
             "mod",
