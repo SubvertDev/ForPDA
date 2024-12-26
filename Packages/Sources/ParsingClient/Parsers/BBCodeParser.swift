@@ -60,6 +60,10 @@ public final class BBCodeParser {
             if let match = text.firstMatch(of: snapback) {
                 text = text.replacingOccurrences(of: String(match.output.0), with: "")
             }
+            let anchor = /\[anchor\](.*?)\[\/anchor\]/
+            if let match = text.firstMatch(of: anchor) {
+                text = text.replacingOccurrences(of: String(match.output.0), with: String(match.output.1))
+            }
         }
         
         replaceCodes(from: &text)
