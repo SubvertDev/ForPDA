@@ -47,6 +47,7 @@ public indirect enum TopicType: Hashable, Equatable {
     case spoiler([TopicType], String?, AttributedString?)
     case quote([TopicType], QuoteType?)
     case code(TopicType, CodeType)
+    case hide([TopicType], Int?)
     case list([TopicType], ListType)
     case notice([TopicType], NoticeType)
     case bullet([TopicType])
@@ -170,6 +171,9 @@ public class TopicBuilder {
                 let text = applyAttributes(attributedRun, of: attributedString, to: [text])
                 types[index] = .code(text.first!, info)
                 
+            case let .hide(array, info):
+                types[index] = .hide(applyAttributes(attributedRun, of: attributedString, to: array), info)
+                
             case let .notice(array, info):
                 types[index] = .notice(applyAttributes(attributedRun, of: attributedString, to: array), info)
                 
@@ -269,6 +273,9 @@ public class TopicBuilder {
         case .code(let text, let codeType):
             return .code(twoToUI(text), codeType)
             
+        case .hide(let array, let info):
+            return .hide(array.map { twoToUI($0) }, info)
+            
         case .notice(let types, let noticeType):
             return .notice(types.map { twoToUI($0) }, noticeType)
             
@@ -287,8 +294,8 @@ public class TopicBuilder {
         }
     }
     
-    let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/cur]", "[/mod]", "[/ex]", "[/img]"]
-    let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code="]
+    let closingTags = ["[/spoiler]", "[/quote]", "[/list]", "[/left]", "[/center]", "[/right]", "[/code]", "[/hide]", "[/cur]", "[/mod]", "[/ex]", "[/img]"]
+    let tagsWithInfo = ["[quote ", "[quote=", "[spoiler=", "[attachment=", "[code=", "[hide="]
     
     enum CurrentTag {
         case spoiler
@@ -298,6 +305,7 @@ public class TopicBuilder {
         case center
         case right
         case code
+        case hide
         case notice
         case image
         case none
@@ -479,6 +487,11 @@ public class TopicBuilder {
                 nextTag = "[code]"
             }
             
+            if nextTag.contains("[hide=") {
+                logger.log("[SCANNER] Swizzled from \(nextTag) to [hide]")
+                nextTag = "[hide]"
+            }
+            
             logger.log("[SCANNER] Starting to switch on \(nextTag)")
             
             switch nextTag {
@@ -515,6 +528,10 @@ public class TopicBuilder {
                 let code = parseCode(from: scanner, attributes: attributes)
                 if case .code = code { results.append(code) } else { fatalError("non code return") }
                 
+            case "[hide]":
+                let hide = parseHide(from: scanner, attributes: attributes)
+                if case .hide = hide { results.append(hide) } else { fatalError("non hide return") }
+                
             case "[img]":
                 let image = parseImage(from: scanner)
                 if case .image = image { results.append(image) } else { fatalError("non image return") }
@@ -534,7 +551,7 @@ public class TopicBuilder {
                     return results
                 }
                 
-            case "[/quote]", "[/code]", "[/list]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]", "[/img]":
+            case "[/quote]", "[/code]", "[/hide]", "[/list]", "[/left]", "[/center]", "[/right]", "[/cur]", "[/mod]", "[/ex]", "[/img]":
                 logger.log("[SCANNER] Closing tag \(nextTag), returning results")
                 return results
                 
@@ -712,6 +729,42 @@ public class TopicBuilder {
         }
         
         return .code(results.first!, attributes)
+    }
+    
+    // MARK: - Hide
+    
+    func parseHideAttributes(_ string: String?) -> Int? {
+        guard let string else {
+            logger.log("[HIDE PARSER] No attributes found")
+            return nil
+        }
+        
+        if string.first == "=", let number = Int(String(string.dropFirst())) {
+            return number
+        } else {
+            return nil
+        }
+    }
+    
+    func parseHide(from scanner: Scanner, attributes: String? = nil) -> TopicType {
+        currentTag = .hide
+        
+        var results: [TopicType] = []
+        let attributes = parseHideAttributes(attributes)
+        
+        while !scanner.isAtEnd {
+            logger.log("[HIDE] New iteration")
+            if scanner.scanString("[/hide]") != nil {
+                logger.log("[HIDE] Found end of hide")
+                break
+            } else {
+                logger.log("[HIDE] Found no hide tag, parsing insides")
+                let types = parse(with: scanner)
+                results.append(contentsOf: types)
+            }
+        }
+        
+        return .hide(results, attributes)
     }
     
     // MARK: - Quote
@@ -994,6 +1047,8 @@ public class TopicBuilder {
             "/center",
             "right",
             "/right",
+            "hide",
+            "/hide",
             "cur",
             "/cur",
             "mod",

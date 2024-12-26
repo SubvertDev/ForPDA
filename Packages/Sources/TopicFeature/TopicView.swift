@@ -10,6 +10,8 @@ import SharedUI
 import NukeUI
 import SFSafeSymbols
 import Models
+import Sharing
+import Dependencies
 
 public struct TopicView: View {
         
@@ -102,6 +104,9 @@ public struct TopicView: View {
             
         case let .code(type, info):
             CodeView(type: type, info: info, onUrlTap: onUrlTap)
+            
+        case let .hide(types, info):
+            HideView(types: types, info: info, attachments: attachments, onUrlTap: onUrlTap)
             
         case let .list(types, _):
             VStack(spacing: 8) {
@@ -368,6 +373,89 @@ struct CodeView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .animation(.default, value: isExpanded)
+    }
+}
+
+// MARK: - Hide View
+
+struct HideView: View {
+    
+    let types: [TopicTypeUI]
+    let info: Int?
+    let attachments: [Post.Attachment]
+    let onUrlTap: URLTapHandler?
+    
+    @State var isShown: Bool
+    @State private var shouldLoadUser: Int?
+    
+    init(
+        types: [TopicTypeUI],
+        info: Int?,
+        attachments: [Post.Attachment],
+        onUrlTap: URLTapHandler?
+    ) {
+        self.types = types
+        self.info = info
+        self.attachments = attachments
+        self.onUrlTap = onUrlTap
+        
+        @Shared(.userSession) var userSession: UserSession?
+        if let userSession = userSession.wrapped {
+            if info != nil {
+                self.isShown = false
+                self.shouldLoadUser = userSession.userId
+            } else {
+                self.isShown = true
+            }
+        } else {
+            self.isShown = false
+        }
+    }
+    
+    var body: some View {
+        Group {
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    Text("Скрытый текст")
+                        .foregroundStyle(Color.Labels.primary)
+                        .font(.callout)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.top, 12)
+                .padding(.bottom, 8)
+                .padding(.horizontal, 12)
+                .overlay(alignment: .bottom) {
+                    Rectangle()
+                        .fill(Color.Separator.secondary)
+                        .frame(height: 1)
+                        .padding(.horizontal, 12)
+                }
+                
+                if isShown {
+                    VStack(spacing: 8) {
+                        ForEach(types, id: \.self) { type in
+                            TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                        }
+                    }
+                    .padding(12)
+                }
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
+            )
+        }
+        .animation(.default, value: isShown)
+        .task {
+            @Dependency(\.cacheClient) var cache
+            if let userId = shouldLoadUser, let info {
+                if let currentUser = await cache.getUser(userId) {
+                    if currentUser.replies >= info {
+                        isShown = true
+                    }
+                }
+            }
+        }
     }
 }
 
