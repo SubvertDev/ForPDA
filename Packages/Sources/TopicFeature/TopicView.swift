@@ -68,11 +68,10 @@ public struct TopicView: View {
         case let .image(url):
             LazyImage(url: url) { state in
                 Group {
-                    if let image = state.image { image.resizable().scaledToFill() }
+                    if let image = state.image { image }
                 }
                 .skeleton(with: state.isLoading, shape: .rectangle)
             }
-            .frame(width: UIScreen.main.bounds.width / 1.5)
             
         case let .left(types):
             VStack(alignment: .leading) {
