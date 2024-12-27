@@ -208,6 +208,14 @@ public struct SettingsFeature: Reducer, Sendable {
                 state.$appSettings.withLock { $0.startPage = state.startPage }
                 return .none
                 
+            case .binding(\.animateIcon):
+                state.$appSettings.withLock { $0.animateIcon = state.animateIcon }
+                return .none
+                
+            case .binding(\.animateIconOnMainThread):
+                state.$appSettings.withLock { $0.animateIconOnMainThread = state.animateIconOnMainThread }
+                return .none
+                
             case .destination, .binding:
                 return .none
             }
