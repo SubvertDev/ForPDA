@@ -125,8 +125,9 @@ public struct ProfileScreen: View {
             }
             
             if let signature = user.signatureAttributed {
-                // FIXME: Change to local RichText
-                RichTextEditor(text: .constant(signature), context: .init()) {
+                RichText(text: signature, onUrlTap: { url in
+                    store.send(.deeplinkTapped(url, .signature))
+                }) {
                     ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
                     ($0 as? UITextView)?.isEditable = false
@@ -192,8 +193,8 @@ public struct ProfileScreen: View {
     private func GeneralSegment(user: User) -> some View {
         GroupsSection(user: user)
         PersonalSection(user: user)
-        if let aboutMe = user.aboutMe {
-            AboutSection(text: aboutMe)
+        if user.aboutMe != nil {
+            AboutSection(user: user)
         }
         if !user.devDBdevices.isEmpty {
             DevicesSection(devices: user.devDBdevices)
@@ -227,13 +228,13 @@ public struct ProfileScreen: View {
                             Text("Status", bundle: .module)
                                 .font(.footnote)
                                 .foregroundStyle(Color.Labels.teritary)
-                            // FIXME: Change to local RichText
-                            RichTextEditor(text: .constant(status), context: .init()) {
+                            
+                            RichText(text: status, configuration: {
                                 ($0 as? UITextView)?.backgroundColor = .clear
                                 ($0 as? UITextView)?.textAlignment = .center
                                 ($0 as? UITextView)?.isEditable = false
                                 ($0 as? UITextView)?.isScrollEnabled = false
-                            }
+                            })
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(12)
@@ -299,14 +300,18 @@ public struct ProfileScreen: View {
     // MARK: - About Section
     
     @ViewBuilder
-    private func AboutSection(text: String) -> some View {
+    private func AboutSection(user: User) -> some View {
         Section {
-            Text(text)
+            if let aboutMe = user.aboutMeAttributed {
+                RichText(text: aboutMe, onUrlTap: { url in
+                    store.send(.deeplinkTapped(url, .about))
+                })
                 .font(.body)
                 .foregroundStyle(Color.Labels.primary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            }
         } header: {
             SectionHeader(title: "About me")
         }
@@ -396,57 +401,61 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func AchievementsSection(achievement: User.Achievement) -> some View {
         Section {
-            HStack(spacing: 0) {
-                HStack {
-                    LazyImage(url: achievement.imageUrl) { state in
-                        Group {
-                            if let image = state.image {
-                                image.resizable().scaledToFill()
-                            } else {
-                                Color.Background.teritary
+            Button {
+                store.send(.deeplinkTapped(achievement.forumUrl, .achievement))
+            } label: {
+                HStack(spacing: 0) {
+                    HStack {
+                        LazyImage(url: achievement.imageUrl) { state in
+                            Group {
+                                if let image = state.image {
+                                    image.resizable().scaledToFill()
+                                } else {
+                                    Color.Background.teritary
+                                }
+                            }
+                            .skeleton(with: state.isLoading, shape: .circle)
+                        }
+                        .frame(width: UIScreen.main.bounds.width / 5,
+                               height: UIScreen.main.bounds.width / 5)
+                        .padding(.trailing, 12)
+                        .overlay(alignment: .bottomTrailing) {
+                            if achievement.count > 1 {
+                                Text(String("\(achievement.count)"))
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .padding(6)
+                                    .background(tintColor)
+                                    .clipShape(Circle())
                             }
                         }
-                        .skeleton(with: state.isLoading, shape: .circle)
                     }
-                    .frame(width: UIScreen.main.bounds.width / 5,
-                           height: UIScreen.main.bounds.width / 5)
-                    .padding(.trailing, 12)
-                    .overlay(alignment: .bottomTrailing) {
-                        if achievement.count > 1 {
-                            Text(String("\(achievement.count)"))
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(6)
-                                .background(tintColor)
-                                .clipShape(Circle())
-                        }
-                    }
-                }
-                
-                VStack(spacing: 8) {
-                    Text(achievement.name)
-                        .font(.headline)
-                        .foregroundStyle(Color.Labels.secondary)
                     
-                    if !achievement.description.isEmpty {
-                        Text(achievement.description)
+                    VStack(spacing: 8) {
+                        Text(achievement.name)
+                            .font(.headline)
+                            .foregroundStyle(Color.Labels.secondary)
+                        
+                        if !achievement.description.isEmpty {
+                            Text(achievement.description)
+                                .font(.footnote)
+                                .foregroundStyle(Color.Labels.teritary)
+                        }
+                        
+                        Text(achievement.presentationDate.formatted(date: .numeric, time: .omitted))
                             .font(.footnote)
                             .foregroundStyle(Color.Labels.teritary)
                     }
-                    
-                    Text(achievement.presentationDate.formatted(date: .numeric, time: .omitted))
-                        .font(.footnote)
-                        .foregroundStyle(Color.Labels.teritary)
+                    .frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+                .background(
+                    Color.Background.teritary
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                )
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(
-                Color.Background.teritary
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-            )
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
@@ -598,6 +607,10 @@ extension User {
     
     var statusAttributed: NSAttributedString? {
         return BBCodeParser.parse(status)
+    }
+    
+    var aboutMeAttributed: NSAttributedString? {
+        return BBCodeParser.parse(aboutMe, fontStyle: .body)
     }
 }
 
