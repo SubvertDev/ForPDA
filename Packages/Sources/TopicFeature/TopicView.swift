@@ -401,48 +401,50 @@ struct HideView: View {
         @Shared(.userSession) var userSession: UserSession?
         if let userSession = userSession.wrapped {
             if info != nil {
-                self.isShown = false
-                self.shouldLoadUser = userSession.userId
+                self._isShown = State(initialValue: false)
+                self._shouldLoadUser = State(initialValue: userSession.userId)  //userSession.userId
             } else {
-                self.isShown = true
+                self._isShown = State(initialValue: true)
             }
         } else {
-            self.isShown = false
+            self._isShown = State(initialValue: false)
         }
     }
     
     var body: some View {
         Group {
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    Text("Скрытый текст")
-                        .foregroundStyle(Color.Labels.primary)
-                        .font(.callout)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(.top, 12)
-                .padding(.bottom, 8)
-                .padding(.horizontal, 12)
-                .overlay(alignment: .bottom) {
-                    Rectangle()
-                        .fill(Color.Separator.secondary)
-                        .frame(height: 1)
-                        .padding(.horizontal, 12)
-                }
-                
-                if isShown {
-                    VStack(spacing: 8) {
-                        ForEach(types, id: \.self) { type in
-                            TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
-                        }
+            if isShown {
+                VStack(spacing: 0) {
+                    HStack(spacing: 0) {
+                        Text("Скрытый текст")
+                            .foregroundStyle(Color.Labels.primary)
+                            .font(.callout)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(12)
+                    .overlay(alignment: .bottom) {
+                        if isShown {
+                            Rectangle()
+                                .fill(Color.Separator.secondary)
+                                .frame(height: 1)
+                                .padding(.horizontal, 12)
+                        }
+                    }
+                    
+                    if isShown {
+                        VStack(spacing: 8) {
+                            ForEach(types, id: \.self) { type in
+                                TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                            }
+                        }
+                        .padding(12)
+                    }
                 }
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
+                )
             }
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.Background.primary, strokeBorder: Color.Separator.secondary)
-            )
         }
         .animation(.default, value: isShown)
         .task {
