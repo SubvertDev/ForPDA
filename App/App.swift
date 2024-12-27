@@ -10,6 +10,9 @@ import ComposableArchitecture
 import AppFeature
 import BackgroundTasks
 
+// Remove after New Year
+import Models
+
 // MARK: - Main View
 
 @main
@@ -19,13 +22,18 @@ struct ForPDAApp: App {
     @Environment(\.scenePhase) private var scenePhase
     
     // Remove after New Year
+    @Shared(.appSettings) var appSettings: AppSettings
     @State var backgroundTask: UIBackgroundTaskIdentifier? = nil
-    let iconAnimator = IconAnimator(
-        numberOfFrames: 90,
-        numberOfLoops: 3,
-        targetFramesPerSecond: 30,
-        shouldRunOnMainThread: true
-    )
+    let iconAnimator: IconAnimator
+    
+    init() {
+        self.iconAnimator = IconAnimator(
+            numberOfFrames: 90,
+            numberOfLoops: 3,
+            targetFramesPerSecond: 30,
+            shouldRunOnMainThread: _appSettings.animateIconOnMainThread.wrappedValue
+        )
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -35,21 +43,19 @@ struct ForPDAApp: App {
                         appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
                         
                         // Remove after New Year
-                        switch newScenePhase {
-                        case .active:
-                            endTask()
-                        case .background:
-                            print("Starting animation")
-                            backgroundTask = UIApplication.shared.beginBackgroundTask()
-                            iconAnimator.startAnimation() {
-                                print("Finishing animation")
-                                // Once the animation is complete,
-                                // end our background task so that iOS knows
-                                // that our app has finished its work
+                        if appSettings.animateIcon {
+                            switch newScenePhase {
+                            case .active:
+                                iconAnimator.cancel()
                                 endTask()
+                            case .background:
+                                backgroundTask = UIApplication.shared.beginBackgroundTask()
+                                iconAnimator.startAnimation() {
+                                    endTask()
+                                }
+                            default:
+                                break
                             }
-                        default:
-                            break
                         }
                     }
                     .onOpenURL { url in

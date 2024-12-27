@@ -29,6 +29,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var historyPerPage: Int
     public var analyticsConfigurationDebug: AnalyticsConfiguration
     public var analyticsConfigurationRelease: AnalyticsConfiguration
+    public var animateIcon: Bool
+    public var animateIconOnMainThread: Bool
     
     public init(
         articlesListRowType: ArticleListRowType,
@@ -42,7 +44,9 @@ public struct AppSettings: Sendable, Equatable, Codable {
         topicPerPage: Int,
         historyPerPage: Int,
         analyticsConfigurationDebug: AnalyticsConfiguration,
-        analyticsConfigurationRelease: AnalyticsConfiguration
+        analyticsConfigurationRelease: AnalyticsConfiguration,
+        animateIcon: Bool,
+        animateIconOnMainThread: Bool
     ) {
         self.articlesListRowType = articlesListRowType
         self.bookmarksListRowType = bookmarksListRowType
@@ -56,6 +60,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.historyPerPage = historyPerPage
         self.analyticsConfigurationDebug = analyticsConfigurationDebug
         self.analyticsConfigurationRelease = analyticsConfigurationRelease
+        self.animateIcon = animateIcon
+        self.animateIconOnMainThread = animateIconOnMainThread
     }
     
     public init(from decoder: any Decoder) throws {
@@ -72,6 +78,8 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.historyPerPage = try container.decodeIfPresent(Int.self, forKey: .historyPerPage) ?? AppSettings.default.historyPerPage
         self.analyticsConfigurationDebug = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationDebug) ?? AppSettings.default.analyticsConfigurationDebug
         self.analyticsConfigurationRelease = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationRelease) ?? AppSettings.default.analyticsConfigurationRelease
+        self.animateIcon = try container.decodeIfPresent(Bool.self, forKey: .animateIcon) ?? AppSettings.default.animateIcon
+        self.animateIconOnMainThread = try container.decodeIfPresent(Bool.self, forKey: .animateIconOnMainThread) ?? AppSettings.default.animateIconOnMainThread
     }
 }
 
@@ -88,6 +96,8 @@ public extension AppSettings {
         topicPerPage: 20,
         historyPerPage: 20,
         analyticsConfigurationDebug: .debug,
-        analyticsConfigurationRelease: .release
+        analyticsConfigurationRelease: .release,
+        animateIcon: true,
+        animateIconOnMainThread: false
     )
 }

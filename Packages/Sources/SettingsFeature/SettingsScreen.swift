@@ -60,6 +60,7 @@ public struct SettingsScreen: View {
     
     enum RowType {
         case basic
+        case toggle
         case navigation
         case backgroundPicker
         case themePicker
@@ -67,7 +68,13 @@ public struct SettingsScreen: View {
     }
         
     @ViewBuilder
-    private func Row(symbol: SFSymbol, title: LocalizedStringKey, type: RowType, action: @escaping () -> Void = {}) -> some View {
+    private func Row(
+        symbol: SFSymbol,
+        title: LocalizedStringKey,
+        type: RowType,
+        toggle: Binding<Bool>? = nil,
+        action: @escaping () -> Void = {}
+    ) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
                 action()
@@ -87,6 +94,9 @@ public struct SettingsScreen: View {
                     
                     switch type {
                     case .basic:
+                        EmptyView()
+                        
+                    case .toggle:
                         EmptyView()
                         
                     case .navigation:
@@ -151,9 +161,14 @@ public struct SettingsScreen: View {
                 }
                 .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            
+            if let toggle {
+                Toggle(String(""), isOn: toggle)
+                    .labelsHidden()
+            }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-        .buttonStyle(.plain)
         .frame(height: 60)
     }
     
@@ -261,6 +276,9 @@ public struct SettingsScreen: View {
             // Row(symbol: .docOnDoc, title: "Copy Push Token", type: .navigation) {
             //     store.send(.copyPushTokenButtonTapped)
             // }
+            Row(symbol: .appGift, title: "Animate icon (restart needed)", type: .toggle, toggle: $store.animateIcon)
+            
+            Row(symbol: .appBadgeCheckmark, title: "Smooth animation (restart needed, can cause lag)", type: .toggle, toggle: $store.animateIconOnMainThread)
             
             Row(symbol: .trash, title: "Clear cache", type: .navigation) {
                 store.send(.clearCacheButtonTapped)
