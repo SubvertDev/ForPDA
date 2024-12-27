@@ -139,9 +139,6 @@
 		B8133B4A2C7FA3C800506430 /* Packages */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Packages; sourceTree = "<group>"; };
 		B82B2EFE2A8942E900CB067C /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B82D8D702D1CB03500784698 /* IconAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconAnimator.swift; sourceTree = "<group>"; };
-		B82D8DB12D1CB05100784698 /* AnimatedAppIcons-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AnimatedAppIcons-Bridging-Header.h"; sourceTree = "<group>"; };
-		B82D8DB22D1CB05100784698 /* LSApplicationProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LSApplicationProxy.h; sourceTree = "<group>"; };
-		B82D8DB32D1CB05100784698 /* LSBundleProxy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LSBundleProxy.h; sourceTree = "<group>"; };
 		B83907412D1DF26A00153557 /* AnimatedIcon000.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AnimatedIcon000.png; sourceTree = "<group>"; };
 		B83907422D1DF26A00153557 /* AnimatedIcon001.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AnimatedIcon001.png; sourceTree = "<group>"; };
 		B83907432D1DF26A00153557 /* AnimatedIcon002.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = AnimatedIcon002.png; sourceTree = "<group>"; };
@@ -246,7 +243,17 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Fonts; sourceTree = "<group>"; };
+		13C9F9FA2CADCDFF003280F3 /* Fonts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -268,13 +275,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		B82D8D732D1CB03500784698 /* Icon */ = {
+		B82D8D732D1CB03500784698 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
 				B82D8D702D1CB03500784698 /* IconAnimator.swift */,
-				B82D8DB12D1CB05100784698 /* AnimatedAppIcons-Bridging-Header.h */,
-				B82D8DB22D1CB05100784698 /* LSApplicationProxy.h */,
-				B82D8DB32D1CB05100784698 /* LSBundleProxy.h */,
 				B83907412D1DF26A00153557 /* AnimatedIcon000.png */,
 				B83907422D1DF26A00153557 /* AnimatedIcon001.png */,
 				B83907432D1DF26A00153557 /* AnimatedIcon002.png */,
@@ -366,7 +370,7 @@
 				B83907992D1DF26A00153557 /* AnimatedIcon088.png */,
 				B839079A2D1DF26A00153557 /* AnimatedIcon089.png */,
 			);
-			path = Icon;
+			path = Icons;
 			sourceTree = "<group>";
 		};
 		B8AB63BE2AA49F6100F2CEFF /* OpenInAppExtension */ = {
@@ -412,7 +416,7 @@
 		B8D351F7293CABB6008A84EA /* App */ = {
 			isa = PBXGroup;
 			children = (
-				B82D8D732D1CB03500784698 /* Icon */,
+				B82D8D732D1CB03500784698 /* Icons */,
 				13C9F9FA2CADCDFF003280F3 /* Fonts */,
 				B8DEB2212BAB81CC00AD97C6 /* App.swift */,
 				B88BDA872BF6BC0200E17268 /* Assets.xcassets */,
@@ -677,7 +681,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 550;
+				CURRENT_PROJECT_VERSION = 551;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -713,7 +717,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 550;
+				CURRENT_PROJECT_VERSION = 551;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenInAppExtension/Info.plist;
@@ -886,7 +890,7 @@
 				CODE_SIGN_ENTITLEMENTS = ForPDA/ForPDA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 550;
+				CURRENT_PROJECT_VERSION = 551;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -904,10 +908,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.8.0;
-				OTHER_LDFLAGS = (
-					"-w",
-					"-Wl,-U,_OBJC_CLASS_$_LSBundleProxy",
-				);
+				OTHER_LDFLAGS = "";
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -917,7 +918,6 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "App/Icon/AnimatedAppIcons-Bridging-Header.h";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = YES;
 				SWIFT_UPCOMING_FEATURE_DEPRECATE_APPLICATION_MAIN = YES;
@@ -945,7 +945,7 @@
 				CODE_SIGN_ENTITLEMENTS = ForPDA/ForPDA.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 550;
+				CURRENT_PROJECT_VERSION = 551;
 				DEVELOPMENT_TEAM = 7353CQCGQC;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -962,10 +962,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.8.0;
-				OTHER_LDFLAGS = (
-					"-w",
-					"-Wl,-U,_OBJC_CLASS_$_LSBundleProxy",
-				);
+				OTHER_LDFLAGS = "";
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -975,7 +972,6 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "App/Icon/AnimatedAppIcons-Bridging-Header.h";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = YES;
 				SWIFT_UPCOMING_FEATURE_DEPRECATE_APPLICATION_MAIN = YES;
