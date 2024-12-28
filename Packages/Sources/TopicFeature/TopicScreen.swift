@@ -107,8 +107,9 @@ public struct TopicScreen: View {
             WithPerceptionTracking {
                 VStack(spacing: 0) {
                     if !store.isFirstPage && topic.posts.first == post {
-                        Text("Шапка Темы")
-                            .padding(16)
+                        // TODO: Add expandable head topic
+//                        Text("Шапка Темы")
+//                            .padding(16)
                     } else {
                         Post(post)
                             .padding(.horizontal, 16)

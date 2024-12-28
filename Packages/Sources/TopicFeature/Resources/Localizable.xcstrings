@@ -67,6 +67,7 @@
 
     },
     "Шапка Темы" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
