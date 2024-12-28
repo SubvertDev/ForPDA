@@ -204,8 +204,9 @@ extension NSAttributedString {
 // MARK: - Forum Colors
 
 public enum ForumColors: CaseIterable {
-    case black
-    case white
+    // Breaks color on light/dark mode change
+//    case black
+//    case white
     case skyblue
     case royalblue
     case blue
@@ -232,8 +233,9 @@ public enum ForumColors: CaseIterable {
     
     public var hexColor: (String, String) {
         switch self {
-        case .black:        return ("000000", "909090")
-        case .white:        return ("FFFFFF", "FFFFFF")
+            // Breaks color on light/dark mode change
+//        case .black:        return ("000000", "909090")
+//        case .white:        return ("FFFFFF", "FFFFFF")
         case .skyblue:      return ("87CEEB", "87CEEB")
         case .royalblue:    return ("4169E1", "4169E1")
         case .blue:         return ("0000FF", "0000FF")
