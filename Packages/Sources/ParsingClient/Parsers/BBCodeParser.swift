@@ -51,15 +51,20 @@ public final class BBCodeParser {
             text = text.replacingOccurrences(of: "\\[font=\"?(.*?)\"?\\](.*?)\\[\\/font\\]", with: "<span style=\"font-family:$1\">$2</span>", options: .regularExpression) // Text font
             text = text.replacingOccurrences(of: "\\[url\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$1</a>", options: .regularExpression) // URL links without text
             text = text.replacingOccurrences(of: "\\[url=\"?(.*?)\"?\\](.*?)\\[\\/url\\]", with: "<a href=\"$1\">$2</a>", options: .regularExpression) // URL links with text
+            text = text.replacingOccurrences(of: "&#91;", with: "∫®åç˚´†¬´ƒ†") // replacing &#91; with option + bracketleft
+            text = text.replacingOccurrences(of: "&#93;", with: "∫®åç˚´†®ˆ©˙†") // replacing &#93; with option + bracketright
+            
             let mergetime = /\[mergetime\](\d+)\[\/mergetime\]/
             if let match = text.firstMatch(of: mergetime), let interval = TimeInterval(match.output.1) {
                 let date = Date(timeIntervalSince1970: interval)
                 text = text.replacingOccurrences(of: "\\[mergetime\\](.*?)\\[\\/mergetime\\]", with: date.formatted(), options: .regularExpression)
             }
+            
             let snapback = /\[snapback\](\d+)\[\/snapback\]/
             if let match = text.firstMatch(of: snapback) {
                 text = text.replacingOccurrences(of: String(match.output.0), with: "")
             }
+            
             let anchor = /\[anchor\](.*?)\[\/anchor\]/
             if let match = text.firstMatch(of: anchor) {
                 text = text.replacingOccurrences(of: String(match.output.0), with: String(match.output.1))
@@ -102,6 +107,11 @@ public final class BBCodeParser {
         if text.contains("[code]") {
             renderedText = reverseTransformCodeTags(in: renderedText)
         }
+        
+        // Quickfix for Spotify Android topic with [mod] in link names
+        // Potentially breaks all other brackets as well
+        renderedText = renderedText.replacingOccurrences(of: "∫®åç˚´†¬´ƒ†", with: "{")
+        renderedText = renderedText.replacingOccurrences(of: "∫®åç˚´†®ˆ©˙†", with: "}")
         
         // Making text color adapt to dark mode
         let mutableString = NSMutableAttributedString(attributedString: renderedText)
@@ -169,6 +179,22 @@ public final class BBCodeParser {
             // Replace the range in the attributed string
             let transformedAttributedString = NSAttributedString(string: transformedText, attributes: mutableAttributedString.attributes(at: codeRange.location, effectiveRange: nil))
             mutableAttributedString.replaceCharacters(in: codeRange, with: transformedAttributedString)
+        }
+        
+        return mutableAttributedString
+    }
+}
+
+extension NSAttributedString {
+    func replacingOccurrences(of target: String, with replacement: String) -> NSAttributedString {
+        let mutableAttributedString = NSMutableAttributedString(attributedString: self)
+        let range = NSRange(location: 0, length: self.length)
+        let regex = try! NSRegularExpression(pattern: NSRegularExpression.escapedPattern(for: target))
+        
+        let matches = regex.matches(in: self.string, options: [], range: range)
+        for match in matches.reversed() { // Reverse to avoid messing up ranges
+            let matchRange = match.range
+            mutableAttributedString.replaceCharacters(in: matchRange, with: replacement)
         }
         
         return mutableAttributedString
