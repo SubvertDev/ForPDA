@@ -23,6 +23,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        //@Presents var sort: SortFeature.State?
         
         public var favorites: [FavoriteInfo] = []
         public var favoritesImportant: [FavoriteInfo] = []
@@ -49,11 +50,17 @@ public struct FavoritesFeature: Reducer, Sendable {
         case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, isForum: Bool)
         
+        case contextMenu(FavoritesContextMenuAction)
+        case commonContextMenu(FavoriteContextMenuAction, Bool)
+        case topicContextMenu(FavoriteTopicContextMenuAction)
+        
         case pageNavigation(PageNavigationFeature.Action)
+        
+        //case sort(PresentationAction<SortFeature.Action>)
         
         case _favoritesResponse(Result<[FavoriteInfo], any Error>)
         
-        case _loadFavorites(unreadFirst: Bool, offset: Int)
+        case _loadFavorites(offset: Int)
     }
     
     // MARK: - Dependencies
@@ -73,10 +80,10 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .onAppear:
                 guard state.favorites.isEmpty && state.favoritesImportant.isEmpty else { return .none }
                 return .merge([
-                    .send(._loadFavorites(unreadFirst: false, offset: 0)),
+                    .send(._loadFavorites(offset: 0)),
                     .run { send in
                         for await _ in notificationCenter.observe(.favoritesUpdated) {
-                            await send(._loadFavorites(unreadFirst: false, offset: 0))
+                            await send(._loadFavorites(offset: 0))
                         }
                     }
                 ])
@@ -84,28 +91,85 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .onRefresh:
                 state.isRefreshing = true
                 return .run { send in
-                    await send(._loadFavorites(unreadFirst: false, offset: 0))
+                    await send(._loadFavorites(offset: 0))
                 }
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
-                return .send(._loadFavorites(unreadFirst: false, offset: newOffset))
+                return .send(._loadFavorites(offset: newOffset))
                 
             case .pageNavigation:
                 return .none
                 
-            case .settingsButtonTapped, .favoriteTapped(_, _, _):
+            case .settingsButtonTapped, .favoriteTapped /*, .sort*/:
                 return .none
                 
-            case let ._loadFavorites(unreadFirst, offset):
+            case .contextMenu(let action):
+                switch action {
+                case .sort:
+                    //state.sort = SortFeature.State()
+                    return .none
+                    
+                case .markAllAsRead:
+                    return .run { send in
+                        _ = try await apiClient.readAllFavorites()
+                        // TODO: Display toast on success/error.
+                        
+                        await send(.onRefresh)
+                    }
+                }
+                
+            case .commonContextMenu(let action, let isForum):
+                switch action {
+                case .copyLink(let _/*id*/):
+                    return .none
+                    
+                case .delete(let id):
+                    return .run { [id = id] send in
+                        let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
+                        _ = try await apiClient.setFavorite(request)
+                        // TODO: Display toast on success/error.
+                        
+                        await send(.onRefresh)
+                    }
+                    
+                case .setImportant(let id, let pin):
+                    return .run { [id = id] send in
+                        let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
+                        _ = try await apiClient.setFavorite(request)
+                        // TODO: Display toast on success/error.
+                        
+                        await send(.onRefresh)
+                    }
+                }
+                
+            case .topicContextMenu(let action):
+                switch action {
+                case .goToEnd:
+                    return .none
+
+                case .notifyHatUpdate(let id, let flag):
+                    return .run { [id = id, flag = flag] send in
+                        await send(.topicContextMenu(.notify(id, flag, .hatUpdate)))
+                    }
+                    
+                case .notify(let id, let flag, let notify):
+                    return .run { [id = id, flag = flag, type = notify] send in
+                        let request = NotifyFavoriteRequest(id: id, flag: flag, type: type)
+                        _ = try await apiClient.notifyFavorite(request)
+                        // TODO: Display toast on success/error.
+                        
+                        await send(.onRefresh)
+                    }
+                }
+                
+            case let ._loadFavorites(offset):
                 if !state.isRefreshing {
                     state.isLoading = true
                 }
                 return .run { [perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
                     let startTime = Date()
                     for try await favorites in try await apiClient.getFavorites(
-                        unreadFirst: unreadFirst,
-                        offset: offset,
-                        perPage: perPage,
+                        request: FavoritesRequest(sort: [], offset: offset, perPage: perPage),
                         policy: isRefreshing ? .skipCache : .cacheAndLoad
                     ) {
                         if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
@@ -143,5 +207,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .none
             }
         }
+//        .ifLet(\.$sort, action: \.sort) {
+//            SortFeature()
+//        }
     }
 }

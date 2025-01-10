@@ -43,13 +43,16 @@ public struct APIClient: Sendable {
     // Forum
     public var getForumsList: @Sendable (_ policy: CachePolicy) async throws -> AsyncThrowingStream<[ForumInfo], any Error>
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Forum, any Error>
+    public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     
     // Favorites
-    public var getFavorites: @Sendable (_ unreadFirst: Bool, _ offset: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
-    public var setFavorite: @Sendable (_ request: SetFavoriteRequest) async throws -> Void
+    public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
+    public var setFavorite: @Sendable (_ request: SetFavoriteRequest) async throws -> Bool
+    public var notifyFavorite: @Sendable (_ request: NotifyFavoriteRequest) async throws -> Bool
+    public var readAllFavorites: @Sendable () async throws -> Bool
     
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
@@ -195,6 +198,16 @@ extension APIClient: DependencyKey {
                     policy: policy
                 )
             },
+            jumpForum: { request in
+                let command = ForumCommand.jump(data: ForumJumpRequest(
+                    type: request.transferType,
+                    postId: request.postId,
+                    allPosts: request.allPosts,
+                    topicId: request.topicId
+                ))
+                let response = try await api.get(command)
+                return try await parser.parseForumJump(response)
+            },
             getAnnouncement: { id in
                 let response = try await api.get(ForumCommand.announcement(linkId: id))
                 return try await parser.parseAnnouncement(response)
@@ -211,12 +224,16 @@ extension APIClient: DependencyKey {
             
             // MARK: - Favorites
             
-            getFavorites: { unreadFirst, offset, perPage, policy in
+            getFavorites: { request, policy in
                 fetch(
                     getCache: { await cache.getFavorites() },
                     setCache: { await cache.setFavorites($0) },
                     remote: {
-                        let command = MemberCommand.Favorites.list(unreadFirst: unreadFirst, offset: offset, perPage: perPage)
+                        let command = MemberCommand.Favorites.list(
+                            sort: request.transferSort,
+                            offset: request.offset,
+                            perPage: request.perPage
+                        )
                         let response = try await api.get(command)
                         let favorites = try await parser.parseFavorites(response)
                         await cache.setFavorites(favorites.favorites)
@@ -226,19 +243,29 @@ extension APIClient: DependencyKey {
                 )
             },
             setFavorite: { request in
-                // TODO: Make Command generic?
-                switch request.action {
-                case .add:
-                    let command = MemberCommand.Favorites.add(id: request.id, type: request.transferType)
-                    _ = try await api.get(command)
-                case .delete:
-                    let command = MemberCommand.Favorites.delete(id: request.id, type: request.transferType)
-                    _ = try await api.get(command)
-                }
-
-                // TODO: Check response statuses for toasts?
-                // let status = Int(response.getResponseStatus())!
-                // return status == 0
+                let command = MemberCommand.Favorites.modify(
+                    id: request.id,
+                    type: request.transferType,
+                    action: request.transferAction
+                )
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            notifyFavorite: { request in
+                let command = MemberCommand.Favorites.notify(
+                    id: request.id,
+                    flag: request.flag,
+                    new: request.transferType
+                )
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            readAllFavorites: {
+                let response = try await api.get(MemberCommand.Favorites.readAll)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Extra
@@ -317,6 +344,9 @@ extension APIClient: DependencyKey {
             getForum: { _, _, _, _ in
                 return .finished()
             },
+            jumpForum: { _ in
+                return .mock
+            },
             getAnnouncement: { _ in
                 return .mock
             },
@@ -326,11 +356,17 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
-            getFavorites: { _, _, _, _ in
+            getFavorites: { _, _ in
                 .finished()
             },
             setFavorite: { _ in
-                
+                return true
+            },
+            notifyFavorite: { _ in
+                return true
+            },
+            readAllFavorites: {
+                return true
             },
             getUnread: {
                 return .mock

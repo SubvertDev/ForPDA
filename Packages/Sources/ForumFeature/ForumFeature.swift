@@ -140,7 +140,7 @@ public struct ForumFeature: Reducer, Sendable {
                     guard let forum = state.forum else { return .none }
                     return .run { [id = state.forumId] send in
                         let request = SetFavoriteRequest(id: id, action: forum.isFavorite ? .delete : .add, type: .forum)
-                        try await apiClient.setFavorite(request)
+                        _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
                     }
                 

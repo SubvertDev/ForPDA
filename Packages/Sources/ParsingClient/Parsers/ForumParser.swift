@@ -46,6 +46,25 @@ public struct ForumParser {
         }
     }
     
+    public static func parseForumJump(from string: String) throws -> ForumJump {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                return ForumJump(
+                    id: array[2] as! Int,
+                    offset: array[3] as! Int,
+                    postId: array[4] as! Int,
+                    allPosts: array[5] as! Int == 1 ? true : false
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
     public static func parseAnnouncement(from string: String) throws -> Announcement {
         if let data = string.data(using: .utf8) {
             do {

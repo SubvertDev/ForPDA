@@ -51,7 +51,13 @@ public struct FavoritesScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        // TODO: Favorites display settings.
+                        // TODO: Sort shield
+                        
+                        Button {
+                            store.send(.contextMenu(.markAllAsRead))
+                        } label: {
+                            Image(systemSymbol: .checkmark)
+                        }
                         
                         Button {
                             store.send(.settingsButtonTapped)
@@ -63,6 +69,87 @@ public struct FavoritesScreen: View {
             }
             .onAppear {
                 store.send(.onAppear)
+            }
+        }
+    }
+    
+    // MARK: - Options Menu
+    
+    private func CommonContextMenu(favorite: FavoriteInfo) -> some View {
+        VStack(spacing: 0) {
+            Section {
+                ContextButton(
+                    text: favorite.isImportant ? "From Important" : "To Important",
+                    symbol: favorite.isImportant ? .heartFill : .heart,
+                    bundle: .module
+                ) {
+                    store.send(.commonContextMenu(
+                        .setImportant(favorite.topic.id, favorite.isImportant ? false : true),
+                        favorite.isForum
+                    ))
+                }
+            }
+            
+            Section {
+                // TODO: Copy link
+                
+                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                    store.send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
+                }
+            }
+        }
+    }
+    
+    private func TopicContextMenu(favorite: FavoriteInfo) -> some View {
+        VStack(spacing: 0) {
+            Section {
+                // TODO: jump to the topic end
+                
+                ContextButton(
+                    text: "Notify Hat Update",
+                    symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
+                    bundle: .module
+                ) {
+                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.topic.id, favorite.flag)))
+                }
+                
+                Menu {
+                    ContextButton(
+                        text: "Always",
+                        symbol: favorite.notify == .always ? .bellFill : .bell,
+                        bundle: .module
+                    ) {
+                        store.send(.topicContextMenu(.notify(favorite.topic.id, favorite.flag, .always)))
+                    }
+                    
+                    ContextButton(
+                        text: "Once",
+                        symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
+                        bundle: .module
+                    ) {
+                        store.send(.topicContextMenu(.notify(favorite.topic.id, favorite.flag, .once)))
+                    }
+                    
+                    ContextButton(
+                        text: "Do Not",
+                        symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
+                        bundle: .module
+                    ) {
+                        store.send(.topicContextMenu(.notify(favorite.topic.id, favorite.flag, .doNot)))
+                    }
+                } label: {
+                    // FIXME: Move to more good place.
+                    let icon: SFSymbol = switch favorite.notify {
+                    case .always: .bellFill
+                    case .once: .bellBadgeFill
+                    case .doNot: .bellSlashFill
+                    }
+                    
+                    HStack {
+                        Text("Notify Type", bundle: .module)
+                        Image(systemSymbol: icon)
+                    }
+                }
             }
         }
     }
@@ -91,6 +178,15 @@ public struct FavoritesScreen: View {
                             isForum: favorite.isForum
                         )
                     )
+                }
+                .contextMenu {
+                    if !favorite.isForum {
+                        TopicContextMenu(favorite: favorite)
+                    }
+                    
+                    Section {
+                        CommonContextMenu(favorite: favorite)
+                    }
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
