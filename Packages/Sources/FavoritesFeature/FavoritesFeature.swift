@@ -11,6 +11,7 @@ import PageNavigationFeature
 import APIClient
 import Models
 import TCAExtensions
+import PasteboardClient
 import NotificationCenterClient
 
 @Reducer
@@ -50,9 +51,9 @@ public struct FavoritesFeature: Reducer, Sendable {
         case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, isForum: Bool)
         
-        case contextMenu(FavoritesContextMenuAction)
+        case contextOptionMenu(FavoritesOptionContextMenuAction)
         case commonContextMenu(FavoriteContextMenuAction, Bool)
-        case topicContextMenu(FavoriteTopicContextMenuAction)
+        case topicContextMenu(FavoriteTopicContextMenuAction, Int)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -66,6 +67,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
     
     // MARK: - Body
@@ -103,7 +105,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .settingsButtonTapped, .favoriteTapped /*, .sort*/:
                 return .none
                 
-            case .contextMenu(let action):
+            case .contextOptionMenu(let action):
                 switch action {
                 case .sort:
                     //state.sort = SortFeature.State()
@@ -120,7 +122,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                 
             case .commonContextMenu(let action, let isForum):
                 switch action {
-                case .copyLink(let _/*id*/):
+                case .copyLink(let id):
+                    let show = isForum ? "showforum" : "showtopic"
+                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?\(show)=\(id)")
                     return .none
                     
                 case .delete(let id):
@@ -142,17 +146,17 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                 }
                 
-            case .topicContextMenu(let action):
+            case .topicContextMenu(let action, let id):
                 switch action {
                 case .goToEnd:
                     return .none
 
-                case .notifyHatUpdate(let id, let flag):
+                case .notifyHatUpdate(let flag):
                     return .run { [id = id, flag = flag] send in
-                        await send(.topicContextMenu(.notify(id, flag, .hatUpdate)))
+                        await send(.topicContextMenu(.notify(flag, .hatUpdate), id))
                     }
                     
-                case .notify(let id, let flag, let notify):
+                case .notify(let flag, let notify):
                     return .run { [id = id, flag = flag, type = notify] send in
                         let request = NotifyFavoriteRequest(id: id, flag: flag, type: type)
                         _ = try await apiClient.notifyFavorite(request)

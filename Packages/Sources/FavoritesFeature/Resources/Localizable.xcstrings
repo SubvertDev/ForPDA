@@ -34,6 +34,16 @@
         }
       }
     },
+    "Copy Link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копировать ссылку"
+          }
+        }
+      }
+    },
     "Delete" : {
       "localizations" : {
         "ru" : {
@@ -70,6 +80,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Убрать из важных"
+          }
+        }
+      }
+    },
+    "Go To End" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти в конец"
           }
         }
       }
@@ -120,6 +141,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Один раз"
+          }
+        }
+      }
+    },
+    "Read All" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прочитать все"
           }
         }
       }

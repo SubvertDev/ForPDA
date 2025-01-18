@@ -51,12 +51,18 @@ public struct FavoritesScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        // TODO: Sort shield
-                        
-                        Button {
-                            store.send(.contextMenu(.markAllAsRead))
+                        Menu {
+                            // TODO: Sort shield
+                            
+                            ContextButton(
+                                text: "Read All",
+                                symbol: .checkmarkCircle,
+                                bundle: .module
+                            ) {
+                                store.send(.contextOptionMenu(.markAllAsRead))
+                            }
                         } label: {
-                            Image(systemSymbol: .checkmark)
+                            Image(systemSymbol: .ellipsisCircle)
                         }
                         
                         Button {
@@ -91,7 +97,9 @@ public struct FavoritesScreen: View {
             }
             
             Section {
-                // TODO: Copy link
+                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                    store.send(.commonContextMenu(.copyLink(favorite.topic.id), favorite.isForum))
+                }
                 
                 ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
                     store.send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
@@ -110,7 +118,7 @@ public struct FavoritesScreen: View {
                     symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
                     bundle: .module
                 ) {
-                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.topic.id, favorite.flag)))
+                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite.topic.id))
                 }
                 
                 Menu {
@@ -119,7 +127,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .always ? .bellFill : .bell,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.topic.id, favorite.flag, .always)))
+                        store.send(.topicContextMenu(.notify(favorite.flag, .always), favorite.topic.id))
                     }
                     
                     ContextButton(
@@ -127,7 +135,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.topic.id, favorite.flag, .once)))
+                        store.send(.topicContextMenu(.notify(favorite.flag, .once), favorite.topic.id))
                     }
                     
                     ContextButton(
@@ -135,19 +143,12 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.topic.id, favorite.flag, .doNot)))
+                        store.send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite.topic.id))
                     }
                 } label: {
-                    // FIXME: Move to more good place.
-                    let icon: SFSymbol = switch favorite.notify {
-                    case .always: .bellFill
-                    case .once: .bellBadgeFill
-                    case .doNot: .bellSlashFill
-                    }
-                    
                     HStack {
                         Text("Notify Type", bundle: .module)
-                        Image(systemSymbol: icon)
+                        NotifyTypeIcon(type: favorite.notify)
                     }
                 }
             }
@@ -271,6 +272,19 @@ public struct FavoritesScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
         .frame(minHeight: 60)
+    }
+    
+    // MARK: - Notify Type Icon
+    
+    @ViewBuilder
+    private func NotifyTypeIcon(type: FavoriteInfo.Notify) -> some View {
+        let icon: SFSymbol = switch type {
+        case .always: .bellFill
+        case .once: .bellBadgeFill
+        case .doNot: .bellSlashFill
+        }
+
+        Image(systemSymbol: icon)
     }
     
     // MARK: - Header

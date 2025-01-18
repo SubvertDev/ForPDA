@@ -57,7 +57,9 @@ public struct ForumFeature: Reducer, Sendable {
         case subforumTapped(id: Int, name: String)
         case announcementTapped(id: Int, name: String)
         
-        case contextMenu(ForumContextMenuAction)
+        case contextOptionMenu(ForumOptionContextMenuAction)
+        case contextTopicMenu(ForumTopicContextMenuAction, Int)
+        case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -124,28 +126,49 @@ public struct ForumFeature: Reducer, Sendable {
             case .subforumRedirectTapped:
                 return .none
                 
-            case .contextMenu(let action):
+            case .contextOptionMenu(let action):
                 switch action {
+                // TODO: sort, to bookmarks
+                default: return .none
+                }
+                
+            case .contextTopicMenu(let action, let id):
+                switch action {
+                case .open:
+                    return .send(.topicTapped(id: id))
+                
+                case .goToEnd:
+                    return .none
+                }
+            
+            case .contextCommonMenu(let action, let id, let isForum):
+                switch action {
+                case .copyLink:
+                    let show = isForum ? "showforum" : "showtopic"
+                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?\(show)=\(id)")
+                    return .none
+                    
                 case .openInBrowser:
-                    guard let forum = state.forum else { return .none }
-                    let url = URL(string: "https://4pda.to/forum/index.php?showforum=\(forum.id)")!
+                    let show = isForum ? "showforum" : "showtopic"
+                    let url = URL(string: "https://4pda.to/forum/index.php?\(show)=\(id)")!
                     return .run { _ in await open(url: url) }
                     
-                case .copyLink:
-                    guard let forum = state.forum else { return .none }
-                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?showforum=\(forum.id)")
-                    return .none
-                
-                case .setFavorite:
-                    guard let forum = state.forum else { return .none }
-                    return .run { [id = state.forumId] send in
-                        let request = SetFavoriteRequest(id: id, action: forum.isFavorite ? .delete : .add, type: .forum)
+                case .markRead:
+                    return .run { [id = id, isForum = isForum] send in
+                        _ = try await apiClient.markReadForum(id: id, isTopic: !isForum)
+                        // TODO: Display toast on success/error.
+                    }
+                    
+                case .setFavorite(let isFavorite):
+                    return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in
+                        let request = SetFavoriteRequest(
+                            id: id,
+                            action: isFavorite ? .delete : .add,
+                            type: isForum ? .forum : .topic
+                        )
                         _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
                     }
-                
-                // TODO: sort, to bookmarks
-                default: return .none
                 }
                 
             case let ._forumResponse(.success(forum)):

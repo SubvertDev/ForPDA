@@ -9,6 +9,6 @@ import Models
 
 public enum FavoriteTopicContextMenuAction {
     case goToEnd
-    case notify(Int, Int, FavoriteNotifyType)
-    case notifyHatUpdate(Int, Int)
+    case notify(Int, FavoriteNotifyType)
+    case notifyHatUpdate(Int)
 }

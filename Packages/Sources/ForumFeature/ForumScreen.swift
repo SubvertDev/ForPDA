@@ -71,23 +71,13 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func OptionsMenu() -> some View {
         Menu {
-            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
-                store.send(.contextMenu(.copyLink))
-            }
-            ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
-                store.send(.contextMenu(.openInBrowser))
-            }
-            
             if let forum = store.forum {
-                Section {
-                    ContextButton(
-                        text: forum.isFavorite ? "Remove from favorites" : "Add to favorites",
-                        symbol: forum.isFavorite ? .starFill : .star,
-                        bundle: .module
-                    ) {
-                        store.send(.contextMenu(.setFavorite))
-                    }
-                }
+                CommonContextMenu(
+                    id: forum.id,
+                    isFavorite: forum.isFavorite,
+                    isUnread: false,
+                    isForum: true
+                )
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
@@ -105,6 +95,13 @@ public struct ForumScreen: View {
                 Row(title: topic.name, lastPost: topic.lastPost, closed: topic.isClosed, unread: topic.isUnread) {
                     store.send(.topicTapped(id: topic.id))
                 }
+                .contextMenu {
+                    TopicContextMenu(topicId: topic.id)
+                    
+                    Section {
+                        CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                    }
+                }
                 .listRowBackground(
                     Color.Background.teritary
                         .clipShape(.rect(
@@ -121,6 +118,23 @@ public struct ForumScreen: View {
             Header(title: pinned ? "Pinned topics" : "Topics")
         }
         .listRowBackground(Color.Background.teritary)
+    }
+    
+    // MARK: - Topic Context Menu
+    
+    @ViewBuilder
+    private func TopicContextMenu(topicId: Int) -> some View {
+        Section {
+            ContextButton(text: "Open", symbol: .eye, bundle: .module) {
+                store.send(.contextTopicMenu(.open, topicId))
+            }
+            
+//            Section {
+//                ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
+//                    store.send(.contextTopicMenu(.goToEnd, topicId))
+//                }
+//            }
+        }
     }
     
     // MARK: - Navigation
@@ -147,6 +161,16 @@ public struct ForumScreen: View {
                         store.send(.subforumTapped(id: forum.id, name: forum.name))
                     }
                 }
+                .contextMenu {
+                    Section {
+                        CommonContextMenu(
+                            id: forum.id,
+                            isFavorite:forum.isFavorite,
+                            isUnread: forum.isUnread,
+                            isForum: true
+                        )
+                    }
+                }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         } header: {
@@ -170,6 +194,33 @@ public struct ForumScreen: View {
             Header(title: "Announcements")
         }
         .listRowBackground(Color.Background.teritary)
+    }
+    
+    @ViewBuilder
+    private func CommonContextMenu(id: Int, isFavorite: Bool, isUnread: Bool, isForum: Bool) -> some View {
+        ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+            store.send(.contextCommonMenu(.copyLink, id, isForum))
+        }
+        
+        ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
+            store.send(.contextCommonMenu(.openInBrowser, id, isForum))
+        }
+        
+        if isUnread {
+            ContextButton(text: "Mark Read", symbol: .checkmarkCircle, bundle: .module) {
+                store.send(.contextCommonMenu(.markRead, id, isForum))
+            }
+        }
+        
+        Section {
+            ContextButton(
+                text: isFavorite ? "Remove from favorites" : "Add to favorites",
+                symbol: isFavorite ? .starFill : .star,
+                bundle: .module
+            ) {
+                store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+            }
+        }
     }
     
     // MARK: - Row
