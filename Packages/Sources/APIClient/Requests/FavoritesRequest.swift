@@ -10,27 +10,32 @@ import PDAPI
 import Models
 
 public struct FavoritesRequest: Sendable {
-    public let sort: [FavoriteSortType]
     public let offset: Int
     public let perPage: Int
+    public let isSortByName: Bool
+    public let isSortReverse: Bool
+    public let isUnreadFirst: Bool
     
     nonisolated(unsafe) public var transferSort: [MemberCommand.Favorites.Sort] {
-        return sort.compactMap { type in
-            switch type {
-            case .byName:      return .byName
-            case .reverse:     return .reverse
-            case .unreadFirst: return .unreadFirst
-            }
-        }
+        return [
+            isSortByName  ? .byName : nil,
+            isSortReverse ? .reverse : nil,
+            isUnreadFirst ? .unreadFirst : nil,
+        ]
+        .compactMap { $0 }
     }
     
     public init(
-        sort: [FavoriteSortType],
         offset: Int,
-        perPage: Int
+        perPage: Int,
+        isSortByName: Bool,
+        isSortReverse: Bool,
+        isUnreadFirst: Bool
     ) {
-        self.sort = sort
         self.offset = offset
         self.perPage = perPage
+        self.isUnreadFirst = isUnreadFirst
+        self.isSortByName = isSortByName
+        self.isSortReverse = isSortReverse
     }
 }

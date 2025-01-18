@@ -52,7 +52,13 @@ public struct FavoritesScreen: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
                         Menu {
-                            // TODO: Sort shield
+                            ContextButton(
+                                text: "Sort",
+                                symbol: .line3HorizontalDecrease,
+                                bundle: .module
+                            ) {
+                                store.send(.contextOptionMenu(.sort))
+                            }
                             
                             ContextButton(
                                 text: "Read All",
@@ -71,6 +77,13 @@ public struct FavoritesScreen: View {
                             Image(systemSymbol: .gearshape)
                         }
                     }
+                }
+            }
+            .sheet(
+                item: $store.scope(state: \.sort, action: \.sort)
+            ) { sortStore in
+                NavigationStack {
+                    SortView(store: sortStore)
                 }
             }
             .onAppear {

@@ -24,7 +24,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
-        //@Presents var sort: SortFeature.State?
+        @Presents var sort: SortFeature.State?
         
         public var favorites: [FavoriteInfo] = []
         public var favoritesImportant: [FavoriteInfo] = []
@@ -57,7 +57,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case pageNavigation(PageNavigationFeature.Action)
         
-        //case sort(PresentationAction<SortFeature.Action>)
+        case sort(PresentationAction<SortFeature.Action>)
         
         case _favoritesResponse(Result<[FavoriteInfo], any Error>)
         
@@ -99,16 +99,26 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadFavorites(offset: newOffset))
                 
+            case .sort(.presented(.saveButtonTapped)):
+                return .run { send in
+                    await send(.onRefresh)
+                    await send(.sort(.presented(.cancelButtonTapped)))
+                }
+                
+            case .sort(.presented(.cancelButtonTapped)):
+                state.sort = nil
+                return .none
+                
             case .pageNavigation:
                 return .none
                 
-            case .settingsButtonTapped, .favoriteTapped /*, .sort*/:
+            case .settingsButtonTapped, .favoriteTapped, .sort:
                 return .none
                 
             case .contextOptionMenu(let action):
                 switch action {
                 case .sort:
-                    //state.sort = SortFeature.State()
+                    state.sort = SortFeature.State()
                     return .none
                     
                 case .markAllAsRead:
@@ -170,11 +180,21 @@ public struct FavoritesFeature: Reducer, Sendable {
                 if !state.isRefreshing {
                     state.isLoading = true
                 }
-                return .run { [perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
+                return .run { [
+                    perPage = state.appSettings.forumPerPage,
+                    favoritesSettings = state.appSettings.favorites,
+                    isRefreshing = state.isRefreshing
+                ] send in
                     let startTime = Date()
                     for try await favorites in try await apiClient.getFavorites(
-                        request: FavoritesRequest(sort: [], offset: offset, perPage: perPage),
-                        policy: isRefreshing ? .skipCache : .cacheAndLoad
+                        request: FavoritesRequest(
+                            offset: offset,
+                            perPage: perPage,
+                            isSortByName: favoritesSettings.isSortByName,
+                            isSortReverse: favoritesSettings.isReverseOrder,
+                            isUnreadFirst: favoritesSettings.isUnreadFirst
+                        ),
+                        policy: isRefreshing ? .cacheAndLoad : .cacheAndLoad
                     ) {
                         if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
                         await send(._favoritesResponse(.success(favorites)))
@@ -195,8 +215,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                 }
                 
-                state.favoritesImportant = favsImportant.sorted(by: { $0.topic.lastPost.date > $1.topic.lastPost.date })
-                state.favorites = favorites.sorted(by: { $0.topic.lastPost.date > $1.topic.lastPost.date })
+                state.favoritesImportant = favsImportant
+                state.favorites = favorites
                 
                 // TODO: Is it ok?
                 state.pageNavigation.count = response.count
@@ -211,8 +231,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .none
             }
         }
-//        .ifLet(\.$sort, action: \.sort) {
-//            SortFeature()
-//        }
+        .ifLet(\.$sort, action: \.sort) {
+            SortFeature()
+        }
     }
 }
