@@ -58,7 +58,7 @@ let package = Package(
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.12.0"),
-        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.2.0"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.3.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
         .package(url: "https://github.com/exyte/Chat.git", from: "2.0.10")
     ],
