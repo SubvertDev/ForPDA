@@ -28,7 +28,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         
         let type: PageNavigationType
         public var count: Int = 0
-        var offset: Int = 0
+        public var offset: Int = 0
         var perPage: Int
         public var shouldShow: Bool {
             return count > perPage

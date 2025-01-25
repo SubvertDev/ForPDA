@@ -32,7 +32,6 @@
       }
     },
     "Go To End" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

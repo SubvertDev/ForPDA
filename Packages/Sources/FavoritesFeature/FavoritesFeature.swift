@@ -49,7 +49,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         case onAppear
         case onRefresh
         case settingsButtonTapped
-        case favoriteTapped(id: Int, name: String, isForum: Bool)
+        case favoriteTapped(id: Int, name: String, offset: Int, isForum: Bool)
         
         case contextOptionMenu(FavoritesOptionContextMenuAction)
         case commonContextMenu(FavoriteContextMenuAction, Bool)
@@ -92,8 +92,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                 
             case .onRefresh:
                 state.isRefreshing = true
-                return .run { send in
-                    await send(._loadFavorites(offset: 0))
+                return .run { [offset = state.pageNavigation.offset] send in
+                    await send(._loadFavorites(offset: offset))
                 }
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
@@ -159,7 +159,13 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .topicContextMenu(let action, let id):
                 switch action {
                 case .goToEnd:
-                    return .none
+                    return .run { [id = id] send in
+                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .last)
+                        let response = try await apiClient.jumpForum(request: request)
+                        
+                        await send(.onRefresh)
+                        await send(.favoriteTapped(id: id, name: "", offset: response.offset, isForum: false))
+                    }
 
                 case .notifyHatUpdate(let flag):
                     return .run { [id = id, flag = flag] send in

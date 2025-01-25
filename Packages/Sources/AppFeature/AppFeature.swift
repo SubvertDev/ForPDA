@@ -446,10 +446,10 @@ public struct AppFeature: Reducer, Sendable {
                 state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
 
-            case .favorites(.favoriteTapped(let id, let name, let isForum)):
+            case .favorites(.favoriteTapped(let id, let name, let offset, let isForum)):
                 let forumPath: FavoritesPath.State = isForum
                     ? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
-                    : .forumPath(.topic(TopicFeature.State(topicId: id)))
+                    : .forumPath(.topic(TopicFeature.State(topicId: id, offset: offset)))
                 state.favoritesPath.append(forumPath)
                 return .none
                 
@@ -460,8 +460,8 @@ public struct AppFeature: Reducer, Sendable {
             case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.userAvatarTapped(userId: userId))))):
                 state.favoritesPath.append(.forumPath(.profile(ProfileFeature.State(userId: userId))))
                 
-            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id))))):
-                state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
+            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id, offset: offset))))):
+                state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id, offset: offset))))
                 
             case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.announcementTapped(id: id, name: name))))):
                 state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: name))))
@@ -507,8 +507,8 @@ public struct AppFeature: Reducer, Sendable {
                 state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: name)))
                 return .none
                 
-            case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id)))):
-                state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
+            case let .forumPath(.element(id: _, action: .forum(.topicTapped(id: id, offset: offset)))):
+                state.forumPath.append(.topic(TopicFeature.State(topicId: id, offset: offset)))
                 return .none
                 
             case let .forumPath(.element(id: _, action: .topic(.userAvatarTapped(userId: userId)))):

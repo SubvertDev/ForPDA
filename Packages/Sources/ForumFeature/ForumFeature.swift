@@ -52,7 +52,7 @@ public struct ForumFeature: Reducer, Sendable {
         case onAppear
         case onRefresh
         case settingsButtonTapped
-        case topicTapped(id: Int)
+        case topicTapped(id: Int, offset: Int)
         case subforumRedirectTapped(URL)
         case subforumTapped(id: Int, name: String)
         case announcementTapped(id: Int, name: String)
@@ -87,8 +87,8 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .onRefresh:
                 state.isRefreshing = true
-                return .run { send in
-                    await send(._loadForum(offset: 0))
+                return .run { [offset = state.pageNavigation.offset] send in
+                    await send(._loadForum(offset: offset))
                 }
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
@@ -135,10 +135,16 @@ public struct ForumFeature: Reducer, Sendable {
             case .contextTopicMenu(let action, let id):
                 switch action {
                 case .open:
-                    return .send(.topicTapped(id: id))
+                    return .send(.topicTapped(id: id, offset: 0))
                 
                 case .goToEnd:
-                    return .none
+                    return .run { [id = id] send in
+                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .last)
+                        let response = try await apiClient.jumpForum(request: request)
+                        
+                        await send(.onRefresh)
+                        await send(.topicTapped(id: id, offset: response.offset))
+                    }
                 }
             
             case .contextCommonMenu(let action, let id, let isForum):

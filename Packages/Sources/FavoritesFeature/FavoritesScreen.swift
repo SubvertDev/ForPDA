@@ -124,7 +124,13 @@ public struct FavoritesScreen: View {
     private func TopicContextMenu(favorite: FavoriteInfo) -> some View {
         VStack(spacing: 0) {
             Section {
-                // TODO: jump to the topic end
+                ContextButton(
+                    text: "Go To End",
+                    symbol: .chevronRight2,
+                    bundle: .module
+                ) {
+                    store.send(.topicContextMenu(.goToEnd, favorite.topic.id))
+                }
                 
                 ContextButton(
                     text: "Notify Hat Update",
@@ -189,6 +195,7 @@ public struct FavoritesScreen: View {
                         .favoriteTapped(
                             id: favorite.topic.id,
                             name: favorite.topic.name,
+                            offset: 0,
                             isForum: favorite.isForum
                         )
                     )

@@ -93,7 +93,7 @@ public struct ForumScreen: View {
             
             ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
                 Row(title: topic.name, lastPost: topic.lastPost, closed: topic.isClosed, unread: topic.isUnread) {
-                    store.send(.topicTapped(id: topic.id))
+                    store.send(.topicTapped(id: topic.id, offset: 0))
                 }
                 .contextMenu {
                     TopicContextMenu(topicId: topic.id)
@@ -129,11 +129,11 @@ public struct ForumScreen: View {
                 store.send(.contextTopicMenu(.open, topicId))
             }
             
-//            Section {
-//                ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
-//                    store.send(.contextTopicMenu(.goToEnd, topicId))
-//                }
-//            }
+            Section {
+                ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
+                    store.send(.contextTopicMenu(.goToEnd, topicId))
+                }
+            }
         }
     }
     
