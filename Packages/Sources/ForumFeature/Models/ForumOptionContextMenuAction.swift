@@ -5,10 +5,7 @@
 //  Created by Xialtal on 20.12.24.
 //
 
-public enum ForumContextMenuAction {
-    case copyLink
+public enum ForumOptionContextMenuAction {
     case sort
-    case openInBrowser
     case toBookmarks
-    case setFavorite
 }

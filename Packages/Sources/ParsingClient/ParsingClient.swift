@@ -30,6 +30,7 @@ public struct ParsingClient: Sendable {
     
     // Forum
     public var parseForumsList: @Sendable (_ response: String) async throws -> [ForumInfo]
+    public var parseForumJump: @Sendable (_ response: String) async throws -> ForumJump
     public var parseForum: @Sendable (_ response: String) async throws -> Forum
     public var parseTopic: @Sendable (_ response: String) async throws -> Topic
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
@@ -75,6 +76,9 @@ extension ParsingClient: DependencyKey {
         },
         parseForumsList: { response in
             return try ForumParser.parseForumList(from: response)
+        },
+        parseForumJump: { response in
+            return try ForumParser.parseForumJump(from: response)
         },
         parseForum: { response in
             return try ForumParser.parse(from: response)

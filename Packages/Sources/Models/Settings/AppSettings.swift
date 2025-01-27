@@ -24,6 +24,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var backgroundTheme: BackgroundTheme
     public var appTintColor: AppTintColor
     public var notifications: NotificationsSettings
+    public var favorites: FavoritesSettings
     public var forumPerPage: Int
     public var topicPerPage: Int
     public var historyPerPage: Int
@@ -40,6 +41,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         backgroundTheme: BackgroundTheme,
         appTintColor: AppTintColor,
         notifications: NotificationsSettings,
+        favorites: FavoritesSettings,
         forumPerPage: Int,
         topicPerPage: Int,
         historyPerPage: Int,
@@ -55,6 +57,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.backgroundTheme = backgroundTheme
         self.appTintColor = appTintColor
         self.notifications = notifications
+        self.favorites = favorites
         self.forumPerPage = forumPerPage
         self.topicPerPage = topicPerPage
         self.historyPerPage = historyPerPage
@@ -73,6 +76,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
         self.notifications = try container.decodeIfPresent(NotificationsSettings.self, forKey: .notifications) ?? AppSettings.default.notifications
+        self.favorites = try container.decodeIfPresent(FavoritesSettings.self, forKey: .favorites) ?? AppSettings.default.favorites
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
         self.historyPerPage = try container.decodeIfPresent(Int.self, forKey: .historyPerPage) ?? AppSettings.default.historyPerPage
@@ -92,6 +96,7 @@ public extension AppSettings {
         backgroundTheme: .blue,
         appTintColor: .primary,
         notifications: .default,
+        favorites: .default,
         forumPerPage: 30,
         topicPerPage: 20,
         historyPerPage: 20,

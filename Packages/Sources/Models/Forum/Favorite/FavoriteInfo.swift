@@ -18,8 +18,8 @@ public struct FavoriteInfo: Codable, Hashable, Sendable {
     
     public var notify: Notify {
         return switch (flag & 3) {
-            case 0: .doNot
-            case 2: .once
+            case 2: .doNot
+            case 1: .once
             default: .always
         }
     }
@@ -29,7 +29,7 @@ public struct FavoriteInfo: Codable, Hashable, Sendable {
     }
     
     public var isNotifyHatUpdate: Bool {
-        return ((flag & 3) & 4) > 0
+        return (flag & 4) > 0
     }
     
     public init(
@@ -45,7 +45,7 @@ public struct FavoriteInfo: Codable, Hashable, Sendable {
 
 public extension FavoriteInfo {
     static let mock = FavoriteInfo(
-        flag: 73,
+        flag: 0,
         topic: .mockToday,
         isForum: false
     )

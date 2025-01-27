@@ -28,6 +28,7 @@ public struct TopicFeature: Reducer, Sendable {
         @Shared(.appSettings) var appSettings: AppSettings
 
         public let topicId: Int
+        public var offset: Int
         var topic: Topic?
         
         var types: [[TopicTypeUI]] = []
@@ -39,9 +40,11 @@ public struct TopicFeature: Reducer, Sendable {
         
         public init(
             topicId: Int,
+            offset: Int = 0,
             topic: Topic? = nil
         ) {
             self.topicId = topicId
+            self.offset = offset
             self.topic = topic
         }
     }
@@ -85,7 +88,7 @@ public struct TopicFeature: Reducer, Sendable {
             switch action {
             case .onTask:
                 guard state.topic == nil else { return .none }
-                return .send(._loadTopic(offset: 0))
+                return .send(.pageNavigation(.offsetChanged(to: state.offset)))
                 
             case .userAvatarTapped:
                 // TODO: Wrap into Delegate action?
@@ -96,10 +99,13 @@ public struct TopicFeature: Reducer, Sendable {
                 return .none
 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
+                state.offset = if newOffset == 0 { newOffset } else {
+                    (newOffset + 1) - state.appSettings.topicPerPage
+                }
                 state.isFirstPage = newOffset == 0
                 return .concatenate([
                     .cancel(id: CancelID.loading),
-                    .send(._loadTopic(offset: newOffset))
+                    .send(._loadTopic(offset: state.offset))
                 ])
                 
             case .pageNavigation:
@@ -143,11 +149,14 @@ public struct TopicFeature: Reducer, Sendable {
                 .cancellable(id: CancelID.loading)
                 
             case let ._topicResponse(.success(topic)):
-                customDump(topic)
+                //customDump(topic)
                 state.topic = topic
                 
-                // TODO: Is it ok?
+                // FIXME: Quickfix for good pagination.
                 state.pageNavigation.count = topic.postsCount
+                state.pageNavigation.offset = if state.offset == 0 { 0 } else {
+                    (state.offset - 1) + state.appSettings.topicPerPage
+                }
                 
                 return .run { send in
                     var topicTypes: [[TopicTypeUI]] = []

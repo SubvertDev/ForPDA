@@ -51,7 +51,25 @@ public struct FavoritesScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        // TODO: Favorites display settings.
+                        Menu {
+                            ContextButton(
+                                text: "Sort",
+                                symbol: .line3HorizontalDecrease,
+                                bundle: .module
+                            ) {
+                                store.send(.contextOptionMenu(.sort))
+                            }
+                            
+                            ContextButton(
+                                text: "Read All",
+                                symbol: .checkmarkCircle,
+                                bundle: .module
+                            ) {
+                                store.send(.contextOptionMenu(.markAllAsRead))
+                            }
+                        } label: {
+                            Image(systemSymbol: .ellipsisCircle)
+                        }
                         
                         Button {
                             store.send(.settingsButtonTapped)
@@ -61,8 +79,97 @@ public struct FavoritesScreen: View {
                     }
                 }
             }
+            .sheet(
+                item: $store.scope(state: \.sort, action: \.sort)
+            ) { sortStore in
+                NavigationStack {
+                    SortView(store: sortStore)
+                }
+            }
             .onAppear {
                 store.send(.onAppear)
+            }
+        }
+    }
+    
+    // MARK: - Options Menu
+    
+    private func CommonContextMenu(favorite: FavoriteInfo) -> some View {
+        VStack(spacing: 0) {
+            Section {
+                ContextButton(
+                    text: favorite.isImportant ? "From Important" : "To Important",
+                    symbol: favorite.isImportant ? .heartFill : .heart,
+                    bundle: .module
+                ) {
+                    store.send(.commonContextMenu(
+                        .setImportant(favorite.topic.id, favorite.isImportant ? false : true),
+                        favorite.isForum
+                    ))
+                }
+            }
+            
+            Section {
+                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                    store.send(.commonContextMenu(.copyLink(favorite.topic.id), favorite.isForum))
+                }
+                
+                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                    store.send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
+                }
+            }
+        }
+    }
+    
+    private func TopicContextMenu(favorite: FavoriteInfo) -> some View {
+        VStack(spacing: 0) {
+            Section {
+                ContextButton(
+                    text: "Go To End",
+                    symbol: .chevronRight2,
+                    bundle: .module
+                ) {
+                    store.send(.topicContextMenu(.goToEnd, favorite.topic.id))
+                }
+                
+                ContextButton(
+                    text: "Notify Hat Update",
+                    symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
+                    bundle: .module
+                ) {
+                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite.topic.id))
+                }
+                
+                Menu {
+                    ContextButton(
+                        text: "Always",
+                        symbol: favorite.notify == .always ? .bellFill : .bell,
+                        bundle: .module
+                    ) {
+                        store.send(.topicContextMenu(.notify(favorite.flag, .always), favorite.topic.id))
+                    }
+                    
+                    ContextButton(
+                        text: "Once",
+                        symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
+                        bundle: .module
+                    ) {
+                        store.send(.topicContextMenu(.notify(favorite.flag, .once), favorite.topic.id))
+                    }
+                    
+                    ContextButton(
+                        text: "Do Not",
+                        symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
+                        bundle: .module
+                    ) {
+                        store.send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite.topic.id))
+                    }
+                } label: {
+                    HStack {
+                        Text("Notify Type", bundle: .module)
+                        NotifyTypeIcon(type: favorite.notify)
+                    }
+                }
             }
         }
     }
@@ -88,9 +195,19 @@ public struct FavoritesScreen: View {
                         .favoriteTapped(
                             id: favorite.topic.id,
                             name: favorite.topic.name,
+                            offset: 0,
                             isForum: favorite.isForum
                         )
                     )
+                }
+                .contextMenu {
+                    if !favorite.isForum {
+                        TopicContextMenu(favorite: favorite)
+                    }
+                    
+                    Section {
+                        CommonContextMenu(favorite: favorite)
+                    }
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -175,6 +292,19 @@ public struct FavoritesScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
         .frame(minHeight: 60)
+    }
+    
+    // MARK: - Notify Type Icon
+    
+    @ViewBuilder
+    private func NotifyTypeIcon(type: FavoriteInfo.Notify) -> some View {
+        let icon: SFSymbol = switch type {
+        case .always: .bellFill
+        case .once: .bellBadgeFill
+        case .doNot: .bellSlashFill
+        }
+
+        Image(systemSymbol: icon)
     }
     
     // MARK: - Header

@@ -13,6 +13,15 @@ public struct SetFavoriteRequest: Sendable {
     public let action: ActionType
     public let type: RequestType
     
+    nonisolated(unsafe) public var transferAction: MemberCommand.Favorites.Action {
+        switch action {
+        case .add: return .add
+        case .pin: return .pin
+        case .delete: return .delete
+        case .unpin: return .unpin
+        }
+    }
+    
     nonisolated(unsafe) public var transferType: MemberCommand.Favorites.Element {
         switch type {
         case .forum: return .forum
@@ -32,7 +41,9 @@ public struct SetFavoriteRequest: Sendable {
     
     public enum ActionType: Sendable {
         case add
+        case pin
         case delete
+        case unpin
     }
     
     public enum RequestType: Sendable {
