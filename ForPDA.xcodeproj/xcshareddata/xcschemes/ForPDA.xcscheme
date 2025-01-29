@@ -1,28 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1600"
-   version = "1.7">
+   LastUpgradeVersion = "1010"
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <PreActions>
-         <ExecutionAction
-            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
-            <ActionContent
-               title = "Generate build phase file lists"
-               scriptText = "cd $SOURCE_ROOT&#10;${SOURCE_ROOT}/Scripts/swiftlint_helper.sh&#10;">
-               <EnvironmentBuildable>
-                  <BuildableReference
-                     BuildableIdentifier = "primary"
-                     BlueprintIdentifier = "B8D351F4293CABB6008A84EA"
-                     BuildableName = "ForPDA.app"
-                     BlueprintName = "ForPDA"
-                     ReferencedContainer = "container:ForPDA.xcodeproj">
-                  </BuildableReference>
-               </EnvironmentBuildable>
-            </ActionContent>
-         </ExecutionAction>
-      </PreActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -32,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B8D351F4293CABB6008A84EA"
+               BlueprintIdentifier = "27F1F3441DA67D01CC3577BA"
                BuildableName = "ForPDA.app"
                BlueprintName = "ForPDA"
                ReferencedContainer = "container:ForPDA.xcodeproj">
@@ -48,10 +30,10 @@
       <Testables>
          <TestableReference
             skipped = "NO"
-            parallelizable = "YES">
+            parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B8F056C72B1F561200F1B324"
+               BlueprintIdentifier = "4B377D1CD1E489B09C77E2D1"
                BuildableName = "ForPDATests.xctest"
                BlueprintName = "ForPDATests"
                ReferencedContainer = "container:ForPDA.xcodeproj">
@@ -73,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B8D351F4293CABB6008A84EA"
+            BlueprintIdentifier = "27F1F3441DA67D01CC3577BA"
             BuildableName = "ForPDA.app"
             BlueprintName = "ForPDA"
             ReferencedContainer = "container:ForPDA.xcodeproj">
@@ -90,7 +72,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B8D351F4293CABB6008A84EA"
+            BlueprintIdentifier = "27F1F3441DA67D01CC3577BA"
             BuildableName = "ForPDA.app"
             BlueprintName = "ForPDA"
             ReferencedContainer = "container:ForPDA.xcodeproj">

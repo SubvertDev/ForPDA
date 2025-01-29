@@ -1,12 +1,26 @@
-## CUSTOM
-
+# Custom
+Credentials.json
 Secrets.swift
 *.p8
-Credentials.json
-build/
 Scripts/build_phases/
 SourcePackages/
 .swiftpm
+
+## App packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# fastlane
+# It is recommended to not store the screenshots in the git repo.
+# Instead, use fastlane to re-generate the screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://docs.fastlane.tools/best-practices/source-control/#source-control
+
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
 
 ### macOS ###
 # General
@@ -14,7 +28,7 @@ SourcePackages/
 .AppleDouble
 .LSOverride
 
-# Icon must end with two \r
+# Icon must end with two
 Icon
 
 # Thumbnails
@@ -36,11 +50,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-### macOS Patch ###
-# iCloud generated files
-*.icloud
-
-### Swift ###
+### Xcode ###
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
@@ -48,97 +58,14 @@ Temporary Items
 ## User settings
 xcuserdata/
 
-## Obj-C/Swift specific
-*.hmap
+## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
+*.xcscmblueprint
+*.xccheckout
 
-## App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-## Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Swift Package Manager
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
-# Package.resolved
-# *.xcodeproj
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
-# hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
-
-.build/
-
-# fastlane
-# It is recommended to not store the screenshots in the git repo.
-# Instead, use fastlane to re-generate the screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/#source-control
-
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/test_output
-
-### Xcode ###
-
-## Xcode 8 and earlier
-
-### Xcode Patch ###
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcodeproj/project.xcworkspace/
-!*.xcworkspace/contents.xcworkspacedata
-/*.gcno
-**/xcshareddata/WorkspaceSettings.xcsettings
-
-# Fastlane
-
-*.gem
-*.rbc
-/.config
-coverage/
-/InstalledFiles
-/pkg/
-/spec/reports/
-/test/tmp/
-/test/version_tmp/
-/tmp/
-rspec_logs.json
-test_output/
-.DS_STORE
-.DS_Store
-.keys
-*.swp
-
-## Environment normalisation:
-/.bundle/
-/lib/bundler/man/
-
-# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
-.rvmrc
-
-# fastlane specific
-/*.itmsp
-.idea
-.rakeTasks
-spec/fixtures/*.itmsp/*.png
-/integration
-**/report.xml
-**/.bundle
-fastlane/lib/fastlane/plugins/template/.rubocop.yml
-snapshot/example/fastlane/README.md
-snapshot/example/fastlane/screenshots
-fastlane/FastlaneRunner
-fastlane/swift/FastlaneRunner
-vendor
-
-# iOS specific ignores, used in sample projects inside the repo
-DerivedData
+## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
+build/
+DerivedData/
+*.moved-aside
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -147,10 +74,21 @@ DerivedData
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-xcuserdata/
-*.moved-aside
-*.xccheckout
-*.xcscmblueprint
 
-# Dotenv
-.env
+### Xcode Patch ###
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+/*.gcno
+
+### Projects ###
+*.xcodeproj
+*.xcworkspace
+
+### Tuist derived files ###
+graph.dot
+Derived/
+
+### Tuist managed dependencies ###
+Tuist/.build
