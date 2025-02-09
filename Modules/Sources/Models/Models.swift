@@ -9,7 +9,6 @@ import SwiftUI
 
 struct Models { }
 
-public extension Color {
-    // TODO: Change back to doNotDeleteMe
-    static let doNotDeleteMe = Color.white
+public extension Bundle {
+    static let models = Bundle.module
 }

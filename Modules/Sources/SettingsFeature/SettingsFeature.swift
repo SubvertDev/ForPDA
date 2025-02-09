@@ -37,8 +37,6 @@ public struct SettingsFeature: Reducer, Sendable {
         public var appColorScheme: AppColorScheme
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
-        public var animateIcon: Bool
-        public var animateIconOnMainThread: Bool
         
         public var appVersionAndBuild: String {
             let info = Bundle.main.infoDictionary
@@ -65,8 +63,6 @@ public struct SettingsFeature: Reducer, Sendable {
             self.appColorScheme = _appSettings.appColorScheme.wrappedValue
             self.backgroundTheme = _appSettings.backgroundTheme.wrappedValue
             self.appTintColor = _appSettings.appTintColor.wrappedValue
-            self.animateIcon = _appSettings.animateIcon.wrappedValue
-            self.animateIconOnMainThread = _appSettings.animateIconOnMainThread.wrappedValue
         }
     }
     
@@ -206,14 +202,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 
             case .binding(\.startPage):
                 state.$appSettings.withLock { $0.startPage = state.startPage }
-                return .none
-                
-            case .binding(\.animateIcon):
-                state.$appSettings.withLock { $0.animateIcon = state.animateIcon }
-                return .none
-                
-            case .binding(\.animateIconOnMainThread):
-                state.$appSettings.withLock { $0.animateIconOnMainThread = state.animateIconOnMainThread }
                 return .none
                 
             case .destination, .binding:

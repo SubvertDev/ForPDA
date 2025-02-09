@@ -120,14 +120,14 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .copyLink:
                     guard let topic = state.topic else { return .none }
-                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)")
                     return .none
                     
                 case .setFavorite:
                     guard let topic = state.topic else { return .none }
                     return .run { [id = state.topicId] send in
                         let request = SetFavoriteRequest(id: id, action: topic.isFavorite ? .delete : .add, type: .topic)
-                        try await apiClient.setFavorite(request)
+                        _ = try await apiClient.setFavorite(request)
                         await send(._setFavoriteResponse(!topic.isFavorite))
                         
                         // TODO: Display toast on success/error.

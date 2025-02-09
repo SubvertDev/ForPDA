@@ -45,25 +45,25 @@ platform :ios do
         build = sh("git rev-list --all --count").chomp.strip
         
         # Updating build number in all targets
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'ForPDA'
-        )
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'OpenInAppExtension'
-        )
+        #increment_build_number_in_xcodeproj(
+        #    build_number: build,
+        #    target: 'ForPDA'
+        #)
+        #increment_build_number_in_xcodeproj(
+        #    build_number: build,
+        #    target: 'OpenInAppExtension'
+        #)
         
         # If version is not specified when calling this lane then use current one instead
         version = options.fetch(:version, get_version_number_from_xcodeproj)
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'ForPDA'
-        )
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'OpenInAppExtension'
-        )
+        #increment_version_number_in_xcodeproj(
+        #    version_number: version,
+        #    target: 'ForPDA'
+        #)
+        #increment_version_number_in_xcodeproj(
+        #    version_number: version,
+        #    target: 'OpenInAppExtension'
+        #)
 
 	output_name = "ForPDA_#{version}"
 
@@ -78,12 +78,12 @@ platform :ios do
 	    export_options: {
 	    provisioningProfiles: { 
 		"com.subvert.forpda" => "com.subvert.forpda AppStore",
-		"com.subvert.forpda.OpenInAppExtension" => "com.subvert.forpda.OpenInAppExtension AppStore"
+		"com.subvert.forpda.safariextension" => "com.subvert.forpda.OpenInAppExtension AppStore"
       	        }
 	    }
         )
 
-        swift_file_path = "../Packages/Sources/AnalyticsClient/Secrets.swift"
+        swift_file_path = "../Modules/Sources/AnalyticsClient/Secrets.swift"
         swift_file_content = File.read(swift_file_path)
         sentry_dsym_token = swift_file_content[/let sentryDSYMToken = "(.*?)"/, 1]
         sentry_debug_files_upload(

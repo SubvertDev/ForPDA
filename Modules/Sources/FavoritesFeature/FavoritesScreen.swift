@@ -241,7 +241,7 @@ public struct FavoritesScreen: View {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 6) {
                         if let lastPost {
-                            Text(lastPost.formattedDate, bundle: Bundle.models)
+                            Text(lastPost.formattedDate, bundle: .models)
                                 .font(.caption)
                                 .foregroundStyle(Color(.Labels.teritary))
                         }

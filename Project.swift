@@ -31,8 +31,7 @@ let project = Project(
                 with: [
                     "ITSAppUsesNonExemptEncryption": "NO",
                     
-//                    "CFBundleDisplayName": "Test",
-                    "CFBundleLocalizations": ["English", "ru"],
+                    "CFBundleLocalizations": ["en", "ru"],
                     "CFBundleURLTypes": [
                         [
                             "CFBundleTypeRole": "Editor",
@@ -102,6 +101,7 @@ let project = Project(
         
             .feature(
                 name: "DeeplinkHandler",
+                hasResources: false,
                 dependencies: [
                     .Internal.LoggerClient,
                     .Internal.AnalyticsClient,
@@ -128,7 +128,6 @@ let project = Project(
         
             .feature(
                 name: "ArticleFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .Internal.SharedUI,
@@ -218,6 +217,7 @@ let project = Project(
         
             .feature(
                 name: "AnnouncementFeature",
+                hasResources: false,
                 dependencies: [
                     .Internal.PageNavigationFeature,
                     .Internal.Models,
@@ -299,6 +299,7 @@ let project = Project(
         
             .feature(
                 name: "QMSListFeature",
+                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .Internal.SharedUI,
@@ -312,6 +313,7 @@ let project = Project(
         
             .feature(
                 name: "QMSFeature",
+                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .Internal.SharedUI,
@@ -356,6 +358,7 @@ let project = Project(
         
             .feature(
                 name: "DeveloperFeature",
+                hasResources: false,
                 dependencies: [
                     .Internal.SharedUI,
                     .Internal.CacheClient,
@@ -366,6 +369,7 @@ let project = Project(
         
             .feature(
                 name: "PageNavigationFeature",
+                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .Internal.SharedUI,
@@ -379,6 +383,7 @@ let project = Project(
         
             .feature(
                 name: "APIClient",
+                hasResources: false,
                 dependencies: [
                     .Internal.ParsingClient,
                     .Internal.CacheClient,
@@ -389,6 +394,7 @@ let project = Project(
         
             .feature(
                 name: "AnalyticsClient",
+                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .Internal.PersistenceKeys,
@@ -400,6 +406,7 @@ let project = Project(
             ),
         .feature(
             name: "ParsingClient",
+            hasResources: false,
             dependencies: [
                 .Internal.Models,
                 .SPM.ZMarkupParser,
@@ -408,12 +415,14 @@ let project = Project(
         ),
         .feature(
             name: "PasteboardClient",
+            hasResources: false,
             dependencies: [
                 .SPM.TCA
             ]
         ),
         .feature(
             name: "NotificationsClient",
+            hasResources: false,
             dependencies: [
                 .Internal.AnalyticsClient,
                 .Internal.LoggerClient,
@@ -423,6 +432,7 @@ let project = Project(
         ),
         .feature(
             name: "NotificationCenterClient",
+            hasResources: false,
             dependencies: [
                 .Internal.LoggerClient,
                 .SPM.TCA
@@ -430,12 +440,14 @@ let project = Project(
         ),
         .feature(
             name: "HapticClient",
+            hasResources: false,
             dependencies: [
                 .SPM.TCA
             ]
         ),
         .feature(
             name: "CacheClient",
+            hasResources: false,
             dependencies: [
                 .Internal.AnalyticsClient,
                 .Internal.Models,
@@ -446,6 +458,7 @@ let project = Project(
         ),
         .feature(
             name: "LoggerClient",
+            hasResources: false,
             dependencies: [
                 .SPM.TCA
             ]
@@ -462,6 +475,7 @@ let project = Project(
         
             .feature(
                 name: "SharedUI",
+                hasResources: false,
                 dependencies: [
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
@@ -480,19 +494,12 @@ let project = Project(
         
             .feature(
                 name: "PersistenceKeys",
+                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .SPM.TCA
                 ]
             ),
-        
-        //            .feature(
-        //                name: "PersistenceKeys",
-        //                dependencies: [
-        //                    .target(name: "Models"),
-        //                    .external(name: "ComposableArchitecture")
-        //                ]
-        //            ),
         
         // MARK: - Tests -
         
@@ -543,29 +550,25 @@ extension ProjectDescription.Target {
         hasResources: Bool = true,
         dependencies: [TargetDependency]
     ) -> ProjectDescription.Target {
+        var resources: [ResourceFileElement] = ["Modules/Resources/**"]
+        if hasResources {
+            resources.append("Modules/Sources/\(name)/Resources/**")
+        }
         return .target(
             name: name,
             destinations: App.destinations,
             product: productType.asProduct(),
             bundleId: App.bundleId + "." + name,
             deploymentTargets: .iOS("16.0"),
-//            infoPlist: productType == .app ? .app : "Derived/InfoPlists/\(App.name)-Info.plist",
             infoPlist: "Derived/InfoPlists/\(App.name)-Info.plist",
             sources: ["Modules/Sources/\(name)/**"],
-            // resources: hasResources ? ["ForPDA/Sources/\(name)/Resources/**"] : nil,
-            resources: hasResources
-                ? ["Modules/Resources/**"]
-                : ["Modules/Resources/**", "Modules/Sources/\(name)/Resources/**"],
+            resources: .resources(resources),
             dependencies: dependencies
-//            settings: .settings(
-//                base: ["OTHER_LDFLAGS": "$(inherited)"]
-//            )
         )
     }
     
     enum ProductType {
-        case app
-        case framework
+        case app, framework
         
         func asProduct() -> ProjectDescription.Product {
             switch self {
@@ -574,17 +577,6 @@ extension ProjectDescription.Target {
             }
         }
     }   
-}
-
-extension ProjectDescription.InfoPlist {
-    static let app = ProjectDescription.InfoPlist.extendingDefault(
-        with: [
-            "UILaunchScreen": [
-                "UIColorName": "",
-                "UIImageName": "",
-            ],
-        ]
-    )
 }
 
 extension TargetDependency {

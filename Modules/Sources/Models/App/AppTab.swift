@@ -14,18 +14,7 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
     case forum
     case profile
     
-    public var title: LocalizedStringKey {
-        switch self {
-        case .articlesList:
-            return "Articles"
-        case .favorites:
-            return "Favorites"
-        case .forum:
-            return "Forum"
-        case .profile:
-            return "Profile"
-        }
-    }
+    // TODO: Title is in two places: AppFeature & AppSettings due to localization headache
     
     public var iconSymbol: SFSymbol {
         switch self {

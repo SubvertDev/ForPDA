@@ -2,7 +2,6 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Add To Bookmarks" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -13,7 +12,6 @@
       }
     },
     "Copy Link" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -24,7 +22,6 @@
       }
     },
     "Open In Browser" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -35,7 +32,6 @@
       }
     },
     "Problems with article?" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -46,7 +42,6 @@
       }
     },
     "Today, %@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -57,7 +52,6 @@
       }
     },
     "Yesterday, %@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

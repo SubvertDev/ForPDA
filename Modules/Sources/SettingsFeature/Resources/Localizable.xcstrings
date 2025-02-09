@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "About app" : {
       "localizations" : {
         "ru" : {
@@ -34,16 +31,6 @@
         }
       }
     },
-    "Animate icon (restart needed)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Анимировать иконку (надо перезайти)"
-          }
-        }
-      }
-    },
     "App discussion (4PDA)" : {
       "localizations" : {
         "ru" : {
@@ -60,6 +47,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обсуждение приложения (Telegram)"
+          }
+        }
+      }
+    },
+    "Articles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статьи"
           }
         }
       }
@@ -172,6 +169,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Черный"
+          }
+        }
+      }
+    },
+    "Favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Избранное"
+          }
+        }
+      }
+    },
+    "Forum" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Форум"
           }
         }
       }
@@ -306,6 +323,16 @@
         }
       }
     },
+    "Profile" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль"
+          }
+        }
+      }
+    },
     "Purple" : {
       "localizations" : {
         "ru" : {
@@ -352,16 +379,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Небесный"
-          }
-        }
-      }
-    },
-    "Smooth animation (restart needed, can cause lag)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Плавная иконка (надо перезайти, может фризить)"
           }
         }
       }

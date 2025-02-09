@@ -66,9 +66,6 @@ public struct AppView: View {
                     Toast()
                         .ignoresSafeArea(.keyboard, edges: .bottom)
                 }
-                
-                // Models Bundle load fix, do NOT delete
-                Color.doNotDeleteMe.frame(width: 0, height: 0)
             }
             .animation(.default, value: store.showToast)
             .ignoresSafeArea(.keyboard, edges: .bottom)
@@ -273,7 +270,8 @@ public struct AppView: View {
                 .font(.body)
                 .bounceUpByLayerEffect(value: shouldAnimatedTabItem[index])
                 .frame(width: 32, height: 32)
-            Text(title, bundle: .models)
+            
+            Text(title, bundle: .module)
                 .font(.caption2)
         }
         .foregroundStyle(store.selectedTab.rawValue == index

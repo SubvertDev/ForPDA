@@ -146,13 +146,13 @@ public struct SettingsScreen: View {
                         Menu {
                             Picker(String(""), selection: $store.startPage) {
                                 ForEach(AppTab.allCases, id: \.self) { tab in
-                                    Text(tab.title, bundle: .models)
+                                    Text(tab.title, bundle: .module)
                                 }
                             }
                             .pickerStyle(.inline)
                         } label: {
                             HStack(spacing: 9) {
-                                Text(store.startPage.title, bundle: .models)
+                                Text(store.startPage.title, bundle: .module)
                                 Image(systemSymbol: .chevronUpChevronDown)
                             }
                             .foregroundStyle(Color(.Labels.teritary))
@@ -276,9 +276,6 @@ public struct SettingsScreen: View {
             // Row(symbol: .docOnDoc, title: "Copy Push Token", type: .navigation) {
             //     store.send(.copyPushTokenButtonTapped)
             // }
-            Row(symbol: .appGift, title: "Animate icon (restart needed)", type: .toggle, toggle: $store.animateIcon)
-            
-            Row(symbol: .appBadgeCheckmark, title: "Smooth animation (restart needed, can cause lag)", type: .toggle, toggle: $store.animateIconOnMainThread)
             
             Row(symbol: .trash, title: "Clear cache", type: .navigation) {
                 store.send(.clearCacheButtonTapped)
@@ -343,7 +340,7 @@ extension AppColorScheme {
     var title: LocalizedStringKey {
         switch self {
         case .light:    "Light"
-        case .dark:     "Dark"
+        case .dark:     "Dark.Scheme"
         case .system:   "System"
         }
     }

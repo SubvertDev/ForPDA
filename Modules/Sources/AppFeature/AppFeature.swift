@@ -107,11 +107,11 @@ public struct AppFeature: Reducer, Sendable {
         public var isShowingTabBar: Bool
         public var showToast: Bool
         public var toast: ToastInfo
-        public var localizationBundle: Bundle? {
+        public var localizationBundle: Bundle {
             switch toast.screen {
-            case .articlesList: return Bundle.articlesListFeature
-            case .article:      return Bundle.articleFeature
-            case .comments:     return Bundle.models
+            case .articlesList: return .articlesList
+            case .article:      return .article
+            case .comments:     return .models
             }
         }
         
@@ -687,21 +687,5 @@ public struct AppFeature: Reducer, Sendable {
             analyticsClient.capture(error)
         }
         return .run { _ in await open(url: url) }
-    }
-}
-
-// MARK: - Extensions
-
-extension Bundle {
-    static var articlesListFeature: Bundle? {
-        return Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticlesListFeature") })
-    }
-    
-    static var articleFeature: Bundle? {
-        Bundle.allBundles.first(where: { $0.bundlePath.contains("ArticleFeature") })
-    }
-    
-    static var models: Bundle? {
-        Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }

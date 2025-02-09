@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "Always" : {
       "localizations" : {
         "ru" : {
@@ -193,9 +190,6 @@
           }
         }
       }
-    },
-    "По дате" : {
-
     }
   },
   "version" : "1.0"
