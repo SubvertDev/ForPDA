@@ -79,13 +79,9 @@ public struct FavoritesScreen: View {
                     }
                 }
             }
-            .sheet(
-                item: $store.scope(state: \.sort, action: \.sort)
-            ) { sortStore in
-                NavigationStack {
-                    SortView(store: sortStore)
-                }
-            }
+            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort), content: { store in
+                SortView(store: store)
+            })
             .onAppear {
                 store.send(.onAppear)
             }
@@ -317,14 +313,6 @@ public struct FavoritesScreen: View {
             .textCase(nil)
             .offset(x: -16)
             .padding(.bottom, 4)
-    }
-}
-
-// MARK: - Extensions
-
-extension Bundle {
-    static var models: Bundle? {
-        return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
     }
 }
 

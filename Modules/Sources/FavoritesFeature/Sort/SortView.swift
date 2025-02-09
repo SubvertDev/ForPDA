@@ -23,61 +23,60 @@ struct SortView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            WithPerceptionTracking {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text("Sort", bundle: .module)
-                            .font(.system(size: 20, weight: .semibold))
-                        
-                        Spacer()
-                    }
+        WithPerceptionTracking {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Sort", bundle: .module)
+                    .font(.system(size: 20, weight: .semibold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top, 16)
-                    .padding(.bottom, 4)
-                    
-                    HStack {
-                        Picker("Sort", selection: $store.sortType) {
-                            // FIXME: Translatable titles
-                            Label(SortType.byDate.title, systemSymbol: .calendar).tag(SortType.byDate)
-                            Label(SortType.byName.title, systemSymbol: .person).tag(SortType.byName)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 60)
+                    .padding(.bottom, 22)
+                
+                HStack {
+                    Picker("Sort", selection: $store.sortType) {
+                        // FIXME: Translatable titles
+                        Label(SortType.byDate.title, systemSymbol: .calendar)
+                            .tag(SortType.byDate)
                         
+                        Label(SortType.byName.title, systemSymbol: .person)
+                            .tag(SortType.byName)
                     }
-                    .listRowBackground(Color(.Background.teritary))
-                                    
-                    Row("In reverse order", value: $store.isReverseOrder)
-                    
-                    Row("Unread first", value: $store.isUnreadFirst)
-                    
-                    HStack {
-                        Button {
-                            store.send(.cancelButtonTapped)
-                        } label: {
-                            Text("Cancel", bundle: .module)
-                                .frame(maxWidth: .infinity)
-                                .padding(8)
-                        }
-                        .buttonStyle(.bordered)
-                        .frame(maxHeight: .infinity)
-                        
-                        Button {
-                            store.send(.saveButtonTapped)
-                        } label: {
-                            Text("Apply", bundle: .module)
-                                .frame(maxWidth: .infinity)
-                                .padding(8)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .frame(maxHeight: .infinity)
-                    }
+                    .frame(maxWidth: .infinity, minHeight: 60)
                 }
+                .listRowBackground(Color(.Background.teritary))
+                .padding(.bottom, 28)
+                
+                Row("In reverse order", value: $store.isReverseOrder)
+                    .padding(.bottom, 24)
+                
+                Row("Unread first", value: $store.isUnreadFirst)
+                    .padding(.bottom, 64)
+                
+                HStack {
+                    Button {
+                        store.send(.cancelButtonTapped)
+                    } label: {
+                        Text("Cancel", bundle: .module)
+                            .frame(maxWidth: .infinity)
+                            .padding(8)
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(height: 48)
+
+                    Button {
+                        store.send(.saveButtonTapped)
+                    } label: {
+                        Text("Apply", bundle: .module)
+                            .frame(maxWidth: .infinity)
+                            .padding(8)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .frame(height: 48)
+                }
+                .padding(.bottom, 8)
             }
+            .padding(.horizontal, 16)
+            .background(Color(.Background.primary))
         }
-        .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
     }
     
     @ViewBuilder
@@ -85,13 +84,12 @@ struct SortView: View {
         HStack(spacing: 0) {
             Text(title, bundle: .module)
                 .foregroundStyle(Color(.Labels.teritary))
-                .font(.system(size: 15, weight: .semibold))
-                .fixedSize(horizontal: true, vertical: false)
+                .font(.subheadline)
+                .fontWeight(.bold)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            Spacer(minLength: 8)
-            
             Toggle(String(""), isOn: value)
+                .labelsHidden()
         }
     }
 }
