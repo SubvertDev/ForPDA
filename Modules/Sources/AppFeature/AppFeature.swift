@@ -305,7 +305,7 @@ public struct AppFeature: Reducer, Sendable {
                 if newPhase == .background {
                     return .send(.registerBackgroundTask)
                 }
-                return .none
+                return .send(.syncUnreadTaskInvoked)
                 
             case .registerBackgroundTask:
                 // return .send(.syncUnreadTaskInvoked) // For test purposes
