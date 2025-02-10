@@ -15,7 +15,9 @@ public struct UnreadParser {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 return Unread(
                     date: Date(timeIntervalSince1970: array[2] as! TimeInterval),
-                    unreadCount: array[3] as! Int,
+                    qmsUnreadCount: array[3] as! Int,
+                    favoritesUnreadCount: array[4] as! Int,
+                    mentionsUnreadCount: array[5] as! Int,
                     items: parseItems(array[6] as! [[Any]])
                 )
             } catch {
