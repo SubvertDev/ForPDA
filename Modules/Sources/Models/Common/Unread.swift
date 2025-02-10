@@ -9,16 +9,22 @@ import Foundation
 
 public struct Unread: Codable, Sendable, Hashable {
     public let date: Date
-    public let unreadCount: Int
+    public let qmsUnreadCount: Int
+    public let favoritesUnreadCount: Int
+    public let mentionsUnreadCount: Int
     public let items: [Item]
     
     public init(
         date: Date,
-        unreadCount: Int,
+        qmsUnreadCount: Int,
+        favoritesUnreadCount: Int,
+        mentionsUnreadCount: Int,
         items: [Item]
     ) {
         self.date = date
-        self.unreadCount = unreadCount
+        self.qmsUnreadCount = qmsUnreadCount
+        self.favoritesUnreadCount = favoritesUnreadCount
+        self.mentionsUnreadCount = mentionsUnreadCount
         self.items = items
     }
     
@@ -31,12 +37,24 @@ public struct Unread: Codable, Sendable, Hashable {
         public let unreadCount: Int
         public let category: Category
         
+        public var notificationType: NotificationType {
+            guard category != .qms else { return .unknown }
+            return NotificationType(rawValue: unreadCount) ?? .unknown
+        }
+        
         public enum Category: Int, Codable, Sendable {
             case qms = 1
             case forum = 2
             case topic = 3
             case forumMention = 4
             case siteMention = 5
+        }
+        
+        public enum NotificationType: Int {
+            case always = 0
+            case once
+            case doNot
+            case unknown
         }
         
         public init(
@@ -62,7 +80,9 @@ public struct Unread: Codable, Sendable, Hashable {
 public extension Unread {
     static let mock = Unread(
         date: .now,
-        unreadCount: 2,
+        qmsUnreadCount: 2,
+        favoritesUnreadCount: 0,
+        mentionsUnreadCount: 0,
         items: [
             Item(
                 id: 12345677,
