@@ -37,7 +37,7 @@ public struct UnreadParser {
                 authorId: unread[3] as! Int,
                 authorName: unread[4] as! String,
                 timestamp: unread[5] as! Int,
-                unreadCount: unread[7] as! Int,
+                unreadCount: unread[7] as! Int, // unread for qms, notification type for others
                 category: Unread.Item.Category(rawValue: unread[0] as! Int)!
             )
         }

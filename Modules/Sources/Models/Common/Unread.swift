@@ -37,12 +37,24 @@ public struct Unread: Codable, Sendable, Hashable {
         public let unreadCount: Int
         public let category: Category
         
+        public var notificationType: NotificationType {
+            guard category != .qms else { return .unknown }
+            return NotificationType(rawValue: unreadCount) ?? .unknown
+        }
+        
         public enum Category: Int, Codable, Sendable {
             case qms = 1
             case forum = 2
             case topic = 3
             case forumMention = 4
             case siteMention = 5
+        }
+        
+        public enum NotificationType: Int {
+            case always = 0
+            case once
+            case doNot
+            case unknown
         }
         
         public init(
