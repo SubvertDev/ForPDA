@@ -14,6 +14,7 @@ import Models
 
 @DependencyClient
 public struct NotificationsClient: Sendable {
+    public var hasPermission: @Sendable () async throws -> Bool
     public var requestPermission: @Sendable () async throws -> Bool
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
@@ -33,6 +34,9 @@ extension NotificationsClient: DependencyKey {
         @Dependency(\.logger[.notifications]) var logger
 
         return NotificationsClient(
+            hasPermission: {
+                return await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .authorized
+            },
             requestPermission: {
                 return try await UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound])
             },
@@ -54,17 +58,46 @@ extension NotificationsClient: DependencyKey {
             },
             showUnreadNotifications: { unread in
                 @Dependency(\.cacheClient) var cacheClient
+                @Shared(.appSettings) var appSettings: AppSettings
                 
                 for item in unread.items {
-                    // customDump(item)
+//                     customDump(item)
                     
-                    if let timestamp = await cacheClient.getLastTimestampOfUnreadItem(item.id), timestamp == item.timestamp {
-                        logger.info("Skipping notification at \(timestamp) of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                    switch item.category {
+                    case .qms where !appSettings.notifications.isQmsEnabled:
+                        continue
+                    case .forum where !appSettings.notifications.isForumEnabled:
+                        continue
+                    case .topic where !appSettings.notifications.isTopicsEnabled:
+                        continue
+                    case .forumMention where !appSettings.notifications.isForumMentionsEnabled:
+                        continue
+                    case .siteMention where !appSettings.notifications.isSiteMentionsEnabled:
+                        continue
+                    default:
+                        break
+                    }
+
+                    switch item.notificationType {
+                    case .always:
+                        if let timestamp = await cacheClient.getLastTimestampOfUnreadItem(item.id), timestamp == item.timestamp {
+                            logger.info("Skipping notification at \(timestamp) of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                            continue
+                        }
+                        await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
+                    case .once:
+                        if let topicId = await cacheClient.getTopicIdOfUnreadItem(item.id), topicId == item.id {
+                            logger.info("Skipping notification of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                            continue
+                        }
+                        await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
+                    case .doNot:
+                        continue
+                    case .unknown:
                         continue
                     }
                     
                     logger.info("Processing notification at \(item.timestamp) of \(item.id) with type \(item.category.rawValue)")
-                    await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
                     
                     let content = UNMutableNotificationContent()
                     content.sound = .default
