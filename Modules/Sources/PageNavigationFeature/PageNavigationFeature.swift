@@ -35,11 +35,11 @@ public struct PageNavigationFeature: Reducer, Sendable {
         }
         
         var currentPage: Int {
-            return offset / perPage + 1
+            return Int(ceil(Double(offset) / Double(perPage))) + 1
         }
         
         var totalPages: Int {
-            return count / perPage + 1
+            return Int(ceil(Double(count) / Double(perPage)))
         }
         
         public init(
@@ -61,6 +61,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case nextPageTapped
         case lastPageTapped
         
+        case update(count: Int, offset: Int?)
         case offsetChanged(to: Int)
     }
     
@@ -83,6 +84,11 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 } else {
                     state.offset = targetOffset
                 }
+                
+            case let .update(count: count, offset: offset):
+                state.count = count
+                if let offset { state.offset = offset }
+                return .none
                 
             case .offsetChanged:
                 return .none

@@ -17,7 +17,7 @@ public struct NotificationsClient: Sendable {
     public var requestPermission: @Sendable () async throws -> Bool
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
-    public var setNotificationsDelegate: @Sendable () -> Void
+    public var delegate: @Sendable () -> AsyncStream<Void> = { .finished }
     public var showUnreadNotifications: @Sendable (Unread) async -> Void
 }
 
@@ -43,8 +43,14 @@ extension NotificationsClient: DependencyKey {
                 let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                 print("Device token: \(token)")
             },
-            setNotificationsDelegate: {
-                
+            delegate: {
+                AsyncStream { continuation in
+                  let delegate = Delegate(continuation: continuation)
+                  UNUserNotificationCenter.current().delegate = delegate
+                  continuation.onTermination = { _ in
+                    _ = delegate
+                  }
+                }
             },
             showUnreadNotifications: { unread in
                 @Dependency(\.cacheClient) var cacheClient
@@ -92,5 +98,19 @@ extension NotificationsClient: DependencyKey {
                 }
             }
         )
+    }
+}
+
+extension NotificationsClient {
+    fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
+        let continuation: AsyncStream<Void>.Continuation
+        
+        init(continuation: AsyncStream<Void>.Continuation) {
+            self.continuation = continuation
+        }
+        
+        func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+            return [.badge, .banner, .list, .sound]
+        }
     }
 }

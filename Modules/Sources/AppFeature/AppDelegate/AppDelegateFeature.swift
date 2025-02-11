@@ -57,26 +57,37 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 cacheClient.configure()
                 
                 return .run { [parserVersion = state.$parserVersion] send in
-                    if ParserSettings.version > parserVersion.wrappedValue {
-                        logger.warning("Parser version outdated, removing posts cache")
-                        await cacheClient.removeAllParsedPostContent()
-                        parserVersion.withLock { $0 = ParserSettings.version }
-                    } else {
-                        logger.info("Parser version match (\(parserVersion.wrappedValue))")
+                    await withThrowingTaskGroup(of: Void.self) { group in
+                        group.addTask {
+                            for await _ in notificationsClient.delegate() {
+                                print("test")
+                            }
+                        }
+                        
+                        group.addTask {
+                            if ParserSettings.version > parserVersion.wrappedValue {
+                                logger.warning("Parser version outdated, removing posts cache")
+                                await cacheClient.removeAllParsedPostContent()
+                                parserVersion.withLock { $0 = ParserSettings.version }
+                            } else {
+                                logger.info("Parser version match (\(parserVersion.wrappedValue))")
+                            }
+                        }
+                        
+                        group.addTask {
+                            let granted = try await notificationsClient.requestPermission()
+                            if granted {
+                                logger.info("Notifications permission are granted")
+                            } else {
+                                logger.error("Notifications permission are not granted")
+                            }
+                            //if granted { await application.registerForRemoteNotifications() }
+                        }
                     }
-                    
-                    let granted = try await notificationsClient.requestPermission()
-                    if granted {
-                        logger.info("Notifications permission are granted")
-                    } else {
-                        logger.error("Notifications permission are not granted")
-                    }
-                    //if granted { await application.registerForRemoteNotifications() }
                 }
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
-                notificationsClient.setNotificationsDelegate()
                 return .none
             }
         }

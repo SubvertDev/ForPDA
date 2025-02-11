@@ -17,7 +17,10 @@ import ParsingClient
 public struct TopicScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TopicFeature>
+    
     @Environment(\.tintColor) private var tintColor
+    @State private var scrollProxy: ScrollViewProxy?
+    @State private var scrollScale: CGFloat = 1
     
     public init(store: StoreOf<TopicFeature>) {
         self.store = store
@@ -30,17 +33,24 @@ public struct TopicScreen: View {
                     .ignoresSafeArea()
                 
                 if let topic = store.topic {
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            Navigation()
-                            
-                            if !store.isLoadingTopic {
-                                PostList(topic: topic)
-                                
-                                Navigation()
+                    ScrollViewReader { proxy in
+                        WithPerceptionTracking {
+                            ScrollView {
+                                LazyVStack(spacing: 16) {
+                                    Navigation()
+                                    
+                                    if !store.isLoadingTopic {
+                                        PostList(topic: topic)
+                                        
+                                        Navigation()
+                                    }
+                                }
+                                .padding(.bottom, 16)
+                            }
+                            .onAppear {
+                                scrollProxy = proxy
                             }
                         }
-                        .padding(.bottom, 16)
                     }
                 }
             }
@@ -52,8 +62,9 @@ public struct TopicScreen: View {
             }
             .navigationTitle(Text(store.topic?.name ?? "Загружаем..."))
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                OptionsMenu()
+            .toolbar { OptionsMenu() }
+            .onChange(of: store.isLoadingTopic) { _ in
+                Task { await scrollAndAnimate() }
             }
             .task {
                 store.send(.onTask)
@@ -137,6 +148,8 @@ public struct TopicScreen: View {
         }
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
+        .scaleEffect(store.postId == post.id ? scrollScale : 1)
+        .id(post.id)
     }
     
     // MARK: - Post Header
@@ -232,6 +245,28 @@ public struct TopicScreen: View {
         .foregroundStyle(Color(.Labels.teritary))
         .padding(.top, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    // MARK: - Helpers
+    
+    private func scrollAndAnimate() async {
+        guard let postId = store.postId else { return }
+        
+        scrollProxy?.scrollTo(postId)
+        
+        Task {
+            // Wait for scroll animation
+            try? await Task.sleep(for: .seconds(0.35))
+            
+            let duration = 0.25
+            let animation = Animation.easeInOut(duration: duration)
+            withAnimation(animation) { scrollScale = 0.95 }
+            
+            Task {
+                try? await Task.sleep(for: .seconds(duration))
+                withAnimation(animation) { scrollScale = 1 }
+            }
+        }
     }
 }
 

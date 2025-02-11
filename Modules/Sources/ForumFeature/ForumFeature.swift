@@ -139,7 +139,7 @@ public struct ForumFeature: Reducer, Sendable {
                 
                 case .goToEnd:
                     return .run { [id = id] send in
-                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .last)
+                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
                         let response = try await apiClient.jumpForum(request: request)
                         
                         await send(.onRefresh)
@@ -162,6 +162,7 @@ public struct ForumFeature: Reducer, Sendable {
                 case .markRead:
                     return .run { [id = id, isForum = isForum] send in
                         _ = try await apiClient.markReadForum(id: id, isTopic: !isForum)
+                        await send(.onRefresh)
                         // TODO: Display toast on success/error.
                     }
                     

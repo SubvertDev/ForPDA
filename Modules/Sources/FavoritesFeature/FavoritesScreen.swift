@@ -192,6 +192,7 @@ public struct FavoritesScreen: View {
                             id: favorite.topic.id,
                             name: favorite.topic.name,
                             offset: 0,
+                            postId: nil,
                             isForum: favorite.isForum
                         )
                     )

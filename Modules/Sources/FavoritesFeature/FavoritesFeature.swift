@@ -49,7 +49,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         case onAppear
         case onRefresh
         case settingsButtonTapped
-        case favoriteTapped(id: Int, name: String, offset: Int, isForum: Bool)
+        case favoriteTapped(id: Int, name: String, offset: Int, postId: Int?, isForum: Bool)
         
         case contextOptionMenu(FavoritesOptionContextMenuAction)
         case commonContextMenu(FavoriteContextMenuAction, Bool)
@@ -160,11 +160,11 @@ public struct FavoritesFeature: Reducer, Sendable {
                 switch action {
                 case .goToEnd:
                     return .run { [id = id] send in
-                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .last)
-                        let response = try await apiClient.jumpForum(request: request)
+                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
+                        let response = try await apiClient.jumpForum(request)
                         
                         await send(.onRefresh)
-                        await send(.favoriteTapped(id: id, name: "", offset: response.offset, isForum: false))
+                        await send(.favoriteTapped(id: id, name: "", offset: response.offset, postId: response.postId, isForum: false))
                     }
 
                 case .notifyHatUpdate(let flag):
@@ -193,14 +193,14 @@ public struct FavoritesFeature: Reducer, Sendable {
                 ] send in
                     let startTime = Date()
                     for try await favorites in try await apiClient.getFavorites(
-                        request: FavoritesRequest(
+                        FavoritesRequest(
                             offset: offset,
                             perPage: perPage,
                             isSortByName: favoritesSettings.isSortByName,
                             isSortReverse: favoritesSettings.isReverseOrder,
                             isUnreadFirst: favoritesSettings.isUnreadFirst
                         ),
-                        policy: isRefreshing ? .cacheAndLoad : .cacheAndLoad
+                        isRefreshing ? .cacheAndLoad : .cacheAndLoad
                     ) {
                         if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
                         await send(._favoritesResponse(.success(favorites)))

@@ -28,7 +28,8 @@ public struct TopicFeature: Reducer, Sendable {
         @Shared(.appSettings) var appSettings: AppSettings
 
         public let topicId: Int
-        public var offset: Int
+        public let initialOffset: Int
+        public var postId: Int?
         var topic: Topic?
         
         var types: [[TopicTypeUI]] = []
@@ -40,12 +41,18 @@ public struct TopicFeature: Reducer, Sendable {
         
         public init(
             topicId: Int,
-            offset: Int = 0,
+            initialOffset: Int = 0,
+            postId: Int? = nil,
             topic: Topic? = nil
         ) {
             self.topicId = topicId
-            self.offset = offset
+            self.postId = postId
             self.topic = topic
+            
+            // If we open this screen with Go To End usage then we can get offset like 99
+            // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
+            // so we can get full page of posts instead only last one post
+            self.initialOffset = initialOffset - (initialOffset % _appSettings.topicPerPage.wrappedValue)
         }
     }
     
@@ -88,7 +95,11 @@ public struct TopicFeature: Reducer, Sendable {
             switch action {
             case .onTask:
                 guard state.topic == nil else { return .none }
-                return .send(.pageNavigation(.offsetChanged(to: state.offset)))
+                return .concatenate(
+                    updatePageNavigation(&state, offset: state.initialOffset),
+                    .cancel(id: CancelID.loading),
+                    .send(._loadTopic(offset: state.initialOffset))
+                )
                 
             case .userAvatarTapped:
                 // TODO: Wrap into Delegate action?
@@ -97,15 +108,11 @@ public struct TopicFeature: Reducer, Sendable {
             case .urlTapped:
                 // TODO: Wrap into Delegate action?
                 return .none
-
+                
             case let .pageNavigation(.offsetChanged(to: newOffset)):
-                state.offset = if newOffset == 0 { newOffset } else {
-                    (newOffset + 1) - state.appSettings.topicPerPage
-                }
-                state.isFirstPage = newOffset == 0
                 return .concatenate([
                     .cancel(id: CancelID.loading),
-                    .send(._loadTopic(offset: state.offset))
+                    .send(._loadTopic(offset: newOffset))
                 ])
                 
             case .pageNavigation:
@@ -141,6 +148,7 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 
             case let ._loadTopic(offset):
+                state.isFirstPage = offset == 0
                 state.isLoadingTopic = true
                 return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
                     let result = await Result { try await apiClient.getTopic(id, offset, perPage) }
@@ -151,36 +159,32 @@ public struct TopicFeature: Reducer, Sendable {
             case let ._topicResponse(.success(topic)):
                 //customDump(topic)
                 state.topic = topic
-                
-                // FIXME: Quickfix for good pagination.
-                state.pageNavigation.count = topic.postsCount
-                state.pageNavigation.offset = if state.offset == 0 { 0 } else {
-                    (state.offset - 1) + state.appSettings.topicPerPage
-                }
-                
-                return .run { send in
-                    var topicTypes: [[TopicTypeUI]] = []
-                    let builder = TopicBuilder()
-                    logger.error("[LOG] Start processing topic: \(Date.now)")
-                    for post in topic.posts {
-                        logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
-                        if let types = await cacheClient.getParsedPostContent(post.id) {
-                            topicTypes.append(types)
-                        } else {
+
+                return .concatenate(
+                    updatePageNavigation(&state),
+                    .run { send in
+                        var topicTypes: [[TopicTypeUI]] = []
+                        let builder = TopicBuilder()
+                        logger.error("[LOG] Start processing topic: \(Date.now)")
+                        for post in topic.posts {
                             logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
-                            let parsedContent = BBCodeParser.parse(post.content)!
-                            logger.error("[LOG] Start building \(post.id): \(Date.now)")
-                            let types = try! builder.build(from: parsedContent)
-                            logger.error("[LOG] Start caching \(post.id): \(Date.now)")
-                            await cacheClient.cacheParsedPostContent(post.id, types)
-                            topicTypes.append(types)
+                            if let types = await cacheClient.getParsedPostContent(post.id) {
+                                topicTypes.append(types)
+                            } else {
+                                logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
+                                let parsedContent = BBCodeParser.parse(post.content)!
+                                logger.error("[LOG] Start building \(post.id): \(Date.now)")
+                                let types = try! builder.build(from: parsedContent)
+                                logger.error("[LOG] Start caching \(post.id): \(Date.now)")
+                                await cacheClient.cacheParsedPostContent(post.id, types)
+                                topicTypes.append(types)
+                            }
+                            logger.error("[LOG] Stop processing \(post.id): \(Date.now)")
                         }
-                        logger.error("[LOG] Stop processing \(post.id): \(Date.now)")
-                    }
-                    logger.error("[LOG] Finish processing topic: \(Date.now)")
-                    await send(._loadTypes(topicTypes))
-                }
-                .cancellable(id: CancelID.loading)
+                        logger.error("[LOG] Finish processing topic: \(Date.now)")
+                        await send(._loadTypes(topicTypes))
+                    }.cancellable(id: CancelID.loading)
+                )
                 
             case let ._loadTypes(types):
                 state.types = types
@@ -197,5 +201,19 @@ public struct TopicFeature: Reducer, Sendable {
                 return .none
             }
         }
+    }
+    
+    // MARK: - Shared logic
+    
+    private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
+        return PageNavigationFeature()
+            .reduce(
+                into: &state.pageNavigation,
+                action: .update(
+                    count: state.topic?.postsCount ?? 0,
+                    offset: offset
+                )
+            )
+            .map(Action.pageNavigation)
     }
 }
