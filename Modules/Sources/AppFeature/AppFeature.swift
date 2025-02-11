@@ -323,14 +323,17 @@ public struct AppFeature: Reducer, Sendable {
                     analyticsClient.capture(error)
                 }
                 return .none
-                
+
             case .syncUnreadTaskInvoked:
-                return .run { send in
+                return .run { [appSettings = state.appSettings] send in
                     do {
+                        guard try await notificationsClient.hasPermission() else { return }
+                        guard appSettings.notifications.isAnyEnabled else { return }
+                        
                         // try await apiClient.connect() // TODO: Do I need this?
                         let unread = try await apiClient.getUnread()
                         await notificationsClient.showUnreadNotifications(unread)
-                        
+
                         // TODO: Make at an array?
                         let invokeTime = Date().timeIntervalSince1970
                         await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)

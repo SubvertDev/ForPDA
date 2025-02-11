@@ -13,6 +13,10 @@ public struct NotificationsSettings: Sendable, Codable, Hashable {
     public var isForumMentionsEnabled: Bool
     public var isSiteMentionsEnabled: Bool
     
+    public var isAnyEnabled: Bool {
+        return isQmsEnabled || isForumEnabled || isTopicsEnabled || isForumMentionsEnabled || isSiteMentionsEnabled
+    }
+    
     public init(
         isQmsEnabled: Bool,
         isForumEnabled: Bool,

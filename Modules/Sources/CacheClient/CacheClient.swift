@@ -52,6 +52,9 @@ public struct CacheClient: Sendable {
     // Notifications
     public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
     public var getLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int) async -> Int?
+    public var setTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
+    public var deleteTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
+    public var getTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Int?
 }
 
 // MARK: - Dependency Key
@@ -160,6 +163,15 @@ extension CacheClient: DependencyKey {
             },
             getLastTimestampOfUnreadItem: { itemId in
                 return try? await notificationsStorage.async.object(forKey: itemId)
+            },
+            setTopicIdOfUnreadItem: { topicId in
+                try? await notificationsStorage.async.setObject(topicId, forKey: topicId)
+            },
+            deleteTopicIdOfUnreadItem: { topicId in
+                try? await notificationsStorage.async.removeObject(forKey: topicId)
+            },
+            getTopicIdOfUnreadItem: { topicId in
+                return try? await notificationsStorage.async.object(forKey: topicId)
             }
         )
     }

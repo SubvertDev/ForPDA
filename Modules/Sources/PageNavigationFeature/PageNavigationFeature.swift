@@ -42,6 +42,10 @@ public struct PageNavigationFeature: Reducer, Sendable {
             return Int(ceil(Double(count) / Double(perPage)))
         }
         
+        public var isLastPage: Bool {
+            return currentPage == totalPages
+        }
+        
         public init(
             type: PageNavigationType
         ) {

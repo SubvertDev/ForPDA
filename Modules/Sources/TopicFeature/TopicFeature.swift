@@ -111,6 +111,11 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .concatenate([
+                    .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
+                        if isLastPage {
+                            await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                        }
+                    },
                     .cancel(id: CancelID.loading),
                     .send(._loadTopic(offset: newOffset))
                 ])

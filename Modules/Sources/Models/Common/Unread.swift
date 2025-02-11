@@ -38,7 +38,7 @@ public struct Unread: Codable, Sendable, Hashable {
         public let category: Category
         
         public var notificationType: NotificationType {
-            guard category != .qms else { return .unknown }
+            guard category != .qms else { return .always }
             return NotificationType(rawValue: unreadCount) ?? .unknown
         }
         
