@@ -25,11 +25,27 @@ struct SortView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                Text("Sort", bundle: .module)
-                    .font(.system(size: 20, weight: .semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 16)
-                    .padding(.bottom, 22)
+                HStack {
+                    Text("Sort", bundle: .module)
+                        .font(.system(size: 20, weight: .semibold))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 16)
+                        .padding(.bottom, 22)
+                    
+                    Button {
+                        store.send(.cancelButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .xmark)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                Circle()
+                                    .fill(Color(.Background.quaternary))
+                                    .clipShape(Circle())
+                            )
+                    }
+                }
                 
                 HStack {
                     Menu {
@@ -127,5 +143,6 @@ struct SortView: View {
                 SortFeature()
             }
         )
+        .tint(Color(.Theme.primary))
     }
 }
