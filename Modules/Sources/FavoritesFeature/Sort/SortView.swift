@@ -32,15 +32,37 @@ struct SortView: View {
                     .padding(.bottom, 22)
                 
                 HStack {
-                    Picker("Sort", selection: $store.sortType) {
-                        // FIXME: Translatable titles
-                        Label(SortType.byDate.title, systemSymbol: .calendar)
-                            .tag(SortType.byDate)
+                    Menu {
+                        Button {
+                            store.send(.selectSortType(.byDate))
+                        } label: {
+                            Text(SortType.byDate.title)
+                            Image(systemSymbol: .calendar)
+                        }
                         
-                        Label(SortType.byName.title, systemSymbol: .person)
-                            .tag(SortType.byName)
+                        Button {
+                            store.send(.selectSortType(.byName))
+                        } label: {
+                            Text(SortType.byName.title)
+                            Image(systemSymbol: .person)
+                        }
+                    } label: {
+                        HStack {
+                            Text(store.sortType.title)
+                                .foregroundStyle(.black)
+                                .cornerRadius(10)
+                                .padding(.leading, 16)
+                            
+                            Spacer()
+                            
+                            Image(systemSymbol: .chevronUpChevronDown)
+                                .foregroundStyle(.black)
+                                .padding(.trailing, 11)
+                        }
+                        .frame(minHeight: 60)
+                        .background(Color(.Background.teritary))
+                        .cornerRadius(10)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 60)
                 }
                 .listRowBackground(Color(.Background.teritary))
                 .padding(.bottom, 28)
@@ -72,7 +94,7 @@ struct SortView: View {
                     .buttonStyle(.borderedProminent)
                     .frame(height: 48)
                 }
-                .padding(.bottom, 8)
+                .padding(.vertical, 8)
             }
             .padding(.horizontal, 16)
             .background(Color(.Background.primary))
