@@ -568,6 +568,8 @@ extension InfoPlist {
         with: [
             "ITSAppUsesNonExemptEncryption": "NO",
             
+            "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+            "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)", 
             "CFBundleLocalizations": ["en", "ru"],
             "CFBundleURLTypes": [
                 [
