@@ -117,7 +117,7 @@ platform :ios do
     lane :upload_dsym_to_sentry do
         auth_token = get_xcconfig_value(
             path: 'Configs/Secrets.xcconfig',
-            name: 'SENTRY_DSN'
+            name: 'SENTRY_DSYM_TOKEN'
         )
         
         sentry_debug_files_upload(
@@ -135,8 +135,17 @@ platform :ios do
             issuer_id: "814e488e-06ba-40ba-a16c-a63e7164023f",
             key_filepath: "Fastlane/AuthKey_X36R58TMRJ.p8"
         )
+        
+        version = get_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'MARKETING_VERSION'
+        )
+        
+        ipa_name = "ForPDA_#{version}.ipa"
 
-        upload_to_testflight
+        upload_to_testflight(
+            ipa: "./build/#{ipa_name}"
+	    )
     end
     
     desc "Notifies to all available channels"
