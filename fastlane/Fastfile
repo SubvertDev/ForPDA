@@ -2,97 +2,135 @@ default_platform(:ios)
 
 platform :ios do
 
-    desc "Update version and build number (e.g. add `version:1.2.3` after lane name)"
+    desc "Setups project"
+    desc "Options: 'master:true' for account holder setup"
+    lane :setup do |options|
+        prepare_certificates(master: options[:master])
+        run_tuist(open: true)
+    end
+    
+    desc "Sets marketing version"
+    desc "Options: 'version:1.0.0'"
+    lane :set_marketing_version do |options|
+        version = options[:version]
 
-    lane :update do |options|
-        # Setting build number to amount of all commits in repo
-	build = sh("git rev-list --all --count").chomp.strip
+        unless version
+            UI.user_error!("Error: Missing required option 'version'. Example usage: fastlane set_marketing_version version:1.0.0")
+        end
 
-        # Updating build number in all targets
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'ForPDA'
-        )
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'ShareExtension'
-        )
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'OpenInAppExtension'
-        )
-        
-        # If version is not specified when calling this lane then use current one instead
-        version = options.fetch(:version, get_version_number_from_xcodeproj)
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'ForPDA'
-        )
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'OpenInAppExtension'
+        unless version =~ /^\d+\.\d+\.\d+$/
+            UI.user_error!("Error: Invalid version format. Expected format: X.Y.Z (e.g., 1.0.0)")
+        end
+
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'CURRENT_PROJECT_VERSION',
+            value: version
         )
 
+        UI.success("Marketing version set to #{version}")
     end
 
-    #----------------------------------------------------------------------------------
-
-    desc "Push new build to TestFlight (has version option to update marketing version)"
-
-    lane :beta do |options|
-
-        # Setting build number to amount of all commits in repo
+    desc "Uploads to TestFlight"
+    lane :upload do
+        prepare_certificates
+        update_build_number
+        run_tuist
+        build_ipa
+        upload_dsym_to_sentry
+        upload_app_to_testflight
+        notify_all
+    end
+    
+    # --------------------------------------------------
+    
+    desc "Prepare certificates via match"
+    desc "Options: 'master:true' for registering new devices"
+    lane :prepare_certificates do |options|
+        if options[:master]
+            register_devices(devices_file: "Fastlane/devices.txt")
+        end
+         
+        match(
+            type: "development",
+            readonly: !options[:master],
+            force_for_new_devices: options[:master]
+        )
+        
+        match(
+            type: "appstore",
+            readonly: !options[:master]
+        )
+    end
+    
+    desc "Updates build number to total commit count"
+    lane :update_build_number do
         build = sh("git rev-list --all --count").chomp.strip
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'CURRENT_PROJECT_VERSION',
+            value: build
+        )
+    end
+    
+    desc "Runs Tuist install & generate"
+    desc "Options: 'open:true' "
+    lane :run_tuist do |options|
+        Dir.chdir("..") do
+            sh("tuist install")
+            if options[:open]
+                sh("tuist generate")
+            else
+                sh("tuist generate --no-open")
+            end
+        end
+    end
+    
+    desc ""
+    lane :build_ipa do
+        version = get_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'MARKETING_VERSION'
+        )
         
-        # Updating build number in all targets
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'ForPDA'
-        )
-        increment_build_number_in_xcodeproj(
-            build_number: build,
-            target: 'OpenInAppExtension'
-        )
+        output_name = "ForPDA_#{version}"
         
-        # If version is not specified when calling this lane then use current one instead
-        version = options.fetch(:version, get_version_number_from_xcodeproj)
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'ForPDA'
-        )
-        increment_version_number_in_xcodeproj(
-            version_number: version,
-            target: 'OpenInAppExtension'
-        )
-
-	output_name = "ForPDA_#{version}"
-
         build_app(
             scheme: "ForPDA",
             output_directory: "build/",
-	    output_name: output_name,
+	        output_name: output_name,
             cloned_source_packages_path: "SourcePackages",
-	    silent: true,
-	    suppress_xcode_output: true,
-	    export_method: "app-store",
-	    export_options: {
-	    provisioningProfiles: { 
-		"com.subvert.forpda" => "com.subvert.forpda AppStore",
-		"com.subvert.forpda.OpenInAppExtension" => "com.subvert.forpda.OpenInAppExtension AppStore"
+	        silent: true,
+	        suppress_xcode_output: true,
+	        skip_package_pkg: true,
+	        export_method: "app-store",
+	        export_options: {
+	            provisioningProfiles: { 
+		            "com.subvert.forpda" => "match AppStore com.subvert.forpda",
+		            "com.subvert.forpda.safariextension" => "match AppStore com.subvert.forpda.safariextension"
       	        }
-	    }
+	        }
         )
-
-        swift_file_path = "../Packages/Sources/AnalyticsClient/Secrets.swift"
-        swift_file_content = File.read(swift_file_path)
-        sentry_dsym_token = swift_file_content[/let sentryDSYMToken = "(.*?)"/, 1]
+    end
+    
+    desc "Uploads DSYM files to Sentry"
+    lane :upload_dsym_to_sentry do
+        auth_token = get_xcconfig_value(
+            path: 'Configs/Secrets.xcconfig',
+            name: 'SENTRY_DSN',
+            mask_value: true
+        )
+        
         sentry_debug_files_upload(
-            auth_token: sentry_dsym_token,
+            auth_token: auth_token,
             org_slug: 'forpda',
             project_slug: 'apple-ios',
             include_sources: true
         )
-
+    end
+    
+    desc "Uploads app to TestFlight"
+    lane :upload_app_to_testflight do
         app_store_connect_api_key(
             key_id: "X36R58TMRJ",
             issuer_id: "814e488e-06ba-40ba-a16c-a63e7164023f",
@@ -100,14 +138,18 @@ platform :ios do
         )
 
         upload_to_testflight
-
+    end
+    
+    desc "Notifies to all available channels"
+    lane :notify_all do
         notification(
             subtitle: "Uploading Finished!",
             message: "Build is on TestFlight",
             content_image: "Images/logo.png"
         )
-
     end
+    
+    # --------------------------------------------------
 
     error do |lane, exception, options|
         notification(

@@ -1,0 +1,224 @@
+//
+//  ForumPageFeature.swift
+//  ForPDA
+//
+//  Created by Ilia Lubianoi on 07.11.2024.
+//
+
+import Foundation
+import ComposableArchitecture
+import PageNavigationFeature
+import APIClient
+import Models
+import PersistenceKeys
+import ParsingClient
+import PasteboardClient
+import NotificationCenterClient
+import TCAExtensions
+
+@Reducer
+public struct TopicFeature: Reducer, Sendable {
+    
+    public init() {}
+    
+    // MARK: - State
+    
+    @ObservableState
+    public struct State: Equatable {
+        @Shared(.appSettings) var appSettings: AppSettings
+
+        public let topicId: Int
+        public let initialOffset: Int
+        public var postId: Int?
+        var topic: Topic?
+        
+        var types: [[TopicTypeUI]] = []
+        
+        var isFirstPage = true
+        var isLoadingTopic = true
+        
+        var pageNavigation = PageNavigationFeature.State(type: .topic)
+        
+        public init(
+            topicId: Int,
+            initialOffset: Int = 0,
+            postId: Int? = nil,
+            topic: Topic? = nil
+        ) {
+            self.topicId = topicId
+            self.postId = postId
+            self.topic = topic
+            
+            // If we open this screen with Go To End usage then we can get offset like 99
+            // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
+            // so we can get full page of posts instead only last one post
+            self.initialOffset = initialOffset - (initialOffset % _appSettings.topicPerPage.wrappedValue)
+        }
+    }
+    
+    // MARK: - Action
+    
+    public enum Action {
+        case onTask
+        case userAvatarTapped(userId: Int)
+        case urlTapped(URL)
+        case pageNavigation(PageNavigationFeature.Action)
+        
+        case contextMenu(TopicContextMenuAction)
+        
+        case _loadTopic(offset: Int)
+        case _loadTypes([[TopicTypeUI]])
+        case _topicResponse(Result<Topic, any Error>)
+        case _setFavoriteResponse(Bool)
+    }
+    
+    // MARK: - Dependencies
+    
+    @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.pasteboardClient) private var pasteboardClient
+    @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.logger) var logger
+    
+    // MARK: - Cancellable
+    
+    private enum CancelID { case loading }
+    
+    // MARK: - Body
+    
+    public var body: some Reducer<State, Action> {
+        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+            PageNavigationFeature()
+        }
+        
+        Reduce<State, Action> { state, action in
+            switch action {
+            case .onTask:
+                guard state.topic == nil else { return .none }
+                return .concatenate(
+                    updatePageNavigation(&state, offset: state.initialOffset),
+                    .cancel(id: CancelID.loading),
+                    .send(._loadTopic(offset: state.initialOffset))
+                )
+                
+            case .userAvatarTapped:
+                // TODO: Wrap into Delegate action?
+                return .none
+                
+            case .urlTapped:
+                // TODO: Wrap into Delegate action?
+                return .none
+                
+            case let .pageNavigation(.offsetChanged(to: newOffset)):
+                return .concatenate([
+                    .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
+                        if isLastPage {
+                            await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                        }
+                    },
+                    .cancel(id: CancelID.loading),
+                    .send(._loadTopic(offset: newOffset))
+                ])
+                
+            case .pageNavigation:
+                return .none
+                
+            case .contextMenu(let action):
+                switch action {
+                case .openInBrowser:
+                    guard let topic = state.topic else { return .none }
+                    let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
+                    return .run { _ in await open(url: url) }
+                    
+                case .copyLink:
+                    guard let topic = state.topic else { return .none }
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)")
+                    return .none
+                    
+                case .setFavorite:
+                    guard let topic = state.topic else { return .none }
+                    return .run { [id = state.topicId] send in
+                        let request = SetFavoriteRequest(id: id, action: topic.isFavorite ? .delete : .add, type: .topic)
+                        _ = try await apiClient.setFavorite(request)
+                        await send(._setFavoriteResponse(!topic.isFavorite))
+                        
+                        // TODO: Display toast on success/error.
+                    } catch: { error, send in
+                        logger.error("Failed to set favorite: \(error)")
+                    }
+                    
+                case .goToEnd:
+                    // TODO: Implement.
+                    return .none
+                }
+                
+            case let ._loadTopic(offset):
+                state.isFirstPage = offset == 0
+                state.isLoadingTopic = true
+                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
+                    let result = await Result { try await apiClient.getTopic(id, offset, perPage) }
+                    await send(._topicResponse(result))
+                }
+                .cancellable(id: CancelID.loading)
+                
+            case let ._topicResponse(.success(topic)):
+                //customDump(topic)
+                state.topic = topic
+
+                return .concatenate(
+                    updatePageNavigation(&state),
+                    .run { send in
+                        var topicTypes: [[TopicTypeUI]] = []
+                        let builder = TopicBuilder()
+                        logger.error("[LOG] Start processing topic: \(Date.now)")
+                        for post in topic.posts {
+                            logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
+                            if let types = await cacheClient.getParsedPostContent(post.id) {
+                                topicTypes.append(types)
+                            } else {
+                                logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
+                                let parsedContent = BBCodeParser.parse(post.content)!
+                                logger.error("[LOG] Start building \(post.id): \(Date.now)")
+                                let types = try! builder.build(from: parsedContent)
+                                logger.error("[LOG] Start caching \(post.id): \(Date.now)")
+                                await cacheClient.cacheParsedPostContent(post.id, types)
+                                topicTypes.append(types)
+                            }
+                            logger.error("[LOG] Stop processing \(post.id): \(Date.now)")
+                        }
+                        logger.error("[LOG] Finish processing topic: \(Date.now)")
+                        await send(._loadTypes(topicTypes))
+                    }.cancellable(id: CancelID.loading)
+                )
+                
+            case let ._loadTypes(types):
+                state.types = types
+                state.isLoadingTopic = false
+                return .none
+                
+            case let ._topicResponse(.failure(error)):
+                print(error)
+                return .none
+                
+            case let ._setFavoriteResponse(isFavorite):
+                state.topic?.isFavorite = isFavorite
+                notificationCenter.send(.favoritesUpdated)
+                return .none
+            }
+        }
+    }
+    
+    // MARK: - Shared logic
+    
+    private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
+        return PageNavigationFeature()
+            .reduce(
+                into: &state.pageNavigation,
+                action: .update(
+                    count: state.topic?.postsCount ?? 0,
+                    offset: offset
+                )
+            )
+            .map(Action.pageNavigation)
+    }
+}
