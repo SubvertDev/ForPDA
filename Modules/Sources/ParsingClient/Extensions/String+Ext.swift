@@ -29,7 +29,7 @@ extension String {
         return editedString
     }
     
-    func convertCodes() -> String {
+    public func convertCodes() -> String {
         BBCodeParser.fastParse(self)
     }
 }

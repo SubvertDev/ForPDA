@@ -5,8 +5,9 @@
 //  Created by Ilia Lubianoi on 15.09.2024.
 //
 
-import UIKit
+import SwiftUI
 import ComposableArchitecture
+import ParsingClient
 import AnalyticsClient
 import LoggerClient
 import CacheClient
@@ -90,7 +91,7 @@ extension NotificationsClient: DependencyKey {
                             logger.info("Skipping notification of item \(item.id) with category \(item.category.rawValue) because it's already processed")
                             continue
                         }
-                        await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
+                        await cacheClient.setTopicIdOfUnreadItem(item.id)
                     case .doNot:
                         continue
                     case .unknown:
@@ -104,20 +105,20 @@ extension NotificationsClient: DependencyKey {
                     
                     switch item.category {
                     case .qms:
-                        content.title = item.authorName
-                        content.body = "\(item.name): \(item.unreadCount) нов\(item.unreadCount == 1 ? "ое" : "ых") сообщения"
+                        content.title = item.authorName.convertCodes()
+                        content.body = String(localized: "\(item.name.convertCodes()): \(item.unreadCount) новое сообщение")
                     case .forum:
                         content.title = "Новое на форуме"
                         content.body = item.name
                     case .topic:
-                        content.title = "\(item.authorName) в теме"
+                        content.title = "\(item.authorName.convertCodes()) в теме"
                         content.body = item.name
                     case .forumMention:
                         content.title = "Упоминание в теме \(item.name)"
-                        content.body = "\(item.authorName) ссылается на вас"
+                        content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     case .siteMention:
                         content.title = "Упоминание в новости \(item.name)"
-                        content.body = "\(item.authorName) ссылается на вас"
+                        content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     }
                     
                     let request = UNNotificationRequest(identifier: "\(item.id)", content: content, trigger: nil)
@@ -134,15 +135,29 @@ extension NotificationsClient: DependencyKey {
     }
 }
 
+extension String {
+    func varyByPlural(_ count: Int, one: String, few: String, many: String) -> String {
+        switch count {
+        case 1:     return self + one
+        case 2...4: return self + few
+        case 5...9: return self + many
+        default:    return self + many
+        }
+    }
+}
+
 extension NotificationsClient {
     fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
         let continuation: AsyncStream<Void>.Continuation
+        private nonisolated(unsafe) var lastNotificationId: String = ""
         
         init(continuation: AsyncStream<Void>.Continuation) {
             self.continuation = continuation
         }
         
         func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+            guard lastNotificationId != notification.request.identifier else { return [] }
+            lastNotificationId = notification.request.identifier // Hotfix for Apple iOS 18 double notification bug
             return [.badge, .banner, .list, .sound]
         }
     }
