@@ -117,8 +117,7 @@ platform :ios do
     lane :upload_dsym_to_sentry do
         auth_token = get_xcconfig_value(
             path: 'Configs/Secrets.xcconfig',
-            name: 'SENTRY_DSN',
-            mask_value: true
+            name: 'SENTRY_DSN'
         )
         
         sentry_debug_files_upload(
