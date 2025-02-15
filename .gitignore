@@ -1,6 +1,8 @@
 # Custom
 Credentials.json
-Secrets.swift
+Secrets.xcconfig
+.env
+devices.txt
 *.p8
 Scripts/build_phases/
 SourcePackages/

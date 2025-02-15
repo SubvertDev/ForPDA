@@ -3,21 +3,29 @@ import ProjectDescription
 let project = Project(
     name: "ForPDA",
     settings: .settings(
-        base: [
-            // "OTHER_LDFLAGS": "-ObjC",
-            "SWIFT_VERSION": "6.0",
-            "OTHER_SWIFT_FLAGS": [
+        base: SettingsDictionary()
+            .swiftVersion("6.0")
+            .debugInformationFormat(.dwarfWithDsym) // Disable for Debug?
+            .otherSwiftFlags([
                 "-Xfrontend",
                 "-warn-long-function-bodies=600",
                 "-Xfrontend",
                 "-warn-long-expression-type-checking=100"
-            ],
-            "INFOPLIST_KEY_CFBundleDisplayName": "\(App.name)",
-            "MARKETING_VERSION": "\(App.version)",
-            "CURRENT_PROJECT_VERSION": "\(App.build)",
-            "SWIFT_EMIT_LOC_STRINGS": "YES",
-            "LOCALIZATION_EXPORT_SUPPORTED": "YES",
-            "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES"
+            ])
+            .manualCodeSigning(
+                identity: "iPhone Developer",
+                provisioningProfileSpecifier: "match Development com.subvert.forpda"
+            )
+            .merging([
+                "INFOPLIST_KEY_CFBundleDisplayName": "\(App.name)",
+                "SWIFT_EMIT_LOC_STRINGS": "YES",
+                "LOCALIZATION_EXPORT_SUPPORTED": "YES",
+                "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
+                "DEVELOPMENT_TEAM[sdk=iphoneos*]": "7353CQCGQC", // Do I need it?
+            ]),
+        configurations: [
+            .debug(name: "Debug", xcconfig: "Configs/App.xcconfig"),
+            .release(name: "Release", xcconfig: "Configs/App.xcconfig"),
         ]
     ),
     targets: [
@@ -27,31 +35,7 @@ let project = Project(
             product: .app,
             bundleId: App.bundleId,
             deploymentTargets: .iOS("16.0"),
-            infoPlist: .extendingDefault(
-                with: [
-                    "ITSAppUsesNonExemptEncryption": "NO",
-                    
-                    "CFBundleLocalizations": ["en", "ru"],
-                    "CFBundleURLTypes": [
-                        [
-                            "CFBundleTypeRole": "Editor",
-                            "CFBundleURLName": "com.subvert.forpda",
-                            "CFBundleURLSchemes": ["forpda"]
-                        ]
-                    ],
-                    
-                    "UIAppFonts": ["fontello.ttf"],
-                    "UILaunchStoryboardName": "LaunchScreen",
-                    "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
-                    "UIBackgroundModes": ["fetch"],
-                    
-                    "BGTaskSchedulerPermittedIdentifiers": ["com.subvert.forpda.background.notifications"],
-                    
-                    "NSCameraUsageDescription": "To capture and send photos in QMS",
-                    "NSMicrophoneUsageDescription": "To send voice messages in QMS",
-                    "NSPhotoLibraryUsageDescription": "To send attachments in QMS"
-                ]
-            ),
+            infoPlist: .main,
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
             dependencies: [
@@ -422,8 +406,8 @@ let project = Project(
         ),
         .feature(
             name: "NotificationsClient",
-            hasResources: false,
             dependencies: [
+                .Internal.ParsingClient,
                 .Internal.AnalyticsClient,
                 .Internal.LoggerClient,
                 .Internal.CacheClient,
@@ -517,16 +501,11 @@ let project = Project(
         // MARK: - Extensions -
         
             .target(
-                name: "ForPDASafariExtension",
+                name: "SafariExtension",
                 destinations: .iOS,
                 product: .appExtension,
-                bundleId: "com.subvert.forpda.safariextension",
-                infoPlist: .dictionary([
-                    "NSExtension": [
-                        "NSExtensionPointIdentifier": "com.apple.Safari.web-extension",
-                        "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SafarWebExtensionHandler"
-                    ]
-                ]),
+                bundleId: App.bundleId + "." + "safariextension",
+                infoPlist: .safariExtension,
                 sources: ["Extensions/Safari/**"],
                 resources: ["Extensions/Safari/Resources/**"]
             )
@@ -539,8 +518,6 @@ struct App {
     static let name = "ForPDA"
     static let destinations: ProjectDescription.Destinations = .iOS
     static let bundleId = "com.subvert.forpda"
-    static let version = "0.8.0"
-    static let build = "557"
 }
 
 extension ProjectDescription.Target {
@@ -560,10 +537,17 @@ extension ProjectDescription.Target {
             product: productType.asProduct(),
             bundleId: App.bundleId + "." + name,
             deploymentTargets: .iOS("16.0"),
-            infoPlist: "Derived/InfoPlists/\(App.name)-Info.plist",
+            infoPlist: .main,
             sources: ["Modules/Sources/\(name)/**"],
             resources: .resources(resources),
-            dependencies: dependencies
+            dependencies: dependencies,
+            settings: .settings(
+                base: [
+                    "TARGETED_DEVICE_FAMILY": "1",
+                    "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO",
+                    "PROVISIONING_PROFILE_SPECIFIER": "" // Disables signing for frameworks
+                ]
+            )
         )
     }
     
@@ -577,6 +561,44 @@ extension ProjectDescription.Target {
             }
         }
     }   
+}
+
+extension InfoPlist {
+    static let main = InfoPlist.extendingDefault(
+        with: [
+            "ITSAppUsesNonExemptEncryption": "NO",
+            
+            "CFBundleLocalizations": ["en", "ru"],
+            "CFBundleURLTypes": [
+                [
+                    "CFBundleTypeRole": "Editor",
+                    "CFBundleURLName": "com.subvert.forpda",
+                    "CFBundleURLSchemes": ["forpda"]
+                ]
+            ],
+            
+            "UIAppFonts": ["fontello.ttf"],
+            "UILaunchStoryboardName": "LaunchScreen",
+            "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
+            "UIBackgroundModes": ["fetch"],
+            
+            "BGTaskSchedulerPermittedIdentifiers": ["com.subvert.forpda.background.notifications"],
+            
+            "NSCameraUsageDescription": "To capture and send photos in QMS",
+            "NSMicrophoneUsageDescription": "To send voice messages in QMS",
+            "NSPhotoLibraryUsageDescription": "To send attachments in QMS",
+            
+            "POSTHOG_TOKEN": "$(POSTHOG_TOKEN)",
+            "SENTRY_DSN": "$(SENTRY_DSN)"
+        ]
+    )
+    
+    static let safariExtension = InfoPlist.dictionary([
+        "NSExtension": [
+            "NSExtensionPointIdentifier": "com.apple.Safari.web-extension",
+            "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SafarWebExtensionHandler"
+        ]
+    ])
 }
 
 extension TargetDependency {

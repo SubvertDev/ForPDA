@@ -44,7 +44,6 @@
 		0F62DD60B6EF9FBCCF80C704 /* SkeletonUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0FB3D18FD2E4674657212F1D /* HapticClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FF418AC7FCB450F4561C6 /* HapticClient.swift */; };
 		10B397773CC509FBB3A1B1BC /* SwiftyGif_SwiftyGif.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = 83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */; };
-		10EF0732504DF8B4005AD263 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 8991CA94D044AEDD76BC9DF6 /* manifest.json */; };
 		10FE8969B49A5664A95142A9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		11D0626A3D3F943EC8B4118F /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 240E58DB5CACACB2C3EC8FAF /* AppTab.swift */; };
 		12D145D38EC65914BEA2D35B /* TuistFonts+HapticClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2451C5A702344866E676CAFF /* TuistFonts+HapticClient.swift */; };
@@ -200,6 +199,7 @@
 		474B3896E09010CD7FC6C06E /* SkeletonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */; };
 		47BB464729AF50959259711D /* TuistBundle+TCAExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB1BB68DDA5F1DC43939A8C /* TuistBundle+TCAExtensions.swift */; };
 		47F2975D643F257254595A14 /* ForumParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58323D145DBF5B1FEE656F70 /* ForumParser.swift */; };
+		483B93685FA2B7F421B877C6 /* messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 3EE2530369C0672DAFBD8BF8 /* messages.json */; };
 		490F7E32738B71FDC5420502 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		493570F4B5AF90BB820FC84C /* PasteboardClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58F83C52ACB94DE307992B8D /* PasteboardClient.framework */; };
 		49E8736180AD6AED493CB4A2 /* PDAPI.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 28A98745325F4FD6EA35AB13 /* PDAPI.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -223,7 +223,6 @@
 		4E600E02F96CF245A9CFE415 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		4EA50708AEFAF88330DDB174 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		4F96F4E422AEEA3C733E828C /* TuistFonts+SettingsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E406A97C7AC1EB77EEF59CE7 /* TuistFonts+SettingsFeature.swift */; };
-		505771FCF5861405E4BF5234 /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B914CF5C24225A771C3BFC8 /* icon-128.png */; };
 		5073102C0B4ACD55E38A97F5 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		507AF15CF5F70EB4F5E55CA9 /* ProfileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C136D21355D51AEB58E812 /* ProfileParser.swift */; };
 		50B1B5EF854160ABEECF55D4 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
@@ -257,7 +256,7 @@
 		5DBE08CB7A420F81EAE28335 /* FavoriteContextMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34514A5F7BBEEE2FBE4D917F /* FavoriteContextMenuAction.swift */; };
 		5E791430C4AB340E55657015 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C4319F291B44E588967CF362 /* Localizable.xcstrings */; };
 		5E8318E9C565FEE453F0126F /* ArticleFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CB3B4EA65C218984C1E25098 /* ArticleFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		5EC0B4E3A1BDA3BF815820F8 /* icon-512.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BCCC2724A44924990D6CEE6 /* icon-512.png */; };
+		5EAE777D4B83A9FB073AB3FA /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B914CF5C24225A771C3BFC8 /* icon-128.png */; };
 		5ECFC1C6A2D23D13AD926807 /* TuistFonts+ProfileFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887A790FAFCCAEBB0C415EB7 /* TuistFonts+ProfileFeature.swift */; };
 		5F001BAEA62C911CDB1BDA46 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		5F1537142E3E7C88802CC4AA /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
@@ -286,7 +285,6 @@
 		642A4F5AE421594B41785F8A /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		643055390E0C752351FA177C /* ContextMenuOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40FBED16A8FA1E22D236DEC4 /* ContextMenuOptions.swift */; };
 		647EA5A308F95D0469003B29 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
-		6485CDA356493EB261BE1E18 /* icon-256.png in Resources */ = {isa = PBXBuildFile; fileRef = CBBC0E316F60774EEC89DF04 /* icon-256.png */; };
 		64A260563770C640D6B0A038 /* ParsingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6431DF445FB6196D0DF1E8D8 /* ParsingClient.swift */; };
 		64CD8E539DD0B70766AD98A3 /* QMSFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2957781ACE16763055F2270D /* QMSFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		64EC6BCB75938CE13E45222E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
@@ -308,6 +306,7 @@
 		6B69319D76BDFFD630C88685 /* QMSListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7610A4E70D43D6BCC7B280AA /* QMSListScreen.swift */; };
 		6B8C34EB76F12AEE273299EA /* MenuButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AD44E6D3049D0CB33C85211 /* MenuButtons.swift */; };
 		6BC0D383E4FF0B5A2871F2B8 /* TopicFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */; };
+		6C6C37262C1B044FDD6EDA66 /* icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A1AFC00CEB5F71F7B0DEE8C /* icon-48.png */; };
 		6CBAEAEDFE6EE46F68EFD2F7 /* LoggerClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */; };
 		6CE43FEF051115426470A227 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		6D8A964092A367A37CF42986 /* TuistFonts+ParsingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD503AB2D9B1CDB4E195DB87 /* TuistFonts+ParsingClient.swift */; };
@@ -330,6 +329,7 @@
 		724E720D9E2A96AC78BDB627 /* RichTextKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACE21C098C19D78B00A3A9C9 /* RichTextKit.framework */; };
 		728F446181413F47688CA4FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		72EF34FCA9725BC9EE0071A9 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A1709C54DA5950515942F4 /* Models.swift */; };
+		732C1C465B12D4DD3EF414F3 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF526150191DDC3B13022ADE /* SafariWebExtensionHandler.swift */; };
 		73B5665B4E7E2028A7DF7D3D /* AuthFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 27B6AB9A46676B3F5C264204 /* AuthFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		746DD42A6FAB0721B6AB656F /* AnnouncementFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7801DBEBB5B0700E92A740EC /* AnnouncementFeature.swift */; };
 		74791FE5A9F819B5A2D95780 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
@@ -338,7 +338,6 @@
 		762CC197BC926A9982660F05 /* AuthParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6FB20BAE6896E328B4D4E2 /* AuthParser.swift */; };
 		7665B621D2329A21F0961C1D /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		767A0F9C07E0C3844FF469D6 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
-		76A9F2CD26B534CB4EDBDB82 /* icon-96.png in Resources */ = {isa = PBXBuildFile; fileRef = 0DCF64129316D28C73F9CBE2 /* icon-96.png */; };
 		76D3BBB97143C9119CBB9A41 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D8C19BA1AA990B2B6DEBF990 /* Localizable.xcstrings */; };
 		76F6FC96E04C5708D9A04DDE /* AnnouncementInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA33373508F922ED4752EFF1 /* AnnouncementInfo.swift */; };
 		773C18395CE8C07F8CB756B7 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
@@ -366,7 +365,6 @@
 		803DB0A08B1C5B2C4927E6B7 /* TuistFonts+AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F10EF0B11A3789933965ED /* TuistFonts+AppFeature.swift */; };
 		805B5250D6C2E18C3C65DA8B /* LocalizedStringKey+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135FF486CD12245451C425FD /* LocalizedStringKey+Ext.swift */; };
 		80A55E8359F6D988A6DBB3C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
-		81F369C80E9AB343972323C7 /* messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 3EE2530369C0672DAFBD8BF8 /* messages.json */; };
 		821A15C6BC483FCB1FCDC7B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		8229E1C17D8B4BFE4012B4E6 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		824D8FF443135C06BB9011F7 /* ActivityIndicatorView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F970CA2A185FF1E82859243F /* ActivityIndicatorView.framework */; };
@@ -382,6 +380,7 @@
 		863FC5A23258686F379BA558 /* TuistAssets+ArticleFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80EED22D45233E216DFED0EA /* TuistAssets+ArticleFeature.swift */; };
 		86990B692F924EA202A37B75 /* HistoryInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 890CB1E0ADAEB58B6F3575B0 /* HistoryInfo.swift */; };
 		86BCBF48FAF3545C0C0BD9E9 /* TuistBundle+BookmarksFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AE19E440727737F7D768040 /* TuistBundle+BookmarksFeature.swift */; };
+		86C2120DAA09ED29FED80140 /* icon-64.png in Resources */ = {isa = PBXBuildFile; fileRef = 998F58CE53B86D30C88480EA /* icon-64.png */; };
 		86D88BFC0D314EAD9273BDBD /* TuistBundle+ProfileFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F6014A32ED05AE3745988BF /* TuistBundle+ProfileFeature.swift */; };
 		86FAF6CD7F8E0B4E96C788BB /* TuistFonts+PasteboardClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160DBE13542DCC8503F20578 /* TuistFonts+PasteboardClient.swift */; };
 		875B98063EE3978A99CF7680 /* ArticleMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101DA82283F6CEA438667EB7 /* ArticleMenu.swift */; };
@@ -453,6 +452,7 @@
 		9AEA1C474F96041EB587DCBE /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		9BCB50BF1CC6141B96EC8205 /* swift-sharing_Sharing.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6ED99D044DB67AD96E453D89 /* swift-sharing_Sharing.bundle */; };
 		9BE30A5D7A2A02F7E722C085 /* TuistAssets+PersistenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75C878A23CE56A1C7D813E0 /* TuistAssets+PersistenceKeys.swift */; };
+		9BEBFEA27052474495492E98 /* TuistBundle+SafariExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734FDFB089B17876ACA7089B /* TuistBundle+SafariExtension.swift */; };
 		9C01A2173B2F1754A5655FD0 /* Cache.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2A6C05AE962C998DBE1A454 /* Cache.framework */; };
 		9C84457BA1E120E5D6A6ABEF /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		9D463B835717AF7689F9913A /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
@@ -462,7 +462,6 @@
 		9E3A2D5DD74828C4F94378A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		9E56B0627E36651DC6B94587 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		9EB9E1441AAC550506542F85 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4DF09FE399CCCBE9E310D9A9 /* Localizable.xcstrings */; };
-		9EBE431ADF4E61AF442E6C8C /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF06C6E53F240A0AA23A202 /* Secrets.swift */; };
 		9ED76FF43619A9DC46C46BAB /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		9EF50E56DD3F8D06A1426BD8 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		9F0151FE5821DB040B14E88E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
@@ -485,7 +484,6 @@
 		A512D6CCB1FD8116FFE9610E /* TuistAssets+PasteboardClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E40FB8B4C28967AE1F4A29D /* TuistAssets+PasteboardClient.swift */; };
 		A5F339D40D3FEBD48ACA0A40 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		A60ACC1B81301C9D92730BA3 /* PageNavigationFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8CEFF67E301FD0409571FAD /* PageNavigationFeature.framework */; };
-		A64A260AB598AA3EAB3DF395 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF526150191DDC3B13022ADE /* SafariWebExtensionHandler.swift */; };
 		A6B6AD98CB01D1BAC6EB9EF7 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		A701EB7BCFA5FCFC600F0BEF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		A7426E91440BAD57E506F00B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
@@ -504,7 +502,6 @@
 		AAD9D1BD8BB52157D9FD3203 /* TuistBundle+SharedUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C691B84ECE7B451A2D11A1 /* TuistBundle+SharedUI.swift */; };
 		AB71D33054FDE48AFFD097FB /* BackgroundTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D55EFF7F8B1B5EDC3F03A2 /* BackgroundTheme.swift */; };
 		ABFE2F11F29F4B5AE05E844C /* AppColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D51A30E35B17B79A119FDD3 /* AppColorScheme.swift */; };
-		AC68AB6AF4572FC9F2E6E400 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 98A2BB020C3E971CB0991A5E /* content.js */; };
 		AC9497CB04DDFCD72EF6E419 /* phlibwebp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E3A87DA15B2D458AB02E623 /* phlibwebp.framework */; };
 		AD27E9035B43576CE13206AA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 5B06AC61792B8C4487A2213C /* Localizable.xcstrings */; };
 		AD89C2D20DECD878EA82B746 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
@@ -535,6 +532,7 @@
 		B5C71529C716B8143B7FE6AE /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
 		B5DB8BDE49B18806E1E790BA /* ParallaxHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA58394E7006E74B711137B /* ParallaxHeader.swift */; };
 		B621E3B47FF5F4925144A54C /* TuistBundle+APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC3BE547E5AE4D5E2D811035 /* TuistBundle+APIClient.swift */; };
+		B68932F57C690796666D6856 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		B7087075DA7BCCFB7A1688C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		B7719EDD4CB97FBDC14187F0 /* ProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670EF6A1CF3FF11D91D3F5DD /* ProfileEvent.swift */; };
 		B77E3F3715BBCDF5B26B4DD5 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDCDFEF4215739787CD77B0 /* AuthResponse.swift */; };
@@ -582,9 +580,11 @@
 		C9BB21B7E3604B43D7945AAE /* ArticleParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99F23D68A39F53CF4566F1A /* ArticleParser.swift */; };
 		CA65F52046767C63F6B38B83 /* LoginEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FD9D2DDE325720FC78D6A0 /* LoginEvent.swift */; };
 		CAA93B384FC9055B705904F7 /* ArticlesListFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A39BD5202EED5434C358B34E /* ArticlesListFeature.framework */; };
+		CABBF3C4FAF86859FA053854 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 98A2BB020C3E971CB0991A5E /* content.js */; };
 		CABDE1660FCCBA352BD96785 /* NotificationsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 889505F119E7D81F1A1B9E41 /* NotificationsClient.framework */; };
 		CAFC891086CF9450E5B3C32B /* ArticleRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F706C68321EBDEA8276E420 /* ArticleRowView.swift */; };
 		CB4710C7C55AD36EC7BB0C07 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		CD11F59393B4DB830F2A2EF2 /* icon-96.png in Resources */ = {isa = PBXBuildFile; fileRef = 0DCF64129316D28C73F9CBE2 /* icon-96.png */; };
 		CDAC086B0007578E9FF1271B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		CDD107A989AA4EEA8EA7CCF5 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		CE056F01D6012BD5A7D9C740 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
@@ -608,7 +608,6 @@
 		D2B10E562DF41E25CBB3A078 /* HapticClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2735BACD13A67B20CB8C16D /* HapticClient.framework */; };
 		D36EA88B0E0C3DF7BC8F3AD8 /* TuistAssets+ProfileFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4589434EF778D21807102DB4 /* TuistAssets+ProfileFeature.swift */; };
 		D37FC01A239B7F084C6A4C62 /* LoggerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18BCC97B4B961713E9D64608 /* LoggerClient.swift */; };
-		D493BB3321E5C25202E04A82 /* icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A1AFC00CEB5F71F7B0DEE8C /* icon-48.png */; };
 		D4AA123884ED686948F48DBC /* ProfileFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A63483B89D8E53655D884F92 /* ProfileFeature.framework */; };
 		D4E7062639BF7CE9FC17B467 /* PageNavigationFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8CEFF67E301FD0409571FAD /* PageNavigationFeature.framework */; };
 		D4F565FBCBB8AD4BE50BAB19 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
@@ -620,11 +619,9 @@
 		D5D1824D00C55A9BDF141599 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 090ABFC8C562AF07EDF7BA25 /* Localizable.xcstrings */; };
 		D6366D6E15622CE28A69F03A /* SettingsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB04AEAA44038F11ED7352E7 /* SettingsFeature.swift */; };
 		D68B46F40978386DC2463EBA /* SwiftyGif.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E785207D0C71434223E267F /* SwiftyGif.framework */; };
-		D6BFA46C2E5B39F5CBF68BBA /* TuistBundle+ForPDASafariExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92692A8F4371DEEE095F8228 /* TuistBundle+ForPDASafariExtension.swift */; };
 		D6FF84647671A638867C7786 /* ArticlesListFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A39BD5202EED5434C358B34E /* ArticlesListFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D71D2F30969D44B14FDE882F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		D7B20FFDC510C6AEC5CEE660 /* ContextButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4903FD59F069B93D813E8A1 /* ContextButton.swift */; };
-		D7C9FD0AA56DAD28B5F47131 /* icon-64.png in Resources */ = {isa = PBXBuildFile; fileRef = 998F58CE53B86D30C88480EA /* icon-64.png */; };
 		D8E0D5E55E83993958CB8706 /* QMSList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18584F04341CBA801DCCAA34 /* QMSList.swift */; };
 		D90FC496C6FD4894BF06AE3A /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		DA11253BF5BA36D6DACEDCBC /* ToastInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55C906394BB2ECF59F0CEC9 /* ToastInfo.swift */; };
@@ -643,10 +640,12 @@
 		DFD97D366B0725ADD3EFF5E6 /* HistoryFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02A126A4634AB82351345379 /* HistoryFeature.framework */; };
 		DFE1FC541AF185F6935349F3 /* ForumRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F2AB27D0AE7F79E68C49FF /* ForumRow.swift */; };
 		DFE423FE140E4F2824FABEE8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
+		E0DEF3468389538B24A70CE7 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = ACBEBA9CCE9F0A3A38014478 /* Localizable.xcstrings */; };
 		E0F239C3124DE93B4D676FC0 /* TuistFonts+DeveloperFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1449F18EB35F83B390E1512A /* TuistFonts+DeveloperFeature.swift */; };
 		E14C2ECF8499FF87875095F6 /* CacheClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E1D74F1A7BF1C7E62B729FF6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		E25709DD9490182769D221A4 /* TuistFonts+BookmarksFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE8A5A78B571C6840E2673C /* TuistFonts+BookmarksFeature.swift */; };
+		E25B2187BB3214D3158D028C /* icon-512.png in Resources */ = {isa = PBXBuildFile; fileRef = 0BCCC2724A44924990D6CEE6 /* icon-512.png */; };
 		E271F3C62E2FE57725F97E6E /* PersistenceKeys.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1716AFC8E678B362BB8EE972 /* PersistenceKeys.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E2747E0D31DEE72D5D8BD10A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		E2B1104D17F99030C7FB605D /* PostHog_PostHog.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */; };
@@ -686,6 +685,7 @@
 		EDFA1D88531988E452B1D327 /* TopicFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EE005910C961A4A1104662FC /* History.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66CBD0143DEEF006DEA7306C /* History.swift */; };
 		EE3BE753A466EA93A1B41522 /* TuistBundle+ArticleFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5625245845B73FC9F03CCCE /* TuistBundle+ArticleFeature.swift */; };
+		EE438B8D99269C16884D08FC /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 8991CA94D044AEDD76BC9DF6 /* manifest.json */; };
 		EEAEC71FA00EE5244FF90D5A /* TuistAssets+TCAExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C801944E5FBE5189EF7ED5 /* TuistAssets+TCAExtensions.swift */; };
 		EEBE74164147729F9A023728 /* APIClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; };
 		EEE229DEB50FC09BFD1C8207 /* PageNavigationFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE01539A6AD4AA3983320B16 /* PageNavigationFeature.swift */; };
@@ -708,6 +708,7 @@
 		F425E27A24C5B8EEAB135EA8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		F46862F31683637A152A2A6A /* CommentFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E829804556D3F4D0A7CEC6A /* CommentFeature+Analytics.swift */; };
 		F47F6C2B6491B5EFBF229E4F /* SetFavoriteRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F4EC55168BA063B91D7CDAA /* SetFavoriteRequest.swift */; };
+		F480EF390C82A65F94F8BBCE /* icon-256.png in Resources */ = {isa = PBXBuildFile; fileRef = CBBC0E316F60774EEC89DF04 /* icon-256.png */; };
 		F4C0A67605E98CF918E358C2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		F4DD8572EBA01F5CEC2637EF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		F56094D8277B990B6634E5BB /* NotificationsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 889505F119E7D81F1A1B9E41 /* NotificationsClient.framework */; };
@@ -1639,6 +1640,13 @@
 			remoteGlobalIDString = 12594FB0B66EBDF44804B062;
 			remoteInfo = HapticClient;
 		};
+		C58B885F7D49F64A3301273E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F26DE94CE2FED6167520917;
+			remoteInfo = ParsingClient;
+		};
 		C61EFCFEC1C6687B9171927C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1851,16 +1859,6 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		21C1D4685FB7A2A37F99947E /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		2519354C165D086ABA72E551 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1892,6 +1890,16 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		38DE0BFA3ED47B91DBB72BEB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3A9D3ACD23DFD130DADC4262 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -2257,6 +2265,7 @@
 		03140BC8DB3A4C443C7D17B7 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		03503F291FA92B3B3B754F43 /* ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumsListFeature.swift; sourceTree = "<group>"; };
 		048460D126E2C26FEB6265DC /* ArticlePoll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePoll.swift; sourceTree = "<group>"; };
+		057B886884B5C026C12F39BB /* SharedUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SharedUI-Info.plist"; sourceTree = "<group>"; };
 		075042B1B2D3B0275E5178A2 /* PDALoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDALoader.swift; sourceTree = "<group>"; };
 		07C65958207606E840A4D26C /* ArticlePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePreview.swift; sourceTree = "<group>"; };
 		07FF3A93B069235628691FEB /* Favorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorite.swift; sourceTree = "<group>"; };
@@ -2269,6 +2278,7 @@
 		0BD2DC532DA036927C0A45DC /* TuistAssets+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+Models.swift"; sourceTree = "<group>"; };
 		0DCF64129316D28C73F9CBE2 /* icon-96.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-96.png"; sourceTree = "<group>"; };
 		0E31FB7300F36F5C9CD75BF0 /* ParsingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingError.swift; sourceTree = "<group>"; };
+		0FBC46964023FE14A1C74F11 /* APIClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "APIClient-Info.plist"; sourceTree = "<group>"; };
 		0FE2FE3A738395B32CD8D60D /* NotificationCenterClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NotificationCenterClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		101DA82283F6CEA438667EB7 /* ArticleMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleMenu.swift; sourceTree = "<group>"; };
 		1041CA98250DBBD834F334E7 /* IssueReporting.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = IssueReporting.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2284,12 +2294,14 @@
 		160DBE13542DCC8503F20578 /* TuistFonts+PasteboardClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+PasteboardClient.swift"; sourceTree = "<group>"; };
 		16D4F5312B239B4DA72E70D9 /* TuistFonts+ForPDA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+ForPDA.swift"; sourceTree = "<group>"; };
 		1716AFC8E678B362BB8EE972 /* PersistenceKeys.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PersistenceKeys.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		17857791212D05958C004BD5 /* AuthFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "AuthFeature-Info.plist"; sourceTree = "<group>"; };
 		1808E0F76631BFD474F21EF2 /* TuistAssets+QMSListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+QMSListFeature.swift"; sourceTree = "<group>"; };
 		1854D21E564C7250DD5FFA82 /* ArticleEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleEvent.swift; sourceTree = "<group>"; };
 		18584F04341CBA801DCCAA34 /* QMSList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSList.swift; sourceTree = "<group>"; };
 		18813B29C2AE41BC1462C685 /* ForPDA-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ForPDA-Info.plist"; sourceTree = "<group>"; };
 		18BCC97B4B961713E9D64608 /* LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerClient.swift; sourceTree = "<group>"; };
 		18C136D21355D51AEB58E812 /* ProfileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileParser.swift; sourceTree = "<group>"; };
+		19375F84D0FB0397E472361F /* QMSListFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "QMSListFeature-Info.plist"; sourceTree = "<group>"; };
 		1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SkeletonUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A9286838B3F04EC37FBAE90 /* ArticlesListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListScreen.swift; sourceTree = "<group>"; };
 		1AE19E440727737F7D768040 /* TuistBundle+BookmarksFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+BookmarksFeature.swift"; sourceTree = "<group>"; };
@@ -2310,6 +2322,7 @@
 		20784E6C88824D521CB56693 /* Bundle+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Ext.swift"; sourceTree = "<group>"; };
 		20C1B68A5B4FF3D1226A3386 /* ArticlesListParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListParser.swift; sourceTree = "<group>"; };
 		21CCF90D908132816911425D /* TuistFonts+AnalyticsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AnalyticsClient.swift"; sourceTree = "<group>"; };
+		22A46161CBC947DE7653A398 /* DeeplinkHandler-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "DeeplinkHandler-Info.plist"; sourceTree = "<group>"; };
 		240E58DB5CACACB2C3EC8FAF /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		2425CEE20C0CB14B1C602356 /* FavoriteNotifyType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteNotifyType.swift; sourceTree = "<group>"; };
 		243DC298825E30AD98A65200 /* Unread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unread.swift; sourceTree = "<group>"; };
@@ -2318,6 +2331,7 @@
 		256E1A20263476DD97FEB276 /* Announcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
 		2690CC2FD37BCB767FA678CE /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		26EC8A8A4A6C70D3C729D6D5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		274A0BC4E5197B7422A1C540 /* DeveloperFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "DeveloperFeature-Info.plist"; sourceTree = "<group>"; };
 		27B6AB9A46676B3F5C264204 /* AuthFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AuthFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		28A98745325F4FD6EA35AB13 /* PDAPI.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = PDAPI.xcframework; sourceTree = "<group>"; };
 		28EFB55271F905D3F3015159 /* TopicContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicContextMenuAction.swift; sourceTree = "<group>"; };
@@ -2333,7 +2347,6 @@
 		2D5F18C64F08F2BD57FECAA8 /* TuistAssets+NotificationsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+NotificationsFeature.swift"; sourceTree = "<group>"; };
 		2DA52225C36942B1CC347029 /* ArticleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleFeature.swift; sourceTree = "<group>"; };
 		2DC5F26CBFACA62CA164964D /* ArticlesListFeatureTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListFeatureTest.swift; sourceTree = "<group>"; };
-		2DCBA340BF5137B65B4EBC4C /* ForPDASafariExtension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ForPDASafariExtension-Info.plist"; sourceTree = "<group>"; };
 		2DF2E071FA5966E3FF92B53E /* TuistBundle+ArticlesListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+ArticlesListFeature.swift"; sourceTree = "<group>"; };
 		2E6295A8375EB2ED722DF4E2 /* Dependencies.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dependencies.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7F9B5FA7920E2EEC101DAB /* RichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichText.swift; sourceTree = "<group>"; };
@@ -2349,9 +2362,9 @@
 		326C538DE32E47F7A63B4824 /* Clocks.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Clocks.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3411644C873E9BBB73FBA6B9 /* FittedSheetModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FittedSheetModifier.swift; sourceTree = "<group>"; };
 		34514A5F7BBEEE2FBE4D917F /* FavoriteContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteContextMenuAction.swift; sourceTree = "<group>"; };
-		349C14FD1FE621F34B984A04 /* ForPDASafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ForPDASafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3843E6F9822A9BC51663F2E1 /* Chat_ExyteChat.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Chat_ExyteChat.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		3874812FA8712A98E159305F /* NotificationsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsFeature.swift; sourceTree = "<group>"; };
+		38DB1507BA715B2BB7D4FB05 /* Models-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Models-Info.plist"; sourceTree = "<group>"; };
 		3959B62E541D1436796AE82E /* FavoritesSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesSettings.swift; sourceTree = "<group>"; };
 		3B5D080F7E03855EF06B9999 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SharedUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2361,6 +2374,7 @@
 		3E80FB6F8051A201BD5FAD63 /* HistoryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryRow.swift; sourceTree = "<group>"; };
 		3ED9802583D0BAD916554C9D /* TuistFonts+PersistenceKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+PersistenceKeys.swift"; sourceTree = "<group>"; };
 		3EE2530369C0672DAFBD8BF8 /* messages.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = messages.json; sourceTree = "<group>"; };
+		3F48EFB072E568BCBC4B9A13 /* ProfileFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ProfileFeature-Info.plist"; sourceTree = "<group>"; };
 		3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnalyticsClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F706C68321EBDEA8276E420 /* ArticleRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleRowView.swift; sourceTree = "<group>"; };
 		3FC78222D0D1E143013C31A3 /* TuistAssets+QMSFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+QMSFeature.swift"; sourceTree = "<group>"; };
@@ -2379,6 +2393,7 @@
 		4589434EF778D21807102DB4 /* TuistAssets+ProfileFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ProfileFeature.swift"; sourceTree = "<group>"; };
 		45A2E94AB4EC0AC324F0B871 /* FavoritesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesScreen.swift; sourceTree = "<group>"; };
 		467A0FE576AB0E535E869C57 /* ProfileFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFeature.swift; sourceTree = "<group>"; };
+		4761DCB86AC73550BDF68479 /* HapticClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "HapticClient-Info.plist"; sourceTree = "<group>"; };
 		4848573B7E3B26811B48F032 /* FavoritesOptionContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesOptionContextMenuAction.swift; sourceTree = "<group>"; };
 		4878C9265AA363BD2B4C1B7D /* TuistAssets+NotificationCenterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+NotificationCenterClient.swift"; sourceTree = "<group>"; };
 		49383B6E5C255FAE6F6A1127 /* CommentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentEvent.swift; sourceTree = "<group>"; };
@@ -2407,6 +2422,7 @@
 		54C691B84ECE7B451A2D11A1 /* TuistBundle+SharedUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+SharedUI.swift"; sourceTree = "<group>"; };
 		562612DCA8E52C675AE58985 /* AppTab+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppTab+Ext.swift"; sourceTree = "<group>"; };
 		566D4DF8BB7C04235624D090 /* TuistFonts+DeeplinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+DeeplinkHandler.swift"; sourceTree = "<group>"; };
+		57469BA6B90D508C37AF584D /* AnalyticsClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "AnalyticsClient-Info.plist"; sourceTree = "<group>"; };
 		57FD9D2DDE325720FC78D6A0 /* LoginEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginEvent.swift; sourceTree = "<group>"; };
 		58323D145DBF5B1FEE656F70 /* ForumParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumParser.swift; sourceTree = "<group>"; };
 		58F4A0D5A49FC65A1BEAA9C7 /* FavoritesRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesRequest.swift; sourceTree = "<group>"; };
@@ -2414,9 +2430,12 @@
 		59E44F366735C48EDDFA2CCA /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Sentry.xcframework; sourceTree = "<group>"; };
 		59FA4B32DED43F7D305F9D58 /* TuistFonts+SharedUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+SharedUI.swift"; sourceTree = "<group>"; };
 		5A57202E2639DE939632C98B /* TuistFonts+LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+LoggerClient.swift"; sourceTree = "<group>"; };
+		5A948A4E95604BCD1CF9AF0C /* AppFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "AppFeature-Info.plist"; sourceTree = "<group>"; };
 		5B06AC61792B8C4487A2213C /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		5B43045B24765F090634B627 /* TuistAssets+AnnouncementFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+AnnouncementFeature.swift"; sourceTree = "<group>"; };
+		5B638C7E671E3036B94F9EA6 /* AnnouncementFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "AnnouncementFeature-Info.plist"; sourceTree = "<group>"; };
 		5B98A9760569CB3FBDF871ED /* ForPDA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ForPDA.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BA49D574EE94FF7ADC02A3C /* ForumFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ForumFeature-Info.plist"; sourceTree = "<group>"; };
 		5D0D313B66CFD06C062A0768 /* TuistBundle+QMSFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+QMSFeature.swift"; sourceTree = "<group>"; };
 		5DC86A73EE608A67A7EDC065 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		5DEFCB42D6996F16057016EE /* TopicInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicInfo.swift; sourceTree = "<group>"; };
@@ -2429,8 +2448,10 @@
 		63C97AB8F5D74357FB1BBA6C /* AuthEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthEvent.swift; sourceTree = "<group>"; };
 		63EE7CBF84E3460445EEBB4C /* TuistFonts+QMSFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+QMSFeature.swift"; sourceTree = "<group>"; };
 		6431DF445FB6196D0DF1E8D8 /* ParsingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingClient.swift; sourceTree = "<group>"; };
+		655C7CA6FA3ED6055BB8F4C5 /* PersistenceKeys-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "PersistenceKeys-Info.plist"; sourceTree = "<group>"; };
 		65A3D0CC25375C5DCEF34038 /* UserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSession.swift; sourceTree = "<group>"; };
 		663D0D35C92DD6FAA116E668 /* QMSListParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSListParser.swift; sourceTree = "<group>"; };
+		666AD5F56D18BC873E4968F6 /* QMSFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "QMSFeature-Info.plist"; sourceTree = "<group>"; };
 		66CBD0143DEEF006DEA7306C /* History.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = History.swift; sourceTree = "<group>"; };
 		670328B8526540FAF00CC673 /* NukeUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NukeUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		670EF6A1CF3FF11D91D3F5DD /* ProfileEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEvent.swift; sourceTree = "<group>"; };
@@ -2439,16 +2460,23 @@
 		67482FDA32E710F193B122C5 /* DeveloperFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DeveloperFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AD44E6D3049D0CB33C85211 /* MenuButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButtons.swift; sourceTree = "<group>"; };
 		6BA4C4ACE4547D301ED518C3 /* TuistAssets+ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForumsListFeature.swift"; sourceTree = "<group>"; };
+		6D0087E3454ECCA95949DE14 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 		6D2AF7FA9E5F0C428ED9EA74 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
+		6EA71B4DB64C044A8AEC27F0 /* CacheClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CacheClient-Info.plist"; sourceTree = "<group>"; };
 		6ED99D044DB67AD96E453D89 /* swift-sharing_Sharing.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "swift-sharing_Sharing.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FC6C548C8921B1CEBC0E6C6 /* TuistAssets+ForPDA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForPDA.swift"; sourceTree = "<group>"; };
 		6FC7C76C4087D0A9FD9DC84F /* TuistFonts+AuthFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AuthFeature.swift"; sourceTree = "<group>"; };
+		6FFE03547A84D91B4E7079BF /* LoggerClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "LoggerClient-Info.plist"; sourceTree = "<group>"; };
 		702F1C4E9BF81ED9C500C584 /* TuistFonts+ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+ForumsListFeature.swift"; sourceTree = "<group>"; };
 		70692661CA720967477A375F /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
 		716AAAD7D01141995578E15A /* MenuEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuEvent.swift; sourceTree = "<group>"; };
 		717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SettingsFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7223F143C8BD6AB571D3BE0B /* BookmarksFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BookmarksFeature-Info.plist"; sourceTree = "<group>"; };
 		7230A59B211A2AAB2056696E /* TuistAssets+NotificationsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+NotificationsClient.swift"; sourceTree = "<group>"; };
+		729D44FF39FE40506AA488E5 /* NotificationCenterClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotificationCenterClient-Info.plist"; sourceTree = "<group>"; };
+		734FDFB089B17876ACA7089B /* TuistBundle+SafariExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+SafariExtension.swift"; sourceTree = "<group>"; };
 		73F2F2B8CDEE562CD63C3C0A /* GifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifView.swift; sourceTree = "<group>"; };
+		7472518D7713BA3DD4C5E5BB /* PasteboardClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "PasteboardClient-Info.plist"; sourceTree = "<group>"; };
 		757FC97F2FBD839762792B39 /* ForumJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumJump.swift; sourceTree = "<group>"; };
 		7610A4E70D43D6BCC7B280AA /* QMSListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSListScreen.swift; sourceTree = "<group>"; };
 		769C5A9CAABB94C898EE2D69 /* TuistBundle+LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+LoggerClient.swift"; sourceTree = "<group>"; };
@@ -2462,6 +2490,7 @@
 		802B3CE80F63078987330D4B /* ForumInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumInfo.swift; sourceTree = "<group>"; };
 		80EED22D45233E216DFED0EA /* TuistAssets+ArticleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ArticleFeature.swift"; sourceTree = "<group>"; };
 		812721A72ADCFCDF77E41819 /* QMSListFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QMSListFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		819C3F42D1C0667301523468 /* HistoryFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "HistoryFeature-Info.plist"; sourceTree = "<group>"; };
 		83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftyGif_SwiftyGif.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		85CCC7B42618527254A75999 /* FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesFeature.swift; sourceTree = "<group>"; };
 		867397EEF56335A036F0E13C /* DeeplinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkHandler.swift; sourceTree = "<group>"; };
@@ -2484,10 +2513,11 @@
 		911C9DAE06BC0966832CA5E8 /* TuistFonts+ForumFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+ForumFeature.swift"; sourceTree = "<group>"; };
 		913352219BB2A91146CAA4CC /* UnreadParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnreadParser.swift; sourceTree = "<group>"; };
 		91F4D833C06850FC59C65F6C /* ExyteMediaPicker_ExyteMediaPicker.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExyteMediaPicker_ExyteMediaPicker.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
-		92692A8F4371DEEE095F8228 /* TuistBundle+ForPDASafariExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+ForPDASafariExtension.swift"; sourceTree = "<group>"; };
 		9364E09A93E9A621F26CEF92 /* ArticleElementParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleElementParser.swift; sourceTree = "<group>"; };
 		93C443F557F63EAD4EC6F9D0 /* TuistAssets+ForumFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForumFeature.swift"; sourceTree = "<group>"; };
 		93CFD7775DACC8813B6771B3 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		93EBB770949C7804CF66E108 /* PageNavigationFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "PageNavigationFeature-Info.plist"; sourceTree = "<group>"; };
+		9420FAA935F19A4180D78A2C /* SafariExtension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SafariExtension-Info.plist"; sourceTree = "<group>"; };
 		948842ACD7815FB6C88585E3 /* CacheClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CacheClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		948BCA10C93338559F09E242 /* ForumsListFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ForumsListFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		94F0AD33CFEC2D542AD5BC7C /* CombineSchedulers.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CombineSchedulers.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2503,6 +2533,8 @@
 		9A5B0E144201FF1CA058F56C /* ConcurrencyExtras.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ConcurrencyExtras.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AC8FE59852541288950EB1F /* AppFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AppFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F90D7226EC000E32F4C40F3 /* AnnouncementScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementScreen.swift; sourceTree = "<group>"; };
+		9FEC8609036C76136C53E155 /* TCAExtensions-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TCAExtensions-Info.plist"; sourceTree = "<group>"; };
+		A0303B62409E7EECD7C74C77 /* NotificationsClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotificationsClient-Info.plist"; sourceTree = "<group>"; };
 		A0A1709C54DA5950515942F4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A0F03AB31225515A63176A69 /* AlertToast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AlertToast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2735BACD13A67B20CB8C16D /* HapticClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HapticClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2515,12 +2547,15 @@
 		A71C4AA6B8EA3A1AD228B771 /* Forum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forum.swift; sourceTree = "<group>"; };
 		A97D84774C04877C9395B797 /* ForumsListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumsListScreen.swift; sourceTree = "<group>"; };
 		A99F23D68A39F53CF4566F1A /* ArticleParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleParser.swift; sourceTree = "<group>"; };
+		AA60F6E4CD915C419DDB139C /* NotificationsFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotificationsFeature-Info.plist"; sourceTree = "<group>"; };
+		ACBEBA9CCE9F0A3A38014478 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		ACCDEBC81D7FBF696AB44904 /* AnalyticsConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsConfiguration.swift; sourceTree = "<group>"; };
 		ACD1369D8CE07B4747D611D1 /* YouTubePlayerKit_YouTubePlayerKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YouTubePlayerKit_YouTubePlayerKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACE21C098C19D78B00A3A9C9 /* RichTextKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RichTextKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AD1EC28ED123E507FA149913 /* DeveloperFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperFeature.swift; sourceTree = "<group>"; };
 		AD503AB2D9B1CDB4E195DB87 /* TuistFonts+ParsingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+ParsingClient.swift"; sourceTree = "<group>"; };
 		AD73BACE15CD99C2A6E07AE3 /* ProfileDeeplinkType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDeeplinkType.swift; sourceTree = "<group>"; };
+		AE3F2A563245045637BEE47E /* FavoritesFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "FavoritesFeature-Info.plist"; sourceTree = "<group>"; };
 		AEB911569EF2ADB3A62F0DAA /* ZMarkupParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZMarkupParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B06C779165D24CB727795AEB /* TuistFonts+NotificationsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+NotificationsFeature.swift"; sourceTree = "<group>"; };
 		B28971DBCF658964A52E32E7 /* ArticleElementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleElementView.swift; sourceTree = "<group>"; };
@@ -2559,6 +2594,7 @@
 		CDE1098EC6C2FB57BE638C5E /* CommentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsView.swift; sourceTree = "<group>"; };
 		CE01539A6AD4AA3983320B16 /* PageNavigationFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNavigationFeature.swift; sourceTree = "<group>"; };
 		CF526150191DDC3B13022ADE /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		CF60D89BC31F9CFF09C6909D /* ArticleFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ArticleFeature-Info.plist"; sourceTree = "<group>"; };
 		D03264C03BC2FC662D02E5A7 /* ArticleMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleMenuAction.swift; sourceTree = "<group>"; };
 		D0B7A4E4709567AE7C55E99A /* TuistBundle+ForPDA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+ForPDA.swift"; sourceTree = "<group>"; };
 		D12BFAFA590C8DDB6580E1F0 /* TuistBundle+AnnouncementFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+AnnouncementFeature.swift"; sourceTree = "<group>"; };
@@ -2582,10 +2618,13 @@
 		DD51C6E965A35DBF9F4FBA55 /* Models.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Models.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE1802B1757DD0294A45CBEB /* ForumFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumFeature.swift; sourceTree = "<group>"; };
 		DE22B6AC2F950018FE21B9E7 /* TopicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicView.swift; sourceTree = "<group>"; };
+		DE55B932FF7D0774C0AEBD07 /* SettingsFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SettingsFeature-Info.plist"; sourceTree = "<group>"; };
 		DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LoggerClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEA8F2E0C1F88D6D8D5CEDDC /* NotificationsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsScreen.swift; sourceTree = "<group>"; };
+		DEADA5CEBDDD4B3B4887E684 /* TopicFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TopicFeature-Info.plist"; sourceTree = "<group>"; };
 		DEE0FEF30FFD545926E71F5E /* TuistAssets+HapticClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+HapticClient.swift"; sourceTree = "<group>"; };
 		DF35AE7A67F698728E031414 /* TuistFonts+FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+FavoritesFeature.swift"; sourceTree = "<group>"; };
+		DF43F51517761000964AB499 /* ArticlesListFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ArticlesListFeature-Info.plist"; sourceTree = "<group>"; };
 		E013255840871EB50A72EE03 /* TuistAssets+LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+LoggerClient.swift"; sourceTree = "<group>"; };
 		E09D8663DDD850468A48D730 /* TopicTypeUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicTypeUI.swift; sourceTree = "<group>"; };
 		E253ABCD9B8300527A696180 /* TuistBundle+CacheClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+CacheClient.swift"; sourceTree = "<group>"; };
@@ -2603,7 +2642,6 @@
 		E6F10EF0B11A3789933965ED /* TuistFonts+AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AppFeature.swift"; sourceTree = "<group>"; };
 		EB37899DCEFC6DDBA1F53741 /* QMSMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSMessage.swift; sourceTree = "<group>"; };
 		EBA0C850AAE415BBD96ADC88 /* TuistAssets+HistoryFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+HistoryFeature.swift"; sourceTree = "<group>"; };
-		EBF06C6E53F240A0AA23A202 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		EC3BE547E5AE4D5E2D811035 /* TuistBundle+APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+APIClient.swift"; sourceTree = "<group>"; };
 		EC78FD8E0F5CFB52C2B788BF /* PDAContextMenuModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDAContextMenuModifier.swift; sourceTree = "<group>"; };
 		ED0C39E32DBDC948691880A4 /* TuistBundle+NotificationCenterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+NotificationCenterClient.swift"; sourceTree = "<group>"; };
@@ -2615,12 +2653,14 @@
 		F002816C690657E8B4FBD69D /* TuistFonts+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+Models.swift"; sourceTree = "<group>"; };
 		F02BC76FA5CA306A964436E2 /* AppDelegateFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateFeature.swift; sourceTree = "<group>"; };
 		F040C86C53931119F2778DAE /* ForumOptionContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumOptionContextMenuAction.swift; sourceTree = "<group>"; };
+		F141F478AD13DCCDCB570E29 /* ParsingClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ParsingClient-Info.plist"; sourceTree = "<group>"; };
 		F1F482EA98581F6535F03460 /* ForumCommonContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumCommonContextMenuAction.swift; sourceTree = "<group>"; };
 		F2A6C05AE962C998DBE1A454 /* Cache.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Cache.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ComposableArchitecture.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4580A764B6B5012E90D6C3F /* AppTab+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppTab+Ext.swift"; sourceTree = "<group>"; };
 		F46672A4BC9DAE9C2C868E2E /* TuistBundle+FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+FavoritesFeature.swift"; sourceTree = "<group>"; };
 		F5592F7811DFDA942198417A /* ForumFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ForumFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5799228F3F16F025F9D6E8A /* ForumsListFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ForumsListFeature-Info.plist"; sourceTree = "<group>"; };
 		F880424E7D27152CFE961D3B /* TuistBundle+PasteboardClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+PasteboardClient.swift"; sourceTree = "<group>"; };
 		F968EB69AD034C83CB134239 /* TuistFonts+QMSListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+QMSListFeature.swift"; sourceTree = "<group>"; };
 		F970CA2A185FF1E82859243F /* ActivityIndicatorView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ActivityIndicatorView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2636,6 +2676,7 @@
 		FD87EFCD7F63A8B2B6E62558 /* BookmarksParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksParser.swift; sourceTree = "<group>"; };
 		FDA99E9A5CB1CEA52A7B5125 /* AuthFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFeature.swift; sourceTree = "<group>"; };
 		FE6816AEF4CDF660C9BB6FB8 /* TuistBundle+PageNavigationFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+PageNavigationFeature.swift"; sourceTree = "<group>"; };
+		FE90FDB70A525BF91F3B5A72 /* SafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2783,6 +2824,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4C3BC1B56105317680BCF3AE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4CD006B0BB5AE3334DA8ED49 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2922,6 +2970,7 @@
 				83205AF1A462FDDCEE68C435 /* CacheClient.framework in Frameworks */,
 				7B88B046D7F6C76AD087B131 /* ComposableArchitecture.framework in Frameworks */,
 				FA757DFE23EA4DA4EB762B1E /* LoggerClient.framework in Frameworks */,
+				B68932F57C690796666D6856 /* ParsingClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3111,13 +3160,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F8323784792850B9FA160A27 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -3263,8 +3305,40 @@
 		1662F78ED88A2C08E14B8AEE /* InfoPlists */ = {
 			isa = PBXGroup;
 			children = (
+				57469BA6B90D508C37AF584D /* AnalyticsClient-Info.plist */,
+				5B638C7E671E3036B94F9EA6 /* AnnouncementFeature-Info.plist */,
+				0FBC46964023FE14A1C74F11 /* APIClient-Info.plist */,
+				5A948A4E95604BCD1CF9AF0C /* AppFeature-Info.plist */,
+				CF60D89BC31F9CFF09C6909D /* ArticleFeature-Info.plist */,
+				DF43F51517761000964AB499 /* ArticlesListFeature-Info.plist */,
+				17857791212D05958C004BD5 /* AuthFeature-Info.plist */,
+				7223F143C8BD6AB571D3BE0B /* BookmarksFeature-Info.plist */,
+				6EA71B4DB64C044A8AEC27F0 /* CacheClient-Info.plist */,
+				22A46161CBC947DE7653A398 /* DeeplinkHandler-Info.plist */,
+				274A0BC4E5197B7422A1C540 /* DeveloperFeature-Info.plist */,
+				AE3F2A563245045637BEE47E /* FavoritesFeature-Info.plist */,
 				18813B29C2AE41BC1462C685 /* ForPDA-Info.plist */,
-				2DCBA340BF5137B65B4EBC4C /* ForPDASafariExtension-Info.plist */,
+				5BA49D574EE94FF7ADC02A3C /* ForumFeature-Info.plist */,
+				F5799228F3F16F025F9D6E8A /* ForumsListFeature-Info.plist */,
+				4761DCB86AC73550BDF68479 /* HapticClient-Info.plist */,
+				819C3F42D1C0667301523468 /* HistoryFeature-Info.plist */,
+				6FFE03547A84D91B4E7079BF /* LoggerClient-Info.plist */,
+				38DB1507BA715B2BB7D4FB05 /* Models-Info.plist */,
+				729D44FF39FE40506AA488E5 /* NotificationCenterClient-Info.plist */,
+				A0303B62409E7EECD7C74C77 /* NotificationsClient-Info.plist */,
+				AA60F6E4CD915C419DDB139C /* NotificationsFeature-Info.plist */,
+				93EBB770949C7804CF66E108 /* PageNavigationFeature-Info.plist */,
+				F141F478AD13DCCDCB570E29 /* ParsingClient-Info.plist */,
+				7472518D7713BA3DD4C5E5BB /* PasteboardClient-Info.plist */,
+				655C7CA6FA3ED6055BB8F4C5 /* PersistenceKeys-Info.plist */,
+				3F48EFB072E568BCBC4B9A13 /* ProfileFeature-Info.plist */,
+				666AD5F56D18BC873E4968F6 /* QMSFeature-Info.plist */,
+				19375F84D0FB0397E472361F /* QMSListFeature-Info.plist */,
+				9420FAA935F19A4180D78A2C /* SafariExtension-Info.plist */,
+				DE55B932FF7D0774C0AEBD07 /* SettingsFeature-Info.plist */,
+				057B886884B5C026C12F39BB /* SharedUI-Info.plist */,
+				9FEC8609036C76136C53E155 /* TCAExtensions-Info.plist */,
+				DEADA5CEBDDD4B3B4887E684 /* TopicFeature-Info.plist */,
 			);
 			path = InfoPlists;
 			sourceTree = "<group>";
@@ -3403,7 +3477,6 @@
 				DC6085DD9EC076F9CE68B66B /* TuistBundle+DeveloperFeature.swift */,
 				F46672A4BC9DAE9C2C868E2E /* TuistBundle+FavoritesFeature.swift */,
 				D0B7A4E4709567AE7C55E99A /* TuistBundle+ForPDA.swift */,
-				92692A8F4371DEEE095F8228 /* TuistBundle+ForPDASafariExtension.swift */,
 				29232FF71BC364A3C44449B4 /* TuistBundle+ForumFeature.swift */,
 				BABB677D51B18FF16F4CAEC2 /* TuistBundle+ForumsListFeature.swift */,
 				136859B894720C8182BCADEA /* TuistBundle+HapticClient.swift */,
@@ -3420,6 +3493,7 @@
 				1F6014A32ED05AE3745988BF /* TuistBundle+ProfileFeature.swift */,
 				5D0D313B66CFD06C062A0768 /* TuistBundle+QMSFeature.swift */,
 				4C683B8FA1E5BCD4D90307D4 /* TuistBundle+QMSListFeature.swift */,
+				734FDFB089B17876ACA7089B /* TuistBundle+SafariExtension.swift */,
 				5210212D64C7D2E37E786F9E /* TuistBundle+SettingsFeature.swift */,
 				54C691B84ECE7B451A2D11A1 /* TuistBundle+SharedUI.swift */,
 				EFB1BB68DDA5F1DC43939A8C /* TuistBundle+TCAExtensions.swift */,
@@ -3485,6 +3559,14 @@
 				5284CA67ADEB5D3244983000 /* SharedUI.swift */,
 			);
 			path = SharedUI;
+			sourceTree = "<group>";
+		};
+		36E4FEA3AE4BA1B193500DF2 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				6D0087E3454ECCA95949DE14 /* App.xcconfig */,
+			);
+			path = Configs;
 			sourceTree = "<group>";
 		};
 		3E8E2795B4891C8A3979CA4E /* Resources */ = {
@@ -3754,6 +3836,7 @@
 		736D67916746C842D68D2F49 /* NotificationsClient */ = {
 			isa = PBXGroup;
 			children = (
+				F36EC259E64BE69074537ACC /* Resources */,
 				FD4E100ACC4643C454EEE8B3 /* NotificationsClient.swift */,
 			);
 			path = NotificationsClient;
@@ -3835,7 +3918,6 @@
 				FBF88C3FEED502F690603E9D /* FavoritesFeature.framework */,
 				2B1ACAD23AE8182F9140F649 /* FloatingButton.framework */,
 				5B98A9760569CB3FBDF871ED /* ForPDA.app */,
-				349C14FD1FE621F34B984A04 /* ForPDASafariExtension.appex */,
 				FD47B25BEA87ACA5D0E621A9 /* ForPDATests.xctest */,
 				F5592F7811DFDA942198417A /* ForumFeature.framework */,
 				948BCA10C93338559F09E242 /* ForumsListFeature.framework */,
@@ -3864,6 +3946,7 @@
 				2957781ACE16763055F2270D /* QMSFeature.framework */,
 				812721A72ADCFCDF77E41819 /* QMSListFeature.framework */,
 				ACE21C098C19D78B00A3A9C9 /* RichTextKit.framework */,
+				FE90FDB70A525BF91F3B5A72 /* SafariExtension.appex */,
 				717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */,
 				322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */,
 				3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */,
@@ -3935,7 +4018,6 @@
 				576DD9071D9AD523EDFEA23E /* Events */,
 				2742C85CA8EC8752153D579A /* UI */,
 				1E39B50DB1BE0483D336E624 /* AnalyticsClient.swift */,
-				EBF06C6E53F240A0AA23A202 /* Secrets.swift */,
 			);
 			path = AnalyticsClient;
 			sourceTree = "<group>";
@@ -4059,6 +4141,7 @@
 		A76F7E0319F4655AA0FFFC39 /* Project */ = {
 			isa = PBXGroup;
 			children = (
+				36E4FEA3AE4BA1B193500DF2 /* Configs */,
 				D11DB9D39DF551B52CE86336 /* Derived */,
 				931FE531463569506493B690 /* Extensions */,
 				D987F6C1D45E8383A31700F2 /* Modules */,
@@ -4403,6 +4486,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		F36EC259E64BE69074537ACC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				ACBEBA9CCE9F0A3A38014478 /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		F46D37DC512BAC82CF3C64B1 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -4495,6 +4586,7 @@
 				A181E5EE9BE1EBEE52C3F00D /* PBXTargetDependency */,
 				E19C5901ADEA6B29B556860C /* PBXTargetDependency */,
 				2E120D6803E277AE90659C29 /* PBXTargetDependency */,
+				2A0B310C49C8367437E3CA76 /* PBXTargetDependency */,
 			);
 			name = NotificationsClient;
 			packageProductDependencies = (
@@ -4701,6 +4793,26 @@
 			productName = NotificationsFeature;
 			productReference = 006917E2DFC70599AF512EA1 /* NotificationsFeature.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		67FF173C6B01CE1AA03F07BB /* SafariExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 89428E67113D3A836DC766CF /* Build configuration list for PBXNativeTarget "SafariExtension" */;
+			buildPhases = (
+				769F11AB7EFC456D7BFC2927 /* Sources */,
+				3B6AE2317D4C39D73D2ADA4F /* Resources */,
+				4C3BC1B56105317680BCF3AE /* Frameworks */,
+				3A9D3ACD23DFD130DADC4262 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SafariExtension;
+			packageProductDependencies = (
+			);
+			productName = SafariExtension;
+			productReference = FE90FDB70A525BF91F3B5A72 /* SafariExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		6C2BD78BE9B4C5FA78FFC4D4 /* PasteboardClient */ = {
 			isa = PBXNativeTarget;
@@ -5244,26 +5356,6 @@
 			productReference = CB3B4EA65C218984C1E25098 /* ArticleFeature.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		FCD2056251E7C7078F632B13 /* ForPDASafariExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 50B53BEA52EF6137051F3BF4 /* Build configuration list for PBXNativeTarget "ForPDASafariExtension" */;
-			buildPhases = (
-				0B1F0EC95A69A76963432B60 /* Sources */,
-				09504CE156838CFD02AD3398 /* Resources */,
-				F8323784792850B9FA160A27 /* Frameworks */,
-				21C1D4685FB7A2A37F99947E /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = ForPDASafariExtension;
-			packageProductDependencies = (
-			);
-			productName = ForPDASafariExtension;
-			productReference = 349C14FD1FE621F34B984A04 /* ForPDASafariExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		FFB7AF79E67AB9F1195AD2B1 /* ForumsListFeature */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EF68DE20F9A52C9890BD4101 /* Build configuration list for PBXNativeTarget "ForumsListFeature" */;
@@ -5329,7 +5421,6 @@
 				BB2853E751029885F1101824 /* DeveloperFeature */,
 				7A113F5A9A36804BD241DA93 /* FavoritesFeature */,
 				27F1F3441DA67D01CC3577BA /* ForPDA */,
-				FCD2056251E7C7078F632B13 /* ForPDASafariExtension */,
 				4B377D1CD1E489B09C77E2D1 /* ForPDATests */,
 				F7A3266CC65F3604675A6B32 /* ForumFeature */,
 				FFB7AF79E67AB9F1195AD2B1 /* ForumsListFeature */,
@@ -5347,6 +5438,7 @@
 				BAC51C8E5FCD8389727525FB /* ProfileFeature */,
 				0AF82A7ED51CA636E4B2EC1D /* QMSFeature */,
 				971A841DF29EABFD548848CF /* QMSListFeature */,
+				67FF173C6B01CE1AA03F07BB /* SafariExtension */,
 				8A3095F4A1BF8A84A0020E2A /* SettingsFeature */,
 				AF7A0B32922CA1E03AEC355C /* SharedUI */,
 				F4D3CCF044E9BACD457D4E55 /* TCAExtensions */,
@@ -5364,22 +5456,6 @@
 				CF76CF59784753F87224ED2A /* fontello.ttf in Resources */,
 				B7087075DA7BCCFB7A1688C7 /* LaunchScreen.storyboard in Resources */,
 				09E62A450F68E8A7E75DB4DC /* Preview Assets.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		09504CE156838CFD02AD3398 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				81F369C80E9AB343972323C7 /* messages.json in Resources */,
-				AC68AB6AF4572FC9F2E6E400 /* content.js in Resources */,
-				505771FCF5861405E4BF5234 /* icon-128.png in Resources */,
-				6485CDA356493EB261BE1E18 /* icon-256.png in Resources */,
-				D493BB3321E5C25202E04A82 /* icon-48.png in Resources */,
-				5EC0B4E3A1BDA3BF815820F8 /* icon-512.png in Resources */,
-				D7C9FD0AA56DAD28B5F47131 /* icon-64.png in Resources */,
-				76A9F2CD26B534CB4EDBDB82 /* icon-96.png in Resources */,
-				10EF0732504DF8B4005AD263 /* manifest.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5426,6 +5502,7 @@
 				2D542BCCEC0E8ABA25F19DC2 /* fontello.ttf in Resources */,
 				A0FF326AD2401F6A4582B7BC /* LaunchScreen.storyboard in Resources */,
 				C6F1D82C4FDC42DC2B81FD89 /* Preview Assets.xcassets in Resources */,
+				E0DEF3468389538B24A70CE7 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5438,6 +5515,22 @@
 				E7F7D8B0535505EFD4E78E96 /* LaunchScreen.storyboard in Resources */,
 				A5F339D40D3FEBD48ACA0A40 /* Preview Assets.xcassets in Resources */,
 				1355514A972AF10AAFD7EB92 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3B6AE2317D4C39D73D2ADA4F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				483B93685FA2B7F421B877C6 /* messages.json in Resources */,
+				CABBF3C4FAF86859FA053854 /* content.js in Resources */,
+				5EAE777D4B83A9FB073AB3FA /* icon-128.png in Resources */,
+				F480EF390C82A65F94F8BBCE /* icon-256.png in Resources */,
+				6C6C37262C1B044FDD6EDA66 /* icon-48.png in Resources */,
+				E25B2187BB3214D3158D028C /* icon-512.png in Resources */,
+				86C2120DAA09ED29FED80140 /* icon-64.png in Resources */,
+				CD11F59393B4DB830F2A2EF2 /* icon-96.png in Resources */,
+				EE438B8D99269C16884D08FC /* manifest.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5768,15 +5861,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		0B1F0EC95A69A76963432B60 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D6BFA46C2E5B39F5CBF68BBA /* TuistBundle+ForPDASafariExtension.swift in Sources */,
-				A64A260AB598AA3EAB3DF395 /* SafariWebExtensionHandler.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		10D1846C6B45CEAF0D0C72A4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -5863,7 +5947,6 @@
 				8781F75A021319CF6929018E /* MenuEvent.swift in Sources */,
 				B7719EDD4CB97FBDC14187F0 /* ProfileEvent.swift in Sources */,
 				1AC77153F4BED487DE8A5D59 /* SettingsEvent.swift in Sources */,
-				9EBE431ADF4E61AF442E6C8C /* Secrets.swift in Sources */,
 				6B32C929F820AF3C71FAA624 /* AnalyticsModifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6046,6 +6129,15 @@
 				E25709DD9490182769D221A4 /* TuistFonts+BookmarksFeature.swift in Sources */,
 				1A9812D138D1CCB512AA13DD /* BookmarksFeature.swift in Sources */,
 				D54D788D77C340A1AAF0D148 /* BookmarksScreen.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		769F11AB7EFC456D7BFC2927 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BEBFEA27052474495492E98 /* TuistBundle+SafariExtension.swift in Sources */,
+				732C1C465B12D4DD3EF414F3 /* SafariWebExtensionHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6447,6 +6539,12 @@
 			name = TopicFeature;
 			target = E0E4DF86DB5588C4A649EE5C /* TopicFeature */;
 			targetProxy = BF4941A72214A7FD76C9AC83 /* PBXContainerItemProxy */;
+		};
+		2A0B310C49C8367437E3CA76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ParsingClient;
+			target = 9F26DE94CE2FED6167520917 /* ParsingClient */;
+			targetProxy = C58B885F7D49F64A3301273E /* PBXContainerItemProxy */;
 		};
 		2A67B2E68902848AC7D3FE2E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7240,7 +7338,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/NotificationCenterClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7270,10 +7368,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.NotificationCenterClient;
 				PRODUCT_NAME = NotificationCenterClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -7281,7 +7380,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7303,7 +7402,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/NotificationsClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7336,14 +7435,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.NotificationsClient;
 				PRODUCT_NAME = NotificationsClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7364,7 +7464,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/PageNavigationFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7394,10 +7494,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.PageNavigationFeature;
 				PRODUCT_NAME = PageNavigationFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -7405,7 +7506,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7427,7 +7528,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/BookmarksFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7460,10 +7561,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.BookmarksFeature;
 				PRODUCT_NAME = BookmarksFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -7471,7 +7573,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7493,7 +7595,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/HistoryFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7526,14 +7628,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.HistoryFeature;
 				PRODUCT_NAME = HistoryFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7555,7 +7658,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ForumsListFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7588,14 +7691,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ForumsListFeature;
 				PRODUCT_NAME = ForumsListFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7617,7 +7721,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AnnouncementFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7650,10 +7754,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AnnouncementFeature;
 				PRODUCT_NAME = AnnouncementFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -7661,7 +7766,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7683,7 +7788,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/DeeplinkHandler-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7716,14 +7821,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.DeeplinkHandler;
 				PRODUCT_NAME = DeeplinkHandler;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7745,7 +7851,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/CacheClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7778,10 +7884,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.CacheClient;
 				PRODUCT_NAME = CacheClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -7789,7 +7896,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7865,7 +7972,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AuthFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7898,14 +8005,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AuthFeature;
 				PRODUCT_NAME = AuthFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7926,7 +8034,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/LoggerClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7956,14 +8064,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.LoggerClient;
 				PRODUCT_NAME = LoggerClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -7978,7 +8087,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/Models-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -7988,8 +8097,37 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.Models;
 				PRODUCT_NAME = Models;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		2D9AD5011E399C0FF9EEC217 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/SafariExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.safariextension;
+				PRODUCT_NAME = SafariExtension;
+				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -8000,8 +8138,6 @@
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
 		};
@@ -8021,7 +8157,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/QMSListFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8054,14 +8190,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.QMSListFeature;
 				PRODUCT_NAME = QMSListFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8069,6 +8206,7 @@
 		};
 		368E3E27321E9348CFE5888A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D0087E3454ECCA95949DE14 /* App.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -8101,10 +8239,12 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 557;
 				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7353CQCGQC;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8124,7 +8264,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ForPDA;
 				LOCALIZATION_EXPORT_SUPPORTED = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_SWIFT_FLAGS = (
@@ -8134,6 +8273,7 @@
 					"-warn-long-expression-type-checking=100",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.subvert.forpda";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 			};
@@ -8155,7 +8295,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ArticleFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8188,10 +8328,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ArticleFeature;
 				PRODUCT_NAME = ArticleFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -8199,7 +8340,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8221,7 +8362,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AppFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8254,47 +8395,23 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AppFeature;
 				PRODUCT_NAME = AppFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
-		4447F87B12F6EBEC2ECBDC4B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDASafariExtension-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.safariextension;
-				PRODUCT_NAME = ForPDASafariExtension;
-				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
-				SWIFT_COMPILATION_MODE = singlefile;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
 		50BF5828548E435192A13419 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D0087E3454ECCA95949DE14 /* App.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -8327,10 +8444,12 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 557;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7353CQCGQC;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8344,7 +8463,6 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ForPDA;
 				LOCALIZATION_EXPORT_SUPPORTED = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 0.8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_SWIFT_FLAGS = (
 					"-Xfrontend",
@@ -8353,6 +8471,7 @@
 					"-warn-long-expression-type-checking=100",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.subvert.forpda";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
@@ -8374,7 +8493,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ParsingClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8404,38 +8523,17 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ParsingClient;
 				PRODUCT_NAME = ParsingClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		61D1B8E9E4DFC61246F66FE6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDASafariExtension-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.safariextension;
-				PRODUCT_NAME = ForPDASafariExtension;
-				SDKROOT = iphoneos;
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -8448,7 +8546,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/Models-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8458,14 +8556,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.Models;
 				PRODUCT_NAME = Models;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8486,7 +8585,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/NotificationCenterClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8516,14 +8615,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.NotificationCenterClient;
 				PRODUCT_NAME = NotificationCenterClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8545,7 +8645,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/DeveloperFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8578,10 +8678,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.DeveloperFeature;
 				PRODUCT_NAME = DeveloperFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -8589,7 +8690,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8611,7 +8712,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/BookmarksFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8644,14 +8745,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.BookmarksFeature;
 				PRODUCT_NAME = BookmarksFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8724,7 +8826,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/SharedUI-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8734,10 +8836,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.SharedUI;
 				PRODUCT_NAME = SharedUI;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -8745,7 +8848,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8767,7 +8870,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ProfileFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8800,14 +8903,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ProfileFeature;
 				PRODUCT_NAME = ProfileFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8829,7 +8933,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/HistoryFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8862,10 +8966,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.HistoryFeature;
 				PRODUCT_NAME = HistoryFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -8873,7 +8978,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8894,7 +8999,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/HapticClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8924,10 +9029,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.HapticClient;
 				PRODUCT_NAME = HapticClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -8935,7 +9041,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -8957,7 +9063,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/SettingsFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -8990,14 +9096,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.SettingsFeature;
 				PRODUCT_NAME = SettingsFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9023,7 +9130,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AnalyticsClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9056,14 +9163,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AnalyticsClient;
 				PRODUCT_NAME = AnalyticsClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9085,7 +9193,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ArticleFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9118,14 +9226,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ArticleFeature;
 				PRODUCT_NAME = ArticleFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9147,7 +9256,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/QMSFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9180,10 +9289,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.QMSFeature;
 				PRODUCT_NAME = QMSFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9191,7 +9301,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9212,7 +9322,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ParsingClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9242,10 +9352,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ParsingClient;
 				PRODUCT_NAME = ParsingClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9253,7 +9364,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9275,7 +9386,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ProfileFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9308,10 +9419,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ProfileFeature;
 				PRODUCT_NAME = ProfileFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9319,7 +9431,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9341,7 +9453,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ForumsListFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9374,10 +9486,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ForumsListFeature;
 				PRODUCT_NAME = ForumsListFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9385,7 +9498,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9406,7 +9519,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/PersistenceKeys-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9436,14 +9549,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.PersistenceKeys;
 				PRODUCT_NAME = PersistenceKeys;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9465,7 +9579,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/DeeplinkHandler-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9498,10 +9612,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.DeeplinkHandler;
 				PRODUCT_NAME = DeeplinkHandler;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9509,7 +9624,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9524,7 +9639,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/SharedUI-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9534,14 +9649,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.SharedUI;
 				PRODUCT_NAME = SharedUI;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9562,7 +9678,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/TCAExtensions-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9592,14 +9708,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.TCAExtensions;
 				PRODUCT_NAME = TCAExtensions;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9621,7 +9738,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/QMSFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9654,16 +9771,39 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.QMSFeature;
 				PRODUCT_NAME = QMSFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		AECFC57109CC9DA18F9EEB36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "Derived/InfoPlists/SafariExtension-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.safariextension;
+				PRODUCT_NAME = SafariExtension;
+				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -9683,7 +9823,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/CacheClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9716,14 +9856,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.CacheClient;
 				PRODUCT_NAME = CacheClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9745,7 +9886,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AnnouncementFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9778,14 +9919,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AnnouncementFeature;
 				PRODUCT_NAME = AnnouncementFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9806,7 +9948,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/PageNavigationFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9836,14 +9978,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.PageNavigationFeature;
 				PRODUCT_NAME = PageNavigationFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9864,7 +10007,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/LoggerClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9894,10 +10037,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.LoggerClient;
 				PRODUCT_NAME = LoggerClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9905,7 +10049,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9931,7 +10075,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/APIClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -9964,10 +10108,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.APIClient;
 				PRODUCT_NAME = APIClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -9975,7 +10120,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -9997,7 +10142,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/SettingsFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10030,10 +10175,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.SettingsFeature;
 				PRODUCT_NAME = SettingsFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10041,7 +10187,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10063,7 +10209,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ArticlesListFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10096,10 +10242,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ArticlesListFeature;
 				PRODUCT_NAME = ArticlesListFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10107,7 +10254,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10129,7 +10276,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/TopicFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10162,14 +10309,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.TopicFeature;
 				PRODUCT_NAME = TopicFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10191,7 +10339,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ForumFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10224,14 +10372,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ForumFeature;
 				PRODUCT_NAME = ForumFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10253,7 +10402,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ArticlesListFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10286,14 +10435,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ArticlesListFeature;
 				PRODUCT_NAME = ArticlesListFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10315,7 +10465,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/TopicFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10348,10 +10498,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.TopicFeature;
 				PRODUCT_NAME = TopicFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10359,7 +10510,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10381,7 +10532,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/NotificationsFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10414,10 +10565,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.NotificationsFeature;
 				PRODUCT_NAME = NotificationsFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10425,7 +10577,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10447,7 +10599,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/NotificationsClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10480,10 +10632,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.NotificationsClient;
 				PRODUCT_NAME = NotificationsClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10491,7 +10644,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10513,7 +10666,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AuthFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10546,10 +10699,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AuthFeature;
 				PRODUCT_NAME = AuthFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10557,7 +10711,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10579,7 +10733,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/FavoritesFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10612,10 +10766,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.FavoritesFeature;
 				PRODUCT_NAME = FavoritesFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10623,7 +10778,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10703,7 +10858,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/NotificationsFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10736,14 +10891,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.NotificationsFeature;
 				PRODUCT_NAME = NotificationsFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10764,7 +10920,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/PasteboardClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10794,10 +10950,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.PasteboardClient;
 				PRODUCT_NAME = PasteboardClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10805,7 +10962,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10826,7 +10983,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/TCAExtensions-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10856,10 +11013,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.TCAExtensions;
 				PRODUCT_NAME = TCAExtensions;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10867,7 +11025,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10889,7 +11047,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/QMSListFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10922,10 +11080,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.QMSListFeature;
 				PRODUCT_NAME = QMSListFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -10933,7 +11092,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -10959,7 +11118,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AnalyticsClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -10992,10 +11151,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AnalyticsClient;
 				PRODUCT_NAME = AnalyticsClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -11003,7 +11163,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11024,7 +11184,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/HapticClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11054,14 +11214,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.HapticClient;
 				PRODUCT_NAME = HapticClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11083,7 +11244,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/DeveloperFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11116,14 +11277,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.DeveloperFeature;
 				PRODUCT_NAME = DeveloperFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11145,7 +11307,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/AppFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11178,10 +11340,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.AppFeature;
 				PRODUCT_NAME = AppFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -11189,7 +11352,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11215,7 +11378,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/APIClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11248,14 +11411,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.APIClient;
 				PRODUCT_NAME = APIClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11276,7 +11440,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/PersistenceKeys-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11306,10 +11470,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.PersistenceKeys;
 				PRODUCT_NAME = PersistenceKeys;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -11317,7 +11482,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11338,7 +11503,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/PasteboardClient-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11368,14 +11533,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.PasteboardClient;
 				PRODUCT_NAME = PasteboardClient;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11397,7 +11563,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/FavoritesFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11430,14 +11596,15 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.FavoritesFeature;
 				PRODUCT_NAME = FavoritesFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11459,7 +11626,7 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
-				INFOPLIST_FILE = "Derived/InfoPlists/ForPDA-Info.plist";
+				INFOPLIST_FILE = "Derived/InfoPlists/ForumFeature-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -11492,10 +11659,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.ForumFeature;
 				PRODUCT_NAME = ForumFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
 					"$(inherited)",
@@ -11503,7 +11671,7 @@
 				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -11647,15 +11815,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		50B53BEA52EF6137051F3BF4 /* Build configuration list for PBXNativeTarget "ForPDASafariExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4447F87B12F6EBEC2ECBDC4B /* Debug */,
-				61D1B8E9E4DFC61246F66FE6 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		555583548439F54446C68D13 /* Build configuration list for PBXNativeTarget "DeveloperFeature" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -11742,6 +11901,15 @@
 			buildConfigurations = (
 				DC537AE37AE2ADD684CB4CB4 /* Debug */,
 				F1235946CB558A2EA788C9C9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		89428E67113D3A836DC766CF /* Build configuration list for PBXNativeTarget "SafariExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D9AD5011E399C0FF9EEC217 /* Debug */,
+				AECFC57109CC9DA18F9EEB36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

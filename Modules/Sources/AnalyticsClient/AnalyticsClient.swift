@@ -96,8 +96,22 @@ extension AnalyticsClient: DependencyKey {
 
 extension AnalyticsClient {
     
+    struct Secrets {
+        enum Key: String {
+            case SENTRY_DSN
+            case SENTRY_DSYM_TOKEN
+            case POSTHOG_TOKEN
+        }
+        
+        static func get(_ key: Key) -> String {
+            guard let value = Bundle.main.object(forInfoDictionaryKey: key.rawValue) as? String
+            else { fatalError("Couldn't find \(key.rawValue) key") }
+            return value
+        }
+    }
+    
     private static func configureAnalytics(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
-        let config = PostHogConfig(apiKey: Secrets.posthogToken, host: "https://eu.i.posthog.com")
+        let config = PostHogConfig(apiKey: Secrets.get(.POSTHOG_TOKEN), host: "https://eu.i.posthog.com")
         config.debug = true
         config.getAnonymousId = { _ in UUID(uuidString: id) ?? UUID.v7() }
         config.optOut = !isEnabled
@@ -134,7 +148,7 @@ extension AnalyticsClient {
     
     private static func configureCrashlytics(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         SentrySDK.start { options in
-            options.dsn = Secrets.sentryDSN
+            options.dsn = Secrets.get(.SENTRY_DSN)
             options.debug = isDebugEnabled
             options.enabled = isEnabled
             options.tracesSampleRate = 1.0
