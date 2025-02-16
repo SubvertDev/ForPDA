@@ -86,7 +86,7 @@ platform :ios do
         end
     end
     
-    desc ""
+    desc "Builds and signs ipa file"
     lane :build_ipa do
         version = get_xcconfig_value(
             path: 'Configs/App.xcconfig',
@@ -154,6 +154,15 @@ platform :ios do
             subtitle: "Uploading Finished!",
             message: "Build is on TestFlight",
             content_image: "Images/logo.png"
+        )
+        
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = sh("git rev-list --all --count").chomp.strip
+        
+        telegram(
+            token: ENV['TG_BOT_TOKEN'],
+            chat_id: ENV['TG_CHAT_ID'],
+            text: "Версия #{version} (#{build}) загружена на TestFlight"
         )
     end
     
