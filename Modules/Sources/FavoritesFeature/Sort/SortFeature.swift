@@ -36,7 +36,7 @@ public struct SortFeature: Reducer, Sendable {
             
     public enum Action: BindableAction {
         case onAppear
-        case selectSortType(SortType)
+        case didSelectSortType(SortType)
         
         case saveButtonTapped
         case cancelButtonTapped
@@ -58,7 +58,7 @@ public struct SortFeature: Reducer, Sendable {
             case .onAppear, .binding, .cancelButtonTapped:
                 return .none
                 
-            case .selectSortType(let type):
+            case .didSelectSortType(let type):
                 state.sortType = type
                 return .none
                 

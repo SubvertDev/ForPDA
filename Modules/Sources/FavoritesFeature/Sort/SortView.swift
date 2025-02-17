@@ -27,7 +27,8 @@ struct SortView: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Text("Sort", bundle: .module)
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.title3)
+                        .fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.top, 16)
                         .padding(.bottom, 22)
@@ -50,14 +51,14 @@ struct SortView: View {
                 HStack {
                     Menu {
                         Button {
-                            store.send(.selectSortType(.byDate))
+                            store.send(.didSelectSortType(.byDate))
                         } label: {
                             Text(SortType.byDate.title)
                             Image(systemSymbol: .calendar)
                         }
                         
                         Button {
-                            store.send(.selectSortType(.byName))
+                            store.send(.didSelectSortType(.byName))
                         } label: {
                             Text(SortType.byName.title)
                             Image(systemSymbol: .person)
@@ -65,17 +66,16 @@ struct SortView: View {
                     } label: {
                         HStack {
                             Text(store.sortType.title)
-                                .foregroundStyle(.black)
-                                .cornerRadius(10)
+                                .foregroundStyle(Color(.Labels.primary))
                                 .padding(.leading, 16)
                             
                             Spacer()
                             
                             Image(systemSymbol: .chevronUpChevronDown)
-                                .foregroundStyle(.black)
+                                .foregroundStyle(Color(.Labels.teritary))
                                 .padding(.trailing, 11)
                         }
-                        .frame(minHeight: 60)
+                        .frame(height: 60)
                         .background(Color(.Background.teritary))
                         .cornerRadius(10)
                     }
