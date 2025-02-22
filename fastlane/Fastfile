@@ -172,7 +172,7 @@ platform :ios do
         version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
         build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
         sh("git commit -a -m \"Bump version\"")
-        sh("git tag #{version}-#{build}")
+        sh("git tag v#{version}-#{build}-beta")
     end
     
     # --------------------------------------------------
