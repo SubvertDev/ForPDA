@@ -31,6 +31,16 @@
         }
       }
     },
+    "Post not found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост не найден"
+          }
+        }
+      }
+    },
     "Profile" : {
       "localizations" : {
         "ru" : {

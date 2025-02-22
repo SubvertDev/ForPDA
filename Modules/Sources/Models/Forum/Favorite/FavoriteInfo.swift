@@ -49,4 +49,10 @@ public extension FavoriteInfo {
         topic: .mockToday,
         isForum: false
     )
+    
+    static let mockUnread = FavoriteInfo(
+        flag: 0,
+        topic: .mockTodayUnread,
+        isForum: false
+    )
 }

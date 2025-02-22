@@ -77,7 +77,7 @@ Options: 'open:true'
 [bundle exec] fastlane ios build_ipa
 ```
 
-
+Builds and signs ipa file
 
 ### ios upload_dsym_to_sentry
 

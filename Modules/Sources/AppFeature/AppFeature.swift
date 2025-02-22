@@ -36,7 +36,7 @@ public struct AppFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Path
+    // MARK: - Paths
     
     @Reducer(state: .equatable)
     public enum ArticlesPath {
@@ -105,13 +105,14 @@ public struct AppFeature: Reducer, Sendable {
         public var selectedTab: AppTab
         public var previousTab: AppTab
         public var isShowingTabBar: Bool
-        public var showToast: Bool
+        public var showToast: Bool // TODO: Refactor into Destination?
         public var toast: ToastInfo
         public var localizationBundle: Bundle {
             switch toast.screen {
             case .articlesList: return .articlesList
             case .article:      return .article
             case .comments:     return .models
+            case .favorites:    return .favorites
             }
         }
         
@@ -193,17 +194,19 @@ public struct AppFeature: Reducer, Sendable {
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
         case syncUnreadTaskInvoked
+        case didFinishToastAnimation
         
         case _failedToConnect(any Error)
     }
     
     // MARK: - Dependencies
     
-    @Dependency(\.logger[.app]) private var logger
-    @Dependency(\.apiClient) private var apiClient
-    @Dependency(\.cacheClient) private var cacheClient
-    @Dependency(\.analyticsClient) private var analyticsClient
-    @Dependency(\.notificationsClient) private var notificationsClient
+    @Dependency(\.logger[.app])         private var logger
+    @Dependency(\.apiClient)            private var apiClient
+    @Dependency(\.cacheClient)          private var cacheClient
+    @Dependency(\.hapticClient)         private var hapticClient
+    @Dependency(\.analyticsClient)      private var analyticsClient
+    @Dependency(\.notificationsClient)  private var notificationsClient
     
     // MARK: - Body
     
@@ -244,6 +247,10 @@ public struct AppFeature: Reducer, Sendable {
                         await send(._failedToConnect(error))
                     }
                 }
+                
+            case .didFinishToastAnimation:
+                state.showToast = false
+                return .none
                 
             case ._failedToConnect:
                 state.alert = .failedToConnect
@@ -451,14 +458,19 @@ public struct AppFeature: Reducer, Sendable {
             case .favorites(.settingsButtonTapped),
                 .favoritesPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
                 state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
-                return .none
 
             case .favorites(.favoriteTapped(let id, let name, let offset, let postId, let isForum)):
                 let forumPath: FavoritesPath.State = isForum
                     ? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
                     : .forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset, postId: postId)))
                 state.favoritesPath.append(forumPath)
-                return .none
+                
+            case .favorites(._jumpRequestFailed):
+                state.toast = ToastInfo(screen: .favorites, message: "Post not found", isError: true)
+                state.showToast = true
+                return .run { _ in
+                    await hapticClient.play(type: .error)
+                }
                 
             case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.urlTapped(url))))),
                 let .favoritesPath(.element(id: _, action: .forumPath(.announcement(.urlTapped(url))))):

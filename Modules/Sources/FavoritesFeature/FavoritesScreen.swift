@@ -16,7 +16,8 @@ public struct FavoritesScreen: View {
     
     @Perception.Bindable public var store: StoreOf<FavoritesFeature>
     @Environment(\.tintColor) private var tintColor
-    
+    @Environment(\.scenePhase) private var scenePhase
+
     public init(store: StoreOf<FavoritesFeature>) {
         self.store = store
     }
@@ -79,9 +80,14 @@ public struct FavoritesScreen: View {
                     }
                 }
             }
-            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort), content: { store in
+            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort)) { store in
                 SortView(store: store)
-            })
+            }
+            .onChange(of: scenePhase) { newScenePhase in
+                if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
+                    store.send(.onSceneBecomeActive)
+                }
+            }
             .onAppear {
                 store.send(.onAppear)
             }
@@ -181,21 +187,26 @@ public struct FavoritesScreen: View {
             
             ForEach(favorites, id: \.hashValue) { favorite in
                 Row(
+                    id: favorite.topic.id,
                     title: favorite.topic.name,
                     lastPost: favorite.topic.lastPost,
                     closed: favorite.topic.isClosed,
                     unread: favorite.topic.isUnread,
                     notify: favorite.notify
-                ) {
-                    store.send(
-                        .favoriteTapped(
-                            id: favorite.topic.id,
-                            name: favorite.topic.name,
-                            offset: 0,
-                            postId: nil,
-                            isForum: favorite.isForum
+                ) { showUnread in
+                    if showUnread {
+                        store.send(.unreadTapped(id: favorite.topic.id))
+                    } else {
+                        store.send(
+                            .favoriteTapped(
+                                id: favorite.topic.id,
+                                name: favorite.topic.name,
+                                offset: 0,
+                                postId: nil,
+                                isForum: favorite.isForum
+                            )
                         )
-                    )
+                    }
                 }
                 .contextMenu {
                     if !favorite.isForum {
@@ -221,19 +232,20 @@ public struct FavoritesScreen: View {
     }
     
     // MARK: - Row
-    
+        
     @ViewBuilder
     private func Row(
+        id: Int,
         title: String,
         lastPost: TopicInfo.LastPost? = nil,
         closed: Bool = false,
         unread: Bool = false,
         notify: FavoriteInfo.Notify,
-        action: @escaping () -> Void = {}
+        action: @escaping (_ unreadTapped: Bool) -> Void
     ) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
-                action()
+                action(false)
             } label: {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 6) {
@@ -267,11 +279,23 @@ public struct FavoritesScreen: View {
                     Spacer(minLength: 0)
 
                     if unread {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
+                        Button {
+                            action(true)
+                        } label: {
+                            if store.unreadTapId == id {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .id(UUID())
+                            } else {
+                                Image(systemSymbol: .circleFill)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .foregroundStyle(tintColor)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .frame(width: 40, height: 40) // Tap area
                     }
                     
                     if closed {
@@ -286,7 +310,7 @@ public struct FavoritesScreen: View {
                 .contentShape(Rectangle())
             }
         }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
         .buttonStyle(.plain)
         .frame(minHeight: 60)
     }
@@ -323,10 +347,12 @@ public struct FavoritesScreen: View {
     NavigationStack {
         FavoritesScreen(
             store: Store(
-                initialState: FavoritesFeature.State(favorites: [.mock])
+                initialState: FavoritesFeature.State(favorites: [.mock, .mockUnread])
             ) {
                 FavoritesFeature()
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
+    .tint(Color(.Theme.primary))
 }
