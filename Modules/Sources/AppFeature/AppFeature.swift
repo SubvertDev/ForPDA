@@ -274,6 +274,14 @@ public struct AppFeature: Reducer, Sendable {
                         state.selectedTab = tab
                     }
                 }
+                
+                // Updating favorites on tab selection
+                if state.selectedTab == .favorites && state.previousTab != .favorites {
+                    return FavoritesFeature()
+                        .reduce(into: &state.favorites, action: .onRefresh)
+                        .map(Action.favorites)
+                }
+                    
                 return .none
                 
             case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
