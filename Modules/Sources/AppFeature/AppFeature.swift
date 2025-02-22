@@ -109,6 +109,7 @@ public struct AppFeature: Reducer, Sendable {
         public var toast: ToastInfo
         public var localizationBundle: Bundle {
             switch toast.screen {
+            case .app:          return .module
             case .articlesList: return .articlesList
             case .article:      return .article
             case .comments:     return .models
@@ -466,7 +467,7 @@ public struct AppFeature: Reducer, Sendable {
                 state.favoritesPath.append(forumPath)
                 
             case .favorites(._jumpRequestFailed):
-                state.toast = ToastInfo(screen: .favorites, message: "Post not found", isError: true)
+                state.toast = ToastInfo(screen: .app, message: "Post not found", isError: true)
                 state.showToast = true
                 return .run { _ in
                     await hapticClient.play(type: .error)

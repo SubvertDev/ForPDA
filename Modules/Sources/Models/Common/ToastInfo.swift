@@ -35,6 +35,7 @@ public struct ToastInfo: Equatable {
 }
 
 public enum ToastScreen: Equatable {
+    case app
     case articlesList
     case article
     case comments

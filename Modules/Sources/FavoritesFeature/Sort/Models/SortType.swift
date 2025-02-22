@@ -14,9 +14,9 @@ public enum SortType {
     public var title: LocalizedStringKey {
         switch self {
         case .byName:
-            "By name"
+            return "By name"
         case .byDate:
-            "By date"
+            return "By date"
         }
     }
 }

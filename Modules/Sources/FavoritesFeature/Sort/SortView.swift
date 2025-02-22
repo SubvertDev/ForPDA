@@ -53,19 +53,19 @@ struct SortView: View {
                         Button {
                             store.send(.didSelectSortType(.byDate))
                         } label: {
-                            Text(SortType.byDate.title)
+                            Text(SortType.byDate.title, bundle: .module)
                             Image(systemSymbol: .calendar)
                         }
                         
                         Button {
                             store.send(.didSelectSortType(.byName))
                         } label: {
-                            Text(SortType.byName.title)
+                            Text(SortType.byName.title, bundle: .module)
                             Image(systemSymbol: .person)
                         }
                     } label: {
                         HStack {
-                            Text(store.sortType.title)
+                            Text(store.sortType.title, bundle: .module)
                                 .foregroundStyle(Color(.Labels.primary))
                                 .padding(.leading, 16)
                             
