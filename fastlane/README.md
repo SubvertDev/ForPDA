@@ -103,6 +103,14 @@ Uploads app to TestFlight
 
 Notifies to all available channels
 
+### ios bump_and_tag
+
+```sh
+[bundle exec] fastlane ios bump_and_tag
+```
+
+Commits changes and adds a tag with version/build
+
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
