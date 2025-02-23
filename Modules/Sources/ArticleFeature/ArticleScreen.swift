@@ -85,9 +85,9 @@ public struct ArticleScreen: View {
         
         ToolbarItemGroup(placement: .topBarTrailing) {
             HStack(spacing: 8) {
-                ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
-                    store.send(.bookmarkButtonTapped)
-                }
+//                ToolbarButton(placement: .topBarTrailing, symbol: .bookmark) {
+//                    store.send(.bookmarkButtonTapped)
+//                }
                 
                 ArticleMenu(store: store, isDark: navBarFullyVisible)
             }

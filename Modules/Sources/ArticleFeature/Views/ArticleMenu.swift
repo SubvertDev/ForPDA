@@ -27,9 +27,9 @@ public struct ArticleMenu: View {
             ContextButton(text: "Share Link", symbol: .squareAndArrowUp, bundle: .module) {
                 store.send(.menuActionTapped(.shareLink))
             }
-            ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
-                store.send(.menuActionTapped(.report))
-            }
+//            ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
+//                store.send(.menuActionTapped(.report))
+//            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)
