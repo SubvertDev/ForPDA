@@ -121,8 +121,6 @@ public struct AppView: View {
         NavigationStack(
             path: $store.scope(state: \.favoritesRootPath, action: \.favoritesRootPath)
         ) {
-//            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-//                .trackAnalytics("Favorites Screen")
             FavoritesRootScreen(store: store.scope(state: \.favoritesRoot, action: \.favoritesRoot))
                 .trackAnalytics("Favorites Root Screen")
         } destination: { store in

@@ -15,9 +15,7 @@ import ForumsListFeature
 import ForumFeature
 import TopicFeature
 import AnnouncementFeature
-//import FavoritesFeature
 import FavoritesRootFeature
-//import BookmarksFeature
 import HistoryFeature
 import AuthFeature
 import ProfileFeature
@@ -46,12 +44,6 @@ public struct AppFeature: Reducer, Sendable {
         case profile(ProfileFeature)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
-    
-    //    @Reducer(state: .equatable)
-    //    public enum FavoritesPath {
-    //        case forumPath(ForumPath.Body = ForumPath.body)
-    //        case settingsPath(SettingsPath.Body = SettingsPath.body)
-    //    }
     
     @Reducer(state: .equatable)
     public enum FavoritesRootPath {
@@ -95,13 +87,11 @@ public struct AppFeature: Reducer, Sendable {
         public var appDelegate: AppDelegateFeature.State
         
         public var articlesPath: StackState<ArticlesPath.State>
-        //        public var favoritesPath: StackState<FavoritesPath.State>
         public var favoritesRootPath: StackState<FavoritesRootPath.State>
         public var forumPath: StackState<ForumPath.State>
         public var profilePath: StackState<ProfilePath.State>
         
         public var articlesList: ArticlesListFeature.State
-        //        public var favorites: FavoritesFeature.State
         public var favoritesRoot: FavoritesRootFeature.State
         public var forumsList: ForumsListFeature.State
         public var profile: ProfileFeature.State
@@ -139,12 +129,10 @@ public struct AppFeature: Reducer, Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
-            //            favoritesPath: StackState<FavoritesPath.State> = StackState(),
             favoritesRootPath: StackState<FavoritesRootPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
             profilePath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
-            //            favorites: FavoritesFeature.State = FavoritesFeature.State(),
             favoritesRoot: FavoritesRootFeature.State = FavoritesRootFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             profile: ProfileFeature.State = ProfileFeature.State(),
@@ -159,13 +147,11 @@ public struct AppFeature: Reducer, Sendable {
             self.appDelegate = appDelegate
             
             self.articlesPath = articlesPath
-            //            self.favoritesPath = favoritesPath
             self.favoritesRootPath = favoritesRootPath
             self.forumPath = forumPath
             self.profilePath = profilePath
             
             self.articlesList = articlesList
-            //            self.favorites = favorites
             self.favoritesRoot = favoritesRoot
             self.forumsList = forumsList
             self.profile = profile
@@ -191,13 +177,11 @@ public struct AppFeature: Reducer, Sendable {
         case appDelegate(AppDelegateFeature.Action)
         
         case articlesPath(StackActionOf<ArticlesPath>)
-        //        case favoritesPath(StackActionOf<FavoritesPath>)
         case favoritesRootPath(StackActionOf<FavoritesRootPath>)
         case forumPath(StackActionOf<ForumPath>)
         case profilePath(StackActionOf<ProfilePath>)
         
         case articlesList(ArticlesListFeature.Action)
-        //        case favorites(FavoritesFeature.Action)
         case favoritesRoot(FavoritesRootFeature.Action)
         case forumsList(ForumsListFeature.Action)
         case profile(ProfileFeature.Action)
@@ -238,9 +222,6 @@ public struct AppFeature: Reducer, Sendable {
             ArticlesListFeature()
         }
         
-        //        Scope(state: \.favorites, action: \.favorites) {
-        //            FavoritesFeature()
-        //        }
         
         Scope(state: \.favoritesRoot, action: \.favoritesRoot) {
             FavoritesRootFeature()
@@ -295,12 +276,7 @@ public struct AppFeature: Reducer, Sendable {
                     }
                 }
                 
-                //                // Updating favorites on tab selection
-                //                if state.selectedTab == .favorites && state.previousTab != .favorites {
-                //                    return FavoritesFeature()
-                //                        .reduce(into: &state.favorites, action: .onRefresh)
-                //                        .map(Action.favorites)
-                //                }
+                // Updating favorites on tab selection
                 if state.selectedTab == .favorites && state.previousTab != .favorites {
                     return FavoritesRootFeature()
                         .reduce(into: &state.favoritesRoot, action: .favorites(.onRefresh))
@@ -386,10 +362,10 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .forumsList, .profile, /*.favorites,*/ .favoritesRoot:
+            case .articlesList, .forumsList, .profile, .favoritesRoot:
                 return .none
                 
-            case .articlesPath, .forumPath, .profilePath, /*.favoritesPath,*/ .favoritesRootPath:
+            case .articlesPath, .forumPath, .profilePath, .favoritesRootPath:
                 return .none
                 
             }
@@ -485,58 +461,6 @@ public struct AppFeature: Reducer, Sendable {
             }
         }
         
-        // MARK: - Favorites Path
-        
-        //        Reduce<State, Action> { state, action in
-        //            switch action {
-        //            case .favorites(.settingsButtonTapped),
-        //                .favoritesPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
-        //                state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
-        //
-        //            case .favorites(.favoriteTapped(let id, let name, let offset, let postId, let isForum)):
-        //                let forumPath: FavoritesPath.State = isForum
-        //                    ? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
-        //                    : .forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset, postId: postId)))
-        //                state.favoritesPath.append(forumPath)
-        //
-        //            case .favorites(._jumpRequestFailed):
-        //                state.toast = ToastInfo(screen: .app, message: "Post not found", isError: true)
-        //                state.showToast = true
-        //                return .run { _ in
-        //                    await hapticClient.play(type: .error)
-        //                }
-        //
-        //            case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.urlTapped(url))))),
-        //                let .favoritesPath(.element(id: _, action: .forumPath(.announcement(.urlTapped(url))))):
-        //                return handleDeeplink(url: url, state: &state)
-        //
-        //            case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.userAvatarTapped(userId: userId))))):
-        //                state.favoritesPath.append(.forumPath(.profile(ProfileFeature.State(userId: userId))))
-        //
-        //            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id, offset: offset))))):
-        //                state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset))))
-        //
-        //            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.announcementTapped(id: id, name: name))))):
-        //                state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: name))))
-        //
-        //            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.subforumTapped(id: id, name: name))))):
-        //                state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: name))))
-        //
-        //            default:
-        //                break
-        //            }
-        //
-        //            return .none
-        //        }
-        //        .forEach(\.favoritesPath, action: \.favoritesPath)
-        //        .onChange(of: \.favoritesPath) { _, newValue in
-        //            Reduce<State, Action> { state, _ in
-        //                state.isShowingTabBar = !newValue.contains {
-        //                    if case .settingsPath = $0 { return true } else { return false }
-        //                }
-        //                return .none
-        //            }
-        //        }
         
         // MARK: - Favorites Root Path
         
@@ -714,9 +638,6 @@ public struct AppFeature: Reducer, Sendable {
             case .articlesPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
                 state.articlesPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
                 
-                //            case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
-                //                state.favoritesPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
-                
             case .favoritesRootPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
                 state.favoritesRootPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
                 
@@ -730,9 +651,6 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .articlesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.articlesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
-                
-                //            case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
-                //                state.favoritesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
                 
             case .favoritesRootPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.favoritesRootPath.append(.settingsPath(.developer(DeveloperFeature.State())))
@@ -759,16 +677,13 @@ public struct AppFeature: Reducer, Sendable {
                 if state.selectedTab == .favorites {
                     switch screen {
                     case let .forum(id: id):
-                        //                        state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: nil))))
                         state.favoritesRootPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: nil))))
                         
                     case let .topic(id: id):
-                        //                        state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
                         state.favoritesRootPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
                         
                         
                     case let .announcement(id: id):
-                        //                        state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: nil))))
                         state.favoritesRootPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: nil))))
                     }
                 }
