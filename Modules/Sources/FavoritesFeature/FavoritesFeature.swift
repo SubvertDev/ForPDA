@@ -49,7 +49,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     public enum Action {
         case onAppear
         case onRefresh
-        case onSceneBecomeActive
+        case onSceneBecomeActive // на рут вынести { последовательно обновлять }
         
         case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, offset: Int, postId: Int?, isForum: Bool)

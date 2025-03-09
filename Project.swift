@@ -63,6 +63,8 @@ let project = Project(
                     .Internal.ForumFeature,
                     .Internal.TopicFeature,
                     .Internal.AnnouncementFeature,
+                    .Internal.FavoritesRootFeature,
+                    .Internal.BookmarksFeature,
                     .Internal.FavoritesFeature,
                     .Internal.HistoryFeature,
                     .Internal.AuthFeature,
@@ -144,6 +146,15 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .SPM.SkeletonUI,
                     .SPM.NukeUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "FavoritesRootFeature",
+                dependencies: [
+                    .Internal.FavoritesFeature,
+                    .Internal.BookmarksFeature,
                     .SPM.TCA
                 ]
             ),
@@ -619,6 +630,7 @@ extension TargetDependency.Internal {
     static let PageNavigationFeature  = TargetDependency.target(name: "PageNavigationFeature")
     static let AnnouncementFeature =    TargetDependency.target(name: "AnnouncementFeature")
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
+    static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
     static let AuthFeature =            TargetDependency.target(name: "AuthFeature")
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")

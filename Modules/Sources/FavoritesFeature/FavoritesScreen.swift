@@ -44,6 +44,10 @@ public struct FavoritesScreen: View {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
+                
+                if !store.isLoading && store.favorites.isEmpty && store.favoritesImportant.isEmpty {
+                    EmptyFavorites()
+                }
             }
             .navigationTitle(Text("Favorites", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
@@ -224,9 +228,13 @@ public struct FavoritesScreen: View {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
         } header: {
-            Header(title: important
-                   ? LocalizedStringKey("Important")
-                   : LocalizedStringKey("Topics / Forums"))
+            if !favorites.isEmpty {
+                Header(title: important
+                       ? LocalizedStringKey("Important")
+                       : LocalizedStringKey("Topics / Forums"))
+            } else {
+                Header(title: "")
+            }
         }
         .listRowBackground(Color(.Background.teritary))
     }
@@ -338,6 +346,31 @@ public struct FavoritesScreen: View {
             .textCase(nil)
             .offset(x: -16)
             .padding(.bottom, 4)
+    }
+    
+    //MARK: - Empty View
+    
+    @ViewBuilder
+    private func EmptyFavorites() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .bookmark)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 8)
+            
+            Text("No favorites", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundColor(Color(.Labels.primary))
+                .padding(.bottom, 6)
+            
+            Text("Save something from the forum here", bundle: .module)
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.Labels.teritary))
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+        }
     }
 }
 

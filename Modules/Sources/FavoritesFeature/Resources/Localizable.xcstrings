@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "Always" : {
       "localizations" : {
         "ru" : {
@@ -131,6 +134,16 @@
         }
       }
     },
+    "No favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет избранных"
+          }
+        }
+      }
+    },
     "Notify Hat Update" : {
       "localizations" : {
         "ru" : {
@@ -167,6 +180,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Прочитать все"
+          }
+        }
+      }
+    },
+    "Save something from the forum here" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохраните сюда что-нибудь из форума"
           }
         }
       }
