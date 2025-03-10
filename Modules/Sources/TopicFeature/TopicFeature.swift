@@ -26,6 +26,7 @@ public struct TopicFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
 
         public let topicId: Int
         public let initialOffset: Int
@@ -38,6 +39,10 @@ public struct TopicFeature: Reducer, Sendable {
         var isLoadingTopic = true
         
         var pageNavigation = PageNavigationFeature.State(type: .topic)
+        
+        public var isUserAuthorized: Bool {
+            return userSession != nil
+        }
         
         public init(
             topicId: Int,

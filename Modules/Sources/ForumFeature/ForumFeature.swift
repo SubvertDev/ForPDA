@@ -24,6 +24,7 @@ public struct ForumFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
 
         public var forumId: Int
         public var forumName: String?
@@ -36,6 +37,10 @@ public struct ForumFeature: Reducer, Sendable {
         public var isRefreshing = false
         
         public var pageNavigation = PageNavigationFeature.State(type: .forum)
+        
+        public var isUserAuthorized: Bool {
+            return userSession != nil
+        }
         
         public init(
             forumId: Int,

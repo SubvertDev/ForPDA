@@ -24,6 +24,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
         @Presents var sort: SortFeature.State?
         
         public var favorites: [FavoriteInfo] = []
@@ -34,6 +35,10 @@ public struct FavoritesFeature: Reducer, Sendable {
         public var unreadTapId: Int?
         
         public var pageNavigation = PageNavigationFeature.State(type: .forum)
+        
+        public var isUserAuthorized: Bool {
+            return userSession != nil
+        }
         
         public init(
             favorites: [FavoriteInfo] = [],
