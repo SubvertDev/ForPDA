@@ -10,6 +10,30 @@
           }
         }
       }
+    },
+    "Copy Link" : {
+      "comment" : "Временный фикс Bundle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировать ссылку"
+          }
+        }
+      }
+    },
+    "Open In Browser" : {
+      "comment" : "Временный фикс Bundle",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть в браузере"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

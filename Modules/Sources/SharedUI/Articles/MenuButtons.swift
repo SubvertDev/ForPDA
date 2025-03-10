@@ -12,15 +12,18 @@ public struct MenuButtons: View {
     public let title: String
     public let authorName: String
     public let contextMenuActions: ContextMenuActions
+    public let bundle: Bundle
     
     public init(
         title: String,
         authorName: String,
-        contextMenuActions: ContextMenuActions
+        contextMenuActions: ContextMenuActions,
+        bundle: Bundle
     ) {
         self.title = title
         self.authorName = authorName
         self.contextMenuActions = contextMenuActions
+        self.bundle = bundle
     }
     
     public var body: some View {
@@ -36,10 +39,10 @@ public struct MenuButtons: View {
             }
             
             Section {
-                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: bundle) {
                     contextMenuActions.copyAction()
                 }
-                ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
+                ContextButton(text: "Open In Browser", symbol: .safari, bundle: bundle) {
                     contextMenuActions.openInBrowserAction()
                 }
 //                ContextButton(text: "Problems with article?", symbol: .exclamationmarkBubble, bundle: .module) {
