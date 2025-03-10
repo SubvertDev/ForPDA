@@ -259,6 +259,7 @@ public struct FavoritesScreen: View {
                         
                         RichText(
                             text: AttributedString(title),
+                            isSelectable: false,
                             font: .body,
                             foregroundStyle: Color(.Labels.primary)
                         )

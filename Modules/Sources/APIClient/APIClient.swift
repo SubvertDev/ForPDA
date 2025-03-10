@@ -57,6 +57,7 @@ public struct APIClient: Sendable {
     
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
+    public var getAttachment: @Sendable (_ id: Int) async throws -> URL
     
     // QMS
     public var loadQMSList: @Sendable () async throws -> QMSList
@@ -281,6 +282,11 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(CommonCommand.syncUnread)
                 return try await parser.parseUnread(response)
             },
+            getAttachment: { id in
+                let response = try await api.get(ForumCommand.attachmentDownloadUrl(id: id))
+                let urlString = String(response.dropFirst(10).dropLast(2))
+                return URL(string: urlString)!
+            },
             
             // MARK: - QMS
             
@@ -380,6 +386,9 @@ extension APIClient: DependencyKey {
             },
             getUnread: {
                 return .mock
+            },
+            getAttachment: { _ in
+                return URL(string: "/")!
             },
             loadQMSList: {
                 return QMSList(users: [])

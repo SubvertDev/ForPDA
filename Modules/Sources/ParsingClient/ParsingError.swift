@@ -7,10 +7,17 @@
 
 import Foundation
 
-enum ParsingError: Error {
+public enum ParsingError: Error {
+    // General
     case failedToCreateDataFromString
     case failedToSerializeData(any Error)
     case failedToCastDataToAny
+//    case notEnoughDataToParse
+    case failedToCastFields
+    
+    // Topic
+    case unknownAttachmentType(Int)
+    case failedToCreateAttachmentMetadataUrl
     
     case failedToExtractImage
     case failedToExtractImages

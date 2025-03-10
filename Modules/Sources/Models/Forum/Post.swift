@@ -47,17 +47,35 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         public let metadata: Metadata?
         public let downloadCount: Int?
         
-        public enum AttachmentType: Sendable, Hashable, Codable {
-            case file
-            case image
+        public var sizeString: String {
+            let units = ["Б", "КБ", "МБ", "ГБ"]
+            var size = Double(size)
+            var unitIndex = 0
+            
+            while size >= 1024 && unitIndex < units.count - 1 {
+                size /= 1024
+                unitIndex += 1
+            }
+            
+            let formatter = NumberFormatter()
+            formatter.maximumFractionDigits = (size.truncatingRemainder(dividingBy: 1) == 0) ? 0 : 1
+            formatter.numberStyle = .decimal
+            
+            let formattedSize = formatter.string(from: NSNumber(value: size)) ?? "\(size)"
+            return "\(formattedSize) \(units[unitIndex])"
+        }
+        
+        public enum AttachmentType: Int, Sendable, Hashable, Codable {
+            case file = 0
+            case image = 1
         }
         
         public struct Metadata: Sendable, Hashable, Codable {
-            public let url: String
+            public let url: URL
             public let width: Int
             public let height: Int
             
-            public init(width: Int, height: Int, url: String) {
+            public init(width: Int, height: Int, url: URL) {
                 self.url = url
                 self.width = width
                 self.height = height
@@ -148,7 +166,7 @@ extension Post {
                 metadata: Attachment.Metadata(
                     width: 281,
                     height: 500,
-                    url: "https://cs2c9f.4pda.ws/14308454.png"
+                    url: URL(string: "https://cs2c9f.4pda.ws/14308454.png")!
                 ),
                 downloadCount: nil
             )
