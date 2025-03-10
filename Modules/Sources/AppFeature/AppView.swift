@@ -15,6 +15,7 @@ import ForumFeature
 import TopicFeature
 import AnnouncementFeature
 import FavoritesFeature
+import FavoritesRootFeature
 import HistoryFeature
 import AuthFeature
 import ProfileFeature
@@ -118,10 +119,10 @@ public struct AppView: View {
     @ViewBuilder
     private func FavoritesTab() -> some View {
         NavigationStack(
-            path: $store.scope(state: \.favoritesPath, action: \.favoritesPath)
+            path: $store.scope(state: \.favoritesRootPath, action: \.favoritesRootPath)
         ) {
-            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-                .trackAnalytics("Favorites Screen")
+            FavoritesRootScreen(store: store.scope(state: \.favoritesRoot, action: \.favoritesRoot))
+                .trackAnalytics("Favorites Root Screen")
         } destination: { store in
             switch store.case {
             case let .forumPath(path):

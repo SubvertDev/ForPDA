@@ -25,7 +25,6 @@
       }
     },
     "Today" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -46,7 +45,6 @@
       }
     },
     "Yesterday" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
