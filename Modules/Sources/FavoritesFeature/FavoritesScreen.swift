@@ -315,6 +315,7 @@ public struct FavoritesScreen: View {
                             .scaledToFit()
                             .frame(width: 16, height: 16)
                             .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.trailing, 12)
                     }
                 }
                 .padding(.vertical, 8)
