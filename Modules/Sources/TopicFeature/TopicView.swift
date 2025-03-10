@@ -50,14 +50,20 @@ public struct TopicView: View {
             )
             
         case let .attachment(imageId):
+            // TODO: Make grid
             if let attachment = attachments.first(where: { $0.id == imageId }),
-               let metadata = attachment.metadata,
-               let url = URL(string: metadata.url) {
-                LazyImage(url: url) { state in
-                    Group {
-                        if let image = state.image { image.resizable().scaledToFill() }
-                    }
-                    .skeleton(with: state.isLoading, shape: .rectangle)
+               let metadata = attachment.metadata {
+                LazyImage(url: metadata.url) { state in
+//                    if let container = state.imageContainer {
+//                        if container.type == .gif {
+//                            GifView(url: url)
+//                        } else {
+                            Group {
+                                if let image = state.image { image.resizable().scaledToFill() }
+                            }
+                            .skeleton(with: state.isLoading, shape: .rectangle)
+//                        }
+//                    }
                 }
                 .frame(
                     width: UIScreen.main.bounds.width / 1.5,
@@ -68,7 +74,7 @@ public struct TopicView: View {
         case let .image(url):
             LazyImage(url: url) { state in
                 Group {
-                    if let image = state.image { image }
+                    if let image = state.image { image.resizable().scaledToFill() }
                 }
                 .skeleton(with: state.isLoading, shape: .rectangle)
             }

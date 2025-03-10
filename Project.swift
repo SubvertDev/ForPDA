@@ -89,6 +89,7 @@ let project = Project(
                 dependencies: [
                     .Internal.LoggerClient,
                     .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .SPM.TCA
                 ]
             ),
@@ -195,7 +196,8 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
-                    .SPM.TCA
+                    .SPM.TCA,
+                    .SPM.MemberwiseInit
                 ]
             ),
         
@@ -666,5 +668,6 @@ extension TargetDependency.SPM {
     static let Sentry =         TargetDependency.external(name: "Sentry")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")
+    static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")
     static let YouTubePlayerKit = TargetDependency.external(name: "YouTubePlayerKit")
 }

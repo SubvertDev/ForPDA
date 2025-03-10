@@ -253,7 +253,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .none
                 
             case let ._favoritesResponse(.failure(error)):
-                print(error)
+                print("FAVORITES RESPONSE FAILURE: \(error)")
                 return .none
                 
             case let ._startUnreadLoadingIndicator(id: id):

@@ -50,6 +50,7 @@ let package = Package(
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.12.0"),
         .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", from: "0.3.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
-        .package(url: "https://github.com/exyte/Chat.git", from: "2.0.10")
+        .package(url: "https://github.com/exyte/Chat.git", from: "2.0.10"),
+        .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", from: "0.5.1")
     ]
 )
