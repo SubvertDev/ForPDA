@@ -39,15 +39,12 @@ public struct BBTokenizer {
     public mutating func nextToken() -> BBToken? {
         // Проверяем есть ли у нас текущий символ, если нет, то текст кончился
         guard let currentChar else { return nil }
-        printer("Обрабатываю \(String(currentChar))")
         if currentChar == "[" {
-            printer("Начало обработки тэга: \(currentChar) \(nextChar ?? " ")")
             // Начинаем парсить потенциально открывающий/закрывающий тег
             let parseStartIndex = currentIndex
             advanceIndex()
             
             if currentIndex < input.endIndex, input[currentIndex] == "/" {
-                printer("Обнаружен закрывающий тег")
                 // Закрывающий тег
                 advanceIndex()
                 let tagStartIndex = currentIndex
@@ -68,10 +65,9 @@ public struct BBTokenizer {
                         return .text(string)
                     }
                 } else {
-                    print("Ошибка 1")
+                    fatalError("Tokenizer1")
                 }
             } else {
-                printer("Обнаружен открывающий тег")
                 // Открывающий тег
                 let tagStartIndex = currentIndex
                 var tagAttribute: String?
@@ -83,7 +79,10 @@ public struct BBTokenizer {
                 
                 let string = String(input[tagStartIndex..<currentIndex])
                 guard let tag = BBTag(rawValue: string) else {
-                    advanceIndex()
+                    // Если мы встретили открывающий тег который не закрылся до конца сообщения, то advance делать не надо
+                    if currentIndex < input.endIndex {
+                        advanceIndex()
+                    }
                     let string = String(input[parseStartIndex..<currentIndex])
                     return .text(string)
                 }
@@ -128,12 +127,10 @@ public struct BBTokenizer {
                     advanceIndex()
                     return .openingTag(tag, tagAttribute)
                 } else {
-                    printer("Ошибка 2")
+                    fatalError("Tokenizer2")
                 }
             }
         } else {
-            printer("Обработка обычного текста")
-            // [
             let textStartIndex = currentIndex
             scanUntil(.openingBracket)
             let text = String(input[textStartIndex..<currentIndex])
@@ -142,13 +139,6 @@ public struct BBTokenizer {
         
         return nil
     }
-    
-//    private mutating func scanText() -> BBToken? {
-//        let startIndex = currentIndex
-//        scanUntil { CharacterSet.delimeters.contains($0) }
-//        guard currentIndex > startIndex else { return nil }
-//        return .text(String(input[startIndex..<currentIndex]))
-//    }
     
     private mutating func scanUntil(_ unicodeScalar: UnicodeScalar) {
         while currentIndex < input.endIndex && (unicodeScalar != input[currentIndex]) {
@@ -177,12 +167,4 @@ extension UnicodeScalar {
 
 extension CharacterSet {
     static let delimeters = CharacterSet(charactersIn: "]=: ")
-}
-
-let isPrintingEnabled = false
-
-fileprivate func printer(_ string: String) {
-    if isPrintingEnabled {
-        print(string)
-    }
 }

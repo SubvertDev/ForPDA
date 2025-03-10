@@ -185,6 +185,7 @@ let project = Project(
                     .Internal.PageNavigationFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .Internal.BBBuilder,
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.AnalyticsClient,
@@ -213,7 +214,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
-                    .Internal.TopicFeature,
+                    .Internal.TopicFeature, // TODO: Убрать
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -487,6 +488,14 @@ let project = Project(
                 ]
             ),
         
+            .feature(
+                name: "BBBuilder",
+                dependencies: [
+                    .Internal.SharedUI,
+                    .Internal.Models
+                ]
+            ),
+        
         // MARK: - Tests -
         
             .target(
@@ -646,6 +655,7 @@ extension TargetDependency.Internal {
     static let SharedUI =            TargetDependency.target(name: "SharedUI")
     static let PersistenceKeys =     TargetDependency.target(name: "PersistenceKeys")
     static let TCAExtensions =       TargetDependency.target(name: "TCAExtensions")
+    static let BBBuilder =           TargetDependency.target(name: "BBBuilder")
 }
 
 extension TargetDependency {

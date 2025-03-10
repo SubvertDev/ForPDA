@@ -36,7 +36,6 @@ public struct TopicFeature: Reducer, Sendable {
         
         var isFirstPage = true
         var isLoadingTopic = true
-        var requestStartTime = DispatchTime.now()
         
         var pageNavigation = PageNavigationFeature.State(type: .topic)
         
@@ -154,7 +153,6 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 
             case let ._loadTopic(offset):
-                state.requestStartTime = DispatchTime.now()
                 state.isFirstPage = offset == 0
                 state.isLoadingTopic = true
                 return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
@@ -179,7 +177,9 @@ public struct TopicFeature: Reducer, Sendable {
                                     text = "" // Not loading hat post for non-first page
                                 }
                                 taskGroup.addTask {
-                                    (index, BBBuilder.build(text: text, attachments: post.attachments))
+//                                    let nodes = BBBuilder.build(text: text, attachments: post.attachments)
+//                                    let types = TopicNodeConverter.convert(nodes)
+                                    return (index, TopicNodeBuilder.build(text, attachments: post.attachments))
                                 }
                             }
                             
@@ -189,11 +189,6 @@ public struct TopicFeature: Reducer, Sendable {
                             }
                             return types.compactMap { $0 }
                         }
-                                //try! measureAverageTime(timesToRun: 2) {
-                                //    let parsed = BBCodeParser.parse(post.content)!
-                                //    let types = try! TopicBuilder().build(from: parsed)
-                                //    topicTypes.append(types)
-                                //}
                         await send(._loadTypes(topicTypes))
                     }.cancellable(id: CancelID.loading)
                 )
@@ -201,7 +196,6 @@ public struct TopicFeature: Reducer, Sendable {
             case let ._loadTypes(types):
                 state.types = types
                 state.isLoadingTopic = false
-                print("Finished in: \(timeElapsed(from: state.requestStartTime))")
                 return .none
 //                return PageNavigationFeature()
 //                    .reduce(into: &state.pageNavigation, action: .nextPageTapped)

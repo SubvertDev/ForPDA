@@ -14,14 +14,6 @@ public final class BBRenderer {
         return baseAttributes[.foregroundColor] as! UIColor
     }
     
-//    public init(
-//        baseFont: UIFont = UIFont.defaultBBFont,
-//        baseForegroundColor: UIColor = UIColor.label // TODO: Change to .Labels.primary
-//    ) {
-//        self.baseFont = baseFont
-//        self.baseForegroundColor = baseForegroundColor
-//    }
-    
     public init(
         baseAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.defaultBBFont,
@@ -31,28 +23,14 @@ public final class BBRenderer {
         self.baseAttributes = baseAttributes
     }
     
-//    public func render(text: String) -> NSAttributedString {
-//        let elements = BBParser.parse(text: text)
-//        let attributes = [
-//            NSAttributedString.Key.font: baseFont,
-//            NSAttributedString.Key.foregroundColor: baseForegroundColor
-//        ]
-//        
-//        customDump(elements)
-//        
-//        return elements.map { $0.render(withAttributes: attributes) }.joined()
-//    }
-    
-    public func render2(text: String) -> NSAttributedString {
+    public func render(text: String) -> NSAttributedString {
         let elements = BBParser.parse(text: text)
         let attributes = [
             NSAttributedString.Key.font: baseFont,
             NSAttributedString.Key.foregroundColor: baseForegroundColor
         ]
-        
-        // customDump(elements)
-        
-        let resultNodes = elements.map { $0.render2(withAttributes: attributes) }
+                
+        let resultNodes = elements.map { $0.render(withAttributes: attributes) }
         let joinedNode = resultNodes.joined()
         guard case let .text(text) = joinedNode else { fatalError() }
         return text
@@ -60,7 +38,7 @@ public final class BBRenderer {
 }
 
 private extension BBNode {
-    func render2(withAttributes attributes: [NSAttributedString.Key: Any]) -> BBContainerNode {
+    func render(withAttributes attributes: [NSAttributedString.Key: Any]) -> BBContainerNode {
         guard let currentFont = attributes[NSAttributedString.Key.font] as? UIFont else {
             fatalError("Missing font attribute in \(attributes)")
         }
@@ -74,39 +52,39 @@ private extension BBNode {
         case .bold(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.font] = currentFont.boldFont()
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .italic(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.font] = currentFont.italicFont()
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
 
         case .underline(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.underlineStyle] = NSUnderlineStyle.single.rawValue
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .strikethrough(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.strikethroughStyle] = NSUnderlineStyle.single.rawValue
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .sup(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.baselineOffset] = 5
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .sub(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.baselineOffset] = -5
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .size(let size, let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.font] = UIFont
                 .preferredFont(forBBCodeSize: size)
                 .addingSymbolicTraits(of: currentFont)
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .color(let color, let children):
             var newAttributes = attributes
@@ -115,13 +93,13 @@ private extension BBNode {
             } else {
                 newAttributes[NSAttributedString.Key.foregroundColor] = UIColor(hex: color)
             }
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .background(let color, let children):
             var newAttributes = attributes
             let dynamicColor = ForumColors(rawValue: color.lowercased())?.hexColor ?? ("FFFFFF", "000000") // TODO: !!!
             newAttributes[NSAttributedString.Key.backgroundColor] = UIColor(dynamicTuple: dynamicColor)
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .font(let name, let children):
             var newAttributes = attributes
@@ -134,16 +112,16 @@ private extension BBNode {
                     .defaultBBFont
                     .addingSymbolicTraits(of: currentFont)
             }
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .url(let url, let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.link] = url
             newAttributes[NSAttributedString.Key.underlineStyle] = NSUnderlineStyle.single.rawValue
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .anchor(let children):
-            return children.map { $0.render2(withAttributes: attributes) }.joined() // TODO: !
+            return children.map { $0.render(withAttributes: attributes) }.joined() // TODO: !
             
         case .offtop(let children):
             var newAttributes = attributes
@@ -151,56 +129,56 @@ private extension BBNode {
                 .preferredFont(forTextStyle: .caption2)
                 .addingSymbolicTraits(of: currentFont)
             newAttributes[NSAttributedString.Key.foregroundColor] = UIColor(Color(.Labels.quaternary))
-            return children.map { $0.render2(withAttributes: newAttributes) }.joined()
+            return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .center(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .center(nodes)
             
         case .left(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .left(nodes)
             
         case .right(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .right(nodes)
             
         case .justify(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .justify(nodes)
             
         case .spoiler(let attribute, let children):
-            let attributedString = attribute.map { BBRenderer(baseAttributes: attributes).render2(text: $0) }
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let attributedString = attribute.map { BBRenderer(baseAttributes: attributes).render(text: $0) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .spoiler(attributedString, nodes)
             
         case .quote(let attribute, let children):
-            let attributedString = attribute.map { BBRenderer(baseAttributes: attributes).render2(text: $0) }
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let attributedString = attribute.map { BBRenderer(baseAttributes: attributes).render(text: $0) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .quote(attributedString, nodes)
             
         case .list(let type, let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .list(type, nodes)
 
         case .code(let attribute, let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .code(attribute.map { NSAttributedString(string: $0) }, nodes)
 
         case .hide(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .hide(nodes)
 
         case .cur(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .cur(nodes)
 
         case .mod(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .mod(nodes)
 
         case .ex(let children):
-            let nodes = children.map { $0.render2(withAttributes: attributes) }
+            let nodes = children.map { $0.render(withAttributes: attributes) }
             return .ex(nodes)
             
         case .snapback(let postId):
@@ -563,7 +541,7 @@ extension Array where Element: NSAttributedString {
     }
 }
 
-extension Array where Element == BBContainerNode {
+public extension Array where Element == BBContainerNode {
     func joined() -> BBContainerNode {
         let result = NSMutableAttributedString()
         for element in self {
