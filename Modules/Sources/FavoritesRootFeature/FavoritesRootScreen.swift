@@ -33,6 +33,7 @@ public struct FavoritesRootScreen: View {
         ZStack {
             Color(.Background.primary)
                 .ignoresSafeArea()
+            
                 VStack {
                     SegmentPicker(selection: $pickerSelection)
                     
@@ -55,7 +56,7 @@ private struct SegmentPicker: View {
     @Binding var selection: FavoritesRootScreen.PickerSelection
     
     var body: some View {
-        Picker("", selection: $selection) {
+        Picker(String(""), selection: $selection) {
             Text("Favorites")
                 .tag(FavoritesRootScreen.PickerSelection.favorites)
             

@@ -32,6 +32,9 @@ public struct FavoritesFeature: Reducer, Sendable {
         public var isLoading = false
         public var isRefreshing = false
         public var unreadTapId: Int?
+        public var shouldShowEmptyState: Bool {
+            return !isLoading && favorites.isEmpty && favoritesImportant.isEmpty
+        }
         
         public var pageNavigation = PageNavigationFeature.State(type: .forum)
         
@@ -49,7 +52,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     public enum Action {
         case onAppear
         case onRefresh
-        case onSceneBecomeActive // на рут вынести { последовательно обновлять }
+        case onSceneBecomeActive
         
         case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, offset: Int, postId: Int?, isForum: Bool)

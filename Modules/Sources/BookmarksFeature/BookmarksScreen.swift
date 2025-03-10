@@ -162,7 +162,7 @@ public struct BookmarksScreen: View {
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
-                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
         }
     }
 }

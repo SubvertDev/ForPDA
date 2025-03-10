@@ -45,7 +45,7 @@ public struct FavoritesScreen: View {
                         .frame(width: 24, height: 24)
                 }
                 
-                if !store.isLoading && store.favorites.isEmpty && store.favoritesImportant.isEmpty {
+                if store.shouldShowEmptyState {
                     EmptyFavorites()
                 }
             }
@@ -232,8 +232,6 @@ public struct FavoritesScreen: View {
                 Header(title: important
                        ? LocalizedStringKey("Important")
                        : LocalizedStringKey("Topics / Forums"))
-            } else {
-                Header(title: "")
             }
         }
         .listRowBackground(Color(.Background.teritary))
@@ -370,6 +368,7 @@ public struct FavoritesScreen: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
         }
     }
 }
