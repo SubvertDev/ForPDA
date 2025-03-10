@@ -91,6 +91,7 @@ let project = Project(
                 dependencies: [
                     .Internal.LoggerClient,
                     .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .SPM.TCA
                 ]
             ),
@@ -195,6 +196,7 @@ let project = Project(
                     .Internal.PageNavigationFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .Internal.BBBuilder,
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.AnalyticsClient,
@@ -206,7 +208,8 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
-                    .SPM.TCA
+                    .SPM.TCA,
+                    .SPM.MemberwiseInit
                 ]
             ),
         
@@ -222,7 +225,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
-                    .Internal.TopicFeature,
+                    .Internal.TopicFeature, // TODO: Убрать
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -496,6 +499,14 @@ let project = Project(
                 ]
             ),
         
+            .feature(
+                name: "BBBuilder",
+                dependencies: [
+                    .Internal.SharedUI,
+                    .Internal.Models
+                ]
+            ),
+        
         // MARK: - Tests -
         
             .target(
@@ -656,6 +667,7 @@ extension TargetDependency.Internal {
     static let SharedUI =            TargetDependency.target(name: "SharedUI")
     static let PersistenceKeys =     TargetDependency.target(name: "PersistenceKeys")
     static let TCAExtensions =       TargetDependency.target(name: "TCAExtensions")
+    static let BBBuilder =           TargetDependency.target(name: "BBBuilder")
 }
 
 extension TargetDependency {
@@ -678,5 +690,6 @@ extension TargetDependency.SPM {
     static let Sentry =         TargetDependency.external(name: "Sentry")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")
+    static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")
     static let YouTubePlayerKit = TargetDependency.external(name: "YouTubePlayerKit")
 }

@@ -80,8 +80,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 return .run { send in
                     var topicTypes: [[TopicTypeUI]] = []
                     
-                    let parsedContent = BBCodeParser.parse(announcement.content)!
-                    let types = try! TopicBuilder().build(from: parsedContent)
+                    let types = TopicNodeBuilder.build(announcement.content, attachments: [])
                     topicTypes.append(types)
                     
                     await send(._loadTypes(topicTypes))

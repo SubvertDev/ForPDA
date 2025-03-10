@@ -30,24 +30,26 @@ public struct FavoritesRootScreen: View {
     }
     
     public var body: some View {
-        ZStack {
-            Color(.Background.primary)
-                .ignoresSafeArea()
-            
-                VStack {
-                    SegmentPicker(selection: $pickerSelection)
-                    
-                    switch pickerSelection {
-                    case .favorites:
-                        FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
+        WithPerceptionTracking {
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                    VStack {
+                        SegmentPicker(selection: $pickerSelection)
                         
-                    case .bookmarks:
-                        BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
+                        switch pickerSelection {
+                        case .favorites:
+                            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
+                            
+                        case .bookmarks:
+                            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
+                        }
                     }
-                }
-        }
-        .onAppear {
-            store.send(.favorites(.onAppear))
+            }
+            .onAppear {
+                store.send(.favorites(.onAppear))
+            }
         }
     }
 }

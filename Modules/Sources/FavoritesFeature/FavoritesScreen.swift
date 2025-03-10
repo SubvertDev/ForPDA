@@ -56,24 +56,26 @@ public struct FavoritesScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        Menu {
-                            ContextButton(
-                                text: "Sort",
-                                symbol: .line3HorizontalDecrease,
-                                bundle: .module
-                            ) {
-                                store.send(.contextOptionMenu(.sort))
+                        if store.isUserAuthorized {
+                            Menu {
+                                ContextButton(
+                                    text: "Sort",
+                                    symbol: .line3HorizontalDecrease,
+                                    bundle: .module
+                                ) {
+                                    store.send(.contextOptionMenu(.sort))
+                                }
+                                
+                                ContextButton(
+                                    text: "Read All",
+                                    symbol: .checkmarkCircle,
+                                    bundle: .module
+                                ) {
+                                    store.send(.contextOptionMenu(.markAllAsRead))
+                                }
+                            } label: {
+                                Image(systemSymbol: .ellipsisCircle)
                             }
-                            
-                            ContextButton(
-                                text: "Read All",
-                                symbol: .checkmarkCircle,
-                                bundle: .module
-                            ) {
-                                store.send(.contextOptionMenu(.markAllAsRead))
-                            }
-                        } label: {
-                            Image(systemSymbol: .ellipsisCircle)
                         }
                         
                         Button {
@@ -263,6 +265,7 @@ public struct FavoritesScreen: View {
                         
                         RichText(
                             text: AttributedString(title),
+                            isSelectable: false,
                             font: .body,
                             foregroundStyle: Color(.Labels.primary)
                         )

@@ -195,9 +195,9 @@ struct CommentView: View {
     @ViewBuilder
     private func MenuButton() -> some View {
         Menu {
-            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
-                store.send(.reportButtonTapped)
-            }
+//            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+//                store.send(.reportButtonTapped)
+//            }
             ContextButton(
                 text: store.comment.isHidden ? "Unhide comment" : "Hide comment",
                 symbol: store.comment.isHidden ? .eyeSlash : .eye,

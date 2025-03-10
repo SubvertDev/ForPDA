@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public indirect enum TopicTypeUI: Hashable, Equatable, Codable {
+public indirect enum TopicTypeUI: Hashable, Equatable, Codable, Sendable {
     case text(AttributedString)
     case attachment(Int)
     case image(URL)
@@ -23,13 +23,13 @@ public indirect enum TopicTypeUI: Hashable, Equatable, Codable {
     case bullet([TopicTypeUI])
 }
 
-public enum ListType: Hashable, Equatable, Codable {
+public enum ListType: Hashable, Equatable, Codable, Sendable {
     case bullet
     case numeric
     case roman
 }
 
-public enum NoticeType: String, Hashable, Equatable, Codable {
+public enum NoticeType: String, Hashable, Equatable, Codable, Sendable {
     case curator = "cur"
     case moderator = "mod"
     case admin = "ex"
@@ -43,17 +43,17 @@ public enum NoticeType: String, Hashable, Equatable, Codable {
     }
 }
 
-public enum QuoteType: Hashable, Equatable, Codable {
+public enum QuoteType: Hashable, Equatable, Codable, Sendable {
     case title(String)
     case metadata(QuoteMetadata)
 }
 
-public enum CodeType: Hashable, Codable {
+public enum CodeType: Hashable, Codable, Sendable {
     case none
     case title(String)
 }
 
-public struct QuoteMetadata: Hashable, Equatable, Codable {
+public struct QuoteMetadata: Hashable, Equatable, Codable, Sendable {
     public var name: String
     public var date: String?
     public var postId: Int?

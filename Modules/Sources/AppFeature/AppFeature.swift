@@ -222,7 +222,6 @@ public struct AppFeature: Reducer, Sendable {
             ArticlesListFeature()
         }
         
-        
         Scope(state: \.favoritesRoot, action: \.favoritesRoot) {
             FavoritesRootFeature()
         }
@@ -299,7 +298,7 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .deeplink(let url):
                 do {
-                    let deeplink = try DeeplinkHandler().handleOuterURL(url)
+                    let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
                     switch deeplink.tab {
                     case let .articles(.article(id, title, imageUrl)):
                         let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
@@ -467,13 +466,18 @@ public struct AppFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .favoritesRoot(.favorites(.settingsButtonTapped)),
-                    .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
+                .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
                 state.favoritesRootPath.append(.settingsPath(.settings(SettingsFeature.State())))
+                
+            case .favoritesRoot(.favorites(._favoritesResponse(.failure))):
+                state.toast = ToastInfo(screen: .favorites, message: "Whoops, something went wrong..", isError: true)
+                state.showToast = true
+                return .run { _ in await hapticClient.play(type: .error) }
                 
             case .favoritesRoot(.favorites(.favoriteTapped(let id, let name, let offset, let postId, let isForum))):
                 let forumPath: FavoritesRootPath.State = isForum
-                ? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
-                : .forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset, postId: postId)))
+                	? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
+                	: .forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset, postId: postId)))
                 state.favoritesRootPath.append(forumPath)
                 
             case .favoritesRoot(.favorites(._jumpRequestFailed)):
@@ -489,6 +493,13 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .favoritesRootPath(.element(id: _, action: .forumPath(.topic(.userAvatarTapped(userId: userId))))):
                 state.favoritesRootPath.append(.forumPath(.profile(ProfileFeature.State(userId: userId))))
+                
+
+            case .favoritesRootPath(.element(id: _, action: .forumPath(.topic(._topicResponse(.failure))))):
+                state.toast = ToastInfo(screen: .favorites, message: "Whoops, something went wrong..", isError: true)
+                state.showToast = true
+                state.favoritesRootPath.removeLast()
+                return .run { _ in await hapticClient.play(type: .error) }
                 
             case let .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id, offset: offset))))):
                 state.favoritesRootPath.append(.forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset))))
@@ -670,9 +681,15 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
+        if url.absoluteString.prefix(7) == "link://" {
+            return .run { _ in
+                let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
+                await open(url: resultUrl)
+            }
+        }
         do {
-            if let deeplink = try DeeplinkHandler().handleInnerURL(url),
-               case let .forum(screen) = deeplink.tab {
+            if let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url),
+                case let .forum(screen) = deeplink.tab {
                 
                 if state.selectedTab == .favorites {
                     switch screen {

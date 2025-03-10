@@ -26,6 +26,7 @@ public struct TopicFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
 
         public let topicId: Int
         public let initialOffset: Int
@@ -38,6 +39,10 @@ public struct TopicFeature: Reducer, Sendable {
         var isLoadingTopic = true
         
         var pageNavigation = PageNavigationFeature.State(type: .topic)
+        
+        public var isUserAuthorized: Bool {
+            return userSession != nil
+        }
         
         public init(
             topicId: Int,
@@ -167,26 +172,28 @@ public struct TopicFeature: Reducer, Sendable {
 
                 return .concatenate(
                     updatePageNavigation(&state),
-                    .run { send in
+                    .run { [isFirstPage = state.isFirstPage] send in
                         var topicTypes: [[TopicTypeUI]] = []
-                        let builder = TopicBuilder()
-                        logger.error("[LOG] Start processing topic: \(Date.now)")
-                        for post in topic.posts {
-                            logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
-                            if let types = await cacheClient.getParsedPostContent(post.id) {
-                                topicTypes.append(types)
-                            } else {
-                                logger.error("[LOG] Start parsing \(post.id): \(Date.now)")
-                                let parsedContent = BBCodeParser.parse(post.content)!
-                                logger.error("[LOG] Start building \(post.id): \(Date.now)")
-                                let types = try! builder.build(from: parsedContent)
-                                logger.error("[LOG] Start caching \(post.id): \(Date.now)")
-                                await cacheClient.cacheParsedPostContent(post.id, types)
-                                topicTypes.append(types)
+                        
+                        topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
+                            for (index, post) in topic.posts.enumerated() {
+                                var text = post.content
+                                if index == 0 && !isFirstPage {
+                                    text = "" // Not loading hat post for non-first page
+                                }
+                                taskGroup.addTask {
+//                                    let nodes = BBBuilder.build(text: text, attachments: post.attachments)
+//                                    let types = TopicNodeConverter.convert(nodes)
+                                    return (index, TopicNodeBuilder.build(text, attachments: post.attachments))
+                                }
                             }
-                            logger.error("[LOG] Stop processing \(post.id): \(Date.now)")
+                            
+                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topic.postsCount)
+                            for await (index, result) in taskGroup {
+                                types[index] = result
+                            }
+                            return types.compactMap { $0 }
                         }
-                        logger.error("[LOG] Finish processing topic: \(Date.now)")
                         await send(._loadTypes(topicTypes))
                     }.cancellable(id: CancelID.loading)
                 )
@@ -195,9 +202,12 @@ public struct TopicFeature: Reducer, Sendable {
                 state.types = types
                 state.isLoadingTopic = false
                 return .none
+//                return PageNavigationFeature()
+//                    .reduce(into: &state.pageNavigation, action: .nextPageTapped)
+//                    .map(Action.pageNavigation)
                 
             case let ._topicResponse(.failure(error)):
-                print(error)
+                print("TOPIC RESPONSE FAILURE: \(error)")
                 return .none
                 
             case let ._setFavoriteResponse(isFavorite):
@@ -221,4 +231,25 @@ public struct TopicFeature: Reducer, Sendable {
             )
             .map(Action.pageNavigation)
     }
+}
+
+func measureElapsedTime(_ operation: () throws -> Void) throws -> UInt64 {
+    let startTime = DispatchTime.now()
+    try operation()
+    let endTime = DispatchTime.now()
+
+    let elapsedTime = endTime.uptimeNanoseconds - startTime.uptimeNanoseconds
+    let elapsedTimeInMilliSeconds = Double(elapsedTime) / 1_000_000.0
+
+    return UInt64(elapsedTimeInMilliSeconds)
+}
+
+func measureAverageTime(timesToRun: Int, _ operation: () throws -> Void) throws {
+    var times = [UInt64]()
+    for _ in 0..<timesToRun {
+        let time = try measureElapsedTime(operation)
+        times.append(time)
+    }
+    let time = times.reduce(0, +) / UInt64(times.count)
+    print("Average time after \(timesToRun) runs: \(time) ms")
 }

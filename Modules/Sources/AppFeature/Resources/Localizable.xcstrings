@@ -50,6 +50,16 @@
           }
         }
       }
+    },
+    "Whoops, something went wrong.." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс, что-то пошло не так.."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

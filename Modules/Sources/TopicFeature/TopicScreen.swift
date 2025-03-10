@@ -84,7 +84,7 @@ public struct TopicScreen: View {
                 store.send(.contextMenu(.openInBrowser))
             }
             
-            if let topic = store.topic {
+            if let topic = store.topic, store.isUserAuthorized {
                 Section {
                     ContextButton(
                         text: topic.isFavorite ? "Remove from favorites" : "Add to favorites",
