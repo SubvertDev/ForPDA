@@ -42,16 +42,16 @@ public struct MenuButtons: View {
                 ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
                     contextMenuActions.openInBrowserAction()
                 }
-                ContextButton(text: "Problems with article?", symbol: .exclamationmarkBubble, bundle: .module) {
-                    contextMenuActions.reportAction()
-                }
+//                ContextButton(text: "Problems with article?", symbol: .exclamationmarkBubble, bundle: .module) {
+//                    contextMenuActions.reportAction()
+//                }
             }
             
-            Section {
-                ContextButton(text: "Add To Bookmarks", symbol: .bookmark, bundle: .module) {
-                    contextMenuActions.addToBookmarksAction()
-                }
-            }
+//            Section {
+//                ContextButton(text: "Add To Bookmarks", symbol: .bookmark, bundle: .module) {
+//                    contextMenuActions.addToBookmarksAction()
+//                }
+//            }
         }
     }
 }

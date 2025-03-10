@@ -206,19 +206,21 @@ public struct ForumScreen: View {
             store.send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
-        if isUnread {
-            ContextButton(text: "Mark Read", symbol: .checkmarkCircle, bundle: .module) {
-                store.send(.contextCommonMenu(.markRead, id, isForum))
+        if store.isUserAuthorized {
+            if isUnread {
+                ContextButton(text: "Mark Read", symbol: .checkmarkCircle, bundle: .module) {
+                    store.send(.contextCommonMenu(.markRead, id, isForum))
+                }
             }
-        }
-        
-        Section {
-            ContextButton(
-                text: isFavorite ? "Remove from favorites" : "Add to favorites",
-                symbol: isFavorite ? .starFill : .star,
-                bundle: .module
-            ) {
-                store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+            
+            Section {
+                ContextButton(
+                    text: isFavorite ? "Remove from favorites" : "Add to favorites",
+                    symbol: isFavorite ? .starFill : .star,
+                    bundle: .module
+                ) {
+                    store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+                }
             }
         }
     }

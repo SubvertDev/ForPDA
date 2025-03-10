@@ -112,6 +112,8 @@ public struct TopicParser {
                 )
             } else { nil }
             
+            let downloadCount = attachment.count == 5 ? attachment[4] as? Int : nil
+            
             let type = if attachment[1] as! Int == 1 {
                 Post.Attachment.AttachmentType.image
             } else {
@@ -123,7 +125,8 @@ public struct TopicParser {
                 type: type,
                 name: attachment[2] as! String,
                 size: attachment[3] as! Int,
-                metadata: metadata
+                metadata: metadata,
+                downloadCount: downloadCount
             )
         }
     }

@@ -45,6 +45,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         public let name: String
         public let size: Int
         public let metadata: Metadata?
+        public let downloadCount: Int?
         
         public enum AttachmentType: Sendable, Hashable, Codable {
             case file
@@ -68,13 +69,15 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
             type: AttachmentType,
             name: String,
             size: Int,
-            metadata: Metadata?
+            metadata: Metadata?,
+            downloadCount: Int?
         ) {
             self.id = id
             self.type = type
             self.name = name
             self.size = size
             self.metadata = metadata
+            self.downloadCount = downloadCount
         }
     }
     
@@ -146,7 +149,8 @@ extension Post {
                     width: 281,
                     height: 500,
                     url: "https://cs2c9f.4pda.ws/14308454.png"
-                )
+                ),
+                downloadCount: nil
             )
         ],
         createdAt: Date(timeIntervalSince1970: 1725706321),

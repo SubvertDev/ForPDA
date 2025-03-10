@@ -14,7 +14,18 @@
         }
       }
     },
+    "No history" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет истории"
+          }
+        }
+      }
+    },
     "Today" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -24,7 +35,18 @@
         }
       }
     },
+    "View any topic in forum and it displays here." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посмотрите любую тему на форуме и она появится тут."
+          }
+        }
+      }
+    },
     "Yesterday" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
