@@ -465,7 +465,7 @@ public struct AppFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .favoritesRoot(.favorites(.settingsButtonTapped)),
+            case .favoritesRoot(.delegate(.openSettings)),
                 .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
                 state.favoritesRootPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 

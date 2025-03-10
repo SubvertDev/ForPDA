@@ -14,20 +14,27 @@ import SFSafeSymbols
 import SharedUI
 import Models
 
+@ViewAction(for: FavoritesRootFeature.self)
 public struct FavoritesRootScreen: View {
+    
+    // MARK: - Properties
+    
+    public let store: StoreOf<FavoritesRootFeature>
+    @State private var pickerSelection: PickerSelection = .favorites
+    @Environment(\.tintColor) private var tintColor
     
     public enum PickerSelection {
         case favorites
         case bookmarks
     }
     
-    public let store: StoreOf<FavoritesRootFeature>
-    @State private var pickerSelection: PickerSelection = .favorites
-    @Environment(\.tintColor) private var tintColor
+    // MARK: - Init
     
     public init(store: StoreOf<FavoritesRootFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -36,7 +43,7 @@ public struct FavoritesRootScreen: View {
                     .ignoresSafeArea()
                 
                     VStack {
-                        SegmentPicker(selection: $pickerSelection)
+                        SegmentPicker()
                         
                         switch pickerSelection {
                         case .favorites:
@@ -47,22 +54,28 @@ public struct FavoritesRootScreen: View {
                         }
                     }
             }
-            .onAppear {
-                store.send(.favorites(.onAppear))
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        send(.settingsButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .gearshape)
+                    }
+                }
             }
+            .animation(.default, value: pickerSelection)
         }
     }
-}
-
-private struct SegmentPicker: View {
-    @Binding var selection: FavoritesRootScreen.PickerSelection
     
-    var body: some View {
-        Picker(String(""), selection: $selection) {
-            Text("Favorites")
+    // MARK: - Segment Picker
+    
+    @ViewBuilder
+    private func SegmentPicker() -> some View {
+        Picker(String(""), selection: $pickerSelection) {
+            Text("Favorites", bundle: .module)
                 .tag(FavoritesRootScreen.PickerSelection.favorites)
             
-            Text("Bookmarks")
+            Text("Bookmarks", bundle: .module)
                 .tag(FavoritesRootScreen.PickerSelection.bookmarks)
         }
         .pickerStyle(.segmented)
@@ -70,10 +83,15 @@ private struct SegmentPicker: View {
     }
 }
 
+// MARK: - Previews
+
 #Preview {
-    FavoritesRootScreen(store: Store(
-        initialState: FavoritesRootFeature.State(
-            favorites: FavoritesFeature.State(),
-            bookmarks: BookmarksFeature.State()),
-        reducer: { FavoritesRootFeature() }))
+    FavoritesRootScreen(
+        store: Store(
+            initialState: FavoritesRootFeature.State(),
+            reducer: {
+                FavoritesRootFeature()
+            }
+        )
+    )
 }

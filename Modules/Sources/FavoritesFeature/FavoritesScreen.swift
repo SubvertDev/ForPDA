@@ -14,13 +14,19 @@ import Models
 
 public struct FavoritesScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<FavoritesFeature>
     @Environment(\.tintColor) private var tintColor
     @Environment(\.scenePhase) private var scenePhase
+    
+    // MARK: - Init
 
     public init(store: StoreOf<FavoritesFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -77,12 +83,6 @@ public struct FavoritesScreen: View {
                                 Image(systemSymbol: .ellipsisCircle)
                             }
                         }
-                        
-                        Button {
-                            store.send(.settingsButtonTapped)
-                        } label: {
-                            Image(systemSymbol: .gearshape)
-                        }
                     }
                 }
             }
@@ -128,6 +128,8 @@ public struct FavoritesScreen: View {
             }
         }
     }
+    
+    // MARK: - Topic Context Menu
     
     private func TopicContextMenu(favorite: FavoriteInfo) -> some View {
         VStack(spacing: 0) {
@@ -182,7 +184,7 @@ public struct FavoritesScreen: View {
         }
     }
     
-    // MARK: - Topics
+    // MARK: - Favorites Section
     
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {

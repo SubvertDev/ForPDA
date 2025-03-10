@@ -59,7 +59,6 @@ public struct FavoritesFeature: Reducer, Sendable {
         case onRefresh
         case onSceneBecomeActive
         
-        case settingsButtonTapped
         case favoriteTapped(id: Int, name: String, offset: Int, postId: Int?, isForum: Bool)
         case unreadTapped(id: Int)
         
@@ -140,7 +139,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
-            case .settingsButtonTapped, .sort:
+            case .sort:
                 return .none
                 
             case .favoriteTapped:
