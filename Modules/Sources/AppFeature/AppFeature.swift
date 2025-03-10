@@ -197,6 +197,7 @@ public struct AppFeature: Reducer, Sendable {
         case syncUnreadTaskInvoked
         case didFinishToastAnimation
         
+        case _showErrorToast
         case _failedToConnect(any Error)
     }
     
@@ -256,6 +257,11 @@ public struct AppFeature: Reducer, Sendable {
             case ._failedToConnect:
                 state.alert = .failedToConnect
                 return .none
+                
+            case ._showErrorToast:
+                state.toast = ToastInfo(screen: .app, message: "Whoops, something went wrong..", isError: true)
+                state.showToast = true
+                return .run { _ in await hapticClient.play(type: .error) }
                 
             case .appDelegate, .binding, .alert:
                 return .none
@@ -354,6 +360,7 @@ public struct AppFeature: Reducer, Sendable {
                         await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
                     } catch {
                         analyticsClient.capture(error)
+                        await send(._showErrorToast)
                     }
                     
                     await send(.registerBackgroundTask)
