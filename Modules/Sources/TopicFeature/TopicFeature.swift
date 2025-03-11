@@ -188,7 +188,7 @@ public struct TopicFeature: Reducer, Sendable {
                                 }
                             }
                             
-                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topic.postsCount)
+                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topic.postsCount + 1)
                             for await (index, result) in taskGroup {
                                 types[index] = result
                             }
