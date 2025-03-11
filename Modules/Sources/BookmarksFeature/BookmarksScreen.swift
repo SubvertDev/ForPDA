@@ -26,10 +26,18 @@ public struct BookmarksScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                EmptyBookmarks()
-                
-                Image(.tapes)
-                    .resizable()
+                VStack(spacing: 0) {
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: 12))
+                        .padding(.bottom, 100)
+                    
+                    EmptyBookmarks()
+                    
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: -20))
+                        .padding(.top, 80)
+                }
+                .frame(width: UIScreen.main.bounds.width)
             }
             .navigationTitle(Text("Bookmarks", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
@@ -65,6 +73,23 @@ public struct BookmarksScreen: View {
                 .foregroundStyle(Color(.Labels.teritary))
                 .padding(.horizontal, 55)
         }
+    }
+    
+    // MARK: Coming Soon Tape
+    
+    @ViewBuilder
+    private func ComingSoonTape() -> some View {
+        HStack(spacing: 8) {
+            ForEach(0..<6, id: \.self) { index in
+                Text("COMING SOON")
+                    .font(.footnote)
+                    .foregroundStyle(Color(.Labels.primaryInvariably))
+                    .fixedSize(horizontal: true, vertical: false)
+                    .lineLimit(1)
+            }
+        }
+        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
+        .background(tintColor)
     }
 }
 
