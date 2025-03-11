@@ -224,7 +224,7 @@ public struct TopicParser {
        
         return Post.LastEdit(
             userId: userId,
-            username: username,
+            username: username.convertCodes(),
             reason: reason,
             date: Date(timeIntervalSince1970: date)
         )
