@@ -20,6 +20,9 @@ struct ArticleElementView: View {
     @State private var gallerySelection: Int = 0
     @State private var pollSelection: ArticlePoll.Option?
     @State private var pollSelections: Set<ArticlePoll.Option> = .init()
+    @State private var showFullScreenImage: Bool = false
+    @State private var showFullScreenGallery: Bool = false
+    @State private var selectedImageID: Int = 0
     
     private var hasSelection: Bool {
         return pollSelection != nil || !pollSelections.isEmpty
@@ -113,6 +116,19 @@ struct ArticleElementView: View {
         .frame(width: UIScreen.main.bounds.width,
                height: UIScreen.main.bounds.width * element.ratioHW)
         .clipped()
+        .onTapGesture {
+            showFullScreenImage.toggle()
+        }
+        .fullScreenCover(isPresented: $showFullScreenImage) {
+            if #available(iOS 16.4, *) {
+//                FullScreenImage(element: element, showFullScreen: $showFullScreenImage)
+//                    .presentationBackground(.clear)
+                TabViewGallery(gallery: [element], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
+                    .presentationBackground(.clear)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
     }
     
     // MARK: - Gallery
@@ -120,7 +136,7 @@ struct ArticleElementView: View {
     @ViewBuilder
     private func gallery(_ element: [ImageElement]) -> some View {
         TabView {
-            ForEach(element, id: \.self) { imageElement in
+            ForEach(Array(element.enumerated()), id: \.element) { index, imageElement in
                 LazyImage(url: imageElement.url) { state in
                     Group {
                         if let image = state.image {
@@ -133,6 +149,12 @@ struct ArticleElementView: View {
                 }
                 .aspectRatio(imageElement.ratioWH, contentMode: .fit)
                 .clipped()
+                .highPriorityGesture(
+                    TapGesture().onEnded {
+                        showFullScreenGallery.toggle()
+                        selectedImageID = index
+                    }
+                )
             }
             .padding(.bottom, 48) // Fix against index overlaying
         }
@@ -140,6 +162,14 @@ struct ArticleElementView: View {
         .tabViewStyle(.page(indexDisplayMode: .always))
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .padding(.bottom, -16)
+        .fullScreenCover(isPresented: $showFullScreenGallery) {
+            if #available(iOS 16.4, *) {
+                TabViewGallery(gallery: element, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
+                    .presentationBackground(.clear)
+            } else {
+                // Fallback on earlier versions
+            }
+        }
     }
     
     // MARK: - Video
