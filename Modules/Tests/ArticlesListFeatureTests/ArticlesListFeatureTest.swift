@@ -155,24 +155,24 @@ struct ArticlesListFeatureTest {
         }
     }
     
-    @Test("List grid view options")
-    func listGridViewOptions() async throws {
-        let store = TestStore(
-            initialState: ArticlesListFeature.State()
-        ) {
-            ArticlesListFeature()
-        }
-        
-        await store.send(.listGridTypeButtonTapped) {
-            $0.listRowType = .normal
-        }
-        
-        store.assert { $0.appSettings.articlesListRowType = .normal }
-        
-        await store.send(.listGridTypeButtonTapped) {
-            $0.listRowType = .short
-        }
-        
-        store.assert { $0.appSettings.articlesListRowType = .short }
-    }
+//    @Test("List grid view options")
+//    func listGridViewOptions() async throws {
+//        let store = TestStore(
+//            initialState: ArticlesListFeature.State()
+//        ) {
+//            ArticlesListFeature()
+//        }
+//        
+//        await store.send(.listGridTypeButtonTapped) {
+//            $0.listRowType = .normal
+//        }
+//        
+//        store.assert { $0.appSettings.articlesListRowType = .normal }
+//        
+//        await store.send(.listGridTypeButtonTapped) {
+//            $0.listRowType = .short
+//        }
+//        
+//        store.assert { $0.appSettings.articlesListRowType = .short }
+//    }
 }

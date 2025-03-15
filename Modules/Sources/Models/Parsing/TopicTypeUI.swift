@@ -9,7 +9,7 @@ import SwiftUI
 
 public indirect enum TopicTypeUI: Hashable, Equatable, Codable, Sendable {
     case text(AttributedString)
-    case attachment(Int)
+    case attachment(Post.Attachment)
     case image(URL)
     case left([TopicTypeUI])
     case center([TopicTypeUI])

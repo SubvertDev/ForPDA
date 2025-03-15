@@ -5,29 +5,32 @@
 //  Created by Ilia Lubianoi on 10.03.2025.
 //
 
-import UIKit
+import UIKit // TODO: Remove after UIFont removal
+import Models
 
 public struct BBAttributedParser {
     
-    public static func parse(text: AttributedString) -> [BBContainerNode] {
-        var parser = BBAttributedParser(text: text)
+    public static func parse(text: AttributedString, attachments: [Post.Attachment]) -> [BBContainerNode] {
+        var parser = BBAttributedParser(text: text, attachments: attachments)
         return parser.parse()
     }
     
     private var attributedTokenizer: BBAttributedTokenizer
-    private var openingTags: [(tag: BBTag, attribute: AttributedString?)] = []
+    private var attachments: [Post.Attachment]
+    private var openingTags: [(tag: BBTag, attribute: NSAttributedString?)] = []
     
-    private init(text: AttributedString) {
+    private init(text: AttributedString, attachments: [Post.Attachment]) {
         attributedTokenizer = BBAttributedTokenizer(string: text)
+        self.attachments = attachments
     }
     
     private mutating func parse() -> [BBContainerNode] {
         var elements: [BBContainerNode] = []
         
         while let token = attributedTokenizer.nextToken() {
+            // print("ATTRIBUTED TOKEN: \(token)")
             if let tag = token.tag, !tag.isContainerTag {
-                print("НЕДОПУСТИМЫЙ ТЕГ \(tag)") // Скорее всего просто кривой тег
-                elements.append(.text(NSAttributedString(token.description)))
+                elements.append(.text(token.description))
                 continue
             }
             
@@ -35,12 +38,15 @@ public struct BBAttributedParser {
             case let .openingTag(tag, attribute):
                 if tag == .attachment {
                     // Атачмент не имеет закрывающего тега, так что сразу добавляем напрямую
-                    elements.append(.attachment(NSAttributedString(attribute!)))
+                    let attribute = attribute!
+                    elements.append(.attachment(attribute))
+                    let id = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst())!
+                    attachments.removeAll(where: { $0.id == id })
                     continue
                 }
                 if tag == .smile {
                     // Смайл не имеет закрывающего тега, так что сразу добавляем напрямую
-                    elements.append(.smile(NSAttributedString(attribute!)))
+                    elements.append(.smile(attribute!))
                     continue
                 }
                 openingTags.append((tag, attribute))
@@ -54,27 +60,51 @@ public struct BBAttributedParser {
                 return [containerNode]
                 
             case let .text(text):
-                elements.append(.text(NSAttributedString(text)))
+                elements.append(.text(text))
                 
             default: // E.g. закрывающий тег у которого нет пары
-                elements.append(.text(NSAttributedString(token.description)))
+                elements.append(.text(token.description))
             }
         }
         
         // TODO: Inject attributes instead of Import?
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.defaultBBFont,
+            .foregroundColor: UIColor(resource: .Labels.primary)
+        ]
+        
         let textElements: [BBContainerNode] = openingTags.map {
-            .text(NSAttributedString(string: "[" + $0.tag.rawValue + "]", attributes: [
-                .font: UIFont.defaultBBFont,
-                .foregroundColor: UIColor(resource: .Labels.primary)
-            ]))
+            .text(NSAttributedString(string: "[" + $0.tag.rawValue + "]", attributes: attributes))
         }
         elements.insert(contentsOf: textElements, at: 0)
         openingTags.removeAll()
         
+        // Adding attachments spoiler for all attachments that weren't used in post
+        let imageNodes = attachments
+            .filter { $0.type == .image }
+            .map { BBContainerNode.attachment(NSAttributedString(string: "\"\($0.id):\($0.name)\"")) }
+        if !imageNodes.isEmpty {
+            elements.append(.spoiler(NSAttributedString(string: "Прикрепленные изображения", attributes: attributes), imageNodes))
+        }
+        
+        attributes[.font] = UIFont.preferredFont(forBBCodeSize: 2).boldFont()
+        
+        // Adding files block for all attachments that weren't used in post
+        let fileNodes = attachments
+            .filter { $0.type == .file }
+            .map { BBContainerNode.attachment(NSAttributedString(string: "\"\($0.id):\($0.name)\""))}
+        if !fileNodes.isEmpty {
+            elements.append(.text(NSAttributedString(string: "\n\nПрикрепленные файлы\n", attributes: attributes)))
+            for (index, fileNode) in fileNodes.enumerated() {
+                if index != 0 { elements.append(.text(NSAttributedString(string: " "))) }
+                elements.append(fileNode)
+            }
+        }
+        
         return elements
     }
     
-    private mutating func close(_ tag: BBTag, attribute: AttributedString?, elements: [BBContainerNode]) -> BBContainerNode? {
+    private mutating func close(_ tag: BBTag, attribute: NSAttributedString?, elements: [BBContainerNode]) -> BBContainerNode? {
         var newElements = elements
         
         while openingTags.count > 0 {

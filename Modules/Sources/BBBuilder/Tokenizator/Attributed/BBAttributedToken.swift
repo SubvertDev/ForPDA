@@ -8,23 +8,23 @@
 import Foundation
 
 public enum BBAttributedToken: Equatable {
-    case openingTag(BBTag, AttributedString?)
+    case openingTag(BBTag, NSAttributedString?)
     case closingTag(BBTag)
-    case text(AttributedString)
+    case text(NSAttributedString)
 }
 
 public extension BBAttributedToken {
-    var description: AttributedString {
+    var description: NSAttributedString {
         switch self {
         case let .openingTag(tag, attribute):
             if let attribute {
-                return AttributedString("[\(tag)=\(attribute)]")
+                return NSAttributedString(string: "[\(tag)=\(attribute.string)]", attributes: BBRenderer.defaultAttributes)
             } else {
-                return AttributedString("[\(tag)]")
+                return NSAttributedString(string: "[\(tag)]", attributes: BBRenderer.defaultAttributes)
             }
             
         case let .closingTag(tag):
-            return AttributedString("[/\(tag)]")
+            return NSAttributedString(string: "[/\(tag)]", attributes: BBRenderer.defaultAttributes)
             
         case let .text(text):
             return text

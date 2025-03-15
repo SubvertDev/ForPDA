@@ -5,32 +5,20 @@ import CustomDump
 
 public final class BBRenderer {
     
+    public static nonisolated(unsafe) let defaultAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.defaultBBFont,
+        .foregroundColor: UIColor(resource: .Labels.primary)
+    ]
+    
     private let baseAttributes: [NSAttributedString.Key: Any]
     
-    private var baseFont: UIFont {
-        return baseAttributes[.font] as! UIFont
-    }
-    private var baseForegroundColor: UIColor {
-        return baseAttributes[.foregroundColor] as! UIColor
-    }
-    
-    public init(
-        baseAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.defaultBBFont,
-            .foregroundColor: UIColor.label
-        ]
-    ) {
-        self.baseAttributes = baseAttributes
+    public init(baseAttributes: [NSAttributedString.Key: Any]? = nil) {
+        self.baseAttributes = baseAttributes ?? BBRenderer.defaultAttributes
     }
     
     public func render(text: String) -> NSAttributedString {
         let elements = BBParser.parse(text: text)
-        let attributes = [
-            NSAttributedString.Key.font: baseFont,
-            NSAttributedString.Key.foregroundColor: baseForegroundColor
-        ]
-                
-        let resultNodes = elements.map { $0.render(withAttributes: attributes) }
+        let resultNodes = elements.map { $0.render(withAttributes: baseAttributes) }
         let joinedNode = resultNodes.joined()
         guard case let .text(text) = joinedNode else { fatalError() }
         return text
@@ -165,9 +153,9 @@ private extension BBNode {
             let nodes = children.map { $0.render(withAttributes: attributes) }
             return .code(attribute.map { NSAttributedString(string: $0) }, nodes)
 
-        case .hide(let children):
+        case .hide(let attribute, let children):
             let nodes = children.map { $0.render(withAttributes: attributes) }
-            return .hide(nodes)
+            return .hide(attribute.map { NSAttributedString(string: $0) }, nodes)
 
         case .cur(let children):
             let nodes = children.map { $0.render(withAttributes: attributes) }
@@ -214,7 +202,7 @@ public extension UIFont {
     }
     
     static var defaultBBFont: UIFont {
-        return preferredFont(forBBCodeSize: 3)
+        return preferredFont(forBBCodeSize: 3) // TODO: Actually, default size is more like ~1.5
     }
 }
 
@@ -572,6 +560,18 @@ public extension Array where Element == BBContainerNode {
                     result.append(string)
                 }
                 result.append(NSAttributedString(string: "[/quote]"))
+                
+            case .code(let attributed, let children):
+                result.append(NSAttributedString(string: "[code"))
+                if let attributed {
+                    result.append(NSAttributedString(string: "="))
+                    result.append(attributed)
+                }
+                result.append(NSAttributedString(string: "]"))
+                if case let .text(string) = children.joined() {
+                    result.append(string)
+                }
+                result.append(NSAttributedString(string: "[/code]"))
                 
             default:
                 break

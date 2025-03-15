@@ -1,6 +1,9 @@
 import UIKit
 import Models
 import SharedUI
+import UniformTypeIdentifiers
+import ComposableArchitecture
+import LoggerClient
 
 func timeElapsed(from start: DispatchTime) -> String {
     let elapsedTime = DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds
@@ -12,16 +15,20 @@ public struct BBBuilder {
     
     // MARK: - Build Interface
     
-    public static func build(text: String, attachments: [Post.Attachment]) -> [BBContainerNode] {
+    public static func build(text: String, attachments: [Post.Attachment] = []) -> [BBContainerNode] {
         let renderedText = AttributedString(BBRenderer().render(text: text))
         let builder = BBBuilder(attachments: attachments)
-        let nodes = BBAttributedParser.parse(text: renderedText)
+        let nodes = BBAttributedParser.parse(text: renderedText, attachments: attachments)
         return builder.mergeTextNodes(nodes)
     }
     
     // MARK: - Properties
     
     private var attachments: [Post.Attachment]
+    
+    // MARK: - Dependencies
+    
+    @Dependency(\.logger[.bbbuilder, false]) private var logger
     
     // MARK: - Init
     
@@ -34,58 +41,187 @@ public struct BBBuilder {
     private func mergeTextNodes(_ nodes: [BBContainerNode], listType: BBContainerNode.ListType? = nil) -> [BBContainerNode] {
         var mergedNodes: [BBContainerNode] = []
         
+        func hasPreviousNode(_ index: Int) -> Bool {
+            return nodes[safe: index - 1] != nil
+        }
+        
+        func hasNextNode(_ index: Int) -> Bool {
+            return nodes[safe: index + 1] != nil
+        }
+        
         for (index, node) in nodes.enumerated() {
-            // print("NEW NODE: \(node)")
+            // logger.info("NEW NODE: \(node)") // node doesnt conform to CustomStringConvertible
+            
+            let mutableText: NSMutableAttributedString
+            if let last = mergedNodes.last, case let .text(lastText) = last {
+                mutableText = NSMutableAttributedString(attributedString: lastText)
+            } else {
+                mutableText = NSMutableAttributedString(string: "")
+            }
+            
             switch node {
-            case .text(let text), .snapback(let text), .mergetime(let text), .img(let text), .attachment(let text), .smile(let text):
-                // ЕСЛИ у нас есть нода ДО текущей и это НЕ пустой текст
-                if let last = mergedNodes.last, case let .text(lastText) = last, !last.isEmptyText {
-                    let mutableText = NSMutableAttributedString(attributedString: lastText)
+            case .text, .snapback, .mergetime, .smile:
+                logger.info("In textable node")
+                if mutableText.string.isEmpty {
+                    var trimLeading = false
+                    var trimTrailing = false
                     
-                    // ЕСЛИ мы в листе ИЛИ последний (такое может быть?) текст был "[*]", то мержим с последним текстом
-                    if listType != nil || lastText.string.count == 3 && lastText.string.prefix(3) == "[*]" {
-                        mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
-                    } else if case .img = node {
-                        // ЕСЛИ нода картинки, ТО мержим как атач
-                        mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
-                    } else if case .attachment = node {
-                        // ЕСЛИ нода атача, ТО мержим как атач
-                        mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
-                    } else if !mutableText.string.isEmpty {
-                        if index < nodes.count - 1, nodes[index + 1].isTextable {
-                            // ЕСЛИ нода НЕ последняя и следующая нода текстовая, ТО мержим с предыдущим текстом
-                            var isAttachmentDelimeter = false
-                            if case .attachment = nodes[index - 1] { isAttachmentDelimeter = true }
-                            mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText, isAttachmentDelimeter: isAttachmentDelimeter)
-                        } else {
-                            // ЕСЛИ нода последняя ИЛИ если следующая нода НЕ текстовая, ТО тримим с конца
-                            mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText, trimTrailing: true)
+                    if hasPreviousNode(index) {
+                        if !nodes[index - 1].isTextable {
+                            trimLeading = true
+                        }
+                        if nodes[index - 1].isMedia {
+                            trimLeading = false
+                        }
+                    } else if !hasPreviousNode(index) {
+                        trimLeading = true
+                    }
+                    logger.info("Trim leading: \(trimLeading)")
+                    
+                    if hasNextNode(index) {
+                        logger.info("Has next node")
+                        if !nodes[index + 1].isTextable {
+                            logger.info("Next node is not textable")
+                            trimTrailing = true
+                        }
+                        if case let .attachment(attribute) = nodes[index + 1], isFileAttachment(attribute: attribute) {
+                            logger.info("Next node is file attachment")
+                            trimTrailing = false
+                        } else if nodes[index + 1].isMedia {
+                            logger.info("Next node is media")
+                            trimTrailing = false
+                        }
+                    } else if !hasNextNode(index) {
+                        logger.info("There's no next node")
+                        trimTrailing = true
+                    }
+                    logger.info("Trim trailing: \(trimTrailing)")
+                    
+                    let textNode = unwrap(
+                        node: node,
+                        with: mutableText,
+                        listType: listType,
+                        trimLeading: trimLeading,
+                        trimTrailing: trimTrailing
+                    )
+                    if !textNode.isEmptyTrimmedText {
+                        logger.info("Mutable text is empty, appending")
+                        mergedNodes.append(textNode)
+                    } else {
+                        logger.info("Text node is empty after trimming, skipping")
+                    }
+                } else {
+                    logger.info("Mutable text is not empty")
+                    
+                    let isNextNodeTextable = nodes[safe: index + 1]?.isTextable ?? false
+                    let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
+                    if isNextNodeTextable || isNextNodeMedia {
+                        logger.info("Next node is textable OR media, unwrapping")
+                        var isAttachmentDelimeneter = false
+                        if case .attachment = nodes[safe: index - 1] { isAttachmentDelimeneter = true }
+                        mergedNodes[mergedNodes.count - 1] = unwrap(
+                            node: node,
+                            with: mutableText,
+                            isAttachmentDelimeter: isAttachmentDelimeneter,
+                            listType: listType
+                        )
+                        if listType != nil,
+                           case let .text(text) = nodes[safe: index - 1],
+                           text.string == "[*]",
+                           case let .text(text) = node,
+                           text.string.last != "\n" {
+                            logger.info("Didn't find newline character at the end of bullet, adding")
+                            mutableText.mutableString.append("\n")
                         }
                     } else {
-                        fatalError("?")
+                        logger.info("Next node is not textable AND not media, unwrapping")
+                        mergedNodes[mergedNodes.count - 1] = unwrap(
+                            node: node,
+                            with: mutableText,
+                            listType: listType,
+                            trimTrailing: true
+                        )
                     }
-                } else { // ЕСЛИ ноды ДО нет или она НЕ текстовая или пустая
-                    if index < nodes.count - 1, nodes[index + 1].isTextable, !nodes[index + 1].isMedia, !nodes[index + 1].isEmptyText {
-                        // ЕСЛИ следующая нода текстовая И НЕ медиа И НЕ пустая, ТО тримим только leading
-                        let textNode = unwrap(node: node, with: text, isFirst: true, trimLeading: true)
-                        if !textNode.isEmptyText { mergedNodes.append(textNode) }
+                }
+                
+            case .img:
+                logger.info("Image case")
+                #warning("todo")
+                mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
+                
+            case let .attachment(attribute):
+                logger.info("Attachment case")
+                
+                let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst())!
+                let attachmentType = attachments[attachments.firstIndex(where: { $0.id == attachmentId })!].type
+                switch attachmentType {
+                case .file:
+                    logger.info("FILE attachment")
+                    let textNode = unwrap(node: node, with: mutableText)
+                    if !textNode.isEmptyText {
+                        mergedNodes.lastOrAppend = textNode
                     } else {
-                        // ЕСЛИ следующая нода НЕ текстовая И/ИЛИ медиа И/ИЛИ пустая
-                        switch node {
-                        case .img, .attachment:
-                            // И текущая нода это картинка/атач, ТО мержим как самостоятельные ноды
-                            if index < nodes.count - 1, nodes[index + 1].startsWithSpace {
-                                let textNode = unwrap(node: node, with: text, isFirst: true)//, trimLeading: true, trimTrailing: true)
-                                if !textNode.isEmptyText { mergedNodes.append(textNode) }
+                        fatalError("File attachment textNode is empty")
+                    }
+                    continue
+                    
+                case .image:
+                    break
+                }
+                
+                logger.info("IMAGE attachment")
+                if hasPreviousNode(index) {
+                    logger.info("Has previous node")
+                    if nodes[index - 1].isTextable {
+                        logger.info("Previous node is textable")
+                        if nodes[index - 1].hasOnlyOneSpace {
+                            logger.info("Previous node is only one space")
+                            if let lastMergedNode = mergedNodes.last, case .text = lastMergedNode {
+                                logger.info("Last merged node was text, unwrapping")
+                                mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
                             } else {
+                                logger.info("Last merged node wasn't text, appending")
                                 mergedNodes.append(node)
                             }
-                        default:
-                            // ТО тримим с обоих краев
-                            let trimTrailing = !(nodes[safe: index + 1]?.isTextable ?? false)
-                            let textNode = unwrap(node: node, with: text, isFirst: true, trimLeading: true, trimTrailing: trimTrailing)
-                            if !textNode.isEmptyText { mergedNodes.append(textNode) }
+//                            mergedNodes.append(node)
+                        } else if nodes[index - 1].isEmptyTrimmedText {
+                            logger.info("Previous node is empty after trimming text, appending")
+                            mergedNodes.append(node)
+                        } else {
+                            logger.info("Previous node is NOT single whitespace, unwrapping")
+                            mergedNodes.lastOrAppend = unwrap(node: node, with: mutableText)
                         }
+                    } else {
+                        logger.info("Previous node is textable OR not media, checking next node")
+                        checkNextNode(hasPreviousNode: true)
+                    }
+                } else {
+                    logger.info("Doesn't have previous node")
+                    checkNextNode(hasPreviousNode: false)
+                }
+                
+                func checkNextNode(hasPreviousNode: Bool) {
+                    if hasNextNode(index) {
+                        logger.info("Has next node")
+                        if nodes[index + 1].isTextable {
+                            logger.info("Next node is textable")
+                            if nodes[index + 1].startsWithNewline || nodes[index + 1].startsWithSpace {
+                                logger.info("Next node starts with newline or space, appending")
+                                mergedNodes.append(node)
+                            } else if hasPreviousNode {
+                                logger.info("Has previous node, unwrapping")
+                                mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
+                            } else {
+                                logger.info("Next is not newline/space and has no previous node, appending unwrapped")
+                                mergedNodes.append(unwrap(node: node, with: mutableText))
+                            }
+                        } else {
+                            logger.info("Next node is non textable, appending")
+                            mergedNodes.append(node)
+                        }
+                    } else {
+                        logger.info("Has no next node, appending")
+                        mergedNodes.append(node)
                     }
                 }
                 
@@ -113,8 +249,8 @@ public struct BBBuilder {
             case .code(let title, let array):
                 mergedNodes.append(.code(title, mergeTextNodes(array)))
                 
-            case .hide(let array):
-                mergedNodes.append(.hide(mergeTextNodes(array)))
+            case .hide(let attribute, let array):
+                mergedNodes.append(.hide(attribute, mergeTextNodes(array)))
                 
             case .cur(let array):
                 mergedNodes.append(.cur(mergeTextNodes(array)))
@@ -127,21 +263,10 @@ public struct BBBuilder {
             }
         }
         
-        // TODO: Тримить сразу в коде выше?
-        var trimmedNodes: [BBContainerNode] = []
-        for node in mergedNodes {
-            if case let .text(text) = node {
-                let text = text.trimmingNewlines()
-                if !text.string.isEmpty {
-                    trimmedNodes.append(.text(text))
-                }
-            } else {
-                trimmedNodes.append(node)
-            }
-        }
-        
-        return trimmedNodes
+        return mergedNodes
     }
+    
+    // MARK: - Unwrap
     
     /// Превращает text / snapback / mergetime / img / attachment / smile в текстовую ноду
     private func unwrap(
@@ -149,6 +274,7 @@ public struct BBBuilder {
         with combinedText: NSAttributedString,
         isFirst: Bool = false,
         isAttachmentDelimeter: Bool = false,
+        listType: BBContainerNode.ListType? = nil,
         trimLeading: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
@@ -168,6 +294,7 @@ public struct BBBuilder {
         with combinedText: NSMutableAttributedString,
         isFirst: Bool = false,
         isAttachmentDelimeter: Bool = false,
+        listType: BBContainerNode.ListType? = nil,
         trimLeading: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
@@ -181,6 +308,9 @@ public struct BBBuilder {
                 if mutableString.string.prefix(1) == " " {
                     mutableString.replaceCharacters(in: NSRange(location: 0, length: 1), with: "\n")
                 }
+            }
+            if let listType {
+                mutableString.replaceListTags(of: listType)
             }
             if isFirst {
                 return .text(mutableString)
@@ -283,11 +413,30 @@ public struct BBBuilder {
             fatalError("НЕИЗВЕСТНЫЙ ТЕКСТОВЫЙ ТЕГ")
         }
     }
+    
+    private func isFileAttachment(attribute: NSAttributedString) -> Bool {
+        let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst())!
+        let attachmentType = attachments[attachments.firstIndex(where: { $0.id == attachmentId })!].type
+        return attachmentType == .file
+    }
 }
 
 extension Array {
     subscript(safe index: Int) -> Element? {
         return indices.contains(index) ? self[index] : nil
+    }
+    
+    var lastOrAppend: Element? {
+        get { last }
+        set {
+            if let newValue = newValue {
+                if isEmpty {
+                    append(newValue)
+                } else {
+                    self[count - 1] = newValue
+                }
+            }
+        }
     }
 }
 
@@ -325,6 +474,50 @@ extension NSAttributedString {
         }
 
         return mutableAttributedString
+    }
+}
+
+extension NSMutableAttributedString {
+    func replaceListTags(of type: BBContainerNode.ListType) {
+        let target = "[*]"
+        
+        var counter = 0
+        while let range = string.range(of: target) {
+            let nsRange = NSRange(range, in: string)
+            replaceCharacters(in: nsRange, with: getReplacement(for: type, at: counter))
+            counter += 1
+        }
+    }
+    
+    private func getReplacement(for type: BBContainerNode.ListType, at index: Int) -> String {
+        switch type {
+        case .bullet:
+            return "• "
+        case .numeric:
+            return "\(index + 1). "
+        case .alphabet:
+            return "\(Character(UnicodeScalar(96 + index)!)). "
+        case .romanBig:
+            return "\(toRoman(index).uppercased()). "
+        case .romanSmall:
+            return "\(toRoman(index).lowercased()). "
+        }
+    }
+    
+    private func toRoman(_ num: Int) -> String {
+        let values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+        let symbols = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"]
+        
+        var result = ""
+        var number = num
+        
+        for (value, symbol) in zip(values, symbols) {
+            while number >= value {
+                result += symbol
+                number -= value
+            }
+        }
+        return result
     }
 }
 

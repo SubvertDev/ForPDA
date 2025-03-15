@@ -58,7 +58,6 @@ let project = Project(
                     .Internal.DeeplinkHandler,
                     .Internal.ArticlesListFeature,
                     .Internal.ArticleFeature,
-                    .Internal.BookmarksFeature,
                     .Internal.ForumsListFeature,
                     .Internal.ForumFeature,
                     .Internal.TopicFeature,
@@ -503,7 +502,9 @@ let project = Project(
                 name: "BBBuilder",
                 dependencies: [
                     .Internal.SharedUI,
-                    .Internal.Models
+                    .Internal.Models,
+                    .Internal.LoggerClient,
+                    .SPM.TCA
                 ]
             ),
         
@@ -514,11 +515,21 @@ let project = Project(
                 destinations: .iOS,
                 product: .unitTests,
                 bundleId: "com.subvert.forpda.tests",
-                infoPlist: nil,
+                deploymentTargets: .iOS("16.0"),
+                infoPlist: .default,
                 sources: ["Modules/Tests/**"],
                 resources: [],
                 dependencies: [.target(name: "ForPDA")]
             ),
+        
+        .tests(
+            name: "BBBuilderTests",
+            dependencies: [
+                .Internal.BBBuilder,
+                .Internal.Models,
+                .Internal.SharedUI
+            ]
+        ),
         
         // MARK: - Extensions -
         
@@ -543,6 +554,7 @@ struct App {
 }
 
 extension ProjectDescription.Target {
+    
     static func feature(
         name: String,
         productType: ProductType = .framework,
@@ -570,6 +582,20 @@ extension ProjectDescription.Target {
                     "PROVISIONING_PROFILE_SPECIFIER": "" // Disables signing for frameworks
                 ]
             )
+        )
+    }
+    
+    static func tests(name: String, dependencies: [TargetDependency]) -> ProjectDescription.Target {
+        return .target(
+            name: name,
+            destinations: App.destinations,
+            product: .unitTests,
+            bundleId: App.bundleId + "." + name + ".Tests",
+            deploymentTargets: .iOS("16.0"),
+            infoPlist: .default,
+            sources: ["Modules/Tests/\(name)/**"],
+            resources: ["Modules/Resources/**"],
+            dependencies: dependencies
         )
     }
     

@@ -58,6 +58,7 @@ public struct TopicFeature: Reducer, Sendable {
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
             // so we can get full page of posts instead only last one post
             self.initialOffset = initialOffset - (initialOffset % _appSettings.topicPerPage.wrappedValue)
+//            self.initialOffset = _appSettings.topicPerPage.wrappedValue * page
         }
     }
     
@@ -172,27 +173,27 @@ public struct TopicFeature: Reducer, Sendable {
 
                 return .concatenate(
                     updatePageNavigation(&state),
-                    .run { [isFirstPage = state.isFirstPage] send in
+                    .run { [isFirstPage = state.isFirstPage, topicPerPage = state.appSettings.topicPerPage] send in
                         var topicTypes: [[TopicTypeUI]] = []
                         
                         topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
                             for (index, post) in topic.posts.enumerated() {
+                                // guard index == 0 else { continue } // For test purposes
                                 var text = post.content
+                                // print(post)
                                 if index == 0 && !isFirstPage {
                                     text = "" // Not loading hat post for non-first page
                                 }
                                 taskGroup.addTask {
-//                                    let nodes = BBBuilder.build(text: text, attachments: post.attachments)
-//                                    let types = TopicNodeConverter.convert(nodes)
-                                    return (index, TopicNodeBuilder.build(text, attachments: post.attachments))
+                                    return (index, TopicNodeBuilder(text: text, attachments: post.attachments).build())
                                 }
                             }
                             
-                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topic.postsCount + 1)
+                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topicPerPage + 1)
                             for await (index, result) in taskGroup {
                                 types[index] = result
                             }
-                            return types.compactMap { $0 }
+                            return types.map { $0 ?? [] }
                         }
                         await send(._loadTypes(topicTypes))
                     }.cancellable(id: CancelID.loading)

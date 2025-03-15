@@ -64,7 +64,7 @@ public struct BBAttributedTokenizer {
                     } else {
                         advanceIndex()
                         let string = AttributedString(original[parseStartIndex..<currentIndex])
-                        return .text(string)
+                        return .text(NSAttributedString(string))
                     }
                 } else {
                     print("TokenizerA1")
@@ -86,7 +86,7 @@ public struct BBAttributedTokenizer {
                         advanceIndex()
                     }
                     let string = AttributedString(original[parseStartIndex..<currentIndex])
-                    return .text(string)
+                    return .text(NSAttributedString(string))
                 }
                 
                 // Ищем ближайший знак равенства "=" или пробела " "
@@ -109,7 +109,7 @@ public struct BBAttributedTokenizer {
                             if tagsBalance < 0 {
                                 let attributeTextWithTags = AttributedString(original[attributeStartIndex..<currentIndex])
                                 advanceIndex()
-                                return .openingTag(tag == .spoiler ? .spoiler : .quote, attributeTextWithTags)
+                                return .openingTag(tag == .spoiler ? .spoiler : .quote, NSAttributedString(attributeTextWithTags))
                             }
                             advanceIndex()
                         }
@@ -127,7 +127,7 @@ public struct BBAttributedTokenizer {
                 // Ищем ближайшую закрывающую скобку "]", записываем как открывающий тег
                 if currentIndex < input.endIndex, input[currentIndex] == .closingBracket {
                     advanceIndex()
-                    return .openingTag(tag, tagAttribute.map { AttributedString($0) })
+                    return .openingTag(tag, tagAttribute.map { NSAttributedString(string: $0) })
                 } else {
                     print("TokenizerA2")
                 }
@@ -141,30 +141,35 @@ public struct BBAttributedTokenizer {
     }
     
     
-    private mutating func scanForText(textStartIndex: AttributedString.UnicodeScalarView.Index) -> BBAttributedToken? {
+    private mutating func scanForText(textStartIndex: AttributedString.UnicodeScalarView.Index, layer: Int = 0) -> BBAttributedToken? {
+        // FIXME: Fix for MIUI page 6, investigate later
+        guard layer < 160 else { return .text(NSAttributedString(AttributedString(original[textStartIndex..<currentIndex]))) }
+        
         scanUntil { $0 == .openingBracket || $0 == .colon }
         
         guard currentIndex < input.endIndex else {
             // TODO: Hotfix, revisit
-            return .text(AttributedString(original[textStartIndex..<currentIndex]))
+            let text = AttributedString(original[textStartIndex..<currentIndex])
+            return .text(NSAttributedString(text))
         }
         
         if input[currentIndex] == .openingBracket {
             let text = AttributedString(original[textStartIndex..<currentIndex])
-            return .text(text)
+            return .text(NSAttributedString(text))
         } else if input[currentIndex] == .colon {
             if let smile = scanForSmile() {
                 if textStartIndex == currentIndex {
                     for _ in 0..<smile.code.count {
                         advanceIndex()
                     }
-                    return .openingTag(.smile, AttributedString(smile.resourceName))
+                    return .openingTag(.smile, NSAttributedString(string: smile.resourceName))
                 } else {
-                    return .text(AttributedString(original[textStartIndex..<currentIndex]))
+                    let text = AttributedString(original[textStartIndex..<currentIndex])
+                    return .text(NSAttributedString(text))
                 }
             } else {
                 advanceIndex()
-                return scanForText(textStartIndex: textStartIndex)
+                return scanForText(textStartIndex: textStartIndex, layer: layer + 1)
             }
         } else {
             fatalError("Kak?")

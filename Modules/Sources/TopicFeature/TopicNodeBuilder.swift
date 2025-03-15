@@ -11,12 +11,20 @@ import BBBuilder
 
 public struct TopicNodeBuilder {
     
-    public static func build(_ text: String, attachments: [Post.Attachment]) -> [TopicTypeUI] {
+    private let text: String
+    private let attachments: [Post.Attachment]
+    
+    public init(text: String, attachments: [Post.Attachment]) {
+        self.text = text
+        self.attachments = attachments
+    }
+    
+    public func build() -> [TopicTypeUI] {
         let nodes = BBBuilder.build(text: text, attachments: attachments)
         return convert(nodes)
     }
     
-    private static func convert(_ nodes: [BBContainerNode]) -> [TopicTypeUI] {
+    private func convert(_ nodes: [BBContainerNode]) -> [TopicTypeUI] {
         var elements: [TopicTypeUI] = []
         for node in nodes {
             switch node {
@@ -48,8 +56,6 @@ public struct TopicNodeBuilder {
                 elements.append(.quote(subElements, parseQuoteAttributes(attributed?.string)))
                 
             case .list(_, let array):
-                // TODO: Надо либо избавиться от листа и перенаправить на текст (если обрабатывать [*] тут)
-                // TODO: Либо возвращать список text'ов с нужным типом сюда
                 let subElements = convert(array)
                 elements.append(.list(subElements, .bullet))
                 
@@ -58,9 +64,9 @@ public struct TopicNodeBuilder {
                 let text = if case let .text(text) = array.joined() { text } else { NSAttributedString(string: "") }
                 elements.append(.code(.text(AttributedString(text)), codeType))
                 
-            case .hide(let array):
+            case .hide(let attribute, let array):
                 let subElements = convert(array)
-                elements.append(.hide(subElements, nil))
+                elements.append(.hide(subElements, Int(attribute?.string ?? "") ?? nil))
                 
             case .img(let url):
                 elements.append(.image(URL(string: url.string)!))
@@ -84,8 +90,9 @@ public struct TopicNodeBuilder {
                 fatalError("ПРОПУЩЕННЫЙ MERGETIME")
                 
             case .attachment(let id):
-                let id = id.string.prefix(upTo: id.string.firstIndex(of: ":")!).dropFirst()
-                elements.append(.attachment(Int(id)!))
+                let id = Int(id.string.prefix(upTo: id.string.firstIndex(of: ":")!).dropFirst())!
+                let attachment = attachments.first(where: { $0.id == id })!
+                elements.append(.attachment(attachment))
                 
             case .smile:
                 fatalError("ПРОПУЩЕННЫЙ SMILE")
@@ -94,7 +101,7 @@ public struct TopicNodeBuilder {
         return elements
     }
     
-    private static func parseQuoteAttributes(_ string: String?) -> QuoteType? {
+    private func parseQuoteAttributes(_ string: String?) -> QuoteType? {
         guard let string else { return nil }
         
         if string.first == "=" {

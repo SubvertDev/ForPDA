@@ -49,27 +49,28 @@ public struct TopicView: View {
                 }
             )
             
-        case let .attachment(imageId):
-            // TODO: Make grid
-            if let attachment = attachments.first(where: { $0.id == imageId }),
-               let metadata = attachment.metadata {
-                LazyImage(url: metadata.url) { state in
-//                    if let container = state.imageContainer {
-//                        if container.type == .gif {
-//                            GifView(url: url)
-//                        } else {
-                            Group {
-                                if let image = state.image { image.resizable().scaledToFill() }
-                            }
-                            .skeleton(with: state.isLoading, shape: .rectangle)
-//                        }
-//                    }
+        case let .attachment(attachment):            
+            let metadata = attachment.metadata!
+//            let scaleFactor: CGFloat = 1
+//            let ratioWH = CGFloat(metadata.width) / CGFloat(metadata.height)
+//            let isWidthMoreThanScreen = CGFloat(metadata.width) > UIScreen.main.bounds.width
+//            let defaultHeight = CGFloat(metadata.height) * scaleFactor
+//            let defaultWidth = CGFloat(metadata.width) * scaleFactor
+//            let height = isWidthMoreThanScreen ? (defaultHeight * UIScreen.main.bounds.width / defaultWidth) : defaultHeight
+//            let width = isWidthMoreThanScreen ? UIScreen.main.bounds.width : defaultWidth
+            LazyImage(url: metadata.url) { state in
+                if let container = state.imageContainer {
+                    if container.type == .gif {
+                        GifView(url: metadata.url)
+                    } else {
+                        Group {
+                            if let image = state.image { image.resizable().scaledToFit() }
+                        }
+                        .skeleton(with: state.isLoading, shape: .rectangle)
+                    }
                 }
-                .frame(
-                    width: UIScreen.main.bounds.width / 1.5,
-                    height: CGFloat(metadata.height) / CGFloat(metadata.width) * UIScreen.main.bounds.width / 1.5
-                )
             }
+//            .frame(width: width, height: height)
             
         case let .image(url):
             LazyImage(url: url) { state in
@@ -95,9 +96,13 @@ public struct TopicView: View {
             .frame(maxWidth: .infinity)
             
         case let .right(types):
-            VStack(alignment: .trailing) {
-                ForEach(types, id: \.self) { type in
-                    TopicView(type: type, attachments: attachments, alignment: .right, onUrlTap: onUrlTap)
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                
+                VStack(alignment: .trailing) {
+                    ForEach(types, id: \.self) { type in
+                        TopicView(type: type, attachments: attachments, alignment: .right, onUrlTap: onUrlTap)
+                    }
                 }
             }
             

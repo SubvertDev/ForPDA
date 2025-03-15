@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum BBContainerNode {
+public enum BBContainerNode: Equatable {
     
     case text(NSAttributedString)
     case center([BBContainerNode])
@@ -18,7 +18,7 @@ public enum BBContainerNode {
     case spoiler(NSAttributedString?, [BBContainerNode])
     case quote(NSAttributedString?, [BBContainerNode])
     case code(NSAttributedString?, [BBContainerNode])
-    case hide([BBContainerNode])
+    case hide(NSAttributedString?, [BBContainerNode])
     case cur([BBContainerNode])
     case mod([BBContainerNode])
     case ex([BBContainerNode])
@@ -38,7 +38,8 @@ public enum BBContainerNode {
     
     public var isTextable: Bool {
         switch self {
-        case .text, .snapback, .mergetime, .img, .attachment, .smile:
+//        case .text, .snapback, .mergetime, .img, .attachment, .smile:
+        case .text, .snapback, .mergetime, .smile:
             return true
         default:
             return false
@@ -54,19 +55,24 @@ public enum BBContainerNode {
         }
     }
     
-//    public var isTextAndEmpty: Bool {
-//        if case let .text(text) = self {
-//            if text.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-//                return true
-//            }
+//    public var isFileAttachment: Bool {
+//        if case let .attachment(attribute) = self {
+//            let fileExtension = String(attribute.string.suffix(from: attribute.string.lastIndex(of: ".")!).dropFirst().dropLast())
+//            return !isImageType(fileExtension)
 //        }
 //        return false
 //    }
     
-    /// Обсуждение клиента, спойлер с тремя картинками, между ними пробел
-    public var isEmptyText: Bool {
+    public var isEmptyTrimmedText: Bool {
         if case let .text(text) = self {
             return text.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        return false
+    }
+    
+    public var isEmptyText: Bool {
+        if case let .text(text) = self {
+            return text.string.isEmpty
         }
         return false
     }
@@ -77,6 +83,25 @@ public enum BBContainerNode {
             return text.string.prefix(1) == " "
         }
         return false
+    }
+    
+    /// Для разделения аттачей по строкам
+    public var hasOnlyOneSpace: Bool {
+        if case let .text(text) = self {
+            return text.string == " "
+        }
+        return false
+    }
+    
+    public var startsWithNewline: Bool {
+        if case let .text(text) = self {
+            return text.string.prefix(1) == "\n"
+        }
+        return false
+    }
+    
+    public var startsWithSpaceOrNewline: Bool {
+        return startsWithSpace || startsWithNewline
     }
     
     init?(tag: BBTag, attribute: AttributedString?, children: [BBContainerNode]) {
@@ -93,7 +118,7 @@ public enum BBContainerNode {
         case .spoiler: self = .spoiler(attribute, children)
         case .quote:   self = .quote(attribute, children)
         case .code:    self = .code(attribute, children)
-        case .hide:    self = .hide(children)
+        case .hide:    self = .hide(attribute, children)
         case .cur:     self = .cur(children)
         case .mod:     self = .mod(children)
         case .ex:      self = .ex(children)

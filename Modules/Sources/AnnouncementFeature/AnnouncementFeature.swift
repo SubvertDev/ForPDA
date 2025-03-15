@@ -80,7 +80,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 return .run { send in
                     var topicTypes: [[TopicTypeUI]] = []
                     
-                    let types = TopicNodeBuilder.build(announcement.content, attachments: [])
+                    let types = TopicNodeBuilder(text: announcement.content, attachments: []).build()
                     topicTypes.append(types)
                     
                     await send(._loadTypes(topicTypes))

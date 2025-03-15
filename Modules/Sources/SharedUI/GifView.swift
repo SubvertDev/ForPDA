@@ -20,6 +20,12 @@ public struct GifView: UIViewRepresentable {
     public func makeUIView(context: Context) -> UIImageView {
         let imageView = UIImageView(gifURL: self.url)
         imageView.contentMode = .scaleAspectFit
+        
+        imageView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        imageView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        imageView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
         return imageView
     }
 
