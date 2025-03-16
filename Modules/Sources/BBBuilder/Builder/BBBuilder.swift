@@ -146,7 +146,7 @@ public struct BBBuilder {
             case .img:
                 logger.info("Image case")
                 #warning("todo")
-                mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
+                mergedNodes.lastOrAppend = unwrap(node: node, with: mutableText)
                 
             case let .attachment(attribute):
                 logger.info("Attachment case")
