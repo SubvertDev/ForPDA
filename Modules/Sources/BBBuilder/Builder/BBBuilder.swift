@@ -152,7 +152,14 @@ public struct BBBuilder {
                 logger.info("Attachment case")
                 
                 let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst())!
-                let attachmentType = attachments[attachments.firstIndex(where: { $0.id == attachmentId })!].type
+                guard let attachmentIndex = attachments.firstIndex(where: { $0.id == attachmentId }) else {
+                    logger.error("Didn't find attachment with id \(attachmentId), fallback to text")
+                    let text = NSAttributedString(string: "[attachment=\(attribute.string)]", attributes: BBRenderer.defaultAttributes)
+                    let textNode: BBContainerNode = .text(text)
+                    mergedNodes.lastOrAppend = unwrap(node: textNode, with: mutableText)
+                    continue
+                }
+                let attachmentType = attachments[attachmentIndex].type
                 switch attachmentType {
                 case .file:
                     logger.info("FILE attachment")

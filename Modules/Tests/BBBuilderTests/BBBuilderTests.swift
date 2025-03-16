@@ -181,10 +181,17 @@ struct BBBuilderTests {
         } else {
             Issue.record("First node is not text or there's more nodes")
         }
-//        #expect(nodes == [
-//            .attachment(firstImageAttachmentAttribute.asAttributed()),
-//            .attachment(secondImageAttachmentAttribute.asAttributed())
-//        ])
+    }
+    
+    @Test func noAttachmentIsConvertedToText() async throws {
+        let id = 0
+        let text = String.imageAttachment(id: id)
+        let nodes = BBBuilder.build(text: text)
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(nodes == [.text(text)])
+        } else {
+            Issue.record("First node is not text or there's more nodes")
+        }
     }
     
     // MARK: - File Attachments
