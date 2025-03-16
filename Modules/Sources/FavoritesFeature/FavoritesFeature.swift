@@ -30,7 +30,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         public var favorites: [FavoriteInfo] = []
         public var favoritesImportant: [FavoriteInfo] = []
         
-        public var isLoading = false
+        public var isLoading = true
         public var isRefreshing = false
         public var unreadTapId: Int?
         public var shouldShowEmptyState: Bool {
@@ -110,6 +110,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 ])
                 
             case .onRefresh:
+                guard !state.isLoading else { return .none }
                 state.isRefreshing = true
                 state.unreadTapId = nil
                 return .run { [offset = state.pageNavigation.offset] send in
