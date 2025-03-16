@@ -38,7 +38,6 @@ public enum BBContainerNode: Equatable {
     
     public var isTextable: Bool {
         switch self {
-//        case .text, .snapback, .mergetime, .img, .attachment, .smile:
         case .text, .snapback, .mergetime, .smile:
             return true
         default:
@@ -54,14 +53,6 @@ public enum BBContainerNode: Equatable {
             return false
         }
     }
-    
-//    public var isFileAttachment: Bool {
-//        if case let .attachment(attribute) = self {
-//            let fileExtension = String(attribute.string.suffix(from: attribute.string.lastIndex(of: ".")!).dropFirst().dropLast())
-//            return !isImageType(fileExtension)
-//        }
-//        return false
-//    }
     
     public var isEmptyTrimmedText: Bool {
         if case let .text(text) = self {
@@ -123,32 +114,32 @@ public enum BBContainerNode: Equatable {
         case .mod:     self = .mod(children)
         case .ex:      self = .ex(children)
         case .snapback:
-            // TODO: Доделать
-            if case let .text(text) = children.first! {
+            if case let .text(text) = children.first {
                 self = .snapback(text)
             } else {
-                fatalError("BBContainerNode НЕ ПОЛУЧИЛОСЬ СОЗДАТЬ SNAPBACK")
+                print("BBContainerNode COULDN'T CREATE SNAPBACK, DEFAULTING TO 0")
+                self = .snapback(NSAttributedString(string: "0"))
             }
         case .mergetime:
-            if case let .text(text) = children.first! {
+            if case let .text(text) = children.first {
                 self = .mergetime(text)
             } else {
                 fatalError("BBContainerNode НЕ ПОЛУЧИЛОСЬ СОЗДАТЬ MERGETIME")
             }
         case .img:
-            if case let .text(text) = children.first! {
+            if case let .text(text) = children.first {
                 self = .img(text)
             } else {
                 fatalError("BBContainerNode НЕ ПОЛУЧИЛОСЬ СОЗДАТЬ IMG")
             }
         case .attachment:
-            if case let .text(text) = children.first! {
+            if case let .text(text) = children.first {
                 self = .attachment(text)
             } else {
                 fatalError("BBContainerNode НЕ ПОЛУЧИЛОСЬ СОЗДАТЬ IMG")
             }
         case .smile:
-            if case let .text(text) = children.first! {
+            if case let .text(text) = children.first {
                 self = .smile(text)
             } else {
                 fatalError("BBContainerNode НЕ ПОЛУЧИЛОСЬ СОЗДАТЬ SMILE")
