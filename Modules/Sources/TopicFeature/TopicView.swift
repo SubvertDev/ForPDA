@@ -51,13 +51,15 @@ public struct TopicView: View {
             
         case let .attachment(attachment):            
             let metadata = attachment.metadata!
-//            let scaleFactor: CGFloat = 1
-//            let ratioWH = CGFloat(metadata.width) / CGFloat(metadata.height)
-//            let isWidthMoreThanScreen = CGFloat(metadata.width) > UIScreen.main.bounds.width
-//            let defaultHeight = CGFloat(metadata.height) * scaleFactor
-//            let defaultWidth = CGFloat(metadata.width) * scaleFactor
-//            let height = isWidthMoreThanScreen ? (defaultHeight * UIScreen.main.bounds.width / defaultWidth) : defaultHeight
-//            let width = isWidthMoreThanScreen ? UIScreen.main.bounds.width : defaultWidth
+            
+            let screenWidth = UIScreen.main.bounds.width - 32
+            let ratioWH = CGFloat(metadata.width) / CGFloat(metadata.height)
+            let scaleFactor = screenWidth / CGFloat(metadata.width)
+            let isWidthMoreThanScreen = scaleFactor < 1
+
+            let width = isWidthMoreThanScreen ? screenWidth : CGFloat(metadata.width)
+            let height = width / ratioWH
+            
             LazyImage(url: metadata.url) { state in
                 if let container = state.imageContainer {
                     if container.type == .gif {
@@ -70,7 +72,7 @@ public struct TopicView: View {
                     }
                 }
             }
-//            .frame(width: width, height: height)
+            .frame(width: width, height: height)
             
         case let .image(url):
             LazyImage(url: url) { state in

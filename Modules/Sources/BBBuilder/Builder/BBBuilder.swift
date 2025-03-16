@@ -69,8 +69,7 @@ public struct BBBuilder {
                     if hasPreviousNode(index) {
                         if !nodes[index - 1].isTextable {
                             trimLeading = true
-                        }
-                        if nodes[index - 1].isMedia {
+                        } else if nodes[index - 1].isMedia {
                             trimLeading = false
                         }
                     } else if !hasPreviousNode(index) {

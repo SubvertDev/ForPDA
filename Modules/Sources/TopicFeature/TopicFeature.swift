@@ -178,9 +178,9 @@ public struct TopicFeature: Reducer, Sendable {
                         
                         topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
                             for (index, post) in topic.posts.enumerated() {
-                                // guard index == 0 else { continue } // For test purposes
+//                                 guard index == 0 else { continue } // For test purposes
                                 var text = post.content
-                                // print(post)
+//                                 print(post)
                                 if index == 0 && !isFirstPage {
                                     text = "" // Not loading hat post for non-first page
                                 }

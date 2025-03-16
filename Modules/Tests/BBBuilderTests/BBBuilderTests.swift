@@ -131,13 +131,13 @@ struct BBBuilderTests {
         }
     }
     
-    @Test func imageAttachmentBeforeNewlineTextIsNotInline() async throws {
+    @Test func imageAttachmentBeforeNewlineTextIsNotInlineAndTextIsTrimmedLeading() async throws {
         let id = 0
         let text = String.imageAttachment(id: id) + "\nText"
         let nodes = BBBuilder.build(text: text, attachments: [.image(id: id)])
         #expect(nodes == [
             .attachment(.imageAttachmentAttribute(id: id)),
-            .text("\nText".withAttributes(BBRenderer.defaultAttributes))
+            .text("Text".withAttributes(BBRenderer.defaultAttributes))
         ])
     }
     
