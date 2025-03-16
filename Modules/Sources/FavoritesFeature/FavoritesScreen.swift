@@ -289,34 +289,36 @@ public struct FavoritesScreen: View {
                     }
                     
                     Spacer(minLength: 0)
-
-                    if unread {
-                        Button {
-                            action(true)
-                        } label: {
-                            if store.unreadTapId == id {
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                                    .id(UUID())
-                            } else {
-                                Image(systemSymbol: .circleFill)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 10, height: 10)
-                                    .foregroundStyle(tintColor)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                        .frame(width: 40, height: 40) // Tap area
-                    }
                     
-                    if closed {
-                        Image(systemSymbol: .lock)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                            .foregroundStyle(Color(.Labels.secondary))
-                            .padding(.trailing, 12)
+                    HStack(spacing: 0) {
+                        if closed {
+                            Image(systemSymbol: .lock)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundStyle(Color(.Labels.secondary))
+                                .padding(.trailing, unread ? 0 : 12)
+                        }
+                        
+                        if unread {
+                            Button {
+                                action(true)
+                            } label: {
+                                if store.unreadTapId == id {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                        .id(UUID())
+                                } else {
+                                    Image(systemSymbol: .circleFill)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 10, height: 10)
+                                        .foregroundStyle(tintColor)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .frame(maxWidth: 42, maxHeight: .infinity)
+                        }
                     }
                 }
                 .padding(.vertical, 8)
