@@ -153,6 +153,11 @@ struct CustomScrollView: UIViewRepresentable {
                 return false
             }
             
+            if parent.imageElement.count == 1 {
+                firstSwipeDirection = .vertical
+                return true
+            }
+            
             if let panGesture = gestureRecognizer as? UIPanGestureRecognizer {
                 let velocity = panGesture.velocity(in: panGesture.view)
                 if firstSwipeDirection == .none {
@@ -167,6 +172,7 @@ struct CustomScrollView: UIViewRepresentable {
                     }
                 }
             }
+            
             return true
         }
     }

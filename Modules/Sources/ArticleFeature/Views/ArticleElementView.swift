@@ -121,12 +121,10 @@ struct ArticleElementView: View {
         }
         .fullScreenCover(isPresented: $showFullScreenImage) {
             if #available(iOS 16.4, *) {
-//                FullScreenImage(element: element, showFullScreen: $showFullScreenImage)
-//                    .presentationBackground(.clear)
                 TabViewGallery(gallery: [element], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
                     .presentationBackground(.clear)
             } else {
-                // Fallback on earlier versions
+                TabViewGallery(gallery: [element], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
             }
         }
     }
@@ -167,7 +165,7 @@ struct ArticleElementView: View {
                 TabViewGallery(gallery: element, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
                     .presentationBackground(.clear)
             } else {
-                // Fallback on earlier versions
+                TabViewGallery(gallery: element, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
             }
         }
     }
