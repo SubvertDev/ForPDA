@@ -34,7 +34,9 @@ public struct FavoritesScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
 
-                if !store.isLoading {
+                if store.shouldShowEmptyState {
+                    EmptyFavorites()
+                } else if !store.isLoading {
                     List {
                         if !store.favoritesImportant.isEmpty {
                             FavoritesSection(favorites: store.favoritesImportant, important: true)
@@ -49,10 +51,6 @@ public struct FavoritesScreen: View {
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
-                }
-                
-                if store.shouldShowEmptyState {
-                    EmptyFavorites()
                 }
             }
             .navigationTitle(Text("Favorites", bundle: .module))
