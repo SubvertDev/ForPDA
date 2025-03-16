@@ -163,7 +163,7 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
             return false
         } else {
             print("[ERROR] Couldn't extract postId from SnapbackImage")
-            return true
+            return false
         }
     }
     

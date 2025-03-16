@@ -58,7 +58,7 @@ public struct TopicFeature: Reducer, Sendable {
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
             // so we can get full page of posts instead only last one post
             self.initialOffset = initialOffset - (initialOffset % _appSettings.topicPerPage.wrappedValue)
-//            self.initialOffset = _appSettings.topicPerPage.wrappedValue * page
+//            self.initialOffset = _appSettings.topicPerPage.wrappedValue * (targetPage - 1)
         }
     }
     
