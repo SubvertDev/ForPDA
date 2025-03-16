@@ -31,12 +31,32 @@
         }
       }
     },
+    "Post not found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост не найден"
+          }
+        }
+      }
+    },
     "Profile" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль"
+          }
+        }
+      }
+    },
+    "Whoops, something went wrong.." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс, что-то пошло не так.."
           }
         }
       }

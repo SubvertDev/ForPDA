@@ -1,6 +1,6 @@
 //
 //  AppFeature.swift
-//  
+//
 //
 //  Created by Ilia Lubianoi on 09.04.2024.
 //
@@ -15,7 +15,7 @@ import ForumsListFeature
 import ForumFeature
 import TopicFeature
 import AnnouncementFeature
-import FavoritesFeature
+import FavoritesRootFeature
 import HistoryFeature
 import AuthFeature
 import ProfileFeature
@@ -36,7 +36,7 @@ public struct AppFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Path
+    // MARK: - Paths
     
     @Reducer(state: .equatable)
     public enum ArticlesPath {
@@ -46,7 +46,7 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     @Reducer(state: .equatable)
-    public enum FavoritesPath {
+    public enum FavoritesRootPath {
         case forumPath(ForumPath.Body = ForumPath.body)
         case settingsPath(SettingsPath.Body = SettingsPath.body)
     }
@@ -85,14 +85,14 @@ public struct AppFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         public var appDelegate: AppDelegateFeature.State
-
+        
         public var articlesPath: StackState<ArticlesPath.State>
-        public var favoritesPath: StackState<FavoritesPath.State>
+        public var favoritesRootPath: StackState<FavoritesRootPath.State>
         public var forumPath: StackState<ForumPath.State>
         public var profilePath: StackState<ProfilePath.State>
         
         public var articlesList: ArticlesListFeature.State
-        public var favorites: FavoritesFeature.State
+        public var favoritesRoot: FavoritesRootFeature.State
         public var forumsList: ForumsListFeature.State
         public var profile: ProfileFeature.State
         
@@ -105,13 +105,15 @@ public struct AppFeature: Reducer, Sendable {
         public var selectedTab: AppTab
         public var previousTab: AppTab
         public var isShowingTabBar: Bool
-        public var showToast: Bool
+        public var showToast: Bool // TODO: Refactor into Destination?
         public var toast: ToastInfo
         public var localizationBundle: Bundle {
             switch toast.screen {
+            case .app:          return .module
             case .articlesList: return .articlesList
             case .article:      return .article
             case .comments:     return .models
+            case .favorites:    return .favorites
             }
         }
         
@@ -127,11 +129,11 @@ public struct AppFeature: Reducer, Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesPath: StackState<ArticlesPath.State> = StackState(),
-            favoritesPath: StackState<FavoritesPath.State> = StackState(),
+            favoritesRootPath: StackState<FavoritesRootPath.State> = StackState(),
             forumPath: StackState<ForumPath.State> = StackState(),
             profilePath: StackState<ProfilePath.State> = StackState(),
             articlesList: ArticlesListFeature.State = ArticlesListFeature.State(),
-            favorites: FavoritesFeature.State = FavoritesFeature.State(),
+            favoritesRoot: FavoritesRootFeature.State = FavoritesRootFeature.State(),
             forumsList: ForumsListFeature.State = ForumsListFeature.State(),
             profile: ProfileFeature.State = ProfileFeature.State(),
             auth: AuthFeature.State? = nil,
@@ -143,14 +145,14 @@ public struct AppFeature: Reducer, Sendable {
             toast: ToastInfo = ToastInfo(screen: .articlesList, message: String(""), isError: false)
         ) {
             self.appDelegate = appDelegate
-
+            
             self.articlesPath = articlesPath
-            self.favoritesPath = favoritesPath
+            self.favoritesRootPath = favoritesRootPath
             self.forumPath = forumPath
             self.profilePath = profilePath
             
             self.articlesList = articlesList
-            self.favorites = favorites
+            self.favoritesRoot = favoritesRoot
             self.forumsList = forumsList
             self.profile = profile
             
@@ -173,14 +175,14 @@ public struct AppFeature: Reducer, Sendable {
         case onAppear
         
         case appDelegate(AppDelegateFeature.Action)
-
+        
         case articlesPath(StackActionOf<ArticlesPath>)
-        case favoritesPath(StackActionOf<FavoritesPath>)
+        case favoritesRootPath(StackActionOf<FavoritesRootPath>)
         case forumPath(StackActionOf<ForumPath>)
         case profilePath(StackActionOf<ProfilePath>)
         
         case articlesList(ArticlesListFeature.Action)
-        case favorites(FavoritesFeature.Action)
+        case favoritesRoot(FavoritesRootFeature.Action)
         case forumsList(ForumsListFeature.Action)
         case profile(ProfileFeature.Action)
         
@@ -193,17 +195,20 @@ public struct AppFeature: Reducer, Sendable {
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
         case syncUnreadTaskInvoked
+        case didFinishToastAnimation
         
+        case _showErrorToast
         case _failedToConnect(any Error)
     }
     
     // MARK: - Dependencies
     
-    @Dependency(\.logger[.app]) private var logger
-    @Dependency(\.apiClient) private var apiClient
-    @Dependency(\.cacheClient) private var cacheClient
-    @Dependency(\.analyticsClient) private var analyticsClient
-    @Dependency(\.notificationsClient) private var notificationsClient
+    @Dependency(\.logger[.app])         private var logger
+    @Dependency(\.apiClient)            private var apiClient
+    @Dependency(\.cacheClient)          private var cacheClient
+    @Dependency(\.hapticClient)         private var hapticClient
+    @Dependency(\.analyticsClient)      private var analyticsClient
+    @Dependency(\.notificationsClient)  private var notificationsClient
     
     // MARK: - Body
     
@@ -218,8 +223,8 @@ public struct AppFeature: Reducer, Sendable {
             ArticlesListFeature()
         }
         
-        Scope(state: \.favorites, action: \.favorites) {
-            FavoritesFeature()
+        Scope(state: \.favoritesRoot, action: \.favoritesRoot) {
+            FavoritesRootFeature()
         }
         
         Scope(state: \.forumsList, action: \.forumsList) {
@@ -229,7 +234,7 @@ public struct AppFeature: Reducer, Sendable {
         Scope(state: \.profile, action: \.profile) {
             ProfileFeature()
         }
-
+        
         Reduce<State, Action> { state, action in
             switch action {
                 
@@ -245,9 +250,18 @@ public struct AppFeature: Reducer, Sendable {
                     }
                 }
                 
+            case .didFinishToastAnimation:
+                state.showToast = false
+                return .none
+                
             case ._failedToConnect:
                 state.alert = .failedToConnect
                 return .none
+                
+            case ._showErrorToast:
+                state.toast = ToastInfo(screen: .app, message: "Whoops, something went wrong..", isError: true)
+                state.showToast = true
+                return .run { _ in await hapticClient.play(type: .error) }
                 
             case .appDelegate, .binding, .alert:
                 return .none
@@ -266,6 +280,13 @@ public struct AppFeature: Reducer, Sendable {
                         state.selectedTab = tab
                     }
                 }
+                
+                // Updating favorites on tab selection
+                if state.selectedTab == .favorites && state.previousTab != .favorites {
+                    return FavoritesRootFeature()
+                        .reduce(into: &state.favoritesRoot, action: .favorites(.onRefresh))
+                        .map(Action.favoritesRoot)
+                }
                 return .none
                 
             case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
@@ -283,7 +304,7 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .deeplink(let url):
                 do {
-                    let deeplink = try DeeplinkHandler().handleOuterURL(url)
+                    let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
                     switch deeplink.tab {
                     case let .articles(.article(id, title, imageUrl)):
                         let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
@@ -323,7 +344,7 @@ public struct AppFeature: Reducer, Sendable {
                     analyticsClient.capture(error)
                 }
                 return .none
-
+                
             case .syncUnreadTaskInvoked:
                 return .run { [appSettings = state.appSettings] send in
                     do {
@@ -333,12 +354,13 @@ public struct AppFeature: Reducer, Sendable {
                         // try await apiClient.connect() // TODO: Do I need this?
                         let unread = try await apiClient.getUnread()
                         await notificationsClient.showUnreadNotifications(unread)
-
+                        
                         // TODO: Make at an array?
                         let invokeTime = Date().timeIntervalSince1970
                         await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
                     } catch {
                         analyticsClient.capture(error)
+                        await send(._showErrorToast)
                     }
                     
                     await send(.registerBackgroundTask)
@@ -346,11 +368,12 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - Default
                 
-            case .articlesList, .forumsList, .profile, .favorites:
+            case .articlesList, .forumsList, .profile, .favoritesRoot:
                 return .none
                 
-            case .articlesPath, .forumPath, .profilePath, .favoritesPath:
+            case .articlesPath, .forumPath, .profilePath, .favoritesRootPath:
                 return .none
+                
             }
         }
         .ifLet(\.$auth, action: \.auth) {
@@ -444,46 +467,63 @@ public struct AppFeature: Reducer, Sendable {
             }
         }
         
-        // MARK: - Favorites Path
+        
+        // MARK: - Favorites Root Path
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .favorites(.settingsButtonTapped),
-                .favoritesPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
-                state.favoritesPath.append(.settingsPath(.settings(SettingsFeature.State())))
-                return .none
-
-            case .favorites(.favoriteTapped(let id, let name, let offset, let postId, let isForum)):
-                let forumPath: FavoritesPath.State = isForum
-                    ? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
-                    : .forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset, postId: postId)))
-                state.favoritesPath.append(forumPath)
-                return .none
+            case .favoritesRoot(.delegate(.openSettings)),
+                .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.settingsButtonTapped)))):
+                state.favoritesRootPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 
-            case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.urlTapped(url))))),
-                let .favoritesPath(.element(id: _, action: .forumPath(.announcement(.urlTapped(url))))):
+            case .favoritesRoot(.favorites(._favoritesResponse(.failure))):
+                state.toast = ToastInfo(screen: .favorites, message: "Whoops, something went wrong..", isError: true)
+                state.showToast = true
+                return .run { _ in await hapticClient.play(type: .error) }
+                
+            case .favoritesRoot(.favorites(.favoriteTapped(let id, let name, let offset, let postId, let isForum))):
+                let forumPath: FavoritesRootPath.State = isForum
+                	? .forumPath(.forum(ForumFeature.State(forumId: id, forumName: name)))
+                	: .forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset, postId: postId)))
+                state.favoritesRootPath.append(forumPath)
+                
+            case .favoritesRoot(.favorites(._jumpRequestFailed)):
+                state.toast = ToastInfo(screen: .app, message: "Post not found", isError: true)
+                state.showToast = true
+                return .run { _ in
+                    await hapticClient.play(type: .error)
+                }
+                
+            case let .favoritesRootPath(.element(id: _, action: .forumPath(.topic(.urlTapped(url))))),
+                let .favoritesRootPath(.element(id: _, action: .forumPath(.announcement(.urlTapped(url))))):
                 return handleDeeplink(url: url, state: &state)
                 
-            case let .favoritesPath(.element(id: _, action: .forumPath(.topic(.userAvatarTapped(userId: userId))))):
-                state.favoritesPath.append(.forumPath(.profile(ProfileFeature.State(userId: userId))))
+            case let .favoritesRootPath(.element(id: _, action: .forumPath(.topic(.userAvatarTapped(userId: userId))))):
+                state.favoritesRootPath.append(.forumPath(.profile(ProfileFeature.State(userId: userId))))
                 
-            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id, offset: offset))))):
-                state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset))))
+
+            case .favoritesRootPath(.element(id: _, action: .forumPath(.topic(._topicResponse(.failure))))):
+                state.toast = ToastInfo(screen: .favorites, message: "Whoops, something went wrong..", isError: true)
+                state.showToast = true
+                state.favoritesRootPath.removeLast()
+                return .run { _ in await hapticClient.play(type: .error) }
                 
-            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.announcementTapped(id: id, name: name))))):
-                state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: name))))
+            case let .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.topicTapped(id: id, offset: offset))))):
+                state.favoritesRootPath.append(.forumPath(.topic(TopicFeature.State(topicId: id, initialOffset: offset))))
                 
-            case let .favoritesPath(.element(id: _, action: .forumPath(.forum(.subforumTapped(id: id, name: name))))):
-                state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: name))))
+            case let .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.announcementTapped(id: id, name: name))))):
+                state.favoritesRootPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: name))))
+                
+            case let .favoritesRootPath(.element(id: _, action: .forumPath(.forum(.subforumTapped(id: id, name: name))))):
+                state.favoritesRootPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: name))))
                 
             default:
                 break
             }
-            
             return .none
         }
-        .forEach(\.favoritesPath, action: \.favoritesPath)
-        .onChange(of: \.favoritesPath) { _, newValue in
+        .forEach(\.favoritesRootPath, action: \.favoritesRootPath)
+        .onChange(of: \.favoritesRootPath) { _, newValue in
             Reduce<State, Action> { state, _ in
                 state.isShowingTabBar = !newValue.contains {
                     if case .settingsPath = $0 { return true } else { return false }
@@ -524,13 +564,13 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .forumPath(.element(id: _, action: .profile(.deeplinkTapped(url, _)))):
                 return handleDeeplink(url: url, state: &state)
-            
+                
             case .forumPath(.element(id: _, action: .topic(.urlTapped(let url)))),
-                 .forumPath(.element(id: _, action: .announcement(.urlTapped(let url)))):
+                    .forumPath(.element(id: _, action: .announcement(.urlTapped(let url)))):
                 return handleDeeplink(url: url, state: &state)
                 
             case .forumsList(.settingsButtonTapped),
-                 .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
+                    .forumPath(.element(id: _, action: .forum(.settingsButtonTapped))):
                 state.forumPath.append(.settingsPath(.settings(SettingsFeature.State())))
                 return .none
                 
@@ -570,7 +610,7 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .profile(.deeplinkTapped(let url, _)):
                 return handleDeeplink(url: url, state: &state)
-                            
+                
             case let .profilePath(.element(id: _, action: .history(.topicTapped(id)))):
                 state.selectedTab = .forum
                 state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
@@ -616,8 +656,8 @@ public struct AppFeature: Reducer, Sendable {
             case .articlesPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
                 state.articlesPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
                 
-            case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
-                state.favoritesPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
+            case .favoritesRootPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
+                state.favoritesRootPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
                 
             case .forumPath(.element(id: _, action: .settingsPath(.settings(.notificationsButtonTapped)))):
                 state.forumPath.append(.settingsPath(.notifications(NotificationsFeature.State())))
@@ -630,8 +670,8 @@ public struct AppFeature: Reducer, Sendable {
             case .articlesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.articlesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
                 
-            case .favoritesPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
-                state.favoritesPath.append(.settingsPath(.developer(DeveloperFeature.State())))
+            case .favoritesRootPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
+                state.favoritesRootPath.append(.settingsPath(.developer(DeveloperFeature.State())))
                 
             case .forumPath(.element(id: _, action: .settingsPath(.settings(.onDeveloperMenuTapped)))):
                 state.forumPath.append(.settingsPath(.developer(DeveloperFeature.State())))
@@ -648,20 +688,27 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
+        if url.absoluteString.prefix(7) == "link://" {
+            return .run { _ in
+                let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
+                await open(url: resultUrl)
+            }
+        }
         do {
-            if let deeplink = try DeeplinkHandler().handleInnerURL(url),
+            if let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url),
                 case let .forum(screen) = deeplink.tab {
                 
                 if state.selectedTab == .favorites {
                     switch screen {
                     case let .forum(id: id):
-                        state.favoritesPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: nil))))
+                        state.favoritesRootPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: nil))))
                         
                     case let .topic(id: id):
-                        state.favoritesPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
+                        state.favoritesRootPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
+                        
                         
                     case let .announcement(id: id):
-                        state.favoritesPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: nil))))
+                        state.favoritesRootPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: nil))))
                     }
                 }
                 
@@ -687,7 +734,6 @@ public struct AppFeature: Reducer, Sendable {
                     default: return .none
                     }
                 }
-
                 return .none
             }
         } catch {

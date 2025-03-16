@@ -12,7 +12,7 @@ public struct ToastInfo: Equatable {
     public let message: LocalizedStringKey
     public let isError: Bool
     
-    public init (
+    public init(
         screen: ToastScreen,
         message: LocalizedStringKey,
         isError: Bool
@@ -22,6 +22,7 @@ public struct ToastInfo: Equatable {
         self.isError = isError
     }
     
+    @_disfavoredOverload
     public init(
         screen: ToastScreen,
         message: String,
@@ -34,7 +35,9 @@ public struct ToastInfo: Equatable {
 }
 
 public enum ToastScreen: Equatable {
+    case app
     case articlesList
     case article
     case comments
+    case favorites
 }

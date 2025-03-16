@@ -14,12 +14,19 @@ import Models
 
 public struct FavoritesScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<FavoritesFeature>
     @Environment(\.tintColor) private var tintColor
+    @Environment(\.scenePhase) private var scenePhase
     
+    // MARK: - Init
+
     public init(store: StoreOf<FavoritesFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -27,7 +34,9 @@ public struct FavoritesScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
 
-                if !store.isLoading {
+                if store.shouldShowEmptyState {
+                    EmptyFavorites()
+                } else if !store.isLoading {
                     List {
                         if !store.favoritesImportant.isEmpty {
                             FavoritesSection(favorites: store.favoritesImportant, important: true)
@@ -51,37 +60,38 @@ public struct FavoritesScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     HStack {
-                        Menu {
-                            ContextButton(
-                                text: "Sort",
-                                symbol: .line3HorizontalDecrease,
-                                bundle: .module
-                            ) {
-                                store.send(.contextOptionMenu(.sort))
+                        if store.isUserAuthorized {
+                            Menu {
+                                ContextButton(
+                                    text: "Sort",
+                                    symbol: .line3HorizontalDecrease,
+                                    bundle: .module
+                                ) {
+                                    store.send(.contextOptionMenu(.sort))
+                                }
+                                
+                                ContextButton(
+                                    text: "Read All",
+                                    symbol: .checkmarkCircle,
+                                    bundle: .module
+                                ) {
+                                    store.send(.contextOptionMenu(.markAllAsRead))
+                                }
+                            } label: {
+                                Image(systemSymbol: .ellipsisCircle)
                             }
-                            
-                            ContextButton(
-                                text: "Read All",
-                                symbol: .checkmarkCircle,
-                                bundle: .module
-                            ) {
-                                store.send(.contextOptionMenu(.markAllAsRead))
-                            }
-                        } label: {
-                            Image(systemSymbol: .ellipsisCircle)
-                        }
-                        
-                        Button {
-                            store.send(.settingsButtonTapped)
-                        } label: {
-                            Image(systemSymbol: .gearshape)
                         }
                     }
                 }
             }
-            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort), content: { store in
+            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort)) { store in
                 SortView(store: store)
-            })
+            }
+            .onChange(of: scenePhase) { newScenePhase in
+                if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
+                    store.send(.onSceneBecomeActive)
+                }
+            }
             .onAppear {
                 store.send(.onAppear)
             }
@@ -116,6 +126,8 @@ public struct FavoritesScreen: View {
             }
         }
     }
+    
+    // MARK: - Topic Context Menu
     
     private func TopicContextMenu(favorite: FavoriteInfo) -> some View {
         VStack(spacing: 0) {
@@ -170,7 +182,7 @@ public struct FavoritesScreen: View {
         }
     }
     
-    // MARK: - Topics
+    // MARK: - Favorites Section
     
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
@@ -181,21 +193,26 @@ public struct FavoritesScreen: View {
             
             ForEach(favorites, id: \.hashValue) { favorite in
                 Row(
+                    id: favorite.topic.id,
                     title: favorite.topic.name,
                     lastPost: favorite.topic.lastPost,
                     closed: favorite.topic.isClosed,
                     unread: favorite.topic.isUnread,
                     notify: favorite.notify
-                ) {
-                    store.send(
-                        .favoriteTapped(
-                            id: favorite.topic.id,
-                            name: favorite.topic.name,
-                            offset: 0,
-                            postId: nil,
-                            isForum: favorite.isForum
+                ) { showUnread in
+                    if showUnread {
+                        store.send(.unreadTapped(id: favorite.topic.id))
+                    } else {
+                        store.send(
+                            .favoriteTapped(
+                                id: favorite.topic.id,
+                                name: favorite.topic.name,
+                                offset: 0,
+                                postId: nil,
+                                isForum: favorite.isForum
+                            )
                         )
-                    )
+                    }
                 }
                 .contextMenu {
                     if !favorite.isForum {
@@ -213,27 +230,30 @@ public struct FavoritesScreen: View {
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             }
         } header: {
-            Header(title: important
-                   ? LocalizedStringKey("Important")
-                   : LocalizedStringKey("Topics / Forums"))
+            if !favorites.isEmpty {
+                Header(title: important
+                       ? LocalizedStringKey("Important")
+                       : LocalizedStringKey("Topics / Forums"))
+            }
         }
         .listRowBackground(Color(.Background.teritary))
     }
     
     // MARK: - Row
-    
+        
     @ViewBuilder
     private func Row(
+        id: Int,
         title: String,
         lastPost: TopicInfo.LastPost? = nil,
         closed: Bool = false,
         unread: Bool = false,
         notify: FavoriteInfo.Notify,
-        action: @escaping () -> Void = {}
+        action: @escaping (_ unreadTapped: Bool) -> Void
     ) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
-                action()
+                action(false)
             } label: {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 6) {
@@ -245,6 +265,7 @@ public struct FavoritesScreen: View {
                         
                         RichText(
                             text: AttributedString(title),
+                            isSelectable: false,
                             font: .body,
                             foregroundStyle: Color(.Labels.primary)
                         )
@@ -257,6 +278,7 @@ public struct FavoritesScreen: View {
                                 
                                 RichText(
                                     text: AttributedString(lastPost.username),
+                                    isSelectable: false,
                                     font: .caption,
                                     foregroundStyle: Color(.Labels.secondary)
                                 )
@@ -265,28 +287,43 @@ public struct FavoritesScreen: View {
                     }
                     
                     Spacer(minLength: 0)
-
-                    if unread {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
-                    }
                     
-                    if closed {
-                        Image(systemSymbol: .lock)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                            .foregroundStyle(Color(.Labels.secondary))
+                    HStack(spacing: 0) {
+                        if closed {
+                            Image(systemSymbol: .lock)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundStyle(Color(.Labels.secondary))
+                                .padding(.trailing, unread ? 0 : 12)
+                        }
+                        
+                        if unread {
+                            Button {
+                                action(true)
+                            } label: {
+                                if store.unreadTapId == id {
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                        .id(UUID())
+                                } else {
+                                    Image(systemSymbol: .circleFill)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 10, height: 10)
+                                        .foregroundStyle(tintColor)
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .frame(maxWidth: 42, maxHeight: .infinity)
+                        }
                     }
                 }
                 .padding(.vertical, 8)
                 .contentShape(Rectangle())
             }
         }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
         .buttonStyle(.plain)
         .frame(minHeight: 60)
     }
@@ -315,6 +352,32 @@ public struct FavoritesScreen: View {
             .offset(x: -16)
             .padding(.bottom, 4)
     }
+    
+    //MARK: - Empty View
+    
+    @ViewBuilder
+    private func EmptyFavorites() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .bookmark)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 8)
+            
+            Text("No favorites", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundColor(Color(.Labels.primary))
+                .padding(.bottom, 6)
+            
+            Text("Save something from the forum here", bundle: .module)
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.Labels.teritary))
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
+        }
+    }
 }
 
 // MARK: - Previews
@@ -323,10 +386,12 @@ public struct FavoritesScreen: View {
     NavigationStack {
         FavoritesScreen(
             store: Store(
-                initialState: FavoritesFeature.State(favorites: [.mock])
+                initialState: FavoritesFeature.State(favorites: [.mock, .mockUnread])
             ) {
                 FavoritesFeature()
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
+    .tint(Color(.Theme.primary))
 }

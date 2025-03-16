@@ -17,6 +17,7 @@ public struct ArticleRowView: View {
     public let state: State
     public let rowType: RowType
     public let contextMenuActions: ContextMenuActions
+    public let bundle: Bundle
     
     private var isShort: Bool {
         return rowType == .short
@@ -29,11 +30,13 @@ public struct ArticleRowView: View {
     public init(
         state: State,
         rowType: RowType,
-        contextMenuActions: ContextMenuActions
+        contextMenuActions: ContextMenuActions,
+        bundle: Bundle
     ) {
         self.state = state
         self.rowType = rowType
         self.contextMenuActions = contextMenuActions
+        self.bundle = bundle
     }
     
     public var body: some View {
@@ -50,7 +53,8 @@ public struct ArticleRowView: View {
         .pdaContextMenu(
             title: state.title,
             authorName: state.authorName,
-            contextMenuActions: contextMenuActions
+            contextMenuActions: contextMenuActions,
+            bundle: bundle
         )
     }
     
@@ -207,7 +211,8 @@ public struct ArticleRowView: View {
             MenuButtons(
                 title: state.title,
                 authorName: state.authorName,
-                contextMenuActions: contextMenuActions
+                contextMenuActions: contextMenuActions,
+                bundle: bundle
             )
         } label: {
             Image(systemSymbol: .ellipsis)

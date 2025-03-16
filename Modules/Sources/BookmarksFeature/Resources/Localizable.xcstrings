@@ -11,7 +11,21 @@
         }
       }
     },
+    "Bookmarks will appear soon" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скоро появятся закладки"
+          }
+        }
+      }
+    },
+    "COMING SOON" : {
+
+    },
     "No bookmarks" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -22,11 +36,22 @@
       }
     },
     "Tap “Add To Bookmarks” in article menu, to save it here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нажмите в меню статьи пункт “Добавить в закладки”, чтобы сохранить ее сюда"
+          }
+        }
+      }
+    },
+    "They're currently in development, stay tuned for updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока они находятся в разработке, следите за обновлениями"
           }
         }
       }

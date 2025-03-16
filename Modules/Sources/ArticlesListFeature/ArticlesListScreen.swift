@@ -85,7 +85,8 @@ public struct ArticlesListScreen: View {
                                 openInBrowserAction:  { store.send(.cellMenuOpened(article, .openInBrowser)) },
                                 reportAction:         { store.send(.cellMenuOpened(article, .report)) },
                                 addToBookmarksAction: { store.send(.cellMenuOpened(article, .addToBookmarks)) }
-                            )
+                            ),
+                            bundle: .module
                         )
                     }
                     .buttonStyle(.plain)

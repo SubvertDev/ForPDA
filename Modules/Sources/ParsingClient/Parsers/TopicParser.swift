@@ -9,122 +9,224 @@ import Foundation
 import Models
 
 public struct TopicParser {
-    public static func parse(from string: String) throws -> Topic {
-        if let data = string.data(using: .utf8) {
-            do {
-                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
-                return Topic(
-                    id: array[3] as! Int,
-                    name: (array[4] as! String).convertCodes(),
-                    description: (array[5] as! String).convertCodes(),
-                    flag: array[6] as! Int,
-                    createdAt: Date(timeIntervalSince1970: array[7] as! TimeInterval),
-                    authorId: array[8] as! Int,
-                    authorName: (array[9] as! String).convertCodes(),
-                    curatorId: array[10] as! Int,
-                    curatorName: array[11] as! String,
-                    poll: parsePoll(array[12] as! [Any]),
-                    postsCount: array[13] as! Int,
-                    posts: parsePost(array[14] as! [[Any]]),
-                    navigation: ForumParser.parseNavigation(array[2] as! [[Any]])
-                )
-            } catch {
-                throw ParsingError.failedToSerializeData(error)
-            }
-        } else {
+    
+    // MARK: - Topic
+    
+    public static func parse(from string: String) throws(ParsingError) -> Topic {
+        guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let navigation = array[safe: 2] as? [[Any]],
+              let id = array[safe: 3] as? Int,
+              let name = array[safe: 4] as? String,
+              let description = array[safe: 5] as? String,
+              let flag = array[safe: 6] as? Int,
+              let createdAt = array[safe: 7] as? TimeInterval,
+              let authorId = array[safe: 8] as? Int,
+              let authorName = array[safe: 9] as? String,
+              let curatorId = array[safe: 10] as? Int,
+              let curatorName = array[safe: 11] as? String,
+              let poll = array[safe: 12] as? [Any],
+              let postsCount = array[safe: 13] as? Int,
+              let posts = array[safe: 14] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return Topic(
+            id: id,
+            name: name.convertCodes(),
+            description: description.convertCodes(),
+            flag: flag,
+            createdAt: Date(timeIntervalSince1970: createdAt),
+            authorId: authorId,
+            authorName: authorName.convertCodes(),
+            curatorId: curatorId,
+            curatorName: curatorName,
+            poll: try parsePoll(poll),
+            postsCount: postsCount,
+            posts: try parsePosts(posts),
+            navigation: ForumParser.parseNavigation(navigation)
+        )
     }
     
-    private static func parsePoll(_ array: [Any]) -> Topic.Poll? {
+    // MARK: - Poll
+    
+    private static func parsePoll(_ array: [Any]) throws(ParsingError) -> Topic.Poll? {
+        if array.isEmpty {
+            return nil
+        }
+        
+        guard let name = array[safe: 0] as? String,
+              let totalVotes = array[safe: 1] as? Int,
+              let voted = array[safe: 2] as? Int,
+              let options = array[safe: 3] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
         return if !array.isEmpty {
             Topic.Poll(
-                name: array[0] as! String,
-                voted: array[2] as! Int == 1 ? true : false,
-                totalVotes: array[1] as! Int,
-                options: parsePollOption(array[3] as! [[Any]])
+                name: name,
+                voted: voted == 1 ? true : false,
+                totalVotes: totalVotes,
+                options: try parsePollOptions(options)
             )
         } else { nil }
     }
     
-    private static func parsePollOption(_ array: [[Any]]) -> [Topic.Poll.Option] {
-        return array.map { option in
+    // MARK: - Poll Options
+    
+    private static func parsePollOptions(_ optionsRaw: [[Any]]) throws(ParsingError) -> [Topic.Poll.Option] {
+        var options: [Topic.Poll.Option] = []
+        for option in optionsRaw {
+            guard let name = option[safe: 0] as? String,
+                  let several = option[safe: 1] as? Int,
+                  let names = option[safe: 2] as? [String],
+                  let votes = option[safe: 3] as? [Int] else {
+                throw ParsingError.failedToCastFields
+            }
+            
             var choices: [Topic.Poll.Choice] = []
             
-            let votes = option[3] as! [Int]
-            let names = option[2] as! [String]
-            
-            for i in 0...(votes.count - 1) {
-                choices.append(Topic.Poll.Choice(
-                    id: i,
-                    name: names[i],
-                    votes: votes[i]
-                ))
+            for index in votes.indices {
+                let choice = Topic.Poll.Choice(
+                    id: index,
+                    name: names[index],
+                    votes: votes[index]
+                )
+                choices.append(choice)
             }
             
-            return Topic.Poll.Option(
-                name: option[0] as! String,
-                several: option[1] as! Int == 1 ? true : false,
+            let option = Topic.Poll.Option(
+                name: name,
+                several: several == 1 ? true : false,
                 choices: choices
             )
+            options.append(option)
         }
+        return options
     }
     
-    private static func parsePost(_ array: [[Any]]) -> [Post] {
-        return array.map { post in
-            let lastEdit: Post.LastEdit? = if post.count > 13 {
-                Post.LastEdit(
-                    userId: post[16] as! Int,
-                    username: (post[14] as! String).convertCodes(),
-                    reason: post[15] as! String,
-                    date: Date(timeIntervalSince1970: post[13] as! TimeInterval)
-                )
-            } else { nil }
-            
-            return Post(
-                id: post[0] as! Int,
-                first: post[1] as! Int == 1 ? true : false,
-                content: post[8] as! String,
-                author: Post.Author(
-                    id: post[2] as! Int,
-                    name: (post[3] as! String).convertCodes(),
-                    groupId: post[4] as! Int,
-                    avatarUrl: post[9] as! String,
-                    lastSeenDate: Date(timeIntervalSince1970: post[5] as! TimeInterval),
-                    signature: post[10] as! String,
-                    reputationCount: post[6] as! Int
-                ),
-                karma: (post[12] as! Int) >> 3,
-                attachments: parseAttachment(post[11] as! [[Any]]),
-                createdAt: Date(timeIntervalSince1970: post[7] as! TimeInterval),
-                lastEdit: lastEdit
-            )
-        }
-    }
+    // MARK: - Posts
     
-    private static func parseAttachment(_ array: [[Any]]) -> [Post.Attachment] {
-        return array.map { attachment in
-            let metadata: Post.Attachment.Metadata? = if attachment.count > 4 {
-                Post.Attachment.Metadata(
-                    width: attachment[5] as! Int,
-                    height: attachment[6] as! Int,
-                    url: attachment[4] as! String
-                )
-            } else { nil }
-            
-            let type = if attachment[1] as! Int == 1 {
-                Post.Attachment.AttachmentType.image
-            } else {
-                Post.Attachment.AttachmentType.file
+    private static func parsePosts(_ postsRaw: [[Any]]) throws(ParsingError) -> [Post] {
+        var posts: [Post] = []
+        for post in postsRaw {
+            guard let id = post[safe: 0] as? Int,
+                  let first = post[safe: 1] as? Int,
+                  let authorId = post[safe: 2] as? Int,
+                  let authorName = post[safe: 3] as? String,
+                  let authorGroupId = post[safe: 4] as? Int,
+                  let authorLastSeenDate = post[safe: 5] as? TimeInterval,
+                  let authorReputationCount = post[safe: 6] as? Int,
+                  let createdAt = post[safe: 7] as? TimeInterval,
+                  let content = post[safe: 8] as? String,
+                  let authorAvatarUrl = post[safe: 9] as? String,
+                  let authorSignature = post[safe: 10] as? String,
+                  let attachments = post[safe: 11] as? [[Any]],
+                  let karma = post[safe: 12] as? Int else {
+                throw ParsingError.failedToCastFields
             }
             
-            return Post.Attachment(
-                id: attachment[0] as! Int,
-                type: type,
-                name: attachment[2] as! String,
-                size: attachment[3] as! Int,
-                metadata: metadata
+            let post = Post(
+                id: id,
+                first: first == 1 ? true : false,
+                content: content,
+                author: Post.Author(
+                    id: authorId,
+                    name: authorName.convertCodes(),
+                    groupId: authorGroupId,
+                    avatarUrl: authorAvatarUrl,
+                    lastSeenDate: Date(timeIntervalSince1970: authorLastSeenDate),
+                    signature: authorSignature,
+                    reputationCount: authorReputationCount
+                ),
+                karma: karma >> 3,
+                attachments: try parseAttachment(attachments),
+                createdAt: Date(timeIntervalSince1970: createdAt),
+                lastEdit: try parseLastEdit(post)
             )
+            posts.append(post)
         }
+        return posts
+    }
+    
+    // MARK: - Attachment
+    
+    private static func parseAttachment(_ attachmentsRaw: [[Any]]) throws(ParsingError) -> [Post.Attachment] {
+        var attachments: [Post.Attachment] = []
+        for attachment in attachmentsRaw {
+            guard let id = attachment[safe: 0] as? Int,
+                  let type = attachment[safe: 1] as? Int,
+                  let name = attachment[safe: 2] as? String,
+                  let size = attachment[safe: 3] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            guard let type = Post.Attachment.AttachmentType(rawValue: type) else {
+                throw ParsingError.unknownAttachmentType(type)
+            }
+            
+            let attachment = Post.Attachment(
+                id: id,
+                type: type,
+                name: name,
+                size: size,
+                metadata: try parseAttachmentMetadata(attachment),
+                downloadCount: attachment[safe: 7] as? Int // Only if attachment.count > 7
+            )
+            attachments.append(attachment)
+        }
+        return attachments
+    }
+    
+    // MARK: - Attachment Metadata
+     
+    private static func parseAttachmentMetadata(_ attachment: [Any]) throws(ParsingError) -> Post.Attachment.Metadata? {
+        if attachment.count <= 4 {
+            return nil
+        }
+        
+        guard let url = attachment[safe: 4] as? String,
+              let width = attachment[safe: 5] as? Int,
+              let height = attachment[safe: 6] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        guard let url = URL(string: url) else {
+            throw ParsingError.failedToCreateAttachmentMetadataUrl
+        }
+        
+        return Post.Attachment.Metadata(
+            width: width,
+            height: height,
+            url: url
+        )
+    }
+    
+    // MARK: - Last Edit
+    
+    private static func parseLastEdit(_ post: [Any]) throws(ParsingError) -> Post.LastEdit? {
+        if post.count <= 13 {
+            return nil
+        }
+        
+        guard let date = post[safe: 13] as? TimeInterval,
+              let username = post[safe: 14] as? String,
+              let reason = post[safe: 15] as? String,
+              let userId = post[safe: 16] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+       
+        return Post.LastEdit(
+            userId: userId,
+            username: username.convertCodes(),
+            reason: reason,
+            date: Date(timeIntervalSince1970: date)
+        )
     }
 }

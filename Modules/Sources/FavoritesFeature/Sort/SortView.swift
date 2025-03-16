@@ -25,22 +25,60 @@ struct SortView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                Text("Sort", bundle: .module)
-                    .font(.system(size: 20, weight: .semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 16)
-                    .padding(.bottom, 22)
+                HStack {
+                    Text("Sort", bundle: .module)
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 16)
+                        .padding(.bottom, 22)
+                    
+                    Button {
+                        store.send(.cancelButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .xmark)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                Circle()
+                                    .fill(Color(.Background.quaternary))
+                                    .clipShape(Circle())
+                            )
+                    }
+                }
                 
                 HStack {
-                    Picker("Sort", selection: $store.sortType) {
-                        // FIXME: Translatable titles
-                        Label(SortType.byDate.title, systemSymbol: .calendar)
-                            .tag(SortType.byDate)
+                    Menu {
+                        Button {
+                            store.send(.didSelectSortType(.byDate))
+                        } label: {
+                            Text(SortType.byDate.title, bundle: .module)
+                            Image(systemSymbol: .calendar)
+                        }
                         
-                        Label(SortType.byName.title, systemSymbol: .person)
-                            .tag(SortType.byName)
+                        Button {
+                            store.send(.didSelectSortType(.byName))
+                        } label: {
+                            Text(SortType.byName.title, bundle: .module)
+                            Image(systemSymbol: .person)
+                        }
+                    } label: {
+                        HStack {
+                            Text(store.sortType.title, bundle: .module)
+                                .foregroundStyle(Color(.Labels.primary))
+                                .padding(.leading, 16)
+                            
+                            Spacer()
+                            
+                            Image(systemSymbol: .chevronUpChevronDown)
+                                .foregroundStyle(Color(.Labels.teritary))
+                                .padding(.trailing, 11)
+                        }
+                        .frame(height: 60)
+                        .background(Color(.Background.teritary))
+                        .cornerRadius(10)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 60)
                 }
                 .listRowBackground(Color(.Background.teritary))
                 .padding(.bottom, 28)
@@ -72,7 +110,7 @@ struct SortView: View {
                     .buttonStyle(.borderedProminent)
                     .frame(height: 48)
                 }
-                .padding(.bottom, 8)
+                .padding(.vertical, 8)
             }
             .padding(.horizontal, 16)
             .background(Color(.Background.primary))
@@ -105,5 +143,6 @@ struct SortView: View {
                 SortFeature()
             }
         )
+        .tint(Color(.Theme.primary))
     }
 }

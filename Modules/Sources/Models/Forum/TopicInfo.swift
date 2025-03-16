@@ -108,6 +108,19 @@ public extension TopicInfo {
         )
     )
     
+    static let mockTodayUnread = TopicInfo(
+        id: Int.random(in: 1..<1000000),
+        name: "Topic example",
+        description: "",
+        flag: 96,
+        postsCount: 10,
+        lastPost: TopicInfo.LastPost(
+            date: .now,
+            userId: 6176341,
+            username: "AirFlare"
+        )
+    )
+    
     static let mockYesterday = TopicInfo(
         id: Int.random(in: 1..<1000000),
         name: "Topic example",

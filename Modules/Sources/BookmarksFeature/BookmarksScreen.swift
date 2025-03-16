@@ -26,118 +26,25 @@ public struct BookmarksScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                ScrollViewReader { reader in
-                    WithPerceptionTracking {
-                        ArticlesList()
-                            .onChange(of: store.scrollToTop) { _ in
-                                withAnimation { reader.scrollTo(0) }
-                            }
-                    }
-                }
-                .refreshable {
-                    await store.send(.onRefresh).finish()
-                }
-                
-                if store.isLoading {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
-                
-                if !store.isLoading && store.articles.isEmpty {
+                VStack(spacing: 0) {
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: 12))
+                        .padding(.bottom, 100)
+                    
                     EmptyBookmarks()
+                    
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: -20))
+                        .padding(.top, 80)
                 }
+                .frame(width: UIScreen.main.bounds.width)
             }
             .navigationTitle(Text("Bookmarks", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbarBackground(Color(.Background.primary), for: .navigationBar)
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    ToolbarButtons()
-                }
+            .onAppear {
+                store.send(.onAppear)
             }
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
-            .sheet(item: $store.destination.share, id: \.self) { url in
-                // FIXME: Perceptible warning despite tracking closure
-                WithPerceptionTracking {
-                    ShareActivityView(url: url) { success in
-                        store.send(.linkShared(success, url))
-                    }
-                    .presentationDetents([.medium])
-                }
-            }
-            .task {
-                store.send(.onTask)
-            }
-        }
-    }
-    
-    // MARK: - Articles List
-        
-    @ViewBuilder
-    private func ArticlesList() -> some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                ForEach(store.articles, id: \.self) { article in
-                    WithPerceptionTracking {
-                        Button {
-                            store.send(.articleTapped(article))
-                        } label: {
-                            ArticleRowView(
-                                state: ArticleRowView.State(
-                                    id: article.id,
-                                    title: article.title,
-                                    authorName: article.authorName,
-                                    imageUrl: article.imageUrl,
-                                    commentsAmount: article.commentsAmount,
-                                    date: article.date
-                                ),
-                                rowType: settingsToRow(store.listRowType),
-                                contextMenuActions: ContextMenuActions(
-                                    shareAction:          { store.send(.cellMenuOpened(article, .shareLink)) },
-                                    copyAction:           { store.send(.cellMenuOpened(article, .copyLink)) },
-                                    openInBrowserAction:  { store.send(.cellMenuOpened(article, .openInBrowser)) },
-                                    reportAction:         { store.send(.cellMenuOpened(article, .report)) },
-                                    addToBookmarksAction: { store.send(.cellMenuOpened(article, .addToBookmarks)) }
-                                )
-                            )
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.horizontal, 16)
-                    }
-                }
-            }
-            
-            if !store.articles.isEmpty {
-                PDALoader()
-                    .frame(width: 24, height: 24)
-                    .padding(.top, 14)
-                    .padding(.bottom, 20)
-            }
-        }
-        .coordinateSpace(name: "scroll")
-        .background(Color(.Background.primary))
-        .scrollDisabled(store.isScrollDisabled)
-    }
-    
-    private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
-        rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
-    }
-    
-    // MARK: - Toolbar Items
-    
-    @ViewBuilder
-    private func ToolbarButtons() -> some View {
-        Button {
-            store.send(.listGridTypeButtonTapped)
-        } label: {
-            Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
-                .replaceDownUpByLayerEffect(value: true)
-        }
-        
-        Button {
-            store.send(.settingsButtonTapped)
-        } label: {
-            Image(systemSymbol: .gearshape)
         }
     }
     
@@ -152,18 +59,37 @@ public struct BookmarksScreen: View {
                 .frame(width: 48, height: 48)
                 .padding(.bottom, 8)
             
-            Text("No bookmarks", bundle: .module)
+//            Text("No bookmarks", bundle: .module)
+            Text("Bookmarks will appear soon", bundle: .module)
                 .font(.title3)
                 .bold()
                 .foregroundColor(Color(.Labels.primary))
                 .padding(.bottom, 6)
             
-            Text("Tap “Add To Bookmarks” in article menu, to save it here", bundle: .module)
+//            Text("Tap “Add To Bookmarks” in article menu, to save it here", bundle: .module)
+            Text("They're currently in development, stay tuned for updates", bundle: .module)
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
-                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
         }
+    }
+    
+    // MARK: Coming Soon Tape
+    
+    @ViewBuilder
+    private func ComingSoonTape() -> some View {
+        HStack(spacing: 8) {
+            ForEach(0..<6, id: \.self) { index in
+                Text("COMING SOON")
+                    .font(.footnote)
+                    .foregroundStyle(Color(.Labels.primaryInvariably))
+                    .fixedSize(horizontal: true, vertical: false)
+                    .lineLimit(1)
+            }
+        }
+        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
+        .background(tintColor)
     }
 }
 

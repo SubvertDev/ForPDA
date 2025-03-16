@@ -40,6 +40,7 @@ platform :ios do
         upload_dsym_to_sentry
         upload_app_to_testflight
         notify_all
+        bump_and_tag
     end
     
     # --------------------------------------------------
@@ -164,6 +165,14 @@ platform :ios do
             chat_id: ENV['TG_CHAT_ID'],
             text: "Версия #{version} (#{build}) загружена на TestFlight"
         )
+    end
+    
+    desc "Commits changes and adds a tag with version/build"
+    lane :bump_and_tag do
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+        sh("git commit -a -m \"Bump version\"")
+        sh("git tag v#{version}-#{build}-beta")
     end
     
     # --------------------------------------------------

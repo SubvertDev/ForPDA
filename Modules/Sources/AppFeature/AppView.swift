@@ -15,6 +15,7 @@ import ForumFeature
 import TopicFeature
 import AnnouncementFeature
 import FavoritesFeature
+import FavoritesRootFeature
 import HistoryFeature
 import AuthFeature
 import ProfileFeature
@@ -118,10 +119,10 @@ public struct AppView: View {
     @ViewBuilder
     private func FavoritesTab() -> some View {
         NavigationStack(
-            path: $store.scope(state: \.favoritesPath, action: \.favoritesPath)
+            path: $store.scope(state: \.favoritesRootPath, action: \.favoritesRootPath)
         ) {
-            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-                .trackAnalytics("Favorites Screen")
+            FavoritesRootScreen(store: store.scope(state: \.favoritesRoot, action: \.favoritesRoot))
+                .trackAnalytics("Favorites Root Screen")
         } destination: { store in
             switch store.case {
             case let .forumPath(path):
@@ -280,10 +281,11 @@ public struct AppView: View {
         .frame(maxWidth: .infinity)
     }
     
-    // MARK: - Toast
+    // MARK: - Toast (Refactor)
     
+    @State private var isExpanded = false
     @State private var duration = 5
-    
+
     @ViewBuilder
     private func Toast() -> some View {
         HStack(spacing: 0) {
@@ -292,10 +294,13 @@ public struct AppView: View {
                 .foregroundStyle(store.toast.isError ? Color(.Main.red) : tintColor)
                 .frame(width: 32, height: 32)
             
-            Text(store.toast.message, bundle: store.localizationBundle)
-                .font(.caption)
-                .foregroundStyle(Color(.Labels.primary))
-                .padding(.trailing, 12)
+            if isExpanded {
+                Text(store.toast.message, bundle: store.localizationBundle)
+                    .font(.caption)
+                    .foregroundStyle(Color(.Labels.primary))
+                    .padding(.trailing, 12)
+                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+            }
         }
         .background(Color(.Background.primary))
         .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -303,12 +308,23 @@ public struct AppView: View {
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color(.Separator.secondary), lineWidth: 0.33)
         }
-        .padding(.bottom, 50 + 16)
         .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
+        .padding(.bottom, 50 + 16)
         .padding(.horizontal, 16)
+        .opacity(isExpanded ? 1 : 0)
         .task {
-            try? await Task.sleep(for: .seconds(duration))
-            store.showToast = false
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                isExpanded = true
+            }
+            
+            try? await Task.sleep(for: .seconds(duration - 1))
+            
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                isExpanded = false
+            }
+            
+            try? await Task.sleep(for: .seconds(0.4))
+            store.send(.didFinishToastAnimation)
         }
     }
 }

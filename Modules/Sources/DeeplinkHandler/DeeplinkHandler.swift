@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import AnalyticsClient
+import APIClient
 
 public struct Deeplink {
     public let tab: Tab
@@ -48,7 +49,7 @@ public struct DeeplinkHandler {
     
     public init() {}
     
-    public func handleOuterURL(_ url: URL) throws(DeeplinkError) -> Deeplink {
+    public func handleOuterToInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink {
         logger.info("Handling outer deeplink URL: \(url.absoluteString.removingPercentEncoding ?? "encoding error")")
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { throw .noUrlComponents }
@@ -77,7 +78,7 @@ public struct DeeplinkHandler {
         }
     }
     
-    public func handleInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink? {
+    public func handleInnerToInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink? {
         let regex = /[?&](\w+)=([^&]+)/
         let matches = url.absoluteString.matches(of: regex)
         
@@ -101,9 +102,17 @@ public struct DeeplinkHandler {
             default:
                 return nil
             }
+            
         case .unknown:
             return nil
         }
+    }
+    
+    public func handleInnerToOuterURL(_ url: URL) async -> URL {
+        let id = Int(url.absoluteString.replacingOccurrences(of: "link://", with: ""))!
+        @Dependency(\.apiClient) var apiClient
+        let url = try! await apiClient.getAttachment(id)
+        return url
     }
     
     enum DeeplinkUrlType: String, CaseIterable {

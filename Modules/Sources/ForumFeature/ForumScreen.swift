@@ -206,19 +206,21 @@ public struct ForumScreen: View {
             store.send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
-        if isUnread {
-            ContextButton(text: "Mark Read", symbol: .checkmarkCircle, bundle: .module) {
-                store.send(.contextCommonMenu(.markRead, id, isForum))
+        if store.isUserAuthorized {
+            if isUnread {
+                ContextButton(text: "Mark Read", symbol: .checkmarkCircle, bundle: .module) {
+                    store.send(.contextCommonMenu(.markRead, id, isForum))
+                }
             }
-        }
-        
-        Section {
-            ContextButton(
-                text: isFavorite ? "Remove from favorites" : "Add to favorites",
-                symbol: isFavorite ? .starFill : .star,
-                bundle: .module
-            ) {
-                store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+            
+            Section {
+                ContextButton(
+                    text: isFavorite ? "Remove from favorites" : "Add to favorites",
+                    symbol: isFavorite ? .starFill : .star,
+                    bundle: .module
+                ) {
+                    store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+                }
             }
         }
     }
@@ -247,6 +249,7 @@ public struct ForumScreen: View {
                         
                         RichText(
                             text: AttributedString(title),
+                            isSelectable: false,
                             font: .body,
                             foregroundStyle: Color(.Labels.primary)
                         )
@@ -259,6 +262,7 @@ public struct ForumScreen: View {
                                 
                                 RichText(
                                     text: AttributedString(lastPost.username),
+                                    isSelectable: false,
                                     font: .caption,
                                     foregroundStyle: Color(.Labels.secondary)
                                 )
@@ -282,6 +286,7 @@ public struct ForumScreen: View {
                             .scaledToFit()
                             .frame(width: 16, height: 16)
                             .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.trailing, 12)
                     }
                 }
                 .padding(.vertical, 8)

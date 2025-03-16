@@ -51,6 +51,10 @@ public struct ForumParser {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 
+                if array.count == 2 {
+                    throw ParsingError.failedToFindPost
+                }
+                
                 return ForumJump(
                     id: array[2] as! Int,
                     offset: array[3] as! Int,

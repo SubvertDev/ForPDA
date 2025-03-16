@@ -77,7 +77,7 @@ Options: 'open:true'
 [bundle exec] fastlane ios build_ipa
 ```
 
-
+Builds and signs ipa file
 
 ### ios upload_dsym_to_sentry
 
@@ -102,6 +102,14 @@ Uploads app to TestFlight
 ```
 
 Notifies to all available channels
+
+### ios bump_and_tag
+
+```sh
+[bundle exec] fastlane ios bump_and_tag
+```
+
+Commits changes and adds a tag with version/build
 
 ----
 

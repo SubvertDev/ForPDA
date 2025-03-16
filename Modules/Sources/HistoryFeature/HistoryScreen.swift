@@ -27,28 +27,43 @@ public struct HistoryScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if !store.isLoading {
-                    VStack(spacing: 1) {
-                        if store.pageNavigation.shouldShow {
-                            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                                .padding(.horizontal, 16)
-                        }
+                if !store.history.isEmpty {
+                    List {
+                        Navigation()
                         
-                        List(store.history, id: \.hashValue) { history in
+                        ForEach(store.history, id: \.hashValue) { history in
                             HistorySection(history: history)
                         }
-                        .scrollContentBackground(.hidden)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
+                        
+                        Navigation()
                     }
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
+                    .scrollContentBackground(.hidden)
+                } else if !store.isLoading {
+                    EmptyHistory()
                 }
             }
             .navigationTitle(Text("History", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
+            .overlay {
+                if store.isLoading {
+                    PDALoader()
+                        .frame(width: 24, height: 24)
+                }
+            }
             .task {
                 store.send(.onTask)
             }
+        }
+    }
+    
+    // MARK: - Page Navigation
+    
+    @ViewBuilder
+    private func Navigation() -> some View {
+        if store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                //.listRowBackground(.primary)
         }
     }
     
@@ -66,6 +81,31 @@ public struct HistoryScreen: View {
             Header(title: history.seenDate.formattedDateOnly())
         }
         .listRowBackground(Color(.Background.teritary))
+    }
+    
+    // MARK: - Empty History
+            
+    @ViewBuilder
+    private func EmptyHistory() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .clockArrowCirclepath)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 6)
+            
+            Text("No history", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundColor(.primary)
+                .padding(.bottom, 6)
+            
+            Text("View any topic in forum and it displays here.", bundle: .module)
+                .font(.footnote)
+                .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+        }
     }
     
     // MARK: - Row
@@ -91,6 +131,7 @@ public struct HistoryScreen: View {
                         
                         RichText(
                             text: AttributedString(title),
+                            isSelectable: false,
                             font: .body,
                             foregroundStyle: Color(.Labels.primary)
                         )
@@ -103,6 +144,7 @@ public struct HistoryScreen: View {
                                 
                                 RichText(
                                     text: AttributedString(lastPost.username),
+                                    isSelectable: false,
                                     font: .caption,
                                     foregroundStyle: Color(.Labels.secondary)
                                 )

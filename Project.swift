@@ -58,11 +58,12 @@ let project = Project(
                     .Internal.DeeplinkHandler,
                     .Internal.ArticlesListFeature,
                     .Internal.ArticleFeature,
-                    .Internal.BookmarksFeature,
                     .Internal.ForumsListFeature,
                     .Internal.ForumFeature,
                     .Internal.TopicFeature,
                     .Internal.AnnouncementFeature,
+                    .Internal.FavoritesRootFeature,
+                    .Internal.BookmarksFeature,
                     .Internal.FavoritesFeature,
                     .Internal.HistoryFeature,
                     .Internal.AuthFeature,
@@ -89,6 +90,7 @@ let project = Project(
                 dependencies: [
                     .Internal.LoggerClient,
                     .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .SPM.TCA
                 ]
             ),
@@ -149,6 +151,15 @@ let project = Project(
             ),
         
             .feature(
+                name: "FavoritesRootFeature",
+                dependencies: [
+                    .Internal.FavoritesFeature,
+                    .Internal.BookmarksFeature,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
                 name: "ForumsListFeature",
                 dependencies: [
                     .Internal.Models,
@@ -184,6 +195,7 @@ let project = Project(
                     .Internal.PageNavigationFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .Internal.BBBuilder,
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.AnalyticsClient,
@@ -195,7 +207,8 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
-                    .SPM.TCA
+                    .SPM.TCA,
+                    .SPM.MemberwiseInit
                 ]
             ),
         
@@ -211,7 +224,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
-                    .Internal.TopicFeature,
+                    .Internal.TopicFeature, // TODO: Убрать
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -485,6 +498,16 @@ let project = Project(
                 ]
             ),
         
+            .feature(
+                name: "BBBuilder",
+                dependencies: [
+                    .Internal.SharedUI,
+                    .Internal.Models,
+                    .Internal.LoggerClient,
+                    .SPM.TCA
+                ]
+            ),
+        
         // MARK: - Tests -
         
             .target(
@@ -492,11 +515,21 @@ let project = Project(
                 destinations: .iOS,
                 product: .unitTests,
                 bundleId: "com.subvert.forpda.tests",
-                infoPlist: nil,
+                deploymentTargets: .iOS("16.0"),
+                infoPlist: .default,
                 sources: ["Modules/Tests/**"],
                 resources: [],
                 dependencies: [.target(name: "ForPDA")]
             ),
+        
+        .tests(
+            name: "BBBuilderTests",
+            dependencies: [
+                .Internal.BBBuilder,
+                .Internal.Models,
+                .Internal.SharedUI
+            ]
+        ),
         
         // MARK: - Extensions -
         
@@ -521,6 +554,7 @@ struct App {
 }
 
 extension ProjectDescription.Target {
+    
     static func feature(
         name: String,
         productType: ProductType = .framework,
@@ -548,6 +582,20 @@ extension ProjectDescription.Target {
                     "PROVISIONING_PROFILE_SPECIFIER": "" // Disables signing for frameworks
                 ]
             )
+        )
+    }
+    
+    static func tests(name: String, dependencies: [TargetDependency]) -> ProjectDescription.Target {
+        return .target(
+            name: name,
+            destinations: App.destinations,
+            product: .unitTests,
+            bundleId: App.bundleId + "." + name + ".Tests",
+            deploymentTargets: .iOS("16.0"),
+            infoPlist: .default,
+            sources: ["Modules/Tests/\(name)/**"],
+            resources: ["Modules/Resources/**"],
+            dependencies: dependencies
         )
     }
     
@@ -619,6 +667,7 @@ extension TargetDependency.Internal {
     static let PageNavigationFeature  = TargetDependency.target(name: "PageNavigationFeature")
     static let AnnouncementFeature =    TargetDependency.target(name: "AnnouncementFeature")
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
+    static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
     static let AuthFeature =            TargetDependency.target(name: "AuthFeature")
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
@@ -644,6 +693,7 @@ extension TargetDependency.Internal {
     static let SharedUI =            TargetDependency.target(name: "SharedUI")
     static let PersistenceKeys =     TargetDependency.target(name: "PersistenceKeys")
     static let TCAExtensions =       TargetDependency.target(name: "TCAExtensions")
+    static let BBBuilder =           TargetDependency.target(name: "BBBuilder")
 }
 
 extension TargetDependency {
@@ -666,5 +716,6 @@ extension TargetDependency.SPM {
     static let Sentry =         TargetDependency.external(name: "Sentry")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")
+    static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")
     static let YouTubePlayerKit = TargetDependency.external(name: "YouTubePlayerKit")
 }

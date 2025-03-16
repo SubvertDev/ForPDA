@@ -155,6 +155,7 @@
       }
     },
     "Problems with article?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -165,6 +166,7 @@
       }
     },
     "Report" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

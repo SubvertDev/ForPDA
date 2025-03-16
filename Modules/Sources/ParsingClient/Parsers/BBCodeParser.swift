@@ -22,6 +22,7 @@ public final class BBCodeParser {
     
     // MARK: - Default Parsing
     
+    @available(*, deprecated)
     public static func parse(_ text: String?, fontStyle: UIFont.TextStyle = .callout) -> NSAttributedString? {
         guard let inputText = text else { return nil }
         var text = inputText

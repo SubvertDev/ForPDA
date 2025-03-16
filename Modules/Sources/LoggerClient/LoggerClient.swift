@@ -13,6 +13,7 @@ public enum LoggerCategory: String, Sendable {
     case deeplink
     case analytics
     case notifications
+    case bbbuilder
 }
 
 extension Logger: @retroactive DependencyKey {
@@ -59,8 +60,12 @@ extension Logger {
         Logger(subsystem: Bundle.main.bundleIdentifier ?? "", category: category)
     }
     
-    public subscript(category: LoggerCategory) -> Logger {
-        Logger(subsystem: Bundle.main.bundleIdentifier ?? "", category: category.rawValue.capitalized)
+    public subscript(category: LoggerCategory, isEnabled: Bool = true) -> Logger {
+        if isEnabled {
+            return Logger(subsystem: Bundle.main.bundleIdentifier ?? "", category: category.rawValue.capitalized)
+        } else {
+            return Logger(.disabled)
+        }
     }
 }
 

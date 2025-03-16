@@ -9,6 +9,7 @@ import Foundation
 
 extension String {
     /// Mostly used to decode specific symbols like emojis
+    // TODO: Revisit
     func convertHtmlCodes() -> String {
         var text = self
         // raw html parse loses \n\t that are used in article tables
