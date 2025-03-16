@@ -264,38 +264,36 @@ extension String {
     ]
     
     func decodeHTMLEntities() -> String {
-        var result: String.UnicodeScalarView = .init()
+        var result = String.UnicodeScalarView()
         var buffer = ""
         var isParsing = false
         
         for char in self.unicodeScalars {
             if char == "&" {
+                if isParsing {
+                    result.append(contentsOf: ("&" + buffer).unicodeScalars) // Restore unfinished entity
+                }
                 isParsing = true
                 buffer.removeAll()
             } else if isParsing {
                 if char == ";" {
                     isParsing = false
                     
-                    if buffer.prefix(1) == "#" { // Numeric aka #10069
+                    if buffer.hasPrefix("#") { // Numeric entity
                         buffer.removeFirst()
-                        if buffer.prefix(1) == "x" || buffer.prefix(1) == "X" { // Hexadecimal
-                            if let value = Int(buffer.dropFirst(), radix: 16),
-                               let scalar = Unicode.Scalar(value) {
-                                result.append(scalar)
-                            } else {
-                                result.append(Unicode.Scalar("&" + buffer + ";")!)
-                            }
+                        let radix = buffer.hasPrefix("x") || buffer.hasPrefix("X") ? 16 : 10
+                        if radix == 16 { buffer.removeFirst() }
+                        
+                        if let value = Int(buffer, radix: radix),
+                           let scalar = Unicode.Scalar(value) {
+                            result.append(scalar)
                         } else {
-                            if let decimal = Int(buffer), let scalar = Unicode.Scalar(decimal) {
-                                result.append(scalar)
-                            } else {
-                                result.append(Unicode.Scalar(65533)!) // Unknown character
-                            }
+                            result.append(contentsOf: ("&#" + buffer + ";").unicodeScalars)
                         }
-                    } else if String.htmlEntities.contains(where: { $0.key == buffer }) {
-                        result.append(Unicode.Scalar(String.htmlEntities[buffer]!)!)
+                    } else if let entityValue = String.htmlEntities[buffer] {
+                        result.append(Unicode.Scalar(entityValue)!)
                     } else {
-                        result.append(Unicode.Scalar("&" + buffer + ";")!)
+                        result.append(contentsOf: ("&" + buffer + ";").unicodeScalars)
                     }
                 } else {
                     buffer.append(String(char))
@@ -303,6 +301,11 @@ extension String {
             } else {
                 result.append(char)
             }
+        }
+        
+        // Handle case where `&` started but was never completed
+        if isParsing {
+            result.append(contentsOf: ("&" + buffer).unicodeScalars)
         }
         
         return String(result)
