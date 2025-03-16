@@ -131,6 +131,7 @@ public struct HistoryScreen: View {
                         
                         RichText(
                             text: AttributedString(title),
+                            isSelectable: false,
                             font: .body,
                             foregroundStyle: Color(.Labels.primary)
                         )
@@ -143,6 +144,7 @@ public struct HistoryScreen: View {
                                 
                                 RichText(
                                     text: AttributedString(lastPost.username),
+                                    isSelectable: false,
                                     font: .caption,
                                     foregroundStyle: Color(.Labels.secondary)
                                 )

@@ -280,6 +280,7 @@ public struct FavoritesScreen: View {
                                 
                                 RichText(
                                     text: AttributedString(lastPost.username),
+                                    isSelectable: false,
                                     font: .caption,
                                     foregroundStyle: Color(.Labels.secondary)
                                 )

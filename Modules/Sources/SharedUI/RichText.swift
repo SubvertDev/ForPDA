@@ -99,30 +99,11 @@ public struct RichText: View {
             }
             delegate.textView = textView
             delegate.setRefresh($refreshId)
-//            delegate.$text = $text
             
             configuration($0)
         }
-//        .id(text) // TODO: Any other way to trigger attachment refresh?
         .id(refreshId)
-        .onChange(of: refreshId) { _ in
-            print("REFRESH TRIGGERED \(refreshId.uuidString)")
-        }
-        .onAppear {
-//            connectDelegate()
-//            Task {
-//                try? await Task.sleep(for: .seconds(3))
-
-//                text = NSAttributedString(attributedString: text)
-//                text = text
-//                print("set new text")
-//            }
-        }
     }
-//    
-//    private func connectDelegate() {
-//        delegate = TextViewDelegate(onUrlTap: onUrlTap)
-//    }
 }
 
 private extension UIFont {
