@@ -48,6 +48,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
         
         public var scrollToTop: Bool = false
         
+        var didLoadOnce = false
+        
         public init(
             destination: Destination.State? = nil,
             appSettings: AppSettings = .default,
@@ -88,6 +90,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.hapticClient) private var hapticClient
     @Dependency(\.continuousClock) private var clock
@@ -168,16 +171,24 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 }
                 state.offset += state.loadAmount
                 state.isLoading = false
+                reportFullyDisplayed(&state)
                 return .none
                 
             case ._articlesResponse(.failure):
                 state.isLoading = false
                 state.destination = .alert(.failedToConnect)
+                reportFullyDisplayed(&state)
                 return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
         
         Analytics()
+    }
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
