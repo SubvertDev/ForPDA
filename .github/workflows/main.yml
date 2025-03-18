@@ -1,5 +1,19 @@
-            - name: Github Telegram Notifier
-  uses: EverythingSuckz/github-telegram-notify@v1.1.2
-  with:
-    bot_token: '${{ secrets.TG_BOT_TOKEN }}'
-    chat_id: '${{ secrets.TG_CHAT_ID }}'
+name: Github Telegram Notifier
+
+on:
+  push:
+    branches:
+      - '**'  # Triggers on any branch
+  pull_request:
+    branches:
+      - '**'  # Triggers on any branch
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Notification
+        uses: EverythingSuckz/github-telegram-notify@v1.1.2
+        with:
+          bot_token: ${{ secrets.TG_BOT_TOKEN }}
+          chat_id: ${{ secrets.TG_CHAT_ID }}
