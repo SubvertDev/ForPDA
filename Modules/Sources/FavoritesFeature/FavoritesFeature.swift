@@ -13,6 +13,7 @@ import Models
 import TCAExtensions
 import PasteboardClient
 import NotificationCenterClient
+import AnalyticsClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -42,6 +43,8 @@ public struct FavoritesFeature: Reducer, Sendable {
         public var isUserAuthorized: Bool {
             return userSession != nil
         }
+        
+        var didLoadOnce = false
         
         public init(
             favorites: [FavoriteInfo] = [],
@@ -79,6 +82,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.continuousClock) var clock
@@ -248,7 +252,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         favorites.append(favorite)
                     }
                 }
-                
+                                
                 state.favoritesImportant = favsImportant
                 state.favorites = favorites
                 
@@ -258,10 +262,13 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.isLoading = false
                 state.isRefreshing = false
                 
+                reportFullyDisplayed(&state)
+                
                 return .none
                 
             case let ._favoritesResponse(.failure(error)):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._startUnreadLoadingIndicator(id: id):
@@ -277,6 +284,12 @@ public struct FavoritesFeature: Reducer, Sendable {
         .ifLet(\.$sort, action: \.sort) {
             SortFeature()
         }
+    }
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
     
     private func goToEnd(id: Int) -> Effect<Action> {
