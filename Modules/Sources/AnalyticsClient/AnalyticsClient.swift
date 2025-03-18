@@ -151,12 +151,19 @@ extension AnalyticsClient {
             options.dsn = Secrets.get(.SENTRY_DSN)
             options.debug = isDebugEnabled
             options.enabled = isEnabled
-            options.tracesSampleRate = 1.0
-            options.profilesSampleRate = 1.0
-            options.diagnosticLevel = .warning
-            options.attachScreenshot = true
-            options.attachViewHierarchy = true
+            options.enableAppLaunchProfiling = true
+            options.enableMetricKit = true
+            options.enableAppHangTrackingV2 = true
+            options.enablePerformanceV2 = true
+            options.enablePreWarmedAppStartTracing = true
+            options.enableCoreDataTracing = false // I don't have CoreData
+            options.enableUserInteractionTracing = false // Doesn't work with SwiftUI
+            options.enableUIViewControllerTracing = false // I dont' have UIViewControllers
+            options.tracePropagationTargets = ["4pda"] // Dismiss analytics requests
             options.swiftAsyncStacktraces = true
+            options.attachScreenshot = true
+            options.tracesSampleRate = 1.0
+            options.diagnosticLevel = .warning
         }
         SentrySDK.setUser(User(userId: id))
         
