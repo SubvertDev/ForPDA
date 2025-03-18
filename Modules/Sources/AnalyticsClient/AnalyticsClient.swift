@@ -112,7 +112,7 @@ extension AnalyticsClient {
     
     private static func configureAnalytics(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         let config = PostHogConfig(apiKey: Secrets.get(.POSTHOG_TOKEN), host: "https://eu.i.posthog.com")
-        config.debug = true
+        config.debug = isDebugEnabled
         config.getAnonymousId = { _ in UUID(uuidString: id) ?? UUID.v7() }
         config.optOut = !isEnabled
         config.captureScreenViews = false // Track manually

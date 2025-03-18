@@ -29,7 +29,7 @@ public struct AnalyticsConfiguration: Sendable, Codable, Hashable {
 public extension AnalyticsConfiguration {
     static let debug = AnalyticsConfiguration(
         isAnalyticsEnabled: false,
-        isAnalyticsDebugEnabled: false,
+        isAnalyticsDebugEnabled: true,
         isCrashlyticsEnabled: false,
         isCrashlyticsDebugEnabled: true
     )
