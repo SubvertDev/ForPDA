@@ -83,9 +83,15 @@ public struct BBBuilder {
                             logger.info("Next node is not textable")
                             trimTrailing = true
                         }
-                        if case let .attachment(attribute) = nodes[index + 1], isFileAttachment(attribute: attribute) {
-                            logger.info("Next node is file attachment")
-                            trimTrailing = false
+                        
+                        if case let .attachment(attribute) = nodes[index + 1] {
+                            if let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst()),
+                               let attachmentIndex = attachments.firstIndex(where: { $0.id == attachmentId }),
+                               attachments[attachmentIndex].type == .file {
+                                // TODO: Simplify
+                                logger.info("Next node is file attachment")
+                                trimTrailing = false
+                            }
                         } else if nodes[index + 1].isMedia {
                             logger.info("Next node is media")
                             trimTrailing = false
@@ -418,12 +424,6 @@ public struct BBBuilder {
         default:
             fatalError("НЕИЗВЕСТНЫЙ ТЕКСТОВЫЙ ТЕГ")
         }
-    }
-    
-    private func isFileAttachment(attribute: NSAttributedString) -> Bool {
-        let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst())!
-        let attachmentType = attachments[attachments.firstIndex(where: { $0.id == attachmentId })!].type
-        return attachmentType == .file
     }
 }
 
