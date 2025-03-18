@@ -23,6 +23,7 @@ public struct AnalyticsClient: Sendable {
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
     public var capture: @Sendable (any Error) -> Void
+    public var reportFullyDisplayed: @Sendable () -> Void
 }
 
 // MARK: - Dependency Keys
@@ -63,6 +64,10 @@ extension AnalyticsClient: DependencyKey {
             capture: { error in
                 logger.error("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
+            },
+            reportFullyDisplayed: {
+                logger.info("Did report fully displayed")
+                SentrySDK.reportFullyDisplayed()
             }
         )
     }
@@ -80,7 +85,8 @@ extension AnalyticsClient: DependencyKey {
         },
         capture: { error in
             print("[Sentry] \(error)")
-        }
+        },
+        reportFullyDisplayed: { }
     )
     
     public static let testValue = Self(
@@ -88,7 +94,8 @@ extension AnalyticsClient: DependencyKey {
         identify: { _ in },
         logout: { },
         log: { _ in },
-        capture: { _ in }
+        capture: { _ in },
+        reportFullyDisplayed: { }
     )
 }
 
@@ -158,7 +165,8 @@ extension AnalyticsClient {
             options.enablePreWarmedAppStartTracing = true
             options.enableCoreDataTracing = false // I don't have CoreData
             options.enableUserInteractionTracing = false // Doesn't work with SwiftUI
-            options.enableUIViewControllerTracing = false // I dont' have UIViewControllers
+            options.enableUIViewControllerTracing = false // I don't have UIViewControllers
+            options.enableTimeToFullDisplayTracing = true
             options.tracePropagationTargets = ["4pda"] // Dismiss analytics requests
             options.swiftAsyncStacktraces = true
             options.attachScreenshot = true
