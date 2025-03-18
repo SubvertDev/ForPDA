@@ -1,4 +1,6 @@
 import UIKit
+import ComposableArchitecture
+import AnalyticsClient
 
 public enum BBNode {
     // Style nodes
@@ -65,9 +67,24 @@ public extension BBNode {
         case .background: self = .background(attribute!, children)
         case .font:  self = .font(attribute!, children)
         case .url:
-            let urlString = attribute?.replacingOccurrences(of: "\"", with: "") ?? "4pda.to"
+            // TODO: Fix after Sentry investingation
+            let defaultUrl = URL(string: "https://4pda.to")!
+            let urlString = attribute?.replacingOccurrences(of: "\"", with: "") ?? "https://4pda.to"
             // URL with url attribute are broken in quotes, so you need percentEncoding to make it fail instead of crash
-            let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
+            guard let string = urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+                @Dependency(\.analyticsClient) var analytics
+                let error = NSError(domain: "BBNode", code: 10001, userInfo: ["urlString": urlString, "attribute": attribute ?? "nil"])
+                analytics.capture(error)
+                self = .url(defaultUrl, children)
+                return
+            }
+            guard let url = URL(string: string) else {
+                @Dependency(\.analyticsClient) var analytics
+                let error = NSError(domain: "BBNode", code: 10002, userInfo: ["string": string, "urlString": urlString, "attribute": attribute ?? "nil"])
+                analytics.capture(error)
+                self = .url(defaultUrl, children)
+                return
+            }
             self = .url(url, children) // TODO: Make proper url handling
         case .anchor: self = .anchor(children)
         case .offtop: self = .offtop(children)

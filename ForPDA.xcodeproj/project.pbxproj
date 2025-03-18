@@ -113,6 +113,7 @@
 		22FBF72740165D435DACB50F /* TuistFonts+FavoritesRootFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03D0A9BB3AE9CC3273BDDD1 /* TuistFonts+FavoritesRootFeature.swift */; };
 		22FCEBD318595269B7618E5F /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		2300F34C391CED5CC3155F33 /* QMSFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2957781ACE16763055F2270D /* QMSFeature.framework */; };
+		23EFDCC7877522AD25273585 /* PostHog_PostHog.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */; };
 		23F77ACB9F13A5AFDFD8931C /* ProfileFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF7965094A569BFF0A23B5EB /* ProfileFeature+Analytics.swift */; };
 		244256DD10810C4BB513CB11 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
 		24580F46E7E73552188ED3F3 /* TuistFonts+PersistenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED9802583D0BAD916554C9D /* TuistFonts+PersistenceKeys.swift */; };
@@ -311,6 +312,7 @@
 		62AEEC5CCF2A3F834D179F3B /* SettingsFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		631F43ECC180BD485C9B5F2B /* TopicNodeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCAB9B30C3A3301190B52089 /* TopicNodeBuilder.swift */; };
 		6353B86288B646502F05E866 /* CacheClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F16F6182018414637FA98B0 /* CacheClient.swift */; };
+		635538EFA1565522E9BAF340 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		635A14237A9C3A6D71E63BE2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 09902809473B6781B1636B1E /* Localizable.xcstrings */; };
 		638A82C0AC8B9E0A1A9DAD77 /* TuistAssets+PageNavigationFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CD7FA87091DE4F23D6D8B /* TuistAssets+PageNavigationFeature.swift */; };
 		63C62CDB01B3EBDAD7F238C9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
@@ -790,6 +792,7 @@
 		F91F7E5E14E4093F6F93AE1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		F9F366404EBE60D927A8E24E /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8BA4B322ED755E0A0FF512 /* AppFeatureTests.swift */; };
 		FA66FD0AFA0FF01E8255B4F4 /* TuistFonts+TopicFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C02613738D6A66349E8A38F /* TuistFonts+TopicFeature.swift */; };
+		FA6C22E62ED6B3D885B0227F /* PostHog_PostHog.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */; };
 		FA757DFE23EA4DA4EB762B1E /* LoggerClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */; };
 		FA91355C64C3E1EB8CFC6E88 /* ZMarkupParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AEB911569EF2ADB3A62F0DAA /* ZMarkupParser.framework */; };
 		FA942E4385A46C7C8F32234A /* OrderedCollections.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544FE74CB2AC3ECA49CEA0A1 /* OrderedCollections.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1151,6 +1154,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 836ED6BED097C45734C6DDA6;
 			remoteInfo = PersistenceKeys;
+		};
+		4C4596084B734954834BB5D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 54C511041B0BAC1254A1E96E;
+			remoteInfo = AnalyticsClient;
 		};
 		4CA57D0859D1DDF23189AEB3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2346,6 +2356,7 @@
 			buildActionMask = 8;
 			dstSubfolderSpec = 16;
 			files = (
+				FA6C22E62ED6B3D885B0227F /* PostHog_PostHog.bundle in Dependencies */,
 				4084CF3F5A0FE435DA529CB8 /* SwiftyGif_SwiftyGif.bundle in Dependencies */,
 				DD7DDC1DACDB5924B2F30015 /* swift-sharing_Sharing.bundle in Dependencies */,
 			);
@@ -3159,6 +3170,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				635538EFA1565522E9BAF340 /* AnalyticsClient.framework in Frameworks */,
 				3DF11589489A4A470715F295 /* ComposableArchitecture.framework in Frameworks */,
 				97B98FD35923FAB19D11201B /* LoggerClient.framework in Frameworks */,
 				F13DDD946843BB2B6B865C91 /* Models.framework in Frameworks */,
@@ -5035,6 +5047,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EC5AC0AB409AD6ABBB183E24 /* PBXTargetDependency */,
 				75E17571944CCF2D8500174E /* PBXTargetDependency */,
 				DC1AC775C9526C79D63535EC /* PBXTargetDependency */,
 				FE08C8A7DE9F53CB74909D04 /* PBXTargetDependency */,
@@ -6041,6 +6054,7 @@
 				710C7EEF50D8ED45E48FF207 /* fontello.ttf in Resources */,
 				2125F11DEAD5B5E2DF99DF8A /* LaunchScreen.storyboard in Resources */,
 				BC92DC56A472AAFCCF5C7CB7 /* Preview Assets.xcassets in Resources */,
+				23EFDCC7877522AD25273585 /* PostHog_PostHog.bundle in Resources */,
 				4907E25377965F6005C6C43B /* SwiftyGif_SwiftyGif.bundle in Resources */,
 				3A3903C9442AF45ED68EC7C6 /* swift-sharing_Sharing.bundle in Resources */,
 			);
@@ -7936,6 +7950,12 @@
 			target = 6C9171FD428EA36E888C2959 /* PageNavigationFeature */;
 			targetProxy = 17AAADC38242BBF64BE2548A /* PBXContainerItemProxy */;
 		};
+		EC5AC0AB409AD6ABBB183E24 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AnalyticsClient;
+			target = 54C511041B0BAC1254A1E96E /* AnalyticsClient */;
+			targetProxy = 4C4596084B734954834BB5D0 /* PBXContainerItemProxy */;
+		};
 		F00CE6886CD95EBD0A2383DE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = BBBuilder;
@@ -9154,6 +9174,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9169,6 +9190,7 @@
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
@@ -9176,6 +9198,8 @@
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -9781,6 +9805,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9795,6 +9820,7 @@
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
@@ -9802,6 +9828,8 @@
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -10220,6 +10248,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10234,6 +10263,7 @@
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
@@ -10241,6 +10271,8 @@
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -12716,6 +12748,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12731,6 +12764,7 @@
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
@@ -12738,6 +12772,8 @@
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",

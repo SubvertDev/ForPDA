@@ -503,6 +503,7 @@ let project = Project(
                 dependencies: [
                     .Internal.SharedUI,
                     .Internal.Models,
+                    .Internal.AnalyticsClient,
                     .Internal.LoggerClient,
                     .SPM.TCA
                 ]
