@@ -1,5 +1,5 @@
-- name: Notify the commit on Telegram
-  uses: EverythingSuckz/github-telegram-notify@main
+            - name: Github Telegram Notifier
+  uses: EverythingSuckz/github-telegram-notify@v1.1.2
   with:
     bot_token: '${{ secrets.TG_BOT_TOKEN }}'
     chat_id: '${{ secrets.TG_CHAT_ID }}'
