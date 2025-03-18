@@ -3,25 +3,10 @@ name: Github Telegram Notifier
 on:
   push:
     branches:
-      - '**'  # Triggers on any branch
+      - '**'
   pull_request:
     branches:
-      - '**'  # Triggers on any branch
-  issues:
-    types: [opened, edited, deleted]
-  issue_comment:
-    types: [created, edited, deleted]
-  pull_request_review:
-    types: [submitted, edited, dismissed]
-  pull_request_review_comment:
-    types: [created, edited, deleted]
-  create:  # Triggers when a branch or tag is created
-  delete:  # Triggers when a branch or tag is deleted
-  release:
-    types: [published, edited, deleted]
-  fork:  # Triggers when the repository is forked
-  watch:  # Triggers when someone stars the repository
-  workflow_dispatch:  # Allows manual trigger from GitHub Actions UI
+      - '**'
 
 jobs:
   notify:
