@@ -29,8 +29,8 @@ public struct CacheClient: Sendable {
     public var getUser: @Sendable (_ id: Int) async -> User?
     
     // Favorites
-    public var setFavorites: @Sendable ([FavoriteInfo]) async -> Void
-    public var getFavorites: @Sendable () async -> [FavoriteInfo]?
+    public var setFavorites: @Sendable (Favorite) async -> Void
+    public var getFavorites: @Sendable () async -> Favorite?
     
     // Forums List
     public var setForumsList: @Sendable ([ForumInfo]) async -> Void
@@ -200,12 +200,12 @@ private extension CacheClient {
     }
     
     private static var favoritesKey: String { "favoritesKey" }
-    private static var favoritesStorage: Storage<String, [FavoriteInfo]> {
+    private static var favoritesStorage: Storage<String, Favorite> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: [FavoriteInfo].self)
+            transformer: TransformerFactory.forCodable(ofType: Favorite.self)
         )
     }
     

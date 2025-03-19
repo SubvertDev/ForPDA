@@ -158,7 +158,7 @@ platform :ios do
         )
         
         version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
-        build = sh("git rev-list --all --count").chomp.strip
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
         
         telegram(
             token: ENV['TG_BOT_TOKEN'],

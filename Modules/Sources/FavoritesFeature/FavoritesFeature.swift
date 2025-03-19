@@ -73,7 +73,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case sort(PresentationAction<SortFeature.Action>)
         
-        case _favoritesResponse(Result<[FavoriteInfo], any Error>)
+        case _favoritesResponse(Result<Favorite, any Error>)
         case _loadFavorites(offset: Int)
         case _startUnreadLoadingIndicator(id: Int)
         case _jumpRequestFailed
@@ -105,6 +105,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .onAppear:
                 guard state.favorites.isEmpty && state.favoritesImportant.isEmpty else { return .none }
                 return .merge([
+                    updatePageNavigation(&state, offset: 0),
                     .send(._loadFavorites(offset: 0)),
                     .run { send in
                         for await _ in notificationCenter.observe(.favoritesUpdated) {
@@ -245,7 +246,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 var favsImportant: [FavoriteInfo] = []
                 var favorites: [FavoriteInfo] = []
 
-                for favorite in response {
+                for favorite in response.favorites {
                     if favorite.isImportant {
                         favsImportant.append(favorite)
                     } else {
@@ -257,14 +258,14 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.favorites = favorites
                 
                 // TODO: Is it ok?
-                state.pageNavigation.count = response.count
+//                state.pageNavigation.count = response.count
                 
                 state.isLoading = false
                 state.isRefreshing = false
                 
                 reportFullyDisplayed(&state)
                 
-                return .none
+                return updatePageNavigation(&state, count: response.favoritesCount)
                 
             case let ._favoritesResponse(.failure(error)):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
@@ -286,10 +287,24 @@ public struct FavoritesFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - Shared logic
+    
     private func reportFullyDisplayed(_ state: inout State) {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()
         state.didLoadOnce = true
+    }
+    
+    private func updatePageNavigation(_ state: inout State, count: Int = 0, offset: Int? = nil) -> Effect<Action> {
+        return PageNavigationFeature()
+            .reduce(
+                into: &state.pageNavigation,
+                action: .update(
+                    count: count,
+                    offset: offset
+                )
+            )
+            .map(Action.pageNavigation)
     }
     
     private func goToEnd(id: Int) -> Effect<Action> {
