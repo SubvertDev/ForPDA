@@ -10,6 +10,7 @@ import ComposableArchitecture
 import PageNavigationFeature
 import APIClient
 import Models
+import AnalyticsClient
 
 @Reducer
 public struct HistoryFeature: Sendable {
@@ -23,10 +24,11 @@ public struct HistoryFeature: Sendable {
         @Shared(.appSettings) var appSettings: AppSettings
         
         public var history: [HistoryRow] = []
-        
         public var isLoading = false
         
         public var pageNavigation = PageNavigationFeature.State(type: .history)
+        
+        var didLoadOnce = false
         
         public init(
             history: [HistoryRow] = []
@@ -51,6 +53,7 @@ public struct HistoryFeature: Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - Body
     
@@ -112,14 +115,23 @@ public struct HistoryFeature: Sendable {
                 state.pageNavigation.count = response.historiesCount
                 
                 state.isLoading = false
-                
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._historyResponse(.failure(error)):
                 // TODO: Handle error
                 print(error)
+                reportFullyDisplayed(&state)
                 return .none
             }
         }
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }

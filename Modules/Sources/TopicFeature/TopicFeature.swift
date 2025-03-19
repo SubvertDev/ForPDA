@@ -15,6 +15,7 @@ import ParsingClient
 import PasteboardClient
 import NotificationCenterClient
 import TCAExtensions
+import AnalyticsClient
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -39,6 +40,8 @@ public struct TopicFeature: Reducer, Sendable {
         var isLoadingTopic = true
         
         var pageNavigation = PageNavigationFeature.State(type: .topic)
+        
+        var didLoadOnce = false
         
         public var isUserAuthorized: Bool {
             return userSession != nil
@@ -82,6 +85,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.logger) var logger
@@ -202,6 +206,7 @@ public struct TopicFeature: Reducer, Sendable {
             case let ._loadTypes(types):
                 state.types = types
                 state.isLoadingTopic = false
+                reportFullyDisplayed(&state)
                 return .none
 //                return PageNavigationFeature()
 //                    .reduce(into: &state.pageNavigation, action: .nextPageTapped)
@@ -209,6 +214,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let ._topicResponse(.failure(error)):
                 print("TOPIC RESPONSE FAILURE: \(error)")
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._setFavoriteResponse(isFavorite):
@@ -219,7 +225,13 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    // MARK: - Shared logic
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
+    }
     
     private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
         return PageNavigationFeature()

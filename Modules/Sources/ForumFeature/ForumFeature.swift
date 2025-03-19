@@ -13,6 +13,7 @@ import Models
 import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
+import AnalyticsClient
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -41,6 +42,8 @@ public struct ForumFeature: Reducer, Sendable {
         public var isUserAuthorized: Bool {
             return userSession != nil
         }
+        
+        var didLoadOnce = false
         
         public init(
             forumId: Int,
@@ -75,6 +78,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     
     // MARK: - Body
@@ -208,13 +212,22 @@ public struct ForumFeature: Reducer, Sendable {
                 
                 state.isLoadingTopics = false
                 state.isRefreshing = false
-                
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._forumResponse(.failure(error)):
                 print(error)
+                reportFullyDisplayed(&state)
                 return .none
             }
         }
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
