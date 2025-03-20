@@ -305,7 +305,9 @@ public struct BBBuilder {
         switch node {
         case .text(let text):
             let mutableString = NSMutableAttributedString(
-                attributedString: text.trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                attributedString: text
+                    .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                    .replacingSquareBrackets()
             )
             if isAttachmentDelimeter {
                 if mutableString.string.prefix(1) == " " {
@@ -471,6 +473,31 @@ extension NSAttributedString {
         }
 
         return mutableAttributedString
+    }
+    
+    // TODO: Revisit performance-wise
+    func replacingSquareBrackets() -> NSAttributedString {
+        let mutableCopy = NSMutableAttributedString(attributedString: self)
+        
+        var searchRange = NSRange(location: 0, length: mutableCopy.length)
+        
+        while let foundRange = mutableCopy.string.range(of: "&#91;", options: [], range: Range(searchRange, in: mutableCopy.string)) {
+            let nsRange = NSRange(foundRange, in: mutableCopy.string)
+            mutableCopy.replaceCharacters(in: nsRange, with: "[")
+            
+            let newLocation = nsRange.location + ("[" as NSString).length
+            searchRange = NSRange(location: newLocation, length: mutableCopy.length - newLocation)
+        }
+        
+        while let foundRange = mutableCopy.string.range(of: "&#93;", options: [], range: Range(searchRange, in: mutableCopy.string)) {
+            let nsRange = NSRange(foundRange, in: mutableCopy.string)
+            mutableCopy.replaceCharacters(in: nsRange, with: "]")
+            
+            let newLocation = nsRange.location + ("]" as NSString).length
+            searchRange = NSRange(location: newLocation, length: mutableCopy.length - newLocation)
+        }
+        
+        return mutableCopy
     }
 }
 
