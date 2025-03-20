@@ -23,6 +23,7 @@ public struct PageNavigation: View {
     
     public init(store: StoreOf<PageNavigationFeature>) {
         self.store = store
+        self.isFocused = store.isFocused
     }
     
     // MARK: - Body
@@ -122,7 +123,7 @@ public struct PageNavigation: View {
                                 Spacer()
                                 
                                 Button("Готово") {
-                                    isFocused = false
+                                    store.send(.setFocus(focusState: false))
                                     store.send(.doneButtonTapped)
                                 }
                             }
@@ -132,9 +133,12 @@ public struct PageNavigation: View {
                 Text("/  \(store.totalPages)")
                     .font(.system(size: 17))
                     .onTapGesture {
-                        isFocused = true
+                        store.send(.setFocus(focusState: true))
                     }
             }
+        }
+        .onChange(of: store.isFocused) { newValue in
+            isFocused = newValue
         }
         .listRowSeparator(.hidden)
         .animation(.default, value: store.currentPage)

@@ -32,6 +32,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         public var count: Int = 0
         public var offset: Int = 0
         var perPage: Int
+        public var isFocused: Bool = false
         public var shouldShow: Bool {
             return count > perPage
         }
@@ -70,6 +71,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case doneButtonTapped
         case updateWidth(geometry: GeometryProxy)
         case updatePageText(value: String)
+        case setFocus(focusState: Bool)
         
         case update(count: Int, offset: Int?)
         case offsetChanged(to: Int)
@@ -92,6 +94,10 @@ public struct PageNavigationFeature: Reducer, Sendable {
                     state.offset = (currentPage - 1) * state.perPage
                 }
                 
+                
+            case .setFocus(let focusState):
+                state.isFocused = focusState
+                return .none
                 
             case .updateWidth(let geometry):
                 let newWidth = max(30, geometry.size.width + 15)

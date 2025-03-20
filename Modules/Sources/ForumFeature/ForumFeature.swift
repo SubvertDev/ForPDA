@@ -61,6 +61,7 @@ public struct ForumFeature: Reducer, Sendable {
         case subforumRedirectTapped(URL)
         case subforumTapped(id: Int, name: String)
         case announcementTapped(id: Int, name: String)
+        case hideKeyboard
         
         case contextOptionMenu(ForumOptionContextMenuAction)
         case contextTopicMenu(ForumTopicContextMenuAction, Int)
@@ -130,6 +131,9 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .subforumRedirectTapped:
                 return .none
+                
+            case .hideKeyboard:
+                return .send(.pageNavigation(.setFocus(focusState: false)))
                 
             case .contextOptionMenu(let action):
                 switch action {
