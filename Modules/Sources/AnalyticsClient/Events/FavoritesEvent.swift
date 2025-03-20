@@ -21,7 +21,7 @@ public enum FavoritesEvent: Event {
     case delete(Int)
     
     case goToEnd(Int)
-    case notify(Int, String)
+    case notify(Int, Int, String)
     case notifyHatUpdate(Int)
     
     case sortDismissed
@@ -64,8 +64,8 @@ public enum FavoritesEvent: Event {
         case let .goToEnd(id):
             return ["id": String(id)]
             
-        case let .notify(id, type):
-            return ["id": String(id), "type": type]
+        case let .notify(id, flag, type):
+            return ["id": String(id), "flag": String(flag), "type": type]
             
         case let .notifyHatUpdate(id):
             return ["id": String(id)]

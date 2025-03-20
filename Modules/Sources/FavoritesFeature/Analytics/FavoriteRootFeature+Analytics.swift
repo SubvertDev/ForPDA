@@ -57,7 +57,7 @@ extension FavoritesFeature {
                     case .goToEnd:
                         analytics.log(FavoritesEvent.goToEnd(id))
                     case let .notify(flag, notify):
-                        analytics.log(FavoritesEvent.notify(id, notify.rawValue))
+                        analytics.log(FavoritesEvent.notify(id, flag, notify.rawValue))
                     case let .notifyHatUpdate(flag):
                         analytics.log(FavoritesEvent.notifyHatUpdate(flag))
                     }
