@@ -285,6 +285,8 @@ public struct FavoritesFeature: Reducer, Sendable {
         .ifLet(\.$sort, action: \.sort) {
             SortFeature()
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared logic
