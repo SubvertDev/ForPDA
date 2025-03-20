@@ -189,7 +189,7 @@ public struct FavoritesScreen: View {
         Section {
             Navigation(isShown: !important)
             
-            ForEach(favorites, id: \.hashValue) { favorite in
+            ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
                 Row(
                     id: favorite.topic.id,
                     title: favorite.topic.name,
@@ -221,6 +221,13 @@ public struct FavoritesScreen: View {
                         CommonContextMenu(favorite: favorite)
                     }
                 }
+                .listRowBackground(
+                    Color(.Background.teritary)
+                        .clipShape(.rect(
+                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == favorites.count - 1 ? 10 : 0,
+                            bottomTrailingRadius: index == favorites.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
+                        ))
+                )
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
