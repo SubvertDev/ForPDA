@@ -161,6 +161,7 @@ extension AnalyticsClient {
             options.enableAppLaunchProfiling = true
             options.enableMetricKit = true
             options.enableAppHangTrackingV2 = true
+            options.enableReportNonFullyBlockingAppHangs = false // False positives
             options.enablePerformanceV2 = true
             options.enablePreWarmedAppStartTracing = true
             options.enableCoreDataTracing = false // I don't have CoreData

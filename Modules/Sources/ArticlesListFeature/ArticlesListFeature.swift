@@ -186,6 +186,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
         Analytics()
     }
     
+    // MARK: - Shared Logic
+    
     private func reportFullyDisplayed(_ state: inout State) {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()

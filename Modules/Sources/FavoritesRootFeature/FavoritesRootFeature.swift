@@ -14,8 +14,17 @@ public struct FavoritesRootFeature: Reducer {
     
     public init() {}
     
+    enum PickerSelection: Int {
+        case favorites = 1
+        case bookmarks = 2
+    }
+    
+    // MARK: - State
+    
     @ObservableState
     public struct State: Equatable {
+        var pickerSelection: PickerSelection = .favorites
+        
         var favorites: FavoritesFeature.State
         var bookmarks: BookmarksFeature.State
         
@@ -28,7 +37,11 @@ public struct FavoritesRootFeature: Reducer {
         }
     }
     
-    public enum Action: ViewAction {
+    // MARK: - Action
+    
+    public enum Action: BindableAction, ViewAction {
+        case binding(BindingAction<State>)
+        
         case favorites(FavoritesFeature.Action)
         case bookmarks(BookmarksFeature.Action)
         
@@ -43,7 +56,11 @@ public struct FavoritesRootFeature: Reducer {
         }
     }
     
+    // MARK: - Body
+    
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Scope(state: \.favorites, action: \.favorites) {
             FavoritesFeature()
         }
@@ -54,15 +71,14 @@ public struct FavoritesRootFeature: Reducer {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .favorites, .bookmarks:
+            case .favorites, .bookmarks, .delegate, .binding:
                 return .none
                 
             case .view(.settingsButtonTapped):
                 return .send(.delegate(.openSettings))
-                
-            case .delegate:
-                return .none
             }
         }
+        
+        Analytics()
     }
 }

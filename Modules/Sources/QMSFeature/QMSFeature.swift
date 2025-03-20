@@ -11,6 +11,7 @@ import APIClient
 import PersistenceKeys
 import Models
 import ExyteChat
+import AnalyticsClient
 
 @Reducer
 public struct QMSFeature: Reducer, Sendable {
@@ -25,6 +26,8 @@ public struct QMSFeature: Reducer, Sendable {
         public let chatId: Int
         public var chat: QMSChat?
         public var messages: [Message] = []
+        
+        var didLoadOnce = false
         
         public var title: String {
             if let chat {
@@ -57,6 +60,7 @@ public struct QMSFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.continuousClock) private var clock
     
     // MARK: - Cancellable
@@ -125,11 +129,20 @@ public struct QMSFeature: Reducer, Sendable {
                     print(error)
                     // TODO: Handle error
                 }
+                reportFullyDisplayed(&state)
                 return .none
                 
             case .binding:
                 return .none
             }
         }
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }

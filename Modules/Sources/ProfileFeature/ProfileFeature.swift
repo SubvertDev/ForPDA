@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import PersistenceKeys
 import Models
+import AnalyticsClient
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -29,6 +30,8 @@ public struct ProfileFeature: Reducer, Sendable {
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
         }
+        
+        var didLoadOnce = false
         
         public init(
             alert: AlertState<Action.Alert>? = nil,
@@ -65,6 +68,7 @@ public struct ProfileFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.dismiss) private var dismiss
     
     // MARK: - Body
@@ -101,15 +105,25 @@ public struct ProfileFeature: Reducer, Sendable {
             case ._userResponse(.success(let user)):
                 state.isLoading = false
                 state.user = user
+                reportFullyDisplayed(&state)
                 return .none
                 
             case ._userResponse(.failure(let error)):
                 state.isLoading = false
                 print(error, #line)
+                reportFullyDisplayed(&state)
                 return .none
             }
         }
         
         Analytics()
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
