@@ -138,6 +138,7 @@ public struct ForumFeature: Reducer, Sendable {
             case .contextOptionMenu(let action):
                 switch action {
                 // TODO: sort, to bookmarks
+                    // TODO: Add analytics
                 default: return .none
                 }
                 
@@ -221,6 +222,8 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic
