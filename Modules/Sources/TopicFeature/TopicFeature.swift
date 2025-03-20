@@ -223,6 +223,8 @@ public struct TopicFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic
