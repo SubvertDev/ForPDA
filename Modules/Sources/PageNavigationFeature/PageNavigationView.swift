@@ -10,12 +10,14 @@ import ComposableArchitecture
 import SFSafeSymbols
 import Models
 import SharedUI
+import Perception
 
 public struct PageNavigation: View {
     
     // MARK: - Properties
     
-    public var store: StoreOf<PageNavigationFeature>
+    @Perception.Bindable public var store: StoreOf<PageNavigationFeature>
+    @FocusState var isFocused: Bool
     
     // MARK: - Init
     
@@ -71,16 +73,68 @@ public struct PageNavigation: View {
             .disabled(store.currentPage + 1 > store.totalPages)
         }
         .overlay {
-            Text(String("\(store.currentPage) / \(store.totalPages)"))
-                .font(.subheadline)
-                .foregroundStyle(Color(.Labels.secondary))
-                .padding(.vertical, 6)
-                .padding(.horizontal, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .foregroundStyle(Color(.Background.teritary))
-                )
-                .contentTransition(.numericText())
+            //            Button {
+            //                print("tapped page nav")
+            //            } label: {
+            //                Text(String("\(store.currentPage) / \(store.totalPages)"))
+            //                    .font(.subheadline)
+            //                    .foregroundStyle(Color(.Labels.secondary))
+            //                    .padding(.vertical, 6)
+            //                    .padding(.horizontal, 12)
+            //                    .background(
+            //                        RoundedRectangle(cornerRadius: 8)
+            //                            .foregroundStyle(Color(.Background.teritary))
+            //                    )
+            //                    .contentTransition(.numericText())
+            //            }
+            HStack {
+                ZStack {
+                    Text("\(store.currentPage)")
+                        .font(.system(size: 17))
+                        .background(GeometryReader { geometry in
+                            Color.clear
+                                .onAppear {
+                                    store.send(.updateWidth(geometry: geometry))
+                                }
+                                .onChange(of: store.pageText) { _ in
+                                    store.send(.updateWidth(geometry: geometry))
+                                }
+                        })
+                        .hidden()
+                    
+                    TextField("", text: $store.pageText)
+                        .frame(width: store.textWidth, alignment: .leading)
+                        .focused($isFocused)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .animation(.easeInOut(duration: 0.2), value: store.textWidth)
+                        .onChange(of: store.pageText) { newValue in
+                            let filtered = newValue.filter { $0.isNumber }
+                            if let intValue = Int(filtered), intValue > store.totalPages {
+                                store.send(.updatePageText(value: "\(store.totalPages)"))
+                            }
+                            else {
+                                store.send(.updatePageText(value: filtered))
+                            }
+                        }
+                        .toolbar {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                
+                                Button("Готово") {
+                                    isFocused = false
+                                    store.send(.doneButtonTapped)
+                                }
+                            }
+                        }
+                }
+                
+                Text("/  \(store.totalPages)")
+                    .font(.system(size: 17))
+                    .onTapGesture {
+                        isFocused = true
+                    }
+            }
         }
         .listRowSeparator(.hidden)
         .animation(.default, value: store.currentPage)

@@ -27,6 +27,8 @@ public struct PageNavigationFeature: Reducer, Sendable {
         @Shared(.appSettings) var appSettings: AppSettings
         
         let type: PageNavigationType
+        public var pageText: String = "1"
+        public var textWidth: CGFloat = 30
         public var count: Int = 0
         public var offset: Int = 0
         var perPage: Int
@@ -59,27 +61,60 @@ public struct PageNavigationFeature: Reducer, Sendable {
         }
     }
     
-    public enum Action {
+    public enum Action: BindableAction {
+        case binding(BindingAction<State>)
         case firstPageTapped
         case previousPageTapped
         case nextPageTapped
         case lastPageTapped
+        case doneButtonTapped
+        case updateWidth(geometry: GeometryProxy)
+        case updatePageText(value: String)
         
         case update(count: Int, offset: Int?)
         case offsetChanged(to: Int)
     }
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce<State, Action> { state, action in
             switch action {
+            case .binding:
+                return .none
+                
+            case .doneButtonTapped:
+                if state.pageText.isEmpty {
+                    state.offset = 0
+                    state.pageText = "1"
+                } else {
+                    let currentPage = Int(state.pageText) ?? 1
+                    state.offset = (currentPage - 1) * state.perPage
+                }
+                
+                
+            case .updateWidth(let geometry):
+                let newWidth = max(30, geometry.size.width + 15)
+                if newWidth != state.textWidth {
+                    state.textWidth = newWidth
+                }
+                return .none
+                
+            case .updatePageText(let newValue):
+                state.pageText = newValue
+                return .none
+                
             case .firstPageTapped:
                 state.offset = 0
+                state.pageText = "1"
                 
             case .previousPageTapped:
                 state.offset -= state.perPage
+                state.pageText = "\(state.currentPage)"
                 
             case .nextPageTapped:
                 state.offset += state.perPage
+                state.pageText = "\(state.currentPage)"
                 
             case .lastPageTapped:
                 let targetOffset = state.count - (state.count % state.perPage)
@@ -88,6 +123,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 } else {
                     state.offset = targetOffset
                 }
+                state.pageText = "\(state.currentPage)"
                 
             case let .update(count: count, offset: offset):
                 state.count = count
