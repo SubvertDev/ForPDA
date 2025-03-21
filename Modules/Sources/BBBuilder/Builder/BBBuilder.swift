@@ -307,7 +307,8 @@ public struct BBBuilder {
             let mutableString = NSMutableAttributedString(
                 attributedString: text
                     .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
-                    .replacingSquareBrackets()
+                    .replacingOccurrences(of: "&#91;", with: "[")
+                    .replacingOccurrences(of: "&#93;", with: "]")
             )
             if isAttachmentDelimeter {
                 if mutableString.string.prefix(1) == " " {
@@ -476,24 +477,15 @@ extension NSAttributedString {
     }
     
     // TODO: Revisit performance-wise
-    func replacingSquareBrackets() -> NSAttributedString {
+    func replacingOccurrences(of target: String, with replacement: String) -> NSAttributedString {
         let mutableCopy = NSMutableAttributedString(attributedString: self)
-        
         var searchRange = NSRange(location: 0, length: mutableCopy.length)
         
-        while let foundRange = mutableCopy.string.range(of: "&#91;", options: [], range: Range(searchRange, in: mutableCopy.string)) {
+        while let foundRange = mutableCopy.string.range(of: target, options: [], range: Range(searchRange, in: mutableCopy.string)) {
             let nsRange = NSRange(foundRange, in: mutableCopy.string)
-            mutableCopy.replaceCharacters(in: nsRange, with: "[")
+            mutableCopy.replaceCharacters(in: nsRange, with: replacement)
             
-            let newLocation = nsRange.location + ("[" as NSString).length
-            searchRange = NSRange(location: newLocation, length: mutableCopy.length - newLocation)
-        }
-        
-        while let foundRange = mutableCopy.string.range(of: "&#93;", options: [], range: Range(searchRange, in: mutableCopy.string)) {
-            let nsRange = NSRange(foundRange, in: mutableCopy.string)
-            mutableCopy.replaceCharacters(in: nsRange, with: "]")
-            
-            let newLocation = nsRange.location + ("]" as NSString).length
+            let newLocation = nsRange.location + (replacement as NSString).length
             searchRange = NSRange(location: newLocation, length: mutableCopy.length - newLocation)
         }
         
