@@ -113,12 +113,14 @@ public struct BBBuilder {
                     let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
                     if isNextNodeTextable || isNextNodeMedia {
                         logger.info("Next node is textable OR media, unwrapping")
-                        var isAttachmentDelimeneter = false
-                        if case .attachment = nodes[safe: index - 1] { isAttachmentDelimeneter = true }
+                        var isAttachmentDelimeter = false
+                        if case .attachment = nodes[safe: index - 1] {
+                            isAttachmentDelimeter = true
+                        }
                         mergedNodes[mergedNodes.count - 1] = unwrap(
                             node: node,
                             with: mutableText,
-                            isAttachmentDelimeter: isAttachmentDelimeneter,
+                            isAttachmentDelimeter: isAttachmentDelimeter,
                             listType: listType
                         )
                         if listType != nil,
@@ -156,11 +158,15 @@ public struct BBBuilder {
                     mergedNodes.lastOrAppend = unwrap(node: textNode, with: mutableText)
                     continue
                 }
-                let attachmentType = attachments[attachmentIndex].type
-                switch attachmentType {
+                
+                switch attachments[attachmentIndex].type {
                 case .file:
                     logger.info("FILE attachment")
-                    let textNode = unwrap(node: node, with: mutableText)
+                    var isAttachmentDelimeter = false
+                    if case let .text(text) = mergedNodes.last, text.string.last != "\n" {
+                        isAttachmentDelimeter = true
+                    }
+                    let textNode = unwrap(node: node, with: mutableText, isAttachmentDelimeter: isAttachmentDelimeter)
                     if !textNode.isEmptyText {
                         mergedNodes.lastOrAppend = textNode
                     } else {
@@ -169,7 +175,7 @@ public struct BBBuilder {
                     continue
                     
                 case .image:
-                    break
+                    break // TODO: Move image attachment below here
                 }
                 
                 logger.info("IMAGE attachment")
@@ -391,6 +397,10 @@ public struct BBBuilder {
                         .font: UIFont.preferredFont(forBBCodeSize: 1),
                         .foregroundColor: UIColor(resource: .Labels.teritary)
                     ]))
+                }
+                
+                if isAttachmentDelimeter {
+                    mutableString.insert(NSAttributedString(string: "\n"), at: 0)
                 }
                                 
                 attachmentString = mutableString
