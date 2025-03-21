@@ -91,7 +91,8 @@ public struct PageNavigation: View {
             HStack {
                 ZStack {
                     Text("\(store.currentPage)")
-                        .font(.system(size: 17))
+                        .font(.subheadline)
+                        .padding(.leading, 6)
                         .background(GeometryReader { geometry in
                             Color.clear
                                 .onAppear {
@@ -131,7 +132,8 @@ public struct PageNavigation: View {
                 }
                 
                 Text("/  \(store.totalPages)")
-                    .font(.system(size: 17))
+                    .font(.subheadline)
+                    .padding(.trailing, 12)
                     .onTapGesture {
                         store.send(.setFocus(focusState: true))
                     }

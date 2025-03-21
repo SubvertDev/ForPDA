@@ -22,6 +22,8 @@ public struct PageNavigationFeature: Reducer, Sendable {
     
     public init() {}
     
+    //MARK: - State
+    
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
@@ -62,6 +64,8 @@ public struct PageNavigationFeature: Reducer, Sendable {
         }
     }
     
+    //MARK: - Action
+    
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
         case firstPageTapped
@@ -76,6 +80,8 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case update(count: Int, offset: Int?)
         case offsetChanged(to: Int)
     }
+    
+    //MARK: - Body
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -93,7 +99,6 @@ public struct PageNavigationFeature: Reducer, Sendable {
                     let currentPage = Int(state.pageText) ?? 1
                     state.offset = (currentPage - 1) * state.perPage
                 }
-                
                 
             case .setFocus(let focusState):
                 state.isFocused = focusState
