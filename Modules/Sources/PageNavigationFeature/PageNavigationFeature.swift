@@ -26,15 +26,16 @@ public struct PageNavigationFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        public enum Field: Sendable { case page }
+        
         @Shared(.appSettings) var appSettings: AppSettings
         
         let type: PageNavigationType
-        public var pageText: String = "1"
-        public var textWidth: CGFloat = 30
+        public var page: String = "1"
         public var count: Int = 0
         public var offset: Int = 0
         var perPage: Int
-        public var isFocused: Bool = false
+        public var focus: Field?
         public var shouldShow: Bool {
             return count > perPage
         }
@@ -73,9 +74,8 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case nextPageTapped
         case lastPageTapped
         case doneButtonTapped
-        case updateWidth(geometry: GeometryProxy)
-        case updatePageText(value: String)
-        case setFocus(focusState: Bool)
+        case updatePage(newValue: String)
+        case goToPage(newPage: Int)
         
         case update(count: Int, offset: Int?)
         case offsetChanged(to: Int)
@@ -92,40 +92,37 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 return .none
                 
             case .doneButtonTapped:
-                if state.pageText.isEmpty {
-                    state.offset = 0
-                    state.pageText = "1"
+                state.focus = nil
+                let newPage: Int
+                if let currentPage = Int(state.page) {
+                    newPage = currentPage
                 } else {
-                    let currentPage = Int(state.pageText) ?? 1
-                    state.offset = (currentPage - 1) * state.perPage
+                    newPage = 0
+                    state.page = "1"
                 }
-                
-            case .setFocus(let focusState):
-                state.isFocused = focusState
-                return .none
-                
-            case .updateWidth(let geometry):
-                let newWidth = max(30, geometry.size.width + 15)
-                if newWidth != state.textWidth {
-                    state.textWidth = newWidth
+                guard newPage != state.currentPage else {
+                    return .none
                 }
-                return .none
+                return .send(.goToPage(newPage: newPage))
                 
-            case .updatePageText(let newValue):
-                state.pageText = newValue
+            case .goToPage(let newPage):
+                state.offset = (newPage - 1) * state.perPage
+                
+            case .updatePage(let newValue):
+                state.page = newValue
                 return .none
                 
             case .firstPageTapped:
                 state.offset = 0
-                state.pageText = "1"
+                state.page = "1"
                 
             case .previousPageTapped:
                 state.offset -= state.perPage
-                state.pageText = "\(state.currentPage)"
+                state.page = "\(state.currentPage)"
                 
             case .nextPageTapped:
                 state.offset += state.perPage
-                state.pageText = "\(state.currentPage)"
+                state.page = "\(state.currentPage)"
                 
             case .lastPageTapped:
                 let targetOffset = state.count - (state.count % state.perPage)
@@ -134,7 +131,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 } else {
                     state.offset = targetOffset
                 }
-                state.pageText = "\(state.currentPage)"
+                state.page = "\(state.currentPage)"
                 
             case let .update(count: count, offset: offset):
                 state.count = count

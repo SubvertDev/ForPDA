@@ -61,9 +61,6 @@ public struct ForumScreen: View {
             .toolbar {
                 OptionsMenu()
             }
-            .onTapGesture {
-                store.send(.hideKeyboard)
-            }
             .onAppear {
                 store.send(.onAppear)
             }

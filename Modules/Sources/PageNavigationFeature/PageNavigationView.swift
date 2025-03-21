@@ -17,13 +17,12 @@ public struct PageNavigation: View {
     // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<PageNavigationFeature>
-    @FocusState var isFocused: Bool
+    @FocusState private var focus: PageNavigationFeature.State.Field?
     
     // MARK: - Init
     
     public init(store: StoreOf<PageNavigationFeature>) {
         self.store = store
-        self.isFocused = store.isFocused
     }
     
     // MARK: - Body
@@ -74,74 +73,43 @@ public struct PageNavigation: View {
             .disabled(store.currentPage + 1 > store.totalPages)
         }
         .overlay {
-            //            Button {
-            //                print("tapped page nav")
-            //            } label: {
-            //                Text(String("\(store.currentPage) / \(store.totalPages)"))
-            //                    .font(.subheadline)
-            //                    .foregroundStyle(Color(.Labels.secondary))
-            //                    .padding(.vertical, 6)
-            //                    .padding(.horizontal, 12)
-            //                    .background(
-            //                        RoundedRectangle(cornerRadius: 8)
-            //                            .foregroundStyle(Color(.Background.teritary))
-            //                    )
-            //                    .contentTransition(.numericText())
-            //            }
-            HStack {
-                ZStack {
-                    Text("\(store.currentPage)")
-                        .font(.subheadline)
-                        .padding(.leading, 6)
-                        .background(GeometryReader { geometry in
-                            Color.clear
-                                .onAppear {
-                                    store.send(.updateWidth(geometry: geometry))
-                                }
-                                .onChange(of: store.pageText) { _ in
-                                    store.send(.updateWidth(geometry: geometry))
-                                }
-                        })
-                        .hidden()
-                    
-                    TextField("", text: $store.pageText)
-                        .frame(width: store.textWidth, alignment: .leading)
-                        .focused($isFocused)
-                        .keyboardType(.numberPad)
-                        .multilineTextAlignment(.trailing)
-                        .animation(.easeInOut(duration: 0.2), value: store.textWidth)
-                        .onChange(of: store.pageText) { newValue in
-                            let filtered = newValue.filter { $0.isNumber }
-                            if let intValue = Int(filtered), intValue > store.totalPages {
-                                store.send(.updatePageText(value: "\(store.totalPages)"))
-                            }
-                            else {
-                                store.send(.updatePageText(value: filtered))
-                            }
-                        }
-                        .toolbar {
-                            ToolbarItemGroup(placement: .keyboard) {
-                                Spacer()
-                                
-                                Button("Готово") {
-                                    store.send(.setFocus(focusState: false))
-                                    store.send(.doneButtonTapped)
-                                }
-                            }
-                        }
-                }
-                
-                Text("/  \(store.totalPages)")
+            HStack(spacing: 8) {
+                TextField("", text: $store.page)
                     .font(.subheadline)
-                    .padding(.trailing, 12)
-                    .onTapGesture {
-                        store.send(.setFocus(focusState: true))
+                    .fixedSize()
+                    .focused($focus, equals: PageNavigationFeature.State.Field.page)
+                    .keyboardType(.numberPad)
+                    .onChange(of: store.page) { newValue in
+                        let filtered = newValue.filter { $0.isNumber }
+                        if let intValue = Int(filtered), intValue > store.totalPages {
+                            store.send(.updatePage(newValue: "\(store.totalPages)"))
+                        } else { }
                     }
+                    .toolbar {
+                        ToolbarItemGroup(placement: .keyboard) {
+                            Spacer()
+                            
+                            Button("Готово") {
+                                store.send(.doneButtonTapped)
+                            }
+                        }
+                    }
+                
+                Text("/")
+                    .font(.subheadline)
+                
+                Text("\(store.totalPages)")
+                    .font(.subheadline)
             }
+            .padding(.vertical, 6)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .foregroundStyle(Color(.Background.teritary))
+            )
+            .contentTransition(.numericText())
         }
-        .onChange(of: store.isFocused) { newValue in
-            isFocused = newValue
-        }
+        .bind($store.focus, to: $focus)
         .listRowSeparator(.hidden)
         .animation(.default, value: store.currentPage)
         .frame(maxWidth: .infinity, maxHeight: 32)
