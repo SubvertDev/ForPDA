@@ -22,7 +22,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
     
     public init() {}
     
-    //MARK: - State
+    // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
@@ -31,9 +31,9 @@ public struct PageNavigationFeature: Reducer, Sendable {
         @Shared(.appSettings) var appSettings: AppSettings
         
         let type: PageNavigationType
-        public var page: String = "1"
-        public var count: Int = 0
-        public var offset: Int = 0
+        public var page = "1"
+        public var count = 0
+        public var offset = 0
         var perPage: Int
         public var focus: Field?
         public var shouldShow: Bool {
@@ -65,7 +65,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         }
     }
     
-    //MARK: - Action
+    // MARK: - Action
     
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
@@ -81,7 +81,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case offsetChanged(to: Int)
     }
     
-    //MARK: - Body
+    // MARK: - Body
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -115,15 +115,15 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 
             case .firstPageTapped:
                 state.offset = 0
-                state.page = "1"
+                state.page = String(state.currentPage)
                 
             case .previousPageTapped:
                 state.offset -= state.perPage
-                state.page = "\(state.currentPage)"
+                state.page = String(state.currentPage)
                 
             case .nextPageTapped:
                 state.offset += state.perPage
-                state.page = "\(state.currentPage)"
+                state.page = String(state.currentPage)
                 
             case .lastPageTapped:
                 let targetOffset = state.count - (state.count % state.perPage)
@@ -132,7 +132,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 } else {
                     state.offset = targetOffset
                 }
-                state.page = "\(state.currentPage)"
+                state.page = String(state.currentPage)
                 
             case let .update(count: count, offset: offset):
                 state.count = count
@@ -147,6 +147,5 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 await send(.offsetChanged(to: offset))
             }
         }
-//        ._printChanges()
     }
 }

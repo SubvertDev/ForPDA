@@ -122,7 +122,6 @@ public struct PageNavigation: View {
         }
         .bind($store.focus, to: $focus)
         .listRowSeparator(.hidden)
-//        .animation(.default, value: store.currentPage)
     }
     
     // MARK: - Navigation Arrow
