@@ -13,6 +13,7 @@ import APIClient
 import CacheClient
 import PasteboardClient
 import HapticClient
+import AnalyticsClient
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {
@@ -63,6 +64,8 @@ public struct ArticleFeature: Reducer, Sendable {
         
         var refreshRequestFinished = false
         var refreshTimePassed = false
+        
+        var didLoadOnce = false
         
         public init(
             destination: Destination.State? = nil,
@@ -133,6 +136,7 @@ public struct ArticleFeature: Reducer, Sendable {
     @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.hapticClient) var hapticClient
     @Dependency(\.parsingClient) var parsingClient
+    @Dependency(\.analyticsClient) var analyticsClient
     @Dependency(\.pasteboardClient) var pasteboardClient
     @Dependency(\.openURL) var openURL
     @Dependency(\.dismiss) var dismiss
@@ -323,6 +327,7 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._articleResponse(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._commentResponse(.success(type)):
@@ -355,6 +360,7 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._parseArticleElements(.success(let elements)):
                 state.elements = elements
                 state.isLoading = false
+                reportFullyDisplayed(&state)
                 return .run { _ in
                     var urls: [URL] = []
                     for case let .image(image) in elements {
@@ -366,6 +372,7 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._parseArticleElements(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
+                reportFullyDisplayed(&state)
                 return .none
                 
             case ._pollVoteResponse(.success):
@@ -389,7 +396,13 @@ public struct ArticleFeature: Reducer, Sendable {
         Analytics()
     }
     
-    // MARK: - Effects
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
+    }
     
     private func loadingIndicator() -> EffectOf<Self> {
         return .run { send in

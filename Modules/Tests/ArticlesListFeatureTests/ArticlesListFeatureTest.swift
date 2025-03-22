@@ -29,6 +29,7 @@ struct ArticlesListFeatureTest {
             $0.articles = articles
             $0.offset = articles.count
             $0.isLoading = false
+            $0.didLoadOnce = true
         }
     }
     
@@ -48,6 +49,7 @@ struct ArticlesListFeatureTest {
         await store.receive(\._articlesResponse.failure) {
             $0.isLoading = false
             $0.destination = .alert(.failedToConnect)
+            $0.didLoadOnce = true
         }
     }
     
@@ -86,6 +88,7 @@ struct ArticlesListFeatureTest {
             $0.articles = articles
             $0.offset = perPage
             $0.isLoading = false
+            $0.didLoadOnce = true
         }
     }
     
@@ -117,6 +120,7 @@ struct ArticlesListFeatureTest {
             $0.articles = initialArticles + loadedArticles
             $0.offset = perPage + perPage
             $0.isLoading = false
+            $0.didLoadOnce = true
         }
     }
     

@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import APIClient
 import Models
+import AnalyticsClient
 
 @Reducer
 public struct ForumsListFeature: Reducer, Sendable {
@@ -20,6 +21,7 @@ public struct ForumsListFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         public var forums: [ForumRow]?
+        var didLoadOnce = false
         
         public init(
             forums: [ForumRow]? = nil
@@ -42,6 +44,7 @@ public struct ForumsListFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - Body
     
@@ -74,12 +77,22 @@ public struct ForumsListFeature: Reducer, Sendable {
                 }
                 
                 state.forums = rows
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._forumsListResponse(.failure(error)):
                 print(error)
+                reportFullyDisplayed(&state)
                 return .none
             }
         }
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }

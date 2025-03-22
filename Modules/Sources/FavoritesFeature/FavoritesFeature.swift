@@ -13,6 +13,7 @@ import Models
 import TCAExtensions
 import PasteboardClient
 import NotificationCenterClient
+import AnalyticsClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -43,6 +44,8 @@ public struct FavoritesFeature: Reducer, Sendable {
             return userSession != nil
         }
         
+        var didLoadOnce = false
+        
         public init(
             favorites: [FavoriteInfo] = [],
             favoritesImportant: [FavoriteInfo] = []
@@ -70,7 +73,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case sort(PresentationAction<SortFeature.Action>)
         
-        case _favoritesResponse(Result<[FavoriteInfo], any Error>)
+        case _favoritesResponse(Result<Favorite, any Error>)
         case _loadFavorites(offset: Int)
         case _startUnreadLoadingIndicator(id: Int)
         case _jumpRequestFailed
@@ -79,6 +82,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.continuousClock) var clock
@@ -101,6 +105,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .onAppear:
                 guard state.favorites.isEmpty && state.favoritesImportant.isEmpty else { return .none }
                 return .merge([
+                    updatePageNavigation(&state, offset: 0),
                     .send(._loadFavorites(offset: 0)),
                     .run { send in
                         for await _ in notificationCenter.observe(.favoritesUpdated) {
@@ -241,27 +246,30 @@ public struct FavoritesFeature: Reducer, Sendable {
                 var favsImportant: [FavoriteInfo] = []
                 var favorites: [FavoriteInfo] = []
 
-                for favorite in response {
+                for favorite in response.favorites {
                     if favorite.isImportant {
                         favsImportant.append(favorite)
                     } else {
                         favorites.append(favorite)
                     }
                 }
-                
+                                
                 state.favoritesImportant = favsImportant
                 state.favorites = favorites
                 
                 // TODO: Is it ok?
-                state.pageNavigation.count = response.count
+//                state.pageNavigation.count = response.count
                 
                 state.isLoading = false
                 state.isRefreshing = false
                 
-                return .none
+                reportFullyDisplayed(&state)
+                
+                return updatePageNavigation(&state, count: response.favoritesCount)
                 
             case let ._favoritesResponse(.failure(error)):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._startUnreadLoadingIndicator(id: id):
@@ -277,6 +285,28 @@ public struct FavoritesFeature: Reducer, Sendable {
         .ifLet(\.$sort, action: \.sort) {
             SortFeature()
         }
+        
+        Analytics()
+    }
+    
+    // MARK: - Shared logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
+    }
+    
+    private func updatePageNavigation(_ state: inout State, count: Int = 0, offset: Int? = nil) -> Effect<Action> {
+        return PageNavigationFeature()
+            .reduce(
+                into: &state.pageNavigation,
+                action: .update(
+                    count: count,
+                    offset: offset
+                )
+            )
+            .map(Action.pageNavigation)
     }
     
     private func goToEnd(id: Int) -> Effect<Action> {

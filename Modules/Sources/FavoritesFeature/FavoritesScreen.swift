@@ -187,11 +187,9 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
         Section {
-            if !important, store.pageNavigation.shouldShow {
-                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-            }
+            Navigation(isShown: !important)
             
-            ForEach(favorites, id: \.hashValue) { favorite in
+            ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
                 Row(
                     id: favorite.topic.id,
                     title: favorite.topic.name,
@@ -223,12 +221,17 @@ public struct FavoritesScreen: View {
                         CommonContextMenu(favorite: favorite)
                     }
                 }
+                .listRowBackground(
+                    Color(.Background.teritary)
+                        .clipShape(.rect(
+                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == favorites.count - 1 ? 10 : 0,
+                            bottomTrailingRadius: index == favorites.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
+                        ))
+                )
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            if !important, store.pageNavigation.shouldShow {
-                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-            }
+            Navigation(isShown: !important)
         } header: {
             if !favorites.isEmpty {
                 Header(title: important
@@ -237,6 +240,17 @@ public struct FavoritesScreen: View {
             }
         }
         .listRowBackground(Color(.Background.teritary))
+    }
+    
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation(isShown: Bool) -> some View {
+        if isShown, store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                .listRowBackground(Color.clear)
+                .padding(.bottom, 4)
+        }
     }
     
     // MARK: - Row

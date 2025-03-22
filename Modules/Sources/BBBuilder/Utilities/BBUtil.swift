@@ -279,7 +279,9 @@ extension String {
                 if char == ";" {
                     isParsing = false
                     
-                    if buffer.hasPrefix("#") { // Numeric entity
+                    if buffer == "#91" || buffer == "#93" {
+                        result.append(contentsOf: ("&" + buffer + ";").unicodeScalars)
+                    } else if buffer.hasPrefix("#") {
                         buffer.removeFirst()
                         let radix = buffer.hasPrefix("x") || buffer.hasPrefix("X") ? 16 : 10
                         if radix == 16 { buffer.removeFirst() }

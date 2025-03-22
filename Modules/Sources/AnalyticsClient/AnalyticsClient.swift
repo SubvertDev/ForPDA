@@ -23,6 +23,7 @@ public struct AnalyticsClient: Sendable {
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
     public var capture: @Sendable (any Error) -> Void
+    public var reportFullyDisplayed: @Sendable () -> Void
 }
 
 // MARK: - Dependency Keys
@@ -63,6 +64,10 @@ extension AnalyticsClient: DependencyKey {
             capture: { error in
                 logger.error("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
+            },
+            reportFullyDisplayed: {
+                logger.info("Did report fully displayed")
+                SentrySDK.reportFullyDisplayed()
             }
         )
     }
@@ -80,7 +85,8 @@ extension AnalyticsClient: DependencyKey {
         },
         capture: { error in
             print("[Sentry] \(error)")
-        }
+        },
+        reportFullyDisplayed: { }
     )
     
     public static let testValue = Self(
@@ -88,7 +94,8 @@ extension AnalyticsClient: DependencyKey {
         identify: { _ in },
         logout: { },
         log: { _ in },
-        capture: { _ in }
+        capture: { _ in },
+        reportFullyDisplayed: { }
     )
 }
 
@@ -112,7 +119,7 @@ extension AnalyticsClient {
     
     private static func configureAnalytics(id: String, isEnabled: Bool, isDebugEnabled: Bool) {
         let config = PostHogConfig(apiKey: Secrets.get(.POSTHOG_TOKEN), host: "https://eu.i.posthog.com")
-        config.debug = true
+        config.debug = isDebugEnabled
         config.getAnonymousId = { _ in UUID(uuidString: id) ?? UUID.v7() }
         config.optOut = !isEnabled
         config.captureScreenViews = false // Track manually
@@ -151,12 +158,21 @@ extension AnalyticsClient {
             options.dsn = Secrets.get(.SENTRY_DSN)
             options.debug = isDebugEnabled
             options.enabled = isEnabled
-            options.tracesSampleRate = 1.0
-            options.profilesSampleRate = 1.0
-            options.diagnosticLevel = .warning
-            options.attachScreenshot = true
-            options.attachViewHierarchy = true
+            options.enableAppLaunchProfiling = true
+            options.enableMetricKit = true
+            options.enableAppHangTrackingV2 = true
+            options.enableReportNonFullyBlockingAppHangs = false // False positives
+            options.enablePerformanceV2 = true
+            options.enablePreWarmedAppStartTracing = true
+            options.enableCoreDataTracing = false // I don't have CoreData
+            options.enableUserInteractionTracing = false // Doesn't work with SwiftUI
+            options.enableUIViewControllerTracing = false // I don't have UIViewControllers
+            options.enableTimeToFullDisplayTracing = true
+            options.tracePropagationTargets = ["4pda"] // Dismiss analytics requests
             options.swiftAsyncStacktraces = true
+            options.attachScreenshot = true
+            options.tracesSampleRate = 1.0
+            options.diagnosticLevel = .warning
         }
         SentrySDK.setUser(User(userId: id))
         

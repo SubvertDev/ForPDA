@@ -503,6 +503,7 @@ let project = Project(
                 dependencies: [
                     .Internal.SharedUI,
                     .Internal.Models,
+                    .Internal.AnalyticsClient,
                     .Internal.LoggerClient,
                     .SPM.TCA
                 ]
@@ -713,7 +714,7 @@ extension TargetDependency.SPM {
     static let Nuke =           TargetDependency.external(name: "Nuke")
     static let NukeUI =         TargetDependency.external(name: "NukeUI")
     static let ZMarkupParser =  TargetDependency.external(name: "ZMarkupParser")
-    static let Sentry =         TargetDependency.external(name: "Sentry")
+    static let Sentry =         TargetDependency.external(name: "SentrySwiftUI")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")
     static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")

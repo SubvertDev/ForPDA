@@ -83,16 +83,7 @@ public struct BBBuilder {
                             logger.info("Next node is not textable")
                             trimTrailing = true
                         }
-                        
-                        if case let .attachment(attribute) = nodes[index + 1] {
-                            if let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst()),
-                               let attachmentIndex = attachments.firstIndex(where: { $0.id == attachmentId }),
-                               attachments[attachmentIndex].type == .file {
-                                // TODO: Simplify
-                                logger.info("Next node is file attachment")
-                                trimTrailing = false
-                            }
-                        } else if nodes[index + 1].isMedia {
+                        if nodes[index + 1].isMedia {
                             logger.info("Next node is media")
                             trimTrailing = false
                         }
@@ -122,12 +113,14 @@ public struct BBBuilder {
                     let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
                     if isNextNodeTextable || isNextNodeMedia {
                         logger.info("Next node is textable OR media, unwrapping")
-                        var isAttachmentDelimeneter = false
-                        if case .attachment = nodes[safe: index - 1] { isAttachmentDelimeneter = true }
+                        var isAttachmentDelimeter = false
+                        if case .attachment = nodes[safe: index - 1] {
+                            isAttachmentDelimeter = true
+                        }
                         mergedNodes[mergedNodes.count - 1] = unwrap(
                             node: node,
                             with: mutableText,
-                            isAttachmentDelimeter: isAttachmentDelimeneter,
+                            isAttachmentDelimeter: isAttachmentDelimeter,
                             listType: listType
                         )
                         if listType != nil,
@@ -165,11 +158,15 @@ public struct BBBuilder {
                     mergedNodes.lastOrAppend = unwrap(node: textNode, with: mutableText)
                     continue
                 }
-                let attachmentType = attachments[attachmentIndex].type
-                switch attachmentType {
+                
+                switch attachments[attachmentIndex].type {
                 case .file:
                     logger.info("FILE attachment")
-                    let textNode = unwrap(node: node, with: mutableText)
+                    var isAttachmentDelimeter = false
+                    if case let .text(text) = mergedNodes.last, text.string.last != "\n" {
+                        isAttachmentDelimeter = true
+                    }
+                    let textNode = unwrap(node: node, with: mutableText, isAttachmentDelimeter: isAttachmentDelimeter)
                     if !textNode.isEmptyText {
                         mergedNodes.lastOrAppend = textNode
                     } else {
@@ -178,7 +175,7 @@ public struct BBBuilder {
                     continue
                     
                 case .image:
-                    break
+                    break // TODO: Move image attachment below here
                 }
                 
                 logger.info("IMAGE attachment")
@@ -314,7 +311,10 @@ public struct BBBuilder {
         switch node {
         case .text(let text):
             let mutableString = NSMutableAttributedString(
-                attributedString: text.trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                attributedString: text
+                    .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                    .replacingOccurrences(of: "&#91;", with: "[")
+                    .replacingOccurrences(of: "&#93;", with: "]")
             )
             if isAttachmentDelimeter {
                 if mutableString.string.prefix(1) == " " {
@@ -398,6 +398,10 @@ public struct BBBuilder {
                         .foregroundColor: UIColor(resource: .Labels.teritary)
                     ]))
                 }
+                
+                if isAttachmentDelimeter {
+                    mutableString.insert(NSAttributedString(string: "\n"), at: 0)
+                }
                                 
                 attachmentString = mutableString
             }
@@ -480,6 +484,22 @@ extension NSAttributedString {
         }
 
         return mutableAttributedString
+    }
+    
+    // TODO: Revisit performance-wise
+    func replacingOccurrences(of target: String, with replacement: String) -> NSAttributedString {
+        let mutableCopy = NSMutableAttributedString(attributedString: self)
+        var searchRange = NSRange(location: 0, length: mutableCopy.length)
+        
+        while let foundRange = mutableCopy.string.range(of: target, options: [], range: Range(searchRange, in: mutableCopy.string)) {
+            let nsRange = NSRange(foundRange, in: mutableCopy.string)
+            mutableCopy.replaceCharacters(in: nsRange, with: replacement)
+            
+            let newLocation = nsRange.location + (replacement as NSString).length
+            searchRange = NSRange(location: newLocation, length: mutableCopy.length - newLocation)
+        }
+        
+        return mutableCopy
     }
 }
 

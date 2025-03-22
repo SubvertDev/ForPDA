@@ -94,17 +94,17 @@ public struct AppView: View {
             path: $store.scope(state: \.articlesPath, action: \.articlesPath)
         ) {
             ArticlesListScreen(store: store.scope(state: \.articlesList, action: \.articlesList))
-                .trackAnalytics("Articles List Screen")
+                .tracking(for: ArticlesListScreen.self)
         } destination: { store in
             WithPerceptionTracking {
                 switch store.case {
                 case let .article(store):
                     ArticleScreen(store: store)
-                        .trackAnalytics("Article Screen", ["id": store.articlePreview.id])
+                        .tracking(for: ArticleScreen.self, ["id": store.articlePreview.id])
                     
                 case let .profile(store):
                     ProfileScreen(store: store)
-                        .trackAnalytics("Profile Screen", ["id": store.userId ?? 0])
+                        .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])
                     
                 case let .settingsPath(path):
                     SettingsPath(path)
@@ -122,7 +122,7 @@ public struct AppView: View {
             path: $store.scope(state: \.favoritesRootPath, action: \.favoritesRootPath)
         ) {
             FavoritesRootScreen(store: store.scope(state: \.favoritesRoot, action: \.favoritesRoot))
-                .trackAnalytics("Favorites Root Screen")
+                .tracking(for: FavoritesRootScreen.self)
         } destination: { store in
             switch store.case {
             case let .forumPath(path):
@@ -144,7 +144,7 @@ public struct AppView: View {
             path: $store.scope(state: \.forumPath, action: \.forumPath)
         ) {
             ForumsListScreen(store: store.scope(state: \.forumsList, action: \.forumsList))
-                .trackAnalytics("Forums List Screen")
+                .tracking(for: ForumsListScreen.self)
         } destination: { store in
             ForumPath(store)
         }
@@ -160,12 +160,12 @@ public struct AppView: View {
             path: $store.scope(state: \.profilePath, action: \.profilePath)
         ) {
             ProfileScreen(store: store.scope(state: \.profile, action: \.profile))
-                .trackAnalytics("Profile Screen")
+                .tracking(for: ProfileScreen.self)
         } destination: { store in
             switch store.case {
             case let .history(store):
                 HistoryScreen(store: store)
-                    .trackAnalytics("History Screen")
+                    .tracking(for: HistoryScreen.self)
             case let .qmsPath(path):
                 QMSPath(path)
             case let .settingsPath(path):
@@ -183,10 +183,10 @@ public struct AppView: View {
         switch store.case {
         case let .qmsList(store):
             QMSListScreen(store: store)
-                .trackAnalytics("QMS List Screen")
+                .tracking(for: QMSListScreen.self)
         case let .qms(store):
             QMSScreen(store: store)
-                .trackAnalytics("QMS Screen")
+                .tracking(for: QMSScreen.self)
         }
     }
     
@@ -198,19 +198,19 @@ public struct AppView: View {
             switch store.case {
             case let .forum(store):
                 ForumScreen(store: store)
-                    .trackAnalytics("Forum Screen", ["id": store.forumId])
+                    .tracking(for: ForumScreen.self, ["id": store.forumId])
                 
             case let .topic(store):
                 TopicScreen(store: store)
-                    .trackAnalytics("Topic Screen", ["id": store.topicId])
+                    .tracking(for: TopicScreen.self, ["id": store.topicId])
                 
             case let .profile(store):
                 ProfileScreen(store: store)
-                    .trackAnalytics("Profile Screen", ["id": store.userId ?? 0])
+                    .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])
                 
             case let .announcement(store):
                 AnnouncementScreen(store: store)
-                    .trackAnalytics("Announcement Screen", ["id": store.announcementId])
+                    .tracking(for: AnnouncementScreen.self, ["id": store.announcementId])
                 
             case let .settingsPath(path):
                 SettingsPath(path)
@@ -225,13 +225,13 @@ public struct AppView: View {
         switch store.case {
         case let .settings(store):
             SettingsScreen(store: store)
-                .trackAnalytics("Settings Screen")
+                .tracking(for: SettingsScreen.self)
         case let .developer(store):
             DeveloperScreen(store: store)
-                .trackAnalytics("Developer Screen")
+                .tracking(for: DeveloperScreen.self)
         case let .notifications(store):
             NotificationsScreen(store: store)
-                .trackAnalytics("Notifications Settings Screen")
+                .tracking(for: NotificationsScreen.self)
         }
     }
     
