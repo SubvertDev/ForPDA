@@ -199,7 +199,7 @@ public struct FavoritesScreen: View {
                     forum: favorite.isForum,
                     notify: favorite.notify
                 ) { showUnread in
-                    if showUnread && favorite.isForum {
+                    if showUnread && !favorite.isForum {
                         store.send(.unreadTapped(id: favorite.topic.id))
                     } else {
                         store.send(
