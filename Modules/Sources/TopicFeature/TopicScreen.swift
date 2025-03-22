@@ -52,6 +52,7 @@ public struct TopicScreen: View {
                             }
                         }
                     }
+                    .scrollDismissesKeyboard(.immediately)
                 }
             }
             .overlay {
