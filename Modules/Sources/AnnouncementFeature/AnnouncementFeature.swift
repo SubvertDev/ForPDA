@@ -13,6 +13,7 @@ import ParsingClient
 import Models
 import PersistenceKeys
 import AnalyticsClient
+import TopicBuilder
 
 @Reducer
 public struct AnnouncementFeature: Reducer, Sendable {

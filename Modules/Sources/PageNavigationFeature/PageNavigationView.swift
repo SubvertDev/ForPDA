@@ -134,18 +134,6 @@ public struct PageNavigation: View {
     }
 }
 
-// MARK: - Model Extensions
-
-extension NoticeType {
-    public var color: Color {
-        switch self {
-        case .curator:   return Color(.Main.green)
-        case .moderator: return Color(.Theme.primary)
-        case .admin:     return Color(.Main.red)
-        }
-    }
-}
-
 // MARK: - Previews
 
 #Preview {

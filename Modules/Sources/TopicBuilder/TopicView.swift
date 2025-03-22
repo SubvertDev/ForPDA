@@ -12,6 +12,7 @@ import SFSafeSymbols
 import Models
 import Sharing
 import Dependencies
+import CacheClient
 
 public struct TopicView: View {
         
@@ -343,12 +344,12 @@ struct CodeView: View {
                 Group {
                     switch info {
                     case .none:
-                        Text("Код")
+                        Text("Code", bundle: .module)
                             .foregroundStyle(Color(.Labels.primary))
                         
                     case let .title(title):
                         HStack {
-                            Text("Код: ")
+                            Text("Code: ", bundle: .module)
                                 .foregroundStyle(Color(.Labels.teritary))
                             Text(title)
                                 .foregroundStyle(Color(.Labels.primary))
@@ -446,7 +447,7 @@ struct HideView: View {
             if isShown {
                 VStack(spacing: 0) {
                     HStack(spacing: 0) {
-                        Text("Скрытый текст")
+                        Text("Hidden text", bundle: .module)
                             .foregroundStyle(Color(.Labels.primary))
                             .font(.callout)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -478,6 +479,7 @@ struct HideView: View {
         }
         .animation(.default, value: isShown)
         .task {
+            // TODO: What is happening here?
             @Dependency(\.cacheClient) var cache
             if let userId = shouldLoadUser, let info {
                 if let currentUser = await cache.getUser(userId) {
@@ -534,6 +536,18 @@ struct NoticeView: View {
                 }
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+// MARK: - Extensions
+
+public extension NoticeType {
+    var color: Color {
+        switch self {
+        case .curator:   return Color(.Main.green)
+        case .moderator: return Color(.Theme.primary)
+        case .admin:     return Color(.Main.red)
+        }
     }
 }
 

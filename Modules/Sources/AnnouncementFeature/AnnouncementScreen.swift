@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import PageNavigationFeature
-import TopicFeature
+import TopicBuilder
 import SFSafeSymbols
 import SharedUI
 import Models

@@ -13,6 +13,7 @@ import SharedUI
 import NukeUI
 import Models
 import ParsingClient
+import TopicBuilder
 
 public struct TopicScreen: View {
     
@@ -237,9 +238,9 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostFooter(_ lastEdit: Post.LastEdit) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Отредактировал: \(lastEdit.username) • \(lastEdit.date.formatted())")
+            Text("Edited: \(lastEdit.username) • \(lastEdit.date.formatted())", bundle: .module)
             if !lastEdit.reason.isEmpty {
-                Text("Причина: \(lastEdit.reason)")
+                Text("Reason: \(lastEdit.reason)", bundle: .module)
             }
         }
         .font(.caption2)

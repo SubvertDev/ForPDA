@@ -16,6 +16,7 @@ import PasteboardClient
 import NotificationCenterClient
 import TCAExtensions
 import AnalyticsClient
+import TopicBuilder
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {

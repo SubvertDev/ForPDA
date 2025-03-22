@@ -195,7 +195,7 @@ let project = Project(
                     .Internal.PageNavigationFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
-                    .Internal.BBBuilder,
+                    .Internal.TopicBuilder,
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.AnalyticsClient,
@@ -213,6 +213,19 @@ let project = Project(
             ),
         
             .feature(
+                name: "TopicBuilder",
+                dependencies: [
+                    .Internal.BBBuilder,
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
                 name: "AnnouncementFeature",
                 hasResources: false,
                 dependencies: [
@@ -224,7 +237,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
-                    .Internal.TopicFeature, // TODO: Убрать
+                    .Internal.TopicBuilder,
                     .SPM.RichTextKit,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -677,6 +690,7 @@ extension TargetDependency.Internal {
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")
     static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
+    static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     
     // Clients
     static let APIClient =           TargetDependency.target(name: "APIClient")
