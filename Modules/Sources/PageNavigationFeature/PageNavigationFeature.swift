@@ -74,7 +74,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
         case nextPageTapped
         case lastPageTapped
         case doneButtonTapped
-        case updatePage(newValue: String)
+        case onViewTapped
         case goToPage(newPage: Int)
         
         case update(count: Int, offset: Int?)
@@ -88,17 +88,18 @@ public struct PageNavigationFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .binding(\.focus):
+                state.page = String(state.currentPage)
+                return .none
+                
             case .binding:
                 return .none
                 
             case .doneButtonTapped:
                 state.focus = nil
-                let newPage: Int
-                if let currentPage = Int(state.page) {
-                    newPage = currentPage
-                } else {
-                    newPage = 0
-                    state.page = "1"
+                guard let newPage = Int(state.page) else {
+                    state.page = String(state.currentPage)
+                    return .none
                 }
                 guard newPage != state.currentPage else {
                     return .none
@@ -108,8 +109,8 @@ public struct PageNavigationFeature: Reducer, Sendable {
             case .goToPage(let newPage):
                 state.offset = (newPage - 1) * state.perPage
                 
-            case .updatePage(let newValue):
-                state.page = newValue
+            case .onViewTapped:
+                state.focus = state.focus == nil ? .page : nil
                 return .none
                 
             case .firstPageTapped:
@@ -146,5 +147,6 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 await send(.offsetChanged(to: offset))
             }
         }
+//        ._printChanges()
     }
 }

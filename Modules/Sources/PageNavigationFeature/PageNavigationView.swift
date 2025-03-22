@@ -74,31 +74,40 @@ public struct PageNavigation: View {
         }
         .overlay {
             HStack(spacing: 8) {
-                TextField("", text: $store.page)
+                TextField(String(""), text: $store.page)
                     .font(.subheadline)
-                    .fixedSize()
-                    .focused($focus, equals: PageNavigationFeature.State.Field.page)
                     .keyboardType(.numberPad)
+                    .focused($focus, equals: PageNavigationFeature.State.Field.page)
+                    .fixedSize()
                     .onChange(of: store.page) { newValue in
-                        let filtered = newValue.filter { $0.isNumber }
-                        if let intValue = Int(filtered), intValue > store.totalPages {
-                            store.send(.updatePage(newValue: "\(store.totalPages)"))
-                        } else { }
+                        guard !store.page.isEmpty else { return }
+                        store.page = String(min(Int(store.page.filter(\.isNumber))!, store.totalPages))
                     }
                     .toolbar {
                         ToolbarItemGroup(placement: .keyboard) {
                             Spacer()
                             
-                            Button("Готово") {
+                            Button {
                                 store.send(.doneButtonTapped)
+                            } label: {
+                                Text("Done", bundle: .module)
                             }
                         }
                     }
+                    .opacity(store.focus == nil ? 0 : 1)
+                    .overlay {
+                        Text(store.page)
+                            .font(.subheadline)
+                            .fixedSize()
+                            .opacity(store.focus == nil ? 1 : 0)
+                            .contentTransition(.numericText())
+                            .animation(.default, value: store.page)
+                    }
                 
-                Text("/")
+                Text(verbatim: "/")
                     .font(.subheadline)
                 
-                Text("\(store.totalPages)")
+                Text(verbatim: "\(store.totalPages)")
                     .font(.subheadline)
             }
             .padding(.vertical, 6)
@@ -107,12 +116,13 @@ public struct PageNavigation: View {
                 RoundedRectangle(cornerRadius: 8)
                     .foregroundStyle(Color(.Background.teritary))
             )
-            .contentTransition(.numericText())
+            .onTapGesture {
+                store.send(.onViewTapped)
+            }
         }
         .bind($store.focus, to: $focus)
         .listRowSeparator(.hidden)
-        .animation(.default, value: store.currentPage)
-        .frame(maxWidth: .infinity, maxHeight: 32)
+//        .animation(.default, value: store.currentPage)
     }
     
     // MARK: - Navigation Arrow
