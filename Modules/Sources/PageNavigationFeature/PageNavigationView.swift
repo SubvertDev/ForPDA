@@ -84,13 +84,15 @@ public struct PageNavigation: View {
                         store.page = String(min(Int(store.page.filter(\.isNumber))!, store.totalPages))
                     }
                     .toolbar {
-                        ToolbarItemGroup(placement: .keyboard) {
-                            Spacer()
-                            
-                            Button {
-                                store.send(.doneButtonTapped)
-                            } label: {
-                                Text("Done", bundle: .module)
+                        if focus == .page {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                
+                                Button {
+                                    store.send(.doneButtonTapped)
+                                } label: {
+                                    Text("Done", bundle: .module)
+                                }
                             }
                         }
                     }
