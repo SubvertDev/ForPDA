@@ -11,6 +11,11 @@ func timeElapsed(from start: DispatchTime) -> String {
     return String(format: "%.2f ms", elapsedTimeInMilliSeconds)
 }
 
+struct ListInfo {
+    var count = 0
+    let type: BBContainerNode.ListType
+}
+
 public struct BBBuilder {
     
     // MARK: - Build Interface
@@ -38,8 +43,9 @@ public struct BBBuilder {
     
     // MARK: - Implementation
     
-    private func mergeTextNodes(_ nodes: [BBContainerNode], listType: BBContainerNode.ListType? = nil) -> [BBContainerNode] {
+    private func mergeTextNodes(_ nodes: [BBContainerNode], listInfo: ListInfo? = nil) -> [BBContainerNode] {
         var mergedNodes: [BBContainerNode] = []
+        var listInfo = listInfo
         
         func hasPreviousNode(_ index: Int) -> Bool {
             return nodes[safe: index - 1] != nil
@@ -62,6 +68,12 @@ public struct BBBuilder {
             switch node {
             case .text, .snapback, .mergetime, .smile:
                 logger.info("In textable node")
+                
+                if listInfo != nil, node.isListTag {
+                    logger.info("List tag, increasing counter")
+                    listInfo?.count += 1
+                }
+                
                 if mutableText.string.isEmpty {
                     var trimLeading = false
                     var trimTrailing = false
@@ -96,7 +108,7 @@ public struct BBBuilder {
                     let textNode = unwrap(
                         node: node,
                         with: mutableText,
-                        listType: listType,
+                        listInfo: listInfo,
                         trimLeading: trimLeading,
                         trimTrailing: trimTrailing
                     )
@@ -121,9 +133,9 @@ public struct BBBuilder {
                             node: node,
                             with: mutableText,
                             isAttachmentDelimeter: isAttachmentDelimeter,
-                            listType: listType
+                            listInfo: listInfo
                         )
-                        if listType != nil,
+                        if listInfo != nil,
                            case let .text(text) = nodes[safe: index - 1],
                            text.string == "[*]",
                            case let .text(text) = node,
@@ -136,7 +148,7 @@ public struct BBBuilder {
                         mergedNodes[mergedNodes.count - 1] = unwrap(
                             node: node,
                             with: mutableText,
-                            listType: listType,
+                            listInfo: listInfo,
                             trimTrailing: true
                         )
                     }
@@ -253,7 +265,7 @@ public struct BBBuilder {
                 mergedNodes.append(.quote(attributed, mergeTextNodes(array)))
                 
             case .list(let type, let array):
-                mergedNodes.append(.list(type, mergeTextNodes(array, listType: type)))
+                mergedNodes.append(.list(type, mergeTextNodes(array, listInfo: ListInfo(type: type))))
                 
             case .code(let title, let array):
                 mergedNodes.append(.code(title, mergeTextNodes(array)))
@@ -283,7 +295,7 @@ public struct BBBuilder {
         with combinedText: NSAttributedString,
         isFirst: Bool = false,
         isAttachmentDelimeter: Bool = false,
-        listType: BBContainerNode.ListType? = nil,
+        listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
@@ -303,7 +315,7 @@ public struct BBBuilder {
         with combinedText: NSMutableAttributedString,
         isFirst: Bool = false,
         isAttachmentDelimeter: Bool = false,
-        listType: BBContainerNode.ListType? = nil,
+        listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
@@ -321,8 +333,8 @@ public struct BBBuilder {
                     mutableString.replaceCharacters(in: NSRange(location: 0, length: 1), with: "\n")
                 }
             }
-            if let listType {
-                mutableString.replaceListTags(of: listType)
+            if let listInfo {
+                mutableString.replaceListTags(for: listInfo)
             }
             if isFirst {
                 return .text(mutableString)
@@ -504,14 +516,12 @@ extension NSAttributedString {
 }
 
 extension NSMutableAttributedString {
-    func replaceListTags(of type: BBContainerNode.ListType) {
+    func replaceListTags(for info: ListInfo) {
         let target = "[*]"
         
-        var counter = 0
         while let range = string.range(of: target) {
             let nsRange = NSRange(range, in: string)
-            replaceCharacters(in: nsRange, with: getReplacement(for: type, at: counter))
-            counter += 1
+            replaceCharacters(in: nsRange, with: getReplacement(for: info.type, at: info.count))
         }
     }
     
@@ -520,7 +530,7 @@ extension NSMutableAttributedString {
         case .bullet:
             return "• "
         case .numeric:
-            return "\(index + 1). "
+            return "\(index). "
         case .alphabet:
             return "\(Character(UnicodeScalar(96 + index)!)). "
         case .romanBig:
