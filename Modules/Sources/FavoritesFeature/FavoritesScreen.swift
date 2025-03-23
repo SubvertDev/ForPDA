@@ -196,9 +196,10 @@ public struct FavoritesScreen: View {
                     lastPost: favorite.topic.lastPost,
                     closed: favorite.topic.isClosed,
                     unread: favorite.topic.isUnread,
+                    forum: favorite.isForum,
                     notify: favorite.notify
                 ) { showUnread in
-                    if showUnread {
+                    if showUnread && !favorite.isForum {
                         store.send(.unreadTapped(id: favorite.topic.id))
                     } else {
                         store.send(
@@ -262,6 +263,7 @@ public struct FavoritesScreen: View {
         lastPost: TopicInfo.LastPost? = nil,
         closed: Bool = false,
         unread: Bool = false,
+        forum: Bool = false,
         notify: FavoriteInfo.Notify,
         action: @escaping (_ unreadTapped: Bool) -> Void
     ) -> some View {
@@ -271,7 +273,7 @@ public struct FavoritesScreen: View {
             } label: {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 6) {
-                        if let lastPost {
+                        if let lastPost, !forum {
                             Text(lastPost.formattedDate, bundle: .models)
                                 .font(.caption)
                                 .foregroundStyle(Color(.Labels.teritary))
@@ -284,7 +286,7 @@ public struct FavoritesScreen: View {
                             foregroundStyle: Color(.Labels.primary)
                         )
                         
-                        if let lastPost {
+                        if let lastPost, !forum {
                             HStack(spacing: 4) {
                                 Image(systemSymbol: .personCircle)
                                     .font(.caption)
