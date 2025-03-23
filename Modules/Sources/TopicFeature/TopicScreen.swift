@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import PageNavigationFeature
+import WriteFormFeature
 import SFSafeSymbols
 import SharedUI
 import NukeUI
@@ -69,6 +70,11 @@ public struct TopicScreen: View {
             }
             .navigationTitle(Text(store.topic?.name ?? "Загружаем..."))
             .navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
+                NavigationStack {
+                    WriteFormScreen(store: store)
+                }
+            }
             .toolbar { OptionsMenu() }
             .onChange(of: store.isLoadingTopic) { _ in
                 Task { await scrollAndAnimate() }
@@ -89,11 +95,27 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func OptionsMenu() -> some View {
         Menu {
+            if let topic = store.topic, store.isUserAuthorized, topic.isCanPost {
+                Section {
+                    ContextButton(text: "Write Post", symbol: .plusCircle, bundle: .module) {
+                        store.send(.contextMenu(.writePost))
+                    }
+                }
+            }
+            
             ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
                 store.send(.contextMenu(.copyLink))
             }
             ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
                 store.send(.contextMenu(.openInBrowser))
+            }
+            
+            if !store.pageNavigation.isLastPage {
+                Section {
+                    ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
+                        store.send(.contextMenu(.goToEnd))
+                    }
+                }
             }
             
             if let topic = store.topic, store.isUserAuthorized {
@@ -223,6 +245,10 @@ public struct TopicScreen: View {
                         .frame(maxHeight: .infinity, alignment: .bottom)
                 }
             }
+            
+            if store.isUserAuthorized {
+                OptionsPostMenu()
+            }
         }
     }
     
@@ -257,6 +283,30 @@ public struct TopicScreen: View {
         .foregroundStyle(Color(.Labels.teritary))
         .padding(.top, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    // MARK: - Options Post Menu
+    
+    @ViewBuilder
+    private func OptionsPostMenu() -> some View {
+        Menu {
+            if let topic = store.topic, topic.isCanPost {
+                Section {
+                    ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
+                        store.send(.contextPostMenu(.reply(topic.authorId, topic.authorName)))
+                    }
+                }
+            }
+        } label: {
+            Image(systemSymbol: .ellipsis)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.teritary))
+                .padding(.horizontal, 8) // Padding for tap area
+                .padding(.vertical, 11)
+                .rotationEffect(.degrees(90))
+        }
+        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
+        .frame(width: 19, height: 22)
     }
     
     // MARK: - Helpers

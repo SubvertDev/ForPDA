@@ -36,6 +36,11 @@ public struct ParsingClient: Sendable {
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
+    public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parsePostSend: @Sendable (_ response: String) async throws -> PostSend
+    
+    // Write Form
+    public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
     
     // Extra
     public var parseUnread: @Sendable (_ response: String) async throws -> Unread
@@ -94,6 +99,15 @@ extension ParsingClient: DependencyKey {
         },
         parseHistory: { response in
             return try HistoryParser.parse(from: response)
+        },
+        parsePostPreview: { response in
+            return try TopicParser.parsePostPreview(from: response)
+        },
+        parsePostSend: { response in
+            return try TopicParser.parsePostSend(from: response)
+        },
+        parseWriteForm: { response in
+            return try WriteFormParser.parse(from: response)
         },
         parseUnread: { response in
             return try UnreadParser.parse(from: response)

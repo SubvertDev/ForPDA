@@ -19,7 +19,7 @@ extension TopicFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onTask, .onSceneBecomeActive, .pageNavigation, ._loadTypes:
+                case .onTask, .onSceneBecomeActive, .pageNavigation, .writeForm, ._loadTypes:
                     break
                     
                 case .onRefresh:
@@ -31,6 +31,12 @@ extension TopicFeature {
                 case let .urlTapped(url):
                     analytics.log(TopicEvent.urlTapped(url))
                     
+                case let .contextPostMenu(option):
+                    switch option {
+                    case .reply(let userId, _):
+                        analytics.log(TopicEvent.menuPostReply(userId))
+                    }
+                    
                 case let .contextMenu(option):
                     switch option {
                     case .copyLink:
@@ -41,6 +47,8 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuGoToEnd)
                     case .setFavorite:
                         analytics.log(TopicEvent.menuSetFavorite)
+                    case .writePost:
+                        analytics.log(TopicEvent.menuWritePost)
                     }
                     
                 case let ._loadTopic(offset: offset):

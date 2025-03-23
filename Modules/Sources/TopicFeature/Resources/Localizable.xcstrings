@@ -37,6 +37,16 @@
         }
       }
     },
+    "Go To End" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти в конец"
+          }
+        }
+      }
+    },
     "Open In Browser" : {
       "localizations" : {
         "ru" : {
@@ -63,6 +73,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить из избранного"
+          }
+        }
+      }
+    },
+    "Reply" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ответить"
+          }
+        }
+      }
+    },
+    "Write Post" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Написать пост"
           }
         }
       }

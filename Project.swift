@@ -79,6 +79,7 @@ let project = Project(
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.TopicFeature,
+                    .Internal.WriteFormFeature,
                     .SPM.AlertToast,
                     .SPM.TCA
                 ]
@@ -382,10 +383,25 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.TopicBuilder,
+                    .Internal.WriteFormFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "WriteFormFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .Internal.SharedUI,
+                    .Internal.TopicBuilder,
+                    .SPM.NukeUI,
+                    .SPM.RichTextKit,
+                    .SPM.TCA,
                 ]
             ),
         
@@ -698,6 +714,7 @@ extension TargetDependency.Internal {
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
+    static let WriteFormFeature =       TargetDependency.target(name: "WriteFormFeature")
     
     // Clients
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")

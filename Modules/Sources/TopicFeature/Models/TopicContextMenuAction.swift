@@ -6,6 +6,7 @@
 //
 
 public enum TopicContextMenuAction {
+    case writePost
     case copyLink
     case openInBrowser
     case goToEnd

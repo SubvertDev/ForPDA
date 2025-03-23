@@ -16,6 +16,9 @@ public enum TopicEvent: Event {
     case menuOpenInBrowser
     case menuGoToEnd
     case menuSetFavorite
+    case menuWritePost
+    
+    case menuPostReply(Int)
     
     case loadingStart(Int)
     case loadingSuccess
@@ -28,7 +31,8 @@ public enum TopicEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let .userAvatarTapped(id):
+        case let .userAvatarTapped(id),
+             let .menuPostReply(id):
             return ["userId": String(id)]
             
         case let .urlTapped(url):
