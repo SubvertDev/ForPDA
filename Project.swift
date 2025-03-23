@@ -55,31 +55,120 @@ let project = Project(
             .feature(
                 name: "AppFeature",
                 dependencies: [
-                    .Internal.DeeplinkHandler,
-                    .Internal.ArticlesListFeature,
-                    .Internal.ArticleFeature,
-                    .Internal.ForumsListFeature,
-                    .Internal.ForumFeature,
-                    .Internal.TopicFeature,
-                    .Internal.AnnouncementFeature,
-                    .Internal.FavoritesRootFeature,
-                    .Internal.BookmarksFeature,
-                    .Internal.FavoritesFeature,
-                    .Internal.HistoryFeature,
-                    .Internal.AuthFeature,
-                    .Internal.ProfileFeature,
-                    .Internal.QMSListFeature,
-                    .Internal.QMSFeature,
-                    .Internal.SettingsFeature,
-                    .Internal.NotificationsFeature,
-                    .Internal.DeveloperFeature,
-                    .Internal.NotificationsClient,
                     .Internal.AnalyticsClient,
+                    .Internal.AnnouncementFeature,
+                    .Internal.ArticleFeature,
+                    .Internal.ArticlesListFeature,
+                    .Internal.AuthFeature,
+                    .Internal.BookmarksFeature,
+                    .Internal.CacheClient,
+                    .Internal.DeeplinkHandler,
+                    .Internal.DeveloperFeature,
+                    .Internal.FavoritesFeature,
+                    .Internal.FavoritesRootFeature,
+                    .Internal.ForumFeature,
+                    .Internal.ForumsListFeature,
+                    .Internal.HistoryFeature,
                     .Internal.LoggerClient,
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                    .Internal.NotificationsFeature,
+                    .Internal.ProfileFeature,
+                    .Internal.QMSFeature,
+                    .Internal.QMSListFeature,
+                    .Internal.SettingsFeature,
+                    .Internal.TCAExtensions,
+                    .Internal.TopicFeature,
+                    .SPM.AlertToast,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "AnnouncementFeature",
+                hasResources: false,
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.ParsingClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TopicBuilder,
+                    .SPM.NukeUI,
+                    .SPM.RichTextKit,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "ArticleFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.CacheClient,
+                    .Internal.HapticClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .Internal.PasteboardClient,
+                    .Internal.SharedUI,
                     .Internal.TCAExtensions,
-                    .SPM.AlertToast,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.SkeletonUI,
+                    .SPM.SmoothGradient,
+                    .SPM.TCA
+                    .SPM.YouTubePlayerKit,
+                ]
+            ),
+        
+            .feature(
+                name: "ArticlesListFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.HapticClient,
+                    .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TCAExtensions,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "AuthFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.HapticClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TCAExtensions,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "BookmarksFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TCAExtensions,
+                    .SPM.NukeUI,
+                    .SPM.SkeletonUI,
                     .SPM.TCA
                 ]
             ),
@@ -88,63 +177,36 @@ let project = Project(
                 name: "DeeplinkHandler",
                 hasResources: false,
                 dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .Internal.LoggerClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.APIClient,
                     .SPM.TCA
                 ]
             ),
         
             .feature(
-                name: "ArticlesListFeature",
+                name: "DeveloperFeature",
+                hasResources: false,
                 dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
                     .Internal.AnalyticsClient,
-                    .Internal.PasteboardClient,
-                    .Internal.HapticClient,
-                    .Internal.TCAExtensions,
-                    .Internal.PersistenceKeys,
-                    .SPM.NukeUI,
-                    .SPM.SFSafeSymbols,
+                    .Internal.CacheClient,
+                    .Internal.SharedUI,
                     .SPM.TCA
                 ]
             ),
         
             .feature(
-                name: "ArticleFeature",
+                name: "FavoritesFeature",
                 dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
+                    .Internal.Models,
+                    .Internal.NotificationCenterClient,
+                    .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
-                    .Internal.PasteboardClient,
-                    .Internal.HapticClient,
-                    .Internal.TCAExtensions,
-                    .SPM.SkeletonUI,
-                    .SPM.NukeUI,
-                    .SPM.YouTubePlayerKit,
-                    .SPM.SFSafeSymbols,
-                    .SPM.SmoothGradient,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "BookmarksFeature",
-                dependencies: [
-                    .Internal.Models,
                     .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.CacheClient,
-                    .Internal.PasteboardClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.PersistenceKeys,
                     .Internal.TCAExtensions,
-                    .SPM.SkeletonUI,
                     .SPM.NukeUI,
                     .SPM.TCA
                 ]
@@ -153,22 +215,8 @@ let project = Project(
             .feature(
                 name: "FavoritesRootFeature",
                 dependencies: [
-                    .Internal.FavoritesFeature,
                     .Internal.BookmarksFeature,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "ForumsListFeature",
-                dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.ParsingClient,
-                    .SPM.NukeUI,
+                    .Internal.FavoritesFeature,
                     .SPM.TCA
                 ]
             ),
@@ -176,13 +224,13 @@ let project = Project(
             .feature(
                 name: "ForumFeature",
                 dependencies: [
-                    .Internal.PageNavigationFeature,
-                    .Internal.Models,
-                    .Internal.SharedUI,
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
+                    .Internal.Models,
+                    .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
+                    .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -190,25 +238,118 @@ let project = Project(
             ),
         
             .feature(
-                name: "TopicFeature",
+                name: "ForumsListFeature",
                 dependencies: [
-                    .Internal.PageNavigationFeature,
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.TopicBuilder,
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
+                    .Internal.Models,
                     .Internal.ParsingClient,
-                    .Internal.LoggerClient,
-                    .Internal.PasteboardClient,
-                    .Internal.NotificationCenterClient,
-                    .Internal.PersistenceKeys,
-                    .Internal.TCAExtensions,
-                    .SPM.RichTextKit,
+                    .Internal.SharedUI,
                     .SPM.NukeUI,
-                    .SPM.TCA,
-                    .SPM.MemberwiseInit
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "HistoryFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.ParsingClient,
+                    .Internal.SharedUI,
+                    .SPM.NukeUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "NotificationsFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "ProfileFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.NukeUI,
+                    .SPM.RichTextKit,
+                    .SPM.SFSafeSymbols,
+                    .SPM.SkeletonUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "PageNavigationFeature",
+                hasResources: false,
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+             ),
+        
+            .feature(
+                name: "QMSListFeature",
+                hasResources: false,
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.NukeUI,
+                    .SPM.SkeletonUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "QMSFeature",
+                hasResources: false,
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.ExyteChat,
+                    .SPM.NukeUI,
+                    .SPM.SkeletonUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "SettingsFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TCAExtensions,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
                 ]
             ),
         
@@ -226,168 +367,27 @@ let project = Project(
             ),
         
             .feature(
-                name: "AnnouncementFeature",
-                hasResources: false,
+                name: "TopicFeature",
                 dependencies: [
-                    .Internal.PageNavigationFeature,
-                    .Internal.Models,
-                    .Internal.SharedUI,
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.ParsingClient,
-                    .Internal.PersistenceKeys,
-                    .Internal.TopicBuilder,
-                    .SPM.RichTextKit,
-                    .SPM.NukeUI,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "FavoritesFeature",
-                dependencies: [
-                    .Internal.PageNavigationFeature,
+                    .Internal.LoggerClient,
                     .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.ParsingClient,
                     .Internal.NotificationCenterClient,
-                    .Internal.TCAExtensions,
-                    .SPM.NukeUI,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "HistoryFeature",
-                dependencies: [
                     .Internal.PageNavigationFeature,
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
                     .Internal.ParsingClient,
-                    .SPM.NukeUI,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "AuthFeature",
-                dependencies: [
-                    .Internal.APIClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.HapticClient,
-                    .Internal.PersistenceKeys,
-                    .Internal.TCAExtensions,
-                    .Internal.SharedUI,
-                    .SPM.NukeUI,
-                    .SPM.SFSafeSymbols,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "ProfileFeature",
-                dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.PersistenceKeys,
-                    .SPM.RichTextKit,
-                    .SPM.SkeletonUI,
-                    .SPM.NukeUI,
-                    .SPM.SFSafeSymbols,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "QMSListFeature",
-                hasResources: false,
-                dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.AnalyticsClient,
-                    .SPM.SkeletonUI,
-                    .SPM.NukeUI,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "QMSFeature",
-                hasResources: false,
-                dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.APIClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.PersistenceKeys,
-                    .SPM.ExyteChat,
-                    .SPM.SkeletonUI,
-                    .SPM.NukeUI,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "SettingsFeature",
-                dependencies: [
-                    .Internal.AnalyticsClient,
                     .Internal.PasteboardClient,
-                    .Internal.CacheClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
                     .Internal.TCAExtensions,
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.PersistenceKeys,
-                    .SPM.SFSafeSymbols,
-                    .SPM.TCA
+                    .Internal.TopicBuilder,
+                    .SPM.MemberwiseInit
+                    .SPM.NukeUI,
+                    .SPM.RichTextKit,
+                    .SPM.TCA,
                 ]
             ),
-        
-            .feature(
-                name: "NotificationsFeature",
-                dependencies: [
-                    .Internal.NotificationsClient,
-                    .Internal.AnalyticsClient,
-                    .Internal.CacheClient,
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.PersistenceKeys,
-                    .SPM.SFSafeSymbols,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "DeveloperFeature",
-                hasResources: false,
-                dependencies: [
-                    .Internal.SharedUI,
-                    .Internal.CacheClient,
-                    .Internal.AnalyticsClient,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "PageNavigationFeature",
-                hasResources: false,
-                dependencies: [
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .Internal.PersistenceKeys,
-                    .SPM.SFSafeSymbols,
-                    .SPM.TCA
-                ]
-             ),
         
         // MARK: - Clients -
         
@@ -395,8 +395,8 @@ let project = Project(
                 name: "APIClient",
                 hasResources: false,
                 dependencies: [
-                    .Internal.ParsingClient,
                     .Internal.CacheClient,
+                    .Internal.ParsingClient,
                     .SPM.PDAPI,
                     .SPM.TCA
                 ]
@@ -406,73 +406,80 @@ let project = Project(
                 name: "AnalyticsClient",
                 hasResources: false,
                 dependencies: [
+                    .Internal.LoggerClient,
                     .Internal.Models,
                     .Internal.PersistenceKeys,
-                    .Internal.LoggerClient,
                     .SPM.PostHog,
                     .SPM.Sentry,
                     .SPM.TCA
                 ]
             ),
-        .feature(
-            name: "ParsingClient",
-            hasResources: false,
-            dependencies: [
-                .Internal.Models,
-                .SPM.ZMarkupParser,
-                .SPM.TCA,
-            ]
-        ),
-        .feature(
-            name: "PasteboardClient",
-            hasResources: false,
-            dependencies: [
-                .SPM.TCA
-            ]
-        ),
-        .feature(
-            name: "NotificationsClient",
-            dependencies: [
-                .Internal.ParsingClient,
-                .Internal.AnalyticsClient,
-                .Internal.LoggerClient,
-                .Internal.CacheClient,
-                .SPM.TCA
-            ]
-        ),
-        .feature(
-            name: "NotificationCenterClient",
-            hasResources: false,
-            dependencies: [
-                .Internal.LoggerClient,
-                .SPM.TCA
-            ]
-        ),
-        .feature(
-            name: "HapticClient",
-            hasResources: false,
-            dependencies: [
-                .SPM.TCA
-            ]
-        ),
-        .feature(
-            name: "CacheClient",
-            hasResources: false,
-            dependencies: [
-                .Internal.AnalyticsClient,
-                .Internal.Models,
-                .SPM.Cache,
-                .SPM.Nuke,
-                .SPM.TCA
-            ]
-        ),
-        .feature(
-            name: "LoggerClient",
-            hasResources: false,
-            dependencies: [
-                .SPM.TCA
-            ]
-        ),
+        
+            .feature(
+                name: "ParsingClient",
+                hasResources: false,
+                dependencies: [
+                    .Internal.Models,
+                    .SPM.TCA,
+                    .SPM.ZMarkupParser,
+                ]
+            ),
+        
+            .feature(
+                name: "PasteboardClient",
+                hasResources: false,
+                dependencies: [
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "NotificationsClient",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.CacheClient,
+                    .Internal.LoggerClient,
+                    .Internal.ParsingClient,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "NotificationCenterClient",
+                hasResources: false,
+                dependencies: [
+                    .Internal.LoggerClient,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "HapticClient",
+                hasResources: false,
+                dependencies: [
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "CacheClient",
+                hasResources: false,
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.Models,
+                    .SPM.Cache,
+                    .SPM.Nuke,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "LoggerClient",
+                hasResources: false,
+                dependencies: [
+                    .SPM.TCA
+                ]
+            ),
         
         // MARK: - Shared -
         
@@ -488,10 +495,10 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .SPM.NukeUI,
-                    .SPM.SFSafeSymbols,
-                    .SPM.SwiftyGif,
-                    .SPM.SkeletonUI,
                     .SPM.RichTextKit
+                    .SPM.SFSafeSymbols,
+                    .SPM.SkeletonUI,
+                    .SPM.SwiftyGif,
                 ]
             ),
         
@@ -514,10 +521,10 @@ let project = Project(
             .feature(
                 name: "BBBuilder",
                 dependencies: [
-                    .Internal.SharedUI,
-                    .Internal.Models,
                     .Internal.AnalyticsClient,
                     .Internal.LoggerClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
                     .SPM.TCA
                 ]
             ),
@@ -671,44 +678,44 @@ extension TargetDependency {
 
 extension TargetDependency.Internal {
     // Features
-    static let DeeplinkHandler =        TargetDependency.target(name: "DeeplinkHandler")
-    static let ArticlesListFeature =    TargetDependency.target(name: "ArticlesListFeature")
-    static let ArticleFeature =         TargetDependency.target(name: "ArticleFeature")
-    static let BookmarksFeature =       TargetDependency.target(name: "BookmarksFeature")
-    static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
-    static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
-    static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
-    static let PageNavigationFeature  = TargetDependency.target(name: "PageNavigationFeature")
     static let AnnouncementFeature =    TargetDependency.target(name: "AnnouncementFeature")
+    static let ArticleFeature =         TargetDependency.target(name: "ArticleFeature")
+    static let ArticlesListFeature =    TargetDependency.target(name: "ArticlesListFeature")
+    static let AuthFeature =            TargetDependency.target(name: "AuthFeature")
+    static let BookmarksFeature =       TargetDependency.target(name: "BookmarksFeature")
+    static let DeeplinkHandler =        TargetDependency.target(name: "DeeplinkHandler")
+    static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
+    static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
+    static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
-    static let AuthFeature =            TargetDependency.target(name: "AuthFeature")
-    static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
-    static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
-    static let QMSFeature =             TargetDependency.target(name: "QMSFeature")
-    static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")
-    static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
+    static let PageNavigationFeature =  TargetDependency.target(name: "PageNavigationFeature")
+    static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
+    static let QMSFeature =             TargetDependency.target(name: "QMSFeature")
+    static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
+    static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
+    static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     
     // Clients
-    static let APIClient =           TargetDependency.target(name: "APIClient")
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")
+    static let APIClient =           TargetDependency.target(name: "APIClient")
     static let CacheClient =         TargetDependency.target(name: "CacheClient")
     static let HapticClient =        TargetDependency.target(name: "HapticClient")
     static let LoggerClient =        TargetDependency.target(name: "LoggerClient")
+    static let NotificationCenterClient = TargetDependency.target(name: "NotificationCenterClient")
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
-    static let NotificationCenterClient = TargetDependency.target(name: "NotificationCenterClient")
     
     // Shared
-    static let Models =              TargetDependency.target(name: "Models")
-    static let SharedUI =            TargetDependency.target(name: "SharedUI")
-    static let PersistenceKeys =     TargetDependency.target(name: "PersistenceKeys")
-    static let TCAExtensions =       TargetDependency.target(name: "TCAExtensions")
     static let BBBuilder =           TargetDependency.target(name: "BBBuilder")
+    static let Models =              TargetDependency.target(name: "Models")
+    static let PersistenceKeys =     TargetDependency.target(name: "PersistenceKeys")
+    static let SharedUI =            TargetDependency.target(name: "SharedUI")
+    static let TCAExtensions =       TargetDependency.target(name: "TCAExtensions")
 }
 
 extension TargetDependency {
@@ -716,21 +723,21 @@ extension TargetDependency {
 }
 
 extension TargetDependency.SPM {
-    static let TCA =            TargetDependency.external(name: "ComposableArchitecture")
-    static let PDAPI =          TargetDependency.external(name: "PDAPI_SPM")
     static let AlertToast =     TargetDependency.external(name: "AlertToast")
     static let Cache =          TargetDependency.external(name: "Cache")
     static let ExyteChat =      TargetDependency.external(name: "ExyteChat")
-    static let SFSafeSymbols =  TargetDependency.external(name: "SFSafeSymbols")
-    static let SwiftyGif =      TargetDependency.external(name: "SwiftyGif")
-    static let SkeletonUI =     TargetDependency.external(name: "SkeletonUI")
-    static let RichTextKit =    TargetDependency.external(name: "RichTextKit")
+    static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")
     static let Nuke =           TargetDependency.external(name: "Nuke")
     static let NukeUI =         TargetDependency.external(name: "NukeUI")
-    static let ZMarkupParser =  TargetDependency.external(name: "ZMarkupParser")
-    static let Sentry =         TargetDependency.external(name: "SentrySwiftUI")
+    static let PDAPI =          TargetDependency.external(name: "PDAPI_SPM")
     static let PostHog =        TargetDependency.external(name: "PostHog")
+    static let RichTextKit =    TargetDependency.external(name: "RichTextKit")
+    static let Sentry =         TargetDependency.external(name: "SentrySwiftUI")
+    static let SFSafeSymbols =  TargetDependency.external(name: "SFSafeSymbols")
+    static let SkeletonUI =     TargetDependency.external(name: "SkeletonUI")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")
-    static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")
+    static let SwiftyGif =      TargetDependency.external(name: "SwiftyGif")
+    static let TCA =            TargetDependency.external(name: "ComposableArchitecture")
     static let YouTubePlayerKit = TargetDependency.external(name: "YouTubePlayerKit")
+    static let ZMarkupParser =  TargetDependency.external(name: "ZMarkupParser")
 }
