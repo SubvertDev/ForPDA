@@ -119,8 +119,8 @@ let project = Project(
                     .SPM.SFSafeSymbols,
                     .SPM.SkeletonUI,
                     .SPM.SmoothGradient,
-                    .SPM.TCA
-                    .SPM.YouTubePlayerKit,
+                    .SPM.TCA,
+                    .SPM.YouTubePlayerKit
                 ]
             ),
         
@@ -382,10 +382,10 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.TopicBuilder,
-                    .SPM.MemberwiseInit
+                    .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
-                    .SPM.TCA,
+                    .SPM.TCA
                 ]
             ),
         
@@ -495,10 +495,10 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .SPM.NukeUI,
-                    .SPM.RichTextKit
+                    .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
                     .SPM.SkeletonUI,
-                    .SPM.SwiftyGif,
+                    .SPM.SwiftyGif
                 ]
             ),
         
