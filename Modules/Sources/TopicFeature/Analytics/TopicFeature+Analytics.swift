@@ -19,8 +19,11 @@ extension TopicFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onTask, .pageNavigation, ._loadTypes:
+                case .onTask, .onSceneBecomeActive, .pageNavigation, ._loadTypes:
                     break
+                    
+                case .onRefresh:
+                    analytics.log(TopicEvent.onRefresh)
                     
                 case let .userAvatarTapped(userId: userId):
                     analytics.log(TopicEvent.userAvatarTapped(userId))

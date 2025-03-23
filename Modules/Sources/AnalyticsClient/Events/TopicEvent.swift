@@ -8,7 +8,7 @@
 import Foundation
 
 public enum TopicEvent: Event {
-    // case onRefresh
+    case onRefresh
     case userAvatarTapped(Int)
     case urlTapped(URL)
     

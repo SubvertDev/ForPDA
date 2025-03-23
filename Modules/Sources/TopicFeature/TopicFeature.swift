@@ -39,6 +39,7 @@ public struct TopicFeature: Reducer, Sendable {
         
         var isFirstPage = true
         var isLoadingTopic = true
+        var isRefreshing = false
         
         var pageNavigation = PageNavigationFeature.State(type: .topic)
         
@@ -70,6 +71,8 @@ public struct TopicFeature: Reducer, Sendable {
     
     public enum Action {
         case onTask
+        case onRefresh
+        case onSceneBecomeActive
         case userAvatarTapped(userId: Int)
         case urlTapped(URL)
         case pageNavigation(PageNavigationFeature.Action)
@@ -112,6 +115,19 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(._loadTopic(offset: state.initialOffset))
                 )
                 
+            case .onRefresh:
+                state.isRefreshing = true
+                return .run { [offset = state.pageNavigation.offset] send in
+                    await send(._loadTopic(offset: offset))
+                }
+                
+            case .onSceneBecomeActive:
+                if state.isLoadingTopic || state.isRefreshing {
+                    return .none
+                } else {
+                    return .send(.onRefresh)
+                }
+                
             case .userAvatarTapped:
                 // TODO: Wrap into Delegate action?
                 return .none
@@ -121,6 +137,7 @@ public struct TopicFeature: Reducer, Sendable {
                 return .none
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
+                state.isRefreshing = false
                 return .concatenate([
                     .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
                         if isLastPage {
@@ -165,10 +182,16 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let ._loadTopic(offset):
                 state.isFirstPage = offset == 0
-                state.isLoadingTopic = true
-                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage] send in
-                    let result = await Result { try await apiClient.getTopic(id, offset, perPage) }
-                    await send(._topicResponse(result))
+                if !state.isRefreshing {
+                    state.isLoadingTopic = true
+                }
+                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage, isRefreshing = state.isRefreshing] send in
+                    let startTime = Date()
+                    let topic = try await apiClient.getTopic(id, offset, perPage)
+                    if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
+                    await send(._topicResponse(.success(topic)))
+                } catch: { error, send in
+                    await send(._topicResponse(.failure(error)))
                 }
                 .cancellable(id: CancelID.loading)
                 
@@ -207,6 +230,7 @@ public struct TopicFeature: Reducer, Sendable {
             case let ._loadTypes(types):
                 state.types = types
                 state.isLoadingTopic = false
+                state.isRefreshing = false
                 reportFullyDisplayed(&state)
                 return .none
 //                return PageNavigationFeature()
@@ -215,6 +239,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let ._topicResponse(.failure(error)):
                 print("TOPIC RESPONSE FAILURE: \(error)")
+                state.isRefreshing = false
                 reportFullyDisplayed(&state)
                 return .none
                 
