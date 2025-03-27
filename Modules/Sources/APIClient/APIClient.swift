@@ -50,7 +50,7 @@ public struct APIClient: Sendable {
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     
     // Favorites
-    public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<[FavoriteInfo], any Error>
+    public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
     public var setFavorite: @Sendable (_ request: SetFavoriteRequest) async throws -> Bool
     public var notifyFavorite: @Sendable (_ request: NotifyFavoriteRequest) async throws -> Bool
     public var readAllFavorites: @Sendable () async throws -> Bool
@@ -244,8 +244,8 @@ extension APIClient: DependencyKey {
                         )
                         let response = try await api.get(command)
                         let favorites = try await parser.parseFavorites(response)
-                        await cache.setFavorites(favorites.favorites)
-                        return favorites.favorites
+                        await cache.setFavorites(favorites)
+                        return favorites
                     },
                     policy: policy
                 )

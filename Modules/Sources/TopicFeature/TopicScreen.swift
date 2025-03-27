@@ -13,11 +13,13 @@ import SharedUI
 import NukeUI
 import Models
 import ParsingClient
+import TopicBuilder
 
 public struct TopicScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TopicFeature>
     
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.tintColor) private var tintColor
     @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
@@ -52,7 +54,12 @@ public struct TopicScreen: View {
                             }
                         }
                     }
+                    .scrollDismissesKeyboard(.immediately)
                 }
+            }
+            .refreshable {
+                // Wrapper around finish() due to SwiftUI bug
+                await Task { await store.send(.onRefresh).finish() }.value
             }
             .overlay {
                 if store.topic == nil || store.isLoadingTopic {
@@ -61,10 +68,15 @@ public struct TopicScreen: View {
                 }
             }
             .navigationTitle(Text(store.topic?.name ?? "Загружаем..."))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar { OptionsMenu() }
             .onChange(of: store.isLoadingTopic) { _ in
                 Task { await scrollAndAnimate() }
+            }
+            .onChange(of: scenePhase) { newScenePhase in
+                if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
+                    store.send(.onSceneBecomeActive)
+                }
             }
             .task {
                 store.send(.onTask)
@@ -236,9 +248,9 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostFooter(_ lastEdit: Post.LastEdit) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Отредактировал: \(lastEdit.username) • \(lastEdit.date.formatted())")
+            Text("Edited: \(lastEdit.username) • \(lastEdit.date.formatted())", bundle: .module)
             if !lastEdit.reason.isEmpty {
-                Text("Причина: \(lastEdit.reason)")
+                Text("Reason: \(lastEdit.reason)", bundle: .module)
             }
         }
         .font(.caption2)

@@ -219,6 +219,18 @@ struct BBBuilderTests {
             Issue.record("First node is not text or there's more nodes")
         }
     }
+    
+    @Test func fileAttachmentsWithoutNewlineAreNewlined() async throws {
+        let firstId = 0
+        let secondId = 1
+        let text = String.fileAttachment(id: firstId) + String.fileAttachment(id: secondId)
+        let nodes = BBBuilder.build(text: text, attachments: [.file(id: firstId), .file(id: secondId)])
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(text.string.contains("\n"))
+        } else {
+            Issue.record("First node is not text or there's more nodes")
+        }
+    }
 }
 
 // MARK: - Helpers

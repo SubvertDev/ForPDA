@@ -95,6 +95,13 @@ public enum BBContainerNode: Equatable {
         return startsWithSpace || startsWithNewline
     }
     
+    public var isListTag: Bool {
+        if case let .text(text) = self {
+            return text.string == "[*]"
+        }
+        return false
+    }
+    
     init?(tag: BBTag, attribute: AttributedString?, children: [BBContainerNode]) {
         self.init(tag: tag, attribute: attribute.map { NSAttributedString($0) }, children: children)
     }

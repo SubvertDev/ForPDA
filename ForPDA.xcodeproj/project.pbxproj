@@ -37,6 +37,8 @@
 		09E62A450F68E8A7E75DB4DC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		0A706D0EC1E51D83B73B38E5 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 78EA25FA948DA07742796886 /* Localizable.xcstrings */; };
 		0ACE20EFDE0F7C08F8835F9D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
+		0B6A34B75CCBA73D5DC594BA /* TuistAssets+TopicBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607DBAD49BF160CA860BB83C /* TuistAssets+TopicBuilder.swift */; };
+		0BF06B2538787CF0D2123691 /* TrackingModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1988966A8252351EEC4FBC32 /* TrackingModifier.swift */; };
 		0C61DA4BEF2B2F105EE95657 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		0C7AC60D2451951359775F17 /* AppTab+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4580A764B6B5012E90D6C3F /* AppTab+Ext.swift */; };
 		0D33C81668B1ACBBF38639B7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
@@ -62,6 +64,7 @@
 		168613C5DC9676E96E43CD26 /* FavoritesRootFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CFCB43438C1BFB94E3746318 /* FavoritesRootFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16EDD9DEEE3A0F89113155AA /* HapticClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A2735BACD13A67B20CB8C16D /* HapticClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		170ED798261DD9B984FCFC30 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
+		182949BB24B46024335DEF1A /* FavoriteRootFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7EBF83504A913DB3F7DB28 /* FavoriteRootFeature+Analytics.swift */; };
 		185DCFD8F405BD42C72A7D25 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
 		1869C6EEB8CCB4F0A8356CE9 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03140BC8DB3A4C443C7D17B7 /* Event.swift */; };
 		18F2BEED9C8B05E89DC34360 /* FavoritesSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3959B62E541D1436796AE82E /* FavoritesSettings.swift */; };
@@ -99,6 +102,7 @@
 		1FF47647899F289C4A34B7DC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		202E7C2457F257E35DCA4041 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		20FCFD59BC856636BEFF84A2 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
+		20FECC906AED3720D0747FD9 /* BBBuilder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 147498104ABA803524CD0B86 /* BBBuilder.framework */; };
 		211DD3C82B393E0992E4FD47 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 10EEF08BE529FFAC6E2ABC5C /* Localizable.xcstrings */; };
 		2125F11DEAD5B5E2DF99DF8A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		2129AAD64E2975500735CFDA /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
@@ -113,6 +117,8 @@
 		22FBF72740165D435DACB50F /* TuistFonts+FavoritesRootFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03D0A9BB3AE9CC3273BDDD1 /* TuistFonts+FavoritesRootFeature.swift */; };
 		22FCEBD318595269B7618E5F /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		2300F34C391CED5CC3155F33 /* QMSFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2957781ACE16763055F2270D /* QMSFeature.framework */; };
+		23AF5DC2860F8CB3C200122A /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
+		23EFDCC7877522AD25273585 /* PostHog_PostHog.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */; };
 		23F77ACB9F13A5AFDFD8931C /* ProfileFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF7965094A569BFF0A23B5EB /* ProfileFeature+Analytics.swift */; };
 		244256DD10810C4BB513CB11 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
 		24580F46E7E73552188ED3F3 /* TuistFonts+PersistenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED9802583D0BAD916554C9D /* TuistFonts+PersistenceKeys.swift */; };
@@ -141,6 +147,7 @@
 		2C2285C04DC9A7ABE236CA09 /* TuistFonts+DeeplinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566D4DF8BB7C04235624D090 /* TuistFonts+DeeplinkHandler.swift */; };
 		2C2A3E38A0C18F96DC54D832 /* AnnouncementFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E395AC018241E654D19849B8 /* AnnouncementFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2C635162C1F6FB88551B5E04 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
+		2C6C240BBEA5CFD86896DB08 /* FavoritesEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69BA76427B3658B090FE99E /* FavoritesEvent.swift */; };
 		2C74E44891836A73990CC8D9 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		2D542BCCEC0E8ABA25F19DC2 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		2DAF67F4959DC888269CE523 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
@@ -185,12 +192,12 @@
 		3D493E243595B9CAEA17218B /* PasteboardClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58F83C52ACB94DE307992B8D /* PasteboardClient.framework */; };
 		3D6848CA1E7572EE2166D5CC /* Cache_Cache.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 4BAC16218EC9F9A9F2999ABB /* Cache_Cache.bundle */; };
 		3D8B13C2C96E1BAD4E9BA80F /* PersistenceKeys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1716AFC8E678B362BB8EE972 /* PersistenceKeys.framework */; };
+		3DA5B45AE2ECC1D667C54C87 /* TopicBuilder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 69D06482712444A605E2B9C6 /* TopicBuilder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3DB52378A831F58E6AEDB9FB /* SkeletonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */; };
 		3DC372365D813FCFC7C0D274 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		3DF11589489A4A470715F295 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		3E329077DF2B69A9DAB3384D /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		3E89CA38C4748B2C246AB6C6 /* PageNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65159CDA1F51D89A4320DE6 /* PageNavigationView.swift */; };
-		3EC285EA8E21A55FDB7A1192 /* TopicFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */; };
 		3EE7E2D443F71D9FC501DF99 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		3F2CD3AA94D9A40649F21AFC /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		3F74B73DB31DDFEB30638AFC /* DeveloperFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67482FDA32E710F193B122C5 /* DeveloperFeature.framework */; };
@@ -224,6 +231,7 @@
 		47BB464729AF50959259711D /* TuistBundle+TCAExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB1BB68DDA5F1DC43939A8C /* TuistBundle+TCAExtensions.swift */; };
 		47F2975D643F257254595A14 /* ForumParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58323D145DBF5B1FEE656F70 /* ForumParser.swift */; };
 		483B93685FA2B7F421B877C6 /* messages.json in Resources */ = {isa = PBXBuildFile; fileRef = 3EE2530369C0672DAFBD8BF8 /* messages.json */; };
+		48EEFD7112502AF88B7888E7 /* TopicEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244D8FC44CA9F4495220EBEF /* TopicEvent.swift */; };
 		4907E25377965F6005C6C43B /* SwiftyGif_SwiftyGif.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */; };
 		490F7E32738B71FDC5420502 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		493570F4B5AF90BB820FC84C /* PasteboardClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58F83C52ACB94DE307992B8D /* PasteboardClient.framework */; };
@@ -232,12 +240,14 @@
 		4A0C570B2AAAD559524D5AAF /* ForumInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802B3CE80F63078987330D4B /* ForumInfo.swift */; };
 		4A58D21AC970DC7FD594ADC1 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		4A664D487B4338B55FFCB152 /* APIClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		4A73242E51D5FF7E00DD2567 /* TopicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09C397224B882970CB61C903 /* TopicView.swift */; };
 		4A9521784AD0388F7B0EE162 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		4AA95C658DF2FA19C307D466 /* APIClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; };
 		4ACE5DFEB43388B20DD195FF /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		4AF2403B7B658737EC0E0298 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		4B87C00E0F579157E5A2AB09 /* YouTubePlayerKit_YouTubePlayerKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = ACD1369D8CE07B4747D611D1 /* YouTubePlayerKit_YouTubePlayerKit.bundle */; };
 		4BBCE5E24C98602B67996773 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
+		4BDB0B54EE935E72BB6AB415 /* ForumFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A5B1CD6207AE3F36AE2C59 /* ForumFeature+Analytics.swift */; };
 		4C315DBC8CD4F54506032CF7 /* NotificationCenterClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FE2FE3A738395B32CD8D60D /* NotificationCenterClient.framework */; };
 		4C8F28E669E91D54A85E6B7E /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		4CDAA6EB14DFA85C0524D7F2 /* ForumFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F5592F7811DFDA942198417A /* ForumFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -268,6 +278,7 @@
 		56568279AD24435BEAB82BA9 /* PasteboardClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA85FEB047315AC65A98944 /* PasteboardClient.swift */; };
 		5696FE4FCE8E55E078E31CCE /* TopicInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DEFCB42D6996F16057016EE /* TopicInfo.swift */; };
 		56D35B72BFB7CAF8FA8EB6DE /* TuistAssets+APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5DE9B91F7A98D9F0CF62F18 /* TuistAssets+APIClient.swift */; };
+		572789A888ED9DD970F7DBC1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0F194BE9709B729AE1587E09 /* Localizable.xcstrings */; };
 		575D2542F97F2841EA5E7648 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		5848F278F9738A2A919CF371 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296EEF5411F040B1B41C772A /* Article.swift */; };
 		58F39CF5683A83F8C4B5E35D /* ParsingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E31FB7300F36F5C9CD75BF0 /* ParsingError.swift */; };
@@ -279,6 +290,8 @@
 		59DC5E7DF57322C12C4CA4EF /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		5A42CE4F90392540D3F92B19 /* BBAttributedTokenizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A7090197422BB1A461D825 /* BBAttributedTokenizer.swift */; };
 		5A86297D975FF8CE8D4FA2C7 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
+		5B0C9EBC3867F80B6E002836 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
+		5B2EC0ABFAD627ACBC7ED8C0 /* SentrySwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99CC39A7F9B6AAAA1BBA7AA2 /* SentrySwiftUI.framework */; };
 		5B8053BD460F45FB6B2402F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		5BEC88433E85603AE8678EEE /* ShareActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A0992B48CEDD10AE732602 /* ShareActivityView.swift */; };
 		5D2226A15E7F6957A6074748 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
@@ -293,6 +306,7 @@
 		5F21B1792F108EEB2B529D47 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		5F21D254E99407336A6ECF86 /* ForumCommonContextMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F482EA98581F6535F03460 /* ForumCommonContextMenuAction.swift */; };
 		5F338AAFE70F050CDAA7FD6A /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
+		5F553D5A34D8EB036D5EEB85 /* TuistBundle+TopicBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E05AC6DBA795BFB3871F9D75 /* TuistBundle+TopicBuilder.swift */; };
 		5F9DEFC8B70EF38CCB3CAC30 /* ForumTopicContextMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13DB0917CE6954D95A752F47 /* ForumTopicContextMenuAction.swift */; };
 		5FBB1B29E3707FCD15F40666 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		5FE484B76D782DF6AFC2B9AD /* LoggerClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */; };
@@ -308,9 +322,10 @@
 		615D61F66C698799F78F2DD6 /* TuistAssets+HistoryFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA0C850AAE415BBD96ADC88 /* TuistAssets+HistoryFeature.swift */; };
 		61B31DE575000F556AA1CC89 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		625B0B2940BC66F3E4B2CF5D /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
+		627AFB8F49BD7BD8A1CB13B7 /* TopicBuilder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69D06482712444A605E2B9C6 /* TopicBuilder.framework */; };
 		62AEEC5CCF2A3F834D179F3B /* SettingsFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		631F43ECC180BD485C9B5F2B /* TopicNodeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCAB9B30C3A3301190B52089 /* TopicNodeBuilder.swift */; };
 		6353B86288B646502F05E866 /* CacheClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F16F6182018414637FA98B0 /* CacheClient.swift */; };
+		635538EFA1565522E9BAF340 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		635A14237A9C3A6D71E63BE2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 09902809473B6781B1636B1E /* Localizable.xcstrings */; };
 		638A82C0AC8B9E0A1A9DAD77 /* TuistAssets+PageNavigationFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC5CD7FA87091DE4F23D6D8B /* TuistAssets+PageNavigationFeature.swift */; };
 		63C62CDB01B3EBDAD7F238C9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
@@ -328,6 +343,7 @@
 		66C081F6761E9CD265539806 /* ForumsListFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948BCA10C93338559F09E242 /* ForumsListFeature.framework */; };
 		66FC76ADFBEF155B4AD5684E /* SortType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 124DA2BF5DC419EB71D063EE /* SortType.swift */; };
 		6757DAF4542B89F4E49037F5 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
+		67A6B4599E52C547BA1DF046 /* FavoriteRootFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E759700E6C2878F605BBEC0 /* FavoriteRootFeature+Analytics.swift */; };
 		67BA9AB34F23890684D33638 /* TabViewGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B38A5F8365A1E77E822F6C62 /* TabViewGallery.swift */; };
 		67DCC37FFEA96AA2B7892715 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		681BDDE56CBE8E4014DFE5E3 /* NotificationsFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 006917E2DFC70599AF512EA1 /* NotificationsFeature.framework */; };
@@ -335,12 +351,13 @@
 		6925169771FE595C9C4BAAC1 /* HapticClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2735BACD13A67B20CB8C16D /* HapticClient.framework */; };
 		698328028EFEAA67CCF821B8 /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A3D0CC25375C5DCEF34038 /* UserSession.swift */; };
 		6AD3AB2E130A5F5A423EA09C /* ArticlesListFeatureTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC5F26CBFACA62CA164964D /* ArticlesListFeatureTest.swift */; };
-		6B32C929F820AF3C71FAA624 /* AnalyticsModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B6BF9D07130F1BD7EA2FAC1 /* AnalyticsModifier.swift */; };
 		6B69319D76BDFFD630C88685 /* QMSListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7610A4E70D43D6BCC7B280AA /* QMSListScreen.swift */; };
 		6B8C34EB76F12AEE273299EA /* MenuButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AD44E6D3049D0CB33C85211 /* MenuButtons.swift */; };
 		6BC0D383E4FF0B5A2871F2B8 /* TopicFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */; };
+		6C490A72D79A0737F9B71B57 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		6C6C37262C1B044FDD6EDA66 /* icon-48.png in Resources */ = {isa = PBXBuildFile; fileRef = 9A1AFC00CEB5F71F7B0DEE8C /* icon-48.png */; };
 		6CBAEAEDFE6EE46F68EFD2F7 /* LoggerClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */; };
+		6CD867F632722592EC5D2AD5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		6CE43FEF051115426470A227 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		6D8A964092A367A37CF42986 /* TuistFonts+ParsingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD503AB2D9B1CDB4E195DB87 /* TuistFonts+ParsingClient.swift */; };
 		6DB25AA3ACE18FB0D6CDF6F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EC8A8A4A6C70D3C729D6D5 /* AppDelegate.swift */; };
@@ -350,6 +367,7 @@
 		6F15E68556002F3D84AB74B3 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BC03E4358AB75C9EC46A474C /* Localizable.xcstrings */; };
 		6F3D866F9AB1FAAD10272427 /* Nuke.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE538E673738E9F50FC43D2 /* Nuke.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F52695E39374B738AA63D02 /* ContextMenuActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2222FEAE92257F6CF899AB /* ContextMenuActions.swift */; };
+		6F91FC7AE82088DD433EADC4 /* Sentry.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5DA19071A17A00EC37E0C13 /* Sentry.framework */; };
 		6FF609E4F184A3E0738E3438 /* TuistBundle+FavoritesFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46672A4BC9DAE9C2C868E2E /* TuistBundle+FavoritesFeature.swift */; };
 		703BE4997C9F565C137F4B82 /* TuistBundle+ForumsListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = BABB677D51B18FF16F4CAEC2 /* TuistBundle+ForumsListFeature.swift */; };
 		707B77AB53A615030C720360 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
@@ -389,9 +407,12 @@
 		7B4E1517C89D8A1C06C615F3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		7B88B046D7F6C76AD087B131 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		7C2A0AF6F1EFEC746437B732 /* XCTestDynamicOverlay.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 99094502D05988D74C959F86 /* XCTestDynamicOverlay.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7C3F14D0FEAC8B75F12FFA33 /* TuistFonts+TopicBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B0050165D04418AE7EBA54 /* TuistFonts+TopicBuilder.swift */; };
 		7C412E466DD27226FCF2D207 /* CommentEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49383B6E5C255FAE6F6A1127 /* CommentEvent.swift */; };
 		7C5F9A3D89C70591F390FCE9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		7CB22C9ED0E55AFB1C2A8411 /* HistoryFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 02A126A4634AB82351345379 /* HistoryFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7CEA8AB42A3B39B174A70F17 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		7D06389355A7DCDC8444651B /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		7D6451C282705FAB845A8761 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DB1A1BEF04B55777E0667444 /* Localizable.xcstrings */; };
 		7D6B6A9311D06FE816F63C32 /* PersistenceKeys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1716AFC8E678B362BB8EE972 /* PersistenceKeys.framework */; };
 		7DC3AF19A728AFECFA0AF692 /* Bundle+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22880A94BCB02D546FB90F5A /* Bundle+Ext.swift */; };
@@ -404,6 +425,7 @@
 		805B5250D6C2E18C3C65DA8B /* LocalizedStringKey+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135FF486CD12245451C425FD /* LocalizedStringKey+Ext.swift */; };
 		80A55E8359F6D988A6DBB3C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		80DE9F5D1AF7B72EECF8670E /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
+		8158771A595FF0B776C3E665 /* TopicFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AB5FBBA90910649B894562 /* TopicFeature+Analytics.swift */; };
 		821A15C6BC483FCB1FCDC7B3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		8229E1C17D8B4BFE4012B4E6 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		824D8FF443135C06BB9011F7 /* ActivityIndicatorView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F970CA2A185FF1E82859243F /* ActivityIndicatorView.framework */; };
@@ -484,6 +506,7 @@
 		97CE99F195BDCE44BE8BCBB2 /* TopicContextMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28EFB55271F905D3F3015159 /* TopicContextMenuAction.swift */; };
 		980590E878B9D059B78BB7F3 /* DeeplinkHandler.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 62E01CB6C03D5D621E83DA14 /* DeeplinkHandler.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		98561DE604C9C86B5B1469CC /* RichTextKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACE21C098C19D78B00A3A9C9 /* RichTextKit.framework */; };
+		98E03E9445ABE62E4F1A7EF5 /* ForumsListFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA24CB8B945960ED12BF7E1C /* ForumsListFeature+Analytics.swift */; };
 		9927F92C7308A87669D45FB7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		99843B87257D08286E6E4422 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		99BB4CC1B230C3C7A92DC463 /* TuistBundle+AuthFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD3C1AC567E30185B8E5EA8 /* TuistBundle+AuthFeature.swift */; };
@@ -501,6 +524,7 @@
 		9D8426F7DFA74ADDF2E8C28B /* PageNavigationFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D8CEFF67E301FD0409571FAD /* PageNavigationFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9E3A2D5DD74828C4F94378A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		9E56B0627E36651DC6B94587 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
+		9EB4FB0B04D4F80C962F385C /* ForumsListEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1489181F499D53FD9B7D119 /* ForumsListEvent.swift */; };
 		9EB9E1441AAC550506542F85 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 4DF09FE399CCCBE9E310D9A9 /* Localizable.xcstrings */; };
 		9ED76FF43619A9DC46C46BAB /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		9EF50E56DD3F8D06A1426BD8 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
@@ -517,7 +541,9 @@
 		A3554B0A82E46EA4D2C0FD2E /* Models.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A36718C93D16A0B99D86152F /* String+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD4EECBF3A0F0D7E4889AF75 /* String+Ext.swift */; };
 		A36CE9C9C094C4F7FA5ABD59 /* ForumFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5592F7811DFDA942198417A /* ForumFeature.framework */; };
+		A38A76F3A5D4BCA4C76704A1 /* ForumEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772D522989822E80213AC6DB /* ForumEvent.swift */; };
 		A3C734CA81CCB2D75E096511 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
+		A3F766909494426B4CB4F06A /* TopicNodeBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E1DE84AE4508BE944393B8C /* TopicNodeBuilder.swift */; };
 		A4165255DCC588E708B1F17B /* PersistenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312BBD2178B95B375F5C6B8E /* PersistenceKeys.swift */; };
 		A4B361A4CC12DFB0FCAFE6CF /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		A4D35E3CBB42E80EBB312795 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
@@ -531,6 +557,7 @@
 		A793226E585A5DE1C17D517E /* TuistBundle+AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7B71D32BB9A66427282918E /* TuistBundle+AppFeature.swift */; };
 		A7945F50FA9439B44A584FF5 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		A7B8CACD70EA2C08F4F90111 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
+		A861B453933241F9980D4538 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		A89A1DDD4F636633EF45B308 /* TuistAssets+FavoritesRootFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1687398AEF9F395AC3ED9EE2 /* TuistAssets+FavoritesRootFeature.swift */; };
 		A8BD575A94675FFEC65C9261 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		A8C0DED09D78E1F9E5D2F5EE /* ArticlesListParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C1B68A5B4FF3D1226A3386 /* ArticlesListParser.swift */; };
@@ -557,11 +584,11 @@
 		B090BC6F36E53B7FA05878D6 /* HistoryFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D5240CF991BC45B412BE66E /* HistoryFeature.swift */; };
 		B0B0BF20DA102EBAE70B2DA6 /* PersistenceKeys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1716AFC8E678B362BB8EE972 /* PersistenceKeys.framework */; };
 		B0FD7F7766CCCE2A175C9F81 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
-		B12943C9FE2741503CCA7CDD /* BBBuilder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 147498104ABA803524CD0B86 /* BBBuilder.framework */; };
 		B1559A196A7786C69F586623 /* TuistFonts+NotificationsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EC2971DC481D53169646D1 /* TuistFonts+NotificationsClient.swift */; };
 		B19A326685B106F44CF79CB3 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		B2040B390D3B46D9824E0084 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59E44F366735C48EDDFA2CCA /* Sentry.xcframework */; };
 		B27DF84A2545D299C35C3A57 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
+		B2A19C2F342A1570F76176C7 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		B3018A8E7A3C5788FD3862B1 /* TuistFonts+AnalyticsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21CCF90D908132816911425D /* TuistFonts+AnalyticsClient.swift */; };
 		B30FA5E77BC5B32EBC30887C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		B328BD5FF0408EF42A0726A9 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
@@ -593,12 +620,14 @@
 		BBD6AEE9CC85F7F462846962 /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8905D1CBF36C6441E71BFF66 /* ProfileScreen.swift */; };
 		BC92DC56A472AAFCCF5C7CB7 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		BD7D278D096507D3D42718A7 /* NotificationCenterClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30941F1EF5BFE45AF2DD2217 /* NotificationCenterClient.swift */; };
+		BD9DBD5E784FCB2A8E9E0F77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		BE21C1C9BD6266F34850A546 /* BBContainerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21523E404C42EDFD745AC276 /* BBContainerNode.swift */; };
 		BE4B8D49C6CF74CF83352D81 /* TCAExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 441555EF19315050B755C0F6 /* TCAExtensions.framework */; };
 		BE527C07ED447A477EC218F1 /* FavoritesFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBF88C3FEED502F690603E9D /* FavoritesFeature.framework */; };
 		BE6360AFC5E8B8F93C2E80D6 /* BookmarksFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 204BBA2929A777A8A5F79CEC /* BookmarksFeature.framework */; };
 		BE6F96F5F5A17420C1EA17EE /* ArticleFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DA52225C36942B1CC347029 /* ArticleFeature.swift */; };
 		BEED7B5E25FD9EF81282AD5D /* TuistBundle+DeveloperFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC6085DD9EC076F9CE68B66B /* TuistBundle+DeveloperFeature.swift */; };
+		C0262568A296D1F15E8D2434 /* SentryInternal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F7D7F70B2E0710DB7FDCA134 /* SentryInternal.framework */; };
 		C0E88BFDFC48A71398A074A6 /* TuistFonts+CacheClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67177EBF73A3EAA0B80AEE24 /* TuistFonts+CacheClient.swift */; };
 		C0F5E9F91AEC239CF60CCE2B /* APIClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; };
 		C116D32978AF1FD9FBE8B91D /* TuistBundle+HistoryFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D3A5E12661A7D81B133B4E /* TuistBundle+HistoryFeature.swift */; };
@@ -616,8 +645,10 @@
 		C4C55A2222BEA5CA85F002E7 /* SharedUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C548898DCEEEABA459FCD3EA /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		C5B01F07A56AD87E36A3AD24 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
+		C5B65368485F3646ACB1C718 /* TopicBuilder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69D06482712444A605E2B9C6 /* TopicBuilder.framework */; };
 		C657DC24A5D653DDEF95C8A6 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		C677264A3E52D942F5EF645E /* PersistenceKeys.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1716AFC8E678B362BB8EE972 /* PersistenceKeys.framework */; };
+		C69FF8C5133EA47FC4DD7692 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		C6C016D4199548620B7E317C /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		C6F1D82C4FDC42DC2B81FD89 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		C6FFD00791F3A59ECD63CC4A /* TuistFonts+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002816C690657E8B4FBD69D /* TuistFonts+Models.swift */; };
@@ -635,6 +666,7 @@
 		CABDE1660FCCBA352BD96785 /* NotificationsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 889505F119E7D81F1A1B9E41 /* NotificationsClient.framework */; };
 		CAFC891086CF9450E5B3C32B /* ArticleRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F706C68321EBDEA8276E420 /* ArticleRowView.swift */; };
 		CB4710C7C55AD36EC7BB0C07 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		CBC71FC7DC37E4A7AAA89926 /* TrackAnalyticsModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD3EAFD936C5EB78B9BDF2F /* TrackAnalyticsModifier.swift */; };
 		CBDB3B189FF5191D017896E4 /* APIClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; };
 		CD11F59393B4DB830F2A2EF2 /* icon-96.png in Resources */ = {isa = PBXBuildFile; fileRef = 0DCF64129316D28C73F9CBE2 /* icon-96.png */; };
 		CD8982E8158D5881CCBDCCF7 /* BBBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E719322B3F012AE63EE991 /* BBBuilderTests.swift */; };
@@ -652,7 +684,6 @@
 		CFE26C5B8BA31D56EE170B81 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		D007F73B216B3D08EF15D64D /* NotifyFavoriteRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3828FB6700EFF5F1D6001B /* NotifyFavoriteRequest.swift */; };
 		D0486A59B8AC38182E9CC11E /* TuistBundle+AnnouncementFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = D12BFAFA590C8DDB6580E1F0 /* TuistBundle+AnnouncementFeature.swift */; };
-		D07C89F075F4C0AF315DD05B /* TopicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE22B6AC2F950018FE21B9E7 /* TopicView.swift */; };
 		D086E76B37113B92C5FF4DC4 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 54AC29D96533B0FA76B1F354 /* Localizable.xcstrings */; };
 		D08940F1D78BC8E4A147932E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		D0CB3E3BA6DC5884BB059156 /* TuistAssets+ArticlesListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBC7097FDA44F6D45414C57F /* TuistAssets+ArticlesListFeature.swift */; };
@@ -675,6 +706,7 @@
 		D5981DFD937FA4FD1A3A5E4A /* DependenciesMacros.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FCA88C9C00BD198001E27282 /* DependenciesMacros.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D5AA0F61805C9000E77B61BC /* TuistFonts+NotificationCenterClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4773F4E4C976379B229EB66 /* TuistFonts+NotificationCenterClient.swift */; };
 		D5D1824D00C55A9BDF141599 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 090ABFC8C562AF07EDF7BA25 /* Localizable.xcstrings */; };
+		D5E633232E9E6DEEBAB72956 /* FavoritesRootEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DB60D4B9083EC073BFC07C /* FavoritesRootEvent.swift */; };
 		D6366D6E15622CE28A69F03A /* SettingsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB04AEAA44038F11ED7352E7 /* SettingsFeature.swift */; };
 		D68B46F40978386DC2463EBA /* SwiftyGif.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E785207D0C71434223E267F /* SwiftyGif.framework */; };
 		D6FF84647671A638867C7786 /* ArticlesListFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A39BD5202EED5434C358B34E /* ArticlesListFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -692,6 +724,7 @@
 		DCF45886EF152E6BABF47265 /* TuistAssets+BBBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB31B4D43A196ADD3F253FB8 /* TuistAssets+BBBuilderTests.swift */; };
 		DD5329F1B49F202AE61E65B0 /* AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5047AE733F1692EF9DEC2C66 /* AppFeature.swift */; };
 		DD7DDC1DACDB5924B2F30015 /* swift-sharing_Sharing.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = 6ED99D044DB67AD96E453D89 /* swift-sharing_Sharing.bundle */; };
+		DD905556E870486CDD309CB5 /* TracePerformanceView+Modifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0CCE6FA801CAA45F4D59B7 /* TracePerformanceView+Modifier.swift */; };
 		DDE4F9782539965F0741904A /* BBParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF8A9A3F93511E773B9B6D /* BBParser.swift */; };
 		DE1D1CFBC9CC8799A0B4A57A /* TCAExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61D0B8C2912779F5A7381D08 /* TCAExtensions.swift */; };
 		DE315163F5AC12E0B9B41E12 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
@@ -793,6 +826,7 @@
 		F91F7E5E14E4093F6F93AE1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		F9F366404EBE60D927A8E24E /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8BA4B322ED755E0A0FF512 /* AppFeatureTests.swift */; };
 		FA66FD0AFA0FF01E8255B4F4 /* TuistFonts+TopicFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C02613738D6A66349E8A38F /* TuistFonts+TopicFeature.swift */; };
+		FA6C22E62ED6B3D885B0227F /* PostHog_PostHog.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */; };
 		FA757DFE23EA4DA4EB762B1E /* LoggerClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */; };
 		FA91355C64C3E1EB8CFC6E88 /* ZMarkupParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AEB911569EF2ADB3A62F0DAA /* ZMarkupParser.framework */; };
 		FA942E4385A46C7C8F32234A /* OrderedCollections.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 544FE74CB2AC3ECA49CEA0A1 /* OrderedCollections.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1064,6 +1098,13 @@
 			remoteGlobalIDString = 9B3F73EFAB2C641BB7A9E9CD;
 			remoteInfo = APIClient;
 		};
+		3964FCB09CABC00948A209C4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 555566E800C8A71FF699F0EB;
+			remoteInfo = TopicBuilder;
+		};
 		3D10823BD0FC97F3B19244B0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1155,6 +1196,13 @@
 			remoteGlobalIDString = 836ED6BED097C45734C6DDA6;
 			remoteInfo = PersistenceKeys;
 		};
+		4C4596084B734954834BB5D0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 54C511041B0BAC1254A1E96E;
+			remoteInfo = AnalyticsClient;
+		};
 		4CA57D0859D1DDF23189AEB3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1175,13 +1223,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 6C2BD78BE9B4C5FA78FFC4D4;
 			remoteInfo = PasteboardClient;
-		};
-		4D376656C0A9F09443D16C35 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 1058C805506D352323E49C75;
-			remoteInfo = BBBuilder;
 		};
 		4DB0D12869446B60699157F8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1260,6 +1301,13 @@
 			remoteGlobalIDString = 116D1B94E352A3154E151C0A;
 			remoteInfo = NotificationsClient;
 		};
+		5A213896C06D157E888248BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AF7A0B32922CA1E03AEC355C;
+			remoteInfo = SharedUI;
+		};
 		5BBDE5E7B2A2C49BE750B076 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1315,6 +1363,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 304A9EDDF9B780A9A8CFA3F7;
 			remoteInfo = CacheClient;
+		};
+		62F1666C81A7C567D1E7157C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 555566E800C8A71FF699F0EB;
+			remoteInfo = TopicBuilder;
 		};
 		635683B43EBEE18C6B8CC825 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1519,6 +1574,13 @@
 			remoteGlobalIDString = 304A9EDDF9B780A9A8CFA3F7;
 			remoteInfo = CacheClient;
 		};
+		94C9E746F93EB4A4E2687680 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 304A9EDDF9B780A9A8CFA3F7;
+			remoteInfo = CacheClient;
+		};
 		95687F5B69A7F0B674A24EE3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1532,6 +1594,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 54C511041B0BAC1254A1E96E;
 			remoteInfo = AnalyticsClient;
+		};
+		9621F9D9169758FA19DE30AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A607EBFEBB6C59D7C5C5A1C2;
+			remoteInfo = Models;
 		};
 		99F365C49BA1EBB7A82EA183 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1728,13 +1797,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = A13E976E83DB217FF755FB89;
 			remoteInfo = AnnouncementFeature;
-		};
-		BF4941A72214A7FD76C9AC83 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E0E4DF86DB5588C4A649EE5C;
-			remoteInfo = TopicFeature;
 		};
 		BFD5350FE8CDF1D1207CA9BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1980,6 +2042,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 6C9171FD428EA36E888C2959;
 			remoteInfo = PageNavigationFeature;
+		};
+		FD16DEB8D9CC91AE15BA5E2D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1058C805506D352323E49C75;
+			remoteInfo = BBBuilder;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -2307,6 +2376,7 @@
 				C4C55A2222BEA5CA85F002E7 /* SharedUI.framework in Embed Frameworks */,
 				0F62DD60B6EF9FBCCF80C704 /* SkeletonUI.framework in Embed Frameworks */,
 				F12B4DA291344E3C9EE2332C /* TCAExtensions.framework in Embed Frameworks */,
+				3DA5B45AE2ECC1D667C54C87 /* TopicBuilder.framework in Embed Frameworks */,
 				EDFA1D88531988E452B1D327 /* TopicFeature.framework in Embed Frameworks */,
 				7C2A0AF6F1EFEC746437B732 /* XCTestDynamicOverlay.framework in Embed Frameworks */,
 				49E8736180AD6AED493CB4A2 /* PDAPI.xcframework in Embed Frameworks */,
@@ -2349,6 +2419,7 @@
 			buildActionMask = 8;
 			dstSubfolderSpec = 16;
 			files = (
+				FA6C22E62ED6B3D885B0227F /* PostHog_PostHog.bundle in Dependencies */,
 				4084CF3F5A0FE435DA529CB8 /* SwiftyGif_SwiftyGif.bundle in Dependencies */,
 				DD7DDC1DACDB5924B2F30015 /* swift-sharing_Sharing.bundle in Dependencies */,
 			);
@@ -2376,6 +2447,16 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE0CF21D6754323A6D008456 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D174916490610E302EE69D04 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -2463,11 +2544,13 @@
 		08A0992B48CEDD10AE732602 /* ShareActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareActivityView.swift; sourceTree = "<group>"; };
 		090ABFC8C562AF07EDF7BA25 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		09902809473B6781B1636B1E /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		09C397224B882970CB61C903 /* TopicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicView.swift; sourceTree = "<group>"; };
 		0A6FB20BAE6896E328B4D4E2 /* AuthParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthParser.swift; sourceTree = "<group>"; };
 		0BCCC2724A44924990D6CEE6 /* icon-512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-512.png"; sourceTree = "<group>"; };
 		0BD2DC532DA036927C0A45DC /* TuistAssets+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+Models.swift"; sourceTree = "<group>"; };
 		0DCF64129316D28C73F9CBE2 /* icon-96.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-96.png"; sourceTree = "<group>"; };
 		0E31FB7300F36F5C9CD75BF0 /* ParsingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParsingError.swift; sourceTree = "<group>"; };
+		0F194BE9709B729AE1587E09 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		0FBC46964023FE14A1C74F11 /* APIClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "APIClient-Info.plist"; sourceTree = "<group>"; };
 		0FE2FE3A738395B32CD8D60D /* NotificationCenterClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NotificationCenterClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		101DA82283F6CEA438667EB7 /* ArticleMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleMenu.swift; sourceTree = "<group>"; };
@@ -2480,6 +2563,7 @@
 		124DA2BF5DC419EB71D063EE /* SortType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortType.swift; sourceTree = "<group>"; };
 		135FF486CD12245451C425FD /* LocalizedStringKey+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalizedStringKey+Ext.swift"; sourceTree = "<group>"; };
 		136859B894720C8182BCADEA /* TuistBundle+HapticClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+HapticClient.swift"; sourceTree = "<group>"; };
+		13B0050165D04418AE7EBA54 /* TuistFonts+TopicBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+TopicBuilder.swift"; sourceTree = "<group>"; };
 		13DB0917CE6954D95A752F47 /* ForumTopicContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumTopicContextMenuAction.swift; sourceTree = "<group>"; };
 		1449F18EB35F83B390E1512A /* TuistFonts+DeveloperFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+DeveloperFeature.swift"; sourceTree = "<group>"; };
 		147498104ABA803524CD0B86 /* BBBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BBBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2496,6 +2580,7 @@
 		18BCC97B4B961713E9D64608 /* LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerClient.swift; sourceTree = "<group>"; };
 		18C136D21355D51AEB58E812 /* ProfileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileParser.swift; sourceTree = "<group>"; };
 		19375F84D0FB0397E472361F /* QMSListFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "QMSListFeature-Info.plist"; sourceTree = "<group>"; };
+		1988966A8252351EEC4FBC32 /* TrackingModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingModifier.swift; sourceTree = "<group>"; };
 		1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SkeletonUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A9286838B3F04EC37FBAE90 /* ArticlesListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListScreen.swift; sourceTree = "<group>"; };
 		1AE19E440727737F7D768040 /* TuistBundle+BookmarksFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+BookmarksFeature.swift"; sourceTree = "<group>"; };
@@ -2523,6 +2608,7 @@
 		240E58DB5CACACB2C3EC8FAF /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		2425CEE20C0CB14B1C602356 /* FavoriteNotifyType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteNotifyType.swift; sourceTree = "<group>"; };
 		243DC298825E30AD98A65200 /* Unread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unread.swift; sourceTree = "<group>"; };
+		244D8FC44CA9F4495220EBEF /* TopicEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicEvent.swift; sourceTree = "<group>"; };
 		2451C5A702344866E676CAFF /* TuistFonts+HapticClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+HapticClient.swift"; sourceTree = "<group>"; };
 		248A4A0D477EF8F2FF5B2508 /* QMSListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSListFeature.swift; sourceTree = "<group>"; };
 		24E719322B3F012AE63EE991 /* BBBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBBuilderTests.swift; sourceTree = "<group>"; };
@@ -2542,7 +2628,6 @@
 		2A643888DD0481570126B791 /* BBTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBTag.swift; sourceTree = "<group>"; };
 		2AE3F675527A83BE0B90963D /* SortFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortFeature.swift; sourceTree = "<group>"; };
 		2B1ACAD23AE8182F9140F649 /* FloatingButton.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FloatingButton.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		2B6BF9D07130F1BD7EA2FAC1 /* AnalyticsModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsModifier.swift; sourceTree = "<group>"; };
 		2BD3C1AC567E30185B8E5EA8 /* TuistBundle+AuthFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+AuthFeature.swift"; sourceTree = "<group>"; };
 		2C02613738D6A66349E8A38F /* TuistFonts+TopicFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+TopicFeature.swift"; sourceTree = "<group>"; };
 		2D5F18C64F08F2BD57FECAA8 /* TuistAssets+NotificationsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+NotificationsFeature.swift"; sourceTree = "<group>"; };
@@ -2613,8 +2698,10 @@
 		4D9480CA1C409BA84E3CAFC6 /* SettingsFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsFeature+Analytics.swift"; sourceTree = "<group>"; };
 		4DA58394E7006E74B711137B /* ParallaxHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxHeader.swift; sourceTree = "<group>"; };
 		4DCF8A9A3F93511E773B9B6D /* BBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBParser.swift; sourceTree = "<group>"; };
+		4DD3EAFD936C5EB78B9BDF2F /* TrackAnalyticsModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackAnalyticsModifier.swift; sourceTree = "<group>"; };
 		4DF09FE399CCCBE9E310D9A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		4E3A87DA15B2D458AB02E623 /* phlibwebp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = phlibwebp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E759700E6C2878F605BBEC0 /* FavoriteRootFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteRootFeature+Analytics.swift"; sourceTree = "<group>"; };
 		4E96789A57FF03B3FE813187 /* TuistAssets+ParsingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ParsingClient.swift"; sourceTree = "<group>"; };
 		4FF90BDDA3C9FFDCACFC7076 /* FavoriteParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteParser.swift; sourceTree = "<group>"; };
 		5047AE733F1692EF9DEC2C66 /* AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeature.swift; sourceTree = "<group>"; };
@@ -2649,6 +2736,7 @@
 		5DEFCB42D6996F16057016EE /* TopicInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicInfo.swift; sourceTree = "<group>"; };
 		5F16F6182018414637FA98B0 /* CacheClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheClient.swift; sourceTree = "<group>"; };
 		5FF78024BE54FEBE8A3DAD68 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		607DBAD49BF160CA860BB83C /* TuistAssets+TopicBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+TopicBuilder.swift"; sourceTree = "<group>"; };
 		61D0B8C2912779F5A7381D08 /* TCAExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCAExtensions.swift; sourceTree = "<group>"; };
 		62DAC7CA542E3A1748FF7454 /* TuistAssets+TopicFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+TopicFeature.swift"; sourceTree = "<group>"; };
 		62E01CB6C03D5D621E83DA14 /* DeeplinkHandler.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DeeplinkHandler.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2669,6 +2757,7 @@
 		67482FDA32E710F193B122C5 /* DeveloperFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DeveloperFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		67862053B6EBC0E277C54CB2 /* ImageCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCollectionViewCell.swift; sourceTree = "<group>"; };
 		67B79800FEE68FB8EA1B8F40 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		69D06482712444A605E2B9C6 /* TopicBuilder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TopicBuilder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AD44E6D3049D0CB33C85211 /* MenuButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButtons.swift; sourceTree = "<group>"; };
 		6BA4C4ACE4547D301ED518C3 /* TuistAssets+ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForumsListFeature.swift"; sourceTree = "<group>"; };
 		6D0087E3454ECCA95949DE14 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
@@ -2691,6 +2780,7 @@
 		757FC97F2FBD839762792B39 /* ForumJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumJump.swift; sourceTree = "<group>"; };
 		7610A4E70D43D6BCC7B280AA /* QMSListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSListScreen.swift; sourceTree = "<group>"; };
 		769C5A9CAABB94C898EE2D69 /* TuistBundle+LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+LoggerClient.swift"; sourceTree = "<group>"; };
+		772D522989822E80213AC6DB /* ForumEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumEvent.swift; sourceTree = "<group>"; };
 		7801DBEBB5B0700E92A740EC /* AnnouncementFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementFeature.swift; sourceTree = "<group>"; };
 		7818003D66B1EB8DEDEEE180 /* AppStorageKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStorageKeys.swift; sourceTree = "<group>"; };
 		78EA25FA948DA07742796886 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -2699,11 +2789,14 @@
 		7D303BBC2E42A58157CA7ABE /* TuistAssets+AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+AppFeature.swift"; sourceTree = "<group>"; };
 		7DE8A5A78B571C6840E2673C /* TuistFonts+BookmarksFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+BookmarksFeature.swift"; sourceTree = "<group>"; };
 		7FE4A40FCB5BCF1D8BE96D90 /* CustomDump.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CustomDump.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7FE8316D561939AEA2A80BAF /* TopicBuilder-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TopicBuilder-Info.plist"; sourceTree = "<group>"; };
 		802B3CE80F63078987330D4B /* ForumInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumInfo.swift; sourceTree = "<group>"; };
+		80A5B1CD6207AE3F36AE2C59 /* ForumFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForumFeature+Analytics.swift"; sourceTree = "<group>"; };
 		80EED22D45233E216DFED0EA /* TuistAssets+ArticleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ArticleFeature.swift"; sourceTree = "<group>"; };
 		812721A72ADCFCDF77E41819 /* QMSListFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = QMSListFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		819C3F42D1C0667301523468 /* HistoryFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "HistoryFeature-Info.plist"; sourceTree = "<group>"; };
 		81A389182FA02B9BAB9FAE0B /* CustomScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomScrollView.swift; sourceTree = "<group>"; };
+		82DB60D4B9083EC073BFC07C /* FavoritesRootEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesRootEvent.swift; sourceTree = "<group>"; };
 		83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftyGif_SwiftyGif.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		85CCC7B42618527254A75999 /* FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesFeature.swift; sourceTree = "<group>"; };
 		867397EEF56335A036F0E13C /* DeeplinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkHandler.swift; sourceTree = "<group>"; };
@@ -2741,28 +2834,33 @@
 		98EBBC3A32F4D0C330CD8D46 /* QMSFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSFeature.swift; sourceTree = "<group>"; };
 		99094502D05988D74C959F86 /* XCTestDynamicOverlay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XCTestDynamicOverlay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		998F58CE53B86D30C88480EA /* icon-64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-64.png"; sourceTree = "<group>"; };
+		99CC39A7F9B6AAAA1BBA7AA2 /* SentrySwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SentrySwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		99F2AB27D0AE7F79E68C49FF /* ForumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumRow.swift; sourceTree = "<group>"; };
 		9A1AFC00CEB5F71F7B0DEE8C /* icon-48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-48.png"; sourceTree = "<group>"; };
 		9A2222FEAE92257F6CF899AB /* ContextMenuActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuActions.swift; sourceTree = "<group>"; };
 		9A5B0E144201FF1CA058F56C /* ConcurrencyExtras.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ConcurrencyExtras.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AC8FE59852541288950EB1F /* AppFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AppFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E1DE84AE4508BE944393B8C /* TopicNodeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicNodeBuilder.swift; sourceTree = "<group>"; };
 		9F90D7226EC000E32F4C40F3 /* AnnouncementScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementScreen.swift; sourceTree = "<group>"; };
 		9FEC8609036C76136C53E155 /* TCAExtensions-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TCAExtensions-Info.plist"; sourceTree = "<group>"; };
 		A0303B62409E7EECD7C74C77 /* NotificationsClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotificationsClient-Info.plist"; sourceTree = "<group>"; };
 		A0A1709C54DA5950515942F4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		A0F03AB31225515A63176A69 /* AlertToast.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AlertToast.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1489181F499D53FD9B7D119 /* ForumsListEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumsListEvent.swift; sourceTree = "<group>"; };
 		A1F054096AFE73FEADE1AE8C /* BBSmile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBSmile.swift; sourceTree = "<group>"; };
 		A2735BACD13A67B20CB8C16D /* HapticClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HapticClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2B34513A311D7E0763CBFFF /* HistoryParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryParser.swift; sourceTree = "<group>"; };
 		A2D8E578C7711497D2DAFA16 /* TuistAssets+SharedUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+SharedUI.swift"; sourceTree = "<group>"; };
 		A39BD5202EED5434C358B34E /* ArticlesListFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ArticlesListFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4773F4E4C976379B229EB66 /* TuistFonts+NotificationCenterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+NotificationCenterClient.swift"; sourceTree = "<group>"; };
+		A5DA19071A17A00EC37E0C13 /* Sentry.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sentry.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Sentry.framework; sourceTree = DEVELOPER_DIR; };
 		A63483B89D8E53655D884F92 /* ProfileFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProfileFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6C81F15347B15AFF49799ED /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A71C4AA6B8EA3A1AD228B771 /* Forum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forum.swift; sourceTree = "<group>"; };
 		A97D84774C04877C9395B797 /* ForumsListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumsListScreen.swift; sourceTree = "<group>"; };
 		A99F23D68A39F53CF4566F1A /* ArticleParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleParser.swift; sourceTree = "<group>"; };
 		AA60F6E4CD915C419DDB139C /* NotificationsFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotificationsFeature-Info.plist"; sourceTree = "<group>"; };
+		AB0CCE6FA801CAA45F4D59B7 /* TracePerformanceView+Modifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TracePerformanceView+Modifier.swift"; sourceTree = "<group>"; };
 		ACBEBA9CCE9F0A3A38014478 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		ACCDEBC81D7FBF696AB44904 /* AnalyticsConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsConfiguration.swift; sourceTree = "<group>"; };
 		ACD1369D8CE07B4747D611D1 /* YouTubePlayerKit_YouTubePlayerKit.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YouTubePlayerKit_YouTubePlayerKit.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2780,6 +2878,7 @@
 		B4EC2971DC481D53169646D1 /* TuistFonts+NotificationsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+NotificationsClient.swift"; sourceTree = "<group>"; };
 		B55C906394BB2ECF59F0CEC9 /* ToastInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastInfo.swift; sourceTree = "<group>"; };
 		B668E963DE621F2E48B05AFF /* ArticleScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleScreen.swift; sourceTree = "<group>"; };
+		B69BA76427B3658B090FE99E /* FavoritesEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesEvent.swift; sourceTree = "<group>"; };
 		BA6BE98BF8DC0AE85F30CC8B /* ZNSTextAttachment.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ZNSTextAttachment.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA750927EA08B8979A02EE54 /* Links.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Links.swift; sourceTree = "<group>"; };
 		BABB677D51B18FF16F4CAEC2 /* TuistBundle+ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+ForumsListFeature.swift"; sourceTree = "<group>"; };
@@ -2805,7 +2904,6 @@
 		CBBC0E316F60774EEC89DF04 /* icon-256.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-256.png"; sourceTree = "<group>"; };
 		CBC0D6252927A914E0AFE85D /* TuistBundle+AnalyticsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+AnalyticsClient.swift"; sourceTree = "<group>"; };
 		CC9C99A60F4A19E5D372567D /* AuthScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthScreen.swift; sourceTree = "<group>"; };
-		CCAB9B30C3A3301190B52089 /* TopicNodeBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicNodeBuilder.swift; sourceTree = "<group>"; };
 		CCD25E2AE16F9B9D1302C44D /* CommentFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentFeature.swift; sourceTree = "<group>"; };
 		CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PostHog_PostHog.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD4EECBF3A0F0D7E4889AF75 /* String+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Ext.swift"; sourceTree = "<group>"; };
@@ -2823,6 +2921,7 @@
 		D12BFAFA590C8DDB6580E1F0 /* TuistBundle+AnnouncementFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+AnnouncementFeature.swift"; sourceTree = "<group>"; };
 		D333050864E4A0D4CDE6A526 /* ArticlesListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListFeature.swift; sourceTree = "<group>"; };
 		D5625245845B73FC9F03CCCE /* TuistBundle+ArticleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+ArticleFeature.swift"; sourceTree = "<group>"; };
+		D5AB5FBBA90910649B894562 /* TopicFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TopicFeature+Analytics.swift"; sourceTree = "<group>"; };
 		D5DE9B91F7A98D9F0CF62F18 /* TuistAssets+APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+APIClient.swift"; sourceTree = "<group>"; };
 		D629579FC4A60AA54306A112 /* QMSUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSUser.swift; sourceTree = "<group>"; };
 		D6475BBD76467BDFFC9D70EA /* SwiftUIIntrospect.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SwiftUIIntrospect.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2832,6 +2931,7 @@
 		D8C19BA1AA990B2B6DEBF990 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		D8CEFF67E301FD0409571FAD /* PageNavigationFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PageNavigationFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D99CA7DD16005BDC6253FD05 /* YouTubePlayerKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = YouTubePlayerKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA7EBF83504A913DB3F7DB28 /* FavoriteRootFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteRootFeature+Analytics.swift"; sourceTree = "<group>"; };
 		DB1A1BEF04B55777E0667444 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DBC7097FDA44F6D45414C57F /* TuistAssets+ArticlesListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ArticlesListFeature.swift"; sourceTree = "<group>"; };
 		DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ParsingClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2839,7 +2939,6 @@
 		DC6085DD9EC076F9CE68B66B /* TuistBundle+DeveloperFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+DeveloperFeature.swift"; sourceTree = "<group>"; };
 		DD51C6E965A35DBF9F4FBA55 /* Models.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Models.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE1802B1757DD0294A45CBEB /* ForumFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumFeature.swift; sourceTree = "<group>"; };
-		DE22B6AC2F950018FE21B9E7 /* TopicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicView.swift; sourceTree = "<group>"; };
 		DE55B932FF7D0774C0AEBD07 /* SettingsFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SettingsFeature-Info.plist"; sourceTree = "<group>"; };
 		DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LoggerClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEA8F2E0C1F88D6D8D5CEDDC /* NotificationsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsScreen.swift; sourceTree = "<group>"; };
@@ -2849,6 +2948,7 @@
 		DF43F51517761000964AB499 /* ArticlesListFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ArticlesListFeature-Info.plist"; sourceTree = "<group>"; };
 		E013255840871EB50A72EE03 /* TuistAssets+LoggerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+LoggerClient.swift"; sourceTree = "<group>"; };
 		E03D0A9BB3AE9CC3273BDDD1 /* TuistFonts+FavoritesRootFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+FavoritesRootFeature.swift"; sourceTree = "<group>"; };
+		E05AC6DBA795BFB3871F9D75 /* TuistBundle+TopicBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+TopicBuilder.swift"; sourceTree = "<group>"; };
 		E09D8663DDD850468A48D730 /* TopicTypeUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicTypeUI.swift; sourceTree = "<group>"; };
 		E253ABCD9B8300527A696180 /* TuistBundle+CacheClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+CacheClient.swift"; sourceTree = "<group>"; };
 		E28415517E6E58D9F5C61646 /* TuistFonts+BBBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+BBBuilder.swift"; sourceTree = "<group>"; };
@@ -2891,10 +2991,12 @@
 		F5592F7811DFDA942198417A /* ForumFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ForumFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5799228F3F16F025F9D6E8A /* ForumsListFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "ForumsListFeature-Info.plist"; sourceTree = "<group>"; };
 		F60911B654B54FBF7ECD27C3 /* MemberwiseInit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MemberwiseInit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F7D7F70B2E0710DB7FDCA134 /* SentryInternal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SentryInternal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F880424E7D27152CFE961D3B /* TuistBundle+PasteboardClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+PasteboardClient.swift"; sourceTree = "<group>"; };
 		F968EB69AD034C83CB134239 /* TuistFonts+QMSListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+QMSListFeature.swift"; sourceTree = "<group>"; };
 		F970CA2A185FF1E82859243F /* ActivityIndicatorView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ActivityIndicatorView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA22241A2BEBB0E248D26FC2 /* TuistFonts+APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+APIClient.swift"; sourceTree = "<group>"; };
+		FA24CB8B945960ED12BF7E1C /* ForumsListFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForumsListFeature+Analytics.swift"; sourceTree = "<group>"; };
 		FA33373508F922ED4752EFF1 /* AnnouncementInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementInfo.swift; sourceTree = "<group>"; };
 		FA4F9D4A6014EF3586D0B42F /* QMSChatInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSChatInfo.swift; sourceTree = "<group>"; };
 		FB654B9EE2BF5E5690138467 /* TuistAssets+FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+FavoritesFeature.swift"; sourceTree = "<group>"; };
@@ -2948,7 +3050,7 @@
 				8F69C9431819919F5A8ADFAB /* PersistenceKeys.framework in Frameworks */,
 				98561DE604C9C86B5B1469CC /* RichTextKit.framework in Frameworks */,
 				AA63E453534F64AD35917F86 /* SharedUI.framework in Frameworks */,
-				3EC285EA8E21A55FDB7A1192 /* TopicFeature.framework in Frameworks */,
+				C5B65368485F3646ACB1C718 /* TopicBuilder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2973,11 +3075,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F91FC7AE82088DD433EADC4 /* Sentry.framework in Frameworks */,
 				14199D8A4F4CF51B8CDC7720 /* ComposableArchitecture.framework in Frameworks */,
 				B8C498CEC48C5FCB4B97B06D /* LoggerClient.framework in Frameworks */,
 				C6C016D4199548620B7E317C /* Models.framework in Frameworks */,
 				4359FD4B03C1A1B36C7EA0AF /* PersistenceKeys.framework in Frameworks */,
 				1312FF6D5946C59EF2BEE2B5 /* PostHog.framework in Frameworks */,
+				C0262568A296D1F15E8D2434 /* SentryInternal.framework in Frameworks */,
+				5B2EC0ABFAD627ACBC7ED8C0 /* SentrySwiftUI.framework in Frameworks */,
 				AC9497CB04DDFCD72EF6E419 /* phlibwebp.framework in Frameworks */,
 				B2040B390D3B46D9824E0084 /* Sentry.xcframework in Frameworks */,
 			);
@@ -3100,6 +3205,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		57E67A8F2B7EE8AB8815BDAB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				20FECC906AED3720D0747FD9 /* BBBuilder.framework in Frameworks */,
+				23AF5DC2860F8CB3C200122A /* CacheClient.framework in Frameworks */,
+				6C490A72D79A0737F9B71B57 /* ComposableArchitecture.framework in Frameworks */,
+				C69FF8C5133EA47FC4DD7692 /* Models.framework in Frameworks */,
+				B2A19C2F342A1570F76176C7 /* NukeUI.framework in Frameworks */,
+				5B0C9EBC3867F80B6E002836 /* SFSafeSymbols.framework in Frameworks */,
+				A861B453933241F9980D4538 /* SharedUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		61CED399AD59C3190BBF6505 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -3131,7 +3250,6 @@
 			files = (
 				0EB2800DB24784A9E152DA3D /* APIClient.framework in Frameworks */,
 				91DFE3E947BCB35EDCFAEF8C /* AnalyticsClient.framework in Frameworks */,
-				B12943C9FE2741503CCA7CDD /* BBBuilder.framework in Frameworks */,
 				7DDA4763595C7CAA42077A70 /* CacheClient.framework in Frameworks */,
 				9F4BB82285AA45F46941C451 /* ComposableArchitecture.framework in Frameworks */,
 				5FE484B76D782DF6AFC2B9AD /* LoggerClient.framework in Frameworks */,
@@ -3146,6 +3264,7 @@
 				724E720D9E2A96AC78BDB627 /* RichTextKit.framework in Frameworks */,
 				19FE2D3D39049B481A3F658D /* SharedUI.framework in Frameworks */,
 				B54E5F9A682C7AED0A7EEEED /* TCAExtensions.framework in Frameworks */,
+				627AFB8F49BD7BD8A1CB13B7 /* TopicBuilder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3165,6 +3284,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				635538EFA1565522E9BAF340 /* AnalyticsClient.framework in Frameworks */,
 				3DF11589489A4A470715F295 /* ComposableArchitecture.framework in Frameworks */,
 				97B98FD35923FAB19D11201B /* LoggerClient.framework in Frameworks */,
 				F13DDD946843BB2B6B865C91 /* Models.framework in Frameworks */,
@@ -3469,6 +3589,14 @@
 			path = Analytics;
 			sourceTree = "<group>";
 		};
+		0926A36482EEA3F3780ECD9E /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				D5AB5FBBA90910649B894562 /* TopicFeature+Analytics.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
 		09A5262EF7223C027BA1D2ED /* Articles */ = {
 			isa = PBXGroup;
 			children = (
@@ -3608,6 +3736,7 @@
 				DE55B932FF7D0774C0AEBD07 /* SettingsFeature-Info.plist */,
 				057B886884B5C026C12F39BB /* SharedUI-Info.plist */,
 				9FEC8609036C76136C53E155 /* TCAExtensions-Info.plist */,
+				7FE8316D561939AEA2A80BAF /* TopicBuilder-Info.plist */,
 				DEADA5CEBDDD4B3B4887E684 /* TopicFeature-Info.plist */,
 			);
 			path = InfoPlists;
@@ -3682,7 +3811,9 @@
 		2742C85CA8EC8752153D579A /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				2B6BF9D07130F1BD7EA2FAC1 /* AnalyticsModifier.swift */,
+				AB0CCE6FA801CAA45F4D59B7 /* TracePerformanceView+Modifier.swift */,
+				4DD3EAFD936C5EB78B9BDF2F /* TrackAnalyticsModifier.swift */,
+				1988966A8252351EEC4FBC32 /* TrackingModifier.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -3754,6 +3885,7 @@
 				87E76DE87812CCD8858D3036 /* TuistAssets+SettingsFeature.swift */,
 				A2D8E578C7711497D2DAFA16 /* TuistAssets+SharedUI.swift */,
 				86C801944E5FBE5189EF7ED5 /* TuistAssets+TCAExtensions.swift */,
+				607DBAD49BF160CA860BB83C /* TuistAssets+TopicBuilder.swift */,
 				62DAC7CA542E3A1748FF7454 /* TuistAssets+TopicFeature.swift */,
 				CBC0D6252927A914E0AFE85D /* TuistBundle+AnalyticsClient.swift */,
 				D12BFAFA590C8DDB6580E1F0 /* TuistBundle+AnnouncementFeature.swift */,
@@ -3791,6 +3923,7 @@
 				5210212D64C7D2E37E786F9E /* TuistBundle+SettingsFeature.swift */,
 				54C691B84ECE7B451A2D11A1 /* TuistBundle+SharedUI.swift */,
 				EFB1BB68DDA5F1DC43939A8C /* TuistBundle+TCAExtensions.swift */,
+				E05AC6DBA795BFB3871F9D75 /* TuistBundle+TopicBuilder.swift */,
 				3E24108E9EB3018A13870361 /* TuistBundle+TopicFeature.swift */,
 				21CCF90D908132816911425D /* TuistFonts+AnalyticsClient.swift */,
 				4A5022DB244E4A147C6A3716 /* TuistFonts+AnnouncementFeature.swift */,
@@ -3827,6 +3960,7 @@
 				E406A97C7AC1EB77EEF59CE7 /* TuistFonts+SettingsFeature.swift */,
 				59FA4B32DED43F7D305F9D58 /* TuistFonts+SharedUI.swift */,
 				1C49C5C7FD539A8AC4BB532E /* TuistFonts+TCAExtensions.swift */,
+				13B0050165D04418AE7EBA54 /* TuistFonts+TopicBuilder.swift */,
 				2C02613738D6A66349E8A38F /* TuistFonts+TopicFeature.swift */,
 			);
 			path = Sources;
@@ -3942,6 +4076,7 @@
 		4A3312770397847D61EEA170 /* ForumsListFeature */ = {
 			isa = PBXGroup;
 			children = (
+				CA10A8156119D686BF75A5C7 /* Analytics */,
 				9FD78A8F0F8F36FC9B6B72FC /* Models */,
 				65702CB96488AE9200D9F02F /* Resources */,
 				03503F291FA92B3B3B754F43 /* ForumsListFeature.swift */,
@@ -3993,10 +4128,15 @@
 				63C97AB8F5D74357FB1BBA6C /* AuthEvent.swift */,
 				49383B6E5C255FAE6F6A1127 /* CommentEvent.swift */,
 				03140BC8DB3A4C443C7D17B7 /* Event.swift */,
+				B69BA76427B3658B090FE99E /* FavoritesEvent.swift */,
+				82DB60D4B9083EC073BFC07C /* FavoritesRootEvent.swift */,
+				772D522989822E80213AC6DB /* ForumEvent.swift */,
+				A1489181F499D53FD9B7D119 /* ForumsListEvent.swift */,
 				57FD9D2DDE325720FC78D6A0 /* LoginEvent.swift */,
 				716AAAD7D01141995578E15A /* MenuEvent.swift */,
 				670EF6A1CF3FF11D91D3F5DD /* ProfileEvent.swift */,
 				962C7DDA1EA5D4A2A5DB1F7D /* SettingsEvent.swift */,
+				244D8FC44CA9F4495220EBEF /* TopicEvent.swift */,
 			);
 			path = Events;
 			sourceTree = "<group>";
@@ -4079,6 +4219,7 @@
 		698CA54640E301F64BDE9396 /* ForumFeature */ = {
 			isa = PBXGroup;
 			children = (
+				91147490ED55E4999B7F7904 /* Analytics */,
 				6BA0B264329742A6E165E105 /* Models */,
 				68CC0177BE43AD01FE3DB8FE /* Resources */,
 				DE1802B1757DD0294A45CBEB /* ForumFeature.swift */,
@@ -4090,6 +4231,7 @@
 		6AF1ED46827C32C359FA5149 /* FavoritesRootFeature */ = {
 			isa = PBXGroup;
 			children = (
+				803781DC284AF7C6302A23A0 /* Analytics */,
 				E041B61ED9AC0E5DBD2AAB6D /* Resources */,
 				05AEEA5E3282EAAD5C826F2F /* FavoritesRootFeature.swift */,
 				46911CFD7169AD1D23D0E24F /* FavoritesRootScreen.swift */,
@@ -4296,6 +4438,8 @@
 				812721A72ADCFCDF77E41819 /* QMSListFeature.framework */,
 				ACE21C098C19D78B00A3A9C9 /* RichTextKit.framework */,
 				FE90FDB70A525BF91F3B5A72 /* SafariExtension.appex */,
+				F7D7F70B2E0710DB7FDCA134 /* SentryInternal.framework */,
+				99CC39A7F9B6AAAA1BBA7AA2 /* SentrySwiftUI.framework */,
 				717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */,
 				322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */,
 				3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */,
@@ -4306,6 +4450,7 @@
 				83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */,
 				1E785207D0C71434223E267F /* SwiftyGif.framework */,
 				441555EF19315050B755C0F6 /* TCAExtensions.framework */,
+				69D06482712444A605E2B9C6 /* TopicBuilder.framework */,
 				44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */,
 				99094502D05988D74C959F86 /* XCTestDynamicOverlay.framework */,
 				ACD1369D8CE07B4747D611D1 /* YouTubePlayerKit_YouTubePlayerKit.bundle */,
@@ -4314,6 +4459,14 @@
 				BA6BE98BF8DC0AE85F30CC8B /* ZNSTextAttachment.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		803781DC284AF7C6302A23A0 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				DA7EBF83504A913DB3F7DB28 /* FavoriteRootFeature+Analytics.swift */,
+			);
+			path = Analytics;
 			sourceTree = "<group>";
 		};
 		8392B7D1A3617141852235D6 /* ProfileFeature */ = {
@@ -4369,6 +4522,14 @@
 				1E39B50DB1BE0483D336E624 /* AnalyticsClient.swift */,
 			);
 			path = AnalyticsClient;
+			sourceTree = "<group>";
+		};
+		91147490ED55E4999B7F7904 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				80A5B1CD6207AE3F36AE2C59 /* ForumFeature+Analytics.swift */,
+			);
+			path = Analytics;
 			sourceTree = "<group>";
 		};
 		931FE531463569506493B690 /* Extensions */ = {
@@ -4476,6 +4637,7 @@
 				728F57740A3F28CB03F476E9 /* SettingsFeature */,
 				35E31A5F3A4EBD297750137A /* SharedUI */,
 				90268AE6F78D08F1CAC76DCD /* TCAExtensions */,
+				B5F692E6BBEF0D0C4E01E039 /* TopicBuilder */,
 				ACEBF70460960A3EA57D36B3 /* TopicFeature */,
 			);
 			path = Sources;
@@ -4497,6 +4659,14 @@
 			path = Analytics;
 			sourceTree = "<group>";
 		};
+		A4009895D23DEB80395A022E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A5DA19071A17A00EC37E0C13 /* Sentry.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A5C03889BC0C7ABF87A26443 /* String */ = {
 			isa = PBXGroup;
 			children = (
@@ -4510,6 +4680,14 @@
 			isa = PBXGroup;
 			children = (
 				873B3BDBCF8002C1AF1C6F80 /* AuthFeature+Analytics.swift */,
+			);
+			path = Analytics;
+			sourceTree = "<group>";
+		};
+		A61A28B657E14D2BC088ABEC /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				4E759700E6C2878F605BBEC0 /* FavoriteRootFeature+Analytics.swift */,
 			);
 			path = Analytics;
 			sourceTree = "<group>";
@@ -4545,12 +4723,11 @@
 		ACEBF70460960A3EA57D36B3 /* TopicFeature */ = {
 			isa = PBXGroup;
 			children = (
+				0926A36482EEA3F3780ECD9E /* Analytics */,
 				1EE3AC7C8FB1DA367F8A1BC0 /* Models */,
 				A07239C2DF0E43964016CA5B /* Resources */,
 				B487A0FA81FA470EE3027064 /* TopicFeature.swift */,
-				CCAB9B30C3A3301190B52089 /* TopicNodeBuilder.swift */,
 				FBF2A058E1956667E8FEF516 /* TopicScreen.swift */,
-				DE22B6AC2F950018FE21B9E7 /* TopicView.swift */,
 			);
 			path = TopicFeature;
 			sourceTree = "<group>";
@@ -4600,6 +4777,24 @@
 			path = QMSListFeature;
 			sourceTree = "<group>";
 		};
+		B5F692E6BBEF0D0C4E01E039 /* TopicBuilder */ = {
+			isa = PBXGroup;
+			children = (
+				B92B938DED53A90D7C0A77C1 /* Resources */,
+				9E1DE84AE4508BE944393B8C /* TopicNodeBuilder.swift */,
+				09C397224B882970CB61C903 /* TopicView.swift */,
+			);
+			path = TopicBuilder;
+			sourceTree = "<group>";
+		};
+		B92B938DED53A90D7C0A77C1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0F194BE9709B729AE1587E09 /* Localizable.xcstrings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		B982053D2330F26673C85EF0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -4632,6 +4827,7 @@
 			children = (
 				A76F7E0319F4655AA0FFFC39 /* Project */,
 				7F68F331628C4DAE7552269A /* Products */,
+				A4009895D23DEB80395A022E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -4692,6 +4888,14 @@
 				CDE1098EC6C2FB57BE638C5E /* CommentsView.swift */,
 			);
 			path = Comments;
+			sourceTree = "<group>";
+		};
+		CA10A8156119D686BF75A5C7 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				FA24CB8B945960ED12BF7E1C /* ForumsListFeature+Analytics.swift */,
+			);
+			path = Analytics;
 			sourceTree = "<group>";
 		};
 		CDB82CCAC58C2A0C87F09F1C /* Forum */ = {
@@ -4796,6 +5000,7 @@
 		DC15834CBEB5685B14C186DF /* FavoritesFeature */ = {
 			isa = PBXGroup;
 			children = (
+				A61A28B657E14D2BC088ABEC /* Analytics */,
 				A7673B3FE5AC65833ACA0649 /* Extensions */,
 				6BE1F4B86791E565BBFFC2BC /* Models */,
 				6D75E40E91E77BBB3FAE0D5D /* Modifiers */,
@@ -5052,6 +5257,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EC5AC0AB409AD6ABBB183E24 /* PBXTargetDependency */,
 				75E17571944CCF2D8500174E /* PBXTargetDependency */,
 				DC1AC775C9526C79D63535EC /* PBXTargetDependency */,
 				FE08C8A7DE9F53CB74909D04 /* PBXTargetDependency */,
@@ -5286,6 +5492,30 @@
 			);
 			productName = NotificationsFeature;
 			productReference = 006917E2DFC70599AF512EA1 /* NotificationsFeature.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		555566E800C8A71FF699F0EB /* TopicBuilder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8011E136364099A31671C1A7 /* Build configuration list for PBXNativeTarget "TopicBuilder" */;
+			buildPhases = (
+				85A15C2A27B019EAF03E280D /* Sources */,
+				96B3E8DD7EC0B9E8513231D3 /* Resources */,
+				57E67A8F2B7EE8AB8815BDAB /* Frameworks */,
+				D174916490610E302EE69D04 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				01D8547457C726072317D9F3 /* PBXTargetDependency */,
+				4315624949B29AF694583002 /* PBXTargetDependency */,
+				6B6692668E4325443CD13B19 /* PBXTargetDependency */,
+				B097E215E881387A888CD672 /* PBXTargetDependency */,
+			);
+			name = TopicBuilder;
+			packageProductDependencies = (
+			);
+			productName = TopicBuilder;
+			productReference = 69D06482712444A605E2B9C6 /* TopicBuilder.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		5ED9C2F665C9D8850EBD9DA9 /* FavoritesRootFeature */ = {
@@ -5557,7 +5787,7 @@
 				C30A2188A51FBEEC358CD234 /* PBXTargetDependency */,
 				5FDBDE652F2EC12983C999DF /* PBXTargetDependency */,
 				FA5013243607BEB08DF5EFD2 /* PBXTargetDependency */,
-				29BA444536E6CCF65AA882B6 /* PBXTargetDependency */,
+				DF5D512CD162262A4F5CAA6A /* PBXTargetDependency */,
 			);
 			name = AnnouncementFeature;
 			packageProductDependencies = (
@@ -5722,7 +5952,6 @@
 			dependencies = (
 				835215C4A924588D47C1F6E0 /* PBXTargetDependency */,
 				DF625B4F6C98694A5627C305 /* PBXTargetDependency */,
-				9226477C0A2E74D4B5604667 /* PBXTargetDependency */,
 				6E9FBEA8B63586671623A053 /* PBXTargetDependency */,
 				7C075FA7C47FD2CC19FF396B /* PBXTargetDependency */,
 				F84FC36BF5177FD876F64F58 /* PBXTargetDependency */,
@@ -5733,6 +5962,7 @@
 				8862894128B81C703CEFF2E6 /* PBXTargetDependency */,
 				A8E344BE3EE5603EB71639AE /* PBXTargetDependency */,
 				7FBBB07A9CDFCE61ED17247D /* PBXTargetDependency */,
+				2D3E8A8F5C027A9919BDCD6D /* PBXTargetDependency */,
 			);
 			name = TopicFeature;
 			packageProductDependencies = (
@@ -5962,6 +6192,7 @@
 				8A3095F4A1BF8A84A0020E2A /* SettingsFeature */,
 				AF7A0B32922CA1E03AEC355C /* SharedUI */,
 				F4D3CCF044E9BACD457D4E55 /* TCAExtensions */,
+				555566E800C8A71FF699F0EB /* TopicBuilder */,
 				E0E4DF86DB5588C4A649EE5C /* TopicFeature */,
 			);
 		};
@@ -6058,6 +6289,7 @@
 				710C7EEF50D8ED45E48FF207 /* fontello.ttf in Resources */,
 				2125F11DEAD5B5E2DF99DF8A /* LaunchScreen.storyboard in Resources */,
 				BC92DC56A472AAFCCF5C7CB7 /* Preview Assets.xcassets in Resources */,
+				23EFDCC7877522AD25273585 /* PostHog_PostHog.bundle in Resources */,
 				4907E25377965F6005C6C43B /* SwiftyGif_SwiftyGif.bundle in Resources */,
 				3A3903C9442AF45ED68EC7C6 /* swift-sharing_Sharing.bundle in Resources */,
 			);
@@ -6221,6 +6453,18 @@
 				E2EA80CD7B95BADA27892AD0 /* fontello.ttf in Resources */,
 				F7D8415A54582D3B8F62E913 /* LaunchScreen.storyboard in Resources */,
 				1555F36AFA33BEFE334219EB /* Preview Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96B3E8DD7EC0B9E8513231D3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BD9DBD5E784FCB2A8E9E0F77 /* Assets.xcassets in Resources */,
+				7D06389355A7DCDC8444651B /* fontello.ttf in Resources */,
+				7CEA8AB42A3B39B174A70F17 /* LaunchScreen.storyboard in Resources */,
+				6CD867F632722592EC5D2AD5 /* Preview Assets.xcassets in Resources */,
+				572789A888ED9DD970F7DBC1 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6475,6 +6719,7 @@
 				E7D23A4076CF61074C6FF579 /* TuistAssets+FavoritesFeature.swift in Sources */,
 				6FF609E4F184A3E0738E3438 /* TuistBundle+FavoritesFeature.swift in Sources */,
 				522927C1B89A92058ED9E6D3 /* TuistFonts+FavoritesFeature.swift in Sources */,
+				67A6B4599E52C547BA1DF046 /* FavoriteRootFeature+Analytics.swift in Sources */,
 				7DC3AF19A728AFECFA0AF692 /* Bundle+Ext.swift in Sources */,
 				FAC1CF105304F8F96C9D12E7 /* FavoritesFeature.swift in Sources */,
 				33B9275337E8357033CCBB06 /* FavoritesScreen.swift in Sources */,
@@ -6512,11 +6757,18 @@
 				F40F9D534A092D3DBF800787 /* AuthEvent.swift in Sources */,
 				7C412E466DD27226FCF2D207 /* CommentEvent.swift in Sources */,
 				1869C6EEB8CCB4F0A8356CE9 /* Event.swift in Sources */,
+				2C6C240BBEA5CFD86896DB08 /* FavoritesEvent.swift in Sources */,
+				D5E633232E9E6DEEBAB72956 /* FavoritesRootEvent.swift in Sources */,
+				A38A76F3A5D4BCA4C76704A1 /* ForumEvent.swift in Sources */,
+				9EB4FB0B04D4F80C962F385C /* ForumsListEvent.swift in Sources */,
 				CA65F52046767C63F6B38B83 /* LoginEvent.swift in Sources */,
 				8781F75A021319CF6929018E /* MenuEvent.swift in Sources */,
 				B7719EDD4CB97FBDC14187F0 /* ProfileEvent.swift in Sources */,
 				1AC77153F4BED487DE8A5D59 /* SettingsEvent.swift in Sources */,
-				6B32C929F820AF3C71FAA624 /* AnalyticsModifier.swift in Sources */,
+				48EEFD7112502AF88B7888E7 /* TopicEvent.swift in Sources */,
+				DD905556E870486CDD309CB5 /* TracePerformanceView+Modifier.swift in Sources */,
+				CBC71FC7DC37E4A7AAA89926 /* TrackAnalyticsModifier.swift in Sources */,
+				0BF06B2538787CF0D2123691 /* TrackingModifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6548,11 +6800,10 @@
 				314F5B6CFBCF136CAB69AC12 /* TuistAssets+TopicFeature.swift in Sources */,
 				4DB8144F0AEF7FC6E47B2C1B /* TuistBundle+TopicFeature.swift in Sources */,
 				FA66FD0AFA0FF01E8255B4F4 /* TuistFonts+TopicFeature.swift in Sources */,
+				8158771A595FF0B776C3E665 /* TopicFeature+Analytics.swift in Sources */,
 				97CE99F195BDCE44BE8BCBB2 /* TopicContextMenuAction.swift in Sources */,
 				8944F28C567C27FE6553B57B /* TopicFeature.swift in Sources */,
-				631F43ECC180BD485C9B5F2B /* TopicNodeBuilder.swift in Sources */,
 				938C971325CA95E7F1AB63E8 /* TopicScreen.swift in Sources */,
-				D07C89F075F4C0AF315DD05B /* TopicView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6670,6 +6921,7 @@
 				434B9F46162CEB43F94AE67F /* TuistAssets+ForumFeature.swift in Sources */,
 				01D34AC4DFA825A4B41C598F /* TuistBundle+ForumFeature.swift in Sources */,
 				1B6BFAF7901D0A82B76D5366 /* TuistFonts+ForumFeature.swift in Sources */,
+				4BDB0B54EE935E72BB6AB415 /* ForumFeature+Analytics.swift in Sources */,
 				3249369127E22A99EBB1E7F7 /* ForumFeature.swift in Sources */,
 				2ED0C55FB86373A6D153C9B6 /* ForumScreen.swift in Sources */,
 				5F21D254E99407336A6ECF86 /* ForumCommonContextMenuAction.swift in Sources */,
@@ -6718,6 +6970,7 @@
 				9FAC908B1C0D18E469F01399 /* TuistAssets+ForumsListFeature.swift in Sources */,
 				703BE4997C9F565C137F4B82 /* TuistBundle+ForumsListFeature.swift in Sources */,
 				ED2848854E668437D9880F8C /* TuistFonts+ForumsListFeature.swift in Sources */,
+				98E03E9445ABE62E4F1A7EF5 /* ForumsListFeature+Analytics.swift in Sources */,
 				E881E5C65B1FD325100CBCEF /* ForumsListFeature.swift in Sources */,
 				03E6F986E22FBB2CC34D91AB /* ForumsListScreen.swift in Sources */,
 				DFE1FC541AF185F6935349F3 /* ForumRow.swift in Sources */,
@@ -6770,6 +7023,18 @@
 				0C7AC60D2451951359775F17 /* AppTab+Ext.swift in Sources */,
 				D6366D6E15622CE28A69F03A /* SettingsFeature.swift in Sources */,
 				19D6D6A09385C7395F8641F0 /* SettingsScreen.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85A15C2A27B019EAF03E280D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B6A34B75CCBA73D5DC594BA /* TuistAssets+TopicBuilder.swift in Sources */,
+				5F553D5A34D8EB036D5EEB85 /* TuistBundle+TopicBuilder.swift in Sources */,
+				7C3F14D0FEAC8B75F12FFA33 /* TuistFonts+TopicBuilder.swift in Sources */,
+				A3F766909494426B4CB4F06A /* TopicNodeBuilder.swift in Sources */,
+				4A73242E51D5FF7E00DD2567 /* TopicView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6840,6 +7105,7 @@
 				A89A1DDD4F636633EF45B308 /* TuistAssets+FavoritesRootFeature.swift in Sources */,
 				EE4717D915DD843DA7826452 /* TuistBundle+FavoritesRootFeature.swift in Sources */,
 				22FBF72740165D435DACB50F /* TuistFonts+FavoritesRootFeature.swift in Sources */,
+				182949BB24B46024335DEF1A /* FavoriteRootFeature+Analytics.swift in Sources */,
 				1D91B99BA240CE89974C8940 /* FavoritesRootFeature.swift in Sources */,
 				327812410ACBEE1A002FD5D3 /* FavoritesRootScreen.swift in Sources */,
 			);
@@ -6996,6 +7262,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		01D8547457C726072317D9F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = BBBuilder;
+			target = 1058C805506D352323E49C75 /* BBBuilder */;
+			targetProxy = FD16DEB8D9CC91AE15BA5E2D /* PBXContainerItemProxy */;
+		};
 		03850F199C326FA9729D7DC3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = PersistenceKeys;
@@ -7152,12 +7424,6 @@
 			target = 971A841DF29EABFD548848CF /* QMSListFeature */;
 			targetProxy = 0857B71E601111C8A350D7DA /* PBXContainerItemProxy */;
 		};
-		29BA444536E6CCF65AA882B6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = TopicFeature;
-			target = E0E4DF86DB5588C4A649EE5C /* TopicFeature */;
-			targetProxy = BF4941A72214A7FD76C9AC83 /* PBXContainerItemProxy */;
-		};
 		2A0B310C49C8367437E3CA76 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = ParsingClient;
@@ -7169,6 +7435,12 @@
 			name = ArticleFeature;
 			target = F8124C1D8CF58BD2703CD4C7 /* ArticleFeature */;
 			targetProxy = 4CA97E06DA75B18FA0B2D8E7 /* PBXContainerItemProxy */;
+		};
+		2D3E8A8F5C027A9919BDCD6D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TopicBuilder;
+			target = 555566E800C8A71FF699F0EB /* TopicBuilder */;
+			targetProxy = 3964FCB09CABC00948A209C4 /* PBXContainerItemProxy */;
 		};
 		2E120D6803E277AE90659C29 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7217,6 +7489,12 @@
 			name = Models;
 			target = A607EBFEBB6C59D7C5C5A1C2 /* Models */;
 			targetProxy = 1341C71BA951DE16914379E2 /* PBXContainerItemProxy */;
+		};
+		4315624949B29AF694583002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CacheClient;
+			target = 304A9EDDF9B780A9A8CFA3F7 /* CacheClient */;
+			targetProxy = 94C9E746F93EB4A4E2687680 /* PBXContainerItemProxy */;
 		};
 		43FEEAA918C5BC29184D363F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7379,6 +7657,12 @@
 			name = CacheClient;
 			target = 304A9EDDF9B780A9A8CFA3F7 /* CacheClient */;
 			targetProxy = AF0E42F160AD1AE71BBA25FA /* PBXContainerItemProxy */;
+		};
+		6B6692668E4325443CD13B19 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Models;
+			target = A607EBFEBB6C59D7C5C5A1C2 /* Models */;
+			targetProxy = 9621F9D9169758FA19DE30AE /* PBXContainerItemProxy */;
 		};
 		6C58F200E71B90C0A717ADEE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7548,12 +7832,6 @@
 			target = AF7A0B32922CA1E03AEC355C /* SharedUI */;
 			targetProxy = 1CDC7F7C0CC12AE60DF21256 /* PBXContainerItemProxy */;
 		};
-		9226477C0A2E74D4B5604667 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = BBBuilder;
-			target = 1058C805506D352323E49C75 /* BBBuilder */;
-			targetProxy = 4D376656C0A9F09443D16C35 /* PBXContainerItemProxy */;
-		};
 		93B1C9F7AA17E782DE8A9F32 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = CacheClient;
@@ -7643,6 +7921,12 @@
 			name = CacheClient;
 			target = 304A9EDDF9B780A9A8CFA3F7 /* CacheClient */;
 			targetProxy = 62CDC568EC63AC110F23052D /* PBXContainerItemProxy */;
+		};
+		B097E215E881387A888CD672 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SharedUI;
+			target = AF7A0B32922CA1E03AEC355C /* SharedUI */;
+			targetProxy = 5A213896C06D157E888248BC /* PBXContainerItemProxy */;
 		};
 		B0B77AFEF8E6833ED04C757D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7896,6 +8180,12 @@
 			target = 54C511041B0BAC1254A1E96E /* AnalyticsClient */;
 			targetProxy = A110385D4BC68AE42C8A6FA0 /* PBXContainerItemProxy */;
 		};
+		DF5D512CD162262A4F5CAA6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TopicBuilder;
+			target = 555566E800C8A71FF699F0EB /* TopicBuilder */;
+			targetProxy = 62F1666C81A7C567D1E7157C /* PBXContainerItemProxy */;
+		};
 		DF625B4F6C98694A5627C305 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = AnalyticsClient;
@@ -7955,6 +8245,12 @@
 			name = PageNavigationFeature;
 			target = 6C9171FD428EA36E888C2959 /* PageNavigationFeature */;
 			targetProxy = 17AAADC38242BBF64BE2548A /* PBXContainerItemProxy */;
+		};
+		EC5AC0AB409AD6ABBB183E24 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = AnalyticsClient;
+			target = 54C511041B0BAC1254A1E96E /* AnalyticsClient */;
+			targetProxy = 4C4596084B734954834BB5D0 /* PBXContainerItemProxy */;
 		};
 		F00CE6886CD95EBD0A2383DE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -8064,6 +8360,73 @@
 			};
 			name = Debug;
 		};
+		07C980CC43BF2E3C3052AC67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
+				);
+				INFOPLIST_FILE = "Derived/InfoPlists/TopicBuilder-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/ComposableArchitectureMacros#ComposableArchitectureMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/PerceptionMacros#PerceptionMacros",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.TopicBuilder;
+				PRODUCT_NAME = TopicBuilder;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		0877729A2D6BF1D44FE086D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -8077,6 +8440,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8091,6 +8455,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8098,6 +8463,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8203,6 +8570,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8217,6 +8585,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8224,6 +8593,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8270,6 +8641,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8284,6 +8656,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8291,6 +8664,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8333,6 +8708,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8347,6 +8723,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8354,6 +8731,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8396,6 +8775,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8410,6 +8790,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8417,6 +8798,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8427,8 +8810,6 @@
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/ComposableArchitectureMacros#ComposableArchitectureMacros",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
-					"-load-plugin-executable",
-					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/MemberwiseInitMacros#MemberwiseInitMacros",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/PerceptionMacros#PerceptionMacros",
 				);
@@ -8465,6 +8846,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8479,6 +8861,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8486,6 +8869,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8528,6 +8913,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8542,6 +8928,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8549,6 +8936,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8592,6 +8981,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8604,6 +8994,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8611,6 +9002,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8651,6 +9044,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8665,6 +9059,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8672,6 +9067,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8836,6 +9233,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8850,6 +9248,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8857,6 +9256,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -8974,6 +9375,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8988,6 +9390,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -8995,6 +9398,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9041,6 +9446,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9055,6 +9461,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9062,6 +9469,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9174,6 +9583,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9188,14 +9599,20 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -9385,6 +9802,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9399,6 +9817,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9406,6 +9825,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9452,6 +9873,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9466,6 +9888,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9473,6 +9896,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9511,6 +9936,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9524,6 +9950,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9531,6 +9958,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9614,6 +10043,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9628,6 +10058,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9635,6 +10066,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9677,6 +10110,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9691,6 +10125,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9698,6 +10133,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9801,6 +10238,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9814,14 +10253,20 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -9856,6 +10301,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9870,6 +10316,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9877,6 +10324,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9923,6 +10372,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9937,6 +10387,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -9944,6 +10395,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -9986,6 +10439,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10000,6 +10454,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10007,6 +10462,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10049,6 +10506,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10063,6 +10521,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10070,6 +10529,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10179,6 +10640,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10193,6 +10655,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10200,6 +10663,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10240,6 +10705,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10253,14 +10720,20 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -10299,6 +10772,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10313,6 +10787,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10320,6 +10795,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10425,6 +10902,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10439,6 +10917,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10446,6 +10925,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10584,6 +11065,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10598,6 +11080,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10605,6 +11088,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10669,6 +11154,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10683,6 +11169,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10690,6 +11177,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10732,6 +11221,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10746,6 +11236,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10753,6 +11244,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10763,8 +11256,6 @@
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/ComposableArchitectureMacros#ComposableArchitectureMacros",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
-					"-load-plugin-executable",
-					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/MemberwiseInitMacros#MemberwiseInitMacros",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/PerceptionMacros#PerceptionMacros",
 				);
@@ -10923,6 +11414,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10937,6 +11429,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -10944,6 +11437,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -10977,6 +11472,77 @@
 			};
 			name = Debug;
 		};
+		BAEDD335E7AA7C5D5D828C1E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
+				);
+				INFOPLIST_FILE = "Derived/InfoPlists/TopicBuilder-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/ComposableArchitectureMacros#ComposableArchitectureMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/PerceptionMacros#PerceptionMacros",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.TopicBuilder;
+				PRODUCT_NAME = TopicBuilder;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
 		BFA6E486DB653D815A6A91A1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -10990,6 +11556,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11004,6 +11571,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11011,6 +11579,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11053,6 +11623,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11067,6 +11638,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11074,6 +11646,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11120,6 +11694,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11134,6 +11709,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11141,6 +11717,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11187,6 +11765,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11201,6 +11780,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11208,6 +11788,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11252,6 +11834,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11266,6 +11849,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11273,6 +11857,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11315,6 +11901,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11329,6 +11916,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11336,6 +11924,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11378,6 +11968,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11392,6 +11983,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11399,6 +11991,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11447,6 +12041,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11461,6 +12056,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11468,6 +12064,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11514,6 +12112,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11528,6 +12127,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11535,6 +12135,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11581,6 +12183,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11595,6 +12198,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11602,6 +12206,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11648,6 +12254,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11662,6 +12269,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11669,6 +12277,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11715,6 +12325,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11729,6 +12340,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11736,6 +12348,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11779,6 +12393,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11791,6 +12406,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11798,6 +12414,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -11842,6 +12460,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11856,6 +12475,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -11863,6 +12483,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12031,6 +12653,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12045,6 +12668,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12052,6 +12676,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12102,6 +12728,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12116,6 +12743,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12123,6 +12751,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12228,6 +12858,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12242,6 +12873,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12249,6 +12881,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12291,6 +12925,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12305,6 +12940,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12312,6 +12948,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12364,6 +13002,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12378,6 +13017,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12385,6 +13025,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12549,6 +13191,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12563,6 +13206,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12570,6 +13214,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12612,6 +13258,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12626,6 +13273,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12633,6 +13281,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12675,6 +13325,7 @@
 					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12688,6 +13339,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
@@ -12695,6 +13347,8 @@
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
 					"-Xcc",
@@ -12736,6 +13390,8 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12750,14 +13406,20 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 				);
 				OTHER_SWIFT_FLAGS = (
 					"$(inherited)",
 					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
 					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
 					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
 					"-load-plugin-executable",
 					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
 					"-load-plugin-executable",
@@ -12948,6 +13610,15 @@
 			buildConfigurations = (
 				DF590D60EAACB8F9A4536775 /* Debug */,
 				ABA0DFDBC66E0F9E82F6B526 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8011E136364099A31671C1A7 /* Build configuration list for PBXNativeTarget "TopicBuilder" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BAEDD335E7AA7C5D5D828C1E /* Debug */,
+				07C980CC43BF2E3C3052AC67 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

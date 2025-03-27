@@ -12,6 +12,8 @@ import TopicFeature
 import ParsingClient
 import Models
 import PersistenceKeys
+import AnalyticsClient
+import TopicBuilder
 
 @Reducer
 public struct AnnouncementFeature: Reducer, Sendable {
@@ -28,6 +30,8 @@ public struct AnnouncementFeature: Reducer, Sendable {
         public var announcement: Announcement?
         
         var types: [[TopicTypeUI]] = []
+        
+        var didLoadOnce = false
        
         public init(id: Int, name: String?) {
             self.announcementId = id
@@ -50,6 +54,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - Body
     
@@ -88,13 +93,23 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 
             case let ._loadTypes(types):
                 state.types = types
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let ._announcementResponse(.failure(error)):
                 // TODO: Handle error
                 print(error)
+                reportFullyDisplayed(&state)
                 return .none
             }
         }
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }

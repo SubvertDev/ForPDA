@@ -187,20 +187,19 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
         Section {
-            if !important, store.pageNavigation.shouldShow {
-                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-            }
+            Navigation(isShown: !important)
             
-            ForEach(favorites, id: \.hashValue) { favorite in
+            ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
                 Row(
                     id: favorite.topic.id,
                     title: favorite.topic.name,
                     lastPost: favorite.topic.lastPost,
                     closed: favorite.topic.isClosed,
                     unread: favorite.topic.isUnread,
+                    forum: favorite.isForum,
                     notify: favorite.notify
                 ) { showUnread in
-                    if showUnread {
+                    if showUnread && !favorite.isForum {
                         store.send(.unreadTapped(id: favorite.topic.id))
                     } else {
                         store.send(
@@ -223,12 +222,17 @@ public struct FavoritesScreen: View {
                         CommonContextMenu(favorite: favorite)
                     }
                 }
+                .listRowBackground(
+                    Color(.Background.teritary)
+                        .clipShape(.rect(
+                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == favorites.count - 1 ? 10 : 0,
+                            bottomTrailingRadius: index == favorites.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
+                        ))
+                )
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            if !important, store.pageNavigation.shouldShow {
-                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-            }
+            Navigation(isShown: !important)
         } header: {
             if !favorites.isEmpty {
                 Header(title: important
@@ -237,6 +241,17 @@ public struct FavoritesScreen: View {
             }
         }
         .listRowBackground(Color(.Background.teritary))
+    }
+    
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation(isShown: Bool) -> some View {
+        if isShown, store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                .listRowBackground(Color.clear)
+                .padding(.bottom, 4)
+        }
     }
     
     // MARK: - Row
@@ -248,6 +263,7 @@ public struct FavoritesScreen: View {
         lastPost: TopicInfo.LastPost? = nil,
         closed: Bool = false,
         unread: Bool = false,
+        forum: Bool = false,
         notify: FavoriteInfo.Notify,
         action: @escaping (_ unreadTapped: Bool) -> Void
     ) -> some View {
@@ -257,7 +273,7 @@ public struct FavoritesScreen: View {
             } label: {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 6) {
-                        if let lastPost {
+                        if let lastPost, !forum {
                             Text(lastPost.formattedDate, bundle: .models)
                                 .font(.caption)
                                 .foregroundStyle(Color(.Labels.teritary))
@@ -270,7 +286,7 @@ public struct FavoritesScreen: View {
                             foregroundStyle: Color(.Labels.primary)
                         )
                         
-                        if let lastPost {
+                        if let lastPost, !forum {
                             HStack(spacing: 4) {
                                 Image(systemSymbol: .personCircle)
                                     .font(.caption)

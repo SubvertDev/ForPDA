@@ -46,6 +46,7 @@ public struct ForumScreen: View {
                         }
                     }
                     .scrollContentBackground(.hidden)
+                    .scrollDismissesKeyboard(.immediately)
                     .refreshable {
                         await store.send(.onRefresh).finish()
                     }

@@ -10,12 +10,14 @@ import ComposableArchitecture
 import SFSafeSymbols
 import Models
 import SharedUI
+import Perception
 
 public struct PageNavigation: View {
     
     // MARK: - Properties
     
-    public var store: StoreOf<PageNavigationFeature>
+    @Perception.Bindable public var store: StoreOf<PageNavigationFeature>
+    @FocusState private var focus: PageNavigationFeature.State.Field?
     
     // MARK: - Init
     
@@ -71,20 +73,57 @@ public struct PageNavigation: View {
             .disabled(store.currentPage + 1 > store.totalPages)
         }
         .overlay {
-            Text(String("\(store.currentPage) / \(store.totalPages)"))
-                .font(.subheadline)
-                .foregroundStyle(Color(.Labels.secondary))
-                .padding(.vertical, 6)
-                .padding(.horizontal, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .foregroundStyle(Color(.Background.teritary))
-                )
-                .contentTransition(.numericText())
+            HStack(spacing: 8) {
+                TextField(String(""), text: $store.page)
+                    .font(.subheadline)
+                    .keyboardType(.numberPad)
+                    .focused($focus, equals: PageNavigationFeature.State.Field.page)
+                    .fixedSize()
+                    .onChange(of: store.page) { newValue in
+                        guard !store.page.isEmpty else { return }
+                        store.page = String(min(Int(store.page.filter(\.isNumber))!, store.totalPages))
+                    }
+                    .toolbar {
+                        if focus == .page {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                
+                                Button {
+                                    store.send(.doneButtonTapped)
+                                } label: {
+                                    Text("Done", bundle: .module)
+                                }
+                            }
+                        }
+                    }
+                    .opacity(store.focus == nil ? 0 : 1)
+                    .overlay {
+                        Text(store.page)
+                            .font(.subheadline)
+                            .fixedSize()
+                            .opacity(store.focus == nil ? 1 : 0)
+                            .contentTransition(.numericText())
+                            .animation(.default, value: store.page)
+                    }
+                
+                Text(verbatim: "/")
+                    .font(.subheadline)
+                
+                Text(verbatim: "\(store.totalPages)")
+                    .font(.subheadline)
+            }
+            .padding(.vertical, 6)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .foregroundStyle(Color(.Background.teritary))
+            )
+            .onTapGesture {
+                store.send(.onViewTapped)
+            }
         }
+        .bind($store.focus, to: $focus)
         .listRowSeparator(.hidden)
-        .animation(.default, value: store.currentPage)
-        .frame(maxWidth: .infinity, maxHeight: 32)
     }
     
     // MARK: - Navigation Arrow
@@ -94,18 +133,6 @@ public struct PageNavigation: View {
         Image(systemSymbol: symbol)
             .font(.body)
             .frame(width: 32, height: 32)
-    }
-}
-
-// MARK: - Model Extensions
-
-extension NoticeType {
-    public var color: Color {
-        switch self {
-        case .curator:   return Color(.Main.green)
-        case .moderator: return Color(.Theme.primary)
-        case .admin:     return Color(.Main.red)
-        }
     }
 }
 

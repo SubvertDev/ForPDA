@@ -11,6 +11,11 @@ func timeElapsed(from start: DispatchTime) -> String {
     return String(format: "%.2f ms", elapsedTimeInMilliSeconds)
 }
 
+struct ListInfo {
+    var count = 0
+    let type: BBContainerNode.ListType
+}
+
 public struct BBBuilder {
     
     // MARK: - Build Interface
@@ -38,8 +43,9 @@ public struct BBBuilder {
     
     // MARK: - Implementation
     
-    private func mergeTextNodes(_ nodes: [BBContainerNode], listType: BBContainerNode.ListType? = nil) -> [BBContainerNode] {
+    private func mergeTextNodes(_ nodes: [BBContainerNode], listInfo: ListInfo? = nil) -> [BBContainerNode] {
         var mergedNodes: [BBContainerNode] = []
+        var listInfo = listInfo
         
         func hasPreviousNode(_ index: Int) -> Bool {
             return nodes[safe: index - 1] != nil
@@ -62,6 +68,12 @@ public struct BBBuilder {
             switch node {
             case .text, .snapback, .mergetime, .smile:
                 logger.info("In textable node")
+                
+                if listInfo != nil, node.isListTag {
+                    logger.info("List tag, increasing counter")
+                    listInfo?.count += 1
+                }
+                
                 if mutableText.string.isEmpty {
                     var trimLeading = false
                     var trimTrailing = false
@@ -83,10 +95,7 @@ public struct BBBuilder {
                             logger.info("Next node is not textable")
                             trimTrailing = true
                         }
-                        if case let .attachment(attribute) = nodes[index + 1], isFileAttachment(attribute: attribute) {
-                            logger.info("Next node is file attachment")
-                            trimTrailing = false
-                        } else if nodes[index + 1].isMedia {
+                        if nodes[index + 1].isMedia {
                             logger.info("Next node is media")
                             trimTrailing = false
                         }
@@ -99,7 +108,7 @@ public struct BBBuilder {
                     let textNode = unwrap(
                         node: node,
                         with: mutableText,
-                        listType: listType,
+                        listInfo: listInfo,
                         trimLeading: trimLeading,
                         trimTrailing: trimTrailing
                     )
@@ -116,15 +125,17 @@ public struct BBBuilder {
                     let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
                     if isNextNodeTextable || isNextNodeMedia {
                         logger.info("Next node is textable OR media, unwrapping")
-                        var isAttachmentDelimeneter = false
-                        if case .attachment = nodes[safe: index - 1] { isAttachmentDelimeneter = true }
+                        var isAttachmentDelimeter = false
+                        if case .attachment = nodes[safe: index - 1] {
+                            isAttachmentDelimeter = true
+                        }
                         mergedNodes[mergedNodes.count - 1] = unwrap(
                             node: node,
                             with: mutableText,
-                            isAttachmentDelimeter: isAttachmentDelimeneter,
-                            listType: listType
+                            isAttachmentDelimeter: isAttachmentDelimeter,
+                            listInfo: listInfo
                         )
-                        if listType != nil,
+                        if listInfo != nil,
                            case let .text(text) = nodes[safe: index - 1],
                            text.string == "[*]",
                            case let .text(text) = node,
@@ -137,7 +148,7 @@ public struct BBBuilder {
                         mergedNodes[mergedNodes.count - 1] = unwrap(
                             node: node,
                             with: mutableText,
-                            listType: listType,
+                            listInfo: listInfo,
                             trimTrailing: true
                         )
                     }
@@ -146,7 +157,7 @@ public struct BBBuilder {
             case .img:
                 logger.info("Image case")
                 #warning("todo")
-                mergedNodes[mergedNodes.count - 1] = unwrap(node: node, with: mutableText)
+                mergedNodes.lastOrAppend = unwrap(node: node, with: mutableText)
                 
             case let .attachment(attribute):
                 logger.info("Attachment case")
@@ -159,11 +170,15 @@ public struct BBBuilder {
                     mergedNodes.lastOrAppend = unwrap(node: textNode, with: mutableText)
                     continue
                 }
-                let attachmentType = attachments[attachmentIndex].type
-                switch attachmentType {
+                
+                switch attachments[attachmentIndex].type {
                 case .file:
                     logger.info("FILE attachment")
-                    let textNode = unwrap(node: node, with: mutableText)
+                    var isAttachmentDelimeter = false
+                    if case let .text(text) = mergedNodes.last, text.string.last != "\n" {
+                        isAttachmentDelimeter = true
+                    }
+                    let textNode = unwrap(node: node, with: mutableText, isAttachmentDelimeter: isAttachmentDelimeter)
                     if !textNode.isEmptyText {
                         mergedNodes.lastOrAppend = textNode
                     } else {
@@ -172,7 +187,7 @@ public struct BBBuilder {
                     continue
                     
                 case .image:
-                    break
+                    break // TODO: Move image attachment below here
                 }
                 
                 logger.info("IMAGE attachment")
@@ -250,7 +265,7 @@ public struct BBBuilder {
                 mergedNodes.append(.quote(attributed, mergeTextNodes(array)))
                 
             case .list(let type, let array):
-                mergedNodes.append(.list(type, mergeTextNodes(array, listType: type)))
+                mergedNodes.append(.list(type, mergeTextNodes(array, listInfo: ListInfo(type: type))))
                 
             case .code(let title, let array):
                 mergedNodes.append(.code(title, mergeTextNodes(array)))
@@ -280,7 +295,7 @@ public struct BBBuilder {
         with combinedText: NSAttributedString,
         isFirst: Bool = false,
         isAttachmentDelimeter: Bool = false,
-        listType: BBContainerNode.ListType? = nil,
+        listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
@@ -300,7 +315,7 @@ public struct BBBuilder {
         with combinedText: NSMutableAttributedString,
         isFirst: Bool = false,
         isAttachmentDelimeter: Bool = false,
-        listType: BBContainerNode.ListType? = nil,
+        listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
@@ -308,15 +323,18 @@ public struct BBBuilder {
         switch node {
         case .text(let text):
             let mutableString = NSMutableAttributedString(
-                attributedString: text.trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                attributedString: text
+                    .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                    .replacingOccurrences(of: "&#91;", with: "[")
+                    .replacingOccurrences(of: "&#93;", with: "]")
             )
             if isAttachmentDelimeter {
                 if mutableString.string.prefix(1) == " " {
                     mutableString.replaceCharacters(in: NSRange(location: 0, length: 1), with: "\n")
                 }
             }
-            if let listType {
-                mutableString.replaceListTags(of: listType)
+            if let listInfo {
+                mutableString.replaceListTags(for: listInfo)
             }
             if isFirst {
                 return .text(mutableString)
@@ -392,6 +410,10 @@ public struct BBBuilder {
                         .foregroundColor: UIColor(resource: .Labels.teritary)
                     ]))
                 }
+                
+                if isAttachmentDelimeter {
+                    mutableString.insert(NSAttributedString(string: "\n"), at: 0)
+                }
                                 
                 attachmentString = mutableString
             }
@@ -418,12 +440,6 @@ public struct BBBuilder {
         default:
             fatalError("НЕИЗВЕСТНЫЙ ТЕКСТОВЫЙ ТЕГ")
         }
-    }
-    
-    private func isFileAttachment(attribute: NSAttributedString) -> Bool {
-        let attachmentId = Int(attribute.string.prefix(upTo: attribute.string.firstIndex(of: ":")!).dropFirst())!
-        let attachmentType = attachments[attachments.firstIndex(where: { $0.id == attachmentId })!].type
-        return attachmentType == .file
     }
 }
 
@@ -481,17 +497,31 @@ extension NSAttributedString {
 
         return mutableAttributedString
     }
+    
+    // TODO: Revisit performance-wise
+    func replacingOccurrences(of target: String, with replacement: String) -> NSAttributedString {
+        let mutableCopy = NSMutableAttributedString(attributedString: self)
+        var searchRange = NSRange(location: 0, length: mutableCopy.length)
+        
+        while let foundRange = mutableCopy.string.range(of: target, options: [], range: Range(searchRange, in: mutableCopy.string)) {
+            let nsRange = NSRange(foundRange, in: mutableCopy.string)
+            mutableCopy.replaceCharacters(in: nsRange, with: replacement)
+            
+            let newLocation = nsRange.location + (replacement as NSString).length
+            searchRange = NSRange(location: newLocation, length: mutableCopy.length - newLocation)
+        }
+        
+        return mutableCopy
+    }
 }
 
 extension NSMutableAttributedString {
-    func replaceListTags(of type: BBContainerNode.ListType) {
+    func replaceListTags(for info: ListInfo) {
         let target = "[*]"
         
-        var counter = 0
         while let range = string.range(of: target) {
             let nsRange = NSRange(range, in: string)
-            replaceCharacters(in: nsRange, with: getReplacement(for: type, at: counter))
-            counter += 1
+            replaceCharacters(in: nsRange, with: getReplacement(for: info.type, at: info.count))
         }
     }
     
@@ -500,7 +530,7 @@ extension NSMutableAttributedString {
         case .bullet:
             return "• "
         case .numeric:
-            return "\(index + 1). "
+            return "\(index). "
         case .alphabet:
             return "\(Character(UnicodeScalar(96 + index)!)). "
         case .romanBig:
