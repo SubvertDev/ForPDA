@@ -11,7 +11,7 @@ import Models
 
 struct CustomScrollView: UIViewRepresentable {
     
-    let imageElement: [ImageElement]
+    let imageElement: [URL]
     @Binding var selectedIndex: Int
     @Binding var isZooming: Bool
     @Binding var isTouched: Bool
@@ -74,7 +74,7 @@ struct CustomScrollView: UIViewRepresentable {
         
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCollectionViewCell", for: indexPath) as! ImageCollectionViewCell
-            cell.setImage(url: parent.imageElement[indexPath.item].url)
+            cell.setImage(url: parent.imageElement[indexPath.item])
 
             cell.onZoom = { isZooming in
                 DispatchQueue.main.async {

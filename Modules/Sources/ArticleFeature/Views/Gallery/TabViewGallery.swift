@@ -16,7 +16,7 @@ import SharedUI
 
 struct TabViewGallery: View {
     
-    var gallery: [ImageElement]
+    var gallery: [URL]
     @Binding var showScreenGallery: Bool
     @Binding var selectedImageID: Int
     @State private var backgroundOpacity: Double = 1.0
@@ -102,7 +102,7 @@ struct TabViewGallery: View {
     }
     
     private func saveImage() {
-        let request = ImageRequest(url: gallery[selectedImageID].url)
+        let request = ImageRequest(url: gallery[selectedImageID])
         
         Nuke.ImagePipeline.shared.loadImage(with: request) { result in
             switch result {
@@ -124,10 +124,10 @@ struct TabViewGallery: View {
         }
     }
     
-    private func preloadImage(for: [ImageElement]) {
+    private func preloadImage(for: [URL]) {
         DispatchQueue.main.async {
             for element in gallery.enumerated() {
-                let imageUrl = gallery[element.offset].url
+                let imageUrl = gallery[element.offset]
                 let request = ImageRequest(url: imageUrl)
                 Nuke.ImagePipeline.shared.loadImage(with: request) { result in
                     switch result {
@@ -227,9 +227,9 @@ struct BackgroundView: ViewModifier {
 
 #Preview {
     TabViewGallery(gallery: [
-        .init(url: URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!, width: 480, height: 269),
-        .init(url: URL(string: "https://i.4pda.ws/static/img/news/63/633618t.jpg")!, width: 480, height: 269),
-        .init(url: URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!, width: 480, height: 269)
+        URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!,
+        URL(string: "https://i.4pda.ws/static/img/news/63/633618t.jpg")!,
+        URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!
     ],
     showScreenGallery: .constant(false), selectedImageID: .constant(0))
 }
