@@ -120,12 +120,7 @@ struct ArticleElementView: View {
             showFullScreenImage.toggle()
         }
         .fullScreenCover(isPresented: $showFullScreenImage) {
-            if #available(iOS 16.4, *) {
-                TabViewGallery(gallery: [element], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
-                    .presentationBackground(.clear)
-            } else {
-                TabViewGallery(gallery: [element], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
-            }
+            TabViewGallery(gallery: [element.url], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
         }
     }
     
@@ -161,12 +156,7 @@ struct ArticleElementView: View {
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .padding(.bottom, -16)
         .fullScreenCover(isPresented: $showFullScreenGallery) {
-            if #available(iOS 16.4, *) {
-                TabViewGallery(gallery: element, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
-                    .presentationBackground(.clear)
-            } else {
-                TabViewGallery(gallery: element, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
-            }
+            TabViewGallery(gallery: element.map{ $0.url }, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
         }
     }
     

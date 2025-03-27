@@ -63,6 +63,7 @@ struct TabViewGallery: View {
             ShareSheet(activityItems: $activityItems)
                 .presentationDetents([.medium])
         }
+        .presentationBackgroundClear()
     }
     
     // MARK: - ToolBarView
@@ -203,6 +204,23 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+extension View {
+    func presentationBackgroundClear() -> some View {
+        self.modifier(BackgroundView())
+    }
+}
+
+struct BackgroundView: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.4, *) {
+            content
+                .presentationBackground(.clear)
+        } else {
+            content
+        }
+    }
 }
 
 // MARK: - Preview
