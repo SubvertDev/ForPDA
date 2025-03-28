@@ -64,7 +64,7 @@ public struct WriteFormScreen: View {
                             .font(.body)
                             .frame(width: 34, height: 22)
                     }
-                    .disabled(store.textContent.isEmptyTrimmed())
+                    .disabled(store.textContent.isEmptyAfterTrimming())
                 }
             }
             
@@ -103,7 +103,7 @@ public struct WriteFormScreen: View {
         }
         .buttonStyle(.borderedProminent)
         .frame(height: 48)
-        .disabled(store.textContent.isEmptyTrimmed())
+        .disabled(store.textContent.isEmptyAfterTrimming())
         
         Spacer()
     }
@@ -124,7 +124,7 @@ private extension WriteFormScreen {
 
 private extension String {
     
-    func isEmptyTrimmed() -> Bool {
+    func isEmptyAfterTrimming() -> Bool {
         return self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "*" : {
-
-    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -79,7 +76,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ой, ошибка при загрузке title :("
+            "value" : "Ой, ошибка при загрузке заголовка :("
           }
         }
       }

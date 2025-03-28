@@ -216,7 +216,7 @@ struct WriteFormView: View {
                 .textCase(nil)
                 .overlay(alignment: .bottomTrailing) {
                     if required {
-                        Text("*")
+                        Text(verbatim: "*")
                             .font(.headline)
                             .offset(x: 8)
                             .foregroundStyle(.red)
@@ -261,10 +261,10 @@ struct CheckBox: ToggleStyle {
 
 struct Field: View {
     
-    var text: Binding<String>
-    var description: String
-    var guideText: String
-    var isEditor: Bool = false
+    let text: Binding<String>
+    let description: String
+    let guideText: String
+    var isEditor = false
     
     var body: some View {
         VStack {

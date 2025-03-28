@@ -43,7 +43,7 @@ public struct WriteFormFeature: Reducer, Sendable {
         
         case updateFieldContent(Int, String)
         
-        case writeFormSended(WriteFormSend)
+        case writeFormSent(WriteFormSend)
         
         case preview(PresentationAction<FormPreviewFeature.Action>)
         
@@ -98,21 +98,18 @@ public struct WriteFormFeature: Reducer, Sendable {
                         attachments = attaches,
                         content = state.textContent
                     ] send in
-                        let result = await Result { try await apiClient.sendPost(
-                            request: PostRequest(
-                                topicId: topicId,
-                                content: content,
-                                flag: 0,
-                                attachments: attachments
-                            )) }
+                        let request = PostRequest(
+                            topicId: topicId,
+                            content: content,
+                            flag: 0,
+                            attachments: attachments
+                        )
+                        let result = await Result { try await apiClient.sendPost(request: request) }
                         await send(._simplePostSendResponse(result))
                     }
                     
                 default: return .none
                 }
-                
-            case .writeFormSended:
-                return .send(.dismissButtonTapped)
                 
             case .preview:
                 return .none
@@ -125,7 +122,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 ))
                 return .none
                 
-            case .dismissButtonTapped:
+            case .dismissButtonTapped, .writeFormSent:
                 return .run { _ in await dismiss() }
                 
             case .updateFieldContent(_, let content):
@@ -155,7 +152,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 return .none
                 
             case let ._simplePostSendResponse(.success(post)):
-                return .send(.writeFormSended(.post(PostSend(
+                return .send(.writeFormSent(.post(PostSend(
                     id: post.id,
                     topicId: post.topicId,
                     offset: post.offset

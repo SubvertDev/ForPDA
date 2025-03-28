@@ -10,7 +10,7 @@ public enum WriteFormFieldType: Sendable, Equatable, Hashable {
     case text(FormField)
     case editor(FormField)
     case dropdown(FormField, _ options: [String])
-    case uploadbox(FormField, _ extens: [String])
+    case uploadbox(FormField, _ extensions: [String])
     case checkboxList(FormField, _ options: [String])
 
     public struct FormField: Sendable, Equatable, Hashable {
