@@ -6,7 +6,6 @@
 //
  
 import SwiftUI
-import UIKit
 import Models
 
 struct CustomScrollView: UIViewRepresentable {
@@ -44,7 +43,7 @@ struct CustomScrollView: UIViewRepresentable {
     
     func updateUIView(_ uiView: UICollectionView, context: Context) {
         let indexPath = IndexPath(item: selectedIndex, section: 0)
-        DispatchQueue.main.async {
+        Task { @MainActor in
             uiView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
         }
     }
@@ -77,13 +76,13 @@ struct CustomScrollView: UIViewRepresentable {
             cell.setImage(url: parent.imageElement[indexPath.item])
 
             cell.onZoom = { isZooming in
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.parent.isZooming = isZooming
                 }
             }
             
             cell.onToolBar = {
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.parent.isTouched.toggle()
                 }
             }
@@ -93,7 +92,12 @@ struct CustomScrollView: UIViewRepresentable {
         func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
             let pageIndex = Int(scrollView.contentOffset.x / scrollView.bounds.width)
             self.parent.selectedIndex = pageIndex
-            scrollView.gestureRecognizers!.last!.isEnabled = true
+            
+            // We always have a last gesture
+            if let gestureRecognizers = scrollView.gestureRecognizers, let lastGesture = gestureRecognizers.last {
+                lastGesture.isEnabled = true
+            }
+            
             firstSwipeDirection = .none
         }
         
@@ -139,10 +143,8 @@ struct CustomScrollView: UIViewRepresentable {
                 }
                 firstSwipeDirection = .none
                 collectionView.isScrollEnabled = true
-            case .failed:
-                print("failed")
-            case .possible:
-                print("possible")
+            case .failed, .possible:
+                break
             @unknown default:
                 break
             }

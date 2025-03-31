@@ -20,9 +20,8 @@ struct ArticleElementView: View {
     @State private var gallerySelection: Int = 0
     @State private var pollSelection: ArticlePoll.Option?
     @State private var pollSelections: Set<ArticlePoll.Option> = .init()
-    @State private var showFullScreenImage: Bool = false
-    @State private var showFullScreenGallery: Bool = false
-    @State private var selectedImageID: Int = 0
+    @State private var showFullScreenGallery = false
+    @State private var selectedImageID = 0
     
     private var hasSelection: Bool {
         return pollSelection != nil || !pollSelections.isEmpty
@@ -117,10 +116,10 @@ struct ArticleElementView: View {
                height: UIScreen.main.bounds.width * element.ratioHW)
         .clipped()
         .onTapGesture {
-            showFullScreenImage.toggle()
+            showFullScreenGallery.toggle()
         }
-        .fullScreenCover(isPresented: $showFullScreenImage) {
-            TabViewGallery(gallery: [element.url], showScreenGallery: $showFullScreenImage, selectedImageID: $selectedImageID)
+        .fullScreenCover(isPresented: $showFullScreenGallery) {
+            TabViewGallery(gallery: [element.url], selectedImageID: selectedImageID)
         }
     }
     
@@ -156,7 +155,7 @@ struct ArticleElementView: View {
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .padding(.bottom, -16)
         .fullScreenCover(isPresented: $showFullScreenGallery) {
-            TabViewGallery(gallery: element.map{ $0.url }, showScreenGallery: $showFullScreenGallery, selectedImageID: $selectedImageID)
+            TabViewGallery(gallery: element.map{ $0.url }, selectedImageID: selectedImageID)
         }
     }
     

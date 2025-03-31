@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 import Nuke
 import NukeUI
 
@@ -60,14 +59,14 @@ class ImageCollectionViewCell: UICollectionViewCell, UIScrollViewDelegate {
     func setImage(url: URL) {
         let request = ImageRequest(url: url)
 
-        Nuke.ImagePipeline.shared.loadImage(with: request) { result in
+        ImagePipeline.shared.loadImage(with: request) { result in
             switch result {
             case .success(let response):
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.imageView.image = response.image
                 }
             case .failure:
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     print("Error loading image")
                 }
             }

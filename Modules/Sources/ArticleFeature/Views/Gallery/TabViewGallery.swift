@@ -15,14 +15,13 @@ import SharedUI
 // MARK: - TabViewGallery
 
 struct TabViewGallery: View {
-    
-    var gallery: [URL]
-    @Binding var showScreenGallery: Bool
-    @Binding var selectedImageID: Int
-    @State private var backgroundOpacity: Double = 1.0
-    @State private var isZooming: Bool = false
-    @State private var isTouched: Bool = true
-    @State private var showShareSheet: Bool = false
+    let gallery: [URL]
+    @Environment(\.dismiss) private var dismiss
+    @State var selectedImageID: Int
+    @State private var backgroundOpacity = 1.0
+    @State private var isZooming = false
+    @State private var isTouched = true
+    @State private var showShareSheet = false
     @State private var activityItems: [Any] = []
     @State private var tempFileUrls: [Int: URL] = [:]
     
@@ -42,22 +41,24 @@ struct TabViewGallery: View {
             }
             
             VStack {
-                CustomScrollView(imageElement: gallery,
-                                 selectedIndex: $selectedImageID,
-                                 isZooming: $isZooming,
-                                 isTouched: $isTouched,
-                                 backgroundOpacity: $backgroundOpacity, onClose: {
-                    showScreenGallery = false
-                })
-                .clipShape(.rect)
+                CustomScrollView(
+                    imageElement: gallery,
+                    selectedIndex: $selectedImageID,
+                    isZooming: $isZooming,
+                    isTouched: $isTouched,
+                    backgroundOpacity: $backgroundOpacity,
+                    onClose: {
+                        dismiss()
+                    })
+                .clipShape(
+                    .rect
+                )
             }
             .ignoresSafeArea()
         }
         .onAppear {
-            preloadImage(for: gallery)
-        }
-        .onDisappear {
             deleteTempFiles()
+            preloadImage()
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(activityItems: $activityItems)
@@ -72,12 +73,12 @@ struct TabViewGallery: View {
     private func ToolBarView() -> some View {
         HStack {
             ToolbarButton(placement: .topBarLeading, symbol: .xmark) {
-                showScreenGallery.toggle()
+                dismiss()
             }
 
             Spacer()
             
-            Text(gallery.count == 1 ? "" : "\(selectedImageID + 1) / \(gallery.count)")
+            Text(gallery.count == 1 ? String("") : String(String(selectedImageID + 1) + "/" + String(gallery.count)))
                 .foregroundStyle(.white.opacity(backgroundOpacity))
                 .font(.headline.weight(.semibold))
             
@@ -89,7 +90,7 @@ struct TabViewGallery: View {
                 }
                 
                 ContextButton(text: "Share", symbol: .squareAndArrowUp, bundle: .module) {
-                    shareSheet()
+                    configureShareSheet()
                 }
                 
             } label: {
@@ -104,7 +105,7 @@ struct TabViewGallery: View {
     private func saveImage() {
         let request = ImageRequest(url: gallery[selectedImageID])
         
-        Nuke.ImagePipeline.shared.loadImage(with: request) { result in
+        ImagePipeline.shared.loadImage(with: request) { result in
             switch result {
             case .success(let response):
                 let image = response.image
@@ -115,35 +116,33 @@ struct TabViewGallery: View {
         }
     }
     
-    private func shareSheet() {
+    private func configureShareSheet() {
         if let fileURL = tempFileUrls[selectedImageID] {
-            activityItems = [fileURL]  // Передаем файл в ShareSheet
-            showShareSheet = true  // Открываем окно
+            activityItems = [fileURL]
+            showShareSheet = true
         } else {
             print("File Not Found for ID: \(selectedImageID)")
         }
     }
     
-    private func preloadImage(for: [URL]) {
-        DispatchQueue.main.async {
-            for element in gallery.enumerated() {
-                let imageUrl = gallery[element.offset]
-                let request = ImageRequest(url: imageUrl)
-                Nuke.ImagePipeline.shared.loadImage(with: request) { result in
-                    switch result {
-                    case .success(let response):
-                        let tempFileUrl = FileManager.default.temporaryDirectory.appendingPathComponent("image\(element.offset + 1).jpg")
-                        do {
-                            if let imageData = response.image.jpegData(compressionQuality: 1.0) {
-                                try imageData.write(to: tempFileUrl)
-                                tempFileUrls[element.offset] = tempFileUrl
-                            }
-                        } catch {
-                            print("Image not loaded: \(error)")
+    private func preloadImage() {
+        for element in gallery.enumerated() {
+            let imageUrl = gallery[element.offset]
+            let request = ImageRequest(url: imageUrl)
+            ImagePipeline.shared.loadImage(with: request) { result in
+                switch result {
+                case .success(let response):
+                    let tempFileUrl = FileManager.default.temporaryDirectory.appendingPathComponent("image\(element.offset + 1).jpg")
+                    do {
+                        if let imageData = response.image.jpegData(compressionQuality: 1.0) {
+                            try imageData.write(to: tempFileUrl)
+                            tempFileUrls[element.offset] = tempFileUrl
                         }
-                    case .failure(let error):
+                    } catch {
                         print("Image not loaded: \(error)")
                     }
+                case .failure(let error):
+                    print("Image not loaded: \(error)")
                 }
             }
         }
@@ -177,12 +176,12 @@ struct TabViewGallery: View {
                 .scaleEffect(0.8) // TODO: ?
                 .background(
                     Circle()
-                        .fill(.ultraThinMaterial.opacity(backgroundOpacity))  // Материал
+                        .fill(.ultraThinMaterial.opacity(backgroundOpacity))
                         .frame(width: 32, height: 32)
                 )
                 .highPriorityGesture(
                     TapGesture().onEnded {
-                        showScreenGallery.toggle()
+                        dismiss()
                     }
                 )
         }
@@ -196,13 +195,8 @@ struct ShareSheet: UIViewControllerRepresentable {
     @Binding var activityItems: [Any]
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        let activityVC = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-
-        print(activityItems)
-
-        return activityVC
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
     }
-
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
@@ -231,5 +225,5 @@ struct BackgroundView: ViewModifier {
         URL(string: "https://i.4pda.ws/static/img/news/63/633618t.jpg")!,
         URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!
     ],
-    showScreenGallery: .constant(false), selectedImageID: .constant(0))
+    selectedImageID: Int(0))
 }
