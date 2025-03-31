@@ -95,7 +95,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func OptionsMenu() -> some View {
         Menu {
-            if let topic = store.topic, store.isUserAuthorized, topic.isCanPost {
+            if let topic = store.topic, store.isUserAuthorized, topic.canPost {
                 Section {
                     ContextButton(text: "Write Post", symbol: .plusCircle, bundle: .module) {
                         store.send(.contextMenu(.writePost))
@@ -290,7 +290,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func OptionsPostMenu() -> some View {
         Menu {
-            if let topic = store.topic, topic.isCanPost {
+            if let topic = store.topic, topic.canPost {
                 Section {
                     ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
                         store.send(.contextPostMenu(.reply(topic.authorId, topic.authorName)))

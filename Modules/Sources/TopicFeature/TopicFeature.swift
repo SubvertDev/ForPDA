@@ -153,7 +153,7 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(._loadTopic(offset: newOffset))
                 ])
                 
-            case .writeForm(.presented(.writeFormSended(let response))):
+            case .writeForm(.presented(.writeFormSent(let response))):
                 if case let .post(data) = response {
                     state.postId = data.id
                     return .send(.pageNavigation(.lastPageTapped))

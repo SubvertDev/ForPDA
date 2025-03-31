@@ -22,7 +22,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let posts: [Post]
     public let navigation: [ForumInfo]
     
-    public var isCanPost: Bool {
+    public var canPost: Bool {
         return (flag & 64) != 0 && (flag & 16) == 0
     }
     
