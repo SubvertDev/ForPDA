@@ -200,10 +200,10 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .contextPostMenu(let action):
                 switch action {
-                case .reply(let authorId, let authorName):
+                case .reply(let postId, let authorName):
                     state.writeForm = WriteFormFeature.State(formFor: .post(
                         topicId: state.topicId,
-                        content: .simple("[SNAPBACK]\(authorId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
+                        content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
                     ))
                     return .none
                 }

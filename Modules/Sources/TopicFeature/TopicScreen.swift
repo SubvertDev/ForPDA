@@ -247,7 +247,7 @@ public struct TopicScreen: View {
             }
             
             if store.isUserAuthorized {
-                OptionsPostMenu()
+                OptionsPostMenu(post.id)
             }
         }
     }
@@ -288,12 +288,12 @@ public struct TopicScreen: View {
     // MARK: - Options Post Menu
     
     @ViewBuilder
-    private func OptionsPostMenu() -> some View {
+    private func OptionsPostMenu(_ postId: Int) -> some View {
         Menu {
             if let topic = store.topic, topic.canPost {
                 Section {
                     ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
-                        store.send(.contextPostMenu(.reply(topic.authorId, topic.authorName)))
+                        store.send(.contextPostMenu(.reply(postId, topic.authorName)))
                     }
                 }
             }
