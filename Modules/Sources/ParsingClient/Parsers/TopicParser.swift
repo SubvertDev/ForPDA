@@ -54,6 +54,41 @@ public struct TopicParser {
         )
     }
     
+    public static func parsePostPreview(from string: String) throws(ParsingError) -> PostPreview {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let content = array[safe: 2] as? String,
+              let attachmentIds = array[safe: 3] as? [Int] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return PostPreview(content: content, attachmentIds: attachmentIds)
+    }
+    
+    public static func parsePostSend(from string: String) throws(ParsingError) -> PostSend {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let id = array[safe: 4] as? Int,
+              let topicId = array[safe: 2] as? Int,
+              let offset = array[safe: 3] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return PostSend(id: id, topicId: topicId, offset: offset)
+    }
+    
     // MARK: - Poll
     
     private static func parsePoll(_ array: [Any]) throws(ParsingError) -> Topic.Poll? {

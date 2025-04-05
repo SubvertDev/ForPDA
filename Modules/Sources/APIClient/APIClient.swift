@@ -47,7 +47,10 @@ public struct APIClient: Sendable {
     public var markReadForum: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
+    public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
+    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
+    public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSend
     
     // Favorites
     public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
@@ -225,9 +228,37 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
+            getTemplate: { request, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: request.id) : .post(topicId: request.id),
+                    action: request.action.transferType
+                )
+                let response = try await api.get(command)
+                return try await parser.parseWriteForm(response)
+            },
 			getHistory: { offset, perPage in
                 let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
+            },
+            previewPost: { request in
+                let command = ForumCommand.Post.preview(data: PostSendRequest(
+                    topicId: request.post.topicId,
+                    content: request.post.content,
+                    attaches: request.post.attachments,
+                    flag: request.post.flag
+                ), postId: request.id)
+                let response = try await api.get(command)
+                return try await parser.parsePostPreview(response)
+            },
+            sendPost: { request in
+                let command = ForumCommand.Post.send(data: PostSendRequest(
+                    topicId: request.topicId,
+                    content: request.content,
+                    attaches: request.attachments,
+                    flag: request.flag
+                ))
+                let response = try await api.get(command)
+                return try await parser.parsePostSend(response)
             },
             
             // MARK: - Favorites
@@ -369,9 +400,18 @@ extension APIClient: DependencyKey {
             getTopic: { _, _, _ in
                 return .mock
             },
+            getTemplate: { _, _ in
+                return [.mockTitle, .mockText, .mockEditor]
+            },
 			getHistory: { _, _ in
                 return .mock
 			},
+            previewPost: { _ in
+                return PostPreview(content: "Post Content...", attachmentIds: [])
+            },
+            sendPost: { _ in
+                return PostSend(id: 0, topicId: 1, offset: 2)
+            },
             getFavorites: { _, _ in
                 .finished()
             },

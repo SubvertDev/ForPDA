@@ -14,6 +14,7 @@ import PersistenceKeys
 import ParsingClient
 import PasteboardClient
 import NotificationCenterClient
+import WriteFormFeature
 import TCAExtensions
 import AnalyticsClient
 import TopicBuilder
@@ -30,6 +31,7 @@ public struct TopicFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        @Presents var writeForm: WriteFormFeature.State?
 
         public let topicId: Int
         public let topicName: String
@@ -82,6 +84,9 @@ public struct TopicFeature: Reducer, Sendable {
         case pageNavigation(PageNavigationFeature.Action)
         
         case contextMenu(TopicContextMenuAction)
+        case contextPostMenu(TopicPostContextMenuAction)
+        
+        case writeForm(PresentationAction<WriteFormFeature.Action>)
         
         case _loadTopic(Int)
         case _loadTypes([[TopicTypeUI]])
@@ -153,23 +158,37 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(._loadTopic(newOffset))
                 ])
                 
+            case .writeForm(.presented(.writeFormSent(let response))):
+                if case let .post(data) = response {
+                    state.postId = data.id
+                    return .send(.pageNavigation(.lastPageTapped))
+                }
+                return .none
+                
+            case .writeForm:
+                return .none
+                
             case .pageNavigation:
                 return .none
                 
             case .contextMenu(let action):
+                guard let topic = state.topic else { return .none }
                 switch action {
+                case .writePost:
+                    state.writeForm = WriteFormFeature.State(
+                        formFor: .post(topicId: topic.id, content: .simple("", []))
+                    )
+                    return .none
+                    
                 case .openInBrowser:
-                    guard let topic = state.topic else { return .none }
                     let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
                     return .run { _ in await open(url: url) }
                     
                 case .copyLink:
-                    guard let topic = state.topic else { return .none }
                     pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)")
                     return .none
                     
                 case .setFavorite:
-                    guard let topic = state.topic else { return .none }
                     return .run { [id = state.topicId] send in
                         let request = SetFavoriteRequest(id: id, action: topic.isFavorite ? .delete : .add, type: .topic)
                         _ = try await apiClient.setFavorite(request)
@@ -181,7 +200,16 @@ public struct TopicFeature: Reducer, Sendable {
                     }
                     
                 case .goToEnd:
-                    // TODO: Implement.
+                    return .send(.pageNavigation(.lastPageTapped))
+                }
+                
+            case .contextPostMenu(let action):
+                switch action {
+                case .reply(let postId, let authorName):
+                    state.writeForm = WriteFormFeature.State(formFor: .post(
+                        topicId: state.topicId,
+                        content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
+                    ))
                     return .none
                 }
                 
@@ -253,6 +281,9 @@ public struct TopicFeature: Reducer, Sendable {
                 notificationCenter.send(.favoritesUpdated)
                 return .none
             }
+        }
+        .ifLet(\.$writeForm, action: \.writeForm) {
+            WriteFormFeature()
         }
         
         Analytics()

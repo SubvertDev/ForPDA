@@ -31,6 +31,7 @@
 		072E89838ACB061B0304CD34 /* SwiftyGif_SwiftyGif.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */; };
 		07880A036244F7E2844FEE16 /* HistoryParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B34513A311D7E0763CBFFF /* HistoryParser.swift */; };
 		07BA774572881A966547A901 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
+		07F106489779B610FF0527E9 /* TuistBundle+WriteFormFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E2C9E1DB441D5FB39DB7FB7 /* TuistBundle+WriteFormFeature.swift */; };
 		082727846F326DA6AE6559A9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		089F78F783F7B3878B5EBC7A /* APIClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; };
 		08A7CDB66525FD8C9D9291F3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
@@ -66,6 +67,7 @@
 		168613C5DC9676E96E43CD26 /* FavoritesRootFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CFCB43438C1BFB94E3746318 /* FavoritesRootFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		16EDD9DEEE3A0F89113155AA /* HapticClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A2735BACD13A67B20CB8C16D /* HapticClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		170ED798261DD9B984FCFC30 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
+		17CB513A4CE67866A50AA266 /* WriteFormParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BD8C9960A6059E77BE0C81 /* WriteFormParser.swift */; };
 		182949BB24B46024335DEF1A /* FavoriteRootFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7EBF83504A913DB3F7DB28 /* FavoriteRootFeature+Analytics.swift */; };
 		185DCFD8F405BD42C72A7D25 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
 		1869C6EEB8CCB4F0A8356CE9 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03140BC8DB3A4C443C7D17B7 /* Event.swift */; };
@@ -98,6 +100,7 @@
 		1E1DFFD3051D9EC74DB6CD04 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF78024BE54FEBE8A3DAD68 /* Comment.swift */; };
 		1E5600217DDAFDB60B7163AC /* TuistFonts+ForPDA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D4F5312B239B4DA72E70D9 /* TuistFonts+ForPDA.swift */; };
 		1EF396F652E59557D2AD29C9 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
+		1F005BCDAB035E303C3330E3 /* WriteFormFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 139AB3680B5EB800D1391F9E /* WriteFormFeature.swift */; };
 		1F14AD6A6680A3049F2E7456 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		1F7E33959F5B57D0A278652B /* BBCodeParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886167C9F9B83E4F1A1EB009 /* BBCodeParser.swift */; };
 		1FA5428D0F1674137256DC58 /* CommentFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCD25E2AE16F9B9D1302C44D /* CommentFeature.swift */; };
@@ -128,6 +131,7 @@
 		24994E144EE8D81BAE6034C4 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		24CE34724F6C85AE1BE0A7A0 /* TuistAssets+QMSListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1808E0F76631BFD474F21EF2 /* TuistAssets+QMSListFeature.swift */; };
 		24D7A180E7B6FDAAFE1E19C8 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
+		24ED0473957D689878F45352 /* RichTextKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ACE21C098C19D78B00A3A9C9 /* RichTextKit.framework */; };
 		2566E0B98B5BFAA56936D487 /* ExyteMediaPicker_ExyteMediaPicker.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 91F4D833C06850FC59C65F6C /* ExyteMediaPicker_ExyteMediaPicker.bundle */; };
 		256B25050A796F2677E008EE /* ToastClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A8075A38922F7D7B03A6E97 /* ToastClient.framework */; };
 		2589EEFD8A3369509CFA1BE3 /* ParsingClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -254,6 +258,7 @@
 		4ACE5DFEB43388B20DD195FF /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
 		4AF2403B7B658737EC0E0298 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		4B87C00E0F579157E5A2AB09 /* YouTubePlayerKit_YouTubePlayerKit.bundle in Resources */ = {isa = PBXBuildFile; fileRef = ACD1369D8CE07B4747D611D1 /* YouTubePlayerKit_YouTubePlayerKit.bundle */; };
+		4BAD7442DECD3715B0CA3D4C /* TuistFonts+WriteFormFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06911F7B51DC304ADF64898A /* TuistFonts+WriteFormFeature.swift */; };
 		4BBCE5E24C98602B67996773 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		4BDB0B54EE935E72BB6AB415 /* ForumFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A5B1CD6207AE3F36AE2C59 /* ForumFeature+Analytics.swift */; };
 		4C315DBC8CD4F54506032CF7 /* NotificationCenterClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FE2FE3A738395B32CD8D60D /* NotificationCenterClient.framework */; };
@@ -263,6 +268,7 @@
 		4CEDB00CE175E961B6E35C0B /* TuistBundle+ArticlesListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DF2E071FA5966E3FF92B53E /* TuistBundle+ArticlesListFeature.swift */; };
 		4DAE65CA55CCEF13221112FB /* TuistFonts+BBBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E28415517E6E58D9F5C61646 /* TuistFonts+BBBuilder.swift */; };
 		4DB8144F0AEF7FC6E47B2C1B /* TuistBundle+TopicFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E24108E9EB3018A13870361 /* TuistBundle+TopicFeature.swift */; };
+		4DFEF8AC82C12C3F858B0DCD /* WriteFormFieldType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86073682A28193B43A059CD7 /* WriteFormFieldType.swift */; };
 		4E4B43DBF12BBB43C20D9A9E /* TuistAssets+CacheClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B97372F47CBC160E6DF222 /* TuistAssets+CacheClient.swift */; };
 		4E600E02F96CF245A9CFE415 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		4EA50708AEFAF88330DDB174 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
@@ -289,6 +295,7 @@
 		56D35B72BFB7CAF8FA8EB6DE /* TuistAssets+APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5DE9B91F7A98D9F0CF62F18 /* TuistAssets+APIClient.swift */; };
 		572789A888ED9DD970F7DBC1 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0F194BE9709B729AE1587E09 /* Localizable.xcstrings */; };
 		575D2542F97F2841EA5E7648 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		57C1B4B7F4CA14962D39FA02 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		5848F278F9738A2A919CF371 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296EEF5411F040B1B41C772A /* Article.swift */; };
 		58F39CF5683A83F8C4B5E35D /* ParsingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E31FB7300F36F5C9CD75BF0 /* ParsingError.swift */; };
 		5916ECAC2DDE2B6E9AF6B188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
@@ -305,7 +312,10 @@
 		5BEC88433E85603AE8678EEE /* ShareActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A0992B48CEDD10AE732602 /* ShareActivityView.swift */; };
 		5D2226A15E7F6957A6074748 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
 		5D3E936325394C3AE2D565A7 /* SortFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AE3F675527A83BE0B90963D /* SortFeature.swift */; };
+		5D7E551D73AF1E95994478CC /* PostPreviewRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D44CBB5150176925A91B0AE /* PostPreviewRequest.swift */; };
 		5DBE08CB7A420F81EAE28335 /* FavoriteContextMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34514A5F7BBEEE2FBE4D917F /* FavoriteContextMenuAction.swift */; };
+		5E234D69A94D7CFCCC9B4B7A /* TopicBuilder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69D06482712444A605E2B9C6 /* TopicBuilder.framework */; };
+		5E6A0B435CBA623AAE3CCE2D /* WriteFormSend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD66762F0214C433C945021 /* WriteFormSend.swift */; };
 		5E791430C4AB340E55657015 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = C4319F291B44E588967CF362 /* Localizable.xcstrings */; };
 		5E8318E9C565FEE453F0126F /* ArticleFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CB3B4EA65C218984C1E25098 /* ArticleFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5EAE777D4B83A9FB073AB3FA /* icon-128.png in Resources */ = {isa = PBXBuildFile; fileRef = 1B914CF5C24225A771C3BFC8 /* icon-128.png */; };
@@ -326,6 +336,7 @@
 		60C89A65F5938955A6E26A07 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		60C905038BAF1E14B04B7783 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		60E3889E11AB858D73274B28 /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
+		6121483499D2279EC85117DE /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		61241B112C772C1E629D27DF /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1D2D41EBB2E59B7352093C60 /* Media.xcassets */; };
 		6144BFDAAB5B5130CCF18A8A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		615D61F66C698799F78F2DD6 /* TuistAssets+HistoryFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBA0C850AAE415BBD96ADC88 /* TuistAssets+HistoryFeature.swift */; };
@@ -333,6 +344,7 @@
 		625B0B2940BC66F3E4B2CF5D /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		627AFB8F49BD7BD8A1CB13B7 /* TopicBuilder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69D06482712444A605E2B9C6 /* TopicBuilder.framework */; };
 		62AEEC5CCF2A3F834D179F3B /* SettingsFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		62CFEBC908A4630DE4AA5E66 /* PostPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2243FDBDA726263DA4FD7C0F /* PostPreview.swift */; };
 		6353B86288B646502F05E866 /* CacheClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F16F6182018414637FA98B0 /* CacheClient.swift */; };
 		635538EFA1565522E9BAF340 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		635A14237A9C3A6D71E63BE2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 09902809473B6781B1636B1E /* Localizable.xcstrings */; };
@@ -368,6 +380,7 @@
 		6CBAEAEDFE6EE46F68EFD2F7 /* LoggerClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE5B4E69183CAF50E2DD9C72 /* LoggerClient.framework */; };
 		6CD867F632722592EC5D2AD5 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		6CE43FEF051115426470A227 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
+		6D260D1885E543E5577E776C /* TopicPostContextMenuAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C093D95366C0A96B67FFCEB4 /* TopicPostContextMenuAction.swift */; };
 		6D8A964092A367A37CF42986 /* TuistFonts+ParsingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD503AB2D9B1CDB4E195DB87 /* TuistFonts+ParsingClient.swift */; };
 		6DB25AA3ACE18FB0D6CDF6F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26EC8A8A4A6C70D3C729D6D5 /* AppDelegate.swift */; };
 		6DB30B28AC7745199B7E0ADA /* PDAPI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A98745325F4FD6EA35AB13 /* PDAPI.xcframework */; };
@@ -414,6 +427,7 @@
 		797563F32368E4E85AB32C7B /* AppStorageKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7818003D66B1EB8DEDEEE180 /* AppStorageKeys.swift */; };
 		797F708C3BA5C253EC97AEB3 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		7A4C68DF7B017FDD77D7A174 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
+		7A61C6AE3297CF28CC0FD71D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		7AEC5C93F4CD2467C522F00F /* ArticlesListFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B7EE05BABC9625147B0CE9 /* ArticlesListFeature+Analytics.swift */; };
 		7B28DB93D54B35EA81C6ABD5 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		7B4E1517C89D8A1C06C615F3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
@@ -432,7 +446,9 @@
 		7E8C015D7CEA545034FEB4B8 /* ArticlesListEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087E6F48AEF12A0A9012E448 /* ArticlesListEvent.swift */; };
 		7EA98B40A7A48B9F76D78221 /* PostHog_PostHog.bundle in Dependencies */ = {isa = PBXBuildFile; fileRef = CCFE48F748346552756D6604 /* PostHog_PostHog.bundle */; };
 		7F2AD1D10E0A53674300D505 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		7FA33256C1D96D5BA9DF6536 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		8009D1561A9481C5637AB82F /* BBRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDC0AEC978B14BE8A6985D47 /* BBRenderer.swift */; };
+		801E996BDD99A009439C5909 /* FormPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEC5A6BD39B550D0C4849C7 /* FormPreviewView.swift */; };
 		803DB0A08B1C5B2C4927E6B7 /* TuistFonts+AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F10EF0B11A3789933965ED /* TuistFonts+AppFeature.swift */; };
 		805B5250D6C2E18C3C65DA8B /* LocalizedStringKey+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135FF486CD12245451C425FD /* LocalizedStringKey+Ext.swift */; };
 		80A55E8359F6D988A6DBB3C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
@@ -472,6 +488,7 @@
 		897E882B5BB7DB6D0CCBAACE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421F3A0F9ED74D9F34672A6C /* User.swift */; };
 		8989A8B9B78367AEB6EC8EF8 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		89F078C3A55D1A081759ABCA /* SettingsFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9480CA1C409BA84E3CAFC6 /* SettingsFeature+Analytics.swift */; };
+		8AF242120A4D7CAD9812E5FC /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		8AFC947CC1C96BD340D16353 /* CachePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4EBC98131492AF9E302E60 /* CachePolicy.swift */; };
 		8B4D593D10AB3B42603D00F0 /* TuistBundle+QMSListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C683B8FA1E5BCD4D90307D4 /* TuistBundle+QMSListFeature.swift */; };
 		8B59C554C5562CB8E9C455B0 /* AuthScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC9C99A60F4A19E5D372567D /* AuthScreen.swift */; };
@@ -507,6 +524,7 @@
 		9467B11638D8D42873A865D4 /* AppTab+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562612DCA8E52C675AE58985 /* AppTab+Ext.swift */; };
 		9472FB4717CD57A419B6564A /* Forum.swift in Sources */ = {isa = PBXBuildFile; fileRef = A71C4AA6B8EA3A1AD228B771 /* Forum.swift */; };
 		949726006F69F70BE6CDFDE0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		950CC1723F39BDA1D995FC89 /* ForumTemplateRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EB5FD64DBE063F98D75E8C /* ForumTemplateRequest.swift */; };
 		95194B8ADF9E8D8FA042CAAD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		95A821E8C803CE36C145F1F8 /* TuistBundle+ParsingClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4D02EEEF8A9360C0A66F3D /* TuistBundle+ParsingClient.swift */; };
 		95EC039D22F5847FA0ECBAA2 /* PageNavigationFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8CEFF67E301FD0409571FAD /* PageNavigationFeature.framework */; };
@@ -526,6 +544,7 @@
 		9A1B4B5A92609D72623566B3 /* ForumsListFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 948BCA10C93338559F09E242 /* ForumsListFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9AD128A873BCEE60687D336F /* NotificationsSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9071E90E62CB3FDF7E780A7D /* NotificationsSettings.swift */; };
 		9AEA1C474F96041EB587DCBE /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
+		9B5DD003C676DE457CC74B95 /* WriteFormFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AED1B44B60252254CC83794 /* WriteFormFeature.framework */; };
 		9BCB50BF1CC6141B96EC8205 /* swift-sharing_Sharing.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6ED99D044DB67AD96E453D89 /* swift-sharing_Sharing.bundle */; };
 		9BE30A5D7A2A02F7E722C085 /* TuistAssets+PersistenceKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = D75C878A23CE56A1C7D813E0 /* TuistAssets+PersistenceKeys.swift */; };
 		9BEBFEA27052474495492E98 /* TuistBundle+SafariExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 734FDFB089B17876ACA7089B /* TuistBundle+SafariExtension.swift */; };
@@ -564,6 +583,7 @@
 		A4D35E3CBB42E80EBB312795 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		A512D6CCB1FD8116FFE9610E /* TuistAssets+PasteboardClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E40FB8B4C28967AE1F4A29D /* TuistAssets+PasteboardClient.swift */; };
 		A51C5243A35759EFC4585D85 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		A5A215244482B5ABB602172C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 997BD0544A512EC07E405C6D /* Localizable.xcstrings */; };
 		A5F339D40D3FEBD48ACA0A40 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		A60ACC1B81301C9D92730BA3 /* PageNavigationFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8CEFF67E301FD0409571FAD /* PageNavigationFeature.framework */; };
 		A6B6AD98CB01D1BAC6EB9EF7 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
@@ -577,6 +597,7 @@
 		A8BD575A94675FFEC65C9261 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		A8C0DED09D78E1F9E5D2F5EE /* ArticlesListParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C1B68A5B4FF3D1226A3386 /* ArticlesListParser.swift */; };
 		A8CF92AF4EA9E4E4EF3B45C7 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
+		A93ECCC5489621082FEEF104 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		A96733D03AF23C226495CCDA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
 		A98B28DF7B577A6710FD284C /* TuistFonts+QMSListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F968EB69AD034C83CB134239 /* TuistFonts+QMSListFeature.swift */; };
 		A9B136F31919698A97366CF2 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
@@ -586,6 +607,7 @@
 		AAD9D1BD8BB52157D9FD3203 /* TuistBundle+SharedUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C691B84ECE7B451A2D11A1 /* TuistBundle+SharedUI.swift */; };
 		AB71D33054FDE48AFFD097FB /* BackgroundTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5D55EFF7F8B1B5EDC3F03A2 /* BackgroundTheme.swift */; };
 		ABFE2F11F29F4B5AE05E844C /* AppColorScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D51A30E35B17B79A119FDD3 /* AppColorScheme.swift */; };
+		AC0C5E728F05FAADFCF42C96 /* WriteFormForType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 257EDD1FDCFCA4E6E8F0865F /* WriteFormForType.swift */; };
 		AC9497CB04DDFCD72EF6E419 /* phlibwebp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E3A87DA15B2D458AB02E623 /* phlibwebp.framework */; };
 		AD27E9035B43576CE13206AA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 5B06AC61792B8C4487A2213C /* Localizable.xcstrings */; };
 		AD89C2D20DECD878EA82B746 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
@@ -623,6 +645,7 @@
 		B7288EEC98423C87E8A86CE8 /* UIImage+Attachments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DBB12B5C69EF4F9DE9F57A /* UIImage+Attachments.swift */; };
 		B7719EDD4CB97FBDC14187F0 /* ProfileEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 670EF6A1CF3FF11D91D3F5DD /* ProfileEvent.swift */; };
 		B77E3F3715BBCDF5B26B4DD5 /* AuthResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDDCDFEF4215739787CD77B0 /* AuthResponse.swift */; };
+		B7C77AFDCCDBB2B49C170333 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		B7F877B78506D4C12413A4FC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 63C087325941C6CC8EDB1EA8 /* Preview Assets.xcassets */; };
 		B82797955C6BDB5EC165900D /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
 		B874E8C02D9A259E0048F3F1 /* Bundle+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B874E8BE2D9A259E0048F3F1 /* Bundle+Ext.swift */; };
@@ -650,12 +673,14 @@
 		C116D32978AF1FD9FBE8B91D /* TuistBundle+HistoryFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D3A5E12661A7D81B133B4E /* TuistBundle+HistoryFeature.swift */; };
 		C131CE22748684FE1275BA89 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		C13DD0C4D2875A75645E93D0 /* NotificationsFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 006917E2DFC70599AF512EA1 /* NotificationsFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C149849CD92C34692016DD8B /* APIClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8EC92B81B575C421F66E176B /* APIClient.framework */; };
 		C16E049304B935AB0EC03005 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		C1A5429855BDEC0033BE7DC8 /* TCAExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 441555EF19315050B755C0F6 /* TCAExtensions.framework */; };
 		C1A6F05AA70CE21C5DDA0170 /* TuistAssets+NotificationCenterClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4878C9265AA363BD2B4C1B7D /* TuistAssets+NotificationCenterClient.swift */; };
 		C1C0F413D9B8A18B7D580041 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
 		C1CBDFA3012F45639E8CF183 /* FavoritesFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FBF88C3FEED502F690603E9D /* FavoritesFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C1D178774CBADA0F684DBAED /* SkeletonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */; };
+		C1E97CE6A302508C077A6531 /* WriteFormScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E97001CC82F5B563E485E17 /* WriteFormScreen.swift */; };
 		C27D1CE24230B479AFDEAE5F /* ArticlePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C65958207606E840A4D26C /* ArticlePreview.swift */; };
 		C28D59D95192AB81521F8942 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FAE808BA8C452D29463AFB /* App.swift */; };
 		C4AEB0466AC59AC4D2CF8861 /* BBAttributedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6912BDB130A96CA8ED167DE /* BBAttributedParser.swift */; };
@@ -675,7 +700,9 @@
 		C82D018B812728430AEF4EAD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		C830377892C55245C1C87343 /* Announcement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 256E1A20263476DD97FEB276 /* Announcement.swift */; };
 		C8C174A7838AA886FEC1D7D6 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
+		C967D45AFA5979FA52F4D6F1 /* PostSend.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD5FAD6DF2127527B768CA5 /* PostSend.swift */; };
 		C9BB21B7E3604B43D7945AAE /* ArticleParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99F23D68A39F53CF4566F1A /* ArticleParser.swift */; };
+		CA2864D56CEE09BF957F7EA2 /* WriteFormFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AED1B44B60252254CC83794 /* WriteFormFeature.framework */; };
 		CA65F52046767C63F6B38B83 /* LoginEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57FD9D2DDE325720FC78D6A0 /* LoginEvent.swift */; };
 		CA8BBC8E71A6DF343FCE120A /* ImageCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67862053B6EBC0E277C54CB2 /* ImageCollectionViewCell.swift */; };
 		CAA93B384FC9055B705904F7 /* ArticlesListFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A39BD5202EED5434C358B34E /* ArticlesListFeature.framework */; };
@@ -691,6 +718,8 @@
 		CDCA41D4CC0EE24C0359BB36 /* BBAttributedToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B9816C032FA0F6370C0EA7 /* BBAttributedToken.swift */; };
 		CDD107A989AA4EEA8EA7CCF5 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
 		CE056F01D6012BD5A7D9C740 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
+		CE2FA27BECD5128E55B381FC /* NukeUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 670328B8526540FAF00CC673 /* NukeUI.framework */; };
+		CE5D223537D419359CF091F1 /* WriteFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919C08C46C7FA672280D53D0 /* WriteFormView.swift */; };
 		CF4D0E522E9C3158A16E11C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		CF520CB644ED846785BE5CA5 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		CF6B2DD64087D3102AEF7815 /* BBUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA8B18AC7EE1DE1289249EF /* BBUtil.swift */; };
@@ -737,6 +766,7 @@
 		DACDF73D089EC180391F725D /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		DC874668DBC95B7B49CC2716 /* PDALoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 075042B1B2D3B0275E5178A2 /* PDALoader.swift */; };
 		DC88A48341BC3E4623A211EB /* Perception.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4D1BA1BF5B366FD5DC7B66DD /* Perception.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DCC68A42745360D4B1D1415E /* PostRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9632C23428F67FF43C8685 /* PostRequest.swift */; };
 		DCCBD3BCF20B63E8D7412DCF /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		DCD8E817E3BF0D500538EDDC /* TuistFonts+PageNavigationFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122B3998EB875231152595D4 /* TuistFonts+PageNavigationFeature.swift */; };
 		DCF45886EF152E6BABF47265 /* TuistAssets+BBBuilderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB31B4D43A196ADD3F253FB8 /* TuistAssets+BBBuilderTests.swift */; };
@@ -789,7 +819,9 @@
 		E84AAADD93B622D5C33BEB37 /* BBSmile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F054096AFE73FEADE1AE8C /* BBSmile.swift */; };
 		E881E5C65B1FD325100CBCEF /* ForumsListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03503F291FA92B3B3B754F43 /* ForumsListFeature.swift */; };
 		E88864301681B6438E4ECED8 /* NotificationsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD4E100ACC4643C454EEE8B3 /* NotificationsClient.swift */; };
+		E8BD6378EDE6AE4B276BDDF4 /* FormPreviewFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ECD022B6C99A5200ECB5A19 /* FormPreviewFeature.swift */; };
 		E94CD5F90FFD90B03A692AB1 /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
+		EA62CDCD6880811C84E53336 /* WriteFormFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 2AED1B44B60252254CC83794 /* WriteFormFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		EAFEDEFD9E37646E4FB44D11 /* ExyteChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C61B17E3E6BC634A08E6D65B /* ExyteChat.framework */; };
 		EB31FD6DE972E71D23745C72 /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		EB5FF6A56AB934D0302AB996 /* ComposableArchitecture.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F42D2398CAA67D4000962E67 /* ComposableArchitecture.framework */; };
@@ -798,6 +830,7 @@
 		EC36728D64E74920EFF8585A /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		EC37A08A646CA25F92F4B249 /* TuistFonts+AuthFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC7C76C4087D0A9FD9DC84F /* TuistFonts+AuthFeature.swift */; };
 		ED2848854E668437D9880F8C /* TuistFonts+ForumsListFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 702F1C4E9BF81ED9C500C584 /* TuistFonts+ForumsListFeature.swift */; };
+		ED4F199F872CE2EB2C0DC4E8 /* TuistAssets+WriteFormFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 085179532A0E5A0B8978227D /* TuistAssets+WriteFormFeature.swift */; };
 		EDB6E63F456EC51DEB945483 /* ToastClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A8075A38922F7D7B03A6E97 /* ToastClient.framework */; };
 		EDC4835F4C2E1F7F36D20823 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		EDFA1D88531988E452B1D327 /* TopicFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -855,6 +888,7 @@
 		FB73FD639F6F3E7689BA7A0B /* UnreadParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913352219BB2A91146CAA4CC /* UnreadParser.swift */; };
 		FBC1D923ABD6B15B2F5307FD /* TuistFonts+LoggerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A57202E2639DE939632C98B /* TuistFonts+LoggerClient.swift */; };
 		FBC3157CAE496D63FFF4831C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		FC1606730D78D7C88A1CA4FE /* SharedUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C12D8E8EDEE4CA1FCD7A845 /* SharedUI.framework */; };
 		FC7B6F3FCE401E9666C4E5DA /* Models.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DD51C6E965A35DBF9F4FBA55 /* Models.framework */; };
 		FD07AA20892984748EE398C6 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		FD10030C1DE45FB1EC5F2D0A /* NotificationsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3874812FA8712A98E159305F /* NotificationsFeature.swift */; };
@@ -1183,6 +1217,13 @@
 			remoteGlobalIDString = 12594FB0B66EBDF44804B062;
 			remoteInfo = HapticClient;
 		};
+		4764986959E5E3B53F867FB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9848C372E1260FB12D609CFE;
+			remoteInfo = WriteFormFeature;
+		};
 		478BD75EECFC0E5F9B0B469D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1266,6 +1307,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = FFB7AF79E67AB9F1195AD2B1;
 			remoteInfo = ForumsListFeature;
+		};
+		4E1896CFA68ED1887AB96EB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9F26DE94CE2FED6167520917;
+			remoteInfo = ParsingClient;
 		};
 		505CE4CF5C1259BC11E2C8D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1428,12 +1476,26 @@
 			remoteGlobalIDString = A607EBFEBB6C59D7C5C5A1C2;
 			remoteInfo = Models;
 		};
+		6BCFAE6B41566FB494596E72 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A607EBFEBB6C59D7C5C5A1C2;
+			remoteInfo = Models;
+		};
 		6F7F9BC18721000082A5D6D8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = AF7A0B32922CA1E03AEC355C;
 			remoteInfo = SharedUI;
+		};
+		72DC354626B39BF5712CC10B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9B3F73EFAB2C641BB7A9E9CD;
+			remoteInfo = APIClient;
 		};
 		74031C0C7CDECE7708422E88 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1548,6 +1610,13 @@
 			remoteInfo = AnalyticsClient;
 		};
 		89BCAA568A73F1A1ADCDFC98 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AF7A0B32922CA1E03AEC355C;
+			remoteInfo = SharedUI;
+		};
+		8CC0FB30930FA4A2066F3A77 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
 			proxyType = 1;
@@ -1806,6 +1875,13 @@
 			remoteGlobalIDString = 304A9EDDF9B780A9A8CFA3F7;
 			remoteInfo = CacheClient;
 		};
+		B6FD743B16C2B07D268DDBCF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9848C372E1260FB12D609CFE;
+			remoteInfo = WriteFormFeature;
+		};
 		B75FD4B9B9DC2D9F436A0FB3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
@@ -1945,6 +2021,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 54C511041B0BAC1254A1E96E;
 			remoteInfo = AnalyticsClient;
+		};
+		D5B507C44E473FA7995003AC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 555566E800C8A71FF699F0EB;
+			remoteInfo = TopicBuilder;
 		};
 		D6C8382DF94C34D795BFC236 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2165,6 +2248,16 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		30893CB30AFF8991FCF6D780 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		31F42C47F670B602E52E96C5 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -2460,6 +2553,7 @@
 				728C835C3097C877B602D8F8 /* ToastClient.framework in Embed Frameworks */,
 				3DA5B45AE2ECC1D667C54C87 /* TopicBuilder.framework in Embed Frameworks */,
 				EDFA1D88531988E452B1D327 /* TopicFeature.framework in Embed Frameworks */,
+				EA62CDCD6880811C84E53336 /* WriteFormFeature.framework in Embed Frameworks */,
 				7C2A0AF6F1EFEC746437B732 /* XCTestDynamicOverlay.framework in Embed Frameworks */,
 				49E8736180AD6AED493CB4A2 /* PDAPI.xcframework in Embed Frameworks */,
 			);
@@ -2619,10 +2713,12 @@
 		048460D126E2C26FEB6265DC /* ArticlePoll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePoll.swift; sourceTree = "<group>"; };
 		057B886884B5C026C12F39BB /* SharedUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SharedUI-Info.plist"; sourceTree = "<group>"; };
 		05AEEA5E3282EAAD5C826F2F /* FavoritesRootFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesRootFeature.swift; sourceTree = "<group>"; };
+		06911F7B51DC304ADF64898A /* TuistFonts+WriteFormFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+WriteFormFeature.swift"; sourceTree = "<group>"; };
 		06586EDA59680FFDD71D8E26 /* StackTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StackTabView.swift; sourceTree = "<group>"; };
 		075042B1B2D3B0275E5178A2 /* PDALoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDALoader.swift; sourceTree = "<group>"; };
 		07C65958207606E840A4D26C /* ArticlePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlePreview.swift; sourceTree = "<group>"; };
 		07FF3A93B069235628691FEB /* Favorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Favorite.swift; sourceTree = "<group>"; };
+		085179532A0E5A0B8978227D /* TuistAssets+WriteFormFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+WriteFormFeature.swift"; sourceTree = "<group>"; };
 		087E6F48AEF12A0A9012E448 /* ArticlesListEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListEvent.swift; sourceTree = "<group>"; };
 		08A0992B48CEDD10AE732602 /* ShareActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareActivityView.swift; sourceTree = "<group>"; };
 		090ABFC8C562AF07EDF7BA25 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -2646,6 +2742,7 @@
 		124DA2BF5DC419EB71D063EE /* SortType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortType.swift; sourceTree = "<group>"; };
 		135FF486CD12245451C425FD /* LocalizedStringKey+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LocalizedStringKey+Ext.swift"; sourceTree = "<group>"; };
 		136859B894720C8182BCADEA /* TuistBundle+HapticClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+HapticClient.swift"; sourceTree = "<group>"; };
+		139AB3680B5EB800D1391F9E /* WriteFormFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormFeature.swift; sourceTree = "<group>"; };
 		13B0050165D04418AE7EBA54 /* TuistFonts+TopicBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+TopicBuilder.swift"; sourceTree = "<group>"; };
 		13DB0917CE6954D95A752F47 /* ForumTopicContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumTopicContextMenuAction.swift; sourceTree = "<group>"; };
 		1449F18EB35F83B390E1512A /* TuistFonts+DeveloperFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+DeveloperFeature.swift"; sourceTree = "<group>"; };
@@ -2686,6 +2783,7 @@
 		20C1B68A5B4FF3D1226A3386 /* ArticlesListParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListParser.swift; sourceTree = "<group>"; };
 		21523E404C42EDFD745AC276 /* BBContainerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBContainerNode.swift; sourceTree = "<group>"; };
 		21CCF90D908132816911425D /* TuistFonts+AnalyticsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AnalyticsClient.swift"; sourceTree = "<group>"; };
+		2243FDBDA726263DA4FD7C0F /* PostPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPreview.swift; sourceTree = "<group>"; };
 		22880A94BCB02D546FB90F5A /* Bundle+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Ext.swift"; sourceTree = "<group>"; };
 		22A46161CBC947DE7653A398 /* DeeplinkHandler-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "DeeplinkHandler-Info.plist"; sourceTree = "<group>"; };
 		240E58DB5CACACB2C3EC8FAF /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
@@ -2696,6 +2794,7 @@
 		248A4A0D477EF8F2FF5B2508 /* QMSListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSListFeature.swift; sourceTree = "<group>"; };
 		24E719322B3F012AE63EE991 /* BBBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBBuilderTests.swift; sourceTree = "<group>"; };
 		256E1A20263476DD97FEB276 /* Announcement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Announcement.swift; sourceTree = "<group>"; };
+		257EDD1FDCFCA4E6E8F0865F /* WriteFormForType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormForType.swift; sourceTree = "<group>"; };
 		2690CC2FD37BCB767FA678CE /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		26EC8A8A4A6C70D3C729D6D5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		274A0BC4E5197B7422A1C540 /* DeveloperFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "DeveloperFeature-Info.plist"; sourceTree = "<group>"; };
@@ -2710,15 +2809,18 @@
 		2A09E83923DFDA94217B16A0 /* TuistBundle+NotificationsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+NotificationsClient.swift"; sourceTree = "<group>"; };
 		2A643888DD0481570126B791 /* BBTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBTag.swift; sourceTree = "<group>"; };
 		2AE3F675527A83BE0B90963D /* SortFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortFeature.swift; sourceTree = "<group>"; };
+		2AED1B44B60252254CC83794 /* WriteFormFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = WriteFormFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B1ACAD23AE8182F9140F649 /* FloatingButton.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FloatingButton.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BD3C1AC567E30185B8E5EA8 /* TuistBundle+AuthFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+AuthFeature.swift"; sourceTree = "<group>"; };
 		2C02613738D6A66349E8A38F /* TuistFonts+TopicFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+TopicFeature.swift"; sourceTree = "<group>"; };
 		2D5F18C64F08F2BD57FECAA8 /* TuistAssets+NotificationsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+NotificationsFeature.swift"; sourceTree = "<group>"; };
 		2DA52225C36942B1CC347029 /* ArticleFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleFeature.swift; sourceTree = "<group>"; };
 		2DC5F26CBFACA62CA164964D /* ArticlesListFeatureTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesListFeatureTest.swift; sourceTree = "<group>"; };
+		2DD66762F0214C433C945021 /* WriteFormSend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormSend.swift; sourceTree = "<group>"; };
 		2DF2E071FA5966E3FF92B53E /* TuistBundle+ArticlesListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+ArticlesListFeature.swift"; sourceTree = "<group>"; };
 		2E6295A8375EB2ED722DF4E2 /* Dependencies.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dependencies.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E7F9B5FA7920E2EEC101DAB /* RichText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichText.swift; sourceTree = "<group>"; };
+		2ECD022B6C99A5200ECB5A19 /* FormPreviewFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormPreviewFeature.swift; sourceTree = "<group>"; };
 		2F4EBC98131492AF9E302E60 /* CachePolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachePolicy.swift; sourceTree = "<group>"; };
 		304CAF5BF60F2F1FF4EEFF99 /* CommentResponseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentResponseType.swift; sourceTree = "<group>"; };
 		30941F1EF5BFE45AF2DD2217 /* NotificationCenterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterClient.swift; sourceTree = "<group>"; };
@@ -2783,13 +2885,16 @@
 		4DA58394E7006E74B711137B /* ParallaxHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxHeader.swift; sourceTree = "<group>"; };
 		4DCF8A9A3F93511E773B9B6D /* BBParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBParser.swift; sourceTree = "<group>"; };
 		4DD3EAFD936C5EB78B9BDF2F /* TrackAnalyticsModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackAnalyticsModifier.swift; sourceTree = "<group>"; };
-		4DF09FE399CCCBE9E310D9A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		4DF09FE399CCCBE9E310D9A9 /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		4E2C9E1DB441D5FB39DB7FB7 /* TuistBundle+WriteFormFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+WriteFormFeature.swift"; sourceTree = "<group>"; };
 		4E3A87DA15B2D458AB02E623 /* phlibwebp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = phlibwebp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E759700E6C2878F605BBEC0 /* FavoriteRootFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteRootFeature+Analytics.swift"; sourceTree = "<group>"; };
 		4E96789A57FF03B3FE813187 /* TuistAssets+ParsingClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ParsingClient.swift"; sourceTree = "<group>"; };
+		4EEC5A6BD39B550D0C4849C7 /* FormPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormPreviewView.swift; sourceTree = "<group>"; };
 		4FF90BDDA3C9FFDCACFC7076 /* FavoriteParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteParser.swift; sourceTree = "<group>"; };
 		5047AE733F1692EF9DEC2C66 /* AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeature.swift; sourceTree = "<group>"; };
 		5106473476DB27A182B6BE98 /* NavigationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButton.swift; sourceTree = "<group>"; };
+		51BD8C9960A6059E77BE0C81 /* WriteFormParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormParser.swift; sourceTree = "<group>"; };
 		5210212D64C7D2E37E786F9E /* TuistBundle+SettingsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+SettingsFeature.swift"; sourceTree = "<group>"; };
 		52496A1067C7E74D4E9CB8E8 /* BBTokenizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBTokenizer.swift; sourceTree = "<group>"; };
 		5284CA67ADEB5D3244983000 /* SharedUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedUI.swift; sourceTree = "<group>"; };
@@ -2850,6 +2955,8 @@
 		6BA4C4ACE4547D301ED518C3 /* TuistAssets+ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForumsListFeature.swift"; sourceTree = "<group>"; };
 		6D0087E3454ECCA95949DE14 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
 		6D2AF7FA9E5F0C428ED9EA74 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
+		6D44CBB5150176925A91B0AE /* PostPreviewRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostPreviewRequest.swift; sourceTree = "<group>"; };
+		6E97001CC82F5B563E485E17 /* WriteFormScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormScreen.swift; sourceTree = "<group>"; };
 		6EA71B4DB64C044A8AEC27F0 /* CacheClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CacheClient-Info.plist"; sourceTree = "<group>"; };
 		6ED99D044DB67AD96E453D89 /* swift-sharing_Sharing.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "swift-sharing_Sharing.bundle"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FC6C548C8921B1CEBC0E6C6 /* TuistAssets+ForPDA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForPDA.swift"; sourceTree = "<group>"; };
@@ -2857,6 +2964,7 @@
 		6FFE03547A84D91B4E7079BF /* LoggerClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "LoggerClient-Info.plist"; sourceTree = "<group>"; };
 		702F1C4E9BF81ED9C500C584 /* TuistFonts+ForumsListFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+ForumsListFeature.swift"; sourceTree = "<group>"; };
 		70692661CA720967477A375F /* HistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryScreen.swift; sourceTree = "<group>"; };
+		715EFD139CA9583092CEB561 /* WriteFormFeature-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "WriteFormFeature-Info.plist"; sourceTree = "<group>"; };
 		7138A10B6E70236A10CBFD71 /* TuistAssets+ToastClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ToastClient.swift"; sourceTree = "<group>"; };
 		716AAAD7D01141995578E15A /* MenuEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuEvent.swift; sourceTree = "<group>"; };
 		717B48A77A292A0B1BE4E300 /* SettingsFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SettingsFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2889,6 +2997,7 @@
 		82DB60D4B9083EC073BFC07C /* FavoritesRootEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesRootEvent.swift; sourceTree = "<group>"; };
 		83FB4761086E2397F004D41A /* SwiftyGif_SwiftyGif.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftyGif_SwiftyGif.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		85CCC7B42618527254A75999 /* FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesFeature.swift; sourceTree = "<group>"; };
+		86073682A28193B43A059CD7 /* WriteFormFieldType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormFieldType.swift; sourceTree = "<group>"; };
 		867397EEF56335A036F0E13C /* DeeplinkHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeeplinkHandler.swift; sourceTree = "<group>"; };
 		86C801944E5FBE5189EF7ED5 /* TuistAssets+TCAExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+TCAExtensions.swift"; sourceTree = "<group>"; };
 		872B0E54D7F8CD499CC13AC0 /* FavoriteSortType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteSortType.swift; sourceTree = "<group>"; };
@@ -2909,6 +3018,7 @@
 		908FCA4ECCC9377321A2860D /* TuistAssets+AnalyticsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+AnalyticsClient.swift"; sourceTree = "<group>"; };
 		911C9DAE06BC0966832CA5E8 /* TuistFonts+ForumFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+ForumFeature.swift"; sourceTree = "<group>"; };
 		913352219BB2A91146CAA4CC /* UnreadParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnreadParser.swift; sourceTree = "<group>"; };
+		919C08C46C7FA672280D53D0 /* WriteFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteFormView.swift; sourceTree = "<group>"; };
 		91F4D833C06850FC59C65F6C /* ExyteMediaPicker_ExyteMediaPicker.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExyteMediaPicker_ExyteMediaPicker.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		9364E09A93E9A621F26CEF92 /* ArticleElementParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleElementParser.swift; sourceTree = "<group>"; };
 		93C443F557F63EAD4EC6F9D0 /* TuistAssets+ForumFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+ForumFeature.swift"; sourceTree = "<group>"; };
@@ -2923,6 +3033,7 @@
 		98B47DA1E5F9CE38C92C248A /* BookmarksFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksFeature.swift; sourceTree = "<group>"; };
 		98EBBC3A32F4D0C330CD8D46 /* QMSFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSFeature.swift; sourceTree = "<group>"; };
 		99094502D05988D74C959F86 /* XCTestDynamicOverlay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XCTestDynamicOverlay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		997BD0544A512EC07E405C6D /* Localizable.xcstrings */ = {isa = PBXFileReference; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		998F58CE53B86D30C88480EA /* icon-64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-64.png"; sourceTree = "<group>"; };
 		99CC39A7F9B6AAAA1BBA7AA2 /* SentrySwiftUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SentrySwiftUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		99F2AB27D0AE7F79E68C49FF /* ForumRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumRow.swift; sourceTree = "<group>"; };
@@ -2982,6 +3093,8 @@
 		BC5CD7FA87091DE4F23D6D8B /* TuistAssets+PageNavigationFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+PageNavigationFeature.swift"; sourceTree = "<group>"; };
 		BC8BA4B322ED755E0A0FF512 /* AppFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeatureTests.swift; sourceTree = "<group>"; };
 		BDCBC1AF48D35A5775CC73BA /* TuistBundle+Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+Models.swift"; sourceTree = "<group>"; };
+		BE9632C23428F67FF43C8685 /* PostRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostRequest.swift; sourceTree = "<group>"; };
+		C093D95366C0A96B67FFCEB4 /* TopicPostContextMenuAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicPostContextMenuAction.swift; sourceTree = "<group>"; };
 		C2B97372F47CBC160E6DF222 /* TuistAssets+CacheClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+CacheClient.swift"; sourceTree = "<group>"; };
 		C4319F291B44E588967CF362 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		C582A7A9938AED709070B483 /* TuistAssets+AuthFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+AuthFeature.swift"; sourceTree = "<group>"; };
@@ -3058,6 +3171,7 @@
 		E6912BDB130A96CA8ED167DE /* BBAttributedParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BBAttributedParser.swift; sourceTree = "<group>"; };
 		E6CEBF838FDC59E8AE5BDD80 /* QMSChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSChat.swift; sourceTree = "<group>"; };
 		E6F10EF0B11A3789933965ED /* TuistFonts+AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AppFeature.swift"; sourceTree = "<group>"; };
+		E9EB5FD64DBE063F98D75E8C /* ForumTemplateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumTemplateRequest.swift; sourceTree = "<group>"; };
 		EB37899DCEFC6DDBA1F53741 /* QMSMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSMessage.swift; sourceTree = "<group>"; };
 		EBA0C850AAE415BBD96ADC88 /* TuistAssets+HistoryFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+HistoryFeature.swift"; sourceTree = "<group>"; };
 		EBED5605A2554F896F138EE6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -3100,6 +3214,7 @@
 		FD4E100ACC4643C454EEE8B3 /* NotificationsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsClient.swift; sourceTree = "<group>"; };
 		FD87EFCD7F63A8B2B6E62558 /* BookmarksParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksParser.swift; sourceTree = "<group>"; };
 		FDA99E9A5CB1CEA52A7B5125 /* AuthFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthFeature.swift; sourceTree = "<group>"; };
+		FDD5FAD6DF2127527B768CA5 /* PostSend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSend.swift; sourceTree = "<group>"; };
 		FE6816AEF4CDF660C9BB6FB8 /* TuistBundle+PageNavigationFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+PageNavigationFeature.swift"; sourceTree = "<group>"; };
 		FE90FDB70A525BF91F3B5A72 /* SafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF1E7FA342A8C51856B13581 /* AsyncTextAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncTextAttachment.swift; sourceTree = "<group>"; };
@@ -3361,6 +3476,7 @@
 				B54E5F9A682C7AED0A7EEEED /* TCAExtensions.framework in Frameworks */,
 				3175C627B54A0C897528F655 /* ToastClient.framework in Frameworks */,
 				627AFB8F49BD7BD8A1CB13B7 /* TopicBuilder.framework in Frameworks */,
+				CA2864D56CEE09BF957F7EA2 /* WriteFormFeature.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3588,6 +3704,7 @@
 				BE4B8D49C6CF74CF83352D81 /* TCAExtensions.framework in Frameworks */,
 				EDB6E63F456EC51DEB945483 /* ToastClient.framework in Frameworks */,
 				6BC0D383E4FF0B5A2871F2B8 /* TopicFeature.framework in Frameworks */,
+				9B5DD003C676DE457CC74B95 /* WriteFormFeature.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3634,13 +3751,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F71A1319CF5F459E888CB921 /* Frameworks */ = {
+		FE4B0F58E04DC9ADF5F3DE95 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B946845F1322B1352C4FC70B /* ComposableArchitecture.framework in Frameworks */,
-				52AEF811E43B6C744A2ED9BD /* HapticClient.framework in Frameworks */,
-				F2E766143E8E08521B1C5CA7 /* Models.framework in Frameworks */,
+				C149849CD92C34692016DD8B /* APIClient.framework in Frameworks */,
+				A93ECCC5489621082FEEF104 /* ComposableArchitecture.framework in Frameworks */,
+				8AF242120A4D7CAD9812E5FC /* Models.framework in Frameworks */,
+				CE2FA27BECD5128E55B381FC /* NukeUI.framework in Frameworks */,
+				57C1B4B7F4CA14962D39FA02 /* ParsingClient.framework in Frameworks */,
+				24ED0473957D689878F45352 /* RichTextKit.framework in Frameworks */,
+				FC1606730D78D7C88A1CA4FE /* SharedUI.framework in Frameworks */,
+				5E234D69A94D7CFCCC9B4B7A /* TopicBuilder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3847,6 +3969,7 @@
 				58349D3991E1656F855EEDBE /* ToastClient-Info.plist */,
 				7FE8316D561939AEA2A80BAF /* TopicBuilder-Info.plist */,
 				DEADA5CEBDDD4B3B4887E684 /* TopicFeature-Info.plist */,
+				715EFD139CA9583092CEB561 /* WriteFormFeature-Info.plist */,
 			);
 			path = InfoPlists;
 			sourceTree = "<group>";
@@ -3881,6 +4004,7 @@
 			isa = PBXGroup;
 			children = (
 				28EFB55271F905D3F3015159 /* TopicContextMenuAction.swift */,
+				C093D95366C0A96B67FFCEB4 /* TopicPostContextMenuAction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3997,6 +4121,7 @@
 				7138A10B6E70236A10CBFD71 /* TuistAssets+ToastClient.swift */,
 				607DBAD49BF160CA860BB83C /* TuistAssets+TopicBuilder.swift */,
 				62DAC7CA542E3A1748FF7454 /* TuistAssets+TopicFeature.swift */,
+				085179532A0E5A0B8978227D /* TuistAssets+WriteFormFeature.swift */,
 				CBC0D6252927A914E0AFE85D /* TuistBundle+AnalyticsClient.swift */,
 				D12BFAFA590C8DDB6580E1F0 /* TuistBundle+AnnouncementFeature.swift */,
 				EC3BE547E5AE4D5E2D811035 /* TuistBundle+APIClient.swift */,
@@ -4036,6 +4161,7 @@
 				5B73F92330265072C927AF54 /* TuistBundle+ToastClient.swift */,
 				E05AC6DBA795BFB3871F9D75 /* TuistBundle+TopicBuilder.swift */,
 				3E24108E9EB3018A13870361 /* TuistBundle+TopicFeature.swift */,
+				4E2C9E1DB441D5FB39DB7FB7 /* TuistBundle+WriteFormFeature.swift */,
 				21CCF90D908132816911425D /* TuistFonts+AnalyticsClient.swift */,
 				4A5022DB244E4A147C6A3716 /* TuistFonts+AnnouncementFeature.swift */,
 				FA22241A2BEBB0E248D26FC2 /* TuistFonts+APIClient.swift */,
@@ -4074,6 +4200,7 @@
 				57118564CEC527E11971693B /* TuistFonts+ToastClient.swift */,
 				13B0050165D04418AE7EBA54 /* TuistFonts+TopicBuilder.swift */,
 				2C02613738D6A66349E8A38F /* TuistFonts+TopicFeature.swift */,
+				06911F7B51DC304ADF64898A /* TuistFonts+WriteFormFeature.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -4459,6 +4586,18 @@
 			path = NotificationsClient;
 			sourceTree = "<group>";
 		};
+		7714021CDD7A29118B517FCA /* WriteFormFeature */ = {
+			isa = PBXGroup;
+			children = (
+				8B6CBF9349416FEF8540C0D6 /* Preview */,
+				7EF8738B8B5AE1D0361F5A45 /* Resources */,
+				139AB3680B5EB800D1391F9E /* WriteFormFeature.swift */,
+				6E97001CC82F5B563E485E17 /* WriteFormScreen.swift */,
+				919C08C46C7FA672280D53D0 /* WriteFormView.swift */,
+			);
+			path = WriteFormFeature;
+			sourceTree = "<group>";
+		};
 		77F7EDC8B597B7E005C5DE10 /* Parsers */ = {
 			isa = PBXGroup;
 			children = (
@@ -4476,6 +4615,7 @@
 				4AC39405A58D933436D549F4 /* QMSParser.swift */,
 				40A47FB4316D803868433B7A /* TopicParser.swift */,
 				913352219BB2A91146CAA4CC /* UnreadParser.swift */,
+				51BD8C9960A6059E77BE0C81 /* WriteFormParser.swift */,
 			);
 			path = Parsers;
 			sourceTree = "<group>";
@@ -4492,6 +4632,14 @@
 				9071E90E62CB3FDF7E780A7D /* NotificationsSettings.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		7EF8738B8B5AE1D0361F5A45 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				997BD0544A512EC07E405C6D /* Localizable.xcstrings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		7F2AC9AD23C2BFF9B5D3E54A /* Sentry */ = {
@@ -4583,6 +4731,7 @@
 				7A8075A38922F7D7B03A6E97 /* ToastClient.framework */,
 				69D06482712444A605E2B9C6 /* TopicBuilder.framework */,
 				44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */,
+				2AED1B44B60252254CC83794 /* WriteFormFeature.framework */,
 				99094502D05988D74C959F86 /* XCTestDynamicOverlay.framework */,
 				ACD1369D8CE07B4747D611D1 /* YouTubePlayerKit_YouTubePlayerKit.bundle */,
 				D99CA7DD16005BDC6253FD05 /* YouTubePlayerKit.framework */,
@@ -4626,6 +4775,15 @@
 				562612DCA8E52C675AE58985 /* AppTab+Ext.swift */,
 			);
 			path = ModelExtensions;
+			sourceTree = "<group>";
+		};
+		8B6CBF9349416FEF8540C0D6 /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				2ECD022B6C99A5200ECB5A19 /* FormPreviewFeature.swift */,
+				4EEC5A6BD39B550D0C4849C7 /* FormPreviewView.swift */,
+			);
+			path = Preview;
 			sourceTree = "<group>";
 		};
 		8CB24403F4D67CD301EA62DB /* Models */ = {
@@ -4685,6 +4843,9 @@
 				BA750927EA08B8979A02EE54 /* Links.swift */,
 				B55C906394BB2ECF59F0CEC9 /* ToastInfo.swift */,
 				243DC298825E30AD98A65200 /* Unread.swift */,
+				86073682A28193B43A059CD7 /* WriteFormFieldType.swift */,
+				257EDD1FDCFCA4E6E8F0865F /* WriteFormForType.swift */,
+				2DD66762F0214C433C945021 /* WriteFormSend.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -4771,6 +4932,7 @@
 				2B2EF7534802002627938063 /* ToastClient */,
 				B5F692E6BBEF0D0C4E01E039 /* TopicBuilder */,
 				ACEBF70460960A3EA57D36B3 /* TopicFeature */,
+				7714021CDD7A29118B517FCA /* WriteFormFeature */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -5060,6 +5222,8 @@
 				66CBD0143DEEF006DEA7306C /* History.swift */,
 				890CB1E0ADAEB58B6F3575B0 /* HistoryInfo.swift */,
 				2690CC2FD37BCB767FA678CE /* Post.swift */,
+				2243FDBDA726263DA4FD7C0F /* PostPreview.swift */,
+				FDD5FAD6DF2127527B768CA5 /* PostSend.swift */,
 				30F9A340AE0471B834D8C9F0 /* Topic.swift */,
 				5DEFCB42D6996F16057016EE /* TopicInfo.swift */,
 			);
@@ -5087,8 +5251,11 @@
 			isa = PBXGroup;
 			children = (
 				58F4A0D5A49FC65A1BEAA9C7 /* FavoritesRequest.swift */,
+				E9EB5FD64DBE063F98D75E8C /* ForumTemplateRequest.swift */,
 				1CFCD0B8F608D1C28D49E649 /* JumpForumRequest.swift */,
 				EF3828FB6700EFF5F1D6001B /* NotifyFavoriteRequest.swift */,
+				6D44CBB5150176925A91B0AE /* PostPreviewRequest.swift */,
+				BE9632C23428F67FF43C8685 /* PostRequest.swift */,
 				8F4EC55168BA063B91D7CDAA /* SetFavoriteRequest.swift */,
 			);
 			path = Requests;
@@ -5501,6 +5668,7 @@
 				51BA8AEFCA1FAAD371BED65A /* PBXTargetDependency */,
 				A2549F4A1B8DAB28E0A0CFBF /* PBXTargetDependency */,
 				2854659BE5C7FCF10DE969C1 /* PBXTargetDependency */,
+				5331C1699F992EC014787A2F /* PBXTargetDependency */,
 			);
 			name = AppFeature;
 			packageProductDependencies = (
@@ -5879,6 +6047,31 @@
 			productReference = 812721A72ADCFCDF77E41819 /* QMSListFeature.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		9848C372E1260FB12D609CFE /* WriteFormFeature */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B0D9AF976D8571D4AE18054A /* Build configuration list for PBXNativeTarget "WriteFormFeature" */;
+			buildPhases = (
+				0FEA7A2C7747564BABFE9F03 /* Sources */,
+				817351239136E27DA6AB5051 /* Resources */,
+				FE4B0F58E04DC9ADF5F3DE95 /* Frameworks */,
+				31F42C47F670B602E52E96C5 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7297669FA1D10AE4F7F5E83F /* PBXTargetDependency */,
+				67173C8EA5810A19DDC30DC9 /* PBXTargetDependency */,
+				71952D08301235E8E3436C4E /* PBXTargetDependency */,
+				76BD2BBBBB19667032E689C2 /* PBXTargetDependency */,
+				C3373C1C5B86E0FEE50F50DD /* PBXTargetDependency */,
+			);
+			name = WriteFormFeature;
+			packageProductDependencies = (
+			);
+			productName = WriteFormFeature;
+			productReference = 2AED1B44B60252254CC83794 /* WriteFormFeature.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		9B3F73EFAB2C641BB7A9E9CD /* APIClient */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C712DC91668AD03976BB088B /* Build configuration list for PBXNativeTarget "APIClient" */;
@@ -6139,6 +6332,7 @@
 				7FBBB07A9CDFCE61ED17247D /* PBXTargetDependency */,
 				4B084A0BDB3F7C4090811C1F /* PBXTargetDependency */,
 				2D3E8A8F5C027A9919BDCD6D /* PBXTargetDependency */,
+				28B6244805C189CF5DE47D67 /* PBXTargetDependency */,
 			);
 			name = TopicFeature;
 			packageProductDependencies = (
@@ -6374,6 +6568,7 @@
 				7E6C96E4B0893EA283DCB290 /* ToastClient */,
 				555566E800C8A71FF699F0EB /* TopicBuilder */,
 				E0E4DF86DB5588C4A649EE5C /* TopicFeature */,
+				9848C372E1260FB12D609CFE /* WriteFormFeature */,
 			);
 		};
 /* End PBXProject section */
@@ -6610,6 +6805,18 @@
 				7B4E1517C89D8A1C06C615F3 /* LaunchScreen.storyboard in Resources */,
 				60AE22D807E6941AE10A7EAC /* Preview Assets.xcassets in Resources */,
 				9055BB6613C3619B25392C64 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		817351239136E27DA6AB5051 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A61C6AE3297CF28CC0FD71D /* Assets.xcassets in Resources */,
+				6121483499D2279EC85117DE /* fontello.ttf in Resources */,
+				7FA33256C1D96D5BA9DF6536 /* LaunchScreen.storyboard in Resources */,
+				B7C77AFDCCDBB2B49C170333 /* Preview Assets.xcassets in Resources */,
+				A5A215244482B5ABB602172C /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6877,6 +7084,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0FEA7A2C7747564BABFE9F03 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED4F199F872CE2EB2C0DC4E8 /* TuistAssets+WriteFormFeature.swift in Sources */,
+				07F106489779B610FF0527E9 /* TuistBundle+WriteFormFeature.swift in Sources */,
+				4BAD7442DECD3715B0CA3D4C /* TuistFonts+WriteFormFeature.swift in Sources */,
+				E8BD6378EDE6AE4B276BDDF4 /* FormPreviewFeature.swift in Sources */,
+				801E996BDD99A009439C5909 /* FormPreviewView.swift in Sources */,
+				1F005BCDAB035E303C3330E3 /* WriteFormFeature.swift in Sources */,
+				C1E97CE6A302508C077A6531 /* WriteFormScreen.swift in Sources */,
+				CE5D223537D419359CF091F1 /* WriteFormView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		10D1846C6B45CEAF0D0C72A4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -6887,8 +7109,11 @@
 				B3A94FC2514FBC3BF5AFE43F /* APIClient.swift in Sources */,
 				8AFC947CC1C96BD340D16353 /* CachePolicy.swift in Sources */,
 				B4B2D2B4EA2C620F6030B8D0 /* FavoritesRequest.swift in Sources */,
+				950CC1723F39BDA1D995FC89 /* ForumTemplateRequest.swift in Sources */,
 				4CE3EAEC8C32FB2BE0B3C7BC /* JumpForumRequest.swift in Sources */,
 				D007F73B216B3D08EF15D64D /* NotifyFavoriteRequest.swift in Sources */,
+				5D7E551D73AF1E95994478CC /* PostPreviewRequest.swift in Sources */,
+				DCC68A42745360D4B1D1415E /* PostRequest.swift in Sources */,
 				F47F6C2B6491B5EFBF229E4F /* SetFavoriteRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7006,6 +7231,7 @@
 				FA66FD0AFA0FF01E8255B4F4 /* TuistFonts+TopicFeature.swift in Sources */,
 				8158771A595FF0B776C3E665 /* TopicFeature+Analytics.swift in Sources */,
 				97CE99F195BDCE44BE8BCBB2 /* TopicContextMenuAction.swift in Sources */,
+				6D260D1885E543E5577E776C /* TopicPostContextMenuAction.swift in Sources */,
 				8944F28C567C27FE6553B57B /* TopicFeature.swift in Sources */,
 				938C971325CA95E7F1AB63E8 /* TopicScreen.swift in Sources */,
 			);
@@ -7035,6 +7261,9 @@
 				24872E7EF4359F25C06A3408 /* Links.swift in Sources */,
 				DA11253BF5BA36D6DACEDCBC /* ToastInfo.swift in Sources */,
 				A0E9F42C67327919724245C0 /* Unread.swift in Sources */,
+				4DFEF8AC82C12C3F858B0DCD /* WriteFormFieldType.swift in Sources */,
+				AC0C5E728F05FAADFCF42C96 /* WriteFormForType.swift in Sources */,
+				5E6A0B435CBA623AAE3CCE2D /* WriteFormSend.swift in Sources */,
 				C830377892C55245C1C87343 /* Announcement.swift in Sources */,
 				76F6FC96E04C5708D9A04DDE /* AnnouncementInfo.swift in Sources */,
 				AFA32CC0010ECE2306C977B6 /* Favorite.swift in Sources */,
@@ -7047,6 +7276,8 @@
 				EE005910C961A4A1104662FC /* History.swift in Sources */,
 				86990B692F924EA202A37B75 /* HistoryInfo.swift in Sources */,
 				70C09F87409D77430AD07FF1 /* Post.swift in Sources */,
+				62CFEBC908A4630DE4AA5E66 /* PostPreview.swift in Sources */,
+				C967D45AFA5979FA52F4D6F1 /* PostSend.swift in Sources */,
 				78B45ABA8143913339274791 /* Topic.swift in Sources */,
 				5696FE4FCE8E55E078E31CCE /* TopicInfo.swift in Sources */,
 				72EF34FCA9725BC9EE0071A9 /* Models.swift in Sources */,
@@ -7448,6 +7679,7 @@
 				786963E3A630DA1881B7C496 /* QMSParser.swift in Sources */,
 				F3729FACB63A7CBFA2A05C0A /* TopicParser.swift in Sources */,
 				FB73FD639F6F3E7689BA7A0B /* UnreadParser.swift in Sources */,
+				17CB513A4CE67866A50AA266 /* WriteFormParser.swift in Sources */,
 				64A260563770C640D6B0A038 /* ParsingClient.swift in Sources */,
 				58F39CF5683A83F8C4B5E35D /* ParsingError.swift in Sources */,
 			);
@@ -7637,6 +7869,12 @@
 			target = E0E4DF86DB5588C4A649EE5C /* TopicFeature */;
 			targetProxy = 91F31296C2E9F7544EB31F0E /* PBXContainerItemProxy */;
 		};
+		28B6244805C189CF5DE47D67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WriteFormFeature;
+			target = 9848C372E1260FB12D609CFE /* WriteFormFeature */;
+			targetProxy = B6FD743B16C2B07D268DDBCF /* PBXContainerItemProxy */;
+		};
 		28E132CEA434B14786DA4590 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = QMSListFeature;
@@ -7799,6 +8037,12 @@
 			target = AF7A0B32922CA1E03AEC355C /* SharedUI */;
 			targetProxy = BFD5350FE8CDF1D1207CA9BE /* PBXContainerItemProxy */;
 		};
+		5331C1699F992EC014787A2F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WriteFormFeature;
+			target = 9848C372E1260FB12D609CFE /* WriteFormFeature */;
+			targetProxy = 4764986959E5E3B53F867FB8 /* PBXContainerItemProxy */;
+		};
 		546DBD80DF4C92BC201ED4A3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Models;
@@ -7865,6 +8109,12 @@
 			target = 12594FB0B66EBDF44804B062 /* HapticClient */;
 			targetProxy = C551928BFC730A9B8B4CD849 /* PBXContainerItemProxy */;
 		};
+		67173C8EA5810A19DDC30DC9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Models;
+			target = A607EBFEBB6C59D7C5C5A1C2 /* Models */;
+			targetProxy = 6BCFAE6B41566FB494596E72 /* PBXContainerItemProxy */;
+		};
 		6A4D9ED5810F074440C80B76 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Models;
@@ -7925,11 +8175,23 @@
 			target = F4D3CCF044E9BACD457D4E55 /* TCAExtensions */;
 			targetProxy = 829D370B9D7FF999649216BC /* PBXContainerItemProxy */;
 		};
+		71952D08301235E8E3436C4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ParsingClient;
+			target = 9F26DE94CE2FED6167520917 /* ParsingClient */;
+			targetProxy = 4E1896CFA68ED1887AB96EB4 /* PBXContainerItemProxy */;
+		};
 		728A69B61702E1DB6E20E40E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Models;
 			target = A607EBFEBB6C59D7C5C5A1C2 /* Models */;
 			targetProxy = CA2834F261AE11EAC8D67A0E /* PBXContainerItemProxy */;
+		};
+		7297669FA1D10AE4F7F5E83F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = APIClient;
+			target = 9B3F73EFAB2C641BB7A9E9CD /* APIClient */;
+			targetProxy = 72DC354626B39BF5712CC10B /* PBXContainerItemProxy */;
 		};
 		7353826570BF727CC1649CAA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7942,6 +8204,12 @@
 			name = LoggerClient;
 			target = 9E92F49EE2FB419CC8E1B905 /* LoggerClient */;
 			targetProxy = 5C93CE73DDA5A85BA5887CDA /* PBXContainerItemProxy */;
+		};
+		76BD2BBBBB19667032E689C2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SharedUI;
+			target = AF7A0B32922CA1E03AEC355C /* SharedUI */;
+			targetProxy = 8CC0FB30930FA4A2066F3A77 /* PBXContainerItemProxy */;
 		};
 		772A781774033A5807E231B3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -8285,6 +8553,12 @@
 			target = 9F26DE94CE2FED6167520917 /* ParsingClient */;
 			targetProxy = 3237F52F9D061D3F0A99EDD4 /* PBXContainerItemProxy */;
 		};
+		C3373C1C5B86E0FEE50F50DD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TopicBuilder;
+			target = 555566E800C8A71FF699F0EB /* TopicBuilder */;
+			targetProxy = D5B507C44E473FA7995003AC /* PBXContainerItemProxy */;
+		};
 		C3AA5385A6D102D205A20992 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = PasteboardClient;
@@ -8557,7 +8831,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8603,7 +8876,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -8641,7 +8913,7 @@
 			};
 			name = Release;
 		};
-		0877729A2D6BF1D44FE086D4 /* Release */ = {
+		081726F6023449BC09FEC712 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
@@ -8652,6 +8924,71 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
+				);
+				INFOPLIST_FILE = "Derived/InfoPlists/WriteFormFeature-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/ComposableArchitectureMacros#ComposableArchitectureMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/PerceptionMacros#PerceptionMacros",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.WriteFormFeature;
+				PRODUCT_NAME = WriteFormFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		0877729A2D6BF1D44FE086D4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -8701,7 +9038,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8736,7 +9072,7 @@
 			};
 			name = Debug;
 		};
-		11E98A6D8AA0F1BF2FA0CA31 /* Debug */ = {
+		10338E4E7F763404CE391B0D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
@@ -8747,6 +9083,75 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
+					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
+				);
+				INFOPLIST_FILE = "Derived/InfoPlists/WriteFormFeature-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+				);
+				OTHER_SWIFT_FLAGS = (
+					"$(inherited)",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include/module.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/SentryInternal/SentryInternal.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/UIKitNavigationShim/UIKitNavigationShim.modulemap",
+					"-Xcc",
+					"-fmodule-map-file=$(SRCROOT)/Tuist/.build/tuist-derived/phlibwebp/phlibwebp.modulemap",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/CasePathsMacros#CasePathsMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/ComposableArchitectureMacros#ComposableArchitectureMacros",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/DependenciesMacrosPlugin#DependenciesMacrosPlugin",
+					"-load-plugin-executable",
+					"$BUILD_DIR/Debug$EFFECTIVE_PLATFORM_NAME/PerceptionMacros#PerceptionMacros",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.subvert.forpda.WriteFormFeature;
+				PRODUCT_NAME = WriteFormFeature;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
+				SWIFT_COMPILATION_MODE = singlefile;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = 1;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		11E98A6D8AA0F1BF2FA0CA31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -8797,7 +9202,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -8846,7 +9250,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -8894,7 +9297,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -8945,7 +9347,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -8994,7 +9395,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9041,7 +9441,6 @@
 				ENABLE_PREVIEWS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9083,7 +9482,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9132,7 +9530,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
@@ -9234,7 +9631,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9354,7 +9750,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9403,7 +9798,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9517,7 +9911,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9565,7 +9958,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
@@ -9690,7 +10082,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9734,7 +10125,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9785,7 +10175,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9829,7 +10218,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9911,7 +10299,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9959,7 +10346,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10010,7 +10396,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10050,7 +10435,6 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10094,7 +10478,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10148,7 +10531,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10197,7 +10579,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10245,7 +10626,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10296,7 +10676,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10342,7 +10721,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10387,7 +10765,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10431,7 +10808,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10482,7 +10858,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10526,7 +10901,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10610,7 +10984,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10654,7 +11027,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10726,7 +11098,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10774,7 +11145,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10824,7 +11194,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10868,7 +11237,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
@@ -10919,7 +11287,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10968,7 +11335,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11019,7 +11385,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11067,7 +11432,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11118,7 +11482,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11168,7 +11531,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11216,7 +11578,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11266,7 +11627,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11314,7 +11674,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11365,7 +11724,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11414,7 +11772,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11465,7 +11822,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11515,7 +11871,8 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
+					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
+					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11610,7 +11967,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11657,7 +12013,6 @@
 				ENABLE_PREVIEWS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11700,7 +12055,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11750,7 +12104,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11796,7 +12149,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11841,7 +12193,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11896,7 +12247,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11946,7 +12296,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11990,7 +12339,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12039,7 +12387,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12094,7 +12441,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12143,7 +12489,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12189,7 +12534,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12233,7 +12577,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12283,7 +12626,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12329,7 +12671,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12374,7 +12715,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12665,6 +13005,15 @@
 			buildConfigurations = (
 				D79D8FFFF7838D5121C7468B /* Debug */,
 				BFA6E486DB653D815A6A91A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B0D9AF976D8571D4AE18054A /* Build configuration list for PBXNativeTarget "WriteFormFeature" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10338E4E7F763404CE391B0D /* Debug */,
+				081726F6023449BC09FEC712 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
