@@ -29,7 +29,7 @@ public struct QMSScreen: View {
                     ChatView(messages: store.messages) { message in
                         store.send(.sendMessageButtonTapped(message.text))
                     }
-                    .setAvailableInput(.textOnly)
+                    .setAvailableInputs([.text])
                     .showMessageMenuOnLongPress(false)
                     .chatTheme(
                         ChatTheme(
