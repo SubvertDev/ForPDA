@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum ContextMenuOptions: LocalizedStringKey, CaseIterable {
+public enum ContextMenuOptions: LocalizedStringKey, CaseIterable, Sendable {
     case shareLink // Not tracked in l10n
     case copyLink = "Copied"
     case openInBrowser // Not tracked in l10n

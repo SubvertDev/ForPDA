@@ -67,7 +67,7 @@ public struct TopicScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.topic?.name ?? "Загружаем..."))
+            .navigationTitle(Text(store.topic?.name ?? store.topicName))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { OptionsMenu() }
             .onChange(of: store.isLoadingTopic) { _ in
@@ -170,7 +170,7 @@ public struct TopicScreen: View {
     private func PostHeader(_ post: Post) -> some View {
         HStack(spacing: 8) {
             Button {
-                store.send(.userAvatarTapped(userId: post.author.id))
+                store.send(.userAvatarTapped(post.author.id))
             } label: {
                 LazyImage(url: URL(string: post.author.avatarUrl)) { state in
                     if let image = state.image {
@@ -287,7 +287,7 @@ public struct TopicScreen: View {
 #Preview {
     TopicScreen(
         store: Store(
-            initialState: TopicFeature.State(topicId: 0)
+            initialState: TopicFeature.State(topicId: 0, topicName: "Test Topic")
         ) {
             TopicFeature()
         } withDependencies: {

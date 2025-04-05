@@ -10,14 +10,21 @@ import ComposableArchitecture
 import SFSafeSymbols
 import SharedUI
 
+@ViewAction(for: ForumsListFeature.self)
 public struct ForumsListScreen: View {
+    
+    // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<ForumsListFeature>
     @Environment(\.tintColor) private var tintColor
     
+    // MARK: - Init
+    
     public init(store: StoreOf<ForumsListFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -32,9 +39,9 @@ public struct ForumsListScreen: View {
                                 HStack(spacing: 25) {
                                     Row(title: forum.name, unread: forum.isUnread) {
                                         if let redirectUrl = forum.redirectUrl {
-                                            store.send(.forumRedirectTapped(redirectUrl))
+                                            send(.forumRedirectTapped(redirectUrl))
                                         } else {
-                                            store.send(.forumTapped(id: forum.id, name: forum.name))
+                                            send(.forumTapped(id: forum.id, name: forum.name))
                                         }
                                     }
                                 }
@@ -60,14 +67,14 @@ public struct ForumsListScreen: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        store.send(.settingsButtonTapped)
+                        send(.settingsButtonTapped)
                     } label: {
                         Image(systemSymbol: .gearshape)
                     }
                 }
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }

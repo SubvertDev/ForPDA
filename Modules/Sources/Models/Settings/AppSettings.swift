@@ -83,7 +83,7 @@ public extension AppSettings {
     static let `default` = AppSettings(
         articlesListRowType: .short,
         bookmarksListRowType: .short,
-        startPage: .articlesList,
+        startPage: .articles,
         appColorScheme: .system,
         backgroundTheme: .blue,
         appTintColor: .primary,

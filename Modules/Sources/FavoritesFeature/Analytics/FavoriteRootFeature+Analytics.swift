@@ -19,7 +19,7 @@ extension FavoritesFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear:
+                case .onAppear, .delegate:
                     break
                     
                 case .onRefresh:
@@ -28,11 +28,11 @@ extension FavoritesFeature {
                 case .onSceneBecomeActive:
                     analytics.log(FavoritesEvent.onSceneBecomeActive)
                     
-                case let .favoriteTapped(id: id, name: name, offset: _, postId: postId, isForum: isForum):
-                    analytics.log(FavoritesEvent.favoriteTapped(id, name, postId, isForum))
+                case let .favoriteTapped(favorite):
+                    analytics.log(FavoritesEvent.favoriteTapped(favorite.topic.id, favorite.topic.name, nil, favorite.isForum))
                     
-                case let .unreadTapped(id: id):
-                    analytics.log(FavoritesEvent.unreadTapped(id))
+                case let .unreadTapped(favorite):
+                    analytics.log(FavoritesEvent.unreadTapped(favorite.topic.id))
                     
                 case let .contextOptionMenu(option):
                     switch option {
@@ -52,12 +52,12 @@ extension FavoritesFeature {
                         analytics.log(FavoritesEvent.delete(id))
                     }
                     
-                case let .topicContextMenu(option, id):
+                case let .topicContextMenu(option, favorite):
                     switch option {
                     case .goToEnd:
-                        analytics.log(FavoritesEvent.goToEnd(id))
+                        analytics.log(FavoritesEvent.goToEnd(favorite.topic.id))
                     case let .notify(flag, notify):
-                        analytics.log(FavoritesEvent.notify(id, flag, notify.rawValue))
+                        analytics.log(FavoritesEvent.notify(favorite.topic.id, flag, notify.rawValue))
                     case let .notifyHatUpdate(flag):
                         analytics.log(FavoritesEvent.notifyHatUpdate(flag))
                     }

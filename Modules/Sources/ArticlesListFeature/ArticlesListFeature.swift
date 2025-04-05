@@ -14,6 +14,7 @@ import AnalyticsClient
 import PasteboardClient
 import HapticClient
 import PersistenceKeys
+import ToastClient
 
 @Reducer
 public struct ArticlesListFeature: Reducer, Sendable {
@@ -84,12 +85,19 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case loadMoreArticles
         
         case _articlesResponse(Result<[ArticlePreview], any Error>)
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openArticle(ArticlePreview)
+            case openSettings
+        }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.hapticClient) private var hapticClient
@@ -100,22 +108,11 @@ public struct ArticlesListFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
+            case let .articleTapped(preview):
+                return .send(.delegate(.openArticle(preview)))
                 
-                // MARK: External
-            case .articleTapped, .binding, .destination:
-                return .none
-                
-            case .cellMenuOpened(let article, let action):
-                switch action {
-                case .shareLink:      state.destination = .share(article.url)
-                case .copyLink:       pasteboardClient.copy(string: article.url.absoluteString)
-                case .openInBrowser:  return .run { _ in await open(url: article.url) }
-                case .report:         break
-                case .addToBookmarks:
-                    state.destination = .alert(.notImplemented)
-                    return .run { _ in await hapticClient.play(.rigid) }
-                }
-                return .none
+            case let .cellMenuOpened(article, action):
+                return handleMenuOptions(article: article, action: action, state: &state)
                 
             case .linkShared:
                 state.destination = nil
@@ -124,7 +121,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
             case .onAppear:
                 guard state.articles.isEmpty else { return .none }
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
-                    let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
+                    let result = await Result { try await apiClient.getArticlesList(offset, amount) }
                     await send(._articlesResponse(result))
                 }
                 
@@ -133,7 +130,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     // TODO: Better way to hold for 1 sec?
                     let startTime = DispatchTime.now()
-                    let result = await Result { try await apiClient.getArticlesList(offset: offset, amount: amount) }
+                    let result = await Result { try await apiClient.getArticlesList(offset, amount) }
                     let endTime = DispatchTime.now()
                     let timeInterval = Int(Double(endTime.uptimeNanoseconds - startTime.uptimeNanoseconds))
                     try await clock.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
@@ -148,9 +145,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 }
                 
             case .settingsButtonTapped:
-                return .none
-                
-                // MARK: Internal
+                return .send(.delegate(.openSettings))
                 
             case .loadMoreArticles:
                 guard !state.isLoading else { return .none }
@@ -158,7 +153,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 state.isLoading = true
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     let result = await Result {
-                        try await apiClient.getArticlesList(offset: offset, amount: amount)
+                        try await apiClient.getArticlesList(offset, amount)
                     }
                     await send(._articlesResponse(result))
                 }
@@ -179,6 +174,9 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 state.destination = .alert(.failedToConnect)
                 reportFullyDisplayed(&state)
                 return .none
+                
+            case .delegate, .binding, .destination:
+                return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
@@ -192,5 +190,34 @@ public struct ArticlesListFeature: Reducer, Sendable {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()
         state.didLoadOnce = true
+    }
+    
+    private func handleMenuOptions(article: ArticlePreview, action: ContextMenuOptions, state: inout State) -> Effect<Action> {
+        switch action {
+        case .shareLink:
+            state.destination = .share(article.url)
+            
+        case .copyLink:
+            pasteboardClient.copy(article.url.absoluteString)
+            return showToast(for: action)
+            
+        case .openInBrowser:
+            return .run { _ in await open(url: article.url) }
+            
+        case .report:
+            return showToast(for: action)
+            
+        case .addToBookmarks:
+            state.destination = .alert(.notImplemented)
+            return .run { _ in await hapticClient.play(.rigid) }
+        }
+        return .none
+    }
+    
+    private func showToast(for action: ContextMenuOptions) -> Effect<Action> {
+        return .run { _ in
+            let toast = ToastInfo(screen: .articlesList, message: action.rawValue)
+            await toastClient.show(toast)
+        }
     }
 }
