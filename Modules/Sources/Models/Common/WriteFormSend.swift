@@ -7,4 +7,5 @@
 
 public enum WriteFormSend: Sendable {
     case post(PostSend)
+    case report(ReportResponseType)
 }

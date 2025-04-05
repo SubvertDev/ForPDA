@@ -260,6 +260,7 @@
 		4BBCE5E24C98602B67996773 /* ParsingClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDC2F95BADB6C0F9E1995E /* ParsingClient.framework */; };
 		4BDB0B54EE935E72BB6AB415 /* ForumFeature+Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80A5B1CD6207AE3F36AE2C59 /* ForumFeature+Analytics.swift */; };
 		4C315DBC8CD4F54506032CF7 /* NotificationCenterClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FE2FE3A738395B32CD8D60D /* NotificationCenterClient.framework */; };
+		4C4CC6E7EE25DEC783258430 /* ReportResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA8473A8B0A9D78765C21FD /* ReportResponseType.swift */; };
 		4C8F28E669E91D54A85E6B7E /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
 		4CDAA6EB14DFA85C0524D7F2 /* ForumFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F5592F7811DFDA942198417A /* ForumFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4CE3EAEC8C32FB2BE0B3C7BC /* JumpForumRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CFCD0B8F608D1C28D49E649 /* JumpForumRequest.swift */; };
@@ -309,6 +310,7 @@
 		5A86297D975FF8CE8D4FA2C7 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		5B0C9EBC3867F80B6E002836 /* SFSafeSymbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 322E22C74D44156FAE5F3F7B /* SFSafeSymbols.framework */; };
 		5B2EC0ABFAD627ACBC7ED8C0 /* SentrySwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99CC39A7F9B6AAAA1BBA7AA2 /* SentrySwiftUI.framework */; };
+		5B7168C43949EBC9B7F5B828 /* WriteFormFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AED1B44B60252254CC83794 /* WriteFormFeature.framework */; };
 		5B8053BD460F45FB6B2402F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 43FD1147E7B1A89246A32C4F /* Assets.xcassets */; };
 		5BEC88433E85603AE8678EEE /* ShareActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A0992B48CEDD10AE732602 /* ShareActivityView.swift */; };
 		5D2226A15E7F6957A6074748 /* CacheClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948842ACD7815FB6C88585E3 /* CacheClient.framework */; };
@@ -387,6 +389,7 @@
 		6DB30B28AC7745199B7E0ADA /* PDAPI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A98745325F4FD6EA35AB13 /* PDAPI.xcframework */; };
 		6DBB0232AF8E50EA0257EBCB /* TuistBundle+DeeplinkHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D65D9F673E58671781D469 /* TuistBundle+DeeplinkHandler.swift */; };
 		6EC7362717E93135FC519AEF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CA619BEEFA3E325A75672894 /* LaunchScreen.storyboard */; };
+		6EE04106A0F1A4950CDD7E62 /* ReportRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A03CD359D92206F8906239E /* ReportRequest.swift */; };
 		6F15E68556002F3D84AB74B3 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BC03E4358AB75C9EC46A474C /* Localizable.xcstrings */; };
 		6F3D866F9AB1FAAD10272427 /* Nuke.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE538E673738E9F50FC43D2 /* Nuke.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6F52695E39374B738AA63D02 /* ContextMenuActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A2222FEAE92257F6CF899AB /* ContextMenuActions.swift */; };
@@ -1063,6 +1066,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 7E6C96E4B0893EA283DCB290;
 			remoteInfo = ToastClient;
+		};
+		19948E566B601308B6DF62F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9848C372E1260FB12D609CFE;
+			remoteInfo = WriteFormFeature;
 		};
 		1AC086D42A66D4D968B7BF2C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2872,6 +2882,7 @@
 		4878C9265AA363BD2B4C1B7D /* TuistAssets+NotificationCenterClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+NotificationCenterClient.swift"; sourceTree = "<group>"; };
 		49383B6E5C255FAE6F6A1127 /* CommentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentEvent.swift; sourceTree = "<group>"; };
 		49E338D7B275AE8FC863BEB8 /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
+		4A03CD359D92206F8906239E /* ReportRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportRequest.swift; sourceTree = "<group>"; };
 		4A5022DB244E4A147C6A3716 /* TuistFonts+AnnouncementFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AnnouncementFeature.swift"; sourceTree = "<group>"; };
 		4A6B74E62A7BA4A8CD002DD6 /* TuistAssets+DeveloperFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+DeveloperFeature.swift"; sourceTree = "<group>"; };
 		4AC39405A58D933436D549F4 /* QMSParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSParser.swift; sourceTree = "<group>"; };
@@ -3208,6 +3219,7 @@
 		FA24CB8B945960ED12BF7E1C /* ForumsListFeature+Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ForumsListFeature+Analytics.swift"; sourceTree = "<group>"; };
 		FA33373508F922ED4752EFF1 /* AnnouncementInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnouncementInfo.swift; sourceTree = "<group>"; };
 		FA4F9D4A6014EF3586D0B42F /* QMSChatInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSChatInfo.swift; sourceTree = "<group>"; };
+		FAA8473A8B0A9D78765C21FD /* ReportResponseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportResponseType.swift; sourceTree = "<group>"; };
 		FB654B9EE2BF5E5690138467 /* TuistAssets+FavoritesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+FavoritesFeature.swift"; sourceTree = "<group>"; };
 		FBF2A058E1956667E8FEF516 /* TopicScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicScreen.swift; sourceTree = "<group>"; };
 		FBF88C3FEED502F690603E9D /* FavoritesFeature.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FavoritesFeature.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3397,6 +3409,7 @@
 				1C2832940F6B6D884F978B42 /* SmoothGradient.framework in Frameworks */,
 				2739B9E48F59E654A2A6031F /* TCAExtensions.framework in Frameworks */,
 				256B25050A796F2677E008EE /* ToastClient.framework in Frameworks */,
+				5B7168C43949EBC9B7F5B828 /* WriteFormFeature.framework in Frameworks */,
 				FE6BC7E0CE63F8B0A3AFEDDB /* YouTubePlayerKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4869,6 +4882,7 @@
 			isa = PBXGroup;
 			children = (
 				BA750927EA08B8979A02EE54 /* Links.swift */,
+				FAA8473A8B0A9D78765C21FD /* ReportResponseType.swift */,
 				E1E86CF545E10700A7D0B0AA /* ReportType.swift */,
 				B55C906394BB2ECF59F0CEC9 /* ToastInfo.swift */,
 				243DC298825E30AD98A65200 /* Unread.swift */,
@@ -5278,6 +5292,7 @@
 				EF3828FB6700EFF5F1D6001B /* NotifyFavoriteRequest.swift */,
 				6D44CBB5150176925A91B0AE /* PostPreviewRequest.swift */,
 				BE9632C23428F67FF43C8685 /* PostRequest.swift */,
+				4A03CD359D92206F8906239E /* ReportRequest.swift */,
 				8F4EC55168BA063B91D7CDAA /* SetFavoriteRequest.swift */,
 			);
 			path = Requests;
@@ -6497,6 +6512,7 @@
 				DBC27BE0D559C06D6963F4DC /* PBXTargetDependency */,
 				96197D810F065BCDD9D922D3 /* PBXTargetDependency */,
 				461891398B2FD8A91A5936C5 /* PBXTargetDependency */,
+				DB7D4CD3B2B5A14D9D073C22 /* PBXTargetDependency */,
 			);
 			name = ArticleFeature;
 			packageProductDependencies = (
@@ -7142,6 +7158,7 @@
 				D007F73B216B3D08EF15D64D /* NotifyFavoriteRequest.swift in Sources */,
 				5D7E551D73AF1E95994478CC /* PostPreviewRequest.swift in Sources */,
 				DCC68A42745360D4B1D1415E /* PostRequest.swift in Sources */,
+				6EE04106A0F1A4950CDD7E62 /* ReportRequest.swift in Sources */,
 				F47F6C2B6491B5EFBF229E4F /* SetFavoriteRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7287,6 +7304,7 @@
 				698328028EFEAA67CCF821B8 /* UserSession.swift in Sources */,
 				F5A962D53C0EB7FBB28CD1A5 /* Bookmark.swift in Sources */,
 				24872E7EF4359F25C06A3408 /* Links.swift in Sources */,
+				4C4CC6E7EE25DEC783258430 /* ReportResponseType.swift in Sources */,
 				C6CAD8321218E37F283F213A /* ReportType.swift in Sources */,
 				DA11253BF5BA36D6DACEDCBC /* ToastInfo.swift in Sources */,
 				A0E9F42C67327919724245C0 /* Unread.swift in Sources */,
@@ -8696,6 +8714,12 @@
 			target = 9E92F49EE2FB419CC8E1B905 /* LoggerClient */;
 			targetProxy = 12FE0494948B1DF5784E696B /* PBXContainerItemProxy */;
 		};
+		DB7D4CD3B2B5A14D9D073C22 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WriteFormFeature;
+			target = 9848C372E1260FB12D609CFE /* WriteFormFeature */;
+			targetProxy = 19948E566B601308B6DF62F6 /* PBXContainerItemProxy */;
+		};
 		DBC27BE0D559C06D6963F4DC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SharedUI;
@@ -8860,7 +8884,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -8905,7 +8928,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -8955,7 +8977,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9003,7 +9024,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9053,7 +9073,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -9098,7 +9117,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9149,7 +9167,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9199,7 +9216,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9248,7 +9264,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9296,7 +9311,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9347,7 +9361,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9396,7 +9409,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9443,7 +9455,6 @@
 				ENABLE_PREVIEWS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
@@ -9488,7 +9499,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9537,7 +9547,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
@@ -9639,7 +9648,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -9759,7 +9767,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9808,7 +9815,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
@@ -9925,7 +9931,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -9974,7 +9979,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10018,7 +10022,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
@@ -10098,7 +10101,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10142,7 +10144,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10193,7 +10194,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10237,7 +10237,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
@@ -10322,7 +10321,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10370,7 +10368,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10421,7 +10418,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10461,7 +10457,6 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10505,7 +10500,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10559,7 +10553,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10607,7 +10600,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10661,7 +10653,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
@@ -10714,7 +10705,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10760,7 +10750,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10805,7 +10794,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -10849,7 +10837,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -10900,7 +10887,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -10944,7 +10930,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11028,7 +11013,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11076,7 +11060,6 @@
 					"$(SRCROOT)/Tuist/.build/checkouts/giphy-ios-sdk",
 				);
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
@@ -11151,7 +11134,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11199,7 +11181,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11249,7 +11230,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11293,7 +11273,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
@@ -11344,7 +11323,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11393,7 +11371,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11444,7 +11421,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11492,7 +11468,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11543,7 +11518,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11593,7 +11567,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11641,7 +11614,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11691,7 +11663,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11739,7 +11710,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11790,7 +11760,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11839,7 +11808,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -11890,7 +11858,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -11940,7 +11907,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -11984,7 +11950,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12035,7 +12000,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12082,7 +12046,6 @@
 				ENABLE_PREVIEWS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
@@ -12128,7 +12091,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12178,7 +12140,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12224,7 +12185,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12269,7 +12229,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12324,7 +12283,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12374,7 +12332,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12418,7 +12375,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12467,7 +12423,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
@@ -12525,7 +12480,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12574,7 +12528,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12620,7 +12573,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-syntax/Sources/_SwiftSyntaxCShims/include",
 				);
@@ -12664,7 +12616,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
@@ -12714,7 +12665,6 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",
 					"$(SRCROOT)/Tuist/.build/checkouts/swift-navigation/Sources/UIKitNavigationShim/include",
@@ -12759,7 +12709,6 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/include",
 					"$(SRCROOT)/Tuist/.build/checkouts/libwebp-Xcode/libwebp",
@@ -12808,7 +12757,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
 					"$(inherited)",
 					"$(SRCROOT)/Tuist/.build/checkouts/posthog-ios/vendor/libwebp",
 					"$(SRCROOT)/Tuist/.build/checkouts/sentry-cocoa/Sources/SentrySwiftUI/SentryInternal",

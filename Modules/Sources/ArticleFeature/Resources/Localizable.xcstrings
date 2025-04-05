@@ -141,19 +141,7 @@
         }
       }
     },
-    "Problems with article?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проблемы со статьей?"
-          }
-        }
-      }
-    },
     "Report" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

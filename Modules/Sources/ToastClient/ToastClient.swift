@@ -45,13 +45,27 @@ extension DependencyValues {
 }
 
 public enum ToastMessage: Sendable {
+    // Posts
     case postNotFound
+    
+    // Report
+    case reportSent
+    case reportTooShort
+    case reportSendError
+    
+    // Common
     case whoopsSomethingWentWrong
     
     public var description: LocalizedStringKey {
         switch self {
         case .postNotFound:
             return "Post not found"
+        case .reportSent:
+            return "Report sent"
+        case .reportTooShort:
+            return "Report too short"
+        case .reportSendError:
+            return "Error sending report"
         case .whoopsSomethingWentWrong:
             return "Whoops, something went wrong.."
         }
@@ -59,18 +73,27 @@ public enum ToastMessage: Sendable {
     
     public var isError: Bool {
         switch self {
-        case .postNotFound:
+        case .postNotFound,
+             .reportTooShort,
+             .reportSendError,
+             .whoopsSomethingWentWrong:
             return true
-        case .whoopsSomethingWentWrong:
-            return true
+            
+        case .reportSent:
+            return false
         }
     }
     
     public var haptic: HapticType {
         switch self {
         case .postNotFound,
+             .reportTooShort,
+             .reportSendError,
              .whoopsSomethingWentWrong:
             return .error
+            
+        case .reportSent:
+            return .success
         }
     }
 }
