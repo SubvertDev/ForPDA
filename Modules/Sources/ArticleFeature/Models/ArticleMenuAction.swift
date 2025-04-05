@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public enum ArticleMenuAction: LocalizedStringKey {
+public enum ArticleMenuAction: LocalizedStringKey, Sendable {
     case copyLink = "Copied"
     case shareLink // Not tracked in l10n
     case report = "Will be fixed soon :)"

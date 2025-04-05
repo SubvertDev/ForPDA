@@ -9,7 +9,6 @@ import Foundation
 
 public enum ForumEvent: Event {
     case onRefresh
-    case settingsButtonTapped
     case topicTapped(Int, Int)
     case subforumRedirectTapped(URL)
     case subforumTapped(Int, String)

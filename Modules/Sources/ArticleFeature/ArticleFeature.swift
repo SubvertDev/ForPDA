@@ -14,6 +14,7 @@ import CacheClient
 import PasteboardClient
 import HapticClient
 import AnalyticsClient
+import ToastClient
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {
@@ -101,7 +102,6 @@ public struct ArticleFeature: Reducer, Sendable {
     public enum Action: BindableAction {
         case destination(PresentationAction<Destination.Action>)
         case binding(BindingAction<State>)
-        case delegate(Delegate)
         case backButtonTapped
         case bookmarkButtonTapped
         case notImplementedButtonTapped
@@ -122,11 +122,10 @@ public struct ArticleFeature: Reducer, Sendable {
         case _parseArticleElements(Result<[ArticleElement], any Error>)
         case _pollVoteResponse(Result<Bool, any Error>)
         
-        @CasePathable
+        case delegate(Delegate)
         public enum Delegate {
             case handleDeeplink(Int)
             case commentHeaderTapped(Int)
-            case showToast(CommentResponseType)
         }
     }
     
@@ -134,6 +133,7 @@ public struct ArticleFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) var apiClient
     @Dependency(\.cacheClient) var cacheClient
+    @Dependency(\.toastClient) var toastClient
     @Dependency(\.hapticClient) var hapticClient
     @Dependency(\.parsingClient) var parsingClient
     @Dependency(\.analyticsClient) var analyticsClient
@@ -191,12 +191,7 @@ public struct ArticleFeature: Reducer, Sendable {
                 }
                 
             case let .menuActionTapped(action):
-                switch action {
-                case .copyLink:  pasteboardClient.copy(string: state.articlePreview.url.absoluteString)
-                case .shareLink: state.destination = .share(state.articlePreview.url)
-                case .report:    break
-                }
-                return .none
+                return handleMenuOptions(action: action, state: &state)
                 
             case .linkShared:
                 state.destination = nil
@@ -332,24 +327,14 @@ public struct ArticleFeature: Reducer, Sendable {
                 
             case let ._commentResponse(.success(type)):
                 state.isUploadingComment = false
-                if type.isError {
-                    state.focus = nil
-                    return .run { send in
-                        await hapticClient.play(.error)
-                        await send(.delegate(.showToast(type)))
-                    }
-                } else {
-                    state.commentText.removeAll()
-                    state.replyComment = nil
-                    state.focus = nil
-                    return .concatenate([
-                        getArticle(id: state.articlePreview.id, useCache: false),
-                        .run { send in
-                            await hapticClient.play(.success)
-                            await send(.delegate(.showToast(type)))
-                        }
-                    ])
-                }
+                state.focus = nil
+                guard !type.isError else { return showToast(for: type) }
+                state.commentText.removeAll()
+                state.replyComment = nil
+                return .concatenate([
+                    getArticle(id: state.articlePreview.id, useCache: false),
+                    showToast(for: type)
+                ])
                 
             case let ._commentResponse(.failure(error)):
                 print(error) // TODO: Catch to Issue
@@ -416,7 +401,7 @@ public struct ArticleFeature: Reducer, Sendable {
         return .concatenate([
             .run { send in
                 do {
-                    for try await article in try await apiClient.getArticle(id: id, policy: .cacheAndLoad) {
+                    for try await article in try await apiClient.getArticle(id, .cacheAndLoad) {
                         await send(._articleResponse(.success(article)))
                     }
                 } catch {
@@ -425,6 +410,40 @@ public struct ArticleFeature: Reducer, Sendable {
             },
             .cancel(id: CancelID.loading)
         ])
+    }
+    
+    private func handleMenuOptions(action: ArticleMenuAction, state: inout State) -> Effect<Action> {
+        switch action {
+        case .copyLink:
+            pasteboardClient.copy(state.articlePreview.url.absoluteString)
+            return showToast(for: action)
+            
+        case .shareLink:
+            state.destination = .share(state.articlePreview.url)
+            
+        case .report:
+            return showToast(for: action)
+        }
+        
+        return .none
+    }
+    
+    private func showToast(for type: CommentResponseType) -> Effect<Action> {
+        #warning("test if it's working")
+        return .run { _ in
+            await hapticClient.play(type.isError ? .error : .success)
+            
+            let toast = ToastInfo(screen: .article, message: type.description)
+            await toastClient.show(toast)
+        }
+    }
+    
+    private func showToast(for action: ArticleMenuAction) -> Effect<Action> {
+        #warning("connect with func above?")
+        return .run { _ in
+            let toast = ToastInfo(screen: .article, message: action.rawValue)
+            await toastClient.show(toast)
+        }
     }
 }
 

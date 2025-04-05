@@ -67,7 +67,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
             case ._loadAnnouncement:
                 guard state.announcement == nil else { return .none }
                 return .run { [id = state.announcementId] send in
-                    let result = await Result { try await apiClient.getAnnouncement(id: id) }
+                    let result = await Result { try await apiClient.getAnnouncement(id) }
                     await send(._announcementResponse(result))
                 }
                 

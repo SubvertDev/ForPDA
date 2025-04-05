@@ -272,21 +272,21 @@ public struct ForumScreen: View {
                     }
                     
                     Spacer(minLength: 0)
-
-                    if unread {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
-                    }
-                    
                     if closed {
                         Image(systemSymbol: .lock)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 16, height: 16)
                             .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.trailing, unread ? 4 : 12)
+                    }
+                    
+                    if unread {
+                        Image(systemSymbol: .circleFill)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 10, height: 10)
+                            .foregroundStyle(tintColor)
                             .padding(.trailing, 12)
                     }
                 }
@@ -294,7 +294,7 @@ public struct ForumScreen: View {
                 .contentShape(Rectangle())
             }
         }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
         .buttonStyle(.plain)
         .frame(minHeight: 60)
     }

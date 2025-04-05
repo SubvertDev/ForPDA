@@ -25,9 +25,6 @@ extension ForumFeature {
                 case .onRefresh:
                     analytics.log(ForumEvent.onRefresh)
                     
-                case .settingsButtonTapped:
-                    analytics.log(ForumEvent.settingsButtonTapped)
-                    
                 case let .topicTapped(id: id, offset: offset):
                     analytics.log(ForumEvent.topicTapped(id, offset))
                     

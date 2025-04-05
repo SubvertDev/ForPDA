@@ -171,13 +171,15 @@ public struct TopicParser {
                 throw ParsingError.unknownAttachmentType(type)
             }
             
+            let downloadCount = (attachment[safe: 7] as? Int) ?? (attachment[safe: 4] as? Int)
+            
             let attachment = Post.Attachment(
                 id: id,
                 type: type,
                 name: name,
                 size: size,
                 metadata: try parseAttachmentMetadata(attachment),
-                downloadCount: attachment[safe: 7] as? Int // Only if attachment.count > 7
+                downloadCount: downloadCount // Only if attachment.count > 7
             )
             attachments.append(attachment)
         }
@@ -187,7 +189,7 @@ public struct TopicParser {
     // MARK: - Attachment Metadata
      
     private static func parseAttachmentMetadata(_ attachment: [Any]) throws(ParsingError) -> Post.Attachment.Metadata? {
-        if attachment.count <= 4 {
+        if attachment.count <= 5 {
             return nil
         }
         
