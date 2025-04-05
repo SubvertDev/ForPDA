@@ -20,6 +20,8 @@ struct ArticleElementView: View {
     @State private var gallerySelection: Int = 0
     @State private var pollSelection: ArticlePoll.Option?
     @State private var pollSelections: Set<ArticlePoll.Option> = .init()
+    @State private var showFullScreenGallery = false
+    @State private var selectedImageID = 0
     
     private var hasSelection: Bool {
         return pollSelection != nil || !pollSelections.isEmpty
@@ -113,6 +115,12 @@ struct ArticleElementView: View {
         .frame(width: UIScreen.main.bounds.width,
                height: UIScreen.main.bounds.width * element.ratioHW)
         .clipped()
+        .onTapGesture {
+            showFullScreenGallery.toggle()
+        }
+        .fullScreenCover(isPresented: $showFullScreenGallery) {
+            TabViewGallery(gallery: [element.url], selectedImageID: selectedImageID)
+        }
     }
     
     // MARK: - Gallery
@@ -120,7 +128,7 @@ struct ArticleElementView: View {
     @ViewBuilder
     private func gallery(_ element: [ImageElement]) -> some View {
         TabView {
-            ForEach(element, id: \.self) { imageElement in
+            ForEach(Array(element.enumerated()), id: \.element) { index, imageElement in
                 LazyImage(url: imageElement.url) { state in
                     Group {
                         if let image = state.image {
@@ -133,6 +141,12 @@ struct ArticleElementView: View {
                 }
                 .aspectRatio(imageElement.ratioWH, contentMode: .fit)
                 .clipped()
+                .highPriorityGesture(
+                    TapGesture().onEnded {
+                        showFullScreenGallery.toggle()
+                        selectedImageID = index
+                    }
+                )
             }
             .padding(.bottom, 48) // Fix against index overlaying
         }
@@ -140,6 +154,9 @@ struct ArticleElementView: View {
         .tabViewStyle(.page(indexDisplayMode: .always))
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .padding(.bottom, -16)
+        .fullScreenCover(isPresented: $showFullScreenGallery) {
+            TabViewGallery(gallery: element.map{ $0.url }, selectedImageID: selectedImageID)
+        }
     }
     
     // MARK: - Video
