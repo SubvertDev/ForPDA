@@ -32,13 +32,26 @@ public struct ForumsListFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action {
-        case onAppear
-        case settingsButtonTapped
-        case forumRedirectTapped(URL)
-        case forumTapped(id: Int, name: String)
+    public enum Action: ViewAction {
+        case view(View)
+        public enum View {
+            case onAppear
+            case settingsButtonTapped
+            case forumRedirectTapped(URL)
+            case forumTapped(id: Int, name: String)
+        }
         
-        case _forumsListResponse(Result<[ForumInfo], any Error>)
+        case `internal`(Internal)
+        public enum Internal {
+            case forumsListResponse(Result<[ForumInfo], any Error>)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openSettings
+            case openForum(id: Int, name: String)
+            case handleForumRedirect(URL)
+        }
     }
     
     // MARK: - Dependencies
@@ -51,22 +64,28 @@ public struct ForumsListFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
+            case .view(.onAppear):
                 guard state.forums == nil else { return .none }
                 return .run { send in
                     for try await forumList in try await apiClient.getForumsList(policy: .cacheOrLoad) {
-                        await send(._forumsListResponse(.success(forumList)))
+                        await send(.internal(.forumsListResponse(.success(forumList))))
                     }
                 } catch: { error, send in
-                    await send(._forumsListResponse(.failure(error)))
+                    await send(.internal(.forumsListResponse(.failure(error))))
                 }
                 
-            case .forumTapped, .settingsButtonTapped, .forumRedirectTapped:
-                return .none
+            case .view(.settingsButtonTapped):
+                return .send(.delegate(.openSettings))
                 
-            case let ._forumsListResponse(.success(forums)):
+            case let .view(.forumTapped(id: id, name: name)):
+                return .send(.delegate(.openForum(id: id, name: name)))
+                
+            case let .view(.forumRedirectTapped(url)):
+                return .send(.delegate(.handleForumRedirect(url)))
+                
+            case let .internal(.forumsListResponse(.success(forums))):
                 var rows: [ForumRow] = []
-
+                
                 for forum in forums {
                     if forum.isCategory {
                         let category = ForumRow(id: forum.id, title: forum.name, forums: [])
@@ -78,13 +97,16 @@ public struct ForumsListFeature: Reducer, Sendable {
                 
                 state.forums = rows
                 reportFullyDisplayed(&state)
-                return .none
                 
-            case let ._forumsListResponse(.failure(error)):
-                print(error)
+            case let .internal(.forumsListResponse(.failure(error))):
+                #warning("add toast")
                 reportFullyDisplayed(&state)
-                return .none
+                
+            case .delegate:
+                break
             }
+            
+            return .none
         }
     }
     

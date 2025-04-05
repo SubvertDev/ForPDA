@@ -11,7 +11,7 @@ import Models
 extension AppTab {
     public var title: LocalizedStringKey {
         switch self {
-        case .articlesList:
+        case .articles:
             return "Articles"
         case .favorites:
             return "Favorites"

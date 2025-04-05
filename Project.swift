@@ -78,6 +78,7 @@ let project = Project(
                     .Internal.QMSListFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
+                    .Internal.ToastClient,
                     .Internal.TopicFeature,
                     .Internal.WriteFormFeature,
                     .SPM.AlertToast,
@@ -116,6 +117,7 @@ let project = Project(
                     .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.ToastClient,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.SkeletonUI,
@@ -136,6 +138,7 @@ let project = Project(
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.ToastClient,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
@@ -208,6 +211,7 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.ToastClient,
                     .SPM.NukeUI,
                     .SPM.TCA
                 ]
@@ -382,6 +386,7 @@ let project = Project(
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.ToastClient,
                     .Internal.TopicBuilder,
                     .Internal.WriteFormFeature,
                     .SPM.MemberwiseInit,
@@ -438,6 +443,16 @@ let project = Project(
                     .Internal.Models,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
+                ]
+            ),
+        
+            .feature(
+                name: "ToastClient",
+                hasResources: true,
+                dependencies: [
+                    .Internal.HapticClient,
+                    .Internal.Models,
+                    .SPM.TCA
                 ]
             ),
         
@@ -726,6 +741,7 @@ extension TargetDependency.Internal {
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
+    static let ToastClient =         TargetDependency.target(name: "ToastClient")
     
     // Shared
     static let BBBuilder =           TargetDependency.target(name: "BBBuilder")

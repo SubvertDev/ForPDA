@@ -19,25 +19,28 @@ extension ForumsListFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear:
+                case .view(.onAppear):
                     break
                     
-                case .settingsButtonTapped:
+                case .view(.settingsButtonTapped):
                     analytics.log(ForumsListEvent.settingsButtonTapped)
                     
-                case let .forumRedirectTapped(url):
+                case let .view(.forumRedirectTapped(url)):
                     analytics.log(ForumsListEvent.forumRedirectTapped(url))
                     
-                case let .forumTapped(id: id, name: name):
+                case let .view(.forumTapped(id: id, name: name)):
                     analytics.log(ForumsListEvent.forumTapped(id, name))
                     
-                case let ._forumsListResponse(response):
+                case let .internal(.forumsListResponse(response)):
                     switch response {
                     case .success:
                         analytics.log(ForumsListEvent.forumListLoadSuccess)
                     case let .failure(error):
                         analytics.log(ForumsListEvent.forumListLoadFailure(error))
                     }
+                    
+                case .delegate:
+                    break
                 }
                 
                 return .none

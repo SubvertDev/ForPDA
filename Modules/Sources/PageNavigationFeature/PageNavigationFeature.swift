@@ -137,6 +137,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
             case let .update(count: count, offset: offset):
                 state.count = count
                 if let offset { state.offset = offset }
+                state.page = String(state.currentPage)
                 return .none
                 
             case .offsetChanged:

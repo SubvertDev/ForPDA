@@ -14,6 +14,7 @@ import TCAExtensions
 import PasteboardClient
 import NotificationCenterClient
 import AnalyticsClient
+import ToastClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -62,12 +63,12 @@ public struct FavoritesFeature: Reducer, Sendable {
         case onRefresh
         case onSceneBecomeActive
         
-        case favoriteTapped(id: Int, name: String, offset: Int, postId: Int?, isForum: Bool)
-        case unreadTapped(id: Int)
+        case favoriteTapped(FavoriteInfo)
+        case unreadTapped(FavoriteInfo)
         
         case contextOptionMenu(FavoritesOptionContextMenuAction)
         case commonContextMenu(FavoriteContextMenuAction, Bool)
-        case topicContextMenu(FavoriteTopicContextMenuAction, Int)
+        case topicContextMenu(FavoriteTopicContextMenuAction, FavoriteInfo)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -77,15 +78,22 @@ public struct FavoritesFeature: Reducer, Sendable {
         case _loadFavorites(offset: Int)
         case _startUnreadLoadingIndicator(id: Int)
         case _jumpRequestFailed
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openForum(id: Int, name: String)
+            case openTopic(id: Int, name: String, offset: Int, postId: Int?)
+        }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
-    @Dependency(\.continuousClock) var clock
+    @Dependency(\.continuousClock) private var clock
     
     // MARK: - Cancellable
     
@@ -118,9 +126,12 @@ public struct FavoritesFeature: Reducer, Sendable {
                 guard !state.isLoading else { return .none }
                 state.isRefreshing = true
                 state.unreadTapId = nil
-                return .run { [offset = state.pageNavigation.offset] send in
-                    await send(._loadFavorites(offset: offset))
-                }
+                return .concatenate(
+                    .cancel(id: CancelID.loading),
+                    .run { [offset = state.pageNavigation.offset] send in
+                        await send(._loadFavorites(offset: offset))
+                    }
+                )
                 
             case .onSceneBecomeActive:
                 if state.isLoading {
@@ -148,8 +159,17 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .sort:
                 return .none
                 
-            case .favoriteTapped:
-                return .cancel(id: CancelID.loading)
+            case let .favoriteTapped(favorite):
+                return .concatenate(
+                    .cancel(id: CancelID.loading),
+                    .run { send in
+                        if favorite.isForum {
+                            await send(.delegate(.openForum(id: favorite.topic.id, name: favorite.topic.name)))
+                        } else {
+                            await send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, offset: 0, postId: nil)))
+                        }
+                    }
+                )
                 
             case .contextOptionMenu(let action):
                 switch action {
@@ -170,11 +190,11 @@ public struct FavoritesFeature: Reducer, Sendable {
                 switch action {
                 case .copyLink(let id):
                     let show = isForum ? "showforum" : "showtopic"
-                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?\(show)=\(id)")
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
                     return .none
                     
                 case .delete(let id):
-                    return .run { [id = id] send in
+                    return .run { send in
                         let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
                         _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
@@ -183,7 +203,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                     
                 case .setImportant(let id, let pin):
-                    return .run { [id = id] send in
+                    return .run { send in
                         let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
                         _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
@@ -192,19 +212,19 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                 }
                 
-            case .topicContextMenu(let action, let id):
+            case let .topicContextMenu(action, favorite):
                 switch action {
                 case .goToEnd:
-                    return goToEnd(id: id)
+                    return goToEnd(favorite: favorite)
 
                 case .notifyHatUpdate(let flag):
-                    return .run { [id = id, flag = flag] send in
-                        await send(.topicContextMenu(.notify(flag, .hatUpdate), id))
+                    return .run { send in
+                        await send(.topicContextMenu(.notify(flag, .hatUpdate), favorite))
                     }
                     
                 case .notify(let flag, let notify):
-                    return .run { [id = id, flag = flag, type = notify] send in
-                        let request = NotifyFavoriteRequest(id: id, flag: flag, type: type)
+                    return .run { send in
+                        let request = NotifyFavoriteRequest(id: favorite.topic.id, flag: flag, type: notify)
                         _ = try await apiClient.notifyFavorite(request)
                         // TODO: Display toast on success/error.
                         
@@ -212,8 +232,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                 }
                 
-            case let .unreadTapped(id: id):
-                return goToEnd(id: id)
+            case let .unreadTapped(favorite):
+                return goToEnd(favorite: favorite)
                 
             case let ._loadFavorites(offset):
                 if !state.isRefreshing {
@@ -257,9 +277,6 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.favoritesImportant = favsImportant
                 state.favorites = favorites
                 
-                // TODO: Is it ok?
-//                state.pageNavigation.count = response.count
-                
                 state.isLoading = false
                 state.isRefreshing = false
                 
@@ -270,16 +287,21 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let ._favoritesResponse(.failure(error)):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
                 reportFullyDisplayed(&state)
-                return .none
+                return showToast(.whoopsSomethingWentWrong)
                 
             case let ._startUnreadLoadingIndicator(id: id):
                 state.unreadTapId = id
                 return .none
                 
             case ._jumpRequestFailed:
-                // Being watched in AppFeature to show toast
                 state.unreadTapId = nil
-                return .cancel(id: CancelID.loading)
+                return .merge(
+                    .cancel(id: CancelID.loading),
+                    showToast(.postNotFound)
+                )
+                
+            case .delegate:
+                return .none
             }
         }
         .ifLet(\.$sort, action: \.sort) {
@@ -309,24 +331,31 @@ public struct FavoritesFeature: Reducer, Sendable {
             .map(Action.pageNavigation)
     }
     
-    private func goToEnd(id: Int) -> Effect<Action> {
+    private func goToEnd(favorite: FavoriteInfo) -> Effect<Action> {
         return .merge(
             .run { send in
                 try await clock.sleep(for: .seconds(1))
-                await send(._startUnreadLoadingIndicator(id: id))
+                await send(._startUnreadLoadingIndicator(id: favorite.topic.id))
             }
             .cancellable(id: CancelID.loading, cancelInFlight: true),
             
             .run { send in
+                let id = favorite.topic.id
                 let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
                 let response = try await apiClient.jumpForum(request)
                     
                 // TODO: Refactor
                 await send(.onRefresh)
-                await send(.favoriteTapped(id: id, name: "", offset: response.offset, postId: response.postId, isForum: false))
+                await send(.delegate(.openTopic(id: id, name: favorite.topic.name, offset: response.offset, postId: response.postId)))
             } catch: { error, send in
                 await send(._jumpRequestFailed)
             }
         )
+    }
+    
+    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
+        return .run { _ in
+            await toastClient.showToast(toast)
+        }
     }
 }

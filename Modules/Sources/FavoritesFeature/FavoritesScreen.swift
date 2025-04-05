@@ -137,7 +137,7 @@ public struct FavoritesScreen: View {
                     symbol: .chevronRight2,
                     bundle: .module
                 ) {
-                    store.send(.topicContextMenu(.goToEnd, favorite.topic.id))
+                    store.send(.topicContextMenu(.goToEnd, favorite))
                 }
                 
                 ContextButton(
@@ -145,7 +145,7 @@ public struct FavoritesScreen: View {
                     symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
                     bundle: .module
                 ) {
-                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite.topic.id))
+                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite))
                 }
                 
                 Menu {
@@ -154,7 +154,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .always ? .bellFill : .bell,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.flag, .always), favorite.topic.id))
+                        store.send(.topicContextMenu(.notify(favorite.flag, .always), favorite))
                     }
                     
                     ContextButton(
@@ -162,7 +162,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.flag, .once), favorite.topic.id))
+                        store.send(.topicContextMenu(.notify(favorite.flag, .once), favorite))
                     }
                     
                     ContextButton(
@@ -170,7 +170,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite.topic.id))
+                        store.send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite))
                     }
                 } label: {
                     HStack {
@@ -200,17 +200,9 @@ public struct FavoritesScreen: View {
                     notify: favorite.notify
                 ) { showUnread in
                     if showUnread && !favorite.isForum {
-                        store.send(.unreadTapped(id: favorite.topic.id))
+                        store.send(.unreadTapped(favorite))
                     } else {
-                        store.send(
-                            .favoriteTapped(
-                                id: favorite.topic.id,
-                                name: favorite.topic.name,
-                                offset: 0,
-                                postId: nil,
-                                isForum: favorite.isForum
-                            )
-                        )
+                        store.send(.favoriteTapped(favorite))
                     }
                 }
                 .contextMenu {
@@ -311,7 +303,7 @@ public struct FavoritesScreen: View {
                                 .scaledToFit()
                                 .frame(width: 16, height: 16)
                                 .foregroundStyle(Color(.Labels.secondary))
-                                .padding(.trailing, unread ? 0 : 12)
+                                .padding(.trailing, unread ? -2 : 12)
                         }
                         
                         if unread {

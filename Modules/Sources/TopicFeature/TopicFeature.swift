@@ -18,6 +18,7 @@ import WriteFormFeature
 import TCAExtensions
 import AnalyticsClient
 import TopicBuilder
+import ToastClient
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -33,6 +34,7 @@ public struct TopicFeature: Reducer, Sendable {
         @Presents var writeForm: WriteFormFeature.State?
 
         public let topicId: Int
+        public let topicName: String
         public let initialOffset: Int
         public var postId: Int?
         var topic: Topic?
@@ -53,11 +55,13 @@ public struct TopicFeature: Reducer, Sendable {
         
         public init(
             topicId: Int,
+            topicName: String,
             initialOffset: Int = 0,
             postId: Int? = nil,
             topic: Topic? = nil
         ) {
             self.topicId = topicId
+            self.topicName = topicName
             self.postId = postId
             self.topic = topic
             
@@ -75,7 +79,7 @@ public struct TopicFeature: Reducer, Sendable {
         case onTask
         case onRefresh
         case onSceneBecomeActive
-        case userAvatarTapped(userId: Int)
+        case userAvatarTapped(Int)
         case urlTapped(URL)
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -84,7 +88,7 @@ public struct TopicFeature: Reducer, Sendable {
         
         case writeForm(PresentationAction<WriteFormFeature.Action>)
         
-        case _loadTopic(offset: Int)
+        case _loadTopic(Int)
         case _loadTypes([[TopicTypeUI]])
         case _topicResponse(Result<Topic, any Error>)
         case _setFavoriteResponse(Bool)
@@ -94,6 +98,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
@@ -117,13 +122,13 @@ public struct TopicFeature: Reducer, Sendable {
                 return .concatenate(
                     updatePageNavigation(&state, offset: state.initialOffset),
                     .cancel(id: CancelID.loading),
-                    .send(._loadTopic(offset: state.initialOffset))
+                    .send(._loadTopic(state.initialOffset))
                 )
                 
             case .onRefresh:
                 state.isRefreshing = true
                 return .run { [offset = state.pageNavigation.offset] send in
-                    await send(._loadTopic(offset: offset))
+                    await send(._loadTopic(offset))
                 }
                 
             case .onSceneBecomeActive:
@@ -150,7 +155,7 @@ public struct TopicFeature: Reducer, Sendable {
                         }
                     },
                     .cancel(id: CancelID.loading),
-                    .send(._loadTopic(offset: newOffset))
+                    .send(._loadTopic(newOffset))
                 ])
                 
             case .writeForm(.presented(.writeFormSent(let response))):
@@ -269,7 +274,7 @@ public struct TopicFeature: Reducer, Sendable {
                 print("TOPIC RESPONSE FAILURE: \(error)")
                 state.isRefreshing = false
                 reportFullyDisplayed(&state)
-                return .none
+                return showToast(.whoopsSomethingWentWrong)
                 
             case let ._setFavoriteResponse(isFavorite):
                 state.topic?.isFavorite = isFavorite
@@ -302,6 +307,12 @@ public struct TopicFeature: Reducer, Sendable {
                 )
             )
             .map(Action.pageNavigation)
+    }
+    
+    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
+        return .run { _ in
+            await toastClient.showToast(toast)
+        }
     }
 }
 

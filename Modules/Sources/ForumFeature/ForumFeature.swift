@@ -59,7 +59,6 @@ public struct ForumFeature: Reducer, Sendable {
     public enum Action {
         case onAppear
         case onRefresh
-        case settingsButtonTapped
         case topicTapped(id: Int, offset: Int)
         case subforumRedirectTapped(URL)
         case subforumTapped(id: Int, name: String)
@@ -112,7 +111,7 @@ public struct ForumFeature: Reducer, Sendable {
                 }
                 return .run { [id = state.forumId, perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
                     let startTime = Date()
-                    for try await forum in try await apiClient.getForum(id: id, page: offset, perPage: perPage, policy: isRefreshing ? .skipCache : .cacheAndLoad) {
+                    for try await forum in try await apiClient.getForum(id, offset, perPage, isRefreshing ? .skipCache : .cacheAndLoad) {
                         if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
                         await send(._forumResponse(.success(forum)))
                     }
@@ -120,12 +119,9 @@ public struct ForumFeature: Reducer, Sendable {
                     await send(._forumResponse(.failure(error)))
                 }
                 
-            case .settingsButtonTapped:
-                return .none
-                
             case .topicTapped:
                 return .none
-            
+                
             case .subforumTapped:
                 return .none
                 
@@ -137,7 +133,7 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .contextOptionMenu(let action):
                 switch action {
-                // TODO: sort, to bookmarks
+                    // TODO: sort, to bookmarks
                     // TODO: Add analytics
                 default: return .none
                 }
@@ -146,22 +142,22 @@ public struct ForumFeature: Reducer, Sendable {
                 switch action {
                 case .open:
                     return .send(.topicTapped(id: id, offset: 0))
-                
+                    
                 case .goToEnd:
                     return .run { [id = id] send in
                         let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
-                        let response = try await apiClient.jumpForum(request: request)
+                        let response = try await apiClient.jumpForum(request)
                         
                         await send(.onRefresh)
                         await send(.topicTapped(id: id, offset: response.offset))
                     }
                 }
-            
+                
             case .contextCommonMenu(let action, let id, let isForum):
                 switch action {
                 case .copyLink:
                     let show = isForum ? "showforum" : "showtopic"
-                    pasteboardClient.copy(string: "https://4pda.to/forum/index.php?\(show)=\(id)")
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
                     return .none
                     
                 case .openInBrowser:
@@ -171,7 +167,7 @@ public struct ForumFeature: Reducer, Sendable {
                     
                 case .markRead:
                     return .run { [id = id, isForum = isForum] send in
-                        _ = try await apiClient.markReadForum(id: id, isTopic: !isForum)
+                        _ = try await apiClient.markReadForum(id, !isForum)
                         await send(.onRefresh)
                         // TODO: Display toast on success/error.
                     }

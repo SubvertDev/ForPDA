@@ -9,7 +9,7 @@ import SwiftUI
 import SFSafeSymbols
 
 public enum AppTab: Int, CaseIterable, Sendable, Codable {
-    case articlesList = 0
+    case articles = 0
     case favorites
     case forum
     case profile
@@ -18,7 +18,7 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
     
     public var iconSymbol: SFSymbol {
         switch self {
-        case .articlesList:
+        case .articles:
             return .docTextImage
         case .favorites:
             return .starBubble

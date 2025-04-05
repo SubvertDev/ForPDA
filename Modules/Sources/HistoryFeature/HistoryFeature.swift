@@ -13,7 +13,7 @@ import Models
 import AnalyticsClient
 
 @Reducer
-public struct HistoryFeature: Sendable {
+public struct HistoryFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -80,7 +80,7 @@ public struct HistoryFeature: Sendable {
                 state.isLoading = true
                 return .run { [perPage = state.appSettings.forumPerPage] send in
                     let result = await Result {
-                        try await apiClient.getHistory(offset: offset, perPage: perPage)
+                        try await apiClient.getHistory(offset, perPage)
                     }
                     await send(._historyResponse(result))
                 }

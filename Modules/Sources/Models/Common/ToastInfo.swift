@@ -7,15 +7,17 @@
 
 import SwiftUI
 
-public struct ToastInfo: Equatable {
+public struct ToastInfo: Equatable, @unchecked Sendable {
+    
     public let screen: ToastScreen
     public let message: LocalizedStringKey
     public let isError: Bool
     
+    @available(*, deprecated, message: "Use `ToastMessage` instead.")
     public init(
         screen: ToastScreen,
         message: LocalizedStringKey,
-        isError: Bool
+        isError: Bool = false
     ) {
         self.screen = screen
         self.message = message
@@ -26,7 +28,7 @@ public struct ToastInfo: Equatable {
     public init(
         screen: ToastScreen,
         message: String,
-        isError: Bool
+        isError: Bool = false
     ) {
         self.screen = screen
         self.message = LocalizedStringKey(message)
@@ -34,7 +36,7 @@ public struct ToastInfo: Equatable {
     }
 }
 
-public enum ToastScreen: Equatable {
+public enum ToastScreen: Equatable, Sendable {
     case app
     case articlesList
     case article
