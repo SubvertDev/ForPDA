@@ -98,7 +98,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case let ._announcementResponse(.failure(error)):
+            case ._announcementResponse(.failure):
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 

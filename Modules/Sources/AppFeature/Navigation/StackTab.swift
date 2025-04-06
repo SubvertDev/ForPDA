@@ -57,6 +57,7 @@ public struct StackTab: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case showTabBar(Bool)
+            case switchTab(to: AppTab)
         }
     }
     
@@ -127,15 +128,10 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
         case let .article(.delegate(.handleDeeplink(id))):
-            #warning("handle deeplink in another place?")
             let preview = ArticlePreview.innerDeeplink(id: id)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        case let .article(.delegate(.commentHeaderTapped(id))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
-            
         case let .article(.comments(.element(id: _, action: .profileTapped(userId: id)))):
-            #warning("what's the difference between these two?")
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
         default:
@@ -216,25 +212,23 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleProfilePathNavigation(action: Path.Profile.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .profile(.historyButtonTapped):
-            #warning("make delegate")
+        case .profile(.delegate(.userLoggedOut)):
+            return .send(.delegate(.switchTab(to: .articles)))
+            
+        case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
-        case .profile(.qmsButtonTapped):
-            #warning("make delegate")
+        case .profile(.delegate(.openQms)):
             state.path.append(.qms(.qmsList(QMSListFeature.State())))
             
-        case .profile(.settingsButtonTapped):
-            #warning("make delegate")
+        case .profile(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
-        case let .profile(.deeplinkTapped(url, _)):
-            #warning("make delegate")
+        case .profile(.delegate(.handleUrl(let url))):
             return handleDeeplink(url: url, state: &state)
             
-        case let .history(.topicTapped(id: id)):
-            #warning("add name to parameters + localization")
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: "Загружаем.."))))
+        case .history(.delegate(.openTopic(id: let id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id))))
             
         default:
             break
@@ -246,12 +240,10 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleSettingsPathNavigation(action: Path.Settings.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .settings(.notificationsButtonTapped):
-            #warning("make delegate")
+        case .settings(.delegate(.openNotificationsSettings)):
             state.path.append(.settings(.notifications(NotificationsFeature.State())))
             
-        case .settings(.onDeveloperMenuTapped):
-            #warning("make delegate")
+        case .settings(.delegate(.openDeveloperMenu)):
             state.path.append(.settings(.developer(DeveloperFeature.State())))
             
         default:
@@ -275,7 +267,6 @@ public struct StackTab: Reducer, Sendable {
     
     // MARK: - Deeplinks
     
-    #warning("different object for deeplink handling?")
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
         var url = url
         
@@ -299,7 +290,7 @@ public struct StackTab: Reducer, Sendable {
                 
                 if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
                     // Same topic, using feature navigation
-                    #warning("send goTo via action or state?")
+                    // TODO: send goTo via action or state?
                     state.path[id: id, case: \.forum.topic]?.goTo = goTo
                     return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(._load)))))
                 }

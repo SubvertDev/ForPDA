@@ -48,20 +48,34 @@ public struct ProfileFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action {
-        case onTask
-        case qmsButtonTapped
-        case settingsButtonTapped
-        case logoutButtonTapped
-        case historyButtonTapped
+    public enum Action: ViewAction {
+        case view(View)
+        public enum View {
+            case onAppear
+            case qmsButtonTapped
+            case settingsButtonTapped
+            case logoutButtonTapped
+            case historyButtonTapped
+            case deeplinkTapped(URL, ProfileDeeplinkType)
+        }
         
-        case deeplinkTapped(URL, ProfileDeeplinkType)
-        
-        case _userResponse(Result<User, any Error>)
+        case `internal`(Internal)
+        public enum Internal {
+            case userResponse(Result<User, any Error>)
+        }
         
         case alert(Alert)
         public enum Alert: Equatable {
             case ok
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openQms
+            case openSettings
+            case openHistory
+            case userLoggedOut
+            case handleUrl(URL)
         }
     }
     
@@ -76,42 +90,52 @@ public struct ProfileFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .alert:
-                return .none
-                
-            case .onTask:
+            case .view(.onAppear):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .run { send in
-                    do {
-                        for try await user in try await apiClient.getUser(userId, .cacheAndLoad) {
-                            await send(._userResponse(.success(user)))
-                        }
-                    } catch {
-                        await send(._userResponse(.failure(error)))
+                    for try await user in try await apiClient.getUser(userId, .cacheAndLoad) {
+                        await send(.internal(.userResponse(.success(user))))
                     }
+                } catch: { error, send in
+                    await send(.internal(.userResponse(.failure(error))))
                 }
                 
-            case .historyButtonTapped, .qmsButtonTapped, .settingsButtonTapped, .deeplinkTapped:
-                return .none
+            case .view(.historyButtonTapped):
+                return .send(.delegate(.openHistory))
                 
-            case .logoutButtonTapped:
+            case .view(.qmsButtonTapped):
+                return .send(.delegate(.openQms))
+                
+            case .view(.settingsButtonTapped):
+                return .send(.delegate(.openSettings))
+                
+            case .view(.deeplinkTapped(let url, _)):
+                return .send(.delegate(.handleUrl(url)))
+                
+            case .view(.logoutButtonTapped):
                 state.$userSession.withLock { $0 = nil }
                 state.isLoading = true
-                return .run { send in
-                    try await apiClient.logout()
-                }
+                return .concatenate(
+                    .run { send in
+                        try await apiClient.logout()
+                    },
+                    .send(.delegate(.userLoggedOut))
+                )
                 
-            case ._userResponse(.success(let user)):
+            case .internal(.userResponse(.success(let user))):
                 state.isLoading = false
                 state.user = user
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case ._userResponse(.failure(let error)):
+            case .internal(.userResponse(.failure(let error))):
                 state.isLoading = false
                 print(error, #line)
                 reportFullyDisplayed(&state)
+                return .none
+                
+            case .alert, .delegate:
                 return .none
             }
         }

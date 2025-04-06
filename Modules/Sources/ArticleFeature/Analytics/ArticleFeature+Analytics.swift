@@ -29,7 +29,8 @@ extension ArticleFeature {
                         ._checkLoading,
                         ._commentResponse,
                         ._pollVoteResponse,
-                        ._stopRefreshingIfFinished:
+                        ._stopRefreshingIfFinished,
+                        .commentBlockHeaderLongTapped:
                     break
                     
                 case .backButtonTapped:

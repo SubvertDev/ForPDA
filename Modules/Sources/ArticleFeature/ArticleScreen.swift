@@ -103,7 +103,9 @@ public struct ArticleScreen: View {
                     defaultHeight: UIScreen.main.bounds.width,
                     safeAreaTopHeight: safeAreaTopHeight
                 ) {
-                    ArticleHeader()
+                    WithPerceptionTracking {
+                        ArticleHeader()
+                    }
                 }
                 
                 if store.isLoading {

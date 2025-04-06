@@ -26,6 +26,9 @@ struct CommentsView: View {
                 .bold()
                 .padding(.vertical, 24)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .onLongPressGesture(minimumDuration: 5) {
+                    store.send(.commentBlockHeaderLongTapped)
+                }
             
             LazyVStack(spacing: 0) {
                 ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in

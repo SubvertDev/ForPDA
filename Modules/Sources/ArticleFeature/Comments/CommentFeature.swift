@@ -69,6 +69,12 @@ public struct CommentFeature: Reducer, Sendable {
         
         case _likeResult(Bool)
         case _timerTicked
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case commentHeaderTapped(Int)
+            case unauthorizedAction
+        }
     }
     
     // MARK: - Dependencies
@@ -96,20 +102,24 @@ public struct CommentFeature: Reducer, Sendable {
             case .alert:
                 return .none
                 
-            case .profileTapped:
-                return .none
+            case let .profileTapped(id):
+                return .send(.delegate(.commentHeaderTapped(id)))
                 
             case .hiddenLabelTapped:
                 state.comment.isHidden = false
                 return .none
                 
             case .reportButtonTapped:
-                guard state.isAuthorized else { return .none }
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
                 state.alert = .notImplemented
                 return .none
                 
             case .hideButtonTapped:
-                guard state.isAuthorized else { return .none }
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
                 state.comment.isHidden.toggle()
                 return .run { [articleId = state.articleId, commentId = state.comment.id] _ in
                     await hapticClient.play(.selection)
@@ -117,11 +127,16 @@ public struct CommentFeature: Reducer, Sendable {
                 }
                 
             case .replyButtonTapped:
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
                 return .none
                 
             case .likeButtonTapped:
                 guard !state.isLiked else { return .none }
-                guard state.isAuthorized else { return .none }
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
                 state.comment.likesAmount += 1
                 state.isLiked = true
                 return .run { [articleId = state.articleId, commentId = state.comment.id] send in
@@ -135,6 +150,9 @@ public struct CommentFeature: Reducer, Sendable {
                 } else {
                     // state.comment.likesAmount -= 1
                 }
+                return .none
+                
+            case .delegate:
                 return .none
             }
         }

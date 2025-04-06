@@ -89,6 +89,8 @@ public struct DeeplinkHandler {
         
         guard let queryItems = components.queryItems else { throw .noQueryItems }
         
+        // showtopic
+        
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
             if let viewType = queryItems.first(where: { $0.name == "view" })?.value {
                 switch viewType {
@@ -112,6 +114,8 @@ public struct DeeplinkHandler {
             // https://4pda.to/forum/index.php?showtopic=123456
             return .topic(id: topicId, goTo: .first)
         }
+        
+        // showforum
         
         if let forumItem = queryItems.first(where: { $0.name == "showforum" }), let value = forumItem.value, let forumId = Int(value) {
             // https://4pda.to/forum/index.php?showforum=123
@@ -137,6 +141,8 @@ public struct DeeplinkHandler {
                 analytics.capture(DeeplinkError.unknownType(type: actType, for: url.absoluteString))
             }
         }
+        
+        // showuser
         
         if let userItem = queryItems.first(where: { $0.name == "showuser" }), let value = userItem.value, let userId = Int(value) {
             // https://4pda.to/forum/index.php?showuser=1234567

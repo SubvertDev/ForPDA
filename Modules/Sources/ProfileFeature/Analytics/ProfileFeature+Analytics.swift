@@ -20,23 +20,23 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onTask, .alert:
+                case .view(.onAppear), .alert, .delegate:
                     break
                     
-                case .qmsButtonTapped:
+                case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)
                     
-                case .settingsButtonTapped:
+                case .view(.settingsButtonTapped):
                     analyticsClient.log(ProfileEvent.settingsTapped)
                     
-                case .logoutButtonTapped:
+                case .view(.logoutButtonTapped):
                     analyticsClient.log(ProfileEvent.logoutTapped)
                     analyticsClient.logout()
                     
-                case .historyButtonTapped:
+                case .view(.historyButtonTapped):
                     analyticsClient.log(ProfileEvent.historyTapped)
                     
-                case .deeplinkTapped(_, let type):
+                case .view(.deeplinkTapped(_, let type)):
                     switch type {
                     case .about:
                         analyticsClient.log(ProfileEvent.linkInAboutTapped)
@@ -46,10 +46,10 @@ extension ProfileFeature {
                         analyticsClient.log(ProfileEvent.achievementTapped)
                     }
                     
-                case let ._userResponse(.success(user)):
+                case .internal(.userResponse(.success(let user))):
                     analyticsClient.log(ProfileEvent.userLoaded(user.id))
                     
-                case ._userResponse(.failure):
+                case .internal(.userResponse(.failure)):
                     analyticsClient.log(ProfileEvent.userLoadingFailed)
                 }
                 return .none
