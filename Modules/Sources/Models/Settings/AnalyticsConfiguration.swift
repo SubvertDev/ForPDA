@@ -29,7 +29,7 @@ public struct AnalyticsConfiguration: Sendable, Codable, Hashable {
 public extension AnalyticsConfiguration {
     static let debug = AnalyticsConfiguration(
         isAnalyticsEnabled: false,
-        isAnalyticsDebugEnabled: true,
+        isAnalyticsDebugEnabled: false, // Removes logger noise
         isCrashlyticsEnabled: false,
         isCrashlyticsDebugEnabled: true
     )

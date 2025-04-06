@@ -141,11 +141,6 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
         self._refreshId = refreshId
     }
     
-//    init(text: Binding<NSAttributedString>, onUrlTap: URLTapHandler?) {
-//        self._text = text
-//        self.onUrlTap = onUrlTap
-//    }
-    
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         print("Intercepted URL tap: \(URL)") // TODO: Remove after tests
         if let onUrlTap {
@@ -157,18 +152,17 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     }
     
     func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if let postIdString = textAttachment.image?.accessibilityHint,
-            let postId = Int(postIdString) {
-            print("Snapback postId = \(postId)")
-            return false
+        if let postIdString = textAttachment.accessibilityHint, let postId = Int(postIdString) {
+            let url = URL(string: "snapback://\(postId)")!
+            onUrlTap?(url)
         } else {
             print("[ERROR] Couldn't extract postId from SnapbackImage")
-            return false
         }
+        return false
     }
     
     func textAttachmentDidLoadImage(textAttachment: AsyncTextAttachment, displaySizeChanged: Bool) {
-        print("Delegate called \(displaySizeChanged) \(textAttachment)")
+        // print("Delegate called \(displaySizeChanged) \(textAttachment)")
         refreshId = UUID()
     }
 }

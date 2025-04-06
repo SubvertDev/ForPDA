@@ -13,6 +13,7 @@ import Models
 import PersistenceKeys
 import AnalyticsClient
 import TopicBuilder
+import ToastClient
 
 @Reducer
 public struct AnnouncementFeature: Reducer, Sendable {
@@ -32,7 +33,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
         
         var didLoadOnce = false
        
-        public init(id: Int, name: String?) {
+        public init(id: Int, name: String? = nil) {
             self.announcementId = id
             self.name = name
         }
@@ -41,18 +42,23 @@ public struct AnnouncementFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
-        case onTask
+        case onAppear
         case urlTapped(URL)
-        case settingsButtonTapped
 
         case _loadAnnouncement
         case _loadTypes([[TopicTypeUI]])
         case _announcementResponse(Result<Announcement, any Error>)
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case handleUrl(URL)
+        }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - Body
@@ -60,7 +66,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .onTask:
+            case .onAppear:
                 return .send(._loadAnnouncement)
                 
             case ._loadAnnouncement:
@@ -70,11 +76,8 @@ public struct AnnouncementFeature: Reducer, Sendable {
                     await send(._announcementResponse(result))
                 }
                 
-            case .urlTapped:
-                return .none
-                
-            case .settingsButtonTapped:
-                return .none
+            case let .urlTapped(url):
+                return .send(.delegate(.handleUrl(url)))
                    
             case let ._announcementResponse(.success(announcement)):
                 // customDump(announcement)
@@ -96,12 +99,15 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 return .none
                 
             case let ._announcementResponse(.failure(error)):
-                // TODO: Handle error
-                print(error)
                 reportFullyDisplayed(&state)
+                return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
+                
+            case .delegate:
                 return .none
             }
         }
+        
+        #warning("no analytics")
     }
     
     // MARK: - Shared Logic

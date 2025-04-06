@@ -31,8 +31,8 @@ public struct AnnouncementScreen: View {
                 if let announcement = store.announcement {
                     ScrollView {
                         AnnouncementBody(announcement)
+                            .padding(.horizontal, 16)
                     }
-                    .padding(16)
                 }
             }
             .overlay {
@@ -42,12 +42,12 @@ public struct AnnouncementScreen: View {
                 }
             }
             .navigationTitle(Text(store.name ?? "Загружаем..."))
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // TODO: Announcement Info?
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                store.send(.onAppear)
             }
         }
     }

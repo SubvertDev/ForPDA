@@ -188,7 +188,6 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .didFinishToastAnimation:
-                #warning("don't forget that")
                 state.toastMessage = nil
                 return .none
                 
@@ -197,7 +196,6 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case ._showErrorToast:
-                // state.showToast = true
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -208,9 +206,9 @@ public struct AppFeature: Reducer, Sendable {
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
                     #warning("not working anymore, no scrollToTop implementation")
-//                    if tab == .articlesList, state.articlesPath.isEmpty {
-//                        state.articlesList.scrollToTop.toggle()
-//                    }
+                    // if tab == .articlesList, state.articlesPath.isEmpty {
+                    //     state.articlesList.scrollToTop.toggle()
+                    // }
                 } else {
                     if tab == .profile && !state.isAuthorized {
                         state.auth = AuthFeature.State(openReason: .profile)
@@ -247,17 +245,10 @@ public struct AppFeature: Reducer, Sendable {
             case .deeplink(let url):
                 do {
                     let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
-                    switch deeplink.tab {
-                    case let .articles(.article(id, title, imageUrl)):
-                        #warning("some stinky shit is happening here")
+                    // TODO: Handles only articles cases for now
+                    if case let .article(id: id, title: title, imageUrl: imageUrl) = deeplink {
                         let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                        return StackTab()
-                            .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.articleTapped(preview)))))
-                            .map(Action.articlesTab)
-                        
-                    default:
-                        // TODO: Add other handlers later
-                        break
+                        state.articlesTab.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
                     }
                 } catch {
                     analyticsClient.capture(error)

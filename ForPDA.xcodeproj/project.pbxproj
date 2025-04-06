@@ -160,6 +160,7 @@
 		2CDF596780AC8D53AEF24E26 /* TuistBundle+ToastClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B73F92330265072C927AF54 /* TuistBundle+ToastClient.swift */; };
 		2D542BCCEC0E8ABA25F19DC2 /* fontello.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8762432353642C2A31FC688F /* fontello.ttf */; };
 		2DAF67F4959DC888269CE523 /* AnalyticsClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F661DEAFFA66EE069A8CFE9 /* AnalyticsClient.framework */; };
+		2DFE154BE99EDA54A700484D /* GoTo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA48A2929A63A76179F0C96D /* GoTo.swift */; };
 		2E01FC9483D4315753D36ED4 /* Chat_ExyteChat.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 3843E6F9822A9BC51663F2E1 /* Chat_ExyteChat.bundle */; };
 		2EA85E550D832ED342C6F9A4 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 67B79800FEE68FB8EA1B8F40 /* Localizable.xcstrings */; };
 		2ED0C55FB86373A6D153C9B6 /* ForumScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC5B5990202F2FAE4A77955 /* ForumScreen.swift */; };
@@ -373,6 +374,7 @@
 		6925169771FE595C9C4BAAC1 /* HapticClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2735BACD13A67B20CB8C16D /* HapticClient.framework */; };
 		698328028EFEAA67CCF821B8 /* UserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A3D0CC25375C5DCEF34038 /* UserSession.swift */; };
 		6AD3AB2E130A5F5A423EA09C /* ArticlesListFeatureTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DC5F26CBFACA62CA164964D /* ArticlesListFeatureTest.swift */; };
+		6B25875E055365E0F834BCCE /* ToastClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A8075A38922F7D7B03A6E97 /* ToastClient.framework */; };
 		6B69319D76BDFFD630C88685 /* QMSListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7610A4E70D43D6BCC7B280AA /* QMSListScreen.swift */; };
 		6B8C34EB76F12AEE273299EA /* MenuButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AD44E6D3049D0CB33C85211 /* MenuButtons.swift */; };
 		6BC0D383E4FF0B5A2871F2B8 /* TopicFeature.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 44022CA1443FDB2FC9C471D4 /* TopicFeature.framework */; };
@@ -682,6 +684,7 @@
 		C1CBDFA3012F45639E8CF183 /* FavoritesFeature.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FBF88C3FEED502F690603E9D /* FavoritesFeature.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C1D178774CBADA0F684DBAED /* SkeletonUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A8638D8BDC11F3A9875BCC2 /* SkeletonUI.framework */; };
 		C1E97CE6A302508C077A6531 /* WriteFormScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E97001CC82F5B563E485E17 /* WriteFormScreen.swift */; };
+		C22F3BBBD5EEC901E28ADE75 /* DeeplinkHandler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 62E01CB6C03D5D621E83DA14 /* DeeplinkHandler.framework */; };
 		C27D1CE24230B479AFDEAE5F /* ArticlePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C65958207606E840A4D26C /* ArticlePreview.swift */; };
 		C28D59D95192AB81521F8942 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FAE808BA8C452D29463AFB /* App.swift */; };
 		C4AEB0466AC59AC4D2CF8861 /* BBAttributedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6912BDB130A96CA8ED167DE /* BBAttributedParser.swift */; };
@@ -900,6 +903,7 @@
 		FEF07F604DDD625FE1B67C44 /* FavoriteSortType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 872B0E54D7F8CD499CC13AC0 /* FavoriteSortType.swift */; };
 		FF4261E51978E794B8296258 /* TuistAssets+BookmarksFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6721D235B3FA36225B3C8144 /* TuistAssets+BookmarksFeature.swift */; };
 		FF946480E61C1496B6B0A40D /* AnnouncementScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F90D7226EC000E32F4C40F3 /* AnnouncementScreen.swift */; };
+		FFB80AA1D2EE630AFE8E3A71 /* ToastClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A8075A38922F7D7B03A6E97 /* ToastClient.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -909,6 +913,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 6C2BD78BE9B4C5FA78FFC4D4;
 			remoteInfo = PasteboardClient;
+		};
+		02B865D9AD17C287D7BD6CAE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E6C96E4B0893EA283DCB290;
+			remoteInfo = ToastClient;
 		};
 		032EA22627F2A3C964BCA464 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1119,6 +1130,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 9E92F49EE2FB419CC8E1B905;
 			remoteInfo = LoggerClient;
+		};
+		30DE50F86FB2CC2123EC3D8E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7E6C96E4B0893EA283DCB290;
+			remoteInfo = ToastClient;
 		};
 		3233959FFAF1B78FCB458D94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2113,6 +2131,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 54C511041B0BAC1254A1E96E;
 			remoteInfo = AnalyticsClient;
+		};
+		E90CFC81A8A4775AD3532AFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E5BE022F59A649A833C0ED54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 42870278AF6586B4C80CA1DB;
+			remoteInfo = DeeplinkHandler;
 		};
 		E9A4870AB051C76B9218D1E4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3174,6 +3199,7 @@
 		E6CEBF838FDC59E8AE5BDD80 /* QMSChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSChat.swift; sourceTree = "<group>"; };
 		E6F10EF0B11A3789933965ED /* TuistFonts+AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistFonts+AppFeature.swift"; sourceTree = "<group>"; };
 		E9EB5FD64DBE063F98D75E8C /* ForumTemplateRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumTemplateRequest.swift; sourceTree = "<group>"; };
+		EA48A2929A63A76179F0C96D /* GoTo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoTo.swift; sourceTree = "<group>"; };
 		EB37899DCEFC6DDBA1F53741 /* QMSMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QMSMessage.swift; sourceTree = "<group>"; };
 		EBA0C850AAE415BBD96ADC88 /* TuistAssets+HistoryFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistAssets+HistoryFeature.swift"; sourceTree = "<group>"; };
 		EBED5605A2554F896F138EE6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -3260,6 +3286,7 @@
 				8F69C9431819919F5A8ADFAB /* PersistenceKeys.framework in Frameworks */,
 				98561DE604C9C86B5B1469CC /* RichTextKit.framework in Frameworks */,
 				AA63E453534F64AD35917F86 /* SharedUI.framework in Frameworks */,
+				6B25875E055365E0F834BCCE /* ToastClient.framework in Frameworks */,
 				C5B65368485F3646ACB1C718 /* TopicBuilder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3278,6 +3305,7 @@
 				4BBCE5E24C98602B67996773 /* ParsingClient.framework in Frameworks */,
 				8E22157BCAD5FD81113C6C80 /* SharedUI.framework in Frameworks */,
 				30CA60A11D12B0CC19C92E09 /* TCAExtensions.framework in Frameworks */,
+				FFB80AA1D2EE630AFE8E3A71 /* ToastClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3464,6 +3492,7 @@
 				91DFE3E947BCB35EDCFAEF8C /* AnalyticsClient.framework in Frameworks */,
 				7DDA4763595C7CAA42077A70 /* CacheClient.framework in Frameworks */,
 				9F4BB82285AA45F46941C451 /* ComposableArchitecture.framework in Frameworks */,
+				C22F3BBBD5EEC901E28ADE75 /* DeeplinkHandler.framework in Frameworks */,
 				5FE484B76D782DF6AFC2B9AD /* LoggerClient.framework in Frameworks */,
 				541F3DAF1E83947B2E4B5830 /* MemberwiseInit.framework in Frameworks */,
 				216BFDED1378176632B3F464 /* Models.framework in Frameworks */,
@@ -5097,6 +5126,7 @@
 			children = (
 				7818003D66B1EB8DEDEEE180 /* AppStorageKeys.swift */,
 				240E58DB5CACACB2C3EC8FAF /* AppTab.swift */,
+				EA48A2929A63A76179F0C96D /* GoTo.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -6185,6 +6215,7 @@
 				C30A2188A51FBEEC358CD234 /* PBXTargetDependency */,
 				5FDBDE652F2EC12983C999DF /* PBXTargetDependency */,
 				FA5013243607BEB08DF5EFD2 /* PBXTargetDependency */,
+				A66F23A9ACEFD1290C161E4A /* PBXTargetDependency */,
 				DF5D512CD162262A4F5CAA6A /* PBXTargetDependency */,
 			);
 			name = AnnouncementFeature;
@@ -6351,6 +6382,7 @@
 				835215C4A924588D47C1F6E0 /* PBXTargetDependency */,
 				DF625B4F6C98694A5627C305 /* PBXTargetDependency */,
 				6E9FBEA8B63586671623A053 /* PBXTargetDependency */,
+				D72A57D5D9B0405B4CF25065 /* PBXTargetDependency */,
 				7C075FA7C47FD2CC19FF396B /* PBXTargetDependency */,
 				F84FC36BF5177FD876F64F58 /* PBXTargetDependency */,
 				8876DDBBC5DC56CB815215BF /* PBXTargetDependency */,
@@ -6467,6 +6499,7 @@
 				FD9DDD76D00CC97507CC447C /* PBXTargetDependency */,
 				2F41BB7CB4BF8DF0D8373DB4 /* PBXTargetDependency */,
 				B0B77AFEF8E6833ED04C757D /* PBXTargetDependency */,
+				C31B3945EDB051165E4EBBC1 /* PBXTargetDependency */,
 			);
 			name = ForumFeature;
 			packageProductDependencies = (
@@ -7274,6 +7307,7 @@
 				C6FFD00791F3A59ECD63CC4A /* TuistFonts+Models.swift in Sources */,
 				797563F32368E4E85AB32C7B /* AppStorageKeys.swift in Sources */,
 				11D0626A3D3F943EC8B4118F /* AppTab.swift in Sources */,
+				2DFE154BE99EDA54A700484D /* GoTo.swift in Sources */,
 				5848F278F9738A2A919CF371 /* Article.swift in Sources */,
 				F004A86703EB6134B11D0DA6 /* ArticleElement.swift in Sources */,
 				DED7880C6B8C32503A0D4FBA /* ArticlePoll.swift in Sources */,
@@ -8438,6 +8472,12 @@
 			target = 116D1B94E352A3154E151C0A /* NotificationsClient */;
 			targetProxy = 5930555ACE1B5EAF17B46672 /* PBXContainerItemProxy */;
 		};
+		A66F23A9ACEFD1290C161E4A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ToastClient;
+			target = 7E6C96E4B0893EA283DCB290 /* ToastClient */;
+			targetProxy = 02B865D9AD17C287D7BD6CAE /* PBXContainerItemProxy */;
+		};
 		A6CD71B6844CD8B4F8B2506A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Models;
@@ -8582,6 +8622,12 @@
 			target = 9F26DE94CE2FED6167520917 /* ParsingClient */;
 			targetProxy = 3237F52F9D061D3F0A99EDD4 /* PBXContainerItemProxy */;
 		};
+		C31B3945EDB051165E4EBBC1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ToastClient;
+			target = 7E6C96E4B0893EA283DCB290 /* ToastClient */;
+			targetProxy = 30DE50F86FB2CC2123EC3D8E /* PBXContainerItemProxy */;
+		};
 		C3373C1C5B86E0FEE50F50DD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = TopicBuilder;
@@ -8671,6 +8717,12 @@
 			name = APIClient;
 			target = 9B3F73EFAB2C641BB7A9E9CD /* APIClient */;
 			targetProxy = A44CD711C6E70DFC4BC96212 /* PBXContainerItemProxy */;
+		};
+		D72A57D5D9B0405B4CF25065 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = DeeplinkHandler;
+			target = 42870278AF6586B4C80CA1DB /* DeeplinkHandler */;
+			targetProxy = E90CFC81A8A4775AD3532AFB /* PBXContainerItemProxy */;
 		};
 		D83ED3AC23C944C15394B725 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

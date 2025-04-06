@@ -249,7 +249,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
                 let ratioWH = originalImageSize.width / (screenWidth! - 32) // TODO: 32 для боковых паддингов, в спойлерах нужно еще больше
                 let width = originalImageSize.width / ratioWH
                 let height = originalImageSize.height / ratioWH
-                print("Setting: \(width) \(height)")
+                // print("Setting: \(width) \(height)")
                 return CGRect(x: 0, y: 0, width: width, height: height)
             } else {
                 let width = originalImageSize.width

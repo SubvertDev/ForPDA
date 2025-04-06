@@ -82,7 +82,8 @@ public struct FavoritesFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case openForum(id: Int, name: String)
-            case openTopic(id: Int, name: String, offset: Int, postId: Int?)
+//            case openTopic(id: Int, name: String, offset: Int, postId: Int?)
+            case openTopic(id: Int, name: String, goTo: GoTo)
         }
     }
     
@@ -166,7 +167,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                         if favorite.isForum {
                             await send(.delegate(.openForum(id: favorite.topic.id, name: favorite.topic.name)))
                         } else {
-                            await send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, offset: 0, postId: nil)))
+                            await send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .first)))
+//                            await send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, offset: 0, postId: nil)))
                         }
                     }
                 )
@@ -215,7 +217,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let .topicContextMenu(action, favorite):
                 switch action {
                 case .goToEnd:
-                    return goToEnd(favorite: favorite)
+                    return goToUnread(favorite: favorite)
 
                 case .notifyHatUpdate(let flag):
                     return .run { send in
@@ -233,7 +235,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 }
                 
             case let .unreadTapped(favorite):
-                return goToEnd(favorite: favorite)
+                return goToUnread(favorite: favorite)
                 
             case let ._loadFavorites(offset):
                 if !state.isRefreshing {
@@ -331,26 +333,30 @@ public struct FavoritesFeature: Reducer, Sendable {
             .map(Action.pageNavigation)
     }
     
-    private func goToEnd(favorite: FavoriteInfo) -> Effect<Action> {
-        return .merge(
-            .run { send in
-                try await clock.sleep(for: .seconds(1))
-                await send(._startUnreadLoadingIndicator(id: favorite.topic.id))
-            }
-            .cancellable(id: CancelID.loading, cancelInFlight: true),
-            
-            .run { send in
-                let id = favorite.topic.id
-                let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
-                let response = try await apiClient.jumpForum(request)
-                    
-                // TODO: Refactor
-                await send(.onRefresh)
-                await send(.delegate(.openTopic(id: id, name: favorite.topic.name, offset: response.offset, postId: response.postId)))
-            } catch: { error, send in
-                await send(._jumpRequestFailed)
-            }
+    private func goToUnread(favorite: FavoriteInfo) -> Effect<Action> {
+        return .concatenate(
+            .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .unread))),
+            .send(.onRefresh)
         )
+//        return .merge(
+//            .run { send in
+//                try await clock.sleep(for: .seconds(1))
+//                await send(._startUnreadLoadingIndicator(id: favorite.topic.id))
+//            }
+//            .cancellable(id: CancelID.loading, cancelInFlight: true),
+//            
+//            .run { send in
+//                let id = favorite.topic.id
+//                let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
+//                let response = try await apiClient.jumpForum(request)
+//                    
+//                // TODO: Refactor
+//                await send(.onRefresh)
+//                await send(.delegate(.openTopic(id: id, name: favorite.topic.name, offset: response.offset, postId: response.postId)))
+//            } catch: { error, send in
+//                await send(._jumpRequestFailed)
+//            }
+//        )
     }
     
     private func showToast(_ toast: ToastMessage) -> Effect<Action> {

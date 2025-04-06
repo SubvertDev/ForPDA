@@ -40,11 +40,6 @@ public struct CacheClient: Sendable {
     public var setForum: @Sendable (_ id: Int, _ forums: Forum) async -> Void
     public var getForum: @Sendable (_ id: Int) async -> Forum?
     
-    // Post Content
-    public var cacheParsedPostContent: @Sendable (_ id: Int, _ content: [TopicTypeUI]) async -> Void
-    public var getParsedPostContent: @Sendable (_ id: Int) async -> [TopicTypeUI]?
-    public var removeAllParsedPostContent: @Sendable () async -> Void
-    
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
     public var getLastBackgroundTaskInvokeTime: @Sendable () async -> [TimeInterval]
@@ -80,7 +75,6 @@ extension CacheClient: DependencyKey {
                 try await favoritesStorage.async.removeAll()
                 try await forumsListStorage.async.removeAll()
                 try await forumsStorage.async.removeAll()
-                try await parsedPostsContentStorage.async.removeAll()
                 try await lastBackgroundTaskInvokeTimeStorage.async.removeAll()
                 try await notificationsStorage.async.removeAll()
             },
@@ -131,18 +125,6 @@ extension CacheClient: DependencyKey {
             },
             getForum: { id in
                 return try? await forumsStorage.async.object(forKey: id)
-            },
-            
-            // MARK: - Post Content
-            
-            cacheParsedPostContent: { id, content in
-                try? await parsedPostsContentStorage.async.setObject(content, forKey: id)
-            },
-            getParsedPostContent: { id in
-                return try? await parsedPostsContentStorage.async.object(forKey: id)
-            },
-            removeAllParsedPostContent: {
-                try? await parsedPostsContentStorage.async.removeAll()
             },
             
             // MARK: - Background Tasks
@@ -225,15 +207,6 @@ private extension CacheClient {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Forum.self)
-        )
-    }
-    
-    private static var parsedPostsContentStorage: Storage<Int, [TopicTypeUI]> {
-        return try! Storage(
-            diskConfig: DiskConfig(name: "Posts Contents", expiry: .date(.days(30))),
-            memoryConfig: MemoryConfig(),
-            fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: [TopicTypeUI].self)
         )
     }
     

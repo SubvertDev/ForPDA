@@ -23,7 +23,6 @@ public struct AppDelegateFeature: Reducer, Sendable {
     
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
-        @Shared(.appStorage(AppStorageKeys.parserVersion)) var parserVersion: Int = 1
         public init() {}
     }
     
@@ -48,6 +47,14 @@ public struct AppDelegateFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .didFinishLaunching:
+                // TODO: Move to analytics client instead?
+                if state.appSettings.analyticsConfigurationDebug != AnalyticsConfiguration.debug {
+                    state.$appSettings.analyticsConfigurationDebug.withLock { $0 = AnalyticsConfiguration.debug }
+                }
+                if state.appSettings.analyticsConfigurationRelease != AnalyticsConfiguration.release {
+                    state.$appSettings.analyticsConfigurationRelease.withLock { $0 = AnalyticsConfiguration.release }
+                }
+                
                 analyticsClient.configure(
                     isDebug
                     ? state.appSettings.analyticsConfigurationDebug
@@ -56,21 +63,11 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
                 cacheClient.configure()
                 
-                return .run { [parserVersion = state.$parserVersion] send in
+                return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
                         group.addTask {
                             for await _ in notificationsClient.delegate() {
                                 print("test")
-                            }
-                        }
-                        
-                        group.addTask {
-                            if ParserSettings.version > parserVersion.wrappedValue {
-                                logger.warning("Parser version outdated, removing posts cache")
-                                await cacheClient.removeAllParsedPostContent()
-                                parserVersion.withLock { $0 = ParserSettings.version }
-                            } else {
-                                logger.info("Parser version match (\(parserVersion.wrappedValue))")
                             }
                         }
                         

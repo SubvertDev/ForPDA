@@ -98,6 +98,7 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
                     .Internal.TopicBuilder,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
@@ -237,6 +238,7 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.ToastClient,
                     .SPM.NukeUI,
                     .SPM.TCA
                 ]
@@ -377,6 +379,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.CacheClient,
+                    .Internal.DeeplinkHandler,
                     .Internal.LoggerClient,
                     .Internal.Models,
                     .Internal.NotificationCenterClient,

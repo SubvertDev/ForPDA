@@ -82,13 +82,13 @@ extension NotificationsClient: DependencyKey {
                     switch item.notificationType {
                     case .always:
                         if let timestamp = await cacheClient.getLastTimestampOfUnreadItem(item.id), timestamp == item.timestamp {
-                            logger.info("Skipping notification at \(timestamp) of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                            // logger.info("Skipping notification at \(timestamp) of item \(item.id) with category \(item.category.rawValue) because it's already processed")
                             continue
                         }
                         await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
                     case .once:
                         if let topicId = await cacheClient.getTopicIdOfUnreadItem(item.id), topicId == item.id {
-                            logger.info("Skipping notification of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                            // logger.info("Skipping notification of item \(item.id) with category \(item.category.rawValue) because it's already processed")
                             continue
                         }
                         await cacheClient.setTopicIdOfUnreadItem(item.id)
@@ -98,7 +98,7 @@ extension NotificationsClient: DependencyKey {
                         continue
                     }
                     
-                    logger.info("Processing notification at \(item.timestamp) of \(item.id) with type \(item.category.rawValue)")
+                    // logger.info("Processing notification at \(item.timestamp) of \(item.id) with type \(item.category.rawValue)")
                     
                     let content = UNMutableNotificationContent()
                     content.sound = .default
@@ -130,6 +130,8 @@ extension NotificationsClient: DependencyKey {
                         analyticsClient.capture(error)
                     }
                 }
+                
+                logger.info("Successfully processed notifications")
             }
         )
     }

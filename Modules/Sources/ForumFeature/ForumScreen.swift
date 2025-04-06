@@ -94,10 +94,10 @@ public struct ForumScreen: View {
             
             ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
                 Row(title: topic.name, lastPost: topic.lastPost, closed: topic.isClosed, unread: topic.isUnread) {
-                    store.send(.topicTapped(id: topic.id, offset: 0))
+                    store.send(.topicTapped(topic))
                 }
                 .contextMenu {
-                    TopicContextMenu(topicId: topic.id)
+                    TopicContextMenu(topic: topic)
                     
                     Section {
                         CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
@@ -124,15 +124,15 @@ public struct ForumScreen: View {
     // MARK: - Topic Context Menu
     
     @ViewBuilder
-    private func TopicContextMenu(topicId: Int) -> some View {
+    private func TopicContextMenu(topic: TopicInfo) -> some View {
         Section {
             ContextButton(text: "Open", symbol: .eye, bundle: .module) {
-                store.send(.contextTopicMenu(.open, topicId))
+                store.send(.contextTopicMenu(.open, topic))
             }
             
             Section {
                 ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
-                    store.send(.contextTopicMenu(.goToEnd, topicId))
+                    store.send(.contextTopicMenu(.goToEnd, topic))
                 }
             }
         }
@@ -159,14 +159,14 @@ public struct ForumScreen: View {
                     if let redirectUrl = forum.redirectUrl {
                         store.send(.subforumRedirectTapped(redirectUrl))
                     } else {
-                        store.send(.subforumTapped(id: forum.id, name: forum.name))
+                        store.send(.subforumTapped(forum))
                     }
                 }
                 .contextMenu {
                     Section {
                         CommonContextMenu(
                             id: forum.id,
-                            isFavorite:forum.isFavorite,
+                            isFavorite: forum.isFavorite,
                             isUnread: forum.isUnread,
                             isForum: true
                         )

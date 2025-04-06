@@ -5,15 +5,16 @@
 //  Created by Xialtal on 25.10.24.
 //
 
-import Foundation
-import ComposableArchitecture
-import PageNavigationFeature
+import AnalyticsClient
 import APIClient
+import ComposableArchitecture
+import Foundation
 import Models
+import PageNavigationFeature
 import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
-import AnalyticsClient
+import ToastClient
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -47,7 +48,7 @@ public struct ForumFeature: Reducer, Sendable {
         
         public init(
             forumId: Int,
-            forumName: String?
+            forumName: String? = nil
         ) {
             self.forumId = forumId
             self.forumName = forumName
@@ -59,24 +60,33 @@ public struct ForumFeature: Reducer, Sendable {
     public enum Action {
         case onAppear
         case onRefresh
-        case topicTapped(id: Int, offset: Int)
+        case topicTapped(TopicInfo)
         case subforumRedirectTapped(URL)
-        case subforumTapped(id: Int, name: String)
+        case subforumTapped(ForumInfo)
         case announcementTapped(id: Int, name: String)
         
         case contextOptionMenu(ForumOptionContextMenuAction)
-        case contextTopicMenu(ForumTopicContextMenuAction, Int)
+        case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
         case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         
         case pageNavigation(PageNavigationFeature.Action)
         
         case _loadForum(offset: Int)
         case _forumResponse(Result<Forum, any Error>)
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openTopic(id: Int, name: String, goTo: GoTo)
+            case openForum(id: Int, name: String)
+            case openAnnouncement(id: Int, name: String)
+            case handleRedirect(URL)
+        }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     
@@ -119,18 +129,6 @@ public struct ForumFeature: Reducer, Sendable {
                     await send(._forumResponse(.failure(error)))
                 }
                 
-            case .topicTapped:
-                return .none
-                
-            case .subforumTapped:
-                return .none
-                
-            case .announcementTapped:
-                return .none
-                
-            case .subforumRedirectTapped:
-                return .none
-                
             case .contextOptionMenu(let action):
                 switch action {
                     // TODO: sort, to bookmarks
@@ -138,19 +136,16 @@ public struct ForumFeature: Reducer, Sendable {
                 default: return .none
                 }
                 
-            case .contextTopicMenu(let action, let id):
+            case let .contextTopicMenu(action, topic):
                 switch action {
                 case .open:
-                    return .send(.topicTapped(id: id, offset: 0))
+                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
                     
                 case .goToEnd:
-                    return .run { [id = id] send in
-                        let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
-                        let response = try await apiClient.jumpForum(request)
-                        
-                        await send(.onRefresh)
-                        await send(.topicTapped(id: id, offset: response.offset))
-                    }
+                    return .concatenate(
+                        .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
+                        .send(.onRefresh)
+                    )
                 }
                 
             case .contextCommonMenu(let action, let id, let isForum):
@@ -167,9 +162,9 @@ public struct ForumFeature: Reducer, Sendable {
                     
                 case .markRead:
                     return .run { [id = id, isForum = isForum] send in
-                        _ = try await apiClient.markReadForum(id, !isForum)
+                        let response = try await apiClient.markReadForum(id, !isForum)
                         await send(.onRefresh)
-                        // TODO: Display toast on success/error.
+                        #warning("add toast")
                     }
                     
                 case .setFavorite(let isFavorite):
@@ -179,8 +174,11 @@ public struct ForumFeature: Reducer, Sendable {
                             action: isFavorite ? .delete : .add,
                             type: isForum ? .forum : .topic
                         )
-                        _ = try await apiClient.setFavorite(request)
-                        // TODO: Display toast on success/error.
+                        let response = try await apiClient.setFavorite(request)
+                        await send(.onRefresh)
+                        #warning("add toast")
+                    } catch: { _, _ in
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
                 }
                 
@@ -213,8 +211,22 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
                 
             case let ._forumResponse(.failure(error)):
-                print(error)
                 reportFullyDisplayed(&state)
+                return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
+                
+            case let .topicTapped(topic):
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
+                
+            case let .subforumTapped(forum):
+                return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
+                
+            case let .announcementTapped(id: id, name: name):
+                return .send(.delegate(.openAnnouncement(id: id, name: name)))
+                
+            case let .subforumRedirectTapped(url):
+                return .send(.delegate(.handleRedirect(url)))
+                
+            case .delegate:
                 return .none
             }
         }
