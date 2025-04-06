@@ -39,7 +39,8 @@ let project = Project(
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
             dependencies: [
-                .target(name: "AppFeature")
+                .target(name: "AppFeature"),
+                .target(name: "SafariExtension")
             ],
             settings: .settings(
                 base: [
@@ -593,9 +594,31 @@ let project = Project(
                 destinations: .iOS,
                 product: .appExtension,
                 bundleId: App.bundleId + "." + "safariextension",
+                deploymentTargets: .iOS("16.0"),
                 infoPlist: .safariExtension,
                 sources: ["Extensions/Safari/**"],
-                resources: ["Extensions/Safari/Resources/**"]
+                resources: [
+                    .glob(
+                        pattern: "Extensions/Safari/Resources/**",
+                        excluding: [
+                            "Extensions/Safari/Resources/_locales/**",
+                            "Extensions/Safari/Resources/images/**"
+                        ]
+                    ),
+                    .folderReference(path: "Extensions/Safari/Resources/_locales"),
+                    .folderReference(path: "Extensions/Safari/Resources/images")
+                ],
+                settings: .settings(
+                    base: SettingsDictionary()
+                        .manualCodeSigning(
+                            identity: "iPhone Developer",
+                            provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension"
+                        )
+                        .merging([
+                            "TARGETED_DEVICE_FAMILY": "1",
+                            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
+                        ])
+                )
             )
     ]
 )
@@ -698,12 +721,16 @@ extension InfoPlist {
         ]
     )
     
-    static let safariExtension = InfoPlist.dictionary([
-        "NSExtension": [
-            "NSExtensionPointIdentifier": "com.apple.Safari.web-extension",
-            "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SafarWebExtensionHandler"
+    static let safariExtension = InfoPlist.extendingDefault(
+        with: [
+            "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+            "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+            "NSExtension": [
+                "NSExtensionPointIdentifier": "com.apple.Safari.web-extension",
+                "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SafarWebExtensionHandler"
+            ]
         ]
-    ])
+    )
 }
 
 extension TargetDependency {
