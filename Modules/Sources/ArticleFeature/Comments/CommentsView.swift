@@ -12,6 +12,7 @@ import NukeUI
 import SharedUI
 import SkeletonUI
 import SFSafeSymbols
+import WriteFormFeature
 
 // MARK: - Comments View
 
@@ -117,6 +118,11 @@ struct CommentView: View {
                 }
                 .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
+            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
+                NavigationStack {
+                    WriteFormScreen(store: store)
+                }
+            }
             .background(Color(.Background.primary))
             .alert($store.scope(state: \.alert, action: \.alert))
             .task {
@@ -198,9 +204,9 @@ struct CommentView: View {
     @ViewBuilder
     private func MenuButton() -> some View {
         Menu {
-//            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
-//                store.send(.reportButtonTapped)
-//            }
+            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+                store.send(.reportButtonTapped)
+            }
             ContextButton(
                 text: store.comment.isHidden ? "Unhide comment" : "Hide comment",
                 symbol: store.comment.isHidden ? .eyeSlash : .eye,

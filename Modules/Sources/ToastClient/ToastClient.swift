@@ -48,7 +48,16 @@ extension DependencyValues {
 
 public enum ToastMessage: Equatable, Sendable {
     case custom(String)
+
+    // Posts
     case postNotFound
+    
+    // Report
+    case reportSent
+    case reportTooShort
+    case reportSendError
+    
+    // Common
     case whoopsSomethingWentWrong
     
     public var description: LocalizedStringKey {
@@ -57,6 +66,12 @@ public enum ToastMessage: Equatable, Sendable {
             return LocalizedStringKey(text)
         case .postNotFound:
             return "Post not found"
+        case .reportSent:
+            return "Report sent"
+        case .reportTooShort:
+            return "Report too short"
+        case .reportSendError:
+            return "Error sending report"
         case .whoopsSomethingWentWrong:
             return "Whoops, something went wrong.."
         }
@@ -64,12 +79,14 @@ public enum ToastMessage: Equatable, Sendable {
     
     public var isError: Bool {
         switch self {
-        case .custom:
+        case .postNotFound,
+             .reportTooShort,
+             .reportSendError,
+             .whoopsSomethingWentWrong:
+			return true
+
+        case .custom, .reportSent:
             return false
-        case .postNotFound:
-            return true
-        case .whoopsSomethingWentWrong:
-            return true
         }
     }
     
@@ -77,9 +94,15 @@ public enum ToastMessage: Equatable, Sendable {
         switch self {
         case .custom:
             return .none
+
         case .postNotFound,
+             .reportTooShort,
+             .reportSendError,
              .whoopsSomethingWentWrong:
             return .error
+            
+        case .reportSent:
+            return .success
         }
     }
 }

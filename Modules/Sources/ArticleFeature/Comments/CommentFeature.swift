@@ -11,6 +11,8 @@ import TCAExtensions
 import PersistenceKeys
 import APIClient
 import Models
+import ToastClient
+import WriteFormFeature
 
 public enum CommentContextMenuOptions {
     case report
@@ -27,6 +29,7 @@ public struct CommentFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
+        @Presents var writeForm: WriteFormFeature.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
@@ -67,6 +70,8 @@ public struct CommentFeature: Reducer, Sendable {
         case replyButtonTapped
         case likeButtonTapped
         
+        case writeForm(PresentationAction<WriteFormFeature.Action>)
+        
         case _likeResult(Bool)
         case _timerTicked
         
@@ -81,6 +86,7 @@ public struct CommentFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.hapticClient) private var hapticClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.continuousClock) private var clock
     
     // MARK: - Body
@@ -104,6 +110,22 @@ public struct CommentFeature: Reducer, Sendable {
                 
             case let .profileTapped(id):
                 return .send(.delegate(.commentHeaderTapped(id)))
+
+            case .writeForm(.presented(.writeFormSent(let response))):
+                if case let .report(result) = response {
+                    return switch result {
+                    case .error:    showToast(.reportSendError)
+                    case .tooShort: showToast(.reportTooShort)
+                    case .success:  showToast(.reportSent)
+                    }
+                }
+                return .none
+                
+            case .writeForm:
+                return .none
+                
+            case .profileTapped:
+                return .none
                 
             case .hiddenLabelTapped:
                 state.comment.isHidden = false
@@ -113,7 +135,10 @@ public struct CommentFeature: Reducer, Sendable {
                 guard state.isAuthorized else {
                     return .send(.delegate(.unauthorizedAction))
                 }
-                state.alert = .notImplemented
+                state.writeForm = WriteFormFeature.State(formFor: .report(
+                    id: state.comment.id,
+                    type: .comment
+                ))
                 return .none
                 
             case .hideButtonTapped:
@@ -156,6 +181,15 @@ public struct CommentFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$writeForm, action: \.writeForm) {
+            WriteFormFeature()
+        }
         .ifLet(\.alert, action: \.alert)
+    }
+    
+    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
+        return .run { _ in
+            await toastClient.showToast(toast)
+        }
     }
 }

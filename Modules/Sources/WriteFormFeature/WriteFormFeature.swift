@@ -53,7 +53,8 @@ public struct WriteFormFeature: Reducer, Sendable {
         
         case _loadForm(id: Int, isTopic: Bool)
         case _formResponse(Result<[WriteFormFieldType], any Error>)
-        case _simplePostSendResponse(Result<PostSend, any Error>)
+        case _simplePostResponse(Result<PostSend, any Error>)
+        case _reportResponse(Result<ReportResponseType, any Error>)
     }
     
     @Dependency(\.apiClient) private var apiClient
@@ -87,7 +88,16 @@ public struct WriteFormFeature: Reducer, Sendable {
                         return .send(._loadForm(id: topicId, isTopic: false))
                     }
                     
-                default: return .none
+                case .report:
+                    return .send(._formResponse(.success([
+                        .editor(.init(
+                            name: "",
+                            description: "",
+                            example: "",
+                            flag: 0,
+                            defaultValue: ""
+                        ))
+                    ])))
                 }
                 
             case .publishButtonTapped:
@@ -105,7 +115,18 @@ public struct WriteFormFeature: Reducer, Sendable {
                             attachments: attachments
                         )
                         let result = await Result { try await apiClient.sendPost(request: request) }
-                        await send(._simplePostSendResponse(result))
+                        await send(._simplePostResponse(result))
+                    }
+                    
+                case .report(let id, let type):
+                    return .run { [
+                        id = id,
+                        type = type,
+                        content = state.textContent
+                    ] send in
+                        let request = ReportRequest(id: id, type: type, message: content)
+                        let result = await Result { try await apiClient.sendReport(request: request) }
+                        await send(._reportResponse(result))
                     }
                     
                 default: return .none
@@ -122,7 +143,16 @@ public struct WriteFormFeature: Reducer, Sendable {
                 ))
                 return .none
                 
-            case .dismissButtonTapped, .writeFormSent:
+            case .writeFormSent(let result):
+                if case let .report(status) = result {
+                    // Not closing form if error.
+                    if status.isError {
+                        return .none
+                    }
+                }
+                return .run { _ in await dismiss() }
+                
+            case .dismissButtonTapped:
                 return .run { _ in await dismiss() }
                 
             case .updateFieldContent(_, let content):
@@ -151,14 +181,21 @@ public struct WriteFormFeature: Reducer, Sendable {
                 print(error)
                 return .none
                 
-            case let ._simplePostSendResponse(.success(post)):
+            case let ._simplePostResponse(.success(post)):
                 return .send(.writeFormSent(.post(PostSend(
                     id: post.id,
                     topicId: post.topicId,
                     offset: post.offset
                 ))))
                 
-            case let ._simplePostSendResponse(.failure(error)):
+            case let ._simplePostResponse(.failure(error)):
+                print(error)
+                return .none
+                
+            case let ._reportResponse(.success(result)):
+                return .send(.writeFormSent(.report(result)))
+                
+            case let ._reportResponse(.failure(error)):
                 print(error)
                 return .none
             }
@@ -167,5 +204,4 @@ public struct WriteFormFeature: Reducer, Sendable {
             FormPreviewFeature()
         }
     }
-    
 }

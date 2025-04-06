@@ -61,6 +61,7 @@ public struct APIClient: Sendable {
     // Extra
     public var getUnread: @Sendable () async throws -> Unread
     public var getAttachment: @Sendable (_ id: Int) async throws -> URL
+    public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
     // QMS
     public var loadQMSList: @Sendable () async throws -> QMSList
@@ -318,6 +319,16 @@ extension APIClient: DependencyKey {
                 let urlString = String(response.dropFirst(10).dropLast(2))
                 return URL(string: urlString)!
             },
+            sendReport: { request in
+                let command = CommonCommand.report(
+                    code: request.transferType,
+                    id: request.id,
+                    message: request.message
+                )
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return ReportResponseType(rawValue: status)
+            },
             
             // MARK: - QMS
             
@@ -429,6 +440,9 @@ extension APIClient: DependencyKey {
             },
             getAttachment: { _ in
                 return URL(string: "/")!
+            },
+            sendReport: { _ in
+                return .success
             },
             loadQMSList: {
                 return QMSList(users: [])
