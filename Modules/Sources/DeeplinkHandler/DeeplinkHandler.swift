@@ -99,7 +99,7 @@ public struct DeeplinkHandler {
                         // https://4pda.to/forum/index.php?showtopic=123456&view=findpost&p=123456789
                         return .topic(id: topicId, goTo: .post(id: postId))
                     } else {
-                        analytics.capture(DeeplinkError.noType(of: "p", for: "showtopic"))
+                        analytics.capture(DeeplinkError.noType(of: "p", for: url.absoluteString))
                     }
                     
                 case "getnewpost":
@@ -125,13 +125,11 @@ public struct DeeplinkHandler {
         if let announcementItem = queryItems.first(where: { $0.name == "act" }), let actType = announcementItem.value {
             switch actType {
             case "announce":
-                analytics.capture(DeeplinkError.noType(of: "announce", for: url.absoluteString))
-                #warning("not-tested")
-                // if let announceItem = queryItems.first(where: { $0.name == "p" }), let value = announceItem.value, let announceId = Int(value) {
-                //     return .announcement(id: announceId)
-                // } else {
-                //     analytics.capture(DeeplinkError.noType(of: "p", for: "showannouncement"))
-                // }
+                 if let announceItem = queryItems.first(where: { $0.name == "st" }), let value = announceItem.value, let announceId = Int(value) {
+                     return .announcement(id: announceId)
+                 } else {
+                     analytics.capture(DeeplinkError.noType(of: "st", for: url.absoluteString))
+                 }
                 
             case "boardrules":
                 // https://4pda.to/forum/index.php?act=boardrules

@@ -302,7 +302,7 @@ public struct StackTab: Reducer, Sendable {
                 state.path.append(.forum(.forum(ForumFeature.State(forumId: id))))
                 
             case let .announcement(id: id):
-                state.path.append(.forum(.announcement(AnnouncementFeature.State.init(id: id))))
+                state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id))))
                 
             case let .user(id: id):
                 state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))

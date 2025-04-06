@@ -121,7 +121,7 @@ public struct TopicView: View {
         case let .list(types, _):
             VStack(spacing: 8) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments)
+                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap)
                         .padding(.leading, nestLevel == 1 ? 0 : 8)
                 }
             }
@@ -140,7 +140,7 @@ public struct TopicView: View {
                 
                 VStack(spacing: 8) {
                     ForEach(types, id: \.self) { type in
-                        TopicView(type: type, attachments: attachments)
+                        TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
                     }
                 }
             }
@@ -382,7 +382,7 @@ struct CodeView: View {
             
             if isExpanded {
                 if case .text = type {
-                    TopicView(type: type)
+                    TopicView(type: type, onUrlTap: onUrlTap)
                         .padding(12)
                 } else {
                     fatalError("Non text type in CodeView")
