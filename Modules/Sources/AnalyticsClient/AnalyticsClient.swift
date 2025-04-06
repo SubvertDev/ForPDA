@@ -58,7 +58,7 @@ extension AnalyticsClient: DependencyKey {
                 PostHogSDK.shared.reset()
             },
             log: { event in
-                logger.info("\(event.name) \(event.properties.map { "(\($0))" } ?? "")")
+                // logger.info("\(event.name) \(event.properties.map { "(\($0))" } ?? "")")
                 PostHogSDK.shared.capture(event.name, properties: event.properties)
             },
             capture: { error in
@@ -66,7 +66,7 @@ extension AnalyticsClient: DependencyKey {
                 SentrySDK.capture(error: error)
             },
             reportFullyDisplayed: {
-                logger.info("Did report fully displayed")
+                // logger.info("Did report fully displayed")
                 SentrySDK.reportFullyDisplayed()
             }
         )

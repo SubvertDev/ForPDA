@@ -28,7 +28,9 @@ extension ToastClient: DependencyKey {
             },
             
             showToast: { toast in
-                await haptic.play(toast.haptic)
+                if let hapticType = toast.haptic {
+                    await haptic.play(hapticType)
+                }
                 continuation.yield(toast)
             },
             
@@ -44,7 +46,9 @@ extension DependencyValues {
     }
 }
 
-public enum ToastMessage: Sendable {
+public enum ToastMessage: Equatable, Sendable {
+    case custom(String)
+
     // Posts
     case postNotFound
     
@@ -58,6 +62,8 @@ public enum ToastMessage: Sendable {
     
     public var description: LocalizedStringKey {
         switch self {
+        case .custom(let text):
+            return LocalizedStringKey(text)
         case .postNotFound:
             return "Post not found"
         case .reportSent:
@@ -77,15 +83,18 @@ public enum ToastMessage: Sendable {
              .reportTooShort,
              .reportSendError,
              .whoopsSomethingWentWrong:
-            return true
-            
-        case .reportSent:
+			return true
+
+        case .custom, .reportSent:
             return false
         }
     }
     
-    public var haptic: HapticType {
+    public var haptic: HapticType? {
         switch self {
+        case .custom:
+            return .none
+
         case .postNotFound,
              .reportTooShort,
              .reportSendError,

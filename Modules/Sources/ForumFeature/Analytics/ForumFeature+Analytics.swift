@@ -19,20 +19,20 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear, .pageNavigation:
+                case .onAppear, .pageNavigation, .delegate:
                     break
                     
                 case .onRefresh:
                     analytics.log(ForumEvent.onRefresh)
                     
-                case let .topicTapped(id: id, offset: offset):
-                    analytics.log(ForumEvent.topicTapped(id, offset))
+                case let .topicTapped(topic):
+                    analytics.log(ForumEvent.topicTapped(topic.id))
                     
                 case let .subforumRedirectTapped(url):
                     analytics.log(ForumEvent.subforumRedirectTapped(url))
                     
-                case let .subforumTapped(id: id, name: name):
-                    analytics.log(ForumEvent.subforumTapped(id, name))
+                case let .subforumTapped(forum):
+                    analytics.log(ForumEvent.subforumTapped(forum.id, forum.name))
                     
                 case let .announcementTapped(id: id, name: name):
                     analytics.log(ForumEvent.announcementTapped(id, name))
@@ -44,12 +44,12 @@ extension ForumFeature {
                     case .toBookmarks:
                         break // TODO: Add
                     }
-                case let .contextTopicMenu(option, id):
+                case let .contextTopicMenu(option, topic):
                     switch option {
                     case .open:
-                        analytics.log(ForumEvent.menuOpen(id))
+                        analytics.log(ForumEvent.menuOpen(topic.id))
                     case .goToEnd:
-                        analytics.log(ForumEvent.menuGoToEnd(id))
+                        analytics.log(ForumEvent.menuGoToEnd(topic.id))
                     }
                 case let .contextCommonMenu(option, id, isForum):
                     switch option {

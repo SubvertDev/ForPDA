@@ -6,6 +6,12 @@
 //
 
 import Foundation
+
+import AnalyticsClient
+import DeeplinkHandler
+import Models
+import TCAExtensions
+
 import ComposableArchitecture
 import ArticleFeature
 import SettingsFeature
@@ -15,7 +21,6 @@ import ForumFeature
 import TopicFeature
 import FavoritesRootFeature
 import ProfileFeature
-import Models
 import AnnouncementFeature
 import HistoryFeature
 import QMSListFeature
@@ -52,8 +57,13 @@ public struct StackTab: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case showTabBar(Bool)
+            case switchTab(to: AppTab)
         }
     }
+    
+    // MARK: - Dependencies
+    
+    @Dependency(\.analyticsClient) private var analytics
     
     // MARK: - Body
     
@@ -118,15 +128,10 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
         case let .article(.delegate(.handleDeeplink(id))):
-            #warning("handle deeplink in another place?")
             let preview = ArticlePreview.innerDeeplink(id: id)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        case let .article(.delegate(.commentHeaderTapped(id))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
-            
         case let .article(.comments(.element(id: _, action: .profileTapped(userId: id)))):
-            #warning("what's the difference between these two?")
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
         default:
@@ -142,8 +147,8 @@ public struct StackTab: Reducer, Sendable {
         case let .favorites(.delegate(.openForum(id: id, name: name))):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
             
-        case let .favorites(.delegate(.openTopic(id: id, name: name, offset: offset, postId: postId))):
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, initialOffset: offset, postId: postId))))
+        case let .favorites(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         case .delegate(.openSettings):
             state.path.append(.settings(.settings(SettingsFeature.State())))
@@ -158,6 +163,9 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleForumPathNavigation(action: Path.Forum.Action, state: inout State) -> Effect<Action> {
         switch action {
+            
+            // Forum List
+            
         case .forumList(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
@@ -167,35 +175,32 @@ public struct StackTab: Reducer, Sendable {
         case let .forumList(.delegate(.handleForumRedirect(url))):
             return handleDeeplink(url: url, state: &state)
             
-        case let .forum(.announcementTapped(id: id, name: name)):
+            // Forum
+            
+        case let .forum(.delegate(.openAnnouncement(id: id, name: name))):
             state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id, name: name))))
             
-        case let .forum(.subforumTapped(id: id, name: name)):
-            #warning("make id/name")
+        case let .forum(.delegate(.openForum(id: id, name: name))):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
             
-        case let .forum(.subforumRedirectTapped(url)):
+        case let .forum(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
+        case let .forum(.delegate(.handleRedirect(url))):
+            return handleDeeplink(url: url, state: &state)
+                        
+            // Topic
+            
+        case let .topic(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
             
-        case let .forum(.topicTapped(id: id, offset: offset)):
-            #warning("add name to parameters + localization")
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: "Загружаем..", initialOffset: offset))))
-            
-        case let .announcement(.urlTapped(url)):
-            #warning("make delegate actions")
-            return handleDeeplink(url: url, state: &state)
-            
-        case let .topic(.urlTapped(url)):
-            #warning("make delegate actions")
-            return handleDeeplink(url: url, state: &state)
-            
-        case let .topic(.userAvatarTapped(id)):
-            #warning("make delegate actions")
+        case let .topic(.delegate(.openUser(id: id))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
-        case let .topic(._topicResponse(.failure)):
-            #warning("make delegate actions")
-            state.path.removeLast()
+            // Announcement
+            
+        case let .announcement(.delegate(.handleUrl(url))):
+            return handleDeeplink(url: url, state: &state)
             
         default:
             break
@@ -207,25 +212,23 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleProfilePathNavigation(action: Path.Profile.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .profile(.historyButtonTapped):
-            #warning("make delegate")
+        case .profile(.delegate(.userLoggedOut)):
+            return .send(.delegate(.switchTab(to: .articles)))
+            
+        case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
-        case .profile(.qmsButtonTapped):
-            #warning("make delegate")
+        case .profile(.delegate(.openQms)):
             state.path.append(.qms(.qmsList(QMSListFeature.State())))
             
-        case .profile(.settingsButtonTapped):
-            #warning("make delegate")
+        case .profile(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
-        case let .profile(.deeplinkTapped(url, _)):
-            #warning("make delegate")
+        case .profile(.delegate(.handleUrl(let url))):
             return handleDeeplink(url: url, state: &state)
             
-        case let .history(.topicTapped(id: id)):
-            #warning("add name to parameters + localization")
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: "Загружаем.."))))
+        case .history(.delegate(.openTopic(id: let id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id))))
             
         default:
             break
@@ -237,12 +240,10 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleSettingsPathNavigation(action: Path.Settings.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .settings(.notificationsButtonTapped):
-            #warning("make delegate")
+        case .settings(.delegate(.openNotificationsSettings)):
             state.path.append(.settings(.notifications(NotificationsFeature.State())))
             
-        case .settings(.onDeveloperMenuTapped):
-            #warning("make delegate")
+        case .settings(.delegate(.openDeveloperMenu)):
             state.path.append(.settings(.developer(DeveloperFeature.State())))
             
         default:
@@ -264,60 +265,66 @@ public struct StackTab: Reducer, Sendable {
         return .none
     }
     
-    #warning("different object for deeplink handling?")
+    // MARK: - Deeplinks
+    
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
-        return .none
-    //        if url.absoluteString.prefix(7) == "link://" {
-    //            return .run { _ in
-    //                let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
-    //                await open(url: resultUrl)
-    //            }
-    //        }
-    //        do {
-    //            if let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url),
-    //                case let .forum(screen) = deeplink.tab {
-    //
-    //                if state.selectedTab == .favorites {
-    //                    switch screen {
-    //                    case let .forum(id: id):
-    //                        state.favoritesRootPath.append(.forumPath(.forum(ForumFeature.State(forumId: id, forumName: nil))))
-    //
-    //                    case let .topic(id: id):
-    //                        state.favoritesRootPath.append(.forumPath(.topic(TopicFeature.State(topicId: id))))
-    //
-    //
-    //                    case let .announcement(id: id):
-    //                        state.favoritesRootPath.append(.forumPath(.announcement(AnnouncementFeature.State(id: id, name: nil))))
-    //                    }
-    //                }
-    //
-    //                if state.selectedTab == .forum {
-    //                    switch screen {
-    //                    case let .forum(id: id):
-    //                        state.forumPath.append(.forum(ForumFeature.State(forumId: id, forumName: nil)))
-    //
-    //                    case let .topic(id: id):
-    //                        state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
-    //
-    //                    case let .announcement(id: id):
-    //                        state.forumPath.append(.announcement(AnnouncementFeature.State(id: id, name: nil)))
-    //                    }
-    //                }
-    //
-    //                if state.selectedTab == .profile {
-    //                    switch screen {
-    //                    case let .topic(id: id):
-    //                        state.forumPath.append(.topic(TopicFeature.State(topicId: id)))
-    //                        state.selectedTab = .forum
-    //
-    //                    default: return .none
-    //                    }
-    //                }
-    //                return .none
-    //            }
-    //        } catch {
-    //            analyticsClient.capture(error)
-    //        }
-    //        return .run { _ in await open(url: url) }
+        var url = url
+        
+        if url.absoluteString.prefix(7) == "link://" {
+            return .run { [url] _ in
+                let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
+                await open(url: resultUrl)
+            }
+        }
+        
+        if url.scheme == "snapback" {
+            if case let .forum(.topic(topic)) = state.path.last {
+                url = URL(string: url.absoluteString + "/\(topic.topicId)")!
+            }
+        }
+        
+        do {
+            let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
+            switch deeplink {
+            case let .topic(id: targetId, goTo: goTo):
+                
+                if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
+                    // Same topic, using feature navigation
+                    // TODO: send goTo via action or state?
+                    state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(._load)))))
+                }
+                
+                // Different topic or announcement, using app navigation
+                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                
+            case let .forum(id: id):
+                state.path.append(.forum(.forum(ForumFeature.State(forumId: id))))
+                
+            case let .announcement(id: id):
+                state.path.append(.forum(.announcement(AnnouncementFeature.State.init(id: id))))
+                
+            case let .user(id: id):
+                state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+                
+            case let .article(id: id, title: title, imageUrl: imageUrl):
+                let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
+                state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
+            }
+            
+            return .none
+        } catch {
+            analytics.capture(error)
+        }
+        
+        return .run { [url] _ in await open(url: url) }
+    }
+}
+
+extension StackState<Path.State> {
+    func last(is keyPath: PartialCaseKeyPath<Path.State>) -> (StackElementID, Path.State)? {
+        guard let (id, element) = Array(zip(ids, self)).last else { return nil }
+        guard element.is(keyPath) else { return nil }
+        return (id, element)
     }
 }

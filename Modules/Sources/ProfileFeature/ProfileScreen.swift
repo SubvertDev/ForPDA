@@ -15,6 +15,7 @@ import Models
 import RichTextKit
 import ParsingClient
 
+@ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
     
     public enum PickerSelection {
@@ -69,7 +70,7 @@ public struct ProfileScreen: View {
                 }
             }
             .task {
-                store.send(.onTask)
+                send(.onAppear)
             }
         }
     }
@@ -80,13 +81,13 @@ public struct ProfileScreen: View {
     private func ToolbarButtons() -> some View {
         if store.shouldShowToolbarButtons {
             Button {
-                store.send(.settingsButtonTapped)
+                send(.settingsButtonTapped)
             } label: {
                 Image(systemSymbol: .gearshape)
             }
             
             Button {
-                store.send(.logoutButtonTapped)
+                send(.logoutButtonTapped)
             } label: {
                 Image(systemSymbol: .rectanglePortraitAndArrowForward)
             }
@@ -126,7 +127,7 @@ public struct ProfileScreen: View {
             
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
-                    store.send(.deeplinkTapped(url, .signature))
+                    send(.deeplinkTapped(url, .signature))
                 }) {
                     ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
@@ -153,12 +154,12 @@ public struct ProfileScreen: View {
         if store.shouldShowToolbarButtons {
             Section {
                 Row(symbol: .person2, title: "QMS", type: .navigation) {
-                    store.send(.qmsButtonTapped)
+                    send(.qmsButtonTapped)
                 }
                 
                 Section {
                     Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
-                        store.send(.historyButtonTapped)
+                        send(.historyButtonTapped)
                     }
                 }
             }
@@ -304,7 +305,7 @@ public struct ProfileScreen: View {
         Section {
             if let aboutMe = user.aboutMeAttributed {
                 RichText(text: aboutMe, onUrlTap: { url in
-                    store.send(.deeplinkTapped(url, .about))
+                    send(.deeplinkTapped(url, .about))
                 })
                 .font(.body)
                 .foregroundStyle(Color(.Labels.primary))
@@ -402,7 +403,7 @@ public struct ProfileScreen: View {
     private func AchievementsSection(achievement: User.Achievement) -> some View {
         Section {
             Button {
-                store.send(.deeplinkTapped(achievement.forumUrl, .achievement))
+                send(.deeplinkTapped(achievement.forumUrl, .achievement))
             } label: {
                 HStack(spacing: 0) {
                     HStack {

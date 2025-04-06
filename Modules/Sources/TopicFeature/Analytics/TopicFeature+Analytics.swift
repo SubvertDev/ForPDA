@@ -19,7 +19,7 @@ extension TopicFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onTask, .onSceneBecomeActive, .pageNavigation, .writeForm, ._loadTypes:
+                case .onAppear, .onSceneBecomeActive, .pageNavigation, .writeForm, ._loadTypes, ._goToPost, ._jumpRequestFailed, .finishedPostAnimation, ._load, .delegate:
                     break
                     
                 case .onRefresh:

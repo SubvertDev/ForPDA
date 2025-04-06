@@ -114,6 +114,7 @@ public struct ArticleFeature: Reducer, Sendable {
         case comments(IdentifiedActionOf<CommentFeature>)
         case sendCommentButtonTapped
         case removeReplyCommentButtonTapped
+        case commentBlockHeaderLongTapped
         
         case _checkLoading
         case _stopRefreshingIfFinished
@@ -125,7 +126,7 @@ public struct ArticleFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case handleDeeplink(Int)
-            case commentHeaderTapped(Int)
+            case unauthorizedAction
         }
     }
     
@@ -165,6 +166,11 @@ public struct ArticleFeature: Reducer, Sendable {
                     }
                 }
                 return .none
+                
+            case .commentBlockHeaderLongTapped:
+                return .run { [isAuthorized = state.isAuthorized, isArticleExpired = state.isArticleExpired, canComment = state.canComment, flag = state.article?.flag, id = state.articlePreview.id] _ in
+                    await toastClient.showToast(.custom("A:\(isAuthorized) E:\(isArticleExpired) C:\(canComment) (\(flag ?? -12345)) - \(id)"))
+                }
                 
             case .comments:
                 return .none
@@ -251,6 +257,9 @@ public struct ArticleFeature: Reducer, Sendable {
                 return .none
                 
             case .sendCommentButtonTapped:
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
                 state.isUploadingComment = true
                 return .run { [articleId = state.articlePreview.id,
                                replyComment = state.replyComment,

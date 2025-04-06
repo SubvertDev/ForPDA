@@ -41,13 +41,17 @@ public struct HistoryFeature: Reducer, Sendable {
     
     public enum Action {
         case onTask
-        case settingsButtonTapped
         case topicTapped(id: Int)
         
         case pageNavigation(PageNavigationFeature.Action)
         
         case _historyResponse(Result<History, any Error>)
         case _loadHistory(offset: Int)
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openTopic(id: Int)
+        }
     }
     
     // MARK: - Dependencies
@@ -73,8 +77,8 @@ public struct HistoryFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
-            case .settingsButtonTapped, .topicTapped:
-                return .none
+            case let .topicTapped(id: id):
+                return .send(.delegate(.openTopic(id: id)))
                 
             case let ._loadHistory(offset):
                 state.isLoading = true
@@ -122,6 +126,9 @@ public struct HistoryFeature: Reducer, Sendable {
                 // TODO: Handle error
                 print(error)
                 reportFullyDisplayed(&state)
+                return .none
+                
+            case .delegate:
                 return .none
             }
         }

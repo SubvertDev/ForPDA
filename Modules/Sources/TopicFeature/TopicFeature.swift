@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import PageNavigationFeature
 import APIClient
+import DeeplinkHandler
 import Models
 import PersistenceKeys
 import ParsingClient
@@ -34,10 +35,12 @@ public struct TopicFeature: Reducer, Sendable {
         @Presents var writeForm: WriteFormFeature.State?
 
         public let topicId: Int
-        public let topicName: String
+        public let topicName: String?
         public let initialOffset: Int
-        public var postId: Int?
-        var topic: Topic?
+        /// For animation purposes only
+        var postId: Int?
+        public var topic: Topic?
+        public var goTo: GoTo
         
         var types: [[TopicTypeUI]] = []
         
@@ -55,15 +58,13 @@ public struct TopicFeature: Reducer, Sendable {
         
         public init(
             topicId: Int,
-            topicName: String,
-            initialOffset: Int = 0,
-            postId: Int? = nil,
-            topic: Topic? = nil
+            topicName: String? = nil,
+            initialOffset: Int = 0, // TODO: Not needed anymore?
+            goTo: GoTo = .first
         ) {
             self.topicId = topicId
             self.topicName = topicName
-            self.postId = postId
-            self.topic = topic
+            self.goTo = goTo
             
             // If we open this screen with Go To End usage then we can get offset like 99
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
@@ -76,11 +77,12 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
-        case onTask
+        case onAppear
         case onRefresh
         case onSceneBecomeActive
         case userAvatarTapped(Int)
         case urlTapped(URL)
+        case finishedPostAnimation
         case pageNavigation(PageNavigationFeature.Action)
         
         case contextMenu(TopicContextMenuAction)
@@ -88,21 +90,31 @@ public struct TopicFeature: Reducer, Sendable {
         
         case writeForm(PresentationAction<WriteFormFeature.Action>)
         
+        case _load
+        case _goToPost(postId: Int, offset: Int)
         case _loadTopic(Int)
         case _loadTypes([[TopicTypeUI]])
         case _topicResponse(Result<Topic, any Error>)
         case _setFavoriteResponse(Bool)
+        case _jumpRequestFailed
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case handleUrl(URL)
+            case openUser(id: Int)
+        }
     }
     
     // MARK: - Dependencies
     
+    @Dependency(\.logger) var logger
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.continuousClock) private var clock
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
-    @Dependency(\.logger) var logger
     
     // MARK: - Cancellable
     
@@ -117,13 +129,17 @@ public struct TopicFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onTask:
+            case .onAppear:
                 guard state.topic == nil else { return .none }
-                return .concatenate(
-                    updatePageNavigation(&state, offset: state.initialOffset),
-                    .cancel(id: CancelID.loading),
-                    .send(._loadTopic(state.initialOffset))
-                )
+                return .send(._load)
+                
+            case ._load:
+                switch state.goTo {
+                case .first:            return loadPage(&state)
+                case .unread:           return jumpTo(.unread, &state)
+                case .post(id: let id): return jumpTo(.post(id: id), &state)
+                case .last:             return jumpTo(.last, &state)
+                }
                 
             case .onRefresh:
                 state.isRefreshing = true
@@ -138,16 +154,15 @@ public struct TopicFeature: Reducer, Sendable {
                     return .send(.onRefresh)
                 }
                 
-            case .userAvatarTapped:
-                // TODO: Wrap into Delegate action?
-                return .none
+            case let .userAvatarTapped(id):
+                return .send(.delegate(.openUser(id: id)))
                 
-            case .urlTapped:
-                // TODO: Wrap into Delegate action?
-                return .none
+            case let .urlTapped(url):
+                return .send(.delegate(.handleUrl(url))) //handleUrl(url, &state)
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
+                state.postId = nil
                 return .concatenate([
                     .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
                         if isLastPage {
@@ -162,6 +177,8 @@ public struct TopicFeature: Reducer, Sendable {
                 if case let .post(data) = response {
                     state.postId = data.id
                     return .send(.pageNavigation(.lastPageTapped))
+                    // TODO: https://pointfreeco.github.io/swift-composable-architecture/main/documentation/composablearchitecture/performance/#Sharing-logic-in-child-features
+                    // return reduce(into: &state, action: .pageNavigation(.lastPageTapped))
                 }
                 return .none
                 
@@ -194,7 +211,7 @@ public struct TopicFeature: Reducer, Sendable {
                         _ = try await apiClient.setFavorite(request)
                         await send(._setFavoriteResponse(!topic.isFavorite))
                         
-                        // TODO: Display toast on success/error.
+                        #warning("toast")
                     } catch: { error, send in
                         logger.error("Failed to set favorite: \(error)")
                     }
@@ -212,6 +229,10 @@ public struct TopicFeature: Reducer, Sendable {
                     ))
                     return .none
                 }
+                
+            case .finishedPostAnimation:
+                state.postId = nil
+                return .none.animation()
                 
             case let ._loadTopic(offset):
                 state.isFirstPage = offset == 0
@@ -270,8 +291,7 @@ public struct TopicFeature: Reducer, Sendable {
 //                    .reduce(into: &state.pageNavigation, action: .nextPageTapped)
 //                    .map(Action.pageNavigation)
                 
-            case let ._topicResponse(.failure(error)):
-                print("TOPIC RESPONSE FAILURE: \(error)")
+            case ._topicResponse(.failure):
                 state.isRefreshing = false
                 reportFullyDisplayed(&state)
                 return showToast(.whoopsSomethingWentWrong)
@@ -279,6 +299,20 @@ public struct TopicFeature: Reducer, Sendable {
             case let ._setFavoriteResponse(isFavorite):
                 state.topic?.isFavorite = isFavorite
                 notificationCenter.send(.favoritesUpdated)
+                return .none
+                
+            case ._jumpRequestFailed:
+                return showToast(.whoopsSomethingWentWrong)
+                
+            case let ._goToPost(postId: postId, offset: offset):
+                state.postId = postId
+                if offset == state.pageNavigation.offset && state.topic != nil {
+                    // If we have this post on the same page, don't reload
+                    return .none
+                }
+                return loadPage(offset: offset, &state)
+                
+            case .delegate:
                 return .none
             }
         }
@@ -291,10 +325,90 @@ public struct TopicFeature: Reducer, Sendable {
     
     // MARK: - Shared Logic
     
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
+    /// If offset is set to nil, then initialOffset property will be used
+    private func loadPage(offset: Int? = nil, _ state: inout State) -> Effect<Action> {
+        return .concatenate(
+            updatePageNavigation(&state, offset: offset ?? state.initialOffset),
+            .cancel(id: CancelID.loading),
+            .send(._loadTopic(offset ?? state.initialOffset))
+        )
+    }
+    
+    #warning("move")
+    public enum JumpTo: Sendable {
+        case unread
+        case last
+        case post(id: Int)
+        
+        var postId: Int {
+            switch self {
+            case .unread, .last: return 0
+            case let .post(id):       return id
+            }
+        }
+        
+        var type: JumpForumRequest.ForumJumpType {
+            switch self {
+            case .unread:      return .new
+            case .last:        return .last
+            case .post:        return .post
+            }
+        }
+    }
+    
+    private func jumpTo(_ jump: JumpTo, _ state: inout State) -> Effect<Action> {
+        return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
+            let request: JumpForumRequest
+            #warning("change after new api version")
+            if jump.type == .post {
+                request = JumpForumRequest(postId: topicId, topicId: jump.postId, allPosts: true, type: jump.type)
+            } else {
+                request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
+            }
+            let response = try await apiClient.jumpForum(request)
+            let offset = response.offset - (response.offset % topicPerPage)
+            await send(._goToPost(postId: response.postId, offset: offset))
+        } catch: { error, send in
+            await send(._jumpRequestFailed)
+        }
+    }
+    
+    private func handleUrl(_ url: URL, _ state: inout State) -> Effect<Action> {
+        // If it's a snapback, we handle it locally (same or other page)
+//        if url.scheme == "snapback", let postIdString = url.host(), let postId = Int(postIdString) {
+//            return jumpTo(.post(id: postId), &state)
+//        }
+        
+//        do {
+//            let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
+//            if case let .topic(id: id, goTo: goTo) = deeplink {
+//                if id == state.topicId {
+//                    print("SAME TOPIC")
+//                    switch goTo {
+//                    case .first:            return loadPage(&state)
+//                    case .unread:           return jumpTo(.unread, &state)
+//                    case .post(id: let id): return jumpTo(.post(id: id), &state)
+//                    case .last:             return jumpTo(.last, &state)
+//                    }
+//                } else {
+//                    print("NON-SAME TOPIC")
+//                }
+//            }
+//        } catch {
+//            print(error)
+//        }
+        
+//        if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
+//            if let value = components.queryItems?.first(where: { $0.name == "showtopic" })?.value {
+//                if let topicId = Int(value) {
+//                    if topicId == state.topicId {
+//                        return jumpTo(.last, <#T##state: &State##State#>)
+//                    }
+//                }
+//            }
+//        }
+        // If it's not, then we delegate it a layer up, to open new screen
+        return .send(.delegate(.handleUrl(url)))
     }
     
     private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
@@ -307,6 +421,12 @@ public struct TopicFeature: Reducer, Sendable {
                 )
             )
             .map(Action.pageNavigation)
+    }
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
     
     private func showToast(_ toast: ToastMessage) -> Effect<Action> {

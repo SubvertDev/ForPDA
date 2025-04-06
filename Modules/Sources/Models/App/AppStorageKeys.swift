@@ -9,9 +9,4 @@ import Foundation
 
 public struct AppStorageKeys {
     public static let analyticsId = "analytics_id"
-    public static let parserVersion = "parser_version"
-}
-
-public struct ParserSettings {
-    public static let version = 7
 }

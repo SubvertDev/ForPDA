@@ -1,0 +1,10 @@
+{
+    "extension_name": {
+        "message": "Открыть в ForPDA",
+        "description": "Отображаемое имя расширения"
+    },
+    "extension_description": {
+        "message": "Это расширение предлагает перейти в ForPDA для поддерживаемых страниц на 4pda.to",
+        "description": "Описание того, что делает это расширение"
+    }
+}

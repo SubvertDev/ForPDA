@@ -93,6 +93,12 @@ public struct SettingsFeature: Reducer, Sendable {
             case openSettings
             case clearCache
         }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openNotificationsSettings
+            case openDeveloperMenu
+        }
     }
     
     // MARK: - Dependencies
@@ -120,10 +126,10 @@ public struct SettingsFeature: Reducer, Sendable {
                 return .none
                 
             case .notificationsButtonTapped:
-                return .none
+                return .send(.delegate(.openNotificationsSettings))
                 
             case .onDeveloperMenuTapped:
-                return .none
+                return .send(.delegate(.openDeveloperMenu))
                 
             case .safariExtensionButtonTapped:
                 // TODO: Not working anymore, check other solutions
@@ -204,7 +210,7 @@ public struct SettingsFeature: Reducer, Sendable {
                 state.$appSettings.withLock { $0.startPage = state.startPage }
                 return .none
                 
-            case .destination, .binding:
+            case .destination, .binding, .delegate:
                 return .none
             }
         }

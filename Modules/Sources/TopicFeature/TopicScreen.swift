@@ -68,7 +68,7 @@ public struct TopicScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.topic?.name ?? store.topicName))
+            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
             .navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
                 NavigationStack {
@@ -76,16 +76,15 @@ public struct TopicScreen: View {
                 }
             }
             .toolbar { OptionsMenu() }
-            .onChange(of: store.isLoadingTopic) { _ in
-                Task { await scrollAndAnimate() }
-            }
+            .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
+            .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
             .onChange(of: scenePhase) { newScenePhase in
                 if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
                     store.send(.onSceneBecomeActive)
                 }
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                store.send(.onAppear)
             }
         }
     }
@@ -312,13 +311,13 @@ public struct TopicScreen: View {
     // MARK: - Helpers
     
     private func scrollAndAnimate() async {
-        guard let postId = store.postId else { return }
+        guard let postId = store.postId, !store.isLoadingTopic else { return }
         
-        scrollProxy?.scrollTo(postId)
+        withAnimation { scrollProxy?.scrollTo(postId, anchor: .top) }
         
         Task {
             // Wait for scroll animation
-            try? await Task.sleep(for: .seconds(0.35))
+            try? await Task.sleep(for: .seconds(0.5))
             
             let duration = 0.25
             let animation = Animation.easeInOut(duration: duration)
@@ -327,6 +326,8 @@ public struct TopicScreen: View {
             Task {
                 try? await Task.sleep(for: .seconds(duration))
                 withAnimation(animation) { scrollScale = 1 }
+                try? await Task.sleep(for: .seconds(duration))
+                store.send(.finishedPostAnimation)
             }
         }
     }

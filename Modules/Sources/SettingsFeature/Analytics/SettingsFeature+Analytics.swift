@@ -20,7 +20,7 @@ extension SettingsFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .destination, .binding:
+                case .destination, .binding, .delegate:
                     break
                     
                 case .languageButtonTapped:

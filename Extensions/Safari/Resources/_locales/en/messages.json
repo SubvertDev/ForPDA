@@ -1,10 +1,10 @@
 {
     "extension_name": {
-        "message": "OpenInAppExtension",
+        "message": "Open in ForPDA",
         "description": "The display name for the extension."
     },
     "extension_description": {
-        "message": "This is OpenInAppExtension. You should tell us what your extension does here.",
+        "message": "This extension offers to open ForPDA for supported pages on 4pda.to",
         "description": "Description of what the extension does."
     }
 }

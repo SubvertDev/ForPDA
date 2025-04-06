@@ -41,40 +41,40 @@ extension HapticClient: DependencyKey {
         play: { type in
             switch type {
             case .success:
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.success)
+                await UINotificationFeedbackGenerator()
+                    .notificationOccurred(.success)
                 
             case .warning:
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.warning)
+                await UINotificationFeedbackGenerator()
+                    .notificationOccurred(.warning)
                 
             case .error:
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.error)
+                await UINotificationFeedbackGenerator()
+                    .notificationOccurred(.error)
 
             case .light:
-                let generator = UIImpactFeedbackGenerator(style: .light)
-                generator.impactOccurred(intensity: 1.0)
+                await UIImpactFeedbackGenerator(style: .light)
+                    .impactOccurred(intensity: 1.0)
 
             case .medium:
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred(intensity: 1.0)
+                await UIImpactFeedbackGenerator(style: .medium)
+                    .impactOccurred(intensity: 1.0)
 
             case .heavy:
-                let generator = UIImpactFeedbackGenerator(style: .heavy)
-                generator.impactOccurred(intensity: 1.0)
+                await UIImpactFeedbackGenerator(style: .heavy)
+                    .impactOccurred(intensity: 1.0)
 
             case .rigid:
-                let generator = UIImpactFeedbackGenerator(style: .rigid)
-                generator.impactOccurred(intensity: 1.0)
+                await UIImpactFeedbackGenerator(style: .rigid)
+                    .impactOccurred(intensity: 1.0)
 
             case .soft:
-                let generator = UIImpactFeedbackGenerator(style: .soft)
-                generator.impactOccurred(intensity: 1.0)
+                await UIImpactFeedbackGenerator(style: .soft)
+                    .impactOccurred(intensity: 1.0)
                 
             case .selection:
-                let generator = UISelectionFeedbackGenerator()
-                generator.selectionChanged()
+                await UISelectionFeedbackGenerator()
+                    .selectionChanged()
             }
         }
     )

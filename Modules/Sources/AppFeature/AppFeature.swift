@@ -164,6 +164,22 @@ public struct AppFeature: Reducer, Sendable {
             StackTab()
         }
         
+        // Authorization actions interceptor
+        Reduce<State, Action> { state, action in
+            switch action {
+            case .articlesTab(.path(.element(id: _, action: .articles(.article(.comments(.element(id: _, action: .delegate(.unauthorizedAction)))))))):
+                state.auth = AuthFeature.State(openReason: .commentAction)
+                
+            case .articlesTab(.path(.element(id: _, action: .articles(.article(.delegate(.unauthorizedAction)))))):
+                state.auth = AuthFeature.State(openReason: .sendComment)
+                
+            default:
+                break
+            }
+            
+            return .none
+        }
+        
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
@@ -188,7 +204,6 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .didFinishToastAnimation:
-                #warning("don't forget that")
                 state.toastMessage = nil
                 return .none
                 
@@ -197,7 +212,6 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case ._showErrorToast:
-                // state.showToast = true
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -208,9 +222,9 @@ public struct AppFeature: Reducer, Sendable {
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
                     #warning("not working anymore, no scrollToTop implementation")
-//                    if tab == .articlesList, state.articlesPath.isEmpty {
-//                        state.articlesList.scrollToTop.toggle()
-//                    }
+                    // if tab == .articlesList, state.articlesPath.isEmpty {
+                    //     state.articlesList.scrollToTop.toggle()
+                    // }
                 } else {
                     if tab == .profile && !state.isAuthorized {
                         state.auth = AuthFeature.State(openReason: .profile)
@@ -247,17 +261,12 @@ public struct AppFeature: Reducer, Sendable {
             case .deeplink(let url):
                 do {
                     let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
-                    switch deeplink.tab {
-                    case let .articles(.article(id, title, imageUrl)):
-                        #warning("some stinky shit is happening here")
+                    // TODO: Handles only articles cases for now
+                    if case let .article(id: id, title: title, imageUrl: imageUrl) = deeplink {
                         let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                        return StackTab()
-                            .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.articleTapped(preview)))))
-                            .map(Action.articlesTab)
-                        
-                    default:
-                        // TODO: Add other handlers later
-                        break
+                        // TODO: Do I need to set previous tab here?
+                        state.selectedTab = .articles
+                        state.articlesTab.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
                     }
                 } catch {
                     analyticsClient.capture(error)
@@ -318,42 +327,20 @@ public struct AppFeature: Reducer, Sendable {
                 state.showTabBar = show
                 return .none
                 
+            case let .articlesTab(.delegate(.switchTab(to: tab))),
+                let .favoritesTab(.delegate(.switchTab(to: tab))),
+                let .forumTab(.delegate(.switchTab(to: tab))),
+                let .profileTab(.delegate(.switchTab(to: tab))):
+                state.previousTab = state.selectedTab
+                state.selectedTab = tab
+                return .none
+                
             case .articlesTab, .favoritesTab, .forumTab, .profileTab:
                 return .none
             }
         }
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
-        }
-        
-        Reduce<State, Action> { state, action in
-            switch action {
-            case .profileTab(.root(.profile(.profile(.logoutButtonTapped)))):
-                #warning("make delegate action")
-                state.selectedTab = .articles
-                
-            case let .articlesTab(.path(.element(id: _, action: .articles(.article(.comments(.element(id: _, action: action))))))):
-                #warning("think about better place for auth handling")
-                switch action {
-                case .likeButtonTapped, .hideButtonTapped, .reportButtonTapped, .replyButtonTapped:
-                    if !state.isAuthorized {
-                        state.auth = AuthFeature.State(openReason: .commentAction)
-                    }
-                default:
-                    break
-                }
-                
-            case .articlesTab(.path(.element(id: _, action: .articles(.article(.sendCommentButtonTapped))))):
-                #warning("think about better place for auth handling")
-                if !state.isAuthorized {
-                    state.auth = AuthFeature.State(openReason: .sendComment)
-                }
-                
-            default:
-                break
-            }
-            
-            return .none
         }
     }
 }
