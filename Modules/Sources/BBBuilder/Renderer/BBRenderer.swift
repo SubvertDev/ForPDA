@@ -1,5 +1,6 @@
 import UIKit
 import SwiftUI
+import SharedUI
 import Models
 import CustomDump
 
@@ -91,9 +92,9 @@ private extension BBNode {
             
         case .font(let name, let children):
             var newAttributes = attributes
-            if let font = UIFont(name: name, size: currentFont.pointSize) {
-                newAttributes[NSAttributedString.Key.font] = font
-//                    .addingSymbolicTraits(of: currentFont)
+            if let customFont = SharedUIFontFamily.allCustomFonts.first(where: { $0.name == name }) {
+                newAttributes[NSAttributedString.Key.font] = customFont.font(size: currentFont.pointSize)
+                     // .addingSymbolicTraits(of: currentFont)
             } else {
                 print("[ОШИБКА] НЕ ПОЛУЧИЛОСЬ НАЙТИ ФОНТ \(name), ИСПОЛЬЗУЮ СТАНДАРТНЫЙ")
                 newAttributes[NSAttributedString.Key.font] = UIFont

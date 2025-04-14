@@ -118,13 +118,13 @@ public final class BBCodeParser {
         let mutableString = NSMutableAttributedString(attributedString: renderedText)
         let fullRange = NSRange(location: 0, length: mutableString.length)
         mutableString.enumerateAttributes(in: fullRange, options: []) { attributes, range, _ in
-            if let color = attributes[.foregroundColor] as? UIColor {
+            if let color = attributes[NSAttributedString.Key.foregroundColor] as? UIColor {
                 if let hex = color.toHexString() {
                     if let matchColor = ForumColors.allCases.first(where: { $0.hexColor.0 == hex }) {
-                        mutableString.addAttribute(.foregroundColor, value: UIColor(dynamicTuple: matchColor.hexColor), range: range)
+                        mutableString.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(dynamicTuple: matchColor.hexColor), range: range)
                     }
                 }
-            } else if attributes[.foregroundColor] == nil {
+            } else if attributes[NSAttributedString.Key.foregroundColor] == nil {
                 mutableString.addAttribute(.foregroundColor, value: UIColor.label, range: range)
             }
         }

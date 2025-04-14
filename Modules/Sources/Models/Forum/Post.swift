@@ -146,7 +146,7 @@ extension Post {
     static let mock = Post(
         id: 12,
         first: false,
-        content: "Lorem ipsum...",
+        content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
         author: Author(
             id: 6176341,
             name: "AirFlare",

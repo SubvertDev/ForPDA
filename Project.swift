@@ -2,32 +2,7 @@ import ProjectDescription
 
 let project = Project(
     name: "ForPDA",
-    settings: .settings(
-        base: SettingsDictionary()
-            .swiftVersion("6.0")
-            .debugInformationFormat(.dwarfWithDsym) // Disable for Debug?
-            .otherSwiftFlags([
-                "-Xfrontend",
-                "-warn-long-function-bodies=600",
-                "-Xfrontend",
-                "-warn-long-expression-type-checking=100"
-            ])
-            .manualCodeSigning(
-                identity: "iPhone Developer",
-                provisioningProfileSpecifier: "match Development com.subvert.forpda"
-            )
-            .merging([
-                "INFOPLIST_KEY_CFBundleDisplayName": "\(App.name)",
-                "SWIFT_EMIT_LOC_STRINGS": "YES",
-                "LOCALIZATION_EXPORT_SUPPORTED": "YES",
-                "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
-                "DEVELOPMENT_TEAM[sdk=iphoneos*]": "7353CQCGQC", // Do I need it?
-            ]),
-        configurations: [
-            .debug(name: "Debug", xcconfig: "Configs/App.xcconfig"),
-            .release(name: "Release", xcconfig: "Configs/App.xcconfig"),
-        ]
-    ),
+    settings: .projectSettings(),
     targets: [
         .target(
             name: App.name,
@@ -42,13 +17,7 @@ let project = Project(
                 .target(name: "AppFeature"),
                 .target(name: "SafariExtension")
             ],
-            settings: .settings(
-                base: [
-                    // "OTHER_LDFLAGS": "$(inherited)",
-                    "TARGETED_DEVICE_FAMILY": "1",
-                    "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
-                ]
-            )
+            settings: .settings(base: .appSettings, defaultSettings: .recommended)
         ),
         
         // MARK: - Features
@@ -307,7 +276,6 @@ let project = Project(
         
             .feature(
                 name: "PageNavigationFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.Models,
                     .Internal.PersistenceKeys,
@@ -453,7 +421,6 @@ let project = Project(
         
             .feature(
                 name: "ToastClient",
-                hasResources: true,
                 dependencies: [
                     .Internal.HapticClient,
                     .Internal.Models,
@@ -528,7 +495,6 @@ let project = Project(
         
             .feature(
                 name: "SharedUI",
-                hasResources: false,
                 dependencies: [
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
@@ -621,6 +587,11 @@ let project = Project(
                         ])
                 )
             )
+    ],
+    resourceSynthesizers: [
+        .plists(),
+        .fonts(),
+        .custom(name: "UI", parser: .assets, extensions: ["xcassets"])
     ]
 )
 
@@ -636,31 +607,32 @@ extension ProjectDescription.Target {
     
     static func feature(
         name: String,
-        productType: ProductType = .framework,
+        productType: Product = defaultProductType(),
         hasResources: Bool = true,
         dependencies: [TargetDependency]
     ) -> ProjectDescription.Target {
-        var resources: [ResourceFileElement] = ["Modules/Resources/**"]
+        
+        var resources: [ResourceFileElement] = []
         if hasResources {
             resources.append("Modules/Sources/\(name)/Resources/**")
         }
+        
+        var infoPlist: InfoPlist = .default
+        if name == "SharedUI" {
+            infoPlist = .extendingDefault(with: ["UIAppFonts": "fontello.ttf"])
+        }
+        
         return .target(
             name: name,
             destinations: App.destinations,
-            product: productType.asProduct(),
+            product: productType,
             bundleId: App.bundleId + "." + name,
             deploymentTargets: .iOS("16.0"),
-            infoPlist: .main,
+            infoPlist: infoPlist,
             sources: ["Modules/Sources/\(name)/**"],
             resources: .resources(resources),
             dependencies: dependencies,
-            settings: .settings(
-                base: [
-                    "TARGETED_DEVICE_FAMILY": "1",
-                    "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO",
-                    "PROVISIONING_PROFILE_SPECIFIER": "" // Disables signing for frameworks
-                ]
-            )
+            settings: .settings(base: .targetSettings, defaultSettings: .recommended)
         )
     }
     
@@ -678,17 +650,91 @@ extension ProjectDescription.Target {
         )
     }
     
-    enum ProductType {
-        case app, framework
-        
-        func asProduct() -> ProjectDescription.Product {
-            switch self {
-            case .app:       return .app
-            case .framework: return .framework
-            }
+    static func defaultProductType() -> ProjectDescription.Product {
+        if case let .string(linking) = Environment.linking {
+            return linking == "static" ? .staticFramework : .framework
+        } else {
+            return .framework
         }
-    }   
+    }
 }
+
+// MARK: - Settings Extension
+
+extension Settings {
+    
+    static func projectSettings() -> ProjectDescription.Settings {
+        return .settings(
+            base: SettingsDictionary()
+                .swiftVersion("6.0")
+                .otherSwiftFlags(.longTypeCheckingFlags)
+                .enableL10nGeneration()
+                .manualCodeSigning(
+                    identity: "Apple Development",
+                    provisioningProfileSpecifier: "match Development com.subvert.forpda"
+                ),
+            configurations: [
+                .debug(name: "Debug", xcconfig: "Configs/App.xcconfig"),
+                .release(name: "Release", settings: .init().enableDsym(), xcconfig: "Configs/App.xcconfig"),
+            ]
+        )
+    }
+}
+
+extension SettingsDictionary {
+    static let appSettings = SettingsDictionary()
+        .merging(.targetSettings)
+        .setAppName(App.name)
+        .setDevelopmentTeam("7353CQCGQC")
+    
+    static let targetSettings = SettingsDictionary()
+        .useIPhoneAsSingleDestination()
+        .disableAssetGeneration()
+}
+
+extension Dictionary where Key == String, Value == SettingValue {
+    func setAppName(_ name: String) -> SettingsDictionary {
+        return merging(["INFOPLIST_KEY_CFBundleDisplayName": .string(name)])
+    }
+    
+    func setDevelopmentTeam(_ teamId: String) -> SettingsDictionary {
+        return merging(["DEVELOPMENT_TEAM[sdk=iphoneos*]": .string(teamId)])
+    }
+    
+    func disableAssetGeneration() -> SettingsDictionary {
+        return merging(["ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS": .string("NO")])
+    }
+    
+    func useIPhoneAsSingleDestination() -> SettingsDictionary {
+        return merging([
+            "TARGETED_DEVICE_FAMILY": "1",
+            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
+        ])
+    }
+    
+    func enableL10nGeneration() -> SettingsDictionary {
+        return merging([
+            "SWIFT_EMIT_LOC_STRINGS": "YES",
+            "LOCALIZATION_EXPORT_SUPPORTED": "YES",
+            "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES"
+        ])
+    }
+    
+    func enableDsym() -> SettingsDictionary {
+        return merging(["DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym"])
+    }
+}
+
+extension Array where Element == String {
+    static let longTypeCheckingFlags = [
+        "-Xfrontend",
+        "-warn-long-function-bodies=600",
+        "-Xfrontend",
+        "-warn-long-expression-type-checking=100"
+    ]
+}
+
+// MARK: - InfoPlist extension
 
 extension InfoPlist {
     static let main = InfoPlist.extendingDefault(
@@ -706,7 +752,6 @@ extension InfoPlist {
                 ]
             ],
             
-            "UIAppFonts": ["fontello.ttf"],
             "UILaunchStoryboardName": "LaunchScreen",
             "UISupportedInterfaceOrientations": ["UIInterfaceOrientationPortrait"],
             "UIBackgroundModes": ["fetch"],
@@ -733,6 +778,8 @@ extension InfoPlist {
         ]
     )
 }
+
+// MARK: - Dependencies
 
 extension TargetDependency {
     struct Internal {}
