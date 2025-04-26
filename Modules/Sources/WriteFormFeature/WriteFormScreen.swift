@@ -43,10 +43,8 @@ public struct WriteFormScreen: View {
                             .frame(width: 24, height: 24)
                     }
                 }
-                .onAppear {
-                    store.send(.onAppear)
-                }
             }
+            .disabled(store.isPublishing)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -54,6 +52,7 @@ public struct WriteFormScreen: View {
                     } label: {
                         Text("Cancel", bundle: .module)
                     }
+                    .disabled(store.isPublishing)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -65,9 +64,12 @@ public struct WriteFormScreen: View {
                             .frame(width: 34, height: 22)
                     }
                     .disabled(store.textContent.isEmptyAfterTrimming())
+                    .disabled(store.isPublishing)
                 }
             }
-            
+            .onAppear {
+                store.send(.onAppear)
+            }
         }
     }
     
@@ -97,13 +99,22 @@ public struct WriteFormScreen: View {
         Button {
             store.send(.publishButtonTapped)
         } label: {
-            Text("Publish", bundle: .module)
-                .frame(maxWidth: .infinity)
-                .padding(8)
+            if store.isPublishing {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .id(UUID())
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            } else {
+                Text("Publish", bundle: .module)
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            }
         }
         .buttonStyle(.borderedProminent)
         .frame(height: 48)
         .disabled(store.textContent.isEmptyAfterTrimming())
+        .disabled(store.isPublishing)
         
         Spacer()
     }
@@ -136,10 +147,15 @@ private extension String {
         WriteFormScreen(
             store: Store(
                 initialState: WriteFormFeature.State(
-                    formFor: .topic(forumId: 0, content: [])
+                    formFor: .post(topicId: 0, content: .simple("", []))
                 )
             ) {
                 WriteFormFeature()
+            } withDependencies: {
+                $0.apiClient.sendPost = { _ in
+                    try await Task.sleep(for: .seconds(10))
+                    return PostSend(id: 0, topicId: 0, offset: 0)
+                }
             }
         )
         .tint(Color(.Theme.primary))

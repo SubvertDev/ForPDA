@@ -75,7 +75,9 @@ struct WriteFormView: View {
                     isEditor: true
                 )
             } header: {
-                Header(title: content.name, required: content.isRequired)
+                if !content.name.isEmpty {
+                    Header(title: content.name, required: content.isRequired)
+                }
             }
             
         case .dropdown(let content, let options):
@@ -288,7 +290,7 @@ struct Field: View {
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color(.Separator.primary), lineWidth: 1)
+                    .strokeBorder(Color(.Separator.primary))
             }
             
             if !description.isEmpty {

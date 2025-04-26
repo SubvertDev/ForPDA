@@ -28,6 +28,7 @@ public struct WriteFormFeature: Reducer, Sendable {
         var formFields: [WriteFormFieldType] = []
         
         var isFormLoading = true
+        var isPublishing = false
         
         public init(
             formFor: WriteFormForType
@@ -101,6 +102,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 }
                 
             case .publishButtonTapped:
+                state.isPublishing = true
                 switch state.formFor {
                 case .post(let topicId, content: .simple(_, let attaches)):
                     return .run { [
@@ -129,7 +131,8 @@ public struct WriteFormFeature: Reducer, Sendable {
                         await send(._reportResponse(result))
                     }
                     
-                default: return .none
+                default:
+                    return .none
                 }
                 
             case .preview:
@@ -189,6 +192,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 ))))
                 
             case let ._simplePostResponse(.failure(error)):
+                state.isPublishing = false
                 print(error)
                 return .none
                 
@@ -196,6 +200,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 return .send(.writeFormSent(.report(result)))
                 
             case let ._reportResponse(.failure(error)):
+                state.isPublishing = false
                 print(error)
                 return .none
             }

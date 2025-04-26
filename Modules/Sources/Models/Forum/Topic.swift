@@ -104,7 +104,7 @@ public extension Topic {
         id: 3242552,
         name: "ForPDA",
         description: "Unofficial 4PDA client for iOS.",
-        flag: 8,
+        flag: 64,
         createdAt: Date(timeIntervalSince1970: 1725706883),
         authorId: 3640948,
         authorName: "4spander",

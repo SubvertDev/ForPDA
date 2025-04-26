@@ -245,7 +245,7 @@ public struct TopicScreen: View {
                 }
             }
             
-            if store.isUserAuthorized {
+            if store.isUserAuthorized, let topic = store.topic, topic.canPost {
                 OptionsPostMenu(post.id)
             }
         }
@@ -289,7 +289,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func OptionsPostMenu(_ postId: Int) -> some View {
         Menu {
-            if let topic = store.topic, topic.canPost {
+            if let topic = store.topic {
                 Section {
                     ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
                         store.send(.contextPostMenu(.reply(postId, topic.authorName)))
@@ -301,11 +301,11 @@ public struct TopicScreen: View {
                 .font(.body)
                 .foregroundStyle(Color(.Labels.teritary))
                 .padding(.horizontal, 8) // Padding for tap area
-                .padding(.vertical, 11)
+                .padding(.vertical, 16)
                 .rotationEffect(.degrees(90))
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
-        .frame(width: 19, height: 22)
+        .frame(width: 8, height: 22)
     }
     
     // MARK: - Helpers
@@ -336,6 +336,8 @@ public struct TopicScreen: View {
 // MARK: - Previews
 
 #Preview {
+    @Shared(.userSession) var userSession = UserSession(userId: 0, token: "", isHidden: false)
+    
     TopicScreen(
         store: Store(
             initialState: TopicFeature.State(topicId: 0, topicName: "Test Topic")
@@ -347,4 +349,5 @@ public struct TopicScreen: View {
             }
         }
     )
+    .tint(Color(.Theme.primary))
 }
