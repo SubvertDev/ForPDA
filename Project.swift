@@ -581,6 +581,7 @@ let project = Project(
                             identity: "iPhone Developer",
                             provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension"
                         )
+                        .setDevelopmentTeam("7353CQCGQC")
                         .merging([
                             "TARGETED_DEVICE_FAMILY": "1",
                             "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
