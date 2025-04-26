@@ -211,7 +211,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
                 if image.isSymbolImage {
                     return image
                 } else {
-                    return UIImage(named: imageIdentifier, in: nil, compatibleWith: UITraitCollection.current)
+                    return UIImage(assetName: imageIdentifier)
                 }
             } else {
                 return image

@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Add To Bookmarks" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -32,6 +33,7 @@
       }
     },
     "Problems with article?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

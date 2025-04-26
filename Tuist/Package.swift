@@ -7,12 +7,12 @@
     let packageSettings = PackageSettings(
         // Default is .staticFramework
         productTypes: [
-            "_CollectionsUtilities": .framework,
             "CasePaths": .framework,
+            "CasePathsCore": .framework,
             "Clocks": .framework,
+            "CombineSchedulers": .framework,
             "ComposableArchitecture": .framework,
             "ConcurrencyExtras": .framework,
-            "CombineSchedulers": .framework,
             "CustomDump": .framework,
             "Dependencies": .framework,
             "DependenciesMacros": .framework,
@@ -21,7 +21,13 @@
             "OrderedCollections": .framework,
             "Perception": .framework,
             "PerceptionCore": .framework,
-            "SwiftUINavigationCore": .framework,
+            "Sharing": .framework,
+            "Sharing1": .framework,
+            "Sharing2": .framework,
+            "SwiftNavigation": .framework,
+            "SwiftUINavigation": .framework,
+            "UIKitNavigation": .framework,
+            "UIKitNavigationShim": .framework,
             "XCTestDynamicOverlay": .framework,
             
             "Nuke": .framework,
