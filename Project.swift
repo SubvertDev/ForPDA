@@ -770,6 +770,7 @@ extension InfoPlist {
     
     static let safariExtension = InfoPlist.extendingDefault(
         with: [
+            "CFBundleDisplayName": "$(PRODUCT_NAME)",
             "CFBundleShortVersionString": "$(MARKETING_VERSION)",
             "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
             "NSExtension": [
