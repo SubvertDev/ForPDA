@@ -87,6 +87,8 @@ platform :ios do
             generate_command += "tuist generate"
             generate_command += " --no-binary-cache" if options[:testflight]
             generate_command += " --no-open" unless options[:open]
+            
+            sh(generate_command)
         end
     end
     
