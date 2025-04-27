@@ -35,12 +35,13 @@ platform :ios do
     lane :upload do
         prepare_certificates
         update_build_number
-        run_tuist
-        tests
+        run_tuist(testflight: true)
+        # tests
         build_ipa
         upload_dsym_to_sentry
         upload_app_to_testflight
         notify_all
+        run_tuist(testflight: false)
         bump_and_tag
     end
     
@@ -76,15 +77,16 @@ platform :ios do
     end
     
     desc "Runs Tuist install & generate"
-    desc "Options: 'open:true' "
+    desc "Options: 'open:true', 'testflight:false'"
     lane :run_tuist do |options|
         Dir.chdir("..") do
             sh("tuist install")
-            if options[:open]
-                sh("tuist generate")
-            else
-                sh("tuist generate --no-open")
-            end
+            
+            generate_command = ""
+            generate_command += "TUIST_LINKING=static " if options[:testflight]
+            generate_command += "tuist generate"
+            generate_command += " --no-binary-cache" if options[:testflight]
+            generate_command += " --no-open" unless options[:open]
         end
     end
     

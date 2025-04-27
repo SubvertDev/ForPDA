@@ -15,14 +15,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios tests
-
-```sh
-[bundle exec] fastlane ios tests
-```
-
-
-
 ### ios setup
 
 ```sh
@@ -77,7 +69,15 @@ Updates build number to total commit count
 
 Runs Tuist install & generate
 
-Options: 'open:true' 
+Options: 'open:true', 'testflight:false'
+
+### ios tests
+
+```sh
+[bundle exec] fastlane ios tests
+```
+
+Runs tests
 
 ### ios build_ipa
 
