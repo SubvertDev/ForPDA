@@ -308,7 +308,8 @@ public struct ArticleFeature: Reducer, Sendable {
                     let commentFeature = CommentFeature.State(
                         comment: comment,
                         articleId: state.articlePreview.id,
-                        isArticleExpired: state.isArticleExpired
+                        isArticleExpired: state.isArticleExpired,
+                        canComment: state.canComment
                     )
                     
                     if let feature = state.comments[id: comment.id] {

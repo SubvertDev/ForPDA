@@ -35,10 +35,15 @@ public struct CommentFeature: Reducer, Sendable {
         public var comment: Comment
         public let articleId: Int
         public let isArticleExpired: Bool
+        public let canComment: Bool
         public var isLiked: Bool
         
         public var isAuthorized: Bool {
             return userSession != nil
+        }
+        
+        public var canReactToComment: Bool {
+            return isAuthorized && comment.canReact
         }
         
         var dateUpdate = false
@@ -48,13 +53,15 @@ public struct CommentFeature: Reducer, Sendable {
             comment: Comment,
             articleId: Int,
             isArticleExpired: Bool,
-            isLiked: Bool = false
+            isLiked: Bool = false,
+            canComment: Bool
         ) {
             self.alert = alert
             self.comment = comment
             self.articleId = articleId
             self.isArticleExpired = isArticleExpired
             self.isLiked = isLiked
+            self.canComment = canComment
         }
     }
     

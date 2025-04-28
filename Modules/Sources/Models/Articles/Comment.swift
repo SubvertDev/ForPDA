@@ -21,6 +21,10 @@ public struct Comment: Sendable, Identifiable, Hashable, Codable {
     public let avatarUrl: URL?
     public var nestLevel: Int
     
+    public var canReact: Bool {
+        return flag & 16 == 0
+    }
+    
     public let isDeleted: Bool
     public var isHidden: Bool
     public let isEdited: Bool

@@ -188,9 +188,14 @@ struct CommentView: View {
             
             MenuButton()
             
-            ReplyButton()
+            // If user not authorized - we show login sheet.
+            if !store.isAuthorized || store.canComment {
+                ReplyButton()
+            }
             
-            LikeButton()
+            if !store.isAuthorized || store.comment.canReact {
+                LikeButton()
+            }
             
             Text(String(store.comment.likesAmount))
                 .font(.subheadline)
@@ -207,12 +212,16 @@ struct CommentView: View {
             ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
                 store.send(.reportButtonTapped)
             }
-            ContextButton(
-                text: store.comment.isHidden ? "Unhide comment" : "Hide comment",
-                symbol: store.comment.isHidden ? .eyeSlash : .eye,
-                bundle: .module
-            ) {
-                store.send(.hideButtonTapped)
+            
+            // If user not authorized - we show login sheet.
+            if !store.isAuthorized || store.comment.canReact {
+                ContextButton(
+                    text: store.comment.isHidden ? "Unhide comment" : "Hide comment",
+                    symbol: store.comment.isHidden ? .eyeSlash : .eye,
+                    bundle: .module
+                ) {
+                    store.send(.hideButtonTapped)
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsis)
