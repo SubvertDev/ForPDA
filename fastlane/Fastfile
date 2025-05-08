@@ -10,8 +10,11 @@ platform :ios do
     end
     
     desc "Sets marketing version"
-    desc "Options: 'version:1.0.0'"
     lane :set_marketing_version do |options|
+        print_lane_options("Prepare Certificates", {
+            version: { description: "(REQUIRED) Sets version (e.g. 1.0.0)" }
+        })
+        
         version = options[:version]
 
         unless version
@@ -45,11 +48,30 @@ platform :ios do
         bump_and_tag
     end
     
+    desc "One-off upload to TF without tests/notify/bump"
+    lane :upload_oneoff do |options|
+        print_lane_options("Prepare Certificates", {
+            build_number: { description: "(REQUIRED) Sets build number" }
+        })
+        UI.user_error!("Missing required option: build_number") unless options[:build_number]
+        
+        prepare_certificates
+        update_build_number(build_number: options[:build_number])
+        run_tuist(testflight: true)
+        build_ipa
+        upload_dsym_to_sentry
+        upload_app_to_testflight
+        run_tuist(testflight: false)
+    end
+    
     # --------------------------------------------------
     
     desc "Prepare certificates via match"
-    desc "Options: 'master:true' for registering new devices"
     lane :prepare_certificates do |options|
+        print_lane_options("Prepare Certificates", {
+            master: { description: "Registers devices from txt file", default: false }
+        })
+        
         if options[:master]
             register_devices(devices_file: "Fastlane/devices.txt")
         end
@@ -67,8 +89,11 @@ platform :ios do
     end
     
     desc "Updates build number to total commit count"
-    lane :update_build_number do
-        build = sh("git rev-list --all --count").chomp.strip
+    lane :update_build_number do |options|
+        print_lane_options("Update Build Number", {
+            build_number: { description: "Overrides build number derived from commits count to set value" }
+        })
+        build = options[:build_number] || sh("git rev-list --all --count").chomp.strip
         update_xcconfig_value(
             path: 'Configs/App.xcconfig',
             name: 'CURRENT_PROJECT_VERSION',
@@ -77,8 +102,11 @@ platform :ios do
     end
     
     desc "Runs Tuist install & generate"
-    desc "Options: 'open:true', 'testflight:false'"
     lane :run_tuist do |options|
+        print_lane_options("Run Tuist", {
+            open: { description: "Opens generated project in Xcode", default: true },
+            testflight: { description: "Enables static linking & disables cache for TestFlight build", default: false}
+        })
         Dir.chdir("..") do
             sh("tuist install")
             
@@ -200,3 +228,14 @@ platform :ios do
     end
 
 end
+
+# Helper functions
+
+def print_lane_options(lane_name, options = {})
+  UI.header("🛠️  #{lane_name} Options 🛠️")
+
+  options.each do |key, value|
+    default_str = value[:default] ? " (default: #{value[:default]})" : ""
+    UI.message("• #{key}: #{value[:description]}#{default_str}")
+  end
+end 

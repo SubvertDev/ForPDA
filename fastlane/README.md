@@ -33,8 +33,6 @@ Options: 'master:true' for account holder setup
 
 Sets marketing version
 
-Options: 'version:1.0.0'
-
 ### ios upload
 
 ```sh
@@ -43,6 +41,14 @@ Options: 'version:1.0.0'
 
 Uploads to TestFlight
 
+### ios upload_oneoff
+
+```sh
+[bundle exec] fastlane ios upload_oneoff
+```
+
+One-off upload to TF without tests/notify/bump
+
 ### ios prepare_certificates
 
 ```sh
@@ -50,8 +56,6 @@ Uploads to TestFlight
 ```
 
 Prepare certificates via match
-
-Options: 'master:true' for registering new devices
 
 ### ios update_build_number
 
@@ -68,8 +72,6 @@ Updates build number to total commit count
 ```
 
 Runs Tuist install & generate
-
-Options: 'open:true', 'testflight:false'
 
 ### ios tests
 
