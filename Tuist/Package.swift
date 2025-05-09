@@ -42,12 +42,12 @@
 let package = Package(
     name: "ForPDA",
     dependencies: [
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.19.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.19.1"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "6.2.0"),
         .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.4.0"),
         .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
-        .package(url: "https://github.com/PostHog/posthog-ios", from: "3.21.0"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.48.0"),
+        .package(url: "https://github.com/PostHog/posthog-ios.git", from: "3.25.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.50.1"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", branch: "main"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "2.0.0"),
