@@ -3,15 +3,17 @@ default_platform(:ios)
 platform :ios do
 
     desc "Setups project"
-    desc "Options: 'master:true' for account holder setup"
     lane :setup do |options|
+        print_lane_options("Setup Project", {
+            version: { description: "(REQUIRED) Sets version (e.g. 1.0.0)" }
+        })
         prepare_certificates(master: options[:master])
         run_tuist(open: true)
     end
     
     desc "Sets marketing version"
     lane :set_marketing_version do |options|
-        print_lane_options("Prepare Certificates", {
+        print_lane_options("Set Marketing Version", {
             version: { description: "(REQUIRED) Sets version (e.g. 1.0.0)" }
         })
         
