@@ -142,7 +142,7 @@ platform :ios do
         
         build_app(
             scheme: "ForPDA",
-            output_directory: "build/",
+            output_directory: "ipa_builds/",
 	        output_name: output_name,
             cloned_source_packages_path: "SourcePackages",
 	        silent: true,
