@@ -358,13 +358,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     private func jumpTo(_ jump: JumpTo, _ state: inout State) -> Effect<Action> {
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
-            let request: JumpForumRequest
-            #warning("change after new api version")
-            if jump.type == .post {
-                request = JumpForumRequest(postId: topicId, topicId: jump.postId, allPosts: true, type: jump.type)
-            } else {
-                request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
-            }
+            let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
             let offset = response.offset - (response.offset % topicPerPage)
             await send(._goToPost(postId: response.postId, offset: offset))

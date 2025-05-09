@@ -93,9 +93,9 @@ extension APIClient: DependencyKey {
                 @Shared(.userSession) var userSession
                 if let userSession {
                     let request = AuthRequest(memberId: userSession.userId, token: userSession.token, hidden: userSession.isHidden)
-                    try api.connect(as: .account(data: request))
+                    try await api.connect(as: .account(data: request))
                 } else {
-                    try api.connect(as: .anonymous)
+                    try await api.connect(as: .anonymous)
                 }
             },
             
