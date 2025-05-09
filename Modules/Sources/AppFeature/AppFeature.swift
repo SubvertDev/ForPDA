@@ -276,12 +276,13 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - ScenePhase
                 
-            case let .scenePhaseDidChange(from: _, to: newPhase):
+            case let .scenePhaseDidChange(from: oldPhase, to: newPhase):
                 return .run { [isLoggedIn = state.userSession != nil] send in
                     if newPhase == .background {
                         await send(.registerBackgroundTask)
                     }
-                    if isLoggedIn {
+                    if isLoggedIn && (newPhase == .background || newPhase == .active) {
+                        // Avoiding double invoke due to "active > inactive > background"
                         await send(.syncUnreadTaskInvoked)
                     }
                 }
