@@ -160,7 +160,8 @@ extension AnalyticsClient {
             options.enabled = isEnabled
             options.enableAppLaunchProfiling = true
             options.enableMetricKit = true
-            options.enableAppHangTrackingV2 = true
+            options.enableAppHangTracking = false // Not working properly
+            options.enableAppHangTrackingV2 = false // Not working properly
             options.enableReportNonFullyBlockingAppHangs = false // False positives
             options.enablePerformanceV2 = true
             options.enablePreWarmedAppStartTracing = true
