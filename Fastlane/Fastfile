@@ -52,10 +52,9 @@ platform :ios do
     
     desc "One-off upload to TF without tests/notify/bump"
     lane :upload_oneoff do |options|
-        print_lane_options("Prepare Certificates", {
-            build_number: { description: "(REQUIRED) Sets build number" }
+        print_lane_options("One-off upload to TF without tests/notify/bump", {
+            build_number: { description: "Sets specific build number" }
         })
-        UI.user_error!("Missing required option: build_number") unless options[:build_number]
         
         prepare_certificates
         update_build_number(build_number: options[:build_number])
@@ -133,12 +132,10 @@ platform :ios do
     
     desc "Builds and signs ipa file"
     lane :build_ipa do
-        version = get_xcconfig_value(
-            path: 'Configs/App.xcconfig',
-            name: 'MARKETING_VERSION'
-        )
-        
-        output_name = "ForPDA_#{version}"
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+                
+        output_name = "ForPDA_#{version}_#{build}"
         
         build_app(
             scheme: "ForPDA",
@@ -181,15 +178,13 @@ platform :ios do
             key_filepath: "Fastlane/AuthKey_X36R58TMRJ.p8"
         )
         
-        version = get_xcconfig_value(
-            path: 'Configs/App.xcconfig',
-            name: 'MARKETING_VERSION'
-        )
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
         
-        ipa_name = "ForPDA_#{version}.ipa"
+        ipa_name = "ForPDA_#{version}_#{build}.ipa"
 
         upload_to_testflight(
-            ipa: "./build/#{ipa_name}"
+            ipa: "./ipa_builds/#{ipa_name}"
 	    )
     end
     

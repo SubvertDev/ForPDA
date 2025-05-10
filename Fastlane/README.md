@@ -23,8 +23,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Setups project
 
-Options: 'master:true' for account holder setup
-
 ### ios set_marketing_version
 
 ```sh
