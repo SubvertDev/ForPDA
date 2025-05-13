@@ -36,6 +36,7 @@ public struct APIClient: Sendable {
     
     // User
     public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
+    public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -171,6 +172,16 @@ extension APIClient: DependencyKey {
                     },
                     policy: policy
                 )
+            },
+            getReputationVotes: { request in
+                let command = MemberCommand.reputationVotes(data: MemberReputationVotesRequest(
+                    memberId: request.userId,
+                    type: request.transferType,
+                    offset: request.offset,
+                    count: request.amount
+                ))
+                let response = try await api.get(command)
+                return try await parser.parseReputationVotes(response: response)
             },
             
             // MARK: - Bookmarks
@@ -389,6 +400,9 @@ extension APIClient: DependencyKey {
             },
             getUser: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }
+            },
+            getReputationVotes: { _ in
+                return .mock
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
