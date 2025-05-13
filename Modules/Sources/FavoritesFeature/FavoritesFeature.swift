@@ -34,7 +34,6 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         public var isLoading = true
         public var isRefreshing = false
-        public var unreadTapId: Int?
         public var shouldShowEmptyState: Bool {
             return !isLoading && favorites.isEmpty && favoritesImportant.isEmpty
         }
@@ -76,7 +75,6 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case _favoritesResponse(Result<Favorite, any Error>)
         case _loadFavorites(offset: Int)
-        case _startUnreadLoadingIndicator(id: Int)
         case _jumpRequestFailed
         
         case delegate(Delegate)
@@ -126,7 +124,6 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .onRefresh:
                 guard !state.isLoading else { return .none }
                 state.isRefreshing = true
-                state.unreadTapId = nil
                 return .concatenate(
                     .cancel(id: CancelID.loading),
                     .run { [offset = state.pageNavigation.offset] send in
@@ -291,12 +288,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return showToast(.whoopsSomethingWentWrong)
                 
-            case let ._startUnreadLoadingIndicator(id: id):
-                state.unreadTapId = id
-                return .none
-                
             case ._jumpRequestFailed:
-                state.unreadTapId = nil
                 return .merge(
                     .cancel(id: CancelID.loading),
                     showToast(.postNotFound)

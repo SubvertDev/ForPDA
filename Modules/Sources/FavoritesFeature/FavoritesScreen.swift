@@ -310,17 +310,11 @@ public struct FavoritesScreen: View {
                             Button {
                                 action(true)
                             } label: {
-                                if store.unreadTapId == id {
-                                    ProgressView()
-                                        .progressViewStyle(.circular)
-                                        .id(UUID())
-                                } else {
-                                    Image(systemSymbol: .circleFill)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 10, height: 10)
-                                        .foregroundStyle(tintColor)
-                                }
+                                Image(systemSymbol: .circleFill)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 10, height: 10)
+                                    .foregroundStyle(tintColor)
                             }
                             .buttonStyle(.plain)
                             .frame(maxWidth: 42, maxHeight: .infinity)

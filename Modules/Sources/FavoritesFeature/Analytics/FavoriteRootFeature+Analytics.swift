@@ -91,9 +91,6 @@ extension FavoritesFeature {
                 case let ._loadFavorites(offset: offset):
                     analytics.log(FavoritesEvent.loadingStart(offset))
                     
-                case let ._startUnreadLoadingIndicator(id: id):
-                    analytics.log(FavoritesEvent.startUnreadLoadingIndicator(id))
-                    
                 case ._jumpRequestFailed:
                     analytics.log(FavoritesEvent.jumpRequestFailed)
                 }
