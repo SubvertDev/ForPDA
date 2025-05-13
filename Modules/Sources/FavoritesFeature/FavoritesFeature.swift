@@ -214,7 +214,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let .topicContextMenu(action, favorite):
                 switch action {
                 case .goToEnd:
-                    return goToUnread(favorite: favorite)
+                    return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .last)))
 
                 case .notifyHatUpdate(let flag):
                     return .run { send in
