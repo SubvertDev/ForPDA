@@ -255,6 +255,7 @@ public struct TopicFeature: Reducer, Sendable {
 
                 return .concatenate(
                     updatePageNavigation(&state),
+                    
                     .run { [isFirstPage = state.isFirstPage, topicPerPage = state.appSettings.topicPerPage] send in
                         var topicTypes: [[TopicTypeUI]] = []
                         
@@ -278,7 +279,13 @@ public struct TopicFeature: Reducer, Sendable {
                             return types.map { $0 ?? [] }
                         }
                         await send(._loadTypes(topicTypes))
-                    }.cancellable(id: CancelID.loading)
+                    }.cancellable(id: CancelID.loading),
+                    
+                    .run { [isLastPage = state.pageNavigation.isLastPage]send in
+                        if isLastPage {
+                            notificationCenter.send(notification: .favoritesUpdated)
+                        }
+                    }
                 )
                 
             case let ._loadTypes(types):

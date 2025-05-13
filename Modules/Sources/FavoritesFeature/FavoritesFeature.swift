@@ -232,7 +232,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 }
                 
             case let .unreadTapped(favorite):
-                return goToUnread(favorite: favorite)
+                return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .unread)))
                 
             case let ._loadFavorites(offset):
                 if !state.isRefreshing {
@@ -323,32 +323,6 @@ public struct FavoritesFeature: Reducer, Sendable {
                 )
             )
             .map(Action.pageNavigation)
-    }
-    
-    private func goToUnread(favorite: FavoriteInfo) -> Effect<Action> {
-        return .concatenate(
-            .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .unread))),
-            .send(.onRefresh)
-        )
-//        return .merge(
-//            .run { send in
-//                try await clock.sleep(for: .seconds(1))
-//                await send(._startUnreadLoadingIndicator(id: favorite.topic.id))
-//            }
-//            .cancellable(id: CancelID.loading, cancelInFlight: true),
-//            
-//            .run { send in
-//                let id = favorite.topic.id
-//                let request = JumpForumRequest(postId: 0, topicId: id, allPosts: true, type: .new)
-//                let response = try await apiClient.jumpForum(request)
-//                    
-//                // TODO: Refactor
-//                await send(.onRefresh)
-//                await send(.delegate(.openTopic(id: id, name: favorite.topic.name, offset: response.offset, postId: response.postId)))
-//            } catch: { error, send in
-//                await send(._jumpRequestFailed)
-//            }
-//        )
     }
     
     private func showToast(_ toast: ToastMessage) -> Effect<Action> {
