@@ -21,6 +21,16 @@
         }
       }
     },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
     "Edited: %@ • %@" : {
       "localizations" : {
         "en" : {

@@ -152,7 +152,7 @@ public struct TopicParser {
         var posts: [Post] = []
         for post in postsRaw {
             guard let id = post[safe: 0] as? Int,
-                  let first = post[safe: 1] as? Int,
+                  let flag = post[safe: 1] as? Int,
                   let authorId = post[safe: 2] as? Int,
                   let authorName = post[safe: 3] as? String,
                   let authorGroupId = post[safe: 4] as? Int,
@@ -169,7 +169,7 @@ public struct TopicParser {
             
             let post = Post(
                 id: id,
-                first: first == 1 ? true : false,
+                flag: flag,
                 content: content,
                 author: Post.Author(
                     id: authorId,
