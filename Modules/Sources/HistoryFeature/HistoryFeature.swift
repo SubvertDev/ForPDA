@@ -28,6 +28,7 @@ public struct HistoryFeature: Reducer, Sendable {
         
         public var pageNavigation = PageNavigationFeature.State(type: .history)
         
+        var offset = 0
         var didLoadOnce = false
         
         public init(
@@ -69,9 +70,10 @@ public struct HistoryFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onTask:
-                return .send(._loadHistory(offset: 0))
+                return .send(._loadHistory(offset: state.offset))
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
+                state.offset = newOffset
                 return .send(._loadHistory(offset: newOffset))
                 
             case .pageNavigation:
