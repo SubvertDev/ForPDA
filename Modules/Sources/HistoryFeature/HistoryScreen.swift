@@ -27,7 +27,7 @@ public struct HistoryScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if !store.history.isEmpty {
+                if !store.history.isEmpty, !store.isLoading {
                     List {
                         Navigation()
                         
@@ -43,6 +43,7 @@ public struct HistoryScreen: View {
                     EmptyHistory()
                 }
             }
+            .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .overlay {
@@ -63,7 +64,7 @@ public struct HistoryScreen: View {
     private func Navigation() -> some View {
         if store.pageNavigation.shouldShow {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                //.listRowBackground(.primary)
+                .listRowBackground(Color(.Background.primary))
         }
     }
     
