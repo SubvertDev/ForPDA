@@ -46,7 +46,7 @@ public struct WriteFormScreen: View {
             }
             .disabled(store.isPublishing)
             .animation(.default, value: store.isEditReasonToggleSelected)
-            .animation(.default, value: store.isEditMarkToggleSelected)
+            .animation(.default, value: store.isShowMarkToggleSelected)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -144,8 +144,8 @@ public struct WriteFormScreen: View {
                 Field(text: $store.editReasonContent, description: "", guideText: "")
                     .disabled(store.isPublishing || !store.isEditReasonToggleSelected)
                 
-                if store.canShowEditMark {
-                    Toggle(isOn: $store.isEditMarkToggleSelected) {
+                if store.canShowShowMark {
+                    Toggle(isOn: $store.isShowMarkToggleSelected) {
                         Text("Show mark", bundle: .module)
                             .font(.subheadline)
                             .foregroundStyle(Color(.Labels.secondary))
