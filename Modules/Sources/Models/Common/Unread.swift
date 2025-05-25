@@ -48,6 +48,16 @@ public struct Unread: Codable, Sendable, Hashable {
             case topic = 3
             case forumMention = 4
             case siteMention = 5
+            
+            public var identifier: String {
+                switch self {
+                case .qms:          return "qms"
+                case .forum:        return "forum"
+                case .topic:        return "topic"
+                case .forumMention: return "forumMention"
+                case .siteMention:  return "siteMention"
+                }
+            }
         }
         
         public enum NotificationType: Int {

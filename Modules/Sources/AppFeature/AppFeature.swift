@@ -237,13 +237,15 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // Updating favorites on tab selection
                 if state.selectedTab == .favorites && state.previousTab != .favorites {
-                    #warning("todo test if it's working or not")
+                    #warning("todo test if refresh is working or not")
                     #warning("looks like its working but there's something fishy with previous tab")
-                    return StackTab()
-                        .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.onRefresh))))
-                        .map(Action.favoritesTab)
+                    return .concatenate(
+                        removeNotifications(&state),
+                        refreshFavoritesTab(&state)
+                    )
                 }
-                return .none
+                
+                return removeNotifications(&state) // TODO: Does nothing atm
                 
             case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
                 state.auth = nil
@@ -301,14 +303,23 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .syncUnreadTaskInvoked:
-                return .run { [appSettings = state.appSettings] send in
+                return .run { [appSettings = state.appSettings, tab = state.selectedTab] send in
                     do {
                         guard try await notificationsClient.hasPermission() else { return }
                         guard appSettings.notifications.isAnyEnabled else { return }
                         
                         // try await apiClient.connect() // TODO: Do I need this?
                         let unread = try await apiClient.getUnread()
-                        await notificationsClient.showUnreadNotifications(unread)
+                        var skipCategories: [Unread.Item.Category] = []
+                        // TODO: Add more skip cases later
+                        switch tab {
+                        case .articles, .forum, .profile:
+                            break
+                        case .favorites:
+                            skipCategories.append(.forum)
+                            skipCategories.append(.topic)
+                        }
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories)
                         
                         // TODO: Make at an array?
                         let invokeTime = Date().timeIntervalSince1970
@@ -343,5 +354,22 @@ public struct AppFeature: Reducer, Sendable {
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
         }
+    }
+    
+    private func removeNotifications(_ state: inout State) -> Effect<Action> {
+        return .run { [tab = state.selectedTab] _ in
+            switch tab {
+            case .articles, .forum, .profile:
+                break
+            case .favorites:
+                await notificationsClient.removeNotifications(categories: [.forum, .topic])
+            }
+        }
+    }
+    
+    private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
+        return StackTab()
+            .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.onRefresh))))
+            .map(Action.favoritesTab)
     }
 }
