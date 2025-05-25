@@ -151,7 +151,9 @@ public struct SettingsFeature: Reducer, Sendable {
                 return .none
                 
             case .appDiscussionButtonTapped:
-                return .none
+                return .run { _ in
+                    await open(url: Links.appDiscussion)
+                }
                 
             case .telegramChangelogButtonTapped:
                 return .run { _ in
@@ -236,7 +238,11 @@ private extension AlertState where Action == SettingsFeature.Action.Alert {
             TextState("Cancel", bundle: .module)
         }
     } message: {
-        TextState("You need to open Settings > Apps > Safari > Extensions > Open in ForPDA > Allow Extension", bundle: .module)
+        TextState("""
+            The extension offers to open articles in the application
+            You need to open Settings > Apps > Safari > Extensions > Open in ForPDA > Allow Extension
+            """, bundle: .module
+        )
     }
     
     // Clear Cache
