@@ -10,8 +10,12 @@ import Foundation
 public enum WriteFormForType: Sendable, Equatable {
     case report(id: Int, type: ReportType)
     case topic(forumId: Int, content: [String])
-    case post(topicId: Int, content: PostContentType)
-    case edit(topicId: Int, postId: Int, content: PostContentType)
+    case post(type: PostType, topicId: Int, content: PostContentType)
+    
+    public enum PostType: Sendable, Equatable {
+        case new
+        case edit(postId: Int)
+    }
     
     public enum PostContentType: Sendable, Equatable {
         case template([String])

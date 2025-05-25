@@ -193,7 +193,7 @@ public struct TopicFeature: Reducer, Sendable {
                 switch action {
                 case .writePost:
                     state.writeForm = WriteFormFeature.State(
-                        formFor: .post(topicId: topic.id, content: .simple("", []))
+                        formFor: .post(type: .new, topicId: topic.id, content: .simple("", []))
                     )
                     return .none
                     
@@ -224,8 +224,17 @@ public struct TopicFeature: Reducer, Sendable {
                 switch action {
                 case .reply(let postId, let authorName):
                     state.writeForm = WriteFormFeature.State(formFor: .post(
+                        type: .new,
                         topicId: state.topicId,
                         content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
+                    ))
+                    return .none
+                    
+                case .edit(let post):
+                    state.writeForm = WriteFormFeature.State(formFor: .post(
+                        type: .edit(postId: post.id),
+                        topicId: state.topicId,
+                        content: .simple(post.content, post.attachments.map { $0.id })
                     ))
                     return .none
                     

@@ -17,6 +17,26 @@
         }
       }
     },
+    "Edit post" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактировать пост"
+          }
+        }
+      }
+    },
+    "Editing reason" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Причина редактирования"
+          }
+        }
+      }
+    },
     "New post" : {
       "localizations" : {
         "en" : {
@@ -141,6 +161,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отправка жалобы"
+          }
+        }
+      }
+    },
+    "Show mark" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать отметку"
           }
         }
       }

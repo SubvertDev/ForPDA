@@ -295,6 +295,12 @@ public struct TopicScreen: View {
                 }
             }
             
+            if post.canEdit {
+                ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
+                    store.send(.contextPostMenu(.edit(post)))
+                }
+            }
+            
             if post.canDelete {
                 ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
                     store.send(.contextPostMenu(.delete(post.id)))

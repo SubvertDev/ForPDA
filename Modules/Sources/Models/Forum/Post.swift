@@ -17,6 +17,10 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let createdAt: Date
     public let lastEdit: LastEdit?
     
+    public var canEdit: Bool {
+        return flag & 128 > 0
+    }
+    
     public var canDelete: Bool {
         return flag & 256 > 0
     }

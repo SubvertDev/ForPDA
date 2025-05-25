@@ -31,6 +31,16 @@
         }
       }
     },
+    "Edit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактировать"
+          }
+        }
+      }
+    },
     "Edited: %@ • %@" : {
       "localizations" : {
         "en" : {

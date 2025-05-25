@@ -19,6 +19,7 @@ public enum TopicEvent: Event {
     case menuWritePost
     
     case menuPostReply(Int)
+    case menuPostEdit(Int)
     case menuPostDelete(Int)
     
     case loadingStart(Int)

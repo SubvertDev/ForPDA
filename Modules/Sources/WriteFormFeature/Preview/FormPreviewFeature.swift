@@ -55,7 +55,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                if case let .post(topicId, contentType) = state.formType {
+                if case let .post(_, topicId, contentType) = state.formType {
                     switch contentType {
                     case .simple(let content, let attachments):
                         return .send(._loadSimplePreview(id: topicId, content: content, attIds: attachments))

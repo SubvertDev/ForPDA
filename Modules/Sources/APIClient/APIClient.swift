@@ -439,8 +439,11 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
-            previewPost: { _ in
-                return PostPreview(content: "Post Content...", attachmentIds: [])
+            previewPost: { request in
+                return PostPreview(
+                    content: request.post.content,
+                    attachmentIds: request.post.attachments
+                )
             },
             sendPost: { _ in
                 return PostSend(id: 0, topicId: 1, offset: 2)
