@@ -127,6 +127,7 @@ private extension WriteFormScreen {
     private func formTitle() -> LocalizedStringKey {
         return switch store.formFor {
         case .post: LocalizedStringKey("New post")
+        case .edit: LocalizedStringKey("Edit post")
         case .topic: LocalizedStringKey("New topic")
         case .report: LocalizedStringKey("Send report")
         }
@@ -142,7 +143,7 @@ private extension String {
 
 // MARK: - Previews
 
-#Preview {
+#Preview("New Post") {
     NavigationStack {
         WriteFormScreen(
             store: Store(
@@ -153,11 +154,30 @@ private extension String {
                 WriteFormFeature()
             } withDependencies: {
                 $0.apiClient.sendPost = { _ in
-                    try await Task.sleep(for: .seconds(10))
+                    try await Task.sleep(for: .seconds(3))
                     return PostSend(id: 0, topicId: 0, offset: 0)
                 }
             }
         )
         .tint(Color(.Theme.primary))
+    }
+}
+
+#Preview("Edit Post") {
+    NavigationStack {
+        WriteFormScreen(
+            store: Store(
+                initialState: WriteFormFeature.State(
+                    formFor: .edit(topicId: 0, postId: 0, content: .simple("Some text", []))
+                )
+            ) {
+                WriteFormFeature()
+            } withDependencies: {
+                $0.apiClient.sendPost = { _ in
+                    try await Task.sleep(for: .seconds(3))
+                    return PostSend(id: 0, topicId: 0, offset: 0)
+                }
+            }
+        )
     }
 }

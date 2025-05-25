@@ -89,6 +89,24 @@ public struct WriteFormFeature: Reducer, Sendable {
                         return .send(._loadForm(id: topicId, isTopic: false))
                     }
                     
+                case let .edit(topicId: topicId, postId: postId, content: content):
+                    switch content {
+                    case let .simple(content, _):
+                        state.textContent = content
+                        return .send(._formResponse(.success([
+                            .editor(.init(
+                                name: "",
+                                description: "",
+                                example: "",
+                                flag: 0,
+                                defaultValue: content
+                            ))
+                        ])))
+                        
+                    case .template:
+                        return .send(._loadForm(id: topicId, isTopic: false))
+                    }
+                    
                 case .report:
                     return .send(._formResponse(.success([
                         .editor(.init(
