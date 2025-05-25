@@ -7,4 +7,5 @@
 
 public enum TopicPostContextMenuAction {
     case reply(Int, String)
+    case delete(Int)
 }

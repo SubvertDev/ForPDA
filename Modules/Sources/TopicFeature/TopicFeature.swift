@@ -91,7 +91,7 @@ public struct TopicFeature: Reducer, Sendable {
         case writeForm(PresentationAction<WriteFormFeature.Action>)
         
         case _load
-        case _goToPost(postId: Int, offset: Int)
+        case _goToPost(postId: Int, offset: Int, forceRefresh: Bool)
         case _loadTopic(Int)
         case _loadTypes([[TopicTypeUI]])
         case _topicResponse(Result<Topic, any Error>)
@@ -136,9 +136,9 @@ public struct TopicFeature: Reducer, Sendable {
             case ._load:
                 switch state.goTo {
                 case .first:            return loadPage(&state)
-                case .unread:           return jumpTo(.unread, &state)
-                case .post(id: let id): return jumpTo(.post(id: id), &state)
-                case .last:             return jumpTo(.last, &state)
+                case .unread:           return jumpTo(.unread, false, &state)
+                case .post(id: let id): return jumpTo(.post(id: id), false, &state)
+                case .last:             return jumpTo(.last, false, &state)
                 }
                 
             case .onRefresh:
@@ -228,6 +228,16 @@ public struct TopicFeature: Reducer, Sendable {
                         content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
                     ))
                     return .none
+                    
+                case .delete(let id):
+                    return .concatenate(
+                        .run { _ in
+                            let status = try await apiClient.deletePosts(postIds: [id])
+                            await toastClient.showToast(status ? .postDeleted : .whoopsSomethingWentWrong)
+                        }.cancellable(id: CancelID.loading),
+                        
+                        jumpTo(.post(id: id), true, &state)
+                    )
                 }
                 
             case .finishedPostAnimation:
@@ -311,10 +321,10 @@ public struct TopicFeature: Reducer, Sendable {
             case ._jumpRequestFailed:
                 return showToast(.whoopsSomethingWentWrong)
                 
-            case let ._goToPost(postId: postId, offset: offset):
+            case let ._goToPost(postId: postId, offset: offset, forceRefresh):
                 state.postId = postId
-                if offset == state.pageNavigation.offset && state.topic != nil {
-                    // If we have this post on the same page, don't reload
+                if !forceRefresh && offset == state.pageNavigation.offset && state.topic != nil {
+                    // If we have this post on the same page without force refresh, don't reload
                     return .none
                 }
                 return loadPage(offset: offset, &state)
@@ -350,7 +360,7 @@ public struct TopicFeature: Reducer, Sendable {
         var postId: Int {
             switch self {
             case .unread, .last: return 0
-            case let .post(id):       return id
+            case let .post(id):  return id
             }
         }
         
@@ -363,12 +373,12 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    private func jumpTo(_ jump: JumpTo, _ state: inout State) -> Effect<Action> {
+    private func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
             let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
             let offset = response.offset - (response.offset % topicPerPage)
-            await send(._goToPost(postId: response.postId, offset: offset))
+            await send(._goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh))
         } catch: { error, send in
             await send(._jumpRequestFailed)
         }

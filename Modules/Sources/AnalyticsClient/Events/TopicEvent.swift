@@ -19,6 +19,7 @@ public enum TopicEvent: Event {
     case menuWritePost
     
     case menuPostReply(Int)
+    case menuPostDelete(Int)
     
     case loadingStart(Int)
     case loadingSuccess
@@ -34,6 +35,9 @@ public enum TopicEvent: Event {
         case let .userAvatarTapped(id),
              let .menuPostReply(id):
             return ["userId": String(id)]
+            
+        case let .menuPostDelete(postId):
+            return ["postId": String(postId)]
             
         case let .urlTapped(url):
             return ["url": url.absoluteString]

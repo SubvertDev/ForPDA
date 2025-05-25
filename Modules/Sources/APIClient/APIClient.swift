@@ -52,6 +52,7 @@ public struct APIClient: Sendable {
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSend
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSend
+    public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
     
     // Favorites
     public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
@@ -275,6 +276,12 @@ extension APIClient: DependencyKey {
                 )
                 let response = try await api.get(command)
                 return try await parser.parsePostSend(response)
+			},
+            deletePosts: { ids in
+                let command = ForumCommand.Post.delete(postIds: ids)
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Favorites
@@ -440,6 +447,9 @@ extension APIClient: DependencyKey {
             },
             editPost: { _ in
                 return PostSend(id: 0, topicId: 1, offset: 2)
+			},
+            deletePosts: { _ in
+                return true
             },
             getFavorites: { _, _ in
                 .finished()

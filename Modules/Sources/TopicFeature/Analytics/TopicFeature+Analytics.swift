@@ -35,6 +35,8 @@ extension TopicFeature {
                     switch option {
                     case .reply(let userId, _):
                         analytics.log(TopicEvent.menuPostReply(userId))
+                    case .delete(let postId):
+                        analytics.log(TopicEvent.menuPostDelete(postId))
                     }
                     
                 case let .contextMenu(option):
