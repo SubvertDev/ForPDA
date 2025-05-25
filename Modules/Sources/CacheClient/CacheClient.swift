@@ -26,7 +26,7 @@ public struct CacheClient: Sendable {
     
     // Users
     public var setUser: @Sendable (User) async -> Void
-    public var getUser: @Sendable (_ id: Int) async -> User?
+    public var getUser: @Sendable (_ id: Int) -> User?
     
     // Favorites
     public var setFavorites: @Sendable (Favorite) async -> Void
@@ -97,7 +97,7 @@ extension CacheClient: DependencyKey {
                 try? await usersStorage.async.setObject(user, forKey: user.id)
             },
             getUser: { userId in
-                return try? await usersStorage.async.object(forKey: userId)
+                return try? usersStorage.object(forKey: userId)
             },
             
             // MARK: - Favorites

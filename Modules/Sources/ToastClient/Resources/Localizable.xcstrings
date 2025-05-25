@@ -11,6 +11,16 @@
         }
       }
     },
+    "Post deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост удален"
+          }
+        }
+      }
+    },
     "Post not found" : {
       "localizations" : {
         "ru" : {

@@ -45,6 +45,8 @@ public struct WriteFormScreen: View {
                 }
             }
             .disabled(store.isPublishing)
+            .animation(.default, value: store.isEditReasonToggleSelected)
+            .animation(.default, value: store.isEditMarkToggleSelected)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -91,6 +93,10 @@ public struct WriteFormScreen: View {
                     }
                     .padding(.top, 16)
                 }
+                
+                if store.inPostEditingMode {
+                    EditReason()
+                }
             }
         }
         
@@ -118,6 +124,40 @@ public struct WriteFormScreen: View {
         
         Spacer()
     }
+    
+    @ViewBuilder
+    private func EditReason() -> some View {
+        VStack {
+            HStack(spacing: 0) {
+                Text("Editing reason", bundle: .module)
+                    .foregroundStyle(Color(.Labels.teritary))
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Toggle(String(""), isOn: $store.isEditReasonToggleSelected)
+                    .labelsHidden()
+            }
+            .padding(.horizontal, 2)
+            
+            if store.isEditReasonToggleSelected {
+                Field(text: $store.editReasonContent, description: "", guideText: "")
+                    .disabled(store.isPublishing || !store.isEditReasonToggleSelected)
+                
+                if store.canShowEditMark {
+                    Toggle(isOn: $store.isEditMarkToggleSelected) {
+                        Text("Show mark", bundle: .module)
+                            .font(.subheadline)
+                            .foregroundStyle(Color(.Labels.secondary))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .toggleStyle(CheckBox())
+                    .padding(6)
+                }
+            }
+        }
+        .padding(.top, 18)
+    }
 }
 
 // MARK: - Helpers
@@ -126,9 +166,17 @@ private extension WriteFormScreen {
     
     private func formTitle() -> LocalizedStringKey {
         return switch store.formFor {
-        case .post: LocalizedStringKey("New post")
-        case .topic: LocalizedStringKey("New topic")
-        case .report: LocalizedStringKey("Send report")
+        case let .post(type, _, _):
+            switch type {
+            case .new:
+                LocalizedStringKey("New post")
+            case .edit:
+                LocalizedStringKey("Edit post")
+            }
+        case .topic:
+            LocalizedStringKey("New topic")
+        case .report:
+            LocalizedStringKey("Send report")
         }
     }
 }
@@ -142,18 +190,42 @@ private extension String {
 
 // MARK: - Previews
 
-#Preview {
+#Preview("New Post") {
     NavigationStack {
         WriteFormScreen(
             store: Store(
                 initialState: WriteFormFeature.State(
-                    formFor: .post(topicId: 0, content: .simple("", []))
+                    formFor: .post(type: .new, topicId: 0, content: .simple("", []))
                 )
             ) {
                 WriteFormFeature()
             } withDependencies: {
                 $0.apiClient.sendPost = { _ in
-                    try await Task.sleep(for: .seconds(10))
+                    try await Task.sleep(for: .seconds(3))
+                    return PostSend(id: 0, topicId: 0, offset: 0)
+                }
+            }
+        )
+        .tint(Color(.Theme.primary))
+    }
+}
+
+#Preview("Edit Post") {
+    NavigationStack {
+        WriteFormScreen(
+            store: Store(
+                initialState: WriteFormFeature.State(
+                    formFor: .post(
+                        type: .edit(postId: 0),
+                        topicId: 0,
+                        content: .simple("Some text", [])
+                    )
+                )
+            ) {
+                WriteFormFeature()
+            } withDependencies: {
+                $0.apiClient.sendPost = { _ in
+                    try await Task.sleep(for: .seconds(3))
                     return PostSend(id: 0, topicId: 0, offset: 0)
                 }
             }

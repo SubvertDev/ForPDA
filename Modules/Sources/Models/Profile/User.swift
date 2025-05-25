@@ -48,6 +48,15 @@ public struct User: Sendable, Hashable, Codable {
         }
     }
     
+    public var canSetShowMarkOnPostEdit: Bool {
+        switch group {
+        case .admin, .supermoderator, .router:
+            return true
+        default:
+            return false
+        }
+    }
+    
     public init(
         id: Int,
         nickname: String,

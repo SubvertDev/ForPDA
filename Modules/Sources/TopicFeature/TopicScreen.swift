@@ -294,6 +294,18 @@ public struct TopicScreen: View {
                     store.send(.contextPostMenu(.reply(post.id, post.author.name)))
                 }
             }
+            
+            if post.canEdit {
+                ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
+                    store.send(.contextPostMenu(.edit(post)))
+                }
+            }
+            
+            if post.canDelete {
+                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                    store.send(.contextPostMenu(.delete(post.id)))
+                }
+            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)

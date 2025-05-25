@@ -243,7 +243,6 @@ struct CheckBox: ToggleStyle {
                         .frame(width: 22, height: 22)
                 } else {
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(.tintColor))
                         .frame(width: 22, height: 22)
                         .overlay {
                             Image(systemSymbol: .checkmark)
