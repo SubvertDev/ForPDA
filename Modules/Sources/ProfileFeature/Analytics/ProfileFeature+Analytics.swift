@@ -20,8 +20,14 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .alert, .delegate:
+                case .view(.onAppear), .delegate, .binding:
                     break
+                    
+                case .view(.sheetContinueButtonTapped):
+                    analyticsClient.log(ProfileEvent.sheetContinueButtonTapped)
+                    
+                case .view(.sheetCloseButtonTapped):
+                    analyticsClient.log(ProfileEvent.sheetCloseButtonTapped)
                     
                 case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)

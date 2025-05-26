@@ -17,6 +17,8 @@ public enum ProfileEvent: Event {
     case achievementTapped
     case linkInAboutTapped
     case linkInSignatureTapped
+    case sheetContinueButtonTapped
+    case sheetCloseButtonTapped
     
     public var name: String {
         return "Profile " + eventName(for: self).inProperCase
