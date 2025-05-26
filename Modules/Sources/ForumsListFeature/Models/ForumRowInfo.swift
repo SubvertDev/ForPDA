@@ -1,5 +1,5 @@
 //
-//  ForumRow.swift
+//  ForumRowInfo.swift
 //  ForPDA
 //
 //  Created by Ilia Lubianoi on 09.11.2024.
@@ -8,7 +8,7 @@
 import Foundation
 import Models
 
-public struct ForumRow: Equatable, Identifiable {
+public struct ForumRowInfo: Equatable, Identifiable {
     public let id: Int
     public let title: String
     public var forums: [ForumInfo]

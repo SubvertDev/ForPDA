@@ -40,18 +40,24 @@ public struct HistoryFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action {
-        case onTask
-        case topicTapped(id: Int)
-        
+    public enum Action: ViewAction {
         case pageNavigation(PageNavigationFeature.Action)
+
+        case view(View)
+        public enum View {
+            case onAppear
+            case topicTapped(TopicInfo, showUnread: Bool)
+        }
         
-        case _historyResponse(Result<History, any Error>)
-        case _loadHistory(offset: Int)
-        
+        case `internal`(Internal)
+        public enum Internal {
+            case historyResponse(Result<History, any Error>)
+            case loadHistory(offset: Int)
+        }
+
         case delegate(Delegate)
         public enum Delegate {
-            case openTopic(id: Int)
+            case openTopic(id: Int, name: String, goTo: GoTo)
         }
     }
     
@@ -69,29 +75,29 @@ public struct HistoryFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onTask:
-                return .send(._loadHistory(offset: state.offset))
+            case .view(.onAppear):
+                return .send(.internal(.loadHistory(offset: state.offset)))
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.offset = newOffset
-                return .send(._loadHistory(offset: newOffset))
+                return .send(.internal(.loadHistory(offset: newOffset)))
                 
             case .pageNavigation:
                 return .none
                 
-            case let .topicTapped(id: id):
-                return .send(.delegate(.openTopic(id: id)))
+            case let .view(.topicTapped(topic, showUnread)):
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: showUnread ? .unread : .first)))
                 
-            case let ._loadHistory(offset):
+            case let .internal(.loadHistory(offset)):
                 state.isLoading = true
                 return .run { [perPage = state.appSettings.forumPerPage] send in
                     let result = await Result {
                         try await apiClient.getHistory(offset, perPage)
                     }
-                    await send(._historyResponse(result))
+                    await send(.internal(.historyResponse(result)))
                 }
                 
-            case let ._historyResponse(.success(response)):
+            case let .internal(.historyResponse(.success(response))):
                 var groupedHistories: [Date: [TopicInfo]] = [:]
                 
                 let calendar = Calendar.current
@@ -124,7 +130,7 @@ public struct HistoryFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case let ._historyResponse(.failure(error)):
+            case let .internal(.historyResponse(.failure(error))):
                 // TODO: Handle error
                 print(error)
                 reportFullyDisplayed(&state)

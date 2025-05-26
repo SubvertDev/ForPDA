@@ -227,8 +227,8 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.handleUrl(let url))):
             return handleDeeplink(url: url, state: &state)
             
-        case .history(.delegate(.openTopic(id: let id))):
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id))))
+        case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         default:
             break

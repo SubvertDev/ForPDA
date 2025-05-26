@@ -19,22 +19,19 @@ extension FavoritesFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear, .delegate:
+                case .view(.onAppear), .delegate:
                     break
                     
-                case .onRefresh:
+                case .view(.onRefresh):
                     analytics.log(FavoritesEvent.onRefresh)
                     
-                case .onSceneBecomeActive:
+                case .view(.onSceneBecomeActive):
                     analytics.log(FavoritesEvent.onSceneBecomeActive)
                     
-                case let .favoriteTapped(favorite):
-                    analytics.log(FavoritesEvent.favoriteTapped(favorite.topic.id, favorite.topic.name, nil, favorite.isForum))
+                case let .view(.favoriteTapped(favorite, showUnread)):
+                    analytics.log(FavoritesEvent.favoriteTapped(favorite.topic.id, favorite.topic.name, nil, favorite.isForum, showUnread))
                     
-                case let .unreadTapped(favorite):
-                    analytics.log(FavoritesEvent.unreadTapped(favorite.topic.id))
-                    
-                case let .contextOptionMenu(option):
+                case let .view(.contextOptionMenu(option)):
                     switch option {
                     case .sort:
                         analytics.log(FavoritesEvent.sortButtonTapped)
@@ -42,7 +39,7 @@ extension FavoritesFeature {
                         analytics.log(FavoritesEvent.readAllButtonTapped)
                     }
                     
-                case let .commonContextMenu(option, isForum):
+                case let .view(.commonContextMenu(option, isForum)):
                     switch option {
                     case let .setImportant(id, pinned):
                         analytics.log(FavoritesEvent.setImportant(id, pinned))
@@ -52,7 +49,7 @@ extension FavoritesFeature {
                         analytics.log(FavoritesEvent.delete(id))
                     }
                     
-                case let .topicContextMenu(option, favorite):
+                case let .view(.topicContextMenu(option, favorite)):
                     switch option {
                     case .goToEnd:
                         analytics.log(FavoritesEvent.goToEnd(favorite.topic.id))
@@ -80,7 +77,7 @@ extension FavoritesFeature {
                         analytics.log(FavoritesEvent.sortCancelButtonTapped)
                     }
                     
-                case let ._favoritesResponse(response):
+                case let .internal(.favoritesResponse(response)):
                     switch response {
                     case .success:
                         analytics.log(FavoritesEvent.loadingSuccess)
@@ -88,11 +85,8 @@ extension FavoritesFeature {
                         analytics.log(FavoritesEvent.loadingFailure(error))
                     }
                     
-                case let ._loadFavorites(offset: offset):
+                case let .internal(.loadFavorites(offset: offset)):
                     analytics.log(FavoritesEvent.loadingStart(offset))
-                    
-                case ._jumpRequestFailed:
-                    analytics.log(FavoritesEvent.jumpRequestFailed)
                 }
                 
                 return .none

@@ -12,6 +12,7 @@ import SFSafeSymbols
 import SharedUI
 import Models
 
+@ViewAction(for: FavoritesFeature.self)
 public struct FavoritesScreen: View {
     
     // MARK: - Properties
@@ -46,7 +47,7 @@ public struct FavoritesScreen: View {
                     }
                     .scrollContentBackground(.hidden)
                     .refreshable {
-                        await store.send(.onRefresh).finish()
+                        await send(.onRefresh).finish()
                     }
                 } else {
                     PDALoader()
@@ -67,7 +68,7 @@ public struct FavoritesScreen: View {
                                     symbol: .line3HorizontalDecrease,
                                     bundle: .module
                                 ) {
-                                    store.send(.contextOptionMenu(.sort))
+                                    send(.contextOptionMenu(.sort))
                                 }
                                 
                                 ContextButton(
@@ -75,7 +76,7 @@ public struct FavoritesScreen: View {
                                     symbol: .checkmarkCircle,
                                     bundle: .module
                                 ) {
-                                    store.send(.contextOptionMenu(.markAllAsRead))
+                                    send(.contextOptionMenu(.markAllAsRead))
                                 }
                             } label: {
                                 Image(systemSymbol: .ellipsisCircle)
@@ -89,11 +90,11 @@ public struct FavoritesScreen: View {
             }
             .onChange(of: scenePhase) { newScenePhase in
                 if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
-                    store.send(.onSceneBecomeActive)
+                    send(.onSceneBecomeActive)
                 }
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -108,7 +109,7 @@ public struct FavoritesScreen: View {
                     symbol: favorite.isImportant ? .heartFill : .heart,
                     bundle: .module
                 ) {
-                    store.send(.commonContextMenu(
+                    send(.commonContextMenu(
                         .setImportant(favorite.topic.id, favorite.isImportant ? false : true),
                         favorite.isForum
                     ))
@@ -117,11 +118,11 @@ public struct FavoritesScreen: View {
             
             Section {
                 ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
-                    store.send(.commonContextMenu(.copyLink(favorite.topic.id), favorite.isForum))
+                    send(.commonContextMenu(.copyLink(favorite.topic.id), favorite.isForum))
                 }
                 
                 ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
-                    store.send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
+                    send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
                 }
             }
         }
@@ -137,7 +138,7 @@ public struct FavoritesScreen: View {
                     symbol: .chevronRight2,
                     bundle: .module
                 ) {
-                    store.send(.topicContextMenu(.goToEnd, favorite))
+                    send(.topicContextMenu(.goToEnd, favorite))
                 }
                 
                 ContextButton(
@@ -145,7 +146,7 @@ public struct FavoritesScreen: View {
                     symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
                     bundle: .module
                 ) {
-                    store.send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite))
+                    send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite))
                 }
                 
                 Menu {
@@ -154,7 +155,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .always ? .bellFill : .bell,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.flag, .always), favorite))
+                        send(.topicContextMenu(.notify(favorite.flag, .always), favorite))
                     }
                     
                     ContextButton(
@@ -162,7 +163,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.flag, .once), favorite))
+                        send(.topicContextMenu(.notify(favorite.flag, .once), favorite))
                     }
                     
                     ContextButton(
@@ -170,7 +171,7 @@ public struct FavoritesScreen: View {
                         symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
                         bundle: .module
                     ) {
-                        store.send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite))
+                        send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite))
                     }
                 } label: {
                     HStack {
@@ -190,19 +191,26 @@ public struct FavoritesScreen: View {
             Navigation(isShown: !important)
             
             ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
-                Row(
-                    id: favorite.topic.id,
-                    title: favorite.topic.name,
-                    lastPost: favorite.topic.lastPost,
-                    closed: favorite.topic.isClosed,
-                    unread: favorite.topic.isUnread,
-                    forum: favorite.isForum,
-                    notify: favorite.notify
-                ) { showUnread in
-                    if showUnread && !favorite.isForum {
-                        store.send(.unreadTapped(favorite))
+                Group {
+                    if favorite.isForum {
+                        ForumRow(
+                            title: favorite.topic.name,
+                            isUnread: favorite.topic.isUnread,
+                            onAction: { unreadTapped in
+                                send(.favoriteTapped(favorite, showUnread: unreadTapped))
+                            }
+                        )
                     } else {
-                        store.send(.favoriteTapped(favorite))
+                        TopicRow(
+                            title: favorite.topic.name,
+                            date: favorite.topic.lastPost.date,
+                            username: favorite.topic.lastPost.username,
+                            isClosed: favorite.topic.isClosed,
+                            isUnread: favorite.topic.isUnread,
+                            onAction: { unreadTapped in
+                                send(.favoriteTapped(favorite, showUnread: unreadTapped))
+                            }
+                        )
                     }
                 }
                 .contextMenu {
@@ -244,90 +252,6 @@ public struct FavoritesScreen: View {
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
         }
-    }
-    
-    // MARK: - Row
-        
-    @ViewBuilder
-    private func Row(
-        id: Int,
-        title: String,
-        lastPost: TopicInfo.LastPost? = nil,
-        closed: Bool = false,
-        unread: Bool = false,
-        forum: Bool = false,
-        notify: FavoriteInfo.Notify,
-        action: @escaping (_ unreadTapped: Bool) -> Void
-    ) -> some View {
-        HStack(spacing: 0) { // Hacky HStack to enable tap animations
-            Button {
-                action(false)
-            } label: {
-                HStack(spacing: 10) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        if let lastPost, !forum {
-                            Text(lastPost.formattedDate, bundle: .models)
-                                .font(.caption)
-                                .foregroundStyle(Color(.Labels.teritary))
-                        }
-                        
-                        RichText(
-                            text: AttributedString(title),
-                            isSelectable: false,
-                            font: .body,
-                            foregroundStyle: Color(.Labels.primary)
-                        )
-                        
-                        if let lastPost, !forum {
-                            HStack(spacing: 4) {
-                                Image(systemSymbol: .personCircle)
-                                    .font(.caption)
-                                    .foregroundStyle(Color(.Labels.secondary))
-                                
-                                RichText(
-                                    text: AttributedString(lastPost.username),
-                                    isSelectable: false,
-                                    font: .caption,
-                                    foregroundStyle: Color(.Labels.secondary)
-                                )
-                            }
-                        }
-                    }
-                    
-                    Spacer(minLength: 0)
-                    
-                    HStack(spacing: 0) {
-                        if closed {
-                            Image(systemSymbol: .lock)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 16, height: 16)
-                                .foregroundStyle(Color(.Labels.secondary))
-                                .padding(.trailing, unread ? -2 : 12)
-                        }
-                        
-                        if unread {
-                            Button {
-                                action(true)
-                            } label: {
-                                Image(systemSymbol: .circleFill)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 10, height: 10)
-                                    .foregroundStyle(tintColor)
-                            }
-                            .buttonStyle(.plain)
-                            .frame(maxWidth: 42, maxHeight: .infinity)
-                        }
-                    }
-                }
-                .padding(.vertical, 8)
-                .contentShape(Rectangle())
-            }
-        }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
-        .buttonStyle(.plain)
-        .frame(minHeight: 60)
     }
     
     // MARK: - Notify Type Icon
