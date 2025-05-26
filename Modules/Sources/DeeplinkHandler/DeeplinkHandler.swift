@@ -178,7 +178,7 @@ public struct DeeplinkHandler {
         case .topic:
             return Deeplink.topic(id: id, goTo: .unread)
         case .forumMention:
-            return Deeplink.forum(id: id)
+            return Deeplink.topic(id: id, goTo: .unread)
         case .siteMention:
             return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
         }
