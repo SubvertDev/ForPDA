@@ -607,8 +607,11 @@ extension User {
     }
     
     var statusAttributed: NSAttributedString? {
-        let trimmed = status!.trimmingCharacters(in: .whitespacesAndNewlines)
-        return !trimmed.isEmpty ? BBCodeParser.parse(status) : nil
+        if let status {
+            let trimmed = status.trimmingCharacters(in: .whitespacesAndNewlines)
+            return !trimmed.isEmpty ? BBCodeParser.parse(status) : nil
+        }
+        return nil
     }
     
     var aboutMeAttributed: NSAttributedString? {
