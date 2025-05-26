@@ -94,7 +94,6 @@ public struct ProfileFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                state.$didAcceptQMSWarningMessage.withLock { $0 = false }
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .run { send in
