@@ -158,4 +158,31 @@ public struct DeeplinkHandler {
         let url = try! await apiClient.getAttachment(id)
         return url
     }
+    
+    // MARK: - Notification
+    
+    public func handleNotification(_ identifier: String) throws(DeeplinkError) -> Deeplink {
+        let split = identifier.split(separator: "-")
+        
+        guard let typeString = split.first, let typeInt = Int(typeString) else { throw .noDeeplinkAvailable }
+        guard let idString = split.last,    let id = Int(idString)        else { throw .noDeeplinkAvailable }
+        
+        guard let type = Unread.Item.Category(rawValue: typeInt) else { throw .noDeeplinkAvailable }
+        
+        switch type {
+        case .qms:
+            // TODO: Add
+            break
+        case .forum:
+            return Deeplink.forum(id: id)
+        case .topic:
+            return Deeplink.topic(id: id, goTo: .unread)
+        case .forumMention:
+            return Deeplink.forum(id: id)
+        case .siteMention:
+            return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
+        }
+        
+        throw .noDeeplinkAvailable
+    }
 }

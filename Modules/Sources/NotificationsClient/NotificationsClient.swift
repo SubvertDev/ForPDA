@@ -19,7 +19,7 @@ public struct NotificationsClient: Sendable {
     public var requestPermission: @Sendable () async throws -> Bool
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
-    public var delegate: @Sendable () -> AsyncStream<Void> = { .finished }
+    public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
     public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
 }
@@ -129,7 +129,7 @@ extension NotificationsClient: DependencyKey {
                         content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     }
                     
-                    let request = UNNotificationRequest(identifier: "\(item.category.identifier)-\(item.id)", content: content, trigger: nil)
+                    let request = UNNotificationRequest(identifier: "\(item.category.rawValue)-\(item.id)", content: content, trigger: nil)
                     
                     do {
                         try await UNUserNotificationCenter.current().add(request)
@@ -146,7 +146,7 @@ extension NotificationsClient: DependencyKey {
                 let filteredPending = pending.filter { notification in
                     if let prefix = notification.identifier.split(separator: "-").first {
                         return categories
-                            .map { $0.identifier }
+                            .map { String($0.rawValue) }
                             .contains(String(prefix))
                     }
                     return false
@@ -157,7 +157,7 @@ extension NotificationsClient: DependencyKey {
                 let filteredDelivered = delivered.filter { notification in
                     if let prefix = notification.request.identifier.split(separator: "-").first {
                         return categories
-                            .map { $0.identifier }
+                            .map { String($0.rawValue) }
                             .contains(String(prefix))
                     }
                     return false
@@ -170,10 +170,10 @@ extension NotificationsClient: DependencyKey {
 
 extension NotificationsClient {
     fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
-        let continuation: AsyncStream<Void>.Continuation
+        let continuation: AsyncStream<String>.Continuation
         private nonisolated(unsafe) var lastNotificationId: String = ""
         
-        init(continuation: AsyncStream<Void>.Continuation) {
+        init(continuation: AsyncStream<String>.Continuation) {
             self.continuation = continuation
         }
         
@@ -181,6 +181,12 @@ extension NotificationsClient {
             guard lastNotificationId != notification.request.identifier else { return [] }
             lastNotificationId = notification.request.identifier // Hotfix for Apple iOS 18 double notification bug
             return [.badge, .banner, .list, .sound]
+        }
+        
+        func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+            let identifier = response.notification.request.identifier
+            try? await Task.sleep(for: .seconds(1))
+            continuation.yield(identifier)
         }
     }
 }

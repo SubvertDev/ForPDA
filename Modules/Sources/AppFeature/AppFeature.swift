@@ -119,6 +119,7 @@ public struct AppFeature: Reducer, Sendable {
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppTab)
         case deeplink(URL)
+        case notificationDeeplink(String)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
         case syncUnreadTaskInvoked
@@ -183,21 +184,30 @@ public struct AppFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                return .concatenate(
-                    .run { send in
-                        do {
-                            await apiClient.setLogResponses(.none)
-                            try await apiClient.connect()
-                        } catch {
-                            await send(._failedToConnect(error))
+                return .run { send in
+                    await withTaskGroup { group in
+                        group.addTask {
+                            do {
+                                await apiClient.setLogResponses(.none)
+                                try await apiClient.connect()
+                            } catch {
+                                await send(._failedToConnect(error))
+                            }
                         }
-                    },
-                    .run { send in
-                        for await toast in toastClient.queue() {
-                            await send(._showToast(toast))
+                        
+                        group.addTask {
+                            for await toast in toastClient.queue() {
+                                await send(._showToast(toast))
+                            }
+                        }
+                        
+                        group.addTask {
+                            for await identifier in notificationsClient.delegate() {
+                                await send(.notificationDeeplink(identifier))
+                            }
                         }
                     }
-                )
+                }
                 
             case let ._showToast(toast):
                 state.toastMessage = toast
@@ -276,9 +286,19 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case let .notificationDeeplink(identifier):
+                do {
+                    let deeplink = try DeeplinkHandler().handleNotification(identifier)
+                    return handleNotificationDeeplink(deeplink, &state)
+                } catch {
+                    analyticsClient.capture(error)
+                    // TODO: Show error in UI?
+                }
+                return .none
+                
                 // MARK: - ScenePhase
                 
-            case let .scenePhaseDidChange(from: oldPhase, to: newPhase):
+            case let .scenePhaseDidChange(from: _, to: newPhase):
                 return .run { [isLoggedIn = state.userSession != nil] send in
                     if newPhase == .background {
                         await send(.registerBackgroundTask)
@@ -356,6 +376,8 @@ public struct AppFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - Private Functions
+    
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
@@ -371,5 +393,53 @@ public struct AppFeature: Reducer, Sendable {
         return StackTab()
             .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.view(.onRefresh)))))
             .map(Action.favoritesTab)
+    }
+    
+    private func handleNotificationDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
+        if case .user = deeplink {
+            return .none
+        }
+        
+        // Handling article deeplink
+        
+        if case let .article(id, _, _) = deeplink {
+            if state.selectedTab != .articles {
+                state.previousTab = state.selectedTab
+                state.selectedTab = .articles
+            }
+            state.articlesTab.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: ArticlePreview.innerDeeplink(id: id)))))
+            return .none
+        }
+        
+        // Handling forum deeplinks
+        
+        let isOnForumHandledTab = state.selectedTab == .favorites || state.selectedTab == .forum
+        
+        let targetState: Path.Forum.Body.State
+        switch deeplink {
+        case let .announcement(id):
+            targetState = .announcement(AnnouncementFeature.State(id: id))
+        case let .topic(id, goTo):
+            targetState = .topic(TopicFeature.State(topicId: id, goTo: goTo))
+        case let .forum(id):
+            targetState = .forum(ForumFeature.State(forumId: id))
+        default:
+            fatalError("Unhandled notifications deeplink")
+        }
+        
+        if isOnForumHandledTab {
+            if state.selectedTab == .favorites {
+                state.favoritesTab.path.append(.forum(targetState))
+            }
+            if state.selectedTab == .forum {
+                state.forumTab.path.append(.forum(targetState))
+            }
+        } else {
+            state.previousTab = state.selectedTab
+            state.selectedTab = .forum
+            state.forumTab.path.append(.forum(targetState))
+        }
+        
+        return .none
     }
 }
