@@ -113,7 +113,7 @@ public struct BBBuilder {
                         trimTrailing: trimTrailing
                     )
                     if !textNode.isEmptyTrimmedText {
-                        logger.info("Mutable text is empty, appending")
+                        logger.info("Mutable text is NOT empty, appending")
                         mergedNodes.append(textNode)
                     } else {
                         logger.info("Text node is empty after trimming, skipping")
@@ -123,6 +123,12 @@ public struct BBBuilder {
                     
                     let isNextNodeTextable = nodes[safe: index + 1]?.isTextable ?? false
                     let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
+                    
+                    if hasPreviousNode(index), nodes[index - 1].isMedia, !node.hasOnlyOneSpace {
+                        logger.info("Previous node is media, appending newline")
+                        mutableText.append(NSAttributedString(string: "\n"))
+                    }
+                    
                     if isNextNodeTextable || isNextNodeMedia {
                         logger.info("Next node is textable OR media, unwrapping")
                         var isAttachmentDelimeter = false
@@ -176,7 +182,9 @@ public struct BBBuilder {
                     logger.info("FILE attachment")
                     var isAttachmentDelimeter = false
                     if case let .text(text) = mergedNodes.last, text.string.last != "\n" {
-                        isAttachmentDelimeter = true
+                        if hasPreviousNode(index), nodes[index - 1].isTextable { } else {
+                            isAttachmentDelimeter = true
+                        }
                     }
                     let textNode = unwrap(node: node, with: mutableText, isAttachmentDelimeter: isAttachmentDelimeter)
                     if !textNode.isEmptyText {

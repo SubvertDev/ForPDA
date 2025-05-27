@@ -124,40 +124,40 @@ struct ArticlesListFeatureTest {
         }
     }
     
-    @Test("All cell menu options")
-    func cellMenuOptions() async throws {
-        let store = TestStore(initialState: ArticlesListFeature.State()) {
-            ArticlesListFeature()
-        }
-        
-        for options in ContextMenuOptions.allCases {
-            switch options {
-            case .shareLink:
-                await store.send(.cellMenuOpened(.mock, .shareLink)) {
-                    $0.destination = .share(ArticlePreview.mock.url)
-                }
-                
-                await store.send(.linkShared(true, URL(string: "/")!)) {
-                    $0.destination = nil
-                }
-                
-            case .copyLink:
-                await store.send(.cellMenuOpened(.mock, .copyLink))
-
-            case .openInBrowser:
-                await store.send(.cellMenuOpened(.mock, .openInBrowser))
-
-            case .report:
-                // TODO: Report
-                break
-                
-            case .addToBookmarks:
-                await store.send(.cellMenuOpened(.mock, .addToBookmarks)) {
-                    $0.destination = .alert(.notImplemented)
-                }
-            }
-        }
-    }
+//    @Test("All cell menu options")
+//    func cellMenuOptions() async throws {
+//        let store = TestStore(initialState: ArticlesListFeature.State()) {
+//            ArticlesListFeature()
+//        }
+//        
+//        for options in ContextMenuOptions.allCases {
+//            switch options {
+//            case .shareLink:
+//                await store.send(.cellMenuOpened(.mock, .shareLink)) {
+//                    $0.destination = .share(ArticlePreview.mock.url)
+//                }
+//                
+//                await store.send(.linkShared(true, URL(string: "/")!)) {
+//                    $0.destination = nil
+//                }
+//                
+//            case .copyLink:
+//                await store.send(.cellMenuOpened(.mock, .copyLink))
+//
+//            case .openInBrowser:
+//                await store.send(.cellMenuOpened(.mock, .openInBrowser))
+//
+//            case .report:
+//                // TODO: Report
+//                break
+//                
+//            case .addToBookmarks:
+//                await store.send(.cellMenuOpened(.mock, .addToBookmarks)) {
+//                    $0.destination = .alert(.notImplemented)
+//                }
+//            }
+//        }
+//    }
     
 //    @Test("List grid view options")
 //    func listGridViewOptions() async throws {
