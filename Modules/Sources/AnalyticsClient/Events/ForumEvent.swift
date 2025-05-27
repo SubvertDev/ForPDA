@@ -9,7 +9,7 @@ import Foundation
 
 public enum ForumEvent: Event {
     case onRefresh
-    case topicTapped(Int)
+    case topicTapped(Int, Bool)
     case subforumRedirectTapped(URL)
     case subforumTapped(Int, String)
     case announcementTapped(Int, String)
@@ -35,8 +35,8 @@ public enum ForumEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let .topicTapped(id):
-            return ["id": String(id)]
+        case let .topicTapped(id, showUnread):
+            return ["id": String(id), "showUnread": showUnread.description]
             
         case let .subforumRedirectTapped(url):
             return ["url": url.absoluteString]
