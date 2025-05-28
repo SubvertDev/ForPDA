@@ -42,17 +42,12 @@ public struct ForumRow: View {
                 Spacer(minLength: 0)
                 
                 if isUnread {
-                    Button {
-                        onAction(true)
-                    } label: {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
-                    }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: 42, maxHeight: .infinity)
+                    Image(systemSymbol: .circleFill)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 10, height: 10)
+                        .foregroundStyle(tintColor)
+                        .frame(maxWidth: 42, maxHeight: .infinity)
                 }
             }
             .padding(.vertical, 8)
