@@ -19,7 +19,7 @@ extension TopicFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear, .onSceneBecomeActive, .pageNavigation, .writeForm, ._loadTypes, ._goToPost, ._jumpRequestFailed, .finishedPostAnimation, ._load, .delegate:
+                case .onAppear, .onSceneBecomeActive, .pageNavigation, .destination, ._loadTypes, ._goToPost, ._jumpRequestFailed, .finishedPostAnimation, ._load, .delegate:
                     break
                     
                 case .onRefresh:
@@ -30,6 +30,9 @@ extension TopicFeature {
                     
                 case let .urlTapped(url):
                     analytics.log(TopicEvent.urlTapped(url))
+                    
+                case let .imageTapped(url):
+                    analytics.log(TopicEvent.imageTapped(url))
                     
                 case let .contextPostMenu(option):
                     switch option {

@@ -26,13 +26,23 @@ public struct TopicFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination {
+        @ReducerCaseIgnored
+        case gallery([URL], [Int], Int)
+        case writeForm(WriteFormFeature)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
-        @Presents var writeForm: WriteFormFeature.State?
+        
+        @Presents public var destination: Destination.State?
 
         public let topicId: Int
         public let topicName: String?
@@ -84,11 +94,12 @@ public struct TopicFeature: Reducer, Sendable {
         case urlTapped(URL)
         case finishedPostAnimation
         case pageNavigation(PageNavigationFeature.Action)
+        case imageTapped(URL)
         
         case contextMenu(TopicContextMenuAction)
         case contextPostMenu(TopicPostContextMenuAction)
         
-        case writeForm(PresentationAction<WriteFormFeature.Action>)
+        case destination(PresentationAction<Destination.Action>)
         
         case _load
         case _goToPost(postId: Int, offset: Int, forceRefresh: Bool)
@@ -172,8 +183,7 @@ public struct TopicFeature: Reducer, Sendable {
                     .cancel(id: CancelID.loading),
                     .send(._loadTopic(newOffset))
                 ])
-                
-            case .writeForm(.presented(.writeFormSent(let response))):
+            case .destination(.presented(.writeForm(.writeFormSent(let response)))):
                 if case let .post(data) = response {
                     state.postId = data.id
                     return .send(.pageNavigation(.lastPageTapped))
@@ -182,7 +192,7 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .writeForm:
+            case .destination:
                 return .none
                 
             case .pageNavigation:
@@ -192,9 +202,14 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
-                    state.writeForm = WriteFormFeature.State(
-                        formFor: .post(type: .new, topicId: topic.id, content: .simple("", []))
+                    let feature = WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new,
+                            topicId: topic.id,
+                            content: .simple("", [])
+                        )
                     )
+                    state.destination = .writeForm(feature)
                     return .none
                     
                 case .openInBrowser:
@@ -223,19 +238,25 @@ public struct TopicFeature: Reducer, Sendable {
             case .contextPostMenu(let action):
                 switch action {
                 case .reply(let postId, let authorName):
-                    state.writeForm = WriteFormFeature.State(formFor: .post(
-                        type: .new,
-                        topicId: state.topicId,
-                        content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
-                    ))
+                    let feature = WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new,
+                            topicId: state.topicId,
+                            content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
+                        )
+                    )
+                    state.destination = .writeForm(feature)
                     return .none
                     
                 case .edit(let post):
-                    state.writeForm = WriteFormFeature.State(formFor: .post(
-                        type: .edit(postId: post.id),
-                        topicId: state.topicId,
-                        content: .simple(post.content, post.attachments.map { $0.id })
-                    ))
+                    let feature = WriteFormFeature.State(
+                        formFor: .post(
+                            type: .edit(postId: post.id),
+                            topicId: state.topicId,
+                            content: .simple(post.content, post.attachments.map { $0.id })
+                        )
+                    )
+                    state.destination = .writeForm(feature)
                     return .none
                     
                 case .delete(let id):
@@ -248,6 +269,26 @@ public struct TopicFeature: Reducer, Sendable {
                         jumpTo(.post(id: id), true, &state)
                     )
                 }
+                
+            case let .imageTapped(url):
+                guard let topic = state.topic else { fatalError() }
+                for post in topic.posts {
+                    for attachment in post.attachments {
+                        guard attachment.type == .image else { continue }
+                        guard attachment.size != 0 else { continue } // Don't show inline images
+                        if let attachmentUrl = attachment.metadata?.url {
+                            if attachmentUrl == url {
+                                let urls = post.imageAttachmentsOrdered.map { $0.metadata!.url }
+                                let ids = post.imageAttachmentsOrdered.map { $0.id }
+                                let index = ids.firstIndex(of: attachment.id) ?? 0
+                                state.destination = .gallery(urls, ids, index)
+                                break
+                            }
+                        }
+                    }
+                    break
+                }
+                return .none
                 
             case .finishedPostAnimation:
                 state.postId = nil
@@ -342,9 +383,7 @@ public struct TopicFeature: Reducer, Sendable {
                 return .none
             }
         }
-        .ifLet(\.$writeForm, action: \.writeForm) {
-            WriteFormFeature()
-        }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }

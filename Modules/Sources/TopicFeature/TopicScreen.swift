@@ -15,6 +15,7 @@ import NukeUI
 import Models
 import ParsingClient
 import TopicBuilder
+import GalleryFeature
 
 public struct TopicScreen: View {
     
@@ -70,10 +71,14 @@ public struct TopicScreen: View {
             }
             .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
             .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
+            .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
                 NavigationStack {
                     WriteFormScreen(store: store)
                 }
+            }
+            .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
+                let state = store.withState { $0 }
+                TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
             }
             .toolbar { OptionsMenu() }
             .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
@@ -261,6 +266,8 @@ public struct TopicScreen: View {
                     ForEach(store.types[postIndex], id: \.self) { type in
                         TopicView(type: type, attachments: post.attachments) { url in
                             store.send(.urlTapped(url))
+                        } onImageTap: { url in
+                            store.send(.imageTapped(url))
                         }
                     }
                 }

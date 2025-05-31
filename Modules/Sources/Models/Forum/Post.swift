@@ -25,6 +25,22 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         return flag & 256 > 0
     }
     
+    public var imageAttachmentsOrdered: [Attachment] {
+        let numberRegex = /(\d+)/
+        let extractedNumbers = content
+            .matches(of: numberRegex)
+            .compactMap { Int($0.1) }
+        
+        let orderedAttachments = extractedNumbers.compactMap { number in
+            attachments.first(where: { $0.id == number })
+        }
+        
+        return orderedAttachments
+            .filter { $0.type == .image }
+            .filter { $0.metadata != nil }
+            .filter { $0.size != 0 }
+    }
+    
     public init(
         id: Int,
         flag: Int,

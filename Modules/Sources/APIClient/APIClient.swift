@@ -164,7 +164,7 @@ extension APIClient: DependencyKey {
             
             getUser: { userId, policy in
                 fetch(
-                    getCache: { await cache.getUser(userId) },
+                    getCache: { cache.getUser(userId) },
                     setCache: { await cache.setUser($0) },
                     remote: {
                         let command = MemberCommand.info(memberId: userId)
@@ -337,9 +337,18 @@ extension APIClient: DependencyKey {
                 return try await parser.parseUnread(response)
             },
             getAttachment: { id in
-                let response = try await api.get(ForumCommand.attachmentDownloadUrl(id: id))
-                let urlString = String(response.dropFirst(10).dropLast(2))
-                return URL(string: urlString)!
+                let stream = fetch(
+                    getCache: { cache.getAttachmentURL(id) },
+                    setCache: { cache.setAttachmentURL(id, $0) },
+                    remote: {
+                        let response = try await api.get(ForumCommand.attachmentDownloadUrl(id: id))
+                        let urlString = String(response.dropFirst(10).dropLast(2))
+                        return URL(string: urlString)!
+                    },
+                    policy: .cacheOrLoad
+                )
+                for try await url in stream { return url } // I was too lazy to conform to AsyncStream on callsite
+                throw NSError(domain: "APIClient.getAttachment", code: 0)
             },
             sendReport: { request in
                 let command = CommonCommand.report(
@@ -499,7 +508,7 @@ extension APIClient: DependencyKey {
     private static func fetch<T>(
         getCache: @Sendable @escaping () async -> T?,
         setCache: @Sendable @escaping (T) async -> Void,
-        remote: @Sendable @escaping () async throws ->T,
+        remote: @Sendable @escaping () async throws -> T,
         policy: CachePolicy
     ) -> AsyncThrowingStream<T, any Error> {
         return AsyncThrowingStream { continuation in

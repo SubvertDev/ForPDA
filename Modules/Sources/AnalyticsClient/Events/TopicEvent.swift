@@ -11,6 +11,7 @@ public enum TopicEvent: Event {
     case onRefresh
     case userAvatarTapped(Int)
     case urlTapped(URL)
+    case imageTapped(URL)
     
     case menuCopyLink
     case menuOpenInBrowser
@@ -40,7 +41,8 @@ public enum TopicEvent: Event {
         case let .menuPostDelete(postId):
             return ["postId": String(postId)]
             
-        case let .urlTapped(url):
+        case let .urlTapped(url),
+             let .imageTapped(url):
             return ["url": url.absoluteString]
             
         case let .loadingStart(offset):

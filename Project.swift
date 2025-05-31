@@ -82,6 +82,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.CacheClient,
+                    .Internal.GalleryFeature,
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.ParsingClient,
@@ -225,6 +226,19 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "GalleryFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.Nuke,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
             ),
@@ -800,6 +814,7 @@ extension TargetDependency.Internal {
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
+    static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")
     static let PageNavigationFeature =  TargetDependency.target(name: "PageNavigationFeature")
