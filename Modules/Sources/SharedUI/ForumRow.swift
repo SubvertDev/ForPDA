@@ -15,12 +15,12 @@ public struct ForumRow: View {
     
     public let title: String
     public let isUnread: Bool
-    public let onAction: (_ unreadTapped: Bool) -> Void
+    public let onAction: () -> Void
     
     public init(
         title: String,
         isUnread: Bool,
-        onAction: @escaping (_: Bool) -> Void
+        onAction: @escaping () -> Void
     ) {
         self.title = title
         self.isUnread = isUnread
@@ -29,7 +29,7 @@ public struct ForumRow: View {
     
     public var body: some View {
         Button {
-            onAction(false)
+            onAction()
         } label: {
             HStack(spacing: 10) {
                 RichText(
@@ -42,17 +42,12 @@ public struct ForumRow: View {
                 Spacer(minLength: 0)
                 
                 if isUnread {
-                    Button {
-                        onAction(true)
-                    } label: {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
-                    }
-                    .buttonStyle(.plain)
-                    .frame(maxWidth: 42, maxHeight: .infinity)
+                    Image(systemSymbol: .circleFill)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 10, height: 10)
+                        .foregroundStyle(tintColor)
+                        .frame(maxWidth: 42, maxHeight: .infinity)
                 }
             }
             .padding(.vertical, 8)
@@ -85,19 +80,19 @@ private extension Date {
         ForumRow(
             title: "4PDA - работа сайта",
             isUnread: true,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: {}
         )
         
         ForumRow(
             title: "Пожелания",
             isUnread: false,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: {}
         )
         
         ForumRow(
             title: "iOS - Программы",
             isUnread: false,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: {}
         )
     }
     .environment(\.tintColor, Color(.Theme.primary))

@@ -196,8 +196,8 @@ public struct FavoritesScreen: View {
                         ForumRow(
                             title: favorite.topic.name,
                             isUnread: favorite.topic.isUnread,
-                            onAction: { unreadTapped in
-                                send(.favoriteTapped(favorite, showUnread: unreadTapped))
+                            onAction: {
+                                send(.favoriteTapped(favorite, showUnread: false))
                             }
                         )
                     } else {

@@ -161,7 +161,7 @@ public struct ForumScreen: View {
     private func SubforumsSection(subforums: [ForumInfo]) -> some View {
         Section {
             ForEach(subforums) { forum in
-                ForumRow(title: forum.name, isUnread: forum.isUnread) { _ in
+                ForumRow(title: forum.name, isUnread: forum.isUnread) {
                     if let redirectUrl = forum.redirectUrl {
                         store.send(.subforumRedirectTapped(redirectUrl))
                     } else {
@@ -192,7 +192,7 @@ public struct ForumScreen: View {
     private func AnnouncmentsSection(announcements: [AnnouncementInfo]) -> some View {
         Section {
             ForEach(announcements) { announcement in
-                ForumRow(title: announcement.name, isUnread: false) { _ in
+                ForumRow(title: announcement.name, isUnread: false) {
                     store.send(.announcementTapped(id: announcement.id, name: announcement.name))
                 }
             }
