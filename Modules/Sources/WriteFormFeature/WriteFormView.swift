@@ -267,6 +267,8 @@ struct Field: View {
     let guideText: String
     var isEditor = false
     
+    @FocusState private var focus: Bool
+    
     var body: some View {
         VStack {
             Group {
@@ -275,6 +277,7 @@ struct Field: View {
                         .font(.body)
                         .foregroundStyle(Color(.quaternaryLabel))
                 }
+                .focused($focus)
                 .font(.body)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -302,6 +305,9 @@ struct Field: View {
             }
         }
         .animation(.default, value: false)
+        .onAppear {
+            focus = true
+        }
     }
 }
 
