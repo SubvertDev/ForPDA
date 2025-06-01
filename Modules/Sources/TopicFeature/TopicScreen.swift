@@ -153,7 +153,7 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func PostList(topic: Topic) -> some View {
-        ForEach(topic.posts) { post in
+        ForEach(topic.posts, id: \.id) { post in
             WithPerceptionTracking {
                 VStack(spacing: 0) {
                     if !store.isFirstPage && topic.posts.first == post {

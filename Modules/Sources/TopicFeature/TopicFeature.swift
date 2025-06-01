@@ -159,12 +159,9 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(.internal(.loadTopic(newOffset)))
                 ])
                 
-            case .destination(.presented(.writeForm(.writeFormSent(let response)))):
+            case let .destination(.presented(.writeForm(.writeFormSent(response)))):
                 if case let .post(data) = response {
-                    state.postId = data.id
-                    return .send(.pageNavigation(.lastPageTapped))
-                    // TODO: https://pointfreeco.github.io/swift-composable-architecture/main/documentation/composablearchitecture/performance/#Sharing-logic-in-child-features
-                    // return reduce(into: &state, action: .pageNavigation(.lastPageTapped))
+                    return jumpTo(.post(id: data.id), true, &state)
                 }
                 return .none
                 
