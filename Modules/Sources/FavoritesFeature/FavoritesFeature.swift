@@ -74,6 +74,7 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
+            case refresh
             case favoritesResponse(Result<Favorite, any Error>)
             case loadFavorites(offset: Int)
         }
@@ -108,7 +109,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                 
             case .sort(.presented(.saveButtonTapped)):
                 return .run { send in
-                    await send(.view(.onRefresh))
+                    await send(.internal(.refresh))
                     await send(.sort(.presented(.cancelButtonTapped)))
                 }
                 
@@ -126,23 +127,20 @@ public struct FavoritesFeature: Reducer, Sendable {
                     .send(.internal(.loadFavorites(offset: 0))),
                     .run { send in
                         for await _ in notificationCenter.observe(.favoritesUpdated) {
-                            await send(.internal(.loadFavorites(offset: 0)))
+                            await send(.internal(.refresh))
                         }
                     }
                 ])
                 
             case .view(.onRefresh):
                 guard !state.isLoading else { return .none }
-                state.isRefreshing = true
-                return .run { [offset = state.pageNavigation.offset] send in
-                    await send(.internal(.loadFavorites(offset: offset)))
-                }
+                return .send(.internal(.refresh))
                 
             case .view(.onSceneBecomeActive):
                 if state.isLoading {
                     return .none
                 } else {
-                    return .send(.view(.onRefresh))
+                    return .send(.internal(.refresh))
                 }
                 
             case let .view(.favoriteTapped(favorite, showUnread)):
@@ -167,7 +165,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         _ = try await apiClient.readAllFavorites()
                         // TODO: Display toast on success/error.
                         
-                        await send(.view(.onRefresh))
+                        await send(.internal(.refresh))
                     }
                 }
                 
@@ -184,7 +182,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
                         
-                        await send(.view(.onRefresh))
+                        await send(.internal(.refresh))
                     }
                     
                 case .setImportant(let id, let pin):
@@ -193,7 +191,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
                         
-                        await send(.view(.onRefresh))
+                        await send(.internal(.refresh))
                     }
                 }
                 
@@ -213,8 +211,14 @@ public struct FavoritesFeature: Reducer, Sendable {
                         _ = try await apiClient.notifyFavorite(request)
                         // TODO: Display toast on success/error.
                         
-                        await send(.view(.onRefresh))
+                        await send(.internal(.refresh))
                     }
+                }
+                
+            case .internal(.refresh):
+                state.isRefreshing = true
+                return .run { [offset = state.pageNavigation.offset] send in
+                    await send(.internal(.loadFavorites(offset: offset)))
                 }
                 
             case let .internal(.loadFavorites(offset)):

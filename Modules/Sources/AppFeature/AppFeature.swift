@@ -391,7 +391,7 @@ public struct AppFeature: Reducer, Sendable {
     
     private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
         return StackTab()
-            .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.view(.onRefresh)))))
+            .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.internal(.refresh)))))
             .map(Action.favoritesTab)
     }
     

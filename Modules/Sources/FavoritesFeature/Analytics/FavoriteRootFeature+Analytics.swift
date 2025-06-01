@@ -87,6 +87,9 @@ extension FavoritesFeature {
                     
                 case let .internal(.loadFavorites(offset: offset)):
                     analytics.log(FavoritesEvent.loadingStart(offset))
+                    
+                case .internal(.refresh):
+                    break
                 }
                 
                 return .none
