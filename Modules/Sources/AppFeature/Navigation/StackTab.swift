@@ -292,7 +292,7 @@ public struct StackTab: Reducer, Sendable {
                     // Same topic, using feature navigation
                     // TODO: send goTo via action or state?
                     state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(._load)))))
+                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                 }
                 
                 // Different topic or announcement, using app navigation

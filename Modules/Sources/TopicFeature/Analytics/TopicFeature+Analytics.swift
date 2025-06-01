@@ -19,22 +19,32 @@ extension TopicFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear, .onSceneBecomeActive, .pageNavigation, .destination, ._loadTypes, ._goToPost, ._jumpRequestFailed, .finishedPostAnimation, ._load, .delegate:
+                case .view(.onAppear),
+                        .view(.onSceneBecomeActive),
+                        .view(.finishedPostAnimation),
+                        .internal(.loadTypes),
+                        .internal(.goToPost),
+                        .internal(.jumpRequestFailed),
+                        .internal(.load),
+                        .internal(.refresh),
+                        .pageNavigation,
+                        .destination,
+                        .delegate:
                     break
                     
-                case .onRefresh:
+                case .view(.onRefresh):
                     analytics.log(TopicEvent.onRefresh)
                     
-                case let .userAvatarTapped(userId: userId):
+                case let .view(.userAvatarTapped(userId: userId)):
                     analytics.log(TopicEvent.userAvatarTapped(userId))
                     
-                case let .urlTapped(url):
+                case let .view(.urlTapped(url)):
                     analytics.log(TopicEvent.urlTapped(url))
                     
-                case let .imageTapped(url):
+                case let .view(.imageTapped(url)):
                     analytics.log(TopicEvent.imageTapped(url))
                     
-                case let .contextPostMenu(option):
+                case let .view(.contextPostMenu(option)):
                     switch option {
                     case .reply(let userId, _):
                         analytics.log(TopicEvent.menuPostReply(userId))
@@ -44,7 +54,7 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostDelete(postId))
                     }
                     
-                case let .contextMenu(option):
+                case let .view(.contextMenu(option)):
                     switch option {
                     case .copyLink:
                         analytics.log(TopicEvent.menuCopyLink)
@@ -58,10 +68,10 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuWritePost)
                     }
                     
-                case let ._loadTopic(offset: offset):
+                case let .internal(.loadTopic(offset: offset)):
                     analytics.log(TopicEvent.loadingStart(offset))
                     
-                case let ._topicResponse(response):
+                case let .internal(.topicResponse(response)):
                     switch response {
                     case .success:
                         analytics.log(TopicEvent.loadingSuccess)
@@ -69,7 +79,7 @@ extension TopicFeature {
                         analytics.log(TopicEvent.loadingFailure(error))
                     }
                     
-                case let ._setFavoriteResponse(response):
+                case let .internal(.setFavoriteResponse(response)):
                     analytics.log(TopicEvent.setFavoriteResponse(response))
                 }
                 

@@ -17,6 +17,7 @@ import ParsingClient
 import TopicBuilder
 import GalleryFeature
 
+@ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TopicFeature>
@@ -61,7 +62,7 @@ public struct TopicScreen: View {
             }
             .refreshable {
                 // Wrapper around finish() due to SwiftUI bug
-                await Task { await store.send(.onRefresh).finish() }.value
+                await Task { await send(.onRefresh).finish() }.value
             }
             .overlay {
                 if store.topic == nil || store.isLoadingTopic {
@@ -85,11 +86,11 @@ public struct TopicScreen: View {
             .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
             .onChange(of: scenePhase) { newScenePhase in
                 if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
-                    store.send(.onSceneBecomeActive)
+                    send(.onSceneBecomeActive)
                 }
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -102,22 +103,22 @@ public struct TopicScreen: View {
             if let topic = store.topic, store.isUserAuthorized, topic.canPost {
                 Section {
                     ContextButton(text: "Write Post", symbol: .plusCircle, bundle: .module) {
-                        store.send(.contextMenu(.writePost))
+                        send(.contextMenu(.writePost))
                     }
                 }
             }
             
             ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
-                store.send(.contextMenu(.copyLink))
+                send(.contextMenu(.copyLink))
             }
             ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
-                store.send(.contextMenu(.openInBrowser))
+                send(.contextMenu(.openInBrowser))
             }
             
             if !store.pageNavigation.isLastPage {
                 Section {
                     ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
-                        store.send(.contextMenu(.goToEnd))
+                        send(.contextMenu(.goToEnd))
                     }
                 }
             }
@@ -129,7 +130,7 @@ public struct TopicScreen: View {
                         symbol: topic.isFavorite ? .starFill : .star,
                         bundle: .module
                     ) {
-                        store.send(.contextMenu(.setFavorite))
+                        send(.contextMenu(.setFavorite))
                     }
                 }
             }
@@ -196,7 +197,7 @@ public struct TopicScreen: View {
     private func PostHeader(_ post: Post) -> some View {
         HStack(spacing: 8) {
             Button {
-                store.send(.userAvatarTapped(post.author.id))
+                send(.userAvatarTapped(post.author.id))
             } label: {
                 LazyImage(url: URL(string: post.author.avatarUrl)) { state in
                     if let image = state.image {
@@ -265,9 +266,9 @@ public struct TopicScreen: View {
                 if store.types.count - 1 >= postIndex {
                     ForEach(store.types[postIndex], id: \.self) { type in
                         TopicView(type: type, attachments: post.attachments) { url in
-                            store.send(.urlTapped(url))
+                            send(.urlTapped(url))
                         } onImageTap: { url in
-                            store.send(.imageTapped(url))
+                            send(.imageTapped(url))
                         }
                     }
                 }
@@ -298,19 +299,19 @@ public struct TopicScreen: View {
         Menu {
             Section {
                 ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
-                    store.send(.contextPostMenu(.reply(post.id, post.author.name)))
+                    send(.contextPostMenu(.reply(post.id, post.author.name)))
                 }
             }
             
             if post.canEdit {
                 ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
-                    store.send(.contextPostMenu(.edit(post)))
+                    send(.contextPostMenu(.edit(post)))
                 }
             }
             
             if post.canDelete {
                 ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
-                    store.send(.contextPostMenu(.delete(post.id)))
+                    send(.contextPostMenu(.delete(post.id)))
                 }
             }
         } label: {
@@ -344,7 +345,7 @@ public struct TopicScreen: View {
                 try? await Task.sleep(for: .seconds(duration))
                 withAnimation(animation) { scrollScale = 1 }
                 try? await Task.sleep(for: .seconds(duration))
-                store.send(.finishedPostAnimation)
+                send(.finishedPostAnimation)
             }
         }
     }
