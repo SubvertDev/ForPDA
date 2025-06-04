@@ -5,7 +5,10 @@
 //  Created by Xialtal on 8.11.24.
 //
 
-public struct FavoriteInfo: Codable, Hashable, Sendable {
+public struct FavoriteInfo: Codable, Identifiable, Hashable, Sendable {
+    public var id: Int {
+        return topic.id
+    }
     public let flag: Int
     public let topic: TopicInfo
     public let isForum: Bool

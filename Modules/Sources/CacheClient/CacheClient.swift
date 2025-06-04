@@ -40,6 +40,10 @@ public struct CacheClient: Sendable {
     public var setForum: @Sendable (_ id: Int, _ forums: Forum) async -> Void
     public var getForum: @Sendable (_ id: Int) async -> Forum?
     
+    // Attachments
+    public var setAttachmentURL: @Sendable (_ id: Int, _ url: URL) -> Void
+    public var getAttachmentURL: @Sendable (_ id: Int) -> URL?
+    
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
     public var getLastBackgroundTaskInvokeTime: @Sendable () async -> [TimeInterval]
@@ -127,6 +131,15 @@ extension CacheClient: DependencyKey {
                 return try? await forumsStorage.async.object(forKey: id)
             },
             
+            // MARK: - Attachments
+            
+            setAttachmentURL: { id, url in
+                try? attachmentURLsStorage.setObject(url, forKey: id)
+            },
+            getAttachmentURL: { id in
+                return try? attachmentURLsStorage.object(forKey: id)
+            },
+            
             // MARK: - Background Tasks
             
             setLastBackgroundTaskInvokeTime: { date in
@@ -207,6 +220,15 @@ private extension CacheClient {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Forum.self)
+        )
+    }
+    
+    private static var attachmentURLsStorage: Storage<Int, URL> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "AttachmentURLs", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: URL.self)
         )
     }
     

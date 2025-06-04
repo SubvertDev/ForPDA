@@ -42,8 +42,20 @@ struct CustomScrollView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UICollectionView, context: Context) {
-        let indexPath = IndexPath(item: selectedIndex, section: 0)
+        var updateIndexes: [Int] = []
+        for (index, element) in context.coordinator.elements.enumerated() {
+            if element != imageElement[index] {
+                updateIndexes.append(index)
+            }
+        }
+        
+        context.coordinator.elements = imageElement
+        
+        let indexes = updateIndexes.map { IndexPath(item: $0, section: 0)}
+        uiView.reloadItems(at: indexes)
+                
         Task { @MainActor in
+            let indexPath = IndexPath(item: selectedIndex, section: 0)
             uiView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: false)
         }
     }
@@ -53,9 +65,10 @@ struct CustomScrollView: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UIGestureRecognizerDelegate{
-        var parent: CustomScrollView
+        private let parent: CustomScrollView
         private var initialTouchPoint: CGPoint = .zero
         private var firstSwipeDirection: SwipeDirection = .none
+        var elements: [URL]
 
         enum SwipeDirection {
             case horizontal
@@ -65,15 +78,18 @@ struct CustomScrollView: UIViewRepresentable {
         
         init(_ parent: CustomScrollView) {
             self.parent = parent
+            self.elements = parent.imageElement
         }
         
         func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return parent.imageElement.count
+            return elements.count
         }
         
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCollectionViewCell", for: indexPath) as! ImageCollectionViewCell
-            cell.setImage(url: parent.imageElement[indexPath.item])
+            
+            cell.removeImage()
+            cell.setImage(url: elements[indexPath.item])
 
             cell.onZoom = { isZooming in
                 Task { @MainActor in

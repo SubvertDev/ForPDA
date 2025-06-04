@@ -12,6 +12,7 @@ import SkeletonUI
 import YouTubePlayerKit
 import SharedUI
 import Models
+import GalleryFeature
 
 struct ArticleElementView: View {
     

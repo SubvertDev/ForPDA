@@ -39,7 +39,7 @@ public struct ForumsListScreen: View {
                                 ForumRow(
                                     title: forum.name,
                                     isUnread: forum.isUnread,
-                                    onAction: { _ in
+                                    onAction: {
                                         if let redirectUrl = forum.redirectUrl {
                                             send(.forumRedirectTapped(redirectUrl))
                                         } else {

@@ -190,14 +190,14 @@ public struct FavoritesScreen: View {
         Section {
             Navigation(isShown: !important)
             
-            ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
+            ForEach(Array(favorites.enumerated()), id: \.element.id) { index, favorite in
                 Group {
                     if favorite.isForum {
                         ForumRow(
                             title: favorite.topic.name,
                             isUnread: favorite.topic.isUnread,
-                            onAction: { unreadTapped in
-                                send(.favoriteTapped(favorite, showUnread: unreadTapped))
+                            onAction: {
+                                send(.favoriteTapped(favorite, showUnread: false))
                             }
                         )
                     } else {

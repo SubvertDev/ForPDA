@@ -151,26 +151,6 @@
         }
       }
     },
-    "Save" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сохранить"
-          }
-        }
-      }
-    },
-    "Share" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться"
-          }
-        }
-      }
-    },
     "Share Link" : {
       "localizations" : {
         "ru" : {
