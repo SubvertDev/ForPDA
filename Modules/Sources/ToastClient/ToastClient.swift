@@ -53,6 +53,13 @@ public enum ToastMessage: Equatable, Sendable {
     case postNotFound
     case postDeleted
     
+    // Topics
+    case topicSent
+    case topicFieldsError
+    case topicBadParameter
+    case topicSentToPremoderation
+    case topicStatus(Int)
+    
     // Report
     case reportSent
     case reportTooShort
@@ -69,6 +76,16 @@ public enum ToastMessage: Equatable, Sendable {
             return "Post not found"
         case .postDeleted:
             return "Post deleted"
+        case .topicSent:
+            return "Topic sent"
+        case .topicFieldsError:
+            return "There were errors in filling out the form"
+        case .topicBadParameter:
+            return "The server refused to create the topic (invalid parameter)"
+        case .topicSentToPremoderation:
+            return "Topic sent to pre-moderation"
+        case .topicStatus(let status):
+            return "Topic sending error. Status \(status)"
         case .reportSent:
             return "Report sent"
         case .reportTooShort:
@@ -85,10 +102,14 @@ public enum ToastMessage: Equatable, Sendable {
         case .postNotFound,
              .reportTooShort,
              .reportSendError,
+             .topicStatus,
+             .topicBadParameter,
+             .topicFieldsError,
+             .topicSentToPremoderation,
              .whoopsSomethingWentWrong:
 			return true
 
-        case .custom, .reportSent, .postDeleted:
+        case .custom, .reportSent, .postDeleted, .topicSent:
             return false
         }
     }
@@ -101,10 +122,14 @@ public enum ToastMessage: Equatable, Sendable {
         case .postNotFound,
              .reportTooShort,
              .reportSendError,
+             .topicStatus,
+             .topicBadParameter,
+             .topicFieldsError,
+             .topicSentToPremoderation,
              .whoopsSomethingWentWrong:
             return .error
             
-        case .reportSent, .postDeleted:
+        case .reportSent, .postDeleted, .topicSent:
             return .success
         }
     }

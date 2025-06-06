@@ -116,6 +116,26 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadForum(offset: newOffset))
                 
+            case let .writeForm(.presented(.writeFormSent(response))):
+                if case let .template(status) = response {
+                    switch status {
+                    case .success(.topic(let id)):
+                        return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                        
+                    case .error(let type):
+                        return switch type {
+                        case .badParam:      showToast(.topicBadParameter)
+                        case .status(let s): showToast(.topicStatus(s))
+                        case .fieldsError:   showToast(.topicFieldsError)
+                        case .sentToPremod:  showToast(.topicSentToPremoderation)
+                        }
+                        
+                    default:
+                        return .none
+                    }
+                }
+                return .none
+                
             case .pageNavigation:
                 return .none
                 
@@ -251,6 +271,12 @@ public struct ForumFeature: Reducer, Sendable {
         }
         
         Analytics()
+    }
+    
+    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
+        return .run { _ in
+            await toastClient.showToast(toast)
+        }
     }
     
     // MARK: - Shared Logic
