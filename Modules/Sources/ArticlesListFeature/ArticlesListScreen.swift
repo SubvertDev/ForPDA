@@ -14,6 +14,7 @@ import SFSafeSymbols
 public struct ArticlesListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
+    @State private var scrollProxy: ScrollViewProxy?
     
     public init(store: StoreOf<ArticlesListFeature>) {
         self.store = store
@@ -25,10 +26,17 @@ public struct ArticlesListScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                ArticlesList()
-                    .refreshable {
-                        await store.send(.onRefresh).finish()
+                ScrollViewReader { proxy in
+                    WithPerceptionTracking {
+                        ArticlesList()
+                            .refreshable {
+                                await store.send(.onRefresh).finish()
+                            }
+                            .onAppear {
+                                scrollProxy = proxy
+                            }
                     }
+                }
                 
                 if store.isLoading && store.articles.isEmpty {
                     PDALoader()
@@ -51,6 +59,11 @@ public struct ArticlesListScreen: View {
                         store.send(.linkShared(success, url))
                     }
                     .presentationDetents([.medium])
+                }
+            }
+            .onChange(of: store.shouldScrollToTop) { _ in
+                withAnimation {
+                    scrollProxy?.scrollTo(store.articles.first?.id)
                 }
             }
             .onAppear {
@@ -89,6 +102,7 @@ public struct ArticlesListScreen: View {
                             bundle: .module
                         )
                     }
+                    .id(article.id)
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
                     .listRowSeparator(.hidden)

@@ -231,10 +231,12 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
-                    #warning("not working anymore, no scrollToTop implementation")
-                    // if tab == .articlesList, state.articlesPath.isEmpty {
-                    //     state.articlesList.scrollToTop.toggle()
-                    // }
+                    if tab == .articles, state.articlesTab.path.isEmpty {
+                        // state.articlesTab.root.articles?.articlesList?.scrollToTop()
+                        return StackTab()
+                            .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
+                            .map(Action.articlesTab)
+                    }
                 } else {
                     if tab == .profile && !state.isAuthorized {
                         state.auth = AuthFeature.State(openReason: .profile)
@@ -247,15 +249,23 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // Updating favorites on tab selection
                 if state.selectedTab == .favorites && state.previousTab != .favorites {
-                    #warning("todo test if refresh is working or not")
-                    #warning("looks like its working but there's something fishy with previous tab")
+                    state.favoritesTab.path.removeAll()
+                    
                     return .concatenate(
                         removeNotifications(&state),
                         refreshFavoritesTab(&state)
                     )
                 }
                 
-                return removeNotifications(&state) // TODO: Does nothing atm
+                if state.selectedTab == .forum && state.previousTab != .forum {
+                    state.forumTab.path.removeAll()
+                }
+                
+                if state.selectedTab == .profile && state.previousTab != .profile {
+                    state.forumTab.path.removeAll()
+                }
+                
+                return removeNotifications(&state)
                 
             case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
                 state.auth = nil

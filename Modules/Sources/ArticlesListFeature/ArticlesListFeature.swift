@@ -47,7 +47,10 @@ public struct ArticlesListFeature: Reducer, Sendable {
             return articles.isEmpty && isLoading
         }
         
-        public var scrollToTop: Bool = false
+        public var shouldScrollToTop = false
+        public mutating func scrollToTop() {
+            shouldScrollToTop.toggle()
+        }
         
         var didLoadOnce = false
         
@@ -83,6 +86,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case settingsButtonTapped
         case onRefresh
         case loadMoreArticles
+        case scrollToTop
         
         case _articlesResponse(Result<[ArticlePreview], any Error>)
         
@@ -116,6 +120,10 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 
             case .linkShared:
                 state.destination = nil
+                return .none
+                
+            case .scrollToTop:
+                state.shouldScrollToTop.toggle()
                 return .none
                 
             case .onAppear:
