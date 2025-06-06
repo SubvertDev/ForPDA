@@ -1,5 +1,5 @@
 {
-  "originHash" : "c7bfba295d4dd291803d398481faefb0fdd5ba0a782d02c6ab0c81b833df59ab",
+  "originHash" : "097d1dd0481e0284ef3e8bc5cb23e8c130015b5fa794922bc9e3d218b6c8b305",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "d640df892fcb3bbeadf02b9ec28eeb682df53d24",
-        "version" : "3.25.0"
+        "revision" : "d6fde6cea4fbb2f968f116aa04572c39297a8c2b",
+        "version" : "3.26.2"
       }
     },
     {
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "6c81e671154e63464dd6749b7ba3279dd390a146",
-        "version" : "8.50.1"
+        "revision" : "930b78a63f47549c81e6e63c9172584f7d3dfdd6",
+        "version" : "8.52.1"
       }
     },
     {
@@ -177,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "b1d27a82b498b8e697acabd8cc01b585d26aab19",
-        "version" : "1.19.1"
+        "revision" : "6574de2396319a58e86e2178577268cb4aeccc30",
+        "version" : "1.20.2"
       }
     },
     {
