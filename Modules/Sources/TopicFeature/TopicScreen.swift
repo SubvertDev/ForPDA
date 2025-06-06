@@ -201,37 +201,41 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostHeader(_ post: Post) -> some View {
         HStack(spacing: 8) {
-            Button {
-                send(.userAvatarTapped(post.author.id))
-            } label: {
-                LazyImage(url: URL(string: post.author.avatarUrl)) { state in
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Image(.avatarDefault).resizable().scaledToFill()
-                    }
+            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
+                if let image = state.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    Image(.avatarDefault).resizable().scaledToFill()
                 }
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
+            }
+            .frame(width: 32, height: 32)
+            .clipShape(Circle())
+            .onTapGesture {
+                send(.userTapped(post.author.id))
             }
             
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
-                    Text(post.author.name)
-                        .font(.subheadline)
-                        .bold()
-                        .foregroundStyle(Color(.Labels.primary))
-                        .lineLimit(1)
-                    
-                    Text(String(post.author.reputationCount))
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.secondary))
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 6)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .foregroundStyle(Color(.Background.teritary))
-                        )
+                    Group {
+                        Text(post.author.name)
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(Color(.Labels.primary))
+                            .lineLimit(1)
+                        
+                        Text(String(post.author.reputationCount))
+                            .font(.caption)
+                            .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .foregroundStyle(Color(.Background.teritary))
+                            )
+                    }
+                    .onTapGesture {
+                        send(.userTapped(post.author.id))
+                    }
                     
                     Spacer()
                     

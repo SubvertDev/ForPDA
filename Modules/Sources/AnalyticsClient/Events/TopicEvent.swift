@@ -10,7 +10,7 @@ import Foundation
 public enum TopicEvent: Event {
     case onRefresh
     case topicHatOpenButtonTapped
-    case userAvatarTapped(Int)
+    case userTapped(Int)
     case urlTapped(URL)
     case imageTapped(URL)
     
@@ -35,7 +35,7 @@ public enum TopicEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let .userAvatarTapped(id),
+        case let .userTapped(id),
              let .menuPostReply(id):
             return ["userId": String(id)]
             

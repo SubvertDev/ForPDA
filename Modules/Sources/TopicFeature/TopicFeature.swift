@@ -99,7 +99,7 @@ public struct TopicFeature: Reducer, Sendable {
             case onSceneBecomeActive
             case finishedPostAnimation
             case topicHatOpenButtonTapped
-            case userAvatarTapped(Int)
+            case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
             case contextMenu(TopicContextMenuAction)
@@ -192,7 +192,7 @@ public struct TopicFeature: Reducer, Sendable {
                 state.shouldShowTopicHatButton = false
                 return .none
                 
-            case let .view(.userAvatarTapped(id)):
+            case let .view(.userTapped(id)):
                 return .send(.delegate(.openUser(id: id)))
                 
             case let .view(.urlTapped(url)):

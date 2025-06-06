@@ -38,8 +38,8 @@ extension TopicFeature {
                 case .view(.topicHatOpenButtonTapped):
                     analytics.log(TopicEvent.topicHatOpenButtonTapped)
                     
-                case let .view(.userAvatarTapped(userId: userId)):
-                    analytics.log(TopicEvent.userAvatarTapped(userId))
+                case let .view(.userTapped(userId: userId)):
+                    analytics.log(TopicEvent.userTapped(userId))
                     
                 case let .view(.urlTapped(url)):
                     analytics.log(TopicEvent.urlTapped(url))
