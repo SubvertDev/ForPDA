@@ -267,6 +267,11 @@ public struct StackTab: Reducer, Sendable {
     
     // MARK: - Deeplinks
     
+    enum DeeplinkHandlingError: Error {
+        case failedToParseSamePagePost
+        case unknownGoToType(GoTo)
+    }
+    
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
         var url = url
         
@@ -287,12 +292,25 @@ public struct StackTab: Reducer, Sendable {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
             case let .topic(id: targetId, goTo: goTo):
-                
                 if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
-                    // Same topic, using feature navigation
-                    // TODO: send goTo via action or state?
-                    state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(._load)))))
+                    if case let .post(goToId) = goTo {
+                        guard let hasPostOnTheSamePage = element.forum?.topic?.topic?.posts.map({ $0.id }).contains(goToId) else {
+                            analytics.capture(DeeplinkHandlingError.failedToParseSamePagePost)
+                            return .none
+                        }
+                        if hasPostOnTheSamePage {
+                            // Post is on the same page, scrolling to
+                            // TODO: send goTo via action or state?
+                            state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                            return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                        } else {
+                            // Post is NOT on the same page, opening new screen
+                            state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                        }
+                    } else {
+                        analytics.capture(DeeplinkHandlingError.unknownGoToType(goTo))
+                        return .none
+                    }
                 }
                 
                 // Different topic or announcement, using app navigation

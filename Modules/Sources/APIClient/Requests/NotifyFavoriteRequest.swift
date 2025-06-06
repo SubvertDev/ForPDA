@@ -14,7 +14,7 @@ public struct NotifyFavoriteRequest: Sendable {
     public let flag: Int
     public let type: FavoriteNotifyType
 
-    nonisolated(unsafe) public var transferType: MemberCommand.Favorites.Notify {
+    nonisolated public var transferType: MemberCommand.Favorites.Notify {
         switch type {
         case .always: return .always
         case .once: return .once

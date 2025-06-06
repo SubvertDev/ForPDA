@@ -131,9 +131,6 @@ public struct CommentFeature: Reducer, Sendable {
             case .writeForm:
                 return .none
                 
-            case .profileTapped:
-                return .none
-                
             case .hiddenLabelTapped:
                 state.comment.isHidden = false
                 return .none

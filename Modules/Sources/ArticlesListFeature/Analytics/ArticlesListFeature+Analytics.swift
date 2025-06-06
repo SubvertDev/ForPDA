@@ -62,7 +62,7 @@ extension ArticlesListFeature {
                 case .loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
-                case .binding, ._articlesResponse, .destination, .delegate:
+                case .binding, ._articlesResponse, .scrollToTop, .destination, .delegate:
                     break
                 }
                 return .none

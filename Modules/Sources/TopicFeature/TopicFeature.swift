@@ -66,6 +66,8 @@ public struct TopicFeature: Reducer, Sendable {
             return userSession != nil
         }
         
+        var shouldShowTopicHatButton = false
+        
         public init(
             topicId: Int,
             topicName: String? = nil,
@@ -86,28 +88,35 @@ public struct TopicFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action {
-        case onAppear
-        case onRefresh
-        case onSceneBecomeActive
-        case userAvatarTapped(Int)
-        case urlTapped(URL)
-        case finishedPostAnimation
-        case pageNavigation(PageNavigationFeature.Action)
-        case imageTapped(URL)
-        
-        case contextMenu(TopicContextMenuAction)
-        case contextPostMenu(TopicPostContextMenuAction)
-        
+    public enum Action: ViewAction {
         case destination(PresentationAction<Destination.Action>)
+        case pageNavigation(PageNavigationFeature.Action)
+
+        case view(View)
+        public enum View {
+            case onAppear
+            case onRefresh
+            case onSceneBecomeActive
+            case finishedPostAnimation
+            case topicHatOpenButtonTapped
+            case userTapped(Int)
+            case urlTapped(URL)
+            case imageTapped(URL)
+            case contextMenu(TopicContextMenuAction)
+            case contextPostMenu(TopicPostContextMenuAction)
+        }
         
-        case _load
-        case _goToPost(postId: Int, offset: Int, forceRefresh: Bool)
-        case _loadTopic(Int)
-        case _loadTypes([[TopicTypeUI]])
-        case _topicResponse(Result<Topic, any Error>)
-        case _setFavoriteResponse(Bool)
-        case _jumpRequestFailed
+        case `internal`(Internal)
+        public enum Internal {
+            case load
+            case refresh
+            case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
+            case loadTopic(Int)
+            case loadTypes([[TopicTypeUI]])
+            case topicResponse(Result<Topic, any Error>)
+            case setFavoriteResponse(Bool)
+            case jumpRequestFailed
+        }
         
         case delegate(Delegate)
         public enum Delegate {
@@ -140,37 +149,6 @@ public struct TopicFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
-                guard state.topic == nil else { return .none }
-                return .send(._load)
-                
-            case ._load:
-                switch state.goTo {
-                case .first:            return loadPage(&state)
-                case .unread:           return jumpTo(.unread, false, &state)
-                case .post(id: let id): return jumpTo(.post(id: id), false, &state)
-                case .last:             return jumpTo(.last, false, &state)
-                }
-                
-            case .onRefresh:
-                state.isRefreshing = true
-                return .run { [offset = state.pageNavigation.offset] send in
-                    await send(._loadTopic(offset))
-                }
-                
-            case .onSceneBecomeActive:
-                if state.isLoadingTopic || state.isRefreshing {
-                    return .none
-                } else {
-                    return .send(.onRefresh)
-                }
-                
-            case let .userAvatarTapped(id):
-                return .send(.delegate(.openUser(id: id)))
-                
-            case let .urlTapped(url):
-                return .send(.delegate(.handleUrl(url))) //handleUrl(url, &state)
-                
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
                 state.postId = nil
@@ -181,24 +159,46 @@ public struct TopicFeature: Reducer, Sendable {
                         }
                     },
                     .cancel(id: CancelID.loading),
-                    .send(._loadTopic(newOffset))
+                    .send(.internal(.loadTopic(newOffset)))
                 ])
-            case .destination(.presented(.writeForm(.writeFormSent(let response)))):
+                
+            case let .destination(.presented(.writeForm(.writeFormSent(response)))):
                 if case let .post(data) = response {
-                    state.postId = data.id
-                    return .send(.pageNavigation(.lastPageTapped))
-                    // TODO: https://pointfreeco.github.io/swift-composable-architecture/main/documentation/composablearchitecture/performance/#Sharing-logic-in-child-features
-                    // return reduce(into: &state, action: .pageNavigation(.lastPageTapped))
+                    return jumpTo(.post(id: data.id), true, &state)
                 }
                 return .none
                 
-            case .destination:
+            case .destination, .pageNavigation:
                 return .none
                 
-            case .pageNavigation:
+            case .view(.onAppear):
+                guard state.topic == nil else { return .none }
+                return .send(.internal(.load))
+                
+            case .view(.onRefresh):
+                return .send(.internal(.refresh))
+                
+            case .view(.onSceneBecomeActive):
+                if state.isLoadingTopic || state.isRefreshing {
+                    return .none
+                } else {
+                    return .send(.internal(.refresh))
+                }
+                
+            case .view(.topicHatOpenButtonTapped):
+                guard let topicHat = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
+                let topicHatNodes = TopicNodeBuilder(text: topicHat.content, attachments: topicHat.attachments).build()
+                state.types.insert(topicHatNodes, at: 0)
+                state.shouldShowTopicHatButton = false
                 return .none
                 
-            case .contextMenu(let action):
+            case let .view(.userTapped(id)):
+                return .send(.delegate(.openUser(id: id)))
+                
+            case let .view(.urlTapped(url)):
+                return .send(.delegate(.handleUrl(url))) //handleUrl(url, &state)
+                
+            case let .view(.contextMenu(action)):
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
@@ -224,7 +224,7 @@ public struct TopicFeature: Reducer, Sendable {
                     return .run { [id = state.topicId] send in
                         let request = SetFavoriteRequest(id: id, action: topic.isFavorite ? .delete : .add, type: .topic)
                         _ = try await apiClient.setFavorite(request)
-                        await send(._setFavoriteResponse(!topic.isFavorite))
+                        await send(.internal(.setFavoriteResponse(!topic.isFavorite)))
                         
                         #warning("toast")
                     } catch: { error, send in
@@ -235,7 +235,7 @@ public struct TopicFeature: Reducer, Sendable {
                     return .send(.pageNavigation(.lastPageTapped))
                 }
                 
-            case .contextPostMenu(let action):
+            case let .view(.contextPostMenu(action)):
                 switch action {
                 case .reply(let postId, let authorName):
                     let feature = WriteFormFeature.State(
@@ -270,7 +270,7 @@ public struct TopicFeature: Reducer, Sendable {
                     )
                 }
                 
-            case let .imageTapped(url):
+            case let .view(.imageTapped(url)):
                 guard let topic = state.topic else { fatalError() }
                 for post in topic.posts {
                     for attachment in post.attachments {
@@ -290,11 +290,25 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .finishedPostAnimation:
+            case .view(.finishedPostAnimation):
                 state.postId = nil
                 return .none.animation()
                 
-            case let ._loadTopic(offset):
+            case .internal(.load):
+                switch state.goTo {
+                case .first:            return loadPage(&state)
+                case .unread:           return jumpTo(.unread, false, &state)
+                case .post(id: let id): return jumpTo(.post(id: id), false, &state)
+                case .last:             return jumpTo(.last, false, &state)
+                }
+                
+            case .internal(.refresh):
+                state.isRefreshing = true
+                return .run { [offset = state.pageNavigation.offset] send in
+                    await send(.internal(.loadTopic(offset)))
+                }
+                
+            case let .internal(.loadTopic(offset)):
                 state.isFirstPage = offset == 0
                 if !state.isRefreshing {
                     state.isLoadingTopic = true
@@ -303,13 +317,13 @@ public struct TopicFeature: Reducer, Sendable {
                     let startTime = Date()
                     let topic = try await apiClient.getTopic(id, offset, perPage)
                     if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
-                    await send(._topicResponse(.success(topic)))
+                    await send(.internal(.topicResponse(.success(topic))))
                 } catch: { error, send in
-                    await send(._topicResponse(.failure(error)))
+                    await send(.internal(.topicResponse(.failure(error))))
                 }
                 .cancellable(id: CancelID.loading)
                 
-            case let ._topicResponse(.success(topic)):
+            case let .internal(.topicResponse(.success(topic))):
                 //customDump(topic)
                 state.topic = topic
 
@@ -338,40 +352,41 @@ public struct TopicFeature: Reducer, Sendable {
                             }
                             return types.map { $0 ?? [] }
                         }
-                        await send(._loadTypes(topicTypes))
+                        await send(.internal(.loadTypes(topicTypes)))
                     }.cancellable(id: CancelID.loading),
                     
-                    .run { [isLastPage = state.pageNavigation.isLastPage]send in
+                    .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
                             notificationCenter.send(notification: .favoritesUpdated)
                         }
                     }
                 )
                 
-            case let ._loadTypes(types):
+            case let .internal(.loadTypes(types)):
                 state.types = types
                 state.isLoadingTopic = false
                 state.isRefreshing = false
+                state.shouldShowTopicHatButton = !state.isFirstPage
                 reportFullyDisplayed(&state)
                 return .none
 //                return PageNavigationFeature()
 //                    .reduce(into: &state.pageNavigation, action: .nextPageTapped)
 //                    .map(Action.pageNavigation)
                 
-            case ._topicResponse(.failure):
+            case .internal(.topicResponse(.failure)):
                 state.isRefreshing = false
                 reportFullyDisplayed(&state)
                 return showToast(.whoopsSomethingWentWrong)
                 
-            case let ._setFavoriteResponse(isFavorite):
+            case let .internal(.setFavoriteResponse(isFavorite)):
                 state.topic?.isFavorite = isFavorite
                 notificationCenter.send(.favoritesUpdated)
                 return .none
                 
-            case ._jumpRequestFailed:
+            case .internal(.jumpRequestFailed):
                 return showToast(.whoopsSomethingWentWrong)
                 
-            case let ._goToPost(postId: postId, offset: offset, forceRefresh):
+            case let .internal(.goToPost(postId: postId, offset: offset, forceRefresh)):
                 state.postId = postId
                 if !forceRefresh && offset == state.pageNavigation.offset && state.topic != nil {
                     // If we have this post on the same page without force refresh, don't reload
@@ -395,7 +410,7 @@ public struct TopicFeature: Reducer, Sendable {
         return .concatenate(
             updatePageNavigation(&state, offset: offset ?? state.initialOffset),
             .cancel(id: CancelID.loading),
-            .send(._loadTopic(offset ?? state.initialOffset))
+            .send(.internal(.loadTopic(offset ?? state.initialOffset)))
         )
     }
     
@@ -426,9 +441,9 @@ public struct TopicFeature: Reducer, Sendable {
             let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
             let offset = response.offset - (response.offset % topicPerPage)
-            await send(._goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh))
+            await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
         } catch: { error, send in
-            await send(._jumpRequestFailed)
+            await send(.internal(.jumpRequestFailed))
         }
     }
     
