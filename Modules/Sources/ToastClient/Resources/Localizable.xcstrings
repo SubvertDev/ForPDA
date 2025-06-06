@@ -51,6 +51,56 @@
         }
       }
     },
+    "The server refused to create the topic (invalid parameter)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер отказал в создании темы (неверный параметр)"
+          }
+        }
+      }
+    },
+    "There were errors in filling out the form" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При заполнении формы допущены ошибки"
+          }
+        }
+      }
+    },
+    "Topic sending error. Status %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка создания темы. Статус %lld"
+          }
+        }
+      }
+    },
+    "Topic sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема создана"
+          }
+        }
+      }
+    },
+    "Topic sent to pre-moderation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема отправлена на премодерацию"
+          }
+        }
+      }
+    },
     "Whoops, something went wrong.." : {
       "localizations" : {
         "ru" : {

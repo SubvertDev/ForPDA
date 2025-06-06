@@ -120,7 +120,10 @@ public struct ForumFeature: Reducer, Sendable {
                 if case let .template(status) = response {
                     switch status {
                     case .success(.topic(let id)):
-                        return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                        return .merge([
+                            showToast(.topicSent),
+                            .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                        ])
                         
                     case .error(let type):
                         return switch type {
