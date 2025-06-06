@@ -117,6 +117,16 @@
         }
       }
     },
+    "Topic Hat" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шапка темы"
+          }
+        }
+      }
+    },
     "Write Post" : {
       "localizations" : {
         "ru" : {

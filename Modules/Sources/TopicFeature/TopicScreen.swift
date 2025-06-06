@@ -156,10 +156,15 @@ public struct TopicScreen: View {
         ForEach(topic.posts, id: \.id) { post in
             WithPerceptionTracking {
                 VStack(spacing: 0) {
-                    if !store.isFirstPage && topic.posts.first == post {
-                        // TODO: Add expandable head topic
-//                        Text("Шапка Темы")
-//                            .padding(16)
+                    if store.shouldShowTopicHatButton && topic.posts.first == post {
+                        Button {
+                            send(.topicHatOpenButtonTapped)
+                        } label: {
+                            Text("Topic Hat", bundle: .module)
+                                .font(.headline)
+                                .bold()
+                                .padding(16)
+                        }
                     } else {
                         Post(post)
                             .padding(.horizontal, 16)

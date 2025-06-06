@@ -66,6 +66,8 @@ public struct TopicFeature: Reducer, Sendable {
             return userSession != nil
         }
         
+        var shouldShowTopicHatButton = false
+        
         public init(
             topicId: Int,
             topicName: String? = nil,
@@ -95,9 +97,10 @@ public struct TopicFeature: Reducer, Sendable {
             case onAppear
             case onRefresh
             case onSceneBecomeActive
+            case finishedPostAnimation
+            case topicHatOpenButtonTapped
             case userAvatarTapped(Int)
             case urlTapped(URL)
-            case finishedPostAnimation
             case imageTapped(URL)
             case contextMenu(TopicContextMenuAction)
             case contextPostMenu(TopicPostContextMenuAction)
@@ -181,6 +184,13 @@ public struct TopicFeature: Reducer, Sendable {
                 } else {
                     return .send(.internal(.refresh))
                 }
+                
+            case .view(.topicHatOpenButtonTapped):
+                guard let topicHat = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
+                let topicHatNodes = TopicNodeBuilder(text: topicHat.content, attachments: topicHat.attachments).build()
+                state.types.insert(topicHatNodes, at: 0)
+                state.shouldShowTopicHatButton = false
+                return .none
                 
             case let .view(.userAvatarTapped(id)):
                 return .send(.delegate(.openUser(id: id)))
@@ -345,7 +355,7 @@ public struct TopicFeature: Reducer, Sendable {
                         await send(.internal(.loadTypes(topicTypes)))
                     }.cancellable(id: CancelID.loading),
                     
-                    .run { [isLastPage = state.pageNavigation.isLastPage]send in
+                    .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
                             notificationCenter.send(notification: .favoritesUpdated)
                         }
@@ -356,6 +366,7 @@ public struct TopicFeature: Reducer, Sendable {
                 state.types = types
                 state.isLoadingTopic = false
                 state.isRefreshing = false
+                state.shouldShowTopicHatButton = !state.isFirstPage
                 reportFullyDisplayed(&state)
                 return .none
 //                return PageNavigationFeature()

@@ -35,6 +35,9 @@ extension TopicFeature {
                 case .view(.onRefresh):
                     analytics.log(TopicEvent.onRefresh)
                     
+                case .view(.topicHatOpenButtonTapped):
+                    analytics.log(TopicEvent.topicHatOpenButtonTapped)
+                    
                 case let .view(.userAvatarTapped(userId: userId)):
                     analytics.log(TopicEvent.userAvatarTapped(userId))
                     
