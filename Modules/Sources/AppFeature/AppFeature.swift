@@ -262,7 +262,7 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 
                 if state.selectedTab == .profile && state.previousTab != .profile {
-                    state.forumTab.path.removeAll()
+                    state.profileTab.path.removeAll()
                 }
                 
                 return removeNotifications(&state)
