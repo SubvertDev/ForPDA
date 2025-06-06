@@ -14,7 +14,7 @@ public struct JumpForumRequest {
     public let allPosts: Bool
     public let type: ForumJumpType
     
-    nonisolated(unsafe) public var transferType: ForumJumpRequest.JumpType {
+    nonisolated public var transferType: ForumJumpRequest.JumpType {
         switch type {
         case .last: return .last
         case .new: return .new
