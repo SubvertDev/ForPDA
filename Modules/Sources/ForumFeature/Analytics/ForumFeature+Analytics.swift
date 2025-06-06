@@ -19,7 +19,7 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear, .pageNavigation, .delegate:
+                case .onAppear, .pageNavigation, .writeForm, .delegate:
                     break
                     
                 case .onRefresh:
@@ -39,6 +39,8 @@ extension ForumFeature {
                     
                 case let .contextOptionMenu(option):
                     switch option {
+                    case .createTopic:
+                        break // TODO: Add
                     case .sort:
                         break // TODO: Add
                     case .toBookmarks:

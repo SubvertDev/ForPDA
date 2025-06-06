@@ -14,6 +14,7 @@ public enum WriteFormFieldType: Sendable, Equatable, Hashable {
     case checkboxList(FormField, _ options: [String])
 
     public struct FormField: Sendable, Equatable, Hashable {
+        public let id: Int
         public let name: String
         public let description: String
         public let example: String
@@ -29,12 +30,14 @@ public enum WriteFormFieldType: Sendable, Equatable, Hashable {
         }
         
         public init(
+            id: Int,
             name: String,
             description: String,
             example: String,
             flag: Int,
             defaultValue: String
         ) {
+            self.id = id
             self.name = name
             self.description = description
             self.example = example
@@ -50,6 +53,7 @@ public extension WriteFormFieldType {
     
     static let mockText: WriteFormFieldType = .text(
         FormField(
+            id: 0,
             name: "Topic name",
             description: "Enter topic name.",
             example: "Starting from For, ends with PDA",
@@ -60,6 +64,7 @@ public extension WriteFormFieldType {
     
     static let mockEditor: WriteFormFieldType = .editor(
         FormField(
+            id: 0,
             name: "Topic content",
             description: "This field contains topic [color=red]hat[/color] content.",
             example: "ForPDA Forever!",
@@ -70,6 +75,7 @@ public extension WriteFormFieldType {
     
     static let mockEditorSimple: WriteFormFieldType = .editor(
         FormField(
+            id: 0,
             name: "",
             description: "",
             example: "Post text...",

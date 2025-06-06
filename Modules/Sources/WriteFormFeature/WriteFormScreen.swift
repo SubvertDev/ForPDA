@@ -65,7 +65,7 @@ public struct WriteFormScreen: View {
                             .font(.body)
                             .frame(width: 34, height: 22)
                     }
-                    .disabled(store.textContent.isEmptyAfterTrimming())
+                    .disabled(store.isSubmitDisabled)
                     .disabled(store.isPublishing)
                 }
             }
@@ -83,11 +83,11 @@ public struct WriteFormScreen: View {
                     VStack {
                         WriteFormView(
                             type: store.formFields[index],
-                            onUpdateContent: { content in
-                                if content != nil {
-                                    store.send(.updateFieldContent(index, content!))
-                                }
-                                return store.textContent
+                            onUpdateContent: { fieldId, data in
+                                store.send(.updateContent(fieldId, data))
+                            },
+                            onFetchContent: { fieldId in
+                                store.content[fieldId] ?? nil
                             }
                         )
                     }
@@ -119,7 +119,7 @@ public struct WriteFormScreen: View {
         }
         .buttonStyle(.borderedProminent)
         .frame(height: 48)
-        .disabled(store.textContent.isEmptyAfterTrimming())
+        .disabled(store.isSubmitDisabled)
         .disabled(store.isPublishing)
         
         Spacer()

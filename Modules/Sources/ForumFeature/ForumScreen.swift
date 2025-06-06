@@ -11,6 +11,7 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
+import WriteFormFeature
 
 public struct ForumScreen: View {
     
@@ -58,6 +59,11 @@ public struct ForumScreen: View {
             .animation(.default, value: store.forum)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             .navigationBarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
+                NavigationStack {
+                    WriteFormScreen(store: store)
+                }
+            }
             .toolbar {
                 OptionsMenu()
             }
@@ -73,6 +79,14 @@ public struct ForumScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             if let forum = store.forum {
+                if forum.canCreateTopic {
+                    Section {
+                        ContextButton(text: "Create Topic", symbol: .plusCircle, bundle: .module) {
+                            store.send(.contextOptionMenu(.createTopic))
+                        }
+                    }
+                }
+                
                 CommonContextMenu(
                     id: forum.id,
                     isFavorite: forum.isFavorite,

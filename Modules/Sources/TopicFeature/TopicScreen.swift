@@ -105,6 +105,12 @@ public struct TopicScreen: View {
                     ContextButton(text: "Write Post", symbol: .plusCircle, bundle: .module) {
                         send(.contextMenu(.writePost))
                     }
+                    
+                    if let postTemplate = topic.postTemplateName {
+                        ContextButton(text: LocalizedStringKey(postTemplate), symbol: .plusApp, bundle: .module) {
+                            send(.contextMenu(.writePostWithTemplate))
+                        }
+                    }
                 }
             }
             

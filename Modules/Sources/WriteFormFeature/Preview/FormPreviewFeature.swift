@@ -19,7 +19,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
     // MARK: - State
     
     @ObservableState
-    public struct State: Equatable {
+    public struct State: Equatable, Sendable {
         public let formType: WriteFormForType
         
         var contentTypes: [TopicTypeUI] = []
@@ -40,8 +40,9 @@ public struct FormPreviewFeature: Reducer, Sendable {
         
         case cancelButtonTapped
         
+        case _loadPreview(id: Int, content: String)
         case _loadSimplePreview(id: Int, content: String, attIds: [Int])
-        case _simplePreviewResponse(Result<PostPreview, any Error>)
+        case _previewResponse(Result<PostPreview, any Error>)
     }
     
     // MARK: - Dependencies
@@ -55,44 +56,61 @@ public struct FormPreviewFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                if case let .post(_, topicId, contentType) = state.formType {
+                switch state.formType {
+                case .topic(let forumId, let content):
+                    return .send(._loadPreview(id: forumId, content: content))
+                    
+                case .post(_, let topicId, let contentType):
                     switch contentType {
                     case .simple(let content, let attachments):
                         return .send(._loadSimplePreview(id: topicId, content: content, attIds: attachments))
                         
-                    // TODO: Think about correct type. Should be Any?
-                    case .template(_): return .none
+                    case .template(let content):
+                        return .send(._loadPreview(id: topicId, content: content))
                     }
+                    
+                case .report(_, _):
+                    // handling as .post
+                    break
                 }
                 return .none
                 
             case .cancelButtonTapped:
                 return .run { _ in await dismiss() }
-
+                
+            case let ._loadPreview(id, content):
+                state.isPreviewLoading = true
+                return .run { [isTopic = state.formType.isTopic] send in
+                    let result = await Result { try await apiClient.previewTemplate(
+                        id: id,
+                        content: content,
+                        isTopic: isTopic
+                    )}
+                    await send(._previewResponse(result))
+                } catch: { error, send in
+                    await send(._previewResponse(.failure(error)))
+                }
+            
             case let ._loadSimplePreview(id, content, attachments):
                 state.isPreviewLoading = true
-                return .run { [
-                    topicId = id,
-                    content = content,
-                    attachments = attachments
-                ] send in
+                return .run { send in
                     let result = await Result { try await apiClient.previewPost(
                         request: PostPreviewRequest(
                             id: 0, // TODO: until we not adding support to edit post.
                             post: PostRequest(
-                                topicId: topicId,
+                                topicId: id,
                                 content: content,
                                 flag: 0,
                                 attachments: attachments
                             )
                         )
                     )}
-                    await send(._simplePreviewResponse(result))
+                    await send(._previewResponse(result))
                 } catch: { error, send in
-                    await send(._simplePreviewResponse(.failure(error)))
+                    await send(._previewResponse(.failure(error)))
                 }
                 
-            case let ._simplePreviewResponse(.success(preview)):
+            case let ._previewResponse(.success(preview)):
                 state.contentTypes = TopicNodeBuilder(
                     text: preview.content, attachments: []
                 ).build()
@@ -103,7 +121,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
                 
                 return .none
                 
-            case let ._simplePreviewResponse(.failure(error)):
+            case let ._previewResponse(.failure(error)):
                 // TODO: Toast?
                 print(error)
                 return .send(.cancelButtonTapped)

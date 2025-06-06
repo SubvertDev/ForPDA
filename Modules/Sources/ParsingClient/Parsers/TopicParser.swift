@@ -33,7 +33,8 @@ public struct TopicParser {
               let curatorName = array[safe: 11] as? String,
               let poll = array[safe: 12] as? [Any],
               let postsCount = array[safe: 13] as? Int,
-              let posts = array[safe: 14] as? [[Any]] else {
+              let posts = array[safe: 14] as? [[Any]],
+              let postTemplates = array[safe: 15] as? [String] else {
             throw ParsingError.failedToCastFields
         }
         
@@ -50,7 +51,8 @@ public struct TopicParser {
             poll: try parsePoll(poll),
             postsCount: postsCount,
             posts: try parsePosts(posts),
-            navigation: ForumParser.parseNavigation(navigation)
+            navigation: ForumParser.parseNavigation(navigation),
+            postTemplateName: !postTemplates.isEmpty ? postTemplates[safe: 0] : nil
         )
     }
     

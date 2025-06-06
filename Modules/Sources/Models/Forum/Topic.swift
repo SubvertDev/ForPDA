@@ -21,6 +21,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let postsCount: Int
     public let posts: [Post]
     public let navigation: [ForumInfo]
+    public let postTemplateName: String?
     
     public var canPost: Bool {
         return (flag & 64) != 0 && (flag & 16) == 0
@@ -79,7 +80,8 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         poll: Poll?,
         postsCount: Int,
         posts: [Post],
-        navigation: [ForumInfo]
+        navigation: [ForumInfo],
+        postTemplateName: String?
     ) {
         self.id = id
         self.name = name
@@ -94,6 +96,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         self.postsCount = postsCount
         self.posts = posts
         self.navigation = navigation
+        self.postTemplateName = postTemplateName
         
         self.isFavorite = (flag & 8) != 0
     }
@@ -130,6 +133,7 @@ public extension Topic {
         ],
         navigation: [
             ForumInfo(id: 1, name: "iOS - Apps", flag: 32)
-        ]
+        ],
+        postTemplateName: "New update"
     )
 }

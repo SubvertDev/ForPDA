@@ -47,7 +47,9 @@ public struct APIClient: Sendable {
     public var markReadForum: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
-    public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
+    public var getTemplate: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> [WriteFormFieldType]
+    public var previewTemplate: @Sendable (_ id: Int, _ content: String, _ isTopic: Bool) async throws -> PostPreview
+    public var sendTemplate: @Sendable (_ id: Int, _ content: String, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSend
@@ -231,13 +233,29 @@ extension APIClient: DependencyKey {
                 let response = try await api.get(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
-            getTemplate: { request, isTopic in
+            getTemplate: { id, isTopic in
                 let command = ForumCommand.template(
-                    type: isTopic ? .topic(forumId: request.id) : .post(topicId: request.id),
-                    action: request.action.transferType
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .get
                 )
                 let response = try await api.get(command)
                 return try await parser.parseWriteForm(response)
+            },
+            previewTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .preview(content)
+                )
+                let response = try await api.get(command)
+                return try await parser.parseTemplatePreview(response: response)
+            },
+            sendTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .send(content)
+                )
+                let response = try await api.get(command)
+                return try await parser.parseTemplateSend(response: response)
             },
 			getHistory: { offset, perPage in
                 let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
@@ -444,6 +462,12 @@ extension APIClient: DependencyKey {
             },
             getTemplate: { _, _ in
                 return [.mockTitle, .mockText, .mockEditor]
+            },
+            previewTemplate: { _, _, _ in
+                return PostPreview(content: "Builded", attachmentIds: [])
+            },
+            sendTemplate: { _, _, isTopic in
+                return .success(isTopic ? .topic(id: 0) : .post(PostSend(id: 0, topicId: 1, offset: 2)))
             },
 			getHistory: { _, _ in
                 return .mock

@@ -212,6 +212,17 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .writeForm(feature)
                     return .none
                     
+                case .writePostWithTemplate:
+                    let feature = WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new,
+                            topicId: topic.id,
+                            content: .template("")
+                        )
+                    )
+                    state.destination = .writeForm(feature)
+                    return .none
+                    
                 case .openInBrowser:
                     let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
                     return .run { _ in await open(url: url) }

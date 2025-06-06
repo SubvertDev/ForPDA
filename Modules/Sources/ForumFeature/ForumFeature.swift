@@ -15,6 +15,7 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
+import WriteFormFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -27,6 +28,7 @@ public struct ForumFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        @Presents var writeForm: WriteFormFeature.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -68,6 +70,8 @@ public struct ForumFeature: Reducer, Sendable {
         case contextOptionMenu(ForumOptionContextMenuAction)
         case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
         case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
+        
+        case writeForm(PresentationAction<WriteFormFeature.Action>)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -115,6 +119,9 @@ public struct ForumFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
+            case .writeForm:
+                return .none
+                
             case let ._loadForum(offset):
                 if !state.isRefreshing {
                     state.isLoadingTopics = true
@@ -131,6 +138,15 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .contextOptionMenu(let action):
                 switch action {
+                case .createTopic:
+                    state.writeForm = WriteFormFeature.State(
+                        formFor: .topic(
+                            forumId: state.forumId,
+                            content: ""
+                        )
+                    )
+                    return .none
+                    
                     // TODO: sort, to bookmarks
                     // TODO: Add analytics
                 default: return .none
@@ -229,6 +245,9 @@ public struct ForumFeature: Reducer, Sendable {
             case .delegate:
                 return .none
             }
+        }
+        .ifLet(\.$writeForm, action: \.writeForm) {
+            WriteFormFeature()
         }
         
         Analytics()

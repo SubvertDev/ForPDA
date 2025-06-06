@@ -15,17 +15,17 @@ struct WriteFormView: View {
     
     let type: WriteFormFieldType
     
-    let onUpdateContent: (String?) -> String // (String) -> Void?,
-    let onUpdateSelection: ((Int, String, Bool) -> Void)?
+    let onUpdateContent: (_ fieldId: Int, _ data: FormContentData) -> Void
+    let onFetchContent: (_ fieldId: Int) -> FormContentData?
     
     init(
         type: WriteFormFieldType,
-        onUpdateContent: @escaping (String?) -> String,
-        onUpdateSelection: ((Int, String, Bool) -> Void)? = nil
+        onUpdateContent: @escaping (Int, FormContentData) -> Void,
+        onFetchContent: @escaping (Int) -> FormContentData?
     ) {
         self.type = type
         self.onUpdateContent = onUpdateContent
-        self.onUpdateSelection = onUpdateSelection
+        self.onFetchContent = onFetchContent
     }
 
     var body: some View {
@@ -34,8 +34,8 @@ struct WriteFormView: View {
             Section {
                 Field(
                     text: Binding(
-                        get: { onUpdateContent(nil) },
-                        set: { _ = onUpdateContent($0) }
+                        get: { getTextFieldContent(fieldId: content.id) },
+                        set: { onUpdateContent(content.id, .text($0)) }
                     ),
                     description: content.description,
                     guideText: content.example
@@ -67,8 +67,8 @@ struct WriteFormView: View {
             Section {
                 Field(
                     text: Binding(
-                        get: { onUpdateContent(nil) },
-                        set: { _ = onUpdateContent($0) }
+                        get: { getTextFieldContent(fieldId: content.id) },
+                        set: { onUpdateContent(content.id, .text($0)) }
                     ),
                     description: content.description,
                     guideText: content.example,
@@ -85,15 +85,14 @@ struct WriteFormView: View {
                 VStack {
                     HStack {
                         Menu {
-                            ForEach(options, id: \.self) { option in
-                                // TODO: Implement Button
+                            ForEach(options.indices, id: \.hashValue) { index in
                                 Button {
-                                    // callback
-                                } label: { Text(option) }
+                                    onUpdateContent(content.id, .dropdown(index, options[index]))
+                                } label: { Text(options[index]) }
                             }
                         } label: {
                             HStack {
-                                Text(options[0]) // FIXME: Fix.
+                                Text(getDropdownSelectedName(fieldId: content.id))
                                     .foregroundStyle(Color(.Labels.primary))
                                     .padding(.leading, 16)
                                 
@@ -125,12 +124,11 @@ struct WriteFormView: View {
         case .checkboxList(let content, let options):
             Section {
                 VStack(spacing: 6) {
-                    ForEach(options.indices, id: \.self) { index in
+                    ForEach(options.indices, id: \.hashValue) { index in
                         Toggle(isOn: Binding(
-                            // FIXME: Now all checkboxes always false. Find the solution with getter.
-                            get: { false },
+                            get: { isCheckBoxSelected(fieldId: content.id, checkboxId: index) },
                             set: { isSelected in
-                                onUpdateSelection?(index, options[index], isSelected)
+                                onUpdateContent(content.id, .checkbox([index: isSelected]))
                             }
                         )) {
                             Text(options[index])
@@ -226,6 +224,29 @@ struct WriteFormView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+}
+
+// MARK: - Helpers
+
+private extension WriteFormView {
+    
+    func getTextFieldContent(fieldId: Int) -> String {
+        return if case .text(let content) = onFetchContent(fieldId) {
+            content
+        } else { "" }
+    }
+    
+    func getDropdownSelectedName(fieldId: Int) -> String {
+        return if case .dropdown(_, let name) = onFetchContent(fieldId) {
+            name
+        } else { "" }
+    }
+    
+    func isCheckBoxSelected(fieldId: Int, checkboxId: Int) -> Bool {
+        return if case .checkbox(let data) = onFetchContent(fieldId) {
+            data[checkboxId] ?? false
+        } else { false }
     }
 }
 
@@ -333,13 +354,20 @@ struct Field: View {
 
 #Preview("Write Form Text Preview") {
     VStack {
-        WriteFormView(type: .text(.init(
-            name: "Topic name",
-            description: "Set the topic name with some logic.",
-            example: "Example: How I can do not love ForPDA?",
-            flag: 1,
-            defaultValue: ""
-        )), onUpdateContent: { _ in "" })
+        WriteFormView(
+            type: .text(
+                .init(
+                    id: 0,
+                    name: "Topic name",
+                    description: "Set the topic name with some logic.",
+                    example: "Example: How I can do not love ForPDA?",
+                    flag: 1,
+                    defaultValue: ""
+                )
+            ),
+            onUpdateContent: { _, _ in },
+            onFetchContent: { _ in .text("Some basic text") }
+        )
         
         Color.white
     }
@@ -350,9 +378,11 @@ struct Field: View {
 
 #Preview("Write Form Title Preview") {
     VStack {
-        WriteFormView(type: .title(
-            "[b]Absolute simple.[/b]"
-        ), onUpdateContent: { _ in "" })
+        WriteFormView(
+            type: .title("[b]Absolute simple.[/b]"),
+            onUpdateContent: { _, _ in },
+            onFetchContent: { _ in nil }
+        )
         
         Color.white
     }
@@ -363,13 +393,20 @@ struct Field: View {
 
 #Preview("Write Form Editor Preview") {
     VStack {
-        WriteFormView(type: .editor(.init(
-            name: "Topic name",
-            description: "Set the topic name with some logic.",
-            example: "Example: How I can do not love ForPDA?",
-            flag: 1,
-            defaultValue: ""
-        )), onUpdateContent: { _ in "" })
+        WriteFormView(
+            type: .editor(
+                .init(
+                    id: 0,
+                    name: "Topic name",
+                    description: "Set the topic name with some logic.",
+                    example: "Example: How I can do not love ForPDA?",
+                    flag: 1,
+                    defaultValue: ""
+                )
+            ),
+            onUpdateContent: { _, _ in },
+            onFetchContent: { _ in .text("Some editor text") }
+        )
         
         Color.white
     }
@@ -380,13 +417,21 @@ struct Field: View {
 
 #Preview("Write Form Dropdown Preview") {
     VStack {
-        WriteFormView(type: .dropdown(.init(
-            name: "Device type",
-            description: "Select device type.",
-            example: "Example: Phone",
-            flag: 1,
-            defaultValue: ""
-        ), ["Phone", "SmartWatch"]), onUpdateContent: { _ in "" })
+        WriteFormView(
+            type: .dropdown(
+                .init(
+                    id: 0,
+                    name: "Device type",
+                    description: "Select device type.",
+                    example: "Example: Phone",
+                    flag: 1,
+                    defaultValue: ""
+                ),
+                ["Phone", "SmartWatch"]
+            ),
+            onUpdateContent: { _, _ in },
+            onFetchContent: { _ in .dropdown(0, "Phone") }
+        )
         
         Color.white
     }
@@ -397,13 +442,21 @@ struct Field: View {
 
 #Preview("Write Form CheckBox Preview") {
     VStack {
-        WriteFormView(type: .checkboxList(.init(
-            name: "",
-            description: "",
-            example: "",
-            flag: 1,
-            defaultValue: ""
-        ), ["I accept all"]), onUpdateContent: { _ in "" })
+        WriteFormView(
+            type: .checkboxList(
+                .init(
+                    id: 0,
+                    name: "",
+                    description: "",
+                    example: "",
+                    flag: 1,
+                    defaultValue: ""
+                ),
+                ["I accept all"]
+            ),
+            onUpdateContent: { _, _ in },
+            onFetchContent: { _ in .checkbox([0: true]) }
+        )
         
         Color.white
     }
@@ -414,13 +467,21 @@ struct Field: View {
 
 #Preview("Write Form UploadBox Preview") {
     VStack {
-        WriteFormView(type: .uploadbox(.init(
-            name: "Device photos",
-            description: "Upload device photos. Allowed formats JPG, GIF, PNG",
-            example: "",
-            flag: 1,
-            defaultValue: ""
-        ), ["jpg", "gif", "png"]), onUpdateContent: { _ in "" })
+        WriteFormView(
+            type: .uploadbox(
+                .init(
+                    id: 0,
+                    name: "Device photos",
+                    description: "Upload device photos. Allowed formats JPG, GIF, PNG",
+                    example: "",
+                    flag: 1,
+                    defaultValue: ""
+                ),
+                ["jpg", "gif", "png"]
+            ),
+            onUpdateContent: { _, _ in },
+            onFetchContent: { _ in .uploadbox([]) }
+        )
         
         Color.white
     }

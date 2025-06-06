@@ -6,6 +6,7 @@
 //
 
 public enum ForumOptionContextMenuAction {
+    case createTopic
     case sort
     case toBookmarks
 }
