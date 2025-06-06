@@ -117,6 +117,16 @@
         }
       }
     },
+    "Today, %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
     "Topic Hat" : {
       "localizations" : {
         "ru" : {
@@ -133,6 +143,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Написать пост"
+          }
+        }
+      }
+    },
+    "Yesterday, %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчера, %@"
           }
         }
       }

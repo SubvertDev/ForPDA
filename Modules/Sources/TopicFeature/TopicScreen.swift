@@ -253,7 +253,7 @@ public struct TopicScreen: View {
                     
                     Spacer()
                     
-                    Text(post.createdAt.formatted())
+                    Text(post.createdAt.formattedDate(), bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.quaternary))
                         .frame(maxHeight: .infinity, alignment: .bottom)
@@ -356,6 +356,25 @@ public struct TopicScreen: View {
                 try? await Task.sleep(for: .seconds(duration))
                 send(.finishedPostAnimation)
             }
+        }
+    }
+}
+
+// MARK: - Extensions
+
+// TODO: Move to extensions?
+private extension Date {
+    func formattedDate() -> LocalizedStringKey {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        
+        if Calendar.current.isDateInToday(self) {
+            return LocalizedStringKey("Today, \(formatter.string(from: self))")
+        } else if Calendar.current.isDateInYesterday(self) {
+            return LocalizedStringKey("Yesterday, \(formatter.string(from: self))")
+        } else {
+            formatter.dateFormat = "dd.MM.yy, HH:mm"
+            return LocalizedStringKey(formatter.string(from: self))
         }
     }
 }
