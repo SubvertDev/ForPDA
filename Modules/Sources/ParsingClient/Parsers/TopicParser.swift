@@ -8,7 +8,6 @@
 import Foundation
 import Models
 import ComposableArchitecture
-import AnalyticsClient
 
 public struct TopicParser {
     
