@@ -15,6 +15,9 @@ public enum ParsingError: Error {
 //    case notEnoughDataToParse
     case failedToCastFields
     
+    // Post send
+    case unknownStatus(Int)
+    
     // Topic
     case unknownAttachmentType(Int)
     case failedToCreateAttachmentMetadataUrl

@@ -50,8 +50,8 @@ public struct APIClient: Sendable {
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
-    public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSend
-    public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSend
+    public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
+    public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
     
     // Favorites
@@ -261,7 +261,7 @@ extension APIClient: DependencyKey {
                     flag: request.flag
                 ))
                 let response = try await api.get(command)
-                return try await parser.parsePostSend(response)
+                return try await parser.parsePostSendResponse(response)
             },
             editPost: { request in
                 let command = ForumCommand.Post.edit(
@@ -275,7 +275,7 @@ extension APIClient: DependencyKey {
                     reason: request.reason
                 )
                 let response = try await api.get(command)
-                return try await parser.parsePostSend(response)
+                return try await parser.parsePostSendResponse(response)
 			},
             deletePosts: { ids in
                 let command = ForumCommand.Post.delete(postIds: ids)
@@ -455,10 +455,10 @@ extension APIClient: DependencyKey {
                 )
             },
             sendPost: { _ in
-                return PostSend(id: 0, topicId: 1, offset: 2)
+                return .success(PostSend(id: 0, topicId: 1, offset: 2))
             },
             editPost: { _ in
-                return PostSend(id: 0, topicId: 1, offset: 2)
+                return .success(PostSend(id: 0, topicId: 1, offset: 2))
 			},
             deletePosts: { _ in
                 return true

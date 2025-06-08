@@ -72,11 +72,13 @@ public struct TopicFeature: Reducer, Sendable {
             topicId: Int,
             topicName: String? = nil,
             initialOffset: Int = 0, // TODO: Not needed anymore?
-            goTo: GoTo = .first
+            goTo: GoTo = .first,
+            destination: Destination.State? = nil
         ) {
             self.topicId = topicId
             self.topicName = topicName
             self.goTo = goTo
+            self.destination = destination
             
             // If we open this screen with Go To End usage then we can get offset like 99
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
@@ -163,8 +165,9 @@ public struct TopicFeature: Reducer, Sendable {
                 ])
                 
             case let .destination(.presented(.writeForm(.writeFormSent(response)))):
-                if case let .post(data) = response {
-                    return jumpTo(.post(id: data.id), true, &state)
+                if case let .post(data) = response,
+                   case let .success(post) = data {
+                    return jumpTo(.post(id: post.id), true, &state)
                 }
                 return .none
                 

@@ -18,3 +18,7 @@ public struct UserSession: Sendable, Equatable, Codable {
         self.isHidden = isHidden
     }
 }
+
+public extension UserSession {
+    static let mock = UserSession(userId: 0, token: "", isHidden: false)
+}

@@ -32,11 +32,6 @@ public struct WriteFormScreen: View {
                 .padding(.horizontal, 16)
                 .background(Color(.Background.primary))
                 .navigationBarTitleDisplayMode(.inline)
-                .sheet(item: $store.scope(state: \.preview, action: \.preview)) { store in
-                    NavigationStack {
-                        FormPreviewView(store: store)
-                    }
-                }
                 .overlay {
                     if store.formFields.isEmpty || store.isFormLoading {
                         PDALoader()
@@ -45,8 +40,15 @@ public struct WriteFormScreen: View {
                 }
             }
             .disabled(store.isPublishing)
+            .animation(.default, value: store.isPublishing)
             .animation(.default, value: store.isEditReasonToggleSelected)
             .animation(.default, value: store.isShowMarkToggleSelected)
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .sheet(item: $store.scope(state: \.destination?.preview, action: \.destination.preview)) { store in
+                NavigationStack {
+                    FormPreviewView(store: store)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -202,7 +204,7 @@ private extension String {
             } withDependencies: {
                 $0.apiClient.sendPost = { _ in
                     try await Task.sleep(for: .seconds(3))
-                    return PostSend(id: 0, topicId: 0, offset: 0)
+                    return .success(PostSend(id: 0, topicId: 0, offset: 0))
                 }
             }
         )
@@ -226,10 +228,14 @@ private extension String {
             } withDependencies: {
                 $0.apiClient.sendPost = { _ in
                     try await Task.sleep(for: .seconds(3))
-                    return PostSend(id: 0, topicId: 0, offset: 0)
+                    return .success(PostSend(id: 0, topicId: 0, offset: 0))
                 }
             }
         )
         .tint(Color(.Theme.primary))
     }
+}
+
+#Preview("Failure statuses") {
+    Text("Failure statuses located in TopicScreen")
 }

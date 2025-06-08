@@ -70,17 +70,7 @@ public struct TopicScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
-            .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
-                NavigationStack {
-                    WriteFormScreen(store: store)
-                }
-            }
-            .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                let state = store.withState { $0 }
-                TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
-            }
+            .navigations(store: store)
             .toolbar { OptionsMenu() }
             .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
             .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
@@ -360,6 +350,38 @@ public struct TopicScreen: View {
     }
 }
 
+// MARK: - Navigation Modifier
+
+struct NavigationModifier: ViewModifier {
+    
+    @Perception.Bindable private var store: StoreOf<TopicFeature>
+    
+    init(store: StoreOf<TopicFeature>) {
+        self.store = store
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+            .navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                NavigationStack {
+                    WriteFormScreen(store: store)
+                }
+            }
+            .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
+                let state = store.withState { $0 }
+                TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+            }
+    }
+}
+
+extension View {
+    func navigations(store: StoreOf<TopicFeature>) -> some View {
+        self.modifier(NavigationModifier(store: store))
+    }
+}
+
 // MARK: - Extensions
 
 // TODO: Move to extensions?
@@ -382,7 +404,7 @@ private extension Date {
 // MARK: - Previews
 
 #Preview {
-    @Shared(.userSession) var userSession = UserSession(userId: 0, token: "", isHidden: false)
+    @Shared(.userSession) var userSession = UserSession.mock
     
     TopicScreen(
         store: Store(
@@ -392,6 +414,72 @@ private extension Date {
         } withDependencies: {
             $0.apiClient.getTopic = { @Sendable _, _, _ in
                 return .mock
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("New post requests attach") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postSendingPreview
+}
+
+@MainActor private var postSendingPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .writeForm(
+                    WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new, topicId: 0, content: .simple("Test Text", [])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendPost = { request in
+                try await Task.sleep(for: .seconds(1))
+                if request.flag == 0 {
+                    return .failure(.attach)
+                } else {
+                    return .success(.init(id: 0, topicId: 0, offset: 0))
+                }
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Post sending returns error status") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postErrorStatusPreview
+}
+
+@MainActor private var postErrorStatusPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0, 
+                topicName: "Test Topic",
+                destination: .writeForm(
+                    WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new, topicId: 0, content: .simple("Test Text", [])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendPost = { request in
+                try await Task.sleep(for: .seconds(1))
+                return .failure(.tooLong) // <----------
             }
         }
     )
