@@ -164,7 +164,7 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(.internal(.loadTopic(newOffset)))
                 ])
                 
-            case let .destination(.presented(.writeForm(.writeFormSent(response)))):
+            case let .destination(.presented(.writeForm(.delegate(.writeFormSent(response))))):
                 if case let .post(data) = response,
                    case let .success(post) = data {
                     return jumpTo(.post(id: post.id), true, &state)

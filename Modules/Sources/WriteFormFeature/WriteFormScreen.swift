@@ -11,9 +11,10 @@ import SwiftUI
 import Models
 import SharedUI
 
+@ViewAction(for: WriteFormFeature.self)
 public struct WriteFormScreen: View {
     
-    @Perception.Bindable var store: StoreOf<WriteFormFeature>
+    @Perception.Bindable public var store: StoreOf<WriteFormFeature>
     @Environment(\.tintColor) private var tintColor
     
     @State private var isPreviewPresented: Bool = false
@@ -52,7 +53,7 @@ public struct WriteFormScreen: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        store.send(.dismissButtonTapped)
+                        send(.dismissButtonTapped)
                     } label: {
                         Text("Cancel", bundle: .module)
                     }
@@ -61,7 +62,7 @@ public struct WriteFormScreen: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        store.send(.previewButtonTapped)
+                        send(.previewButtonTapped)
                     } label: {
                         Image(systemSymbol: .eye)
                             .font(.body)
@@ -72,7 +73,7 @@ public struct WriteFormScreen: View {
                 }
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -87,7 +88,7 @@ public struct WriteFormScreen: View {
                             type: store.formFields[index],
                             onUpdateContent: { content in
                                 if content != nil {
-                                    store.send(.updateFieldContent(index, content!))
+                                    send(.updateFieldContent(index, content!))
                                 }
                                 return store.textContent
                             }
@@ -105,7 +106,7 @@ public struct WriteFormScreen: View {
         Spacer()
         
         Button {
-            store.send(.publishButtonTapped)
+            send(.publishButtonTapped)
         } label: {
             if store.isPublishing {
                 ProgressView()
