@@ -191,7 +191,7 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.topicHatOpenButtonTapped):
                 guard let topicHat = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let topicHatNodes = TopicNodeBuilder(text: topicHat.content, attachments: topicHat.attachments).build()
-                state.types.insert(topicHatNodes, at: 0)
+                state.types[0] = topicHatNodes
                 state.shouldShowTopicHatButton = false
                 return .none
                 
