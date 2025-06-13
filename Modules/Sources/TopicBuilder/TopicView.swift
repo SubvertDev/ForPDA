@@ -14,13 +14,16 @@ import Sharing
 import Dependencies
 import CacheClient
 
+public typealias ImageTapHandler = (URL) -> Void
+
 public struct TopicView: View {
-        
+    
     let type: TopicTypeUI
     let nestLevel: Int
     let attachments: [Post.Attachment]
     let textAlignment: NSTextAlignment?
     let onUrlTap: URLTapHandler?
+    let onImageTap: ImageTapHandler?
     
     public init(
         type: TopicTypeUI,
@@ -28,13 +31,15 @@ public struct TopicView: View {
         attachments: [Post.Attachment] = [],
         alignment: NSTextAlignment? = nil,
         lineLimit: Int? = nil,
-        onUrlTap: URLTapHandler? = nil
+        onUrlTap: URLTapHandler? = nil,
+        onImageTap: ImageTapHandler? = nil
     ) {
         self.type = type
         self.nestLevel = nestLevel
         self.attachments = attachments
         self.textAlignment = alignment
         self.onUrlTap = onUrlTap
+        self.onImageTap = onImageTap
     }
     
     public var body: some View {
@@ -75,6 +80,9 @@ public struct TopicView: View {
                 }
             }
             .frame(width: width, height: height)
+            .onTapGesture {
+                onImageTap?(metadata.url)
+            }
             
         case let .image(url):
             LazyImage(url: url) { state in
@@ -83,18 +91,35 @@ public struct TopicView: View {
                 }
                 .skeleton(with: state.isLoading, shape: .rectangle)
             }
+            .onTapGesture {
+                onImageTap?(url)
+            }
             
         case let .left(types):
             VStack(alignment: .leading) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, alignment: .left, onUrlTap: onUrlTap)
+                    TopicView(
+                        type: type,
+                        nestLevel: nestLevel + 1,
+                        attachments: attachments,
+                        alignment: .left,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
                 }
             }
             
         case let .center(types):
             VStack(alignment: .center) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, alignment: .center, onUrlTap: onUrlTap)
+                    TopicView(
+                        type: type,
+                        nestLevel: nestLevel + 1,
+                        attachments: attachments,
+                        alignment: .center,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
                 }
             }
             .frame(maxWidth: .infinity)
@@ -102,32 +127,79 @@ public struct TopicView: View {
         case let .right(types):
             VStack(alignment: .trailing) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, alignment: .right, onUrlTap: onUrlTap)
+                    TopicView(
+                        type: type,
+                        nestLevel: nestLevel + 1,
+                        attachments: attachments,
+                        alignment: .right,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
                 }
             }
             
         case let .spoiler(types, info):
-            SpoilerView(types: types, nestLevel: nestLevel, info: info, attachments: attachments, onUrlTap: onUrlTap)
+            SpoilerView(
+                types: types,
+                nestLevel: nestLevel,
+                info: info,
+                attachments: attachments,
+                onUrlTap: onUrlTap,
+                onImageTap: onImageTap
+            )
             
         case let .quote(types, info):
-            QuoteView(types: types, nestLevel: nestLevel, info: info, attachments: attachments, onUrlTap: onUrlTap)
+            QuoteView(
+                types: types,
+                nestLevel: nestLevel,
+                info: info,
+                attachments: attachments,
+                onUrlTap: onUrlTap,
+                onImageTap: onImageTap
+            )
             
         case let .code(type, info):
-            CodeView(type: type, nestLevel: nestLevel, info: info, onUrlTap: onUrlTap)
+            CodeView(
+                type: type,
+                nestLevel: nestLevel,
+                info: info,
+                onUrlTap: onUrlTap,
+                onImageTap: onImageTap
+            )
             
         case let .hide(types, info):
-            HideView(types: types, nestLevel: nestLevel, info: info, attachments: attachments, onUrlTap: onUrlTap)
+            HideView(
+                types: types,
+                nestLevel: nestLevel,
+                info: info,
+                attachments: attachments,
+                onUrlTap: onUrlTap,
+                onImageTap: onImageTap
+            )
             
         case let .list(types, _):
             VStack(spacing: 8) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap)
-                        .padding(.leading, nestLevel == 1 ? 0 : 8)
+                    TopicView(
+                        type: type,
+                        nestLevel: nestLevel + 1,
+                        attachments: attachments,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
+                    .padding(.leading, nestLevel == 1 ? 0 : 8)
                 }
             }
             
         case let .notice(types, info):
-            NoticeView(types: types, nestLevel: nestLevel + 1, info: info, attachments: attachments, onUrlTap: onUrlTap)
+            NoticeView(
+                types: types,
+                nestLevel: nestLevel + 1,
+                info: info,
+                attachments: attachments,
+                onUrlTap: onUrlTap,
+                onImageTap: onImageTap
+            )
             
         case let .bullet(types):
             HStack(alignment: .top, spacing: 6) {
@@ -140,7 +212,12 @@ public struct TopicView: View {
                 
                 VStack(spacing: 8) {
                     ForEach(types, id: \.self) { type in
-                        TopicView(type: type, attachments: attachments, onUrlTap: onUrlTap)
+                        TopicView(
+                            type: type,
+                            attachments: attachments,
+                            onUrlTap: onUrlTap,
+                            onImageTap: onImageTap
+                        )
                     }
                 }
             }
@@ -159,6 +236,7 @@ struct SpoilerView: View {
     let info: AttributedString?
     let attachments: [Post.Attachment]
     let onUrlTap: URLTapHandler?
+    let onImageTap: ImageTapHandler?
     private let text: AttributedString
     
     private static var defaultAttributes: AttributeContainer {
@@ -173,13 +251,15 @@ struct SpoilerView: View {
         nestLevel: Int,
         info: AttributedString?,
         attachments: [Post.Attachment],
-        onUrlTap: URLTapHandler?
+        onUrlTap: URLTapHandler?,
+        onImageTap: ImageTapHandler?
     ) {
         self.types = types
         self.nestLevel = nestLevel
         self.info = info
         self.attachments = attachments
         self.onUrlTap = onUrlTap
+        self.onImageTap = onImageTap
         
         var attrString = AttributedString("Спойлер\(info != nil ? ": " : "")")
         attrString.setAttributes(SpoilerView.defaultAttributes)
@@ -220,7 +300,13 @@ struct SpoilerView: View {
             if isExpanded {
                 VStack(spacing: 8) {
                     ForEach(types, id: \.self) { type in
-                        TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap)
+                        TopicView(
+                            type: type,
+                            nestLevel: nestLevel + 1,
+                            attachments: attachments,
+                            onUrlTap: onUrlTap,
+                            onImageTap: onImageTap
+                        )
                     }
                 }
                 .padding(12)
@@ -243,6 +329,7 @@ struct QuoteView: View {
     let info: QuoteType?
     let attachments: [Post.Attachment]
     let onUrlTap: URLTapHandler?
+    let onImageTap: ImageTapHandler?
     private let text: AttributedString
     private var date: String?
     
@@ -258,7 +345,8 @@ struct QuoteView: View {
         nestLevel: Int,
         info: QuoteType?,
         attachments: [Post.Attachment],
-        onUrlTap: URLTapHandler?
+        onUrlTap: URLTapHandler?,
+        onImageTap: ImageTapHandler?
     ) {
         self.types = types
         self.nestLevel = nestLevel
@@ -266,6 +354,7 @@ struct QuoteView: View {
         self.attachments = attachments
         self.onUrlTap = onUrlTap
         self.date = nil
+        self.onImageTap = onImageTap
         
         var text = AttributedString("Цитата\(info != nil ? ": " : "")")
         if let info {
@@ -315,7 +404,13 @@ struct QuoteView: View {
             
             VStack(spacing: 8) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap)
+                    TopicView(
+                        type: type,
+                        nestLevel: nestLevel + 1,
+                        attachments: attachments,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
                 }
             }
             .padding(12)
@@ -337,6 +432,7 @@ struct CodeView: View {
     let nestLevel: Int
     let info: CodeType
     let onUrlTap: URLTapHandler?
+    let onImageTap: ImageTapHandler?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -382,8 +478,12 @@ struct CodeView: View {
             
             if isExpanded {
                 if case .text = type {
-                    TopicView(type: type, onUrlTap: onUrlTap)
-                        .padding(12)
+                    TopicView(
+                        type: type,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
+                    .padding(12)
                 } else {
                     fatalError("Non text type in CodeView")
                 }
@@ -412,6 +512,7 @@ struct HideView: View {
     let info: Int?
     let attachments: [Post.Attachment]
     let onUrlTap: URLTapHandler?
+    let onImageTap: ImageTapHandler?
     
     @State var isShown: Bool
     @State private var shouldLoadUser: Int?
@@ -421,13 +522,15 @@ struct HideView: View {
         nestLevel: Int,
         info: Int?,
         attachments: [Post.Attachment],
-        onUrlTap: URLTapHandler?
+        onUrlTap: URLTapHandler?,
+        onImageTap: ImageTapHandler?
     ) {
         self.types = types
         self.nestLevel = nestLevel
         self.info = info
         self.attachments = attachments
         self.onUrlTap = onUrlTap
+        self.onImageTap = onImageTap
         
         @Shared(.userSession) var userSession: UserSession?
         if let userSession = userSession.wrapped {
@@ -479,7 +582,7 @@ struct HideView: View {
         }
         .animation(.default, value: isShown)
         .task {
-            // TODO: What is happening here?
+            #warning("What is happening here?")
             @Dependency(\.cacheClient) var cache
             if let userId = shouldLoadUser, let info {
                 if let currentUser = await cache.getUser(userId) {
@@ -501,6 +604,7 @@ struct NoticeView: View {
     let info: NoticeType
     let attachments: [Post.Attachment]
     let onUrlTap: URLTapHandler?
+    let onImageTap: ImageTapHandler?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -521,7 +625,13 @@ struct NoticeView: View {
 //            
             VStack(spacing: 8) {
                 ForEach(types, id: \.self) { type in
-                    TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap)
+                    TopicView(
+                        type: type,
+                        nestLevel: nestLevel + 1,
+                        attachments: attachments,
+                        onUrlTap: onUrlTap,
+                        onImageTap: onImageTap
+                    )
                 }
             }
             .padding(12)
@@ -560,7 +670,8 @@ public extension NoticeType {
             type: .text(AttributedString(string)),
             nestLevel: 1,
             info: .none,
-            onUrlTap: nil
+            onUrlTap: nil,
+            onImageTap: nil
         )
         Color.white
     }
@@ -575,7 +686,8 @@ public extension NoticeType {
             nestLevel: 1,
             info: .moderator,
             attachments: [],
-            onUrlTap: nil
+            onUrlTap: nil,
+            onImageTap: nil
         )
         Color.white
     }

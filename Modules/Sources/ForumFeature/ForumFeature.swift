@@ -60,7 +60,7 @@ public struct ForumFeature: Reducer, Sendable {
     public enum Action {
         case onAppear
         case onRefresh
-        case topicTapped(TopicInfo)
+        case topicTapped(TopicInfo, showUnread: Bool)
         case subforumRedirectTapped(URL)
         case subforumTapped(ForumInfo)
         case announcementTapped(id: Int, name: String)
@@ -214,8 +214,8 @@ public struct ForumFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
-            case let .topicTapped(topic):
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
+            case let .topicTapped(topic, showUnread):
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: showUnread ? .unread : .first)))
                 
             case let .subforumTapped(forum):
                 return .send(.delegate(.openForum(id: forum.id, name: forum.name)))

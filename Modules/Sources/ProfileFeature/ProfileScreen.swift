@@ -18,19 +18,31 @@ import ParsingClient
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
     
+    // MARK: - Profile properties
+    
+    @Perception.Bindable public var store: StoreOf<ProfileFeature>
+    @Environment(\.tintColor) private var tintColor
+    
     public enum PickerSelection {
-        case general
-        case statistics
-        case achievements
+        case general, statistics, achievements
+    }
+    @State private var pickerSelection: PickerSelection = .general
+    
+    // MARK: - Timer properties
+    
+    @State private var timeRemaining = 5
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    var isSheetTimerFinished: Bool {
+        return timeRemaining <= 0
     }
     
-    public let store: StoreOf<ProfileFeature>
-    @Environment(\.tintColor) private var tintColor
-    @State private var pickerSelection: PickerSelection = .general
+    // MARK: - Init
     
     public init(store: StoreOf<ProfileFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -69,7 +81,12 @@ public struct ProfileScreen: View {
                     ToolbarButtons()
                 }
             }
-            .task {
+            .sheet(isPresented: $store.showQMSWarningSheet) {
+                WarningSheet()
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+            }
+            .onAppear {
                 send(.onAppear)
             }
         }
@@ -549,6 +566,101 @@ public struct ProfileScreen: View {
                 .foregroundStyle(.secondary)
         }
     }
+    
+    // MARK: - Warning Sheet
+    
+    @ViewBuilder
+    private func WarningSheet() -> some View {
+        VStack(spacing: 0) {
+            Spacer()
+            
+            Image(systemSymbol: .hammer)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .padding(.bottom, 8)
+            
+            Text("This functionality is presented as-is", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundStyle(Color(.Labels.primary))
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 6)
+            
+            Text("Chats do not (yet) support: BB-codes, attachments, caching, push-notifications and some other functionality", bundle: .module)
+                .font(.footnote)
+                .foregroundStyle(Color(.Labels.teritary))
+                .multilineTextAlignment(.center)
+            
+            Spacer()
+            
+            Button {
+                send(.sheetContinueButtonTapped)
+            } label: {
+                Text(isSheetTimerFinished ? "Understood, continue" : "Continue in (\(timeRemaining))", bundle: .module)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(tintColor)
+            .frame(height: 48)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .background(ignoresSafeAreaEdges: .bottom)
+            .disabled(!isSheetTimerFinished)
+        }
+        .background {
+            VStack(spacing: 0) {
+                ComingSoonTape()
+                    .rotationEffect(Angle(degrees: 12))
+                    .padding(.top, 32)
+                
+                Spacer()
+                
+                ComingSoonTape()
+                    .rotationEffect(Angle(degrees: -12))
+                    .padding(.bottom, 96)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .overlay(alignment: .topTrailing) {
+            Button {
+                send(.sheetCloseButtonTapped)
+            } label: {
+                ZStack {
+                    Circle()
+                        .fill(Color(.Background.quaternary))
+                        .frame(width: 30, height: 30)
+                    
+                    Image(systemSymbol: .xmark)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color(.Labels.teritary))
+                }
+                .padding(.top, 14)
+                .padding(.trailing, 16)
+            }
+        }
+        .onReceive(timer) { input in
+            if timeRemaining > 0 {
+                timeRemaining -= 1
+            }
+        }
+    }
+    
+    // MARK: - Coming Soon Tape
+    
+    @ViewBuilder
+    private func ComingSoonTape() -> some View {
+        HStack(spacing: 8) {
+            ForEach(0..<6, id: \.self) { index in
+                Text("IN DEVELOPMENT", bundle: .module)
+                    .font(.footnote)
+                    .foregroundStyle(Color(.Labels.primaryInvariably))
+                    .fixedSize(horizontal: true, vertical: false)
+                    .lineLimit(1)
+            }
+        }
+        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
+        .background(tintColor)
+    }
 }
 
 // MARK: - Extensions
@@ -607,7 +719,11 @@ extension User {
     }
     
     var statusAttributed: NSAttributedString? {
-        return BBCodeParser.parse(status)
+        if let status {
+            let trimmed = status.trimmingCharacters(in: .whitespacesAndNewlines)
+            return !trimmed.isEmpty ? BBCodeParser.parse(status) : nil
+        }
+        return nil
     }
     
     var aboutMeAttributed: NSAttributedString? {

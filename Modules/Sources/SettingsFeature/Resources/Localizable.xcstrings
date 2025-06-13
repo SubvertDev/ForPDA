@@ -31,22 +31,22 @@
         }
       }
     },
-    "App discussion (4PDA)" : {
+    "App discussion in Telegram" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обсуждение приложения (4PDA)"
+            "value" : "Обсуждение приложения в Telegram"
           }
         }
       }
     },
-    "App discussion (Telegram)" : {
+    "App discussion on the forum" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обсуждение приложения (Telegram)"
+            "value" : "Обсуждение приложения на форуме"
           }
         }
       }
@@ -253,12 +253,12 @@
         }
       }
     },
-    "List of changes (Telegram)" : {
+    "List of changes in Telegram" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Список изменений (Telegram)"
+            "value" : "Список изменений в Telegram"
           }
         }
       }
@@ -404,11 +404,22 @@
       }
     },
     "Text size" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Размер текста"
+          }
+        }
+      }
+    },
+    "The extension offers to open articles in the application\nYou need to open Settings > Apps > Safari > Extensions > Open in ForPDA > Allow Extension" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Расширение предлагает открыть статьи в приложении\nНеобходимо открыть Настройки > Приложения > Safari > Расширения > Open in ForPDA > Разрешить расширение"
           }
         }
       }
@@ -439,16 +450,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Желтый"
-          }
-        }
-      }
-    },
-    "You need to open Settings > Apps > Safari > Extensions > Open in ForPDA > Allow Extension" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Необходимо открыть Настройки > Приложения > Safari > Расширения > Open in ForPDA > Разрешить расширение"
           }
         }
       }

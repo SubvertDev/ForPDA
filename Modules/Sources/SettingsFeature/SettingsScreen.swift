@@ -247,9 +247,9 @@ public struct SettingsScreen: View {
                 store.send(.notificationsButtonTapped)
             }
             
-            Row(symbol: .textformatSize, title: "Text size", type: .navigation) {
-                store.send(.notImplementedFeatureTapped)
-            }
+//            Row(symbol: .textformatSize, title: "Text size", type: .navigation) {
+//                store.send(.notImplementedFeatureTapped)
+//            }
             
             Row(symbol: .globe, title: "Language", type: .navigation) {
                 store.send(.languageButtonTapped)
@@ -296,15 +296,15 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func LinksSection() -> some View {
         Section {
-            Row(symbol: .infoBubble, title: "App discussion (4PDA)", type: .navigation) {
-                store.send(.notImplementedFeatureTapped)
+            Row(symbol: .infoBubble, title: "App discussion on the forum", type: .navigation) {
+                store.send(.appDiscussionButtonTapped)
             }
             
-            Row(symbol: .paperplane, title: "App discussion (Telegram)", type: .navigation) {
+            Row(symbol: .paperplane, title: "App discussion in Telegram", type: .navigation) {
                 store.send(.telegramChatButtonTapped)
             }
             
-            Row(symbol: .paperplane, title: "List of changes (Telegram)", type: .navigation) {
+            Row(symbol: .paperplane, title: "List of changes in Telegram", type: .navigation) {
                 store.send(.telegramChangelogButtonTapped)
             }
             

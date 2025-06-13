@@ -9,8 +9,10 @@ import Foundation
 
 public enum TopicEvent: Event {
     case onRefresh
-    case userAvatarTapped(Int)
+    case topicHatOpenButtonTapped
+    case userTapped(Int)
     case urlTapped(URL)
+    case imageTapped(URL)
     
     case menuCopyLink
     case menuOpenInBrowser
@@ -19,6 +21,8 @@ public enum TopicEvent: Event {
     case menuWritePost
     
     case menuPostReply(Int)
+    case menuPostEdit(Int)
+    case menuPostDelete(Int)
     
     case loadingStart(Int)
     case loadingSuccess
@@ -31,11 +35,15 @@ public enum TopicEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let .userAvatarTapped(id),
+        case let .userTapped(id),
              let .menuPostReply(id):
             return ["userId": String(id)]
             
-        case let .urlTapped(url):
+        case let .menuPostDelete(postId):
+            return ["postId": String(postId)]
+            
+        case let .urlTapped(url),
+             let .imageTapped(url):
             return ["url": url.absoluteString]
             
         case let .loadingStart(offset):

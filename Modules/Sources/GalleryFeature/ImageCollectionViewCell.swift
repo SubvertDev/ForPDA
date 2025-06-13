@@ -73,6 +73,10 @@ class ImageCollectionViewCell: UICollectionViewCell, UIScrollViewDelegate {
         }
     }
     
+    func removeImage() {
+        imageView.image = nil
+    }
+    
     func setZoom(isZoomed: Bool) {
         UIView.animate(withDuration: 0.3) {
             self.onZoom?(true)

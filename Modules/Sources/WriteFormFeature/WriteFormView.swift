@@ -243,7 +243,6 @@ struct CheckBox: ToggleStyle {
                         .frame(width: 22, height: 22)
                 } else {
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(.tintColor))
                         .frame(width: 22, height: 22)
                         .overlay {
                             Image(systemSymbol: .checkmark)
@@ -268,6 +267,8 @@ struct Field: View {
     let guideText: String
     var isEditor = false
     
+    @FocusState private var focus: Bool
+    
     var body: some View {
         VStack {
             Group {
@@ -276,6 +277,7 @@ struct Field: View {
                         .font(.body)
                         .foregroundStyle(Color(.quaternaryLabel))
                 }
+                .focused($focus)
                 .font(.body)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -303,6 +305,9 @@ struct Field: View {
             }
         }
         .animation(.default, value: false)
+        .onAppear {
+            focus = true
+        }
     }
 }
 

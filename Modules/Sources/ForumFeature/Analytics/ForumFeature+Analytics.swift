@@ -25,8 +25,8 @@ extension ForumFeature {
                 case .onRefresh:
                     analytics.log(ForumEvent.onRefresh)
                     
-                case let .topicTapped(topic):
-                    analytics.log(ForumEvent.topicTapped(topic.id))
+                case let .topicTapped(topic, showUnread):
+                    analytics.log(ForumEvent.topicTapped(topic.id, showUnread))
                     
                 case let .subforumRedirectTapped(url):
                     analytics.log(ForumEvent.subforumRedirectTapped(url))

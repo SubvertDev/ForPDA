@@ -20,11 +20,11 @@ public struct ForumsListFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public var forums: [ForumRow]?
+        public var forums: [ForumRowInfo]?
         var didLoadOnce = false
         
         public init(
-            forums: [ForumRow]? = nil
+            forums: [ForumRowInfo]? = nil
         ) {
             self.forums = forums
         }
@@ -84,11 +84,11 @@ public struct ForumsListFeature: Reducer, Sendable {
                 return .send(.delegate(.handleForumRedirect(url)))
                 
             case let .internal(.forumsListResponse(.success(forums))):
-                var rows: [ForumRow] = []
+                var rows: [ForumRowInfo] = []
                 
                 for forum in forums {
                     if forum.isCategory {
-                        let category = ForumRow(id: forum.id, title: forum.name, forums: [])
+                        let category = ForumRowInfo(id: forum.id, title: forum.name, forums: [])
                         rows.append(category)
                     } else {
                         rows[rows.count - 1].forums.append(forum)

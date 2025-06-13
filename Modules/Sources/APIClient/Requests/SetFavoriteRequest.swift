@@ -13,7 +13,7 @@ public struct SetFavoriteRequest: Sendable {
     public let action: ActionType
     public let type: RequestType
     
-    nonisolated(unsafe) public var transferAction: MemberCommand.Favorites.Action {
+    nonisolated public var transferAction: MemberCommand.Favorites.Action {
         switch action {
         case .add: return .add
         case .pin: return .pin
@@ -22,7 +22,7 @@ public struct SetFavoriteRequest: Sendable {
         }
     }
     
-    nonisolated(unsafe) public var transferType: MemberCommand.Favorites.Element {
+    nonisolated public var transferType: MemberCommand.Favorites.Element {
         switch type {
         case .forum: return .forum
         case .topic: return .topic

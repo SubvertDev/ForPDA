@@ -65,11 +65,11 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
                 return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
-                        group.addTask {
-                            for await _ in notificationsClient.delegate() {
-                                print("test")
-                            }
-                        }
+//                        group.addTask {
+//                            for await _ in notificationsClient.delegate() {
+//                                print("test")
+//                            }
+//                        }
                         
                         group.addTask {
                             let granted = try await notificationsClient.requestPermission()

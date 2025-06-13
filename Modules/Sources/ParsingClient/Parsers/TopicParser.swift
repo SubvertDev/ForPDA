@@ -7,6 +7,7 @@
 
 import Foundation
 import Models
+import ComposableArchitecture
 
 public struct TopicParser {
     
@@ -71,7 +72,7 @@ public struct TopicParser {
         return PostPreview(content: content, attachmentIds: attachmentIds)
     }
     
-    public static func parsePostSend(from string: String) throws(ParsingError) -> PostSend {
+    public static func parsePostSendResponse(from string: String) throws(ParsingError) -> PostSendResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -80,13 +81,26 @@ public struct TopicParser {
             throw ParsingError.failedToCastDataToAny
         }
         
-        guard let id = array[safe: 4] as? Int,
-              let topicId = array[safe: 2] as? Int,
-              let offset = array[safe: 3] as? Int else {
-            throw ParsingError.failedToCastFields
+        if array.count == 2 {
+            guard let statusRaw = array[safe: 1] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            guard let result = PostSendError(rawValue: statusRaw) else {
+                throw ParsingError.unknownStatus(statusRaw)
+            }
+            
+            return .failure(result)
+        } else {
+            guard let id = array[safe: 4] as? Int,
+                  let topicId = array[safe: 2] as? Int,
+                  let offset = array[safe: 3] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            let result = PostSend(id: id, topicId: topicId, offset: offset)
+            return .success(result)
         }
-        
-        return PostSend(id: id, topicId: topicId, offset: offset)
     }
     
     // MARK: - Poll
@@ -152,7 +166,7 @@ public struct TopicParser {
         var posts: [Post] = []
         for post in postsRaw {
             guard let id = post[safe: 0] as? Int,
-                  let first = post[safe: 1] as? Int,
+                  let flag = post[safe: 1] as? Int,
                   let authorId = post[safe: 2] as? Int,
                   let authorName = post[safe: 3] as? String,
                   let authorGroupId = post[safe: 4] as? Int,
@@ -169,7 +183,7 @@ public struct TopicParser {
             
             let post = Post(
                 id: id,
-                first: first == 1 ? true : false,
+                flag: flag,
                 content: content,
                 author: Post.Author(
                     id: authorId,

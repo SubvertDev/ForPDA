@@ -9,7 +9,7 @@ import Foundation
 
 public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let id: Int
-    public let first: Bool
+    public let flag: Int
     public let content: String
     public let author: Author
     public let karma: Int
@@ -17,11 +17,33 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let createdAt: Date
     public let lastEdit: LastEdit?
     
-    // TODO: 12 => 0 on first post; other - 1; can be 17 also
+    public var canEdit: Bool {
+        return flag & 128 > 0
+    }
+    
+    public var canDelete: Bool {
+        return flag & 256 > 0
+    }
+    
+    public var imageAttachmentsOrdered: [Attachment] {
+        let numberRegex = /(\d+)/
+        let extractedNumbers = content
+            .matches(of: numberRegex)
+            .compactMap { Int($0.1) }
+        
+        let orderedAttachments = extractedNumbers.compactMap { number in
+            attachments.first(where: { $0.id == number })
+        }
+        
+        return orderedAttachments
+            .filter { $0.type == .image }
+            .filter { $0.metadata != nil }
+            .filter { $0.size != 0 }
+    }
     
     public init(
         id: Int,
-        first: Bool,
+        flag: Int,
         content: String,
         author: Author,
         karma: Int,
@@ -30,7 +52,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         lastEdit: LastEdit?
     ) {
         self.id = id
-        self.first = first
+        self.flag = flag
         self.content = content
         self.author = author
         self.karma = karma
@@ -145,7 +167,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
 extension Post {
     static let mock = Post(
         id: 12,
-        first: false,
+        flag: 384,
         content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
         author: Author(
             id: 6176341,

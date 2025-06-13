@@ -5,7 +5,7 @@
 //  Created by Ilia Lubianoi on 05.04.2025.
 //
 
-public enum GoTo: Equatable {
+public enum GoTo: Sendable, Equatable {
     case first
     case unread
     case post(id: Int)

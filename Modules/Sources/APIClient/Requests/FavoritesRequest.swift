@@ -16,7 +16,7 @@ public struct FavoritesRequest: Sendable {
     public let isSortReverse: Bool
     public let isUnreadFirst: Bool
     
-    nonisolated(unsafe) public var transferSort: [MemberCommand.Favorites.Sort] {
+    nonisolated public var transferSort: [MemberCommand.Favorites.Sort] {
         return [
             isSortByName  ? .byName : nil,
             isSortReverse ? .reverse : nil,

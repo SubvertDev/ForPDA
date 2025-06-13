@@ -22,19 +22,19 @@ public enum Deeplink {
 public struct DeeplinkHandler {
     
     public enum DeeplinkError: Error {
-        case noUrlComponents
-        case noRegexMatch
-        case noMatch
-        case badIdOnMatch
-        case noComponentsMatch
-        case noQueryItems
-        case noImageUrl
-        case badImageUrl
-        case noTitle
-        case badTitle
+        case noUrlComponents(in: URL)
+        case noRegexMatch(in: URL)
+        case noMatch(in: URL)
+        case badIdOnMatch(in: URL)
+        case noComponentsMatch(in: URL)
+        case noQueryItems(in: URL)
+        case noImageUrl(in: URL)
+        case badImageUrl(in: URL)
+        case noTitle(in: URL)
+        case badTitle(in: URL)
         case unknownType(type: String, for: String)
         case noType(of: String, for: String)
-        case noDeeplinkAvailable
+        case noDeeplinkAvailable(for: URL)
     }
     
     @Dependency(\.logger[.deeplink]) private var logger
@@ -47,29 +47,29 @@ public struct DeeplinkHandler {
     public func handleOuterToInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink {
         logger.info("Handling outer deeplink URL: \(url.absoluteString.removingPercentEncoding ?? "encoding error")")
         
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { throw .noUrlComponents }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { throw .noUrlComponents(in: url) }
         
         switch components.host {
         case "article":
             // ID
             let regex = #//([\d]{6})//#
-            guard let match = url.absoluteString.firstMatch(of: regex) else { throw .noRegexMatch }
-            guard let id = Int(match.output.1) else { throw .badIdOnMatch }
+            guard let match = url.absoluteString.firstMatch(of: regex) else { throw .noRegexMatch(in: url) }
+            guard let id = Int(match.output.1) else { throw .badIdOnMatch(in: url) }
             
-            guard let queryItems = components.queryItems else { throw .noQueryItems }
+            guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
             
             // Image URL
-            guard let imageUrlString = queryItems.first(where: { $0.name == "imageUrl"} )?.value else { throw .noImageUrl }
-            guard let imageUrl = URL(string: imageUrlString) else { throw .badImageUrl }
+            guard let imageUrlString = queryItems.first(where: { $0.name == "imageUrl"} )?.value else { throw .noImageUrl(in: url) }
+            guard let imageUrl = URL(string: imageUrlString) else { throw .badImageUrl(in: url) }
             
             // Title
-            guard let titleEncoded = queryItems.first(where: { $0.name == "title"} )?.value else { throw .noTitle }
-            guard let title = titleEncoded.removingPercentEncoding else { throw .badTitle }
+            guard let titleEncoded = queryItems.first(where: { $0.name == "title"} )?.value else { throw .noTitle(in: url) }
+            guard let title = titleEncoded.removingPercentEncoding else { throw .badTitle(in: url) }
 
             return .article(id: id, title: title, imageUrl: imageUrl)
             
         default:
-            throw .noComponentsMatch
+            throw .noComponentsMatch(in: url)
         }
     }
     
@@ -83,11 +83,11 @@ public struct DeeplinkHandler {
             }
         }
         
-        guard let host = url.host, host == "4pda.to" else { throw .noDeeplinkAvailable }
+        guard let host = url.host, host == "4pda.to" else { throw .noDeeplinkAvailable(for: url) }
         
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents }
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents(in: url) }
         
-        guard let queryItems = components.queryItems else { throw .noQueryItems }
+        guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
         
         // showtopic
         
@@ -147,7 +147,7 @@ public struct DeeplinkHandler {
             return .user(id: userId)
         }
         
-        throw .noDeeplinkAvailable
+        throw .noDeeplinkAvailable(for: url)
     }
     
     // MARK: - Inner To Outer
@@ -157,5 +157,32 @@ public struct DeeplinkHandler {
         @Dependency(\.apiClient) var apiClient
         let url = try! await apiClient.getAttachment(id)
         return url
+    }
+    
+    // MARK: - Notification
+    
+    public func handleNotification(_ identifier: String) throws(DeeplinkError) -> Deeplink {
+        let split = identifier.split(separator: "-")
+        let url = URL(string: "notification://\(identifier)")!
+        guard let typeString = split.first, let typeInt = Int(typeString) else { throw .noDeeplinkAvailable(for: url) }
+        guard let idString = split.last,    let id = Int(idString)        else { throw .noDeeplinkAvailable(for: url) }
+        
+        guard let type = Unread.Item.Category(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
+        
+        switch type {
+        case .qms:
+            // TODO: Add
+            break
+        case .forum:
+            return Deeplink.forum(id: id)
+        case .topic:
+            return Deeplink.topic(id: id, goTo: .unread)
+        case .forumMention:
+            return Deeplink.topic(id: id, goTo: .unread)
+        case .siteMention:
+            return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
+        }
+        
+        throw .noDeeplinkAvailable(for: url)
     }
 }

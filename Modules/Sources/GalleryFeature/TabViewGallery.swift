@@ -5,17 +5,20 @@
 //  Created by Виталий Канин on 19.02.2025.
 //
 
-import SwiftUI
+import APIClient
+import ComposableArchitecture
 import Models
 import Nuke
 import NukeUI
 import SFSafeSymbols
 import SharedUI
+import SwiftUI
 
 // MARK: - TabViewGallery
 
-struct TabViewGallery: View {
-    let gallery: [URL]
+public struct TabViewGallery: View {
+    @State var gallery: [URL]
+    let ids: [Int]?
     @Environment(\.dismiss) private var dismiss
     @State var selectedImageID: Int
     @State private var backgroundOpacity = 1.0
@@ -25,7 +28,17 @@ struct TabViewGallery: View {
     @State private var activityItems: [Any] = []
     @State private var tempFileUrls: [Int: URL] = [:]
     
-    var body: some View {
+    public init(
+        gallery: [URL],
+        ids: [Int]? = nil,
+        selectedImageID: Int
+    ) {
+        self.gallery = gallery
+        self.ids = ids
+        self.selectedImageID = selectedImageID
+    }
+    
+    public var body: some View {
         ZStack {
             if isTouched {
                 withAnimation(.easeInOut) {
@@ -59,6 +72,7 @@ struct TabViewGallery: View {
         .onAppear {
             deleteTempFiles()
             preloadImage()
+            loadFullImages()
         }
         .sheet(isPresented: $showShareSheet) {
             ShareSheet(activityItems: $activityItems)
@@ -144,6 +158,22 @@ struct TabViewGallery: View {
                 case .failure(let error):
                     print("Image not loaded: \(error)")
                 }
+            }
+        }
+    }
+    
+    
+    private func loadFullImages() {
+        guard let ids else { return }
+        let mainId = ids[selectedImageID]
+        Task {
+            @Dependency(\.apiClient) var api
+            let url = try await api.getAttachment(id: mainId)
+            gallery[selectedImageID] = url
+            
+            for (index, id) in ids.enumerated() where id != mainId {
+                let url = try await api.getAttachment(id: id)
+                gallery[index] = url
             }
         }
     }

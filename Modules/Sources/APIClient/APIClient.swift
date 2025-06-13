@@ -51,7 +51,9 @@ public struct APIClient: Sendable {
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
-    public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSend
+    public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
+    public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
+    public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
     
     // Favorites
     public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
@@ -163,7 +165,7 @@ extension APIClient: DependencyKey {
             
             getUser: { userId, policy in
                 fetch(
-                    getCache: { await cache.getUser(userId) },
+                    getCache: { cache.getUser(userId) },
                     setCache: { await cache.setUser($0) },
                     remote: {
                         let command = MemberCommand.info(memberId: userId)
@@ -270,7 +272,27 @@ extension APIClient: DependencyKey {
                     flag: request.flag
                 ))
                 let response = try await api.get(command)
-                return try await parser.parsePostSend(response)
+                return try await parser.parsePostSendResponse(response)
+            },
+            editPost: { request in
+                let command = ForumCommand.Post.edit(
+                    data: PostSendRequest(
+                        topicId: request.data.topicId,
+                        content: request.data.content,
+                        attaches: request.data.attachments,
+                        flag: request.data.flag
+                    ),
+                    postId: request.postId,
+                    reason: request.reason
+                )
+                let response = try await api.get(command)
+                return try await parser.parsePostSendResponse(response)
+			},
+            deletePosts: { ids in
+                let command = ForumCommand.Post.delete(postIds: ids)
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Favorites
@@ -326,9 +348,18 @@ extension APIClient: DependencyKey {
                 return try await parser.parseUnread(response)
             },
             getAttachment: { id in
-                let response = try await api.get(ForumCommand.attachmentDownloadUrl(id: id))
-                let urlString = String(response.dropFirst(10).dropLast(2))
-                return URL(string: urlString)!
+                let stream = fetch(
+                    getCache: { cache.getAttachmentURL(id) },
+                    setCache: { cache.setAttachmentURL(id, $0) },
+                    remote: {
+                        let response = try await api.get(ForumCommand.attachmentDownloadUrl(id: id))
+                        let urlString = String(response.dropFirst(10).dropLast(2))
+                        return URL(string: urlString)!
+                    },
+                    policy: .cacheOrLoad
+                )
+                for try await url in stream { return url } // I was too lazy to conform to AsyncStream on callsite
+                throw NSError(domain: "APIClient.getAttachment", code: 0)
             },
             sendReport: { request in
                 let command = CommonCommand.report(
@@ -431,11 +462,20 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
-            previewPost: { _ in
-                return PostPreview(content: "Post Content...", attachmentIds: [])
+            previewPost: { request in
+                return PostPreview(
+                    content: request.post.content,
+                    attachmentIds: request.post.attachments
+                )
             },
             sendPost: { _ in
-                return PostSend(id: 0, topicId: 1, offset: 2)
+                return .success(PostSend(id: 0, topicId: 1, offset: 2))
+            },
+            editPost: { _ in
+                return .success(PostSend(id: 0, topicId: 1, offset: 2))
+			},
+            deletePosts: { _ in
+                return true
             },
             getFavorites: { _, _ in
                 .finished()
@@ -482,7 +522,7 @@ extension APIClient: DependencyKey {
     private static func fetch<T>(
         getCache: @Sendable @escaping () async -> T?,
         setCache: @Sendable @escaping (T) async -> Void,
-        remote: @Sendable @escaping () async throws ->T,
+        remote: @Sendable @escaping () async throws -> T,
         policy: CachePolicy
     ) -> AsyncThrowingStream<T, any Error> {
         return AsyncThrowingStream { continuation in

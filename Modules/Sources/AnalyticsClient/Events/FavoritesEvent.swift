@@ -10,8 +10,7 @@ import Foundation
 public enum FavoritesEvent: Event {
     case onRefresh
     case onSceneBecomeActive
-    case favoriteTapped(Int, String, Int?, Bool)
-    case unreadTapped(Int)
+    case favoriteTapped(Int, String, Int?, Bool, Bool)
     
     case sortButtonTapped
     case readAllButtonTapped
@@ -33,7 +32,6 @@ public enum FavoritesEvent: Event {
     case loadingSuccess
     case loadingFailure(any Error)
     case startUnreadLoadingIndicator(Int)
-    case jumpRequestFailed
     
     public var name: String {
         return "Favorites " + eventName(for: self).inProperCase
@@ -41,16 +39,14 @@ public enum FavoritesEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let .favoriteTapped(id, name, postId, isForum):
+        case let .favoriteTapped(id, name, postId, isForum, showUnread):
             return [
                 "id": String(id),
                 "name": name,
                 "postId": postId.map { String($0) } ?? "nil",
-                "isForum": isForum.description
+                "isForum": isForum.description,
+                "showUnread": showUnread.description
             ]
-            
-        case let .unreadTapped(id):
-            return ["id": String(id)]
             
         case let .setImportant(id, isForum):
             return ["id": String(id), "isForum": isForum.description]

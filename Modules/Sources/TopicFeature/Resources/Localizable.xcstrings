@@ -21,6 +21,26 @@
         }
       }
     },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактировать"
+          }
+        }
+      }
+    },
     "Edited: %@ • %@" : {
       "localizations" : {
         "en" : {
@@ -97,12 +117,42 @@
         }
       }
     },
+    "Today, %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
+    "Topic Hat" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шапка темы"
+          }
+        }
+      }
+    },
     "Write Post" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Написать пост"
+          }
+        }
+      }
+    },
+    "Yesterday, %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчера, %@"
           }
         }
       }

@@ -93,8 +93,14 @@ public struct ForumScreen: View {
             Navigation(pinned: pinned)
             
             ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
-                Row(title: topic.name, lastPost: topic.lastPost, closed: topic.isClosed, unread: topic.isUnread) {
-                    store.send(.topicTapped(topic))
+                TopicRow(
+                    title: topic.name,
+                    date: topic.lastPost.date,
+                    username: topic.lastPost.username,
+                    isClosed: topic.isClosed,
+                    isUnread: topic.isUnread
+                ) { unreadTapped in
+                    store.send(.topicTapped(topic, showUnread: unreadTapped))
                 }
                 .contextMenu {
                     TopicContextMenu(topic: topic)
@@ -155,7 +161,7 @@ public struct ForumScreen: View {
     private func SubforumsSection(subforums: [ForumInfo]) -> some View {
         Section {
             ForEach(subforums) { forum in
-                Row(title: forum.name, unread: forum.isUnread) {
+                ForumRow(title: forum.name, isUnread: forum.isUnread) {
                     if let redirectUrl = forum.redirectUrl {
                         store.send(.subforumRedirectTapped(redirectUrl))
                     } else {
@@ -186,7 +192,7 @@ public struct ForumScreen: View {
     private func AnnouncmentsSection(announcements: [AnnouncementInfo]) -> some View {
         Section {
             ForEach(announcements) { announcement in
-                Row(title: announcement.name) {
+                ForumRow(title: announcement.name, isUnread: false) {
                     store.send(.announcementTapped(id: announcement.id, name: announcement.name))
                 }
             }
@@ -224,79 +230,6 @@ public struct ForumScreen: View {
                 }
             }
         }
-    }
-    
-    // MARK: - Row
-    
-    @ViewBuilder
-    private func Row(
-        title: String,
-        lastPost: TopicInfo.LastPost? = nil,
-        closed: Bool = false,
-        unread: Bool = false,
-        action: @escaping () -> Void
-    ) -> some View {
-        HStack(spacing: 0) { // Hacky HStack to enable tap animations
-            Button {
-                action()
-            } label: {
-                HStack(spacing: 10) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        if let lastPost {
-                            Text(lastPost.formattedDate, bundle: Bundle.models)
-                                .font(.caption)
-                                .foregroundStyle(Color(.Labels.teritary))
-                        }
-                        
-                        RichText(
-                            text: AttributedString(title),
-                            isSelectable: false,
-                            font: .body,
-                            foregroundStyle: Color(.Labels.primary)
-                        )
-                        
-                        if let lastPost {
-                            HStack(spacing: 4) {
-                                Image(systemSymbol: .personCircle)
-                                    .font(.caption)
-                                    .foregroundStyle(Color(.Labels.secondary))
-                                
-                                RichText(
-                                    text: AttributedString(lastPost.username),
-                                    isSelectable: false,
-                                    font: .caption,
-                                    foregroundStyle: Color(.Labels.secondary)
-                                )
-                            }
-                        }
-                    }
-                    
-                    Spacer(minLength: 0)
-                    if closed {
-                        Image(systemSymbol: .lock)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
-                            .foregroundStyle(Color(.Labels.secondary))
-                            .padding(.trailing, unread ? 4 : 12)
-                    }
-                    
-                    if unread {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
-                            .padding(.trailing, 12)
-                    }
-                }
-                .padding(.vertical, 8)
-                .contentShape(Rectangle())
-            }
-        }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
-        .buttonStyle(.plain)
-        .frame(minHeight: 60)
     }
     
     // MARK: - Header

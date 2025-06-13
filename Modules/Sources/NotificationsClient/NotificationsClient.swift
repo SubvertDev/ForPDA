@@ -19,8 +19,9 @@ public struct NotificationsClient: Sendable {
     public var requestPermission: @Sendable () async throws -> Bool
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
-    public var delegate: @Sendable () -> AsyncStream<Void> = { .finished }
-    public var showUnreadNotifications: @Sendable (Unread) async -> Void
+    public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
+    public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
+    public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
 }
 
 extension DependencyValues {
@@ -57,12 +58,14 @@ extension NotificationsClient: DependencyKey {
                   }
                 }
             },
-            showUnreadNotifications: { unread in
+            showUnreadNotifications: { unread, skipCategories in
                 @Dependency(\.cacheClient) var cacheClient
                 @Shared(.appSettings) var appSettings: AppSettings
                 
+                logger.info("Going to show \(unread.items.count) notifications.\nSkip categories: \(skipCategories)")
+                
                 for item in unread.items {
-//                     customDump(item)
+                    // customDump(item)
                     
                     switch item.category {
                     case .qms where !appSettings.notifications.isQmsEnabled:
@@ -98,6 +101,11 @@ extension NotificationsClient: DependencyKey {
                         continue
                     }
                     
+                    if skipCategories.contains(item.category) {
+                        // logger.info("Skipping notfication of item \(item.id) with category \(item.category.rawValue) because it's marked to skip")
+                        continue
+                    }
+                    
                     // logger.info("Processing notification at \(item.timestamp) of \(item.id) with type \(item.category.rawValue)")
                     
                     let content = UNMutableNotificationContent()
@@ -121,7 +129,7 @@ extension NotificationsClient: DependencyKey {
                         content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     }
                     
-                    let request = UNNotificationRequest(identifier: "\(item.id)", content: content, trigger: nil)
+                    let request = UNNotificationRequest(identifier: "\(item.category.rawValue)-\(item.id)", content: content, trigger: nil)
                     
                     do {
                         try await UNUserNotificationCenter.current().add(request)
@@ -132,28 +140,40 @@ extension NotificationsClient: DependencyKey {
                 }
                 
                 logger.info("Successfully processed notifications")
+            },
+            removeNotifications: { categories in
+                let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
+                let filteredPending = pending.filter { notification in
+                    if let prefix = notification.identifier.split(separator: "-").first {
+                        return categories
+                            .map { String($0.rawValue) }
+                            .contains(String(prefix))
+                    }
+                    return false
+                }
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
+                
+                let delivered = await UNUserNotificationCenter.current().deliveredNotifications()
+                let filteredDelivered = delivered.filter { notification in
+                    if let prefix = notification.request.identifier.split(separator: "-").first {
+                        return categories
+                            .map { String($0.rawValue) }
+                            .contains(String(prefix))
+                    }
+                    return false
+                }
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: filteredDelivered.map(\.request.identifier))
             }
         )
     }
 }
 
-extension String {
-    func varyByPlural(_ count: Int, one: String, few: String, many: String) -> String {
-        switch count {
-        case 1:     return self + one
-        case 2...4: return self + few
-        case 5...9: return self + many
-        default:    return self + many
-        }
-    }
-}
-
 extension NotificationsClient {
     fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
-        let continuation: AsyncStream<Void>.Continuation
+        let continuation: AsyncStream<String>.Continuation
         private nonisolated(unsafe) var lastNotificationId: String = ""
         
-        init(continuation: AsyncStream<Void>.Continuation) {
+        init(continuation: AsyncStream<String>.Continuation) {
             self.continuation = continuation
         }
         
@@ -161,6 +181,12 @@ extension NotificationsClient {
             guard lastNotificationId != notification.request.identifier else { return [] }
             lastNotificationId = notification.request.identifier // Hotfix for Apple iOS 18 double notification bug
             return [.badge, .banner, .list, .sound]
+        }
+        
+        func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+            let identifier = response.notification.request.identifier
+            try? await Task.sleep(for: .seconds(1))
+            continuation.yield(identifier)
         }
     }
 }

@@ -231,9 +231,64 @@ struct BBBuilderTests {
             Issue.record("First node is not text or there's more nodes")
         }
     }
+    
+    @Test func fileAttachmentAddsNewlineForTextAfter() async throws {
+        let file = File(id: 0, name: "name.zip", size: 0, downloads: nil)
+        let text = String.fileAttachment(id: file.id) + "text"
+        let nodes = BBBuilder.build(text: text, attachments: [.file(id: file.id)])
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(text.string == fileConstructor(file) + "\ntext")
+        } else {
+            Issue.record("First node is not text or there's more nodes")
+        }
+    }
+    
+    @Test func fileAttachmentTreatsWhitespaceBeforeOtherAttachmentAsNewline() async throws {
+        let file1 = File(id: 1, name: "name1.zip", size: 0, downloads: nil)
+        let file2 = File(id: 2, name: "name2.zip", size: 0, downloads: nil)
+        let text = String.fileAttachment(id: file1.id) + " " + String.fileAttachment(id: file2.id)
+        let nodes = BBBuilder.build(
+            text: text,
+            attachments: [
+                .file(id: file1.id, name: file1.name, downloads: file1.downloads),
+                .file(id: file2.id, name: file2.name, downloads: file2.downloads),
+            ]
+        )
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(text.string == fileConstructor(file1) + "\n" + fileConstructor(file2))
+        } else {
+            Issue.record("First node is not text or there's more nodes")
+        }
+    }
+    
+    @Test func fileAttachmentDoesNotAddNewlineForTextBefore() async throws {
+        let file = File(id: 0, name: "name.zip", size: 0, downloads: nil)
+        let text = "Text: " + String.fileAttachment(id: file.id)
+        let nodes = BBBuilder.build(text: text, attachments: [.file(id: file.id)])
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(text.string == "Text: " + fileConstructor(file))
+        } else {
+            Issue.record("First node is not text or there's more nodes")
+        }
+    }
 }
 
 // MARK: - Helpers
+
+private struct File {
+    let id: Int
+    let name: String
+    let size: Int
+    let downloads: Int?
+}
+
+private func fileConstructor(_ file: File) -> String {
+    var result = "\u{FFFC}\(file.name) (\(file.size) Б)"
+    if let downloads = file.downloads {
+        result.append(" Скачиваний: \(downloads)")
+    }
+    return result
+}
 
 private extension Post.Attachment {
     static func image(id: Int) -> Post.Attachment {
@@ -246,8 +301,8 @@ private extension Post.Attachment {
         )
     }
     
-    static func file(id: Int) -> Post.Attachment {
-        return Post.Attachment(id: id, type: .file, name: "name.zip", size: 0, metadata: nil, downloadCount: 69)
+    static func file(id: Int, name: String = "name.zip", size: Int = 0, downloads: Int? = nil) -> Post.Attachment {
+        return Post.Attachment(id: id, type: .file, name: name, size: size, metadata: nil, downloadCount: downloads)
     }
 }
 

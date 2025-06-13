@@ -100,7 +100,7 @@ public struct ForumParser {
         return array.map { announcement in
             return AnnouncementInfo(
                 id: announcement[0] as! Int,
-                name: announcement[1] as! String
+                name: (announcement[1] as! String).convertCodes()
             )
         }
     }

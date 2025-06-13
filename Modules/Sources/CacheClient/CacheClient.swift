@@ -26,7 +26,7 @@ public struct CacheClient: Sendable {
     
     // Users
     public var setUser: @Sendable (User) async -> Void
-    public var getUser: @Sendable (_ id: Int) async -> User?
+    public var getUser: @Sendable (_ id: Int) -> User?
     
     // Favorites
     public var setFavorites: @Sendable (Favorite) async -> Void
@@ -39,6 +39,10 @@ public struct CacheClient: Sendable {
     // Forums
     public var setForum: @Sendable (_ id: Int, _ forums: Forum) async -> Void
     public var getForum: @Sendable (_ id: Int) async -> Forum?
+    
+    // Attachments
+    public var setAttachmentURL: @Sendable (_ id: Int, _ url: URL) -> Void
+    public var getAttachmentURL: @Sendable (_ id: Int) -> URL?
     
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
@@ -97,7 +101,7 @@ extension CacheClient: DependencyKey {
                 try? await usersStorage.async.setObject(user, forKey: user.id)
             },
             getUser: { userId in
-                return try? await usersStorage.async.object(forKey: userId)
+                return try? usersStorage.object(forKey: userId)
             },
             
             // MARK: - Favorites
@@ -125,6 +129,15 @@ extension CacheClient: DependencyKey {
             },
             getForum: { id in
                 return try? await forumsStorage.async.object(forKey: id)
+            },
+            
+            // MARK: - Attachments
+            
+            setAttachmentURL: { id, url in
+                try? attachmentURLsStorage.setObject(url, forKey: id)
+            },
+            getAttachmentURL: { id in
+                return try? attachmentURLsStorage.object(forKey: id)
             },
             
             // MARK: - Background Tasks
@@ -207,6 +220,15 @@ private extension CacheClient {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Forum.self)
+        )
+    }
+    
+    private static var attachmentURLsStorage: Storage<Int, URL> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "AttachmentURLs", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: URL.self)
         )
     }
     

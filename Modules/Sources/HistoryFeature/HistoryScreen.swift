@@ -12,6 +12,7 @@ import SFSafeSymbols
 import SharedUI
 import Models
 
+@ViewAction(for: HistoryFeature.self)
 public struct HistoryScreen: View {
     
     @Perception.Bindable public var store: StoreOf<HistoryFeature>
@@ -27,14 +28,13 @@ public struct HistoryScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if !store.history.isEmpty {
+                if !store.history.isEmpty, !store.isLoading {
                     List {
                         Navigation()
                         
-                        ForEach(store.history, id: \.hashValue) { history in
+                        ForEach(store.history, id: \.self) { history in
                             HistorySection(history: history)
                         }
-                        .listRowInsets(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
                         
                         Navigation()
                     }
@@ -43,6 +43,7 @@ public struct HistoryScreen: View {
                     EmptyHistory()
                 }
             }
+            .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .overlay {
@@ -51,8 +52,8 @@ public struct HistoryScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                send(.onAppear)
             }
         }
     }
@@ -63,7 +64,7 @@ public struct HistoryScreen: View {
     private func Navigation() -> some View {
         if store.pageNavigation.shouldShow {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                //.listRowBackground(.primary)
+                .listRowBackground(Color(.Background.primary))
         }
     }
     
@@ -71,12 +72,18 @@ public struct HistoryScreen: View {
     
     private func HistorySection(history: HistoryRow) -> some View {
         Section {
-            ForEach(history.topics) { topic in
-                Row(title: topic.name, lastPost: topic.lastPost, unread: topic.isUnread) {
-                    store.send(.topicTapped(id: topic.id))
-                }
+            ForEach(history.topics, id: \.id) { topic in
+                TopicRow(
+                    title: topic.name,
+                    date: topic.lastPost.date,
+                    username: topic.lastPost.username,
+                    isClosed: topic.isClosed,
+                    isUnread: topic.isUnread,
+                    onAction: { unreadTapped in
+                        send(.topicTapped(topic, showUnread: unreadTapped))
+                    }
+                )
             }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         } header: {
             Header(title: history.seenDate.formattedDateOnly())
         }
@@ -106,69 +113,6 @@ public struct HistoryScreen: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
         }
-    }
-    
-    // MARK: - Row
-    
-    @ViewBuilder
-    private func Row(
-        title: String,
-        lastPost: TopicInfo.LastPost? = nil,
-        unread: Bool,
-        action: @escaping () -> Void = {}
-    ) -> some View {
-        HStack(spacing: 0) { // Hacky HStack to enable tap animations
-            Button {
-                action()
-            } label: {
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        if let lastPost {
-                            Text(lastPost.formattedDate, bundle: Bundle.models)
-                                .font(.caption)
-                                .foregroundStyle(Color(.Labels.teritary))
-                        }
-                        
-                        RichText(
-                            text: AttributedString(title),
-                            isSelectable: false,
-                            font: .body,
-                            foregroundStyle: Color(.Labels.primary)
-                        )
-                        
-                        if let lastPost {
-                            HStack(spacing: 4) {
-                                Image(systemSymbol: .personCircle)
-                                    .font(.caption)
-                                    .foregroundStyle(Color(.Labels.secondary))
-                                
-                                RichText(
-                                    text: AttributedString(lastPost.username),
-                                    isSelectable: false,
-                                    font: .caption,
-                                    foregroundStyle: Color(.Labels.secondary)
-                                )
-                            }
-                        }
-                    }
-                    
-                    Spacer(minLength: 0)
-                    
-                    if unread {
-                        Image(systemSymbol: .circleFill)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 10, height: 10)
-                            .foregroundStyle(tintColor)
-                    }
-                }
-                .padding(.vertical, 8)
-                .contentShape(Rectangle())
-            }
-        }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-        .buttonStyle(.plain)
-        .frame(minHeight: 60)
     }
     
     // MARK: - Header

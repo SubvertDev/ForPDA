@@ -21,8 +21,8 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        @Presents public var alert: AlertState<Action.Alert>?
         @Shared(.userSession) public var userSession: UserSession?
+        @Shared(.appStorage("didAcceptQMSWarningMessage")) var didAcceptQMSWarningMessage = false
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
@@ -33,22 +33,26 @@ public struct ProfileFeature: Reducer, Sendable {
         
         var didLoadOnce = false
         
+        public var showQMSWarningSheet: Bool
+        
         public init(
-            alert: AlertState<Action.Alert>? = nil,
             userId: Int? = nil,
             isLoading: Bool = true,
-            user: User? = nil
+            user: User? = nil,
+            showQMSWarningSheet: Bool = false
         ) {
-            self.alert = alert
             self.userId = userId
             self.isLoading = isLoading
             self.user = user
+            self.showQMSWarningSheet = showQMSWarningSheet
         }
     }
     
     // MARK: - Action
     
-    public enum Action: ViewAction {
+    public enum Action: ViewAction, BindableAction {
+        case binding(BindingAction<State>)
+
         case view(View)
         public enum View {
             case onAppear
@@ -57,16 +61,13 @@ public struct ProfileFeature: Reducer, Sendable {
             case logoutButtonTapped
             case historyButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
+            case sheetContinueButtonTapped
+            case sheetCloseButtonTapped
         }
         
         case `internal`(Internal)
         public enum Internal {
             case userResponse(Result<User, any Error>)
-        }
-        
-        case alert(Alert)
-        public enum Alert: Equatable {
-            case ok
         }
         
         case delegate(Delegate)
@@ -88,6 +89,8 @@ public struct ProfileFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
@@ -105,7 +108,21 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .send(.delegate(.openHistory))
                 
             case .view(.qmsButtonTapped):
+                if state.didAcceptQMSWarningMessage {
+                    return .send(.delegate(.openQms))
+                } else {
+                    state.showQMSWarningSheet = true
+                    return .none
+                }
+                
+            case .view(.sheetContinueButtonTapped):
+                state.$didAcceptQMSWarningMessage.withLock { $0 = true }
+                state.showQMSWarningSheet = false
                 return .send(.delegate(.openQms))
+                
+            case .view(.sheetCloseButtonTapped):
+                state.showQMSWarningSheet = false
+                return .none
                 
             case .view(.settingsButtonTapped):
                 return .send(.delegate(.openSettings))
@@ -135,7 +152,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case .alert, .delegate:
+            case .delegate, .binding:
                 return .none
             }
         }

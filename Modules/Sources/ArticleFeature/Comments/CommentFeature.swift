@@ -118,7 +118,7 @@ public struct CommentFeature: Reducer, Sendable {
             case let .profileTapped(id):
                 return .send(.delegate(.commentHeaderTapped(id)))
 
-            case .writeForm(.presented(.writeFormSent(let response))):
+            case .writeForm(.presented(.delegate(.writeFormSent(let response)))):
                 if case let .report(result) = response {
                     return switch result {
                     case .error:    showToast(.reportSendError)
@@ -129,9 +129,6 @@ public struct CommentFeature: Reducer, Sendable {
                 return .none
                 
             case .writeForm:
-                return .none
-                
-            case .profileTapped:
                 return .none
                 
             case .hiddenLabelTapped:

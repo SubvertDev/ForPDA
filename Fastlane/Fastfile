@@ -41,7 +41,7 @@ platform :ios do
         prepare_certificates
         update_build_number
         run_tuist(testflight: true)
-        # tests
+        tests
         build_ipa
         upload_dsym_to_sentry
         upload_app_to_testflight

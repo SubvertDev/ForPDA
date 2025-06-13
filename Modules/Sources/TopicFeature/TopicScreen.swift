@@ -15,7 +15,9 @@ import NukeUI
 import Models
 import ParsingClient
 import TopicBuilder
+import GalleryFeature
 
+@ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TopicFeature>
@@ -60,7 +62,7 @@ public struct TopicScreen: View {
             }
             .refreshable {
                 // Wrapper around finish() due to SwiftUI bug
-                await Task { await store.send(.onRefresh).finish() }.value
+                await Task { await send(.onRefresh).finish() }.value
             }
             .overlay {
                 if store.topic == nil || store.isLoadingTopic {
@@ -68,23 +70,17 @@ public struct TopicScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
-            .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
-                NavigationStack {
-                    WriteFormScreen(store: store)
-                }
-            }
+            .navigations(store: store)
             .toolbar { OptionsMenu() }
             .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
             .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
             .onChange(of: scenePhase) { newScenePhase in
                 if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
-                    store.send(.onSceneBecomeActive)
+                    send(.onSceneBecomeActive)
                 }
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -97,22 +93,22 @@ public struct TopicScreen: View {
             if let topic = store.topic, store.isUserAuthorized, topic.canPost {
                 Section {
                     ContextButton(text: "Write Post", symbol: .plusCircle, bundle: .module) {
-                        store.send(.contextMenu(.writePost))
+                        send(.contextMenu(.writePost))
                     }
                 }
             }
             
             ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
-                store.send(.contextMenu(.copyLink))
+                send(.contextMenu(.copyLink))
             }
             ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
-                store.send(.contextMenu(.openInBrowser))
+                send(.contextMenu(.openInBrowser))
             }
             
             if !store.pageNavigation.isLastPage {
                 Section {
                     ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
-                        store.send(.contextMenu(.goToEnd))
+                        send(.contextMenu(.goToEnd))
                     }
                 }
             }
@@ -124,7 +120,7 @@ public struct TopicScreen: View {
                         symbol: topic.isFavorite ? .starFill : .star,
                         bundle: .module
                     ) {
-                        store.send(.contextMenu(.setFavorite))
+                        send(.contextMenu(.setFavorite))
                     }
                 }
             }
@@ -147,13 +143,18 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func PostList(topic: Topic) -> some View {
-        ForEach(topic.posts) { post in
+        ForEach(topic.posts, id: \.id) { post in
             WithPerceptionTracking {
                 VStack(spacing: 0) {
-                    if !store.isFirstPage && topic.posts.first == post {
-                        // TODO: Add expandable head topic
-//                        Text("Шапка Темы")
-//                            .padding(16)
+                    if store.shouldShowTopicHatButton && topic.posts.first == post {
+                        Button {
+                            send(.topicHatOpenButtonTapped)
+                        } label: {
+                            Text("Topic Hat", bundle: .module)
+                                .font(.headline)
+                                .bold()
+                                .padding(16)
+                        }
                     } else {
                         Post(post)
                             .padding(.horizontal, 16)
@@ -190,37 +191,41 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostHeader(_ post: Post) -> some View {
         HStack(spacing: 8) {
-            Button {
-                store.send(.userAvatarTapped(post.author.id))
-            } label: {
-                LazyImage(url: URL(string: post.author.avatarUrl)) { state in
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Image(.avatarDefault).resizable().scaledToFill()
-                    }
+            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
+                if let image = state.image {
+                    image.resizable().scaledToFill()
+                } else {
+                    Image(.avatarDefault).resizable().scaledToFill()
                 }
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
+            }
+            .frame(width: 32, height: 32)
+            .clipShape(Circle())
+            .onTapGesture {
+                send(.userTapped(post.author.id))
             }
             
             VStack(spacing: 4) {
                 HStack(spacing: 8) {
-                    Text(post.author.name)
-                        .font(.subheadline)
-                        .bold()
-                        .foregroundStyle(Color(.Labels.primary))
-                        .lineLimit(1)
-                    
-                    Text(String(post.author.reputationCount))
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.secondary))
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 6)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .foregroundStyle(Color(.Background.teritary))
-                        )
+                    Group {
+                        Text(post.author.name)
+                            .font(.subheadline)
+                            .bold()
+                            .foregroundStyle(Color(.Labels.primary))
+                            .lineLimit(1)
+                        
+                        Text(String(post.author.reputationCount))
+                            .font(.caption)
+                            .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .foregroundStyle(Color(.Background.teritary))
+                            )
+                    }
+                    .onTapGesture {
+                        send(.userTapped(post.author.id))
+                    }
                     
                     Spacer()
                     
@@ -238,7 +243,7 @@ public struct TopicScreen: View {
                     
                     Spacer()
                     
-                    Text(post.createdAt.formatted())
+                    Text(post.createdAt.formattedDate(), bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.quaternary))
                         .frame(maxHeight: .infinity, alignment: .bottom)
@@ -260,7 +265,9 @@ public struct TopicScreen: View {
                 if store.types.count - 1 >= postIndex {
                     ForEach(store.types[postIndex], id: \.self) { type in
                         TopicView(type: type, attachments: post.attachments) { url in
-                            store.send(.urlTapped(url))
+                            send(.urlTapped(url))
+                        } onImageTap: { url in
+                            send(.imageTapped(url))
                         }
                     }
                 }
@@ -291,7 +298,19 @@ public struct TopicScreen: View {
         Menu {
             Section {
                 ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
-                    store.send(.contextPostMenu(.reply(post.id, post.author.name)))
+                    send(.contextPostMenu(.reply(post.id, post.author.name)))
+                }
+            }
+            
+            if post.canEdit {
+                ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
+                    send(.contextPostMenu(.edit(post)))
+                }
+            }
+            
+            if post.canDelete {
+                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                    send(.contextPostMenu(.delete(post.id)))
                 }
             }
         } label: {
@@ -325,8 +344,59 @@ public struct TopicScreen: View {
                 try? await Task.sleep(for: .seconds(duration))
                 withAnimation(animation) { scrollScale = 1 }
                 try? await Task.sleep(for: .seconds(duration))
-                store.send(.finishedPostAnimation)
+                send(.finishedPostAnimation)
             }
+        }
+    }
+}
+
+// MARK: - Navigation Modifier
+
+struct NavigationModifier: ViewModifier {
+    
+    @Perception.Bindable private var store: StoreOf<TopicFeature>
+    
+    init(store: StoreOf<TopicFeature>) {
+        self.store = store
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+            .navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                NavigationStack {
+                    WriteFormScreen(store: store)
+                }
+            }
+            .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
+                let state = store.withState { $0 }
+                TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+            }
+    }
+}
+
+extension View {
+    func navigations(store: StoreOf<TopicFeature>) -> some View {
+        self.modifier(NavigationModifier(store: store))
+    }
+}
+
+// MARK: - Extensions
+
+// TODO: Move to extensions?
+private extension Date {
+    func formattedDate() -> LocalizedStringKey {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        
+        if Calendar.current.isDateInToday(self) {
+            return LocalizedStringKey("Today, \(formatter.string(from: self))")
+        } else if Calendar.current.isDateInYesterday(self) {
+            return LocalizedStringKey("Yesterday, \(formatter.string(from: self))")
+        } else {
+            formatter.dateFormat = "dd.MM.yy, HH:mm"
+            return LocalizedStringKey(formatter.string(from: self))
         }
     }
 }
@@ -334,7 +404,7 @@ public struct TopicScreen: View {
 // MARK: - Previews
 
 #Preview {
-    @Shared(.userSession) var userSession = UserSession(userId: 0, token: "", isHidden: false)
+    @Shared(.userSession) var userSession = UserSession.mock
     
     TopicScreen(
         store: Store(
@@ -344,6 +414,72 @@ public struct TopicScreen: View {
         } withDependencies: {
             $0.apiClient.getTopic = { @Sendable _, _, _ in
                 return .mock
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("New post requests attach") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postSendingPreview
+}
+
+@MainActor private var postSendingPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .writeForm(
+                    WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new, topicId: 0, content: .simple("Test Text", [])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendPost = { request in
+                try await Task.sleep(for: .seconds(1))
+                if request.flag == 0 {
+                    return .failure(.attach)
+                } else {
+                    return .success(.init(id: 0, topicId: 0, offset: 0))
+                }
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Post sending returns error status") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postErrorStatusPreview
+}
+
+@MainActor private var postErrorStatusPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0, 
+                topicName: "Test Topic",
+                destination: .writeForm(
+                    WriteFormFeature.State(
+                        formFor: .post(
+                            type: .new, topicId: 0, content: .simple("Test Text", [])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendPost = { request in
+                try await Task.sleep(for: .seconds(1))
+                return .failure(.tooLong) // <----------
             }
         }
     )
