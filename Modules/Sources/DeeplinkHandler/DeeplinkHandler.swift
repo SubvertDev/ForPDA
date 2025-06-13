@@ -164,8 +164,9 @@ public struct DeeplinkHandler {
     public func handleNotification(_ identifier: String) throws(DeeplinkError) -> Deeplink {
         let split = identifier.split(separator: "-")
         let url = URL(string: "notification://\(identifier)")!
-        guard let typeString = split.first, let typeInt = Int(typeString) else { throw .noDeeplinkAvailable(for: url) }
-        guard let idString = split.last,    let id = Int(idString)        else { throw .noDeeplinkAvailable(for: url) }
+        guard let typeString = split.first,     let typeInt = Int(typeString)        else { throw .noDeeplinkAvailable(for: url) }
+        guard let idString = split[safe: 1],    let id = Int(idString)               else { throw .noDeeplinkAvailable(for: url) }
+        guard let timestampString = split.last, let timestamp = Int(timestampString) else { throw .noDeeplinkAvailable(for: url) }
         
         guard let type = Unread.Item.Category(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
         
@@ -178,11 +179,18 @@ public struct DeeplinkHandler {
         case .topic:
             return Deeplink.topic(id: id, goTo: .unread)
         case .forumMention:
-            return Deeplink.topic(id: id, goTo: .unread)
+            // Forum mention has topic id in timestamp place
+            return Deeplink.topic(id: timestamp, goTo: .post(id: id))
         case .siteMention:
             return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
         }
         
         throw .noDeeplinkAvailable(for: url)
+    }
+}
+
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }
