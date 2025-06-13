@@ -121,7 +121,6 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 //        let url = URL(string: "https://cs4a0d.4pda.ws/30526949/logo.png?s=00378e7459cfdd7967cc65ea00000000ae6372537e06c01c5b8747bf174cfa95")!
 //        print("URL for \(id) is \(url)")
         let (data, _) = try await URLSession.shared.data(from: url)
-        throw NSError(domain: "", code: 0)
         
         var displaySizeChanged = false
         
