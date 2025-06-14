@@ -13,7 +13,7 @@ public struct ReputationChangeRequest: Sendable {
     public let reason: String
     public let action: ChangeActionType
     
-    public enum ContentType: Sendable {
+    public enum ContentType: Sendable, Equatable {
         case post(id: Int)
         case comment(id: Int)
         case profile

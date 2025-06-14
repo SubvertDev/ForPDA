@@ -16,6 +16,7 @@ import ParsingClient
 import PasteboardClient
 import NotificationCenterClient
 import WriteFormFeature
+import ReputationChangeFeature
 import TCAExtensions
 import AnalyticsClient
 import TopicBuilder
@@ -34,6 +35,7 @@ public struct TopicFeature: Reducer, Sendable {
         case gallery([URL], [Int], Int)
         case editWarning
         case writeForm(WriteFormFeature)
+        case changeReputation(ReputationChangeFeature)
     }
     
     // MARK: - State
@@ -280,6 +282,15 @@ public struct TopicFeature: Reducer, Sendable {
                         
                         jumpTo(.post(id: id), true, &state)
                     )
+                    
+                case .changeReputation(let postId, let userId, let username):
+                    let feature = ReputationChangeFeature.State(
+                        userId: userId,
+                        username: username,
+                        content: .post(id: postId)
+                    )
+                    state.destination = .changeReputation(feature)
+                    return .none
                 }
                 
             case let .view(.imageTapped(url)):

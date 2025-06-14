@@ -14,6 +14,7 @@ import SharedUI
 import NukeUI
 import Models
 import ParsingClient
+import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
 
@@ -313,6 +314,14 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.delete(post.id)))
                 }
             }
+            
+            if store.isUserAuthorized, post.author.id != store.userSession!.userId {
+                Section {
+                    ContextButton(text: "Reputation", symbol: .plusminus, bundle: .module) {
+                        send(.contextPostMenu(.changeReputation(post.id, post.author.id, post.author.name)))
+                    }
+                }
+            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)
@@ -373,6 +382,9 @@ struct NavigationModifier: ViewModifier {
             .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
                 let state = store.withState { $0 }
                 TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+            }
+            .fittedSheet(item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation)) { store in
+                ReputationChangeView(store: store)
             }
             .sheet(isPresented: Binding($store.destination.editWarning)) {
                 EditWarningSheet()
