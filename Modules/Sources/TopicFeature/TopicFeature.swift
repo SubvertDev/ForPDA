@@ -298,7 +298,6 @@ public struct TopicFeature: Reducer, Sendable {
                             }
                         }
                     }
-                    break
                 }
                 return .none
                 

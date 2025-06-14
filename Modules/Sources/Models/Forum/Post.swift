@@ -8,6 +8,9 @@
 import Foundation
 
 public struct Post: Sendable, Hashable, Identifiable, Codable {
+        
+    // MARK: - Properties
+    
     public let id: Int
     public let flag: Int
     public let content: String
@@ -31,15 +34,19 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
             .matches(of: numberRegex)
             .compactMap { Int($0.1) }
         
-        let orderedAttachments = extractedNumbers.compactMap { number in
+        var orderedAttachments = extractedNumbers.compactMap { number in
             attachments.first(where: { $0.id == number })
         }
         
+        if !content.contains("attachment") || orderedAttachments.count < attachments.filter({ isImageAttachment($0) }).count {
+            orderedAttachments = Array(Set(orderedAttachments + attachments))
+        }
+        
         return orderedAttachments
-            .filter { $0.type == .image }
-            .filter { $0.metadata != nil }
-            .filter { $0.size != 0 }
+            .filter { isImageAttachment($0) }
     }
+    
+    // MARK: - Init
     
     public init(
         id: Int,
@@ -60,6 +67,8 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         self.createdAt = createdAt
         self.lastEdit = lastEdit
     }
+    
+    // MARK: - Nested Structs
     
     public struct Attachment: Sendable, Hashable, Codable {
         public let id: Int
@@ -162,7 +171,15 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
             self.reputationCount = reputationCount
         }
     }
+    
+    // MARK: - Private
+    
+    private func isImageAttachment(_ attachment: Attachment) -> Bool {
+        return attachment.type == .image && attachment.metadata != nil && attachment.size != 0
+    }
 }
+
+// MARK: - Mocks
 
 extension Post {
     static let mock = Post(
