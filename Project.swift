@@ -88,6 +88,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
