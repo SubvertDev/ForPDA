@@ -70,9 +70,16 @@ private extension BBNode {
             
         case .size(let size, let children):
             var newAttributes = attributes
-            newAttributes[NSAttributedString.Key.font] = UIFont
-                .preferredFont(forBBCodeSize: size)
-                .addingSymbolicTraits(of: currentFont)
+            let currentFont = newAttributes[NSAttributedString.Key.font] as! UIFont
+            if currentFont.fontName == UIFont.systemFont(ofSize: currentFont.pointSize).fontName {
+                newAttributes[NSAttributedString.Key.font] = UIFont
+                    .preferredFont(forBBCodeSize: size)
+                    .addingSymbolicTraits(of: currentFont)
+            } else {
+                newAttributes[NSAttributedString.Key.font] = currentFont
+                    .withSize(UIFont.preferredFont(forBBCodeSize: size).pointSize)
+                    .addingSymbolicTraits(of: currentFont)
+            }
             return children.map { $0.render(withAttributes: newAttributes) }.joined()
             
         case .color(let color, let children):
