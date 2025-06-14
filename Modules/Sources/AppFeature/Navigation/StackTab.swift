@@ -306,6 +306,7 @@ public struct StackTab: Reducer, Sendable {
                         } else {
                             // Post is NOT on the same page, opening new screen
                             state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                            return .none
                         }
                     } else {
                         analytics.capture(DeeplinkHandlingError.unknownGoToType(goTo))
