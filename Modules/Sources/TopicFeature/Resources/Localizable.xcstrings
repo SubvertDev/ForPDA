@@ -57,12 +57,32 @@
         }
       }
     },
+    "Editing posts with attachments is not yet supported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактирование постов с вложениями пока что не поддерживается"
+          }
+        }
+      }
+    },
     "Go To End" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перейти в конец"
+          }
+        }
+      }
+    },
+    "IN DEVELOPMENT" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В РАЗРАБОТКЕ"
           }
         }
       }
@@ -133,6 +153,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Шапка темы"
+          }
+        }
+      }
+    },
+    "Understood" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понятно"
           }
         }
       }

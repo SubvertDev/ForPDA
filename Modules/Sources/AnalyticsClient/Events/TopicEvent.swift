@@ -13,6 +13,7 @@ public enum TopicEvent: Event {
     case userTapped(Int)
     case urlTapped(URL)
     case imageTapped(URL)
+    case editWarningSheetClosed
     
     case menuCopyLink
     case menuOpenInBrowser

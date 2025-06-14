@@ -29,7 +29,8 @@ extension TopicFeature {
                         .internal(.refresh),
                         .pageNavigation,
                         .destination,
-                        .delegate:
+                        .delegate,
+                        .binding:
                     break
                     
                 case .view(.onRefresh):
@@ -70,6 +71,9 @@ extension TopicFeature {
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
                     }
+                    
+                case .view(.editWarningSheetCloseButtonTapped):
+                    analytics.log(TopicEvent.editWarningSheetClosed)
                     
                 case let .internal(.loadTopic(offset: offset)):
                     analytics.log(TopicEvent.loadingStart(offset))
