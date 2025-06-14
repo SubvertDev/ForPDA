@@ -113,14 +113,14 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
     
     var isDownloading = false
     
-    private func startAttachmentDownload(url: URL) async {
+    private func startAttachmentDownload(url: URL) async throws {
 //        defer { isDownloading = false }
         guard !isDownloading else { return }
         isDownloading = true
 //        let url = try! await apiClient.getAttachment(id: id)
 //        let url = URL(string: "https://cs4a0d.4pda.ws/30526949/logo.png?s=00378e7459cfdd7967cc65ea00000000ae6372537e06c01c5b8747bf174cfa95")!
 //        print("URL for \(id) is \(url)")
-        let (data, _) = try! await URLSession.shared.data(from: url)
+        let (data, _) = try await URLSession.shared.data(from: url)
         
         var displaySizeChanged = false
         
@@ -223,9 +223,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 			self.textContainer = textContainer
 			
             if let attachmentUrl {
-                Task { await startAttachmentDownload(url: attachmentUrl) }
-//            } else {
-//                startAsyncImageDownload()
+                Task { await startDownload(url: attachmentUrl) }
             }
 			
 			return nil
@@ -233,6 +231,35 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 		
 		return image
 	}
+    
+    private func startDownload(url: URL) async {
+        do {
+            try await startAttachmentDownload(url: url)
+        } catch {
+             let font = UIFont.preferredFont(forTextStyle: .largeTitle)
+             let config = UIImage.SymbolConfiguration(font: font)
+             let image = UIImage(systemSymbol: .xCircleFill, withConfiguration: config)
+                .withTintColor(UIColor(resource: .Main.red))
+            
+            contents = image.pngData()
+            fileType = UTType.png.identifier
+            
+            var displaySizeChanged = false
+            if displaySize == nil {
+                displaySizeChanged = true
+            }
+            
+            Task { @MainActor in
+                if displaySizeChanged {
+                    textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
+                } else {
+                    textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
+                }
+                
+                delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
+            }
+        }
+    }
 
     public override func attachmentBounds(
         for textContainer: NSTextContainer?,

@@ -32,6 +32,7 @@ public struct TopicFeature: Reducer, Sendable {
     public enum Destination {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
+        case editWarning
         case writeForm(WriteFormFeature)
     }
     
@@ -90,7 +91,8 @@ public struct TopicFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action: ViewAction {
+    public enum Action: ViewAction, BindableAction {
+        case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
         case pageNavigation(PageNavigationFeature.Action)
 
@@ -106,6 +108,7 @@ public struct TopicFeature: Reducer, Sendable {
             case imageTapped(URL)
             case contextMenu(TopicContextMenuAction)
             case contextPostMenu(TopicPostContextMenuAction)
+            case editWarningSheetCloseButtonTapped
         }
         
         case `internal`(Internal)
@@ -145,6 +148,8 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Scope(state: \.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
@@ -171,7 +176,7 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .destination, .pageNavigation:
+            case .destination, .pageNavigation, .binding:
                 return .none
                 
             case .view(.onAppear):
@@ -259,7 +264,11 @@ public struct TopicFeature: Reducer, Sendable {
                             content: .simple(post.content, post.attachments.map { $0.id })
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    if post.attachments.isEmpty {
+                        state.destination = .writeForm(feature)
+                    } else {
+                        state.destination = .editWarning
+                    }
                     return .none
                     
                 case .delete(let id):
@@ -296,6 +305,10 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.finishedPostAnimation):
                 state.postId = nil
                 return .none.animation()
+                
+            case .view(.editWarningSheetCloseButtonTapped):
+                state.destination = nil
+                return .none
                 
             case .internal(.load):
                 switch state.goTo {

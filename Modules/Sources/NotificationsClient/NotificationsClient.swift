@@ -129,7 +129,7 @@ extension NotificationsClient: DependencyKey {
                         content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     }
                     
-                    let request = UNNotificationRequest(identifier: "\(item.category.rawValue)-\(item.id)", content: content, trigger: nil)
+                    let request = UNNotificationRequest(identifier: "\(item.category.rawValue)-\(item.id)-\(item.timestamp)", content: content, trigger: nil)
                     
                     do {
                         try await UNUserNotificationCenter.current().add(request)

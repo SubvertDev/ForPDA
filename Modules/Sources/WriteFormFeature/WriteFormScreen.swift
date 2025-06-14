@@ -18,6 +18,7 @@ public struct WriteFormScreen: View {
     @Environment(\.tintColor) private var tintColor
     
     @State private var isPreviewPresented: Bool = false
+    @FocusState private var isFocused: Bool
     
     public init(store: StoreOf<WriteFormFeature>) {
         self.store = store
@@ -26,19 +27,20 @@ public struct WriteFormScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             NavigationStack {
-                VStack(alignment: .leading, spacing: 0) {
-                    WriteForm()
-                }
-                .navigationTitle(Text(formTitle(), bundle: .module))
-                .padding(.horizontal, 16)
-                .background(Color(.Background.primary))
-                .navigationBarTitleDisplayMode(.inline)
-                .overlay {
-                    if store.formFields.isEmpty || store.isFormLoading {
-                        PDALoader()
-                            .frame(width: 24, height: 24)
+                WriteForm()
+                    .navigationTitle(Text(formTitle(), bundle: .module))
+                    .padding(.horizontal, 16)
+                    .background(Color(.Background.primary))
+                    .navigationBarTitleDisplayMode(.inline)
+                    .onTapGesture {
+                        isFocused = false
                     }
-                }
+                    .overlay {
+                        if store.formFields.isEmpty || store.isFormLoading {
+                            PDALoader()
+                                .frame(width: 24, height: 24)
+                        }
+                    }
             }
             .disabled(store.isPublishing)
             .animation(.default, value: store.isPublishing)
@@ -86,6 +88,7 @@ public struct WriteFormScreen: View {
                     VStack {
                         WriteFormView(
                             type: store.formFields[index],
+                            isFocused: $isFocused,
                             onUpdateContent: { content in
                                 if content != nil {
                                     send(.updateFieldContent(index, content!))
@@ -144,7 +147,7 @@ public struct WriteFormScreen: View {
             .padding(.horizontal, 2)
             
             if store.isEditReasonToggleSelected {
-                Field(text: $store.editReasonContent, description: "", guideText: "")
+                Field(text: $store.editReasonContent, description: "", guideText: "", isFocused: $isFocused)
                     .disabled(store.isPublishing || !store.isEditReasonToggleSelected)
                 
                 if store.canShowShowMark {

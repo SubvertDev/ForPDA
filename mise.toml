@@ -1,2 +1,3 @@
 [tools]
-tuist = "latest"
+ruby = "3.4.4"
+tuist = "4.53.3"
