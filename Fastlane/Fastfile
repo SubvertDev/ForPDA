@@ -125,7 +125,7 @@ platform :ios do
     lane :tests do
         run_tests(
             scheme: "ForPDA",
-            device: "iPhone 16 Pro (18.2)",
+            device: "iPhone 16 Pro (18.5)",
             ensure_devices_found: true
         )
     end
