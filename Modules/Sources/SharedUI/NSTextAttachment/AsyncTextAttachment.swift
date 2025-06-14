@@ -271,33 +271,25 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 			return CGRect(origin: .zero, size: displaySize)
 		}
         
-        if let originalImageSize {
-            if originalImageSize.width > screenWidth! {
-                let ratioWH = originalImageSize.width / (screenWidth! - 32) // TODO: 32 для боковых паддингов, в спойлерах нужно еще больше
-                let width = originalImageSize.width / ratioWH
-                let height = originalImageSize.height / ratioWH
-                // print("Setting: \(width) \(height)")
-                return CGRect(x: 0, y: 0, width: width, height: height)
-            } else {
-                let width = originalImageSize.width
-                let height = originalImageSize.height
-                return CGRect(x: 0, y: 0, width: width, height: height)
-            }
+        guard let originalImageSize else {
+            return .zero
         }
-		
-//		if let imageSize = originalImageSize {
-//			let maxWidth = maximumDisplayWidth ?? lineFrag.size.width
-//			let factor = maxWidth / imageSize.width
-//			
-//            return CGRect(
-//                origin: .zero,
-//                size: CGSize(
-//                    width: Int(imageSize.width * factor),
-//                    height: Int(imageSize.height * factor)
-//                )
-//            )
-//		}
-		
-		return .zero
+        
+        // TODO: ScreenWidth is nil when opening post hat on non-first page
+        if screenWidth == nil {
+            screenWidth = 393 // Average
+        }
+        
+        if originalImageSize.width > screenWidth! {
+            let ratioWH = originalImageSize.width / (screenWidth! - 32) // TODO: 32 для боковых паддингов, в спойлерах нужно еще больше
+            let width = originalImageSize.width / ratioWH
+            let height = originalImageSize.height / ratioWH
+            // print("Setting: \(width) \(height)")
+            return CGRect(x: 0, y: 0, width: width, height: height)
+        } else {
+            let width = originalImageSize.width
+            let height = originalImageSize.height
+            return CGRect(x: 0, y: 0, width: width, height: height)
+        }
 	}
 }
