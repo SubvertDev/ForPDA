@@ -37,11 +37,12 @@ platform :ios do
     end
 
     desc "Uploads to TestFlight"
-    lane :upload do
+    lane :upload do |options|
+        run_tests = options[:run_tests] || false
         prepare_certificates
         update_build_number
         run_tuist(testflight: true)
-        tests
+        tests if run_tests
         build_ipa
         upload_dsym_to_sentry
         upload_app_to_testflight

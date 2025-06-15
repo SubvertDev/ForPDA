@@ -19,7 +19,7 @@ extension FavoritesFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate:
+                case .view(.onFirstAppear), .view(.onNextAppear), .delegate:
                     break
                     
                 case .view(.onRefresh):
