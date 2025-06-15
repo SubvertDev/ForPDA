@@ -211,6 +211,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
+                    .Internal.WriteFormFeature,
                     .SPM.NukeUI,
                     .SPM.TCA
                 ]
