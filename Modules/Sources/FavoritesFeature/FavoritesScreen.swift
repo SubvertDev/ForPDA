@@ -93,8 +93,10 @@ public struct FavoritesScreen: View {
                     send(.onSceneBecomeActive)
                 }
             }
-            .onAppear {
-                send(.onAppear)
+            .onFirstAppear {
+                send(.onFirstAppear)
+            } onNextAppear: {
+                send(.onNextAppear)
             }
         }
     }
@@ -190,7 +192,7 @@ public struct FavoritesScreen: View {
         Section {
             Navigation(isShown: !important)
             
-            ForEach(Array(favorites.enumerated()), id: \.element.id) { index, favorite in
+            ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
                 Group {
                     if favorite.isForum {
                         ForumRow(

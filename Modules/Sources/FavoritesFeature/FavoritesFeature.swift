@@ -63,7 +63,8 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         case view(View)
         public enum View {
-            case onAppear
+            case onFirstAppear
+            case onNextAppear
             case onRefresh
             case onSceneBecomeActive
             case favoriteTapped(FavoriteInfo, showUnread: Bool)
@@ -120,8 +121,7 @@ public struct FavoritesFeature: Reducer, Sendable {
             case .pageNavigation, .sort:
                 return .none
                 
-            case .view(.onAppear):
-                guard state.favorites.isEmpty && state.favoritesImportant.isEmpty else { return .none }
+            case .view(.onFirstAppear):
                 return .merge([
                     updatePageNavigation(&state, offset: 0),
                     .send(.internal(.loadFavorites(offset: 0))),
@@ -131,6 +131,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                         }
                     }
                 ])
+                
+            case .view(.onNextAppear):
+                return .send(.internal(.refresh))
                 
             case .view(.onRefresh):
                 guard !state.isLoading else { return .none }

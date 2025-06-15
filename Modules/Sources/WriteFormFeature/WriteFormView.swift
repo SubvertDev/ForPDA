@@ -14,19 +14,10 @@ import BBBuilder
 struct WriteFormView: View {
     
     let type: WriteFormFieldType
+    @FocusState.Binding var isFocused: Bool
     
     let onUpdateContent: (_ fieldId: Int, _ data: FormContentData) -> Void
     let onFetchContent: (_ fieldId: Int) -> FormContentData?
-    
-    init(
-        type: WriteFormFieldType,
-        onUpdateContent: @escaping (Int, FormContentData) -> Void,
-        onFetchContent: @escaping (Int) -> FormContentData?
-    ) {
-        self.type = type
-        self.onUpdateContent = onUpdateContent
-        self.onFetchContent = onFetchContent
-    }
 
     var body: some View {
         switch type {
@@ -38,7 +29,8 @@ struct WriteFormView: View {
                         set: { onUpdateContent(content.id, .text($0)) }
                     ),
                     description: content.description,
-                    guideText: content.example
+                    guideText: content.example,
+                    isFocused: $isFocused
                 )
             } header: {
                 Header(title: content.name, required: content.isRequired)
@@ -72,7 +64,8 @@ struct WriteFormView: View {
                     ),
                     description: content.description,
                     guideText: content.example,
-                    isEditor: true
+                    isEditor: true,
+                    isFocused: $isFocused
                 )
             } header: {
                 if !content.name.isEmpty {
@@ -288,7 +281,7 @@ struct Field: View {
     let guideText: String
     var isEditor = false
     
-    @FocusState private var focus: Bool
+    @FocusState.Binding var isFocused: Bool
     
     var body: some View {
         VStack {
@@ -298,7 +291,7 @@ struct Field: View {
                         .font(.body)
                         .foregroundStyle(Color(.quaternaryLabel))
                 }
-                .focused($focus)
+                .focused($isFocused)
                 .font(.body)
                 .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -310,6 +303,9 @@ struct Field: View {
             .background {
                 RoundedRectangle(cornerRadius: 14)
                     .fill(Color(.Background.teritary))
+                    .onTapGesture {
+                        isFocused = true
+                    }
             }
             .overlay {
                 RoundedRectangle(cornerRadius: 14)
@@ -327,21 +323,24 @@ struct Field: View {
         }
         .animation(.default, value: false)
         .onAppear {
-            focus = true
+            isFocused = true
         }
     }
 }
 
 // MARK: - Field View Preview
 
+@available(iOS 17, *)
 #Preview("Field View") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         Spacer()
         
         Field(
             text: Binding( get: { "" }, set: { _ in } ),
             description: "Some basic description$",
-            guideText: "Some guide text"
+            guideText: "Some guide text",
+            isFocused: $isFocused
         )
         .bounceUpByLayerEffect(value: false)
         
@@ -352,7 +351,9 @@ struct Field: View {
 
 // MARK: - Write Form Text Preview
 
+@available(iOS 17, *)
 #Preview("Write Form Text Preview") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         WriteFormView(
             type: .text(
@@ -365,6 +366,7 @@ struct Field: View {
                     defaultValue: ""
                 )
             ),
+			isFocused: $isFocused,
             onUpdateContent: { _, _ in },
             onFetchContent: { _ in .text("Some basic text") }
         )
@@ -376,10 +378,13 @@ struct Field: View {
 
 // MARK: - Write Form Title Preview
 
+@available(iOS 17, *)
 #Preview("Write Form Title Preview") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         WriteFormView(
             type: .title("[b]Absolute simple.[/b]"),
+			isFocused: $isFocused,
             onUpdateContent: { _, _ in },
             onFetchContent: { _ in nil }
         )
@@ -391,7 +396,9 @@ struct Field: View {
 
 // MARK: - Write Form Editor Preview
 
+@available(iOS 17, *)
 #Preview("Write Form Editor Preview") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         WriteFormView(
             type: .editor(
@@ -404,6 +411,7 @@ struct Field: View {
                     defaultValue: ""
                 )
             ),
+			isFocused: $isFocused,
             onUpdateContent: { _, _ in },
             onFetchContent: { _ in .text("Some editor text") }
         )
@@ -415,7 +423,9 @@ struct Field: View {
 
 // MARK: - Write Form Dropdown Preview
 
+@available(iOS 17, *)
 #Preview("Write Form Dropdown Preview") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         WriteFormView(
             type: .dropdown(
@@ -429,6 +439,7 @@ struct Field: View {
                 ),
                 ["Phone", "SmartWatch"]
             ),
+			isFocused: $isFocused,
             onUpdateContent: { _, _ in },
             onFetchContent: { _ in .dropdown(0, "Phone") }
         )
@@ -440,7 +451,9 @@ struct Field: View {
 
 // MARK: - Write Form CheckBox Preview
 
+@available(iOS 17, *)
 #Preview("Write Form CheckBox Preview") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         WriteFormView(
             type: .checkboxList(
@@ -454,6 +467,7 @@ struct Field: View {
                 ),
                 ["I accept all"]
             ),
+			isFocused: $isFocused,
             onUpdateContent: { _, _ in },
             onFetchContent: { _ in .checkbox([0: true]) }
         )
@@ -465,7 +479,9 @@ struct Field: View {
 
 // MARK: - Write Form UploadBox Preview
 
+@available(iOS 17, *)
 #Preview("Write Form UploadBox Preview") {
+    @Previewable @FocusState var isFocused: Bool
     VStack {
         WriteFormView(
             type: .uploadbox(
@@ -479,6 +495,7 @@ struct Field: View {
                 ),
                 ["jpg", "gif", "png"]
             ),
+			isFocused: $isFocused,
             onUpdateContent: { _, _ in },
             onFetchContent: { _ in .uploadbox([]) }
         )
