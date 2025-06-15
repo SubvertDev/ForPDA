@@ -116,7 +116,7 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadForum(offset: newOffset))
                 
-            case let .writeForm(.presented(.writeFormSent(response))):
+            case let .writeForm(.presented(.delegate(.writeFormSent(response)))):
                 if case let .template(status) = response {
                     switch status {
                     case .success(.topic(let id)):
