@@ -231,41 +231,10 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
-                    if tab == .articles, state.articlesTab.path.isEmpty {
-                        // state.articlesTab.root.articles?.articlesList?.scrollToTop()
-                        return StackTab()
-                            .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                            .map(Action.articlesTab)
-                    }
+                    return handleSameTabSelection(&state)
                 } else {
-                    if tab == .profile && !state.isAuthorized {
-                        state.auth = AuthFeature.State(openReason: .profile)
-                        // Opening tab only after auth via delegate action
-                    } else {
-                        state.previousTab = state.selectedTab
-                        state.selectedTab = tab
-                    }
+                    return handleOtherTabSelection(newTab: tab, &state)
                 }
-                
-                // Updating favorites on tab selection
-                if state.selectedTab == .favorites && state.previousTab != .favorites {
-                    state.favoritesTab.path.removeAll()
-                    
-                    return .concatenate(
-                        removeNotifications(&state),
-                        refreshFavoritesTab(&state)
-                    )
-                }
-                
-                if state.selectedTab == .forum && state.previousTab != .forum {
-                    state.forumTab.path.removeAll()
-                }
-                
-                if state.selectedTab == .profile && state.previousTab != .profile {
-                    state.profileTab.path.removeAll()
-                }
-                
-                return removeNotifications(&state)
                 
             case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
                 state.auth = nil
@@ -387,6 +356,56 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     // MARK: - Private Functions
+    
+    private func handleSameTabSelection(_ state: inout State) -> Effect<Action> {
+        if state.selectedTab == .articles, state.articlesTab.path.isEmpty {
+            // Scroll to top of articles
+            return StackTab()
+                .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
+                .map(Action.articlesTab)
+        }
+        
+        switch state.selectedTab {
+        case .articles:
+            //
+            if state.articlesTab.path.isEmpty {
+                return StackTab()
+                    .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
+                    .map(Action.articlesTab)
+            } else {
+                // TODO: enum
+                let error = NSError(domain: "Impossible articles tab action", code: 0)
+                analyticsClient.capture(error)
+            }
+            
+        case .favorites:
+            if !state.favoritesTab.path.isEmpty {
+                state.favoritesTab.path.removeAll()
+                return .concatenate(
+                    removeNotifications(&state),
+                    refreshFavoritesTab(&state)
+                )
+            }
+            
+        case .forum:
+            state.forumTab.path.removeAll()
+
+        case .profile:
+            state.profileTab.path.removeAll()
+        }
+        
+        return removeNotifications(&state)
+    }
+    
+    private func handleOtherTabSelection(newTab: AppTab, _ state: inout State) -> Effect<Action> {
+        if newTab == .profile && !state.isAuthorized {
+            state.auth = AuthFeature.State(openReason: .profile)
+        } else {
+            state.previousTab = state.selectedTab
+            state.selectedTab = newTab
+        }
+        return removeNotifications(&state)
+    }
     
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
