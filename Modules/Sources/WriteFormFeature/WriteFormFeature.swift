@@ -165,36 +165,6 @@ public struct WriteFormFeature: Reducer, Sendable {
             case .publishButtonTapped:
                 state.isPublishing = true
                 return .send(._publishPost(flag: .default))
-                
-            case .previewButtonTapped:
-                let topicId = if case .post(_, let topicId, _) = state.formFor { topicId } else { 0 }
-                let type = if case .post(let type, _, _) = state.formFor { type } else { WriteFormForType.PostType.new }
-                state.destination = .preview(
-                    FormPreviewFeature.State(
-                        formType: .post(
-                            type: type,
-                            topicId: topicId,
-                            content: .simple(state.textContent, [])
-                        )
-                    )
-                )
-                return .none
-                
-            case .writeFormSent(let result):
-                if case let .report(status) = result {
-                    // Not closing form if error.
-                    if status.isError {
-                        return .none
-                    }
-                }
-                return .run { _ in await dismiss() }
-                
-            case .dismissButtonTapped:
-                return .run { _ in await dismiss() }
-                
-            case .updateFieldContent(_, let content):
-                state.textContent = content
-                return .none
             
             case let ._publishPost(flag: postTypeFlag):
                 switch state.formFor {
@@ -251,16 +221,10 @@ public struct WriteFormFeature: Reducer, Sendable {
                     return .none
                 }
                 
-            case .preview:
-                return .none
-                
             case .previewButtonTapped:
                 switch state.formFor {
                 case .topic(let forumId, _):
-                    state.preview = FormPreviewFeature.State(formType: .topic(
-                        forumId: forumId,
-                        content: state.textContent
-                    ))
+                    state.destination = .preview(FormPreviewFeature.State(formType: .topic(forumId: forumId, content: state.textContent)))
                     
                 case .post(let type, let topicId, let content):
                     let data = if case .simple(_, let attachments) = content {
@@ -268,18 +232,10 @@ public struct WriteFormFeature: Reducer, Sendable {
                     } else {
                         WriteFormForType.PostContentType.template(state.textContent)
                     }
-                    state.preview = FormPreviewFeature.State(formType: .post(
-                        type: type,
-                        topicId: topicId,
-                        content: data
-                    ))
+                    state.destination = .preview(FormPreviewFeature.State(formType: .post(type: type, topicId: topicId, content: data)))
                     
                 case .report:
-                    state.preview = FormPreviewFeature.State(formType: .post(
-                        type: .new,
-                        topicId: 0,
-                        content: .simple(state.textContent, [])
-                    ))
+                    state.destination = .preview(FormPreviewFeature.State(formType: .post(type: .new, topicId: 0, content: .simple(state.textContent, []))))
                 }
                 return .none
                 
@@ -408,12 +364,14 @@ public struct WriteFormFeature: Reducer, Sendable {
                 print(error)
                 return .none
                 
-            case let ._simplePostResponse(.success(post)):
-                return .send(.writeFormSent(.post(PostSend(
-                    id: post.id,
-                    topicId: post.topicId,
-                    offset: post.offset
-                ))))
+            case let ._simplePostResponse(.success(response)):
+                switch response {
+                case let .success(post):
+                    return .send(.writeFormSent(.post(.success(PostSend(id: post.id, topicId: post.topicId, offset: post.offset)))))
+                case let .failure(error):
+                    // TODO: ???
+                    print(error)
+                }
                 
             case let ._simplePostResponse(.failure(error)):
                 state.isPublishing = false

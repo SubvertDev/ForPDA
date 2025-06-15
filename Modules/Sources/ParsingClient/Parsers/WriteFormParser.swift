@@ -60,10 +60,16 @@ public struct WriteFormParser {
         switch status {
         case 0:
             // if elements > 3 - response for post.
-            return if array.count > 3 {
-                .success(.post(try TopicParser.parsePostSend(from: string)))
+            if array.count > 3 {
+                let response = try TopicParser.parsePostSendResponse(from: string)
+                switch response {
+                case let .success(post):
+                    return .success(.post(post))
+                case let .failure(error):
+                    throw .unknownStatus(error.rawValue)
+                }
             } else {
-                .success(.topic(id: array[safe: 2] as! Int))
+                return .success(.topic(id: array[safe: 2] as! Int))
             }
             
         case 5:
