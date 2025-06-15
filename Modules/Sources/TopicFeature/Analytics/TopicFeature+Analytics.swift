@@ -52,6 +52,8 @@ extension TopicFeature {
                     switch option {
                     case .reply(let userId, _):
                         analytics.log(TopicEvent.menuPostReply(userId))
+                    case .karma(let postId, _):
+                        analytics.log(TopicEvent.menuPostKarma(postId))
                     case .edit(let post):
                         analytics.log(TopicEvent.menuPostEdit(post.id))
                     case .delete(let postId):

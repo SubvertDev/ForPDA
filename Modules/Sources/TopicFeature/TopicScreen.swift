@@ -26,6 +26,7 @@ public struct TopicScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
+    @State private var showKarmaConfirmation = false
     
     public init(store: StoreOf<TopicFeature>) {
         self.store = store
@@ -302,6 +303,12 @@ public struct TopicScreen: View {
                 }
             }
             
+            if store.isUserAuthorized, store.userSession!.userId != post.author.id, post.canChangeKarma {
+                ContextButton(text: "Rate", symbol: .chevronUpChevronDown, bundle: .module) {
+                    showKarmaConfirmation = true
+                }
+            }
+            
             if post.canEdit {
                 ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
                     send(.contextPostMenu(.edit(post)))
@@ -320,6 +327,19 @@ public struct TopicScreen: View {
                 .padding(.horizontal, 8) // Padding for tap area
                 .padding(.vertical, 16)
                 .rotationEffect(.degrees(90))
+        }
+        .confirmationDialog("", isPresented: $showKarmaConfirmation) {
+            Button {
+                send(.contextPostMenu(.karma(post.id, false)))
+            } label: {
+                Text("Up", bundle: .module)
+            }
+            
+            Button {
+                send(.contextPostMenu(.karma(post.id, true)))
+            } label: {
+                Text("Down", bundle: .module)
+            }
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 8, height: 22)

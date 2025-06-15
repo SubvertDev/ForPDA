@@ -15,10 +15,10 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let flag: Int
     public let content: String
     public let author: Author
-    public let karma: Int
     public let attachments: [Attachment]
     public let createdAt: Date
     public let lastEdit: LastEdit?
+    private let rawKarma: Int
     
     public var canEdit: Bool {
         return flag & 128 > 0
@@ -26,6 +26,16 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     
     public var canDelete: Bool {
         return flag & 256 > 0
+    }
+    
+    public var karma: Int {
+        return rawKarma >> 3
+    }
+    
+    public var canChangeKarma: Bool {
+        if rawKarma & 1 > 0 {
+            rawKarma & 2 <= 0
+        } else { false }
     }
     
     public var imageAttachmentsOrdered: [Attachment] {
@@ -62,7 +72,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         self.flag = flag
         self.content = content
         self.author = author
-        self.karma = karma
+        self.rawKarma = karma
         self.attachments = attachments
         self.createdAt = createdAt
         self.lastEdit = lastEdit

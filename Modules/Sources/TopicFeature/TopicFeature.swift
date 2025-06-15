@@ -280,6 +280,16 @@ public struct TopicFeature: Reducer, Sendable {
                         
                         jumpTo(.post(id: id), true, &state)
                     )
+                    
+                case .karma(let id, let isDown):
+                    return .concatenate(
+                        .run { _ in
+                            let status = try await apiClient.postKarma(postId: id, isDown: isDown)
+                            await toastClient.showToast(status ? .postKarmaChanged : .whoopsSomethingWentWrong)
+                        }.cancellable(id: CancelID.loading),
+                        
+                        jumpTo(.post(id: id), true, &state)
+                    )
                 }
                 
             case let .view(.imageTapped(url)):

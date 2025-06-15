@@ -52,6 +52,7 @@ public enum ToastMessage: Equatable, Sendable {
     // Posts
     case postNotFound
     case postDeleted
+    case postKarmaChanged
     
     // Report
     case reportSent
@@ -69,6 +70,8 @@ public enum ToastMessage: Equatable, Sendable {
             return "Post not found"
         case .postDeleted:
             return "Post deleted"
+        case .postKarmaChanged:
+            return "Post karma changed"
         case .reportSent:
             return "Report sent"
         case .reportTooShort:
@@ -88,7 +91,7 @@ public enum ToastMessage: Equatable, Sendable {
              .whoopsSomethingWentWrong:
 			return true
 
-        case .custom, .reportSent, .postDeleted:
+        case .custom, .reportSent, .postDeleted, .postKarmaChanged:
             return false
         }
     }
@@ -104,7 +107,7 @@ public enum ToastMessage: Equatable, Sendable {
              .whoopsSomethingWentWrong:
             return .error
             
-        case .reportSent, .postDeleted:
+        case .reportSent, .postDeleted, .postKarmaChanged:
             return .success
         }
     }
