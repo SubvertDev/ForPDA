@@ -85,27 +85,33 @@ public struct WriteFormFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action: BindableAction {
+    public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
         
-        case onAppear
+        case view(View)
+        public enum View {
+            case onAppear
+            case updateContent(Int, FormContentData)
+            case publishButtonTapped
+            case dismissButtonTapped
+            case previewButtonTapped
+        }
         
-        case updateContent(Int, FormContentData)
+        case `internal`(Internal)
+        public enum Internal {
+            case publishPost(flag: PostSendFlag)
+            case loadForm(id: Int, isTopic: Bool)
+            case formResponse(Result<[WriteFormFieldType], any Error>)
+            case simplePostResponse(Result<PostSendResponse, any Error>)
+	        case templateResponse(Result<TemplateSend, any Error>)
+            case reportResponse(Result<ReportResponseType, any Error>)
+        }
         
-        case writeFormSent(WriteFormSend)
-        
-        case publishButtonTapped
-        case dismissButtonTapped
-        case previewButtonTapped
-        
-        case _publishPost(flag: PostSendFlag)
-        
-        case _loadForm(id: Int, isTopic: Bool)
-        case _formResponse(Result<[WriteFormFieldType], any Error>)
-        case _templateResponse(Result<TemplateSend, any Error>)
-        case _simplePostResponse(Result<PostSendResponse, any Error>)
-        case _reportResponse(Result<ReportResponseType, any Error>)
+        case delegate(Delegate)
+        public enum Delegate {
+            case writeFormSent(WriteFormSend)
+        }
     }
     
     @Dependency(\.apiClient) private var apiClient
@@ -119,10 +125,10 @@ public struct WriteFormFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
+            case .view(.onAppear):
                 switch state.formFor {
                 case .topic(let forumId, _):
-                    return .send(._loadForm(id: forumId, isTopic: true))
+                    return .send(.internal(.loadForm(id: forumId, isTopic: true)))
                     
                 case .post(_, let topicId, let contentType):
                     if state.inPostEditingMode,
@@ -133,6 +139,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                     }
                     switch contentType {
                     case .simple(let content, _):
+#warning("Отделить send")
                         state.content[0] = .text(content)
                         return .send(._formResponse(.success([
                             .editor(.init(
@@ -159,14 +166,42 @@ public struct WriteFormFeature: Reducer, Sendable {
                             flag: 1,
                             defaultValue: ""
                         ))
-                    ])))
+                        return .send(.internal(.formResponse(.success([field]))))
+                        
+                    case .template:
+                        return .send(.internal(.loadForm(id: topicId, isTopic: false)))
+                    }
+                    
+                case .report:
+                    let field = WriteFormFieldType.editor(.init(
+                        name: "",
+                        description: "",
+                        example: "",
+                        flag: 0,
+                        defaultValue: ""
+                    ))
+                    return .send(.internal(.formResponse(.success([field]))))
                 }
                 
-            case .publishButtonTapped:
+            case .view(.publishButtonTapped):
                 state.isPublishing = true
-                return .send(._publishPost(flag: .default))
+                return .send(.internal(.publishPost(flag: .default)))
+                
+            case .view(.previewButtonTapped):
+                let topicId = if case .post(_, let topicId, _) = state.formFor { topicId } else { 0 }
+                let type = if case .post(let type, _, _) = state.formFor { type } else { WriteFormForType.PostType.new }
+                state.destination = .preview(
+                    FormPreviewFeature.State(
+                        formType: .post(
+                            type: type,
+                            topicId: topicId,
+                            content: .simple(state.textContent, [])
+                        )
+                    )
+                )
+                return .none
             
-            case let ._publishPost(flag: postTypeFlag):
+            case let .internal(.publishPost(flag: postTypeFlag)):
                 switch state.formFor {
                 case .topic(let id, _), .post(type: .new, let id, content: .template(_)):
                     return .run { [isTopic = state.formFor.isTopic, content = state.textContent] send in
@@ -192,7 +227,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                                 attachments: attachments
                             )
                             let result = await Result { try await apiClient.sendPost(request: request) }
-                            await send(._simplePostResponse(result))
+                            await send(.internal(.simplePostResponse(result)))
                             
                         case .edit(let postId):
                             let request = PostEditRequest(
@@ -206,7 +241,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                                 )
                             )
                             let result = await Result { try await apiClient.editPost(request: request) }
-                            await send(._simplePostResponse(result))
+                            await send(.internal(.simplePostResponse(result)))
                         }
                     }
                     
@@ -214,7 +249,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                     return .run { [content = state.textContent] send in
                         let request = ReportRequest(id: id, type: type, message: content)
                         let result = await Result { try await apiClient.sendReport(request: request) }
-                        await send(._reportResponse(result))
+                        await send(.internal(.reportResponse(result)))
                     }
                     
                 default:
@@ -282,15 +317,15 @@ public struct WriteFormFeature: Reducer, Sendable {
                 }
                 return .none
 
-            case let ._loadForm(id, isTopic):
+            case let .internal(loadForm(id, isTopic)):
                 return .run { send in
                     let result = await Result { try await apiClient.getTemplate(id: id, isTopic: isTopic) }
-                    await send(._formResponse(result))
+                    await send(.internal(.formResponse(result)))
                 } catch: { error, send in
-                    await send(._formResponse(.failure(error)))
+                    await send(.internal(.formResponse(.failure(error))))
                 }
                 
-            case let ._formResponse(.success(form)):
+            case let .internal(.formResponse(.success(form))):
                 state.formFields = form
                 
                 state.isFormLoading = false
@@ -317,14 +352,14 @@ public struct WriteFormFeature: Reducer, Sendable {
                 
                 return .none
                 
-            case let ._formResponse(.failure(error)):
+            case let .internal(.formResponse(.failure(error))):
                 print(error)
                 return .none
                 
-            case let ._simplePostResponse(.success(.success(post))):
-                return .send(.writeFormSent(.post(.success(post))))
+            case let .internal(.simplePostResponse(.success(.success(post)))):
+                return .send(.delegate(.writeFormSent(.post(.success(post)))))
                 
-            case let ._simplePostResponse(.success(.failure(status))):
+            case let .internal(.simplePostResponse(.success(.failure(status)))):
                 switch status {
                 case .premoderation:
                     state.destination = .alert(.postIsSentToPremoderation)
@@ -350,7 +385,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                     return .run { _ in await dismiss() }
                 }
                 
-                return .send(._publishPost(flag: PostSendFlag(rawValue: editorFlag)!))
+                return .send(.internal(.publishPost(flag: PostSendFlag(rawValue: editorFlag)!)))
                 
             case .destination(.dismiss):
                 state.isPublishing = false
@@ -373,18 +408,27 @@ public struct WriteFormFeature: Reducer, Sendable {
                     print(error)
                 }
                 
-            case let ._simplePostResponse(.failure(error)):
+            case let .internal(.simplePostResponse(.failure(error))):
                 state.isPublishing = false
                 print(error)
                 return .none
                 
-            case let ._reportResponse(.success(result)):
-                return .send(.writeFormSent(.report(result)))
+            case let .internal(.reportResponse(.success(result))):
+                return .send(.delegate(.writeFormSent(.report(result))))
                 
-            case let ._reportResponse(.failure(error)):
+            case let .internal(.reportResponse(.failure(error))):
                 state.isPublishing = false
                 print(error)
                 return .none
+                
+            case .delegate(.writeFormSent(let result)):
+                if case let .report(status) = result {
+                    // Not closing form if error.
+                    if status.isError {
+                        return .none
+                    }
+                }
+                return .run { _ in await dismiss() }
                 
             case .binding(\.isEditReasonToggleSelected):
                 if !state.isEditReasonToggleSelected {
