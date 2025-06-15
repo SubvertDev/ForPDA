@@ -148,7 +148,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                                     description: "",
                                     example: "",
                                     flag: 1,
-                                    defaultValue: state.inPostEditingMode ? content : ""
+                                    defaultValue: content
                                 )
                             )
                         ]
