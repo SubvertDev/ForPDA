@@ -32,6 +32,8 @@ public struct TopicFeature: Reducer, Sendable {
     public enum Destination {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
+        @ReducerCaseIgnored
+        case karmaChange(Int)
         case editWarning
         case writeForm(WriteFormFeature)
     }
@@ -103,6 +105,7 @@ public struct TopicFeature: Reducer, Sendable {
             case onSceneBecomeActive
             case finishedPostAnimation
             case topicHatOpenButtonTapped
+            case changeKarmaTapped(Int, Bool)
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
@@ -116,6 +119,7 @@ public struct TopicFeature: Reducer, Sendable {
             case load
             case refresh
             case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
+            case changeKarma(postId: Int, isUp: Bool)
             case loadTopic(Int)
             case loadTypes([[TopicTypeUI]])
             case topicResponse(Result<Topic, any Error>)
@@ -281,16 +285,13 @@ public struct TopicFeature: Reducer, Sendable {
                         jumpTo(.post(id: id), true, &state)
                     )
                     
-                case .karma(let id, let isDown):
-                    return .concatenate(
-                        .run { _ in
-                            let status = try await apiClient.postKarma(postId: id, isDown: isDown)
-                            await toastClient.showToast(status ? .postKarmaChanged : .whoopsSomethingWentWrong)
-                        }.cancellable(id: CancelID.loading),
-                        
-                        jumpTo(.post(id: id), true, &state)
-                    )
+                case .karma(let id):
+                    state.destination = .karmaChange(id)
+                    return .none
                 }
+                
+            case .view(.changeKarmaTapped(let postId, let isUp)):
+                return .send(.internal(.changeKarma(postId: postId, isUp: isUp)))
                 
             case let .view(.imageTapped(url)):
                 guard let topic = state.topic else { fatalError() }
@@ -332,6 +333,16 @@ public struct TopicFeature: Reducer, Sendable {
                 return .run { [offset = state.pageNavigation.offset] send in
                     await send(.internal(.loadTopic(offset)))
                 }
+                
+            case .internal(.changeKarma(let postId, let isUp)):
+                return .concatenate(
+                    .run { _ in
+                        let status = try await apiClient.postKarma(postId: postId, isUp: isUp)
+                        await toastClient.showToast(status ? .postKarmaChanged : .whoopsSomethingWentWrong)
+                    }.cancellable(id: CancelID.loading),
+                
+                    jumpTo(.post(id: postId), true, &state)
+                )
                 
             case let .internal(.loadTopic(offset)):
                 state.isFirstPage = offset == 0

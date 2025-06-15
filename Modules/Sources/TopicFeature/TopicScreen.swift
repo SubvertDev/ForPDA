@@ -305,7 +305,7 @@ public struct TopicScreen: View {
             
             if store.isUserAuthorized, store.userSession!.userId != post.author.id, post.canChangeKarma {
                 ContextButton(text: "Rate", symbol: .chevronUpChevronDown, bundle: .module) {
-                    showKarmaConfirmation = true
+                    send(.contextPostMenu(.karma(post.id)))
                 }
             }
             
@@ -327,19 +327,6 @@ public struct TopicScreen: View {
                 .padding(.horizontal, 8) // Padding for tap area
                 .padding(.vertical, 16)
                 .rotationEffect(.degrees(90))
-        }
-        .confirmationDialog("", isPresented: $showKarmaConfirmation) {
-            Button {
-                send(.contextPostMenu(.karma(post.id, false)))
-            } label: {
-                Text("Up", bundle: .module)
-            }
-            
-            Button {
-                send(.contextPostMenu(.karma(post.id, true)))
-            } label: {
-                Text("Down", bundle: .module)
-            }
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 8, height: 22)
@@ -398,6 +385,19 @@ struct NavigationModifier: ViewModifier {
                 EditWarningSheet()
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
+            }
+            .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text("") }) { postId in
+                Button {
+                    store.send(.view(.changeKarmaTapped(postId, true)))
+                } label: {
+                    Text("Up", bundle: .module)
+                }
+                
+                Button {
+                    store.send(.view(.changeKarmaTapped(postId, false)))
+                } label: {
+                    Text("Down", bundle: .module)
+                }
             }
     }
     
