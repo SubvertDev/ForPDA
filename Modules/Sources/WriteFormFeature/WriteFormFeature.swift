@@ -15,11 +15,35 @@ public struct WriteFormFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Helper Enums
+    
+    public enum PostSendFlag: Int, Sendable {
+        case `default` = 0
+        case attach = 1
+        case doNotAttach = 3
+    }
+    
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination {
+        case preview(FormPreviewFeature)
+        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Alert {
+            case attach
+            case doNotAttach
+            case dismiss
+        }
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
-        @Presents var preview: FormPreviewFeature.State?
+        @Presents public var destination: Destination.State?
+        
         @Shared(.userSession) var userSession
         
         public let formFor: WriteFormForType
@@ -63,6 +87,7 @@ public struct WriteFormFeature: Reducer, Sendable {
     
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case destination(PresentationAction<Destination.Action>)
         
         case onAppear
         
@@ -70,16 +95,16 @@ public struct WriteFormFeature: Reducer, Sendable {
         
         case writeFormSent(WriteFormSend)
         
-        case preview(PresentationAction<FormPreviewFeature.Action>)
-        
         case publishButtonTapped
         case dismissButtonTapped
         case previewButtonTapped
         
+        case _publishPost(flag: PostSendFlag)
+        
         case _loadForm(id: Int, isTopic: Bool)
         case _formResponse(Result<[WriteFormFieldType], any Error>)
         case _templateResponse(Result<TemplateSend, any Error>)
-        case _simplePostResponse(Result<PostSend, any Error>)
+        case _simplePostResponse(Result<PostSendResponse, any Error>)
         case _reportResponse(Result<ReportResponseType, any Error>)
     }
     
@@ -139,6 +164,39 @@ public struct WriteFormFeature: Reducer, Sendable {
                 
             case .publishButtonTapped:
                 state.isPublishing = true
+                return .send(._publishPost(flag: .default))
+                
+            case .previewButtonTapped:
+                let topicId = if case .post(_, let topicId, _) = state.formFor { topicId } else { 0 }
+                let type = if case .post(let type, _, _) = state.formFor { type } else { WriteFormForType.PostType.new }
+                state.destination = .preview(
+                    FormPreviewFeature.State(
+                        formType: .post(
+                            type: type,
+                            topicId: topicId,
+                            content: .simple(state.textContent, [])
+                        )
+                    )
+                )
+                return .none
+                
+            case .writeFormSent(let result):
+                if case let .report(status) = result {
+                    // Not closing form if error.
+                    if status.isError {
+                        return .none
+                    }
+                }
+                return .run { _ in await dismiss() }
+                
+            case .dismissButtonTapped:
+                return .run { _ in await dismiss() }
+                
+            case .updateFieldContent(_, let content):
+                state.textContent = content
+                return .none
+            
+            case let ._publishPost(flag: postTypeFlag):
                 switch state.formFor {
                 case .topic(let id, _), .post(type: .new, let id, content: .template(_)):
                     return .run { [isTopic = state.formFor.isTopic, content = state.textContent] send in
@@ -151,14 +209,16 @@ public struct WriteFormFeature: Reducer, Sendable {
                     }
                     
                 case .post(let type, let topicId, content: .simple(_, let attachments)):
-                    let flag = state.isShowMarkToggleSelected ? 4 : 0
-                    return .run { [reason = state.editReasonContent, content = state.textContent] send in
+                    let editPostFlag = state.isShowMarkToggleSelected ? 4 : 0
+                    return .run { [editPostFlag, topicId, attachments, reason = state.editReasonContent, content = state.textContent] send in
                         switch type {
                         case .new:
+                            var newPostFlag = 0
+                            newPostFlag |= postTypeFlag.rawValue
                             let request = PostRequest(
                                 topicId: topicId,
                                 content: content,
-                                flag: 0,
+                                flag: newPostFlag,
                                 attachments: attachments
                             )
                             let result = await Result { try await apiClient.sendPost(request: request) }
@@ -171,7 +231,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                                 data: PostRequest(
                                     topicId: topicId,
                                     content: content,
-                                    flag: flag,
+                                    flag: editPostFlag,
                                     attachments: attachments
                                 )
                             )
@@ -305,6 +365,41 @@ public struct WriteFormFeature: Reducer, Sendable {
                 print(error)
                 return .none
                 
+            case let ._simplePostResponse(.success(.success(post))):
+                return .send(.writeFormSent(.post(.success(post))))
+                
+            case let ._simplePostResponse(.success(.failure(status))):
+                switch status {
+                case .premoderation:
+                    state.destination = .alert(.postIsSentToPremoderation)
+                case .tooLong:
+                    state.destination = .alert(.postIsTooLong)
+                case .alreadySent:
+                    state.destination = .alert(.postIsAlreadySent)
+                case .attach:
+                    state.destination = .alert(.attachToPreviousPost)
+                case .unknown:
+                    state.destination = .alert(.unknownError)
+                }
+                return .none
+                
+            case let .destination(.presented(.alert(action))):
+                let editorFlag: Int
+                switch action {
+                case .attach:
+                    editorFlag = 1
+                case .doNotAttach:
+                    editorFlag = 3
+                case .dismiss:
+                    return .run { _ in await dismiss() }
+                }
+                
+                return .send(._publishPost(flag: PostSendFlag(rawValue: editorFlag)!))
+                
+            case .destination(.dismiss):
+                state.isPublishing = false
+                return .none
+
             case let ._templateResponse(.success(result)):
                 return .send(.writeFormSent(.template(result)))
                 
@@ -340,12 +435,61 @@ public struct WriteFormFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .binding:
+            case .binding, .destination:
                 return .none
             }
         }
-        .ifLet(\.$preview, action: \.preview) {
-            FormPreviewFeature()
+        .ifLet(\.$destination, action: \.destination)
+    }
+}
+
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == WriteFormFeature.Destination.Alert {
+    
+    nonisolated(unsafe) static let postIsSentToPremoderation = AlertState {
+        TextState("Post is sent to premoderation")
+    } actions: {
+        ButtonState(action: .dismiss) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let postIsTooLong = AlertState {
+        TextState("Post is too long")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let postIsAlreadySent = AlertState {
+        TextState("Post is already sent")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let attachToPreviousPost = AlertState {
+        TextState("Attach this post to previous one?")
+    } actions: {
+        ButtonState(action: .attach) {
+            TextState("Yes, attach")
+        }
+        ButtonState(action: .doNotAttach) {
+            TextState("No, no need")
+        }
+    } message: {
+        TextState("It will be attached as a dialog to your last post")
+    }
+    
+    nonisolated(unsafe) static let unknownError = AlertState {
+        TextState("Unknown error")
+    } actions: {
+        ButtonState {
+            TextState("OK")
         }
     }
 }

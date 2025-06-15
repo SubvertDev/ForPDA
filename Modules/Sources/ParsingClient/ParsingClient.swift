@@ -37,9 +37,9 @@ public struct ParsingClient: Sendable {
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
     public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
     public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PostPreview
     public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
-    public var parsePostSend: @Sendable (_ response: String) async throws -> PostSend
     
     // Write Form
     public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
@@ -105,14 +105,14 @@ extension ParsingClient: DependencyKey {
         parsePostPreview: { response in
             return try TopicParser.parsePostPreview(from: response)
         },
+        parsePostSendResponse: { response in
+            return try TopicParser.parsePostSendResponse(from: response)
+		},
         parseTemplatePreview: { response in
             return try WriteFormParser.parseTemplatePreview(from: response)
         },
         parseTemplateSend: { response in
             return try WriteFormParser.parseTemplateSend(from: response)
-        },
-        parsePostSend: { response in
-            return try TopicParser.parsePostSend(from: response)
         },
         parseWriteForm: { response in
             return try WriteFormParser.parse(from: response)

@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Attach this post to previous one?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прикрепить этот пост к предыдущему?"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "en" : {
@@ -37,6 +47,16 @@
         }
       }
     },
+    "It will be attached as a dialog to your last post" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Он будет добавлен в виде диалога к вашему последнему посту"
+          }
+        }
+      }
+    },
     "New post" : {
       "localizations" : {
         "en" : {
@@ -69,6 +89,26 @@
         }
       }
     },
+    "No, no need" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет, не нужно"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
     "Oops, error with loading preview :(" : {
       "localizations" : {
         "en" : {
@@ -97,6 +137,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ой, ошибка при загрузке заголовка :("
+          }
+        }
+      }
+    },
+    "Post is already sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост уже был отправлен"
+          }
+        }
+      }
+    },
+    "Post is sent to premoderation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост отправлен на премодерацию"
+          }
+        }
+      }
+    },
+    "Post is too long" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост слишком длинный"
           }
         }
       }
@@ -171,6 +241,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать отметку"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
+          }
+        }
+      }
+    },
+    "Yes, attach" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да, прикрепить"
           }
         }
       }

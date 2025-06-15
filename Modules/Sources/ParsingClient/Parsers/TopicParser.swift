@@ -7,6 +7,8 @@
 
 import Foundation
 import Models
+import ComposableArchitecture
+import AnalyticsClient
 
 public struct TopicParser {
     
@@ -73,7 +75,7 @@ public struct TopicParser {
         return PostPreview(content: content, attachmentIds: attachmentIds)
     }
     
-    public static func parsePostSend(from string: String) throws(ParsingError) -> PostSend {
+    public static func parsePostSendResponse(from string: String) throws(ParsingError) -> PostSendResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -82,13 +84,26 @@ public struct TopicParser {
             throw ParsingError.failedToCastDataToAny
         }
         
-        guard let id = array[safe: 4] as? Int,
-              let topicId = array[safe: 2] as? Int,
-              let offset = array[safe: 3] as? Int else {
-            throw ParsingError.failedToCastFields
+        if array.count == 2 {
+            guard let statusRaw = array[safe: 1] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            guard let result = PostSendError(rawValue: statusRaw) else {
+                throw ParsingError.unknownStatus(statusRaw)
+            }
+            
+            return .failure(result)
+        } else {
+            guard let id = array[safe: 4] as? Int,
+                  let topicId = array[safe: 2] as? Int,
+                  let offset = array[safe: 3] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            let result = PostSend(id: id, topicId: topicId, offset: offset)
+            return .success(result)
         }
-        
-        return PostSend(id: id, topicId: topicId, offset: offset)
     }
     
     // MARK: - Poll
