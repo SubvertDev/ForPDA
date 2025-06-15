@@ -93,8 +93,10 @@ public struct FavoritesScreen: View {
                     send(.onSceneBecomeActive)
                 }
             }
-            .onAppear {
-                send(.onAppear)
+            .onFirstAppear {
+                send(.onFirstAppear)
+            } onNextAppear: {
+                send(.onNextAppear)
             }
         }
     }
