@@ -649,7 +649,7 @@ extension ProjectDescription.Target {
             dependencies: dependencies,
             settings: .settings(
                 base: .targetSettings,
-                defaultSettings: .recommended(excluding: ["ASSETCATALOG_COMPILER_APPICON_NAME"])
+                defaultSettings: .recommended
             )
         )
     }
@@ -727,7 +727,7 @@ extension Dictionary where Key == String, Value == SettingValue {
     }
     
     func includeAppIcon() -> SettingsDictionary {
-        return merging(["ASSETCATALOG_COMPILER_APPICON_NAME": .string("$(ASSETCATALOG_COMPILER_APPICON_NAME)")])
+        return merging(["ASSETCATALOG_COMPILER_APPICON_NAME": .string("AppIcon-$(RELEASE_CHANNEL)")])
     }
     
     func excludeAppIcon() -> SettingsDictionary {
