@@ -165,16 +165,11 @@ platform :ios do
             output_directory: "ipa_builds/",
 	        output_name: output_name,
             cloned_source_packages_path: "SourcePackages",
+            configuration: "Release",
 	        silent: true,
 	        suppress_xcode_output: true,
 	        skip_package_pkg: true,
-	        export_method: "app-store",
-	        export_options: {
-	            provisioningProfiles: { 
-		            "com.subvert.forpda" => "match AppStore com.subvert.forpda",
-		            "com.subvert.forpda.safariextension" => "match AppStore com.subvert.forpda.safariextension"
-      	        }
-	        }
+	        export_method: "app-store"
         )
     end
     
