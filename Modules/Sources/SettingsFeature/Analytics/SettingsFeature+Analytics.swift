@@ -47,6 +47,9 @@ extension SettingsFeature {
                 case .clearCacheButtonTapped:
                     analyticsClient.log(SettingsEvent.clearCacheTapped)
                     
+                case .supportOnBoostyButtonTapped:
+                    analyticsClient.log(SettingsEvent.supportOnBoostyTapped)
+                    
                 case .appDiscussionButtonTapped:
                     analyticsClient.log(SettingsEvent.appDiscussion4pdaTapped)
 

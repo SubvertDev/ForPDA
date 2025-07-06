@@ -78,6 +78,7 @@ public struct SettingsFeature: Reducer, Sendable {
         case copyDebugIdButtonTapped
         // case copyPushTokenButtonTapped
         case clearCacheButtonTapped
+        case supportOnBoostyButtonTapped
         case appDiscussionButtonTapped
         case telegramChangelogButtonTapped
         case telegramChatButtonTapped
@@ -149,6 +150,11 @@ public struct SettingsFeature: Reducer, Sendable {
             case .clearCacheButtonTapped:
                 state.destination = .alert(.clearCache)
                 return .none
+                
+            case .supportOnBoostyButtonTapped:
+                return .run { _ in
+                    await open(url: Links.boosty)
+                }
                 
             case .appDiscussionButtonTapped:
                 return .run { _ in

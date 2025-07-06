@@ -30,8 +30,8 @@ public struct SettingsScreen: View {
                 List {
                     ThemeSection()
                     BasicSection()
-                    AdvancedSection()
                     LinksSection()
+                    AdvancedSection()
                     AboutAppSection()
                 }
                 .scrollContentBackground(.hidden)
@@ -72,6 +72,7 @@ public struct SettingsScreen: View {
         symbol: SFSymbol,
         title: LocalizedStringKey,
         type: RowType,
+        isBold: Bool = false,
         toggle: Binding<Bool>? = nil,
         action: @escaping () -> Void = {}
     ) -> some View {
@@ -89,6 +90,7 @@ public struct SettingsScreen: View {
                     Text(title, bundle: .module)
                         .font(.body)
                         .foregroundStyle(Color(.Labels.primary))
+                        .bold(isBold)
                     
                     Spacer(minLength: 8)
                     
@@ -239,7 +241,7 @@ public struct SettingsScreen: View {
         Section {
             Row(symbol: ._1Circle, title: "Starting page", type: .startPagePicker)
             
-            Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
+//            Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
             
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
             
@@ -296,8 +298,8 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func LinksSection() -> some View {
         Section {
-            Row(symbol: .infoBubble, title: "App discussion on the forum", type: .navigation) {
-                store.send(.appDiscussionButtonTapped)
+            Row(symbol: .boltHeart, title: "Support on Boosty", type: .navigation, isBold: true) {
+                store.send(.supportOnBoostyButtonTapped)
             }
             
             Row(symbol: .paperplane, title: "App discussion in Telegram", type: .navigation) {
@@ -306,6 +308,10 @@ public struct SettingsScreen: View {
             
             Row(symbol: .paperplane, title: "List of changes in Telegram", type: .navigation) {
                 store.send(.telegramChangelogButtonTapped)
+            }
+            
+            Row(symbol: .infoBubble, title: "App discussion on the forum", type: .navigation) {
+                store.send(.appDiscussionButtonTapped)
             }
             
             Row(symbol: .folderBadgeGearshape, title: "GitHub repository", type: .navigation) {
@@ -433,4 +439,5 @@ private var isDebug: Bool {
         )
     }
     .environment(\.tintColor, Color(.Theme.primary))
+    .environment(\.locale, Locale(identifier: "ru"))
 }
