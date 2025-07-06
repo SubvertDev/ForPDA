@@ -647,7 +647,10 @@ extension ProjectDescription.Target {
             sources: ["Modules/Sources/\(name)/**"],
             resources: .resources(resources),
             dependencies: dependencies,
-            settings: .settings(base: .targetSettings, defaultSettings: .recommended)
+            settings: .settings(
+                base: .targetSettings,
+                defaultSettings: .recommended(excluding: ["ASSETCATALOG_COMPILER_APPICON_NAME"])
+            )
         )
     }
     
@@ -701,10 +704,12 @@ extension SettingsDictionary {
         .merging(.targetSettings)
         .setAppName(App.name)
         .setDevelopmentTeam("7353CQCGQC")
+        .includeAppIcon()
     
     static let targetSettings = SettingsDictionary()
         .useIPhoneAsSingleDestination()
         .disableAssetGeneration()
+        .excludeAppIcon()
 }
 
 extension Dictionary where Key == String, Value == SettingValue {
@@ -718,6 +723,14 @@ extension Dictionary where Key == String, Value == SettingValue {
     
     func disableAssetGeneration() -> SettingsDictionary {
         return merging(["ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS": .string("NO")])
+    }
+    
+    func includeAppIcon() -> SettingsDictionary {
+        return merging(["ASSETCATALOG_COMPILER_APPICON_NAME": .string("$(ASSETCATALOG_COMPILER_APPICON_NAME)")])
+    }
+    
+    func excludeAppIcon() -> SettingsDictionary {
+        return merging(["ASSETCATALOG_COMPILER_APPICON_NAME": .string("")])
     }
     
     func useIPhoneAsSingleDestination() -> SettingsDictionary {

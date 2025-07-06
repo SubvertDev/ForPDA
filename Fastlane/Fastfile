@@ -38,10 +38,22 @@ platform :ios do
 
     desc "Uploads to TestFlight"
     lane :upload do |options|
-        run_tests = options[:run_tests] || false
+        print_lane_options("Uploads to Testflight", {
+            scheme: { desctiption: "Scheme: beta or stable", default: "beta" }   
+        })
+        
+        scheme = options[:scheme] || "beta"
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'ASSETCATALOG_COMPILER_APPICON_NAME',
+            value: 'AppIcon-#{scheme.capitalize}'
+        )
+        
         prepare_certificates
         update_build_number
         run_tuist(testflight: true)
+        run_tests = options[:run_tests] || false
         tests if run_tests
         build_ipa
         upload_dsym_to_sentry
@@ -54,8 +66,17 @@ platform :ios do
     desc "One-off upload to TF without tests/notify/bump"
     lane :upload_oneoff do |options|
         print_lane_options("One-off upload to TF without tests/notify/bump", {
-            build_number: { description: "Sets specific build number" }
+            build_number: { description: "Sets specific build number" },
+            scheme: { desctiption: "Scheme: beta or stable.", default: "beta" }
         })
+        
+        scheme = options[:scheme] || "beta"
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'ASSETCATALOG_COMPILER_APPICON_NAME',
+            value: 'AppIcon-#{scheme.capitalize}'
+        )
         
         prepare_certificates
         update_build_number(build_number: options[:build_number])
