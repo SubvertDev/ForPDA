@@ -168,7 +168,8 @@ platform :ios do
 	        silent: true,
 	        suppress_xcode_output: true,
 	        skip_package_pkg: true,
-	        export_method: "app-store"
+	        export_method: "app-store",
+	        export_team_id: "7353CQCGQC"
         )
     end
     
