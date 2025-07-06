@@ -43,11 +43,12 @@ platform :ios do
         })
         
         scheme = options[:scheme] || "beta"
+        appIconName = "AppIcon-#{scheme.capitalize}"
         
         update_xcconfig_value(
             path: 'Configs/App.xcconfig',
             name: 'ASSETCATALOG_COMPILER_APPICON_NAME',
-            value: 'AppIcon-#{scheme.capitalize}'
+            value: appIconName
         )
         
         prepare_certificates
