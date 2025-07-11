@@ -1,6 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "his" : {
+
+    },
+    "History" : {
+
+    },
     "Reputation" : {
       "localizations" : {
         "ru" : {
@@ -11,7 +17,10 @@
         }
       }
     },
-    "Reputation view" : {
+    "vot" : {
+
+    },
+    "Votes" : {
 
     }
   },
