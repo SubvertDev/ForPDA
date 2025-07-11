@@ -397,7 +397,9 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func ForumStatisticsSection(user: User) -> some View {
         Section {
-            Row(title: "Reputation", type: .description(String(user.reputation)))
+            Row(title: "Reputation", type: .navigation) {
+                send(.reputationButtonTapped)
+            }
             Row(title: "Topics", type: .description(String(user.topics)))
             Row(title: "Replies", type: .description(String(user.replies)))
         } header: {

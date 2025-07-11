@@ -46,6 +46,7 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
+                    .Internal.ReputationFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -325,6 +326,14 @@ let project = Project(
                     .SPM.ExyteChat,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "ReputationFeature",
+                dependencies: [
+                    .Internal.APIClient,
                     .SPM.TCA
                 ]
             ),
@@ -840,6 +849,7 @@ extension TargetDependency.Internal {
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
     static let QMSFeature =             TargetDependency.target(name: "QMSFeature")
     static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
+    static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")

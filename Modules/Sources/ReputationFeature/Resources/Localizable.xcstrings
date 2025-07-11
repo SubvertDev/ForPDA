@@ -1,0 +1,19 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация"
+          }
+        }
+      }
+    },
+    "Reputation view" : {
+
+    }
+  },
+  "version" : "1.0"
+}

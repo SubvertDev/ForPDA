@@ -25,6 +25,7 @@ import AnnouncementFeature
 import HistoryFeature
 import QMSListFeature
 import QMSFeature
+import ReputationFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -217,6 +218,9 @@ public struct StackTab: Reducer, Sendable {
             
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
+            
+        case .profile(.delegate(.openReputation)):
+            state.path.append(.profile(.reputation(ReputationFeature.State())))
             
         case .profile(.delegate(.openQms)):
             state.path.append(.qms(.qmsList(QMSListFeature.State())))
