@@ -46,7 +46,7 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
-                    .Internal.ReputationFeature,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -88,6 +88,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -331,12 +332,17 @@ let project = Project(
             ),
         
             .feature(
-                name: "ReputationFeature",
+                name: "ReputationChangeFeature",
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
-            ),
+             ),
         
             .feature(
                 name: "SettingsFeature",
@@ -380,6 +386,7 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -849,7 +856,7 @@ extension TargetDependency.Internal {
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
     static let QMSFeature =             TargetDependency.target(name: "QMSFeature")
     static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
-    static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
+    static let ReputationChangeFeature = TargetDependency.target(name: "ReputationChangeFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")

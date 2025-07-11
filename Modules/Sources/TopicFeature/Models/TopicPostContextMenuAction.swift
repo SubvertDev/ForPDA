@@ -11,4 +11,5 @@ public enum TopicPostContextMenuAction {
     case reply(Int, String)
     case edit(Post)
     case delete(Int)
+    case changeReputation(Int, Int, String)
 }

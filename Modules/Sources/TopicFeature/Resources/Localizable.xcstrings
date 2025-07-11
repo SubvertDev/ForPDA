@@ -137,6 +137,16 @@
         }
       }
     },
+    "Reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация"
+          }
+        }
+      }
+    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {
