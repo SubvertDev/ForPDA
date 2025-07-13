@@ -35,12 +35,12 @@ public struct ReputationScreen: View {
                     if !store.isLoading {
                         switch store.pickerSelection {
                         case .history:
-                            HistorySelection()
+                            ReputationSelection()
                                 .onAppear {
                                     send(.onAppear)
                                 }
                         case .votes:
-                            Text("vot")
+                            ReputationSelection()
                                 .onAppear {
                                     send(.onAppear)
                                 }
@@ -58,23 +58,27 @@ public struct ReputationScreen: View {
         }
     }
     
-    // MARK: - HistorySelection
+    // MARK: - ReputationSelection
     
     @ViewBuilder
-    private func HistorySelection() -> some View {
+    private func ReputationSelection() -> some View {
         ZStack {
             Color(.Background.primary)
                 .ignoresSafeArea()
             
             if let votes = store.historyData?.votes {
                 List(votes, id: \.self) { vote in
-                    HistoryCell(vote: vote)
+                    ReputationCell(vote: vote)
                 }
                 .listStyle(.plain)
             } else {
                 Spacer()
                 
-                EmptyReputation(isHistory: true)
+                if store.pickerSelection == .history {
+                    EmptyReputation(isHistory: true)
+                } else {
+                    EmptyReputation(isHistory: false)
+                }
                 
                 Spacer()
             }
@@ -95,19 +99,32 @@ public struct ReputationScreen: View {
         .padding(.horizontal, 18)
     }
     
-    // MARK: - HistoryCell
+    // MARK: - ReputationCell
     
     @ViewBuilder
-    private func HistoryCell(vote: ReputationVote) -> some View {
+    private func ReputationCell(vote: ReputationVote) -> some View {
         
-        var title: String {
+        var createdInTitle: (String, Int) {
             switch vote.createdIn {
             case .topic(_, let topicName, _):
-                return topicName
+                return (topicName, 0)
             case .site(_, let articleName, _):
-                return articleName
+                return (articleName, 1)
             case .profile:
-                return "Profile"
+                return ("Profile", 2)
+            }
+        }
+        
+        var createdInImage: Image {
+            if #available(iOS 17.0, *) {
+                switch createdInTitle.1 {
+                case 0: return Image(systemSymbol: .bubbleLeftAndTextBubbleRight)
+                case 1: return Image(systemSymbol: .docPlaintext)
+                case 2: return Image(systemSymbol: .person)
+                default: return Image(systemSymbol: .bubbleLeft)
+                }
+            } else {
+                return Image(systemSymbol: .bubbleLeft)
             }
         }
         
@@ -138,19 +155,12 @@ public struct ReputationScreen: View {
             .padding(.horizontal, 12)
             
             HStack {
-                if #available(iOS 17.0, *) {
-                    Image(systemSymbol: .bubbleLeftAndTextBubbleRight)
-                        .resizable()
-                        .foregroundStyle(Color(.Labels.teritary))
-                        .frame(width: 20, height: 16)
-                } else {
-                    Image(systemSymbol: .bubbleLeft)
-                        .resizable()
-                        .foregroundStyle(Color(.Labels.teritary))
-                        .frame(width: 20, height: 16)
-                }
+                createdInImage
+                    .resizable()
+                    .foregroundStyle(Color(.Labels.teritary))
+                    .frame(width: 20, height: 16)
                 
-                Text(title)
+                Text(createdInTitle.0)
                     .lineLimit(1)
                     .foregroundStyle(Color(.Labels.teritary))
                     .font(.system(size: 12, weight: .regular))

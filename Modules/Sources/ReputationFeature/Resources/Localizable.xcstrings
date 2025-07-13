@@ -12,7 +12,14 @@
       }
     },
     "Lowered" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понизил"
+          }
+        }
+      }
     },
     "My votes" : {
       "localizations" : {
@@ -25,10 +32,24 @@
       }
     },
     "No reputation history" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет истории репутации"
+          }
+        }
+      }
     },
     "Raised" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поднял"
+          }
+        }
+      }
     },
     "Reputation" : {
       "localizations" : {
@@ -40,14 +61,25 @@
         }
       }
     },
-    "vot" : {
-
-    },
     "Vote for other users if you liked the topic on the forum" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голосуте за других пользователей, если вам понравилась тема на форуме"
+          }
+        }
+      }
     },
     "Write topics on the forum and get reputation from other users" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пишите темы на форуме и получайте репутацию от других пользователей"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

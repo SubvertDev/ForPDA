@@ -44,7 +44,7 @@ public struct ReputationFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            case loadHistory
+            case loadData(isHistory: Bool)
             case historyResponse(Result<ReputationVotes, any Error>)
         }
     }
@@ -52,6 +52,7 @@ public struct ReputationFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Shared(.userSession) var userSession
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -60,18 +61,26 @@ public struct ReputationFeature: Reducer, Sendable {
             switch action {
             case .view(.onAppear):
                 if state.pickerSelection == .history {
-                    return .send(.internal(.loadHistory))
+                    return .send(.internal(.loadData(isHistory: true)))
                 } else {
-                    print("is onAppear votes")
+                    return .send(.internal(.loadData(isHistory: false)))
                 }
-                return .none
                 
-            case .internal(.loadHistory):
-                return .run { send in
-                    let result = await Result {
-                        try await apiClient.getReputationVotes(data: ReputationVotesRequest(userId: 6176341, type: .from, offset: 0, amount: 10))
+            case .internal(.loadData(let isHistory)):
+                if isHistory {
+                    return .run { send in
+                        let result = await Result {
+                            try await apiClient.getReputationVotes(data: ReputationVotesRequest(userId: userSession!.userId, type: .from, offset: 0, amount: 10))
+                        }
+                        await send(.internal(.historyResponse(result)))
                     }
-                    await send(.internal(.historyResponse(result)))
+                } else {
+                    return .run { send in
+                        let result = await Result {
+                            try await apiClient.getReputationVotes(data: ReputationVotesRequest(userId: userSession!.userId, type: .to, offset: 0, amount: 10))
+                        }
+                        await send(.internal(.historyResponse(result)))
+                    }
                 }
                 
             case .internal(.historyResponse(let result)):
