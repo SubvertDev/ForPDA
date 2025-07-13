@@ -1,10 +1,33 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "his" : {
+    "History" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "История"
+          }
+        }
+      }
+    },
+    "Lowered" : {
 
     },
-    "History" : {
+    "My votes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мои голоса"
+          }
+        }
+      }
+    },
+    "No reputation history" : {
+
+    },
+    "Raised" : {
 
     },
     "Reputation" : {
@@ -20,7 +43,10 @@
     "vot" : {
 
     },
-    "Votes" : {
+    "Vote for other users if you liked the topic on the forum" : {
+
+    },
+    "Write topics on the forum and get reputation from other users" : {
 
     }
   },

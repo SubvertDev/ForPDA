@@ -8,6 +8,7 @@ import Foundation
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import Models
 
 @ViewAction(for: ReputationFeature.self)
 public struct ReputationScreen: View {
@@ -15,6 +16,7 @@ public struct ReputationScreen: View {
     // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<ReputationFeature>
+    @Environment(\.tintColor) private var tintColor
     
     public init(store: StoreOf<ReputationFeature>) {
         self.store = store
@@ -56,12 +58,26 @@ public struct ReputationScreen: View {
         }
     }
     
+    // MARK: - HistorySelection
+    
     @ViewBuilder
     private func HistorySelection() -> some View {
         ZStack {
             Color(.Background.primary)
                 .ignoresSafeArea()
             
+            if let votes = store.historyData?.votes {
+                List(votes, id: \.self) { vote in
+                    HistoryCell(vote: vote)
+                }
+                .listStyle(.plain)
+            } else {
+                Spacer()
+                
+                EmptyReputation(isHistory: true)
+                
+                Spacer()
+            }
         }
     }
     
@@ -72,11 +88,136 @@ public struct ReputationScreen: View {
         _Picker("", selection: $store.pickerSelection) {
             Text("History", bundle: .module)
                 .tag(ReputationFeature.PickerSelection.history)
-            
-            Text("Votes", bundle: .module)
+            Text("My votes", bundle: .module)
                 .tag(ReputationFeature.PickerSelection.votes)
         }
         .pickerStyle(.segmented)
+        .padding(.horizontal, 18)
+    }
+    
+    // MARK: - HistoryCell
+    
+    @ViewBuilder
+    private func HistoryCell(vote: ReputationVote) -> some View {
+        
+        var title: String {
+            switch vote.createdIn {
+            case .topic(_, let topicName, _):
+                return topicName
+            case .site(_, let articleName, _):
+                return articleName
+            case .profile:
+                return "Profile"
+            }
+        }
+        
+        VStack(alignment: .leading) {
+            HStack {
+                Text(vote.authorName)
+                    .foregroundStyle(Color(.Labels.primary))
+                    .font(.system(size: 16, weight: .semibold))
+                
+                Spacer()
+                
+                Text(vote.flag == 1 ? "Raised" : "Lowered")
+                    .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                    .font(.system(size: 12, weight: .medium))
+                
+                if #available(iOS 17.0, *) {
+                    Image(systemSymbol: vote.flag == 1 ? .arrowshapeUpFill : .arrowshapeDownFill)
+                        .resizable()
+                        .foregroundStyle(tintColor)
+                        .frame(maxWidth: 20, maxHeight: 20)
+                } else {
+                    Image(systemSymbol: vote.flag == 1 ? .arrowUp : .arrowDown)
+                        .resizable()
+                        .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                        .frame(maxWidth: 20, maxHeight: 20)
+                }
+            }
+            .padding(.horizontal, 12)
+            
+            HStack {
+                if #available(iOS 17.0, *) {
+                    Image(systemSymbol: .bubbleLeftAndTextBubbleRight)
+                        .resizable()
+                        .foregroundStyle(Color(.Labels.teritary))
+                        .frame(width: 20, height: 16)
+                } else {
+                    Image(systemSymbol: .bubbleLeft)
+                        .resizable()
+                        .foregroundStyle(Color(.Labels.teritary))
+                        .frame(width: 20, height: 16)
+                }
+                
+                Text(title)
+                    .lineLimit(1)
+                    .foregroundStyle(Color(.Labels.teritary))
+                    .font(.system(size: 12, weight: .regular))
+                
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            
+            Text(vote.reason)
+                .lineLimit(1)
+                .foregroundStyle(Color(.Labels.primary))
+                .font(.system(size: 15, weight: .regular))
+                .multilineTextAlignment(.leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+            
+            HStack {
+                Text(formatDate(vote.createdAt))
+                    .foregroundStyle(Color(.Labels.teritary))
+                    .font(.system(size: 12, weight: .regular))
+                
+                Spacer()
+                
+                Button {
+                    print("options cell \(vote.id) tapped")
+                } label: {
+                    Image(systemSymbol: .ellipsis)
+                        .foregroundStyle(Color(.Labels.teritary))
+                }
+            }
+            .padding(.horizontal, 12)
+        }
+    }
+    
+    //MARK: - Empty View
+    
+    @ViewBuilder
+    private func EmptyReputation(isHistory: Bool) -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .plusminus)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 8)
+            
+            Text("No reputation history")
+                .font(.title3)
+                .bold()
+                .foregroundColor(Color(.Labels.primary))
+                .padding(.bottom, 6)
+            
+            Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum")
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.Labels.teritary))
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
+        }
+    }
+    
+    // MARK: - formatDate
+    
+    private func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "ru_RU")
+        dateFormatter.dateFormat = "d MMMM yyyy HH:mm"
+        return dateFormatter.string(from: date)
     }
 }
 
