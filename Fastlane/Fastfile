@@ -1,0 +1,256 @@
+default_platform(:ios)
+
+platform :ios do
+
+    desc "Setups project"
+    lane :setup do |options|
+        print_lane_options("Setup Project", {
+            version: { description: "(REQUIRED) Sets version (e.g. 1.0.0)" }
+        })
+        prepare_certificates(master: options[:master])
+        run_tuist(open: true)
+    end
+    
+    desc "Sets marketing version"
+    lane :set_marketing_version do |options|
+        print_lane_options("Set Marketing Version", {
+            version: { description: "(REQUIRED) Sets version (e.g. 1.0.0)" }
+        })
+        
+        version = options[:version]
+
+        unless version
+            UI.user_error!("Error: Missing required option 'version'. Example usage: fastlane set_marketing_version version:1.0.0")
+        end
+
+        unless version =~ /^\d+\.\d+\.\d+$/
+            UI.user_error!("Error: Invalid version format. Expected format: X.Y.Z (e.g., 1.0.0)")
+        end
+
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'CURRENT_PROJECT_VERSION',
+            value: version
+        )
+
+        UI.success("Marketing version set to #{version}")
+    end
+
+    desc "Uploads to TestFlight"
+    lane :upload do |options|
+        print_lane_options("Uploads to Testflight", {
+            release: { desctiption: "Release channel: beta or stable", default: "beta" }   
+        })
+        
+        release_channel = (options[:release] || "beta").capitalize
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'RELEASE_CHANNEL',
+            value: release_channel
+        )
+        
+        prepare_certificates
+        update_build_number
+        run_tuist(testflight: true)
+        run_tests = options[:run_tests] || false
+        tests if run_tests
+        build_ipa
+        upload_dsym_to_sentry
+        upload_app_to_testflight
+        notify_all
+        run_tuist(testflight: false)
+        bump_and_tag
+    end
+    
+    desc "One-off upload to TF without tests/notify/bump"
+    lane :upload_oneoff do |options|
+        print_lane_options("One-off upload to TF without tests/notify/bump", {
+            build_number: { description: "Sets specific build number" },
+            release: { desctiption: "Release channel: beta or stable", default: "beta" }   
+        })
+        
+        release_channel = (options[:release] || "beta").capitalize
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'RELEASE_CHANNEL',
+            value: release_channel
+        )
+        
+        prepare_certificates
+        update_build_number(build_number: options[:build_number])
+        run_tuist(testflight: true)
+        build_ipa
+        upload_dsym_to_sentry
+        upload_app_to_testflight
+        run_tuist(testflight: false)
+    end
+    
+    # --------------------------------------------------
+    
+    desc "Prepare certificates via match"
+    lane :prepare_certificates do |options|
+        print_lane_options("Prepare Certificates", {
+            master: { description: "Registers devices from txt file", default: false }
+        })
+        
+        if options[:master]
+            register_devices(devices_file: "Fastlane/devices.txt")
+        end
+         
+        match(
+            type: "development",
+            readonly: !options[:master],
+            force_for_new_devices: options[:master]
+        )
+        
+        match(
+            type: "appstore",
+            readonly: !options[:master]
+        )
+    end
+    
+    desc "Updates build number to total commit count"
+    lane :update_build_number do |options|
+        print_lane_options("Update Build Number", {
+            build_number: { description: "Overrides build number derived from commits count to set value" }
+        })
+        build = options[:build_number] || sh("git rev-list --all --count").chomp.strip
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'CURRENT_PROJECT_VERSION',
+            value: build
+        )
+    end
+    
+    desc "Runs Tuist install & generate"
+    lane :run_tuist do |options|
+        print_lane_options("Run Tuist", {
+            open: { description: "Opens generated project in Xcode", default: true },
+            testflight: { description: "Enables static linking & disables cache for TestFlight build", default: false}
+        })
+        Dir.chdir("..") do
+            sh("tuist install")
+            
+            generate_command = ""
+            generate_command += "TUIST_LINKING=static " if options[:testflight]
+            generate_command += "tuist generate"
+            generate_command += " --no-binary-cache" if options[:testflight]
+            generate_command += " --no-open" unless options[:open]
+            
+            sh(generate_command)
+        end
+    end
+    
+    desc "Runs tests"
+    lane :tests do
+        run_tests(
+            scheme: "ForPDA",
+            device: "iPhone 16 Pro (18.5)",
+            ensure_devices_found: true
+        )
+    end
+    
+    desc "Builds and signs ipa file"
+    lane :build_ipa do
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+                
+        output_name = "ForPDA_#{version}_#{build}"
+        
+        build_app(
+            scheme: "ForPDA",
+            output_directory: "ipa_builds/",
+	        output_name: output_name,
+            cloned_source_packages_path: "SourcePackages",
+            configuration: "Release",
+	        silent: true,
+	        suppress_xcode_output: true,
+	        skip_package_pkg: true,
+	        export_method: "app-store",
+	        export_team_id: "7353CQCGQC"
+        )
+    end
+    
+    desc "Uploads DSYM files to Sentry"
+    lane :upload_dsym_to_sentry do
+        auth_token = get_xcconfig_value(
+            path: 'Configs/Secrets.xcconfig',
+            name: 'SENTRY_DSYM_TOKEN'
+        )
+        
+        sentry_debug_files_upload(
+            auth_token: auth_token,
+            org_slug: 'forpda',
+            project_slug: 'apple-ios',
+            include_sources: true
+        )
+    end
+    
+    desc "Uploads app to TestFlight"
+    lane :upload_app_to_testflight do
+        app_store_connect_api_key(
+            key_id: "X36R58TMRJ",
+            issuer_id: "814e488e-06ba-40ba-a16c-a63e7164023f",
+            key_filepath: "Fastlane/AuthKey_X36R58TMRJ.p8"
+        )
+        
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+        
+        ipa_name = "ForPDA_#{version}_#{build}.ipa"
+
+        upload_to_testflight(
+            ipa: "./ipa_builds/#{ipa_name}"
+	    )
+    end
+    
+    desc "Notifies to all available channels"
+    lane :notify_all do
+        notification(
+            subtitle: "Uploading Finished!",
+            message: "Build is on TestFlight",
+            content_image: "Images/logo.png"
+        )
+        
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+        
+        telegram(
+            token: ENV['TG_BOT_TOKEN'],
+            chat_id: ENV['TG_CHAT_ID'],
+            text: "Версия #{version} (#{build}) загружена на TestFlight"
+        )
+    end
+    
+    desc "Commits changes and adds a tag with version/build"
+    lane :bump_and_tag do
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+        sh("git commit -a -m \"Bump version\"")
+        sh("git tag v#{version}-#{build}-beta")
+    end
+    
+    # --------------------------------------------------
+
+    error do |lane, exception, options|
+        notification(
+            subtitle: "Error while executing #{lane}!",
+            message: "#{exception}",
+            content_image: "Images/logo.png"
+        )
+    end
+
+end
+
+# Helper functions
+
+def print_lane_options(lane_name, options = {})
+  UI.header("🛠️  #{lane_name} Options 🛠️")
+
+  options.each do |key, value|
+    default_str = value[:default] ? " (default: #{value[:default]})" : ""
+    UI.message("• #{key}: #{value[:description]}#{default_str}")
+  end
+end 

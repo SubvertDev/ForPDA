@@ -1,0 +1,61 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Bookmarks" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закладки"
+          }
+        }
+      }
+    },
+    "Bookmarks will appear soon" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скоро появятся закладки"
+          }
+        }
+      }
+    },
+    "COMING SOON" : {
+
+    },
+    "No bookmarks" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет закладок"
+          }
+        }
+      }
+    },
+    "Tap “Add To Bookmarks” in article menu, to save it here" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нажмите в меню статьи пункт “Добавить в закладки”, чтобы сохранить ее сюда"
+          }
+        }
+      }
+    },
+    "They're currently in development, stay tuned for updates" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока они находятся в разработке, следите за обновлениями"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

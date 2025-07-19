@@ -1,0 +1,66 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Error sending report" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка отправки жалобы"
+          }
+        }
+      }
+    },
+    "Post deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост удален"
+          }
+        }
+      }
+    },
+    "Post not found" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост не найден"
+          }
+        }
+      }
+    },
+    "Report sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба отправлена"
+          }
+        }
+      }
+    },
+    "Report too short" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком короткая жалоба"
+          }
+        }
+      }
+    },
+    "Whoops, something went wrong.." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс, что-то пошло не так.."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
