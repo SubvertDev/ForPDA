@@ -20,6 +20,7 @@ public struct APIClient: Sendable {
     // Common
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     public var connect: @Sendable () async throws -> Void
+    public var upload: @Sendable (_ filename: String, _ filehash: String, _ data: Data, _ isQms: Bool) async throws -> AsyncStream<UploadProgressStatus>
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -101,6 +102,15 @@ extension APIClient: DependencyKey {
                 } else {
                     try await api.connect(as: .anonymous)
                 }
+            },
+            upload: { filename, filehash, data, isQms in
+                return await api.upload(data: UploadRequest(
+                    fileName: filename,
+                    fileSize: data.count,
+                    fileData: data,
+                    md5: filehash,
+                    isQms: isQms
+                ))
             },
             
             // MARK: - Articles
@@ -408,6 +418,9 @@ extension APIClient: DependencyKey {
         APIClient(
             setLogResponses: { _ in },
             connect: { },
+            upload: { _, _, _, _ in
+                return .finished
+            },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
