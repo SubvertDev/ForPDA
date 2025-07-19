@@ -1,6 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
+    "Add more" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить еще"
+          }
+        }
+      }
+    },
     "Attach this post to previous one?" : {
       "localizations" : {
         "ru" : {
@@ -215,6 +228,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите файлы…"
+          }
+        }
+      }
+    },
+    "Select from Files" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из файлов"
+          }
+        }
+      }
+    },
+    "Select from Gallery" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из галлереи"
           }
         }
       }

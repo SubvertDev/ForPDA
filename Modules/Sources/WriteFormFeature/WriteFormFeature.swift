@@ -203,11 +203,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 switch state.formFor {
                 case .topic(let id, _), .post(type: .new, let id, content: .template(_)):
                     return .run { [isTopic = state.formFor.isTopic, content = state.textContent] send in
-                        let result = await Result { try await apiClient.sendTemplate(
-                            id: id,
-                            content: content,
-                            isTopic: isTopic
-                        ) }
+                        let result = await Result { try await apiClient.sendTemplate(id, content, isTopic) }
                         await send(.internal(.templateResponse(result)))
                     }
                     
@@ -224,7 +220,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                                 flag: newPostFlag,
                                 attachments: attachments
                             )
-                            let result = await Result { try await apiClient.sendPost(request: request) }
+                            let result = await Result { try await apiClient.sendPost(request) }
                             await send(.internal(.simplePostResponse(result)))
                             
                         case .edit(let postId):
@@ -238,7 +234,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                                     attachments: attachments
                                 )
                             )
-                            let result = await Result { try await apiClient.editPost(request: request) }
+                            let result = await Result { try await apiClient.editPost(request) }
                             await send(.internal(.simplePostResponse(result)))
                         }
                     }
@@ -246,7 +242,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 case .report(let id, let type):
                     return .run { [content = state.textContent] send in
                         let request = ReportRequest(id: id, type: type, message: content)
-                        let result = await Result { try await apiClient.sendReport(request: request) }
+                        let result = await Result { try await apiClient.sendReport(request) }
                         await send(.internal(.reportResponse(result)))
                     }
                     
@@ -278,7 +274,7 @@ public struct WriteFormFeature: Reducer, Sendable {
 
             case let .internal(.loadForm(id, isTopic)):
                 return .run { send in
-                    let result = await Result { try await apiClient.getTemplate(id: id, isTopic: isTopic) }
+                    let result = await Result { try await apiClient.getTemplate(id, isTopic) }
                     await send(.internal(.formResponse(result)))
                 } catch: { error, send in
                     await send(.internal(.formResponse(.failure(error))))
@@ -337,9 +333,9 @@ public struct WriteFormFeature: Reducer, Sendable {
                 let editorFlag: Int
                 switch action {
                 case .attach:
-                    editorFlag = 1
+                    editorFlag = PostSendFlag.attach.rawValue
                 case .doNotAttach:
-                    editorFlag = 3
+                    editorFlag = PostSendFlag.doNotAttach.rawValue
                 case .dismiss:
                     return .run { _ in await dismiss() }
                 }

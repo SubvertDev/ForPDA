@@ -21,6 +21,22 @@ struct WriteFormView: View {
 
     var body: some View {
         switch type {
+        case .uploadbox(let content, let extensions):
+            UploadBoxView(content, extensions, onUploadFile: { id, event in
+                switch event {
+                case .uploaded:
+                    print("uploaded")
+                case .uploading:
+                    print("UPLOADING")
+                case .uploadError:
+                    print("uploadError")
+                case .selectError:
+                    print("selectError")
+                case .removed:
+                    print("removed")
+                }
+            })
+            
         case .text(let content):
             Section {
                 Field(
@@ -146,44 +162,6 @@ struct WriteFormView: View {
             } header: {
                 Header(title: content.name, required: content.isRequired)
             }
-            
-        case .uploadbox(let content, _ /* allowed extensions */):
-            VStack(spacing: 6) {
-                Header(title: content.name, required: content.isRequired)
-                
-                Button {
-                    // TODO: Implement
-                } label: {
-                    VStack {
-                        Image(systemSymbol: .docBadgePlus)
-                            .font(.title)
-                            .foregroundStyle(Color(.tintColor))
-                            .frame(width: 48, height: 48)
-                        
-                        Text("Select files...", bundle: .module)
-                            .font(.body)
-                            .foregroundColor(Color(.Labels.quaternary))
-                    }
-                    .padding(.vertical, 15)
-                    .padding(.horizontal, 12)
-                    .frame(maxWidth: .infinity, minHeight: 144)
-                    .background {
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color(.Background.teritary))
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(
-                                Color(.tintColor),
-                                style: StrokeStyle(lineWidth: 1, dash: [8])
-                            )
-                    }
-                }
-                
-                if !content.description.isEmpty {
-                    DescriptionText(text: content.description)
-                }
-            }
         }
     }
     
@@ -234,6 +212,12 @@ private extension WriteFormView {
         return if case .dropdown(_, let name) = onFetchContent(fieldId) {
             name
         } else { "" }
+    }
+    
+    func getUploadBoxFiles(fieldId: Int) -> [FormContentData.File] {
+        return if case .uploadbox(let files) = onFetchContent(fieldId) {
+            files
+        } else { [] }
     }
     
     func isCheckBoxSelected(fieldId: Int, checkboxId: Int) -> Bool {
