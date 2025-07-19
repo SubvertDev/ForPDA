@@ -648,7 +648,10 @@ extension ProjectDescription.Target {
             sources: ["Modules/Sources/\(name)/**"],
             resources: .resources(resources),
             dependencies: dependencies,
-            settings: .settings(base: .targetSettings, defaultSettings: .recommended)
+            settings: .settings(
+                base: .targetSettings,
+                defaultSettings: .recommended
+            )
         )
     }
     
@@ -684,11 +687,7 @@ extension Settings {
             base: SettingsDictionary()
                 .swiftVersion("6.0")
                 .otherSwiftFlags(.longTypeCheckingFlags)
-                .enableL10nGeneration()
-                .manualCodeSigning(
-                    identity: "Apple Development",
-                    provisioningProfileSpecifier: "match Development com.subvert.forpda"
-                ),
+                .enableL10nGeneration(),
             configurations: [
                 .debug(name: "Debug", xcconfig: "Configs/App.xcconfig"),
                 .release(name: "Release", settings: .init().enableDsym(), xcconfig: "Configs/App.xcconfig"),
@@ -702,10 +701,17 @@ extension SettingsDictionary {
         .merging(.targetSettings)
         .setAppName(App.name)
         .setDevelopmentTeam("7353CQCGQC")
+        .includeAppIcon()
+        .manualCodeSigning(
+            identity: "Apple Development",
+            provisioningProfileSpecifier: "match Development com.subvert.forpda"
+        )
     
     static let targetSettings = SettingsDictionary()
         .useIPhoneAsSingleDestination()
         .disableAssetGeneration()
+        .excludeAppIcon()
+        .disableCodeSigning()
 }
 
 extension Dictionary where Key == String, Value == SettingValue {
@@ -719,6 +725,19 @@ extension Dictionary where Key == String, Value == SettingValue {
     
     func disableAssetGeneration() -> SettingsDictionary {
         return merging(["ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS": .string("NO")])
+    }
+    
+    func includeAppIcon() -> SettingsDictionary {
+        return merging(["ASSETCATALOG_COMPILER_APPICON_NAME": .string("AppIcon-$(RELEASE_CHANNEL)")])
+    }
+    
+    func excludeAppIcon() -> SettingsDictionary {
+        return merging(["ASSETCATALOG_COMPILER_APPICON_NAME": .string("")])
+    }
+    
+    func disableCodeSigning() -> SettingsDictionary {
+        return merging(["CODE_SIGNING_ALLOWED": .string("NO")])
+            .manualCodeSigning(identity: nil, provisioningProfileSpecifier: nil)
     }
     
     func useIPhoneAsSingleDestination() -> SettingsDictionary {

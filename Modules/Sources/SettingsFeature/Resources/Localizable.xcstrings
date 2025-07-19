@@ -62,6 +62,7 @@
       }
     },
     "Background color" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -393,23 +394,22 @@
         }
       }
     },
+    "Support on Boosty" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поддержать на Boosty"
+          }
+        }
+      }
+    },
     "System" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Системная"
-          }
-        }
-      }
-    },
-    "Text size" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Размер текста"
           }
         }
       }

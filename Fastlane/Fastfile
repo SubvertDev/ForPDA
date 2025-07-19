@@ -38,10 +38,22 @@ platform :ios do
 
     desc "Uploads to TestFlight"
     lane :upload do |options|
-        run_tests = options[:run_tests] || false
+        print_lane_options("Uploads to Testflight", {
+            release: { desctiption: "Release channel: beta or stable", default: "beta" }   
+        })
+        
+        release_channel = (options[:release] || "beta").capitalize
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'RELEASE_CHANNEL',
+            value: release_channel
+        )
+        
         prepare_certificates
         update_build_number
         run_tuist(testflight: true)
+        run_tests = options[:run_tests] || false
         tests if run_tests
         build_ipa
         upload_dsym_to_sentry
@@ -54,8 +66,17 @@ platform :ios do
     desc "One-off upload to TF without tests/notify/bump"
     lane :upload_oneoff do |options|
         print_lane_options("One-off upload to TF without tests/notify/bump", {
-            build_number: { description: "Sets specific build number" }
+            build_number: { description: "Sets specific build number" },
+            release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
+        
+        release_channel = (options[:release] || "beta").capitalize
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'RELEASE_CHANNEL',
+            value: release_channel
+        )
         
         prepare_certificates
         update_build_number(build_number: options[:build_number])
@@ -143,16 +164,12 @@ platform :ios do
             output_directory: "ipa_builds/",
 	        output_name: output_name,
             cloned_source_packages_path: "SourcePackages",
+            configuration: "Release",
 	        silent: true,
 	        suppress_xcode_output: true,
 	        skip_package_pkg: true,
 	        export_method: "app-store",
-	        export_options: {
-	            provisioningProfiles: { 
-		            "com.subvert.forpda" => "match AppStore com.subvert.forpda",
-		            "com.subvert.forpda.safariextension" => "match AppStore com.subvert.forpda.safariextension"
-      	        }
-	        }
+	        export_team_id: "7353CQCGQC"
         )
     end
     

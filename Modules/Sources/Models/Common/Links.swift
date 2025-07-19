@@ -9,10 +9,11 @@ import Foundation
 
 // TODO: Duplicate on github?
 
-public struct Links {
+public enum Links {
     
     public static let _4pda = URL(string: "https://4pda.to/")!
     public static let _4pdaAuthor = URL(string: "https://4pda.to/forum/index.php?showuser=3640948")!
+    public static let boosty = URL(string: "https://boosty.to/forpda")!
     public static let appDiscussion = URL(string: "https://4pda.to/forum/index.php?showtopic=1104159")!
     public static let telegramChangelog = URL(string: "https://t.me/forpda_ios")!
     public static let telegramChat = URL(string: "https://t.me/forpda_ios_chat")!
