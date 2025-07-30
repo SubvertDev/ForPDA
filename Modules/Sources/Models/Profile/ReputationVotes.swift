@@ -6,8 +6,8 @@
 //
 
 public struct ReputationVotes: Codable, Hashable, Sendable {
-    public let votes: [ReputationVote]
-    public let votesCount: Int
+    public var votes: [ReputationVote]
+    public var votesCount: Int
     
     public init(
         votes: [ReputationVote],

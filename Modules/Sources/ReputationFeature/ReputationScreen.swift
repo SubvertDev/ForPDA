@@ -4,6 +4,7 @@
 //
 //  Created by Рустам Ойтов on 11.07.2025.
 //
+
 import Foundation
 import SwiftUI
 import ComposableArchitecture
@@ -26,6 +27,7 @@ public struct ReputationScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
+            // сделать онапир только при первом запуске(обновление только при рефреше)
             ZStack {
                 Color(.Background.primary)
                     .ignoresSafeArea()
@@ -35,12 +37,13 @@ public struct ReputationScreen: View {
                     if !store.isLoading {
                         switch store.pickerSelection {
                         case .history:
-                            ReputationSelection()
+                            ReputationSelection(isHistory: true)
                                 .onAppear {
                                     send(.onAppear)
                                 }
+                            
                         case .votes:
-                            ReputationSelection()
+                            ReputationSelection(isHistory: false)
                                 .onAppear {
                                     send(.onAppear)
                                 }
@@ -55,31 +58,36 @@ public struct ReputationScreen: View {
             }
             .navigationTitle(Text("Reputation", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
+//            .onAppear {
+//                send(.onAppear)
+//            }
         }
     }
     
     // MARK: - ReputationSelection
     
     @ViewBuilder
-    private func ReputationSelection() -> some View {
+    private func ReputationSelection(isHistory: Bool) -> some View {
         ZStack {
             Color(.Background.primary)
                 .ignoresSafeArea()
             
-            if let votes = store.historyData?.votes {
-                List(votes, id: \.self) { vote in
-                    ReputationCell(vote: vote)
+            if let votes = store.historyData?.votes, !votes.isEmpty {
+                List {
+                    ForEach(votes, id: \.self) { vote in
+                        ReputationCell(vote: vote)
+                            .onAppear {
+                                if let index = votes.firstIndex(of: vote),
+                                   index == votes.count - 2 {
+                                    send(.loadMore)
+                                }
+                            }
+                    }
                 }
                 .listStyle(.plain)
             } else {
                 Spacer()
-                
-                if store.pickerSelection == .history {
-                    EmptyReputation(isHistory: true)
-                } else {
-                    EmptyReputation(isHistory: false)
-                }
-                
+                EmptyReputation(isHistory: isHistory)
                 Spacer()
             }
         }
@@ -103,31 +111,6 @@ public struct ReputationScreen: View {
     
     @ViewBuilder
     private func ReputationCell(vote: ReputationVote) -> some View {
-        
-        var createdInTitle: (String, Int) {
-            switch vote.createdIn {
-            case .topic(_, let topicName, _):
-                return (topicName, 0)
-            case .site(_, let articleName, _):
-                return (articleName, 1)
-            case .profile:
-                return ("Profile", 2)
-            }
-        }
-        
-        var createdInImage: Image {
-            if #available(iOS 17.0, *) {
-                switch createdInTitle.1 {
-                case 0: return Image(systemSymbol: .bubbleLeftAndTextBubbleRight)
-                case 1: return Image(systemSymbol: .docPlaintext)
-                case 2: return Image(systemSymbol: .person)
-                default: return Image(systemSymbol: .bubbleLeft)
-                }
-            } else {
-                return Image(systemSymbol: .bubbleLeft)
-            }
-        }
-        
         VStack(alignment: .leading) {
             HStack {
                 Text(vote.authorName)
@@ -136,10 +119,12 @@ public struct ReputationScreen: View {
                 
                 Spacer()
                 
+                //change model - VOTE isUp
                 Text(vote.flag == 1 ? "Raised" : "Lowered")
                     .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
                     .font(.system(size: 12, weight: .medium))
                 
+                // сделать на модели arrowUpSymbol arrowDownSymbol - проверку сделать в модели
                 if #available(iOS 17.0, *) {
                     Image(systemSymbol: vote.flag == 1 ? .arrowshapeUpFill : .arrowshapeDownFill)
                         .resizable()
@@ -155,12 +140,12 @@ public struct ReputationScreen: View {
             .padding(.horizontal, 12)
             
             HStack {
-                createdInImage
+                Image(systemSymbol: vote.systemSymbol)
                     .resizable()
                     .foregroundStyle(Color(.Labels.teritary))
                     .frame(width: 20, height: 16)
                 
-                Text(createdInTitle.0)
+                Text(vote.title)
                     .lineLimit(1)
                     .foregroundStyle(Color(.Labels.teritary))
                     .font(.system(size: 12, weight: .regular))
@@ -225,7 +210,6 @@ public struct ReputationScreen: View {
     
     private func formatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ru_RU")
         dateFormatter.dateFormat = "d MMMM yyyy HH:mm"
         return dateFormatter.string(from: date)
     }
@@ -268,5 +252,6 @@ where Label: View, SelectionValue: Hashable, Content: View {
                 ReputationFeature()
             }
         )
+        .environment(\.locale, Locale(identifier: "ru"))
     }
 }

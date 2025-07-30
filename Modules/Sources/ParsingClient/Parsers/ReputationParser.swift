@@ -55,7 +55,7 @@ public struct ReputationParser {
                 toName: toName,
                 authorId: authorId,
                 authorName: authorName,
-                reason: reason,
+                reason: reason.convertCodes(),
                 modified: try parseVoteModified(vote, flag),
                 createdIn: try parseVoteCreatedIn(vote),
                 createdAt: Date(timeIntervalSince1970: createdAt),

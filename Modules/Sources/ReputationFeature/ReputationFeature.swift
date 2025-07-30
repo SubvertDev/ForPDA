@@ -24,13 +24,14 @@ public struct ReputationFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        
         public var isLoading = false
-        public var historyData: Models.ReputationVotes?
+        public var historyData: ReputationVotes?
         var pickerSelection: PickerSelection = .history
         
-        public init() {}
+        public var loadAmount: Int = 20
+        public var offset: Int = 0
         
+        public init() {}
     }
     
     // MARK: - Action
@@ -40,6 +41,7 @@ public struct ReputationFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
+            case loadMore
         }
         
         case `internal`(Internal)
@@ -60,38 +62,55 @@ public struct ReputationFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                if state.pickerSelection == .history {
+                state.offset = 0
+                switch state.pickerSelection {
+                case .history:
                     return .send(.internal(.loadData(isHistory: true)))
-                } else {
+                case .votes:
                     return .send(.internal(.loadData(isHistory: false)))
                 }
                 
-            case .internal(.loadData(let isHistory)):
-                if isHistory {
-                    return .run { send in
-                        let result = await Result {
-                            try await apiClient.getReputationVotes(data: ReputationVotesRequest(userId: userSession!.userId, type: .from, offset: 0, amount: 10))
-                        }
-                        await send(.internal(.historyResponse(result)))
-                    }
-                } else {
-                    return .run { send in
-                        let result = await Result {
-                            try await apiClient.getReputationVotes(data: ReputationVotesRequest(userId: userSession!.userId, type: .to, offset: 0, amount: 10))
-                        }
-                        await send(.internal(.historyResponse(result)))
-                    }
+            case .view(.loadMore):
+                guard !state.isLoading else { return .none }
+                guard state.historyData?.votes.isEmpty == false else { return .none }
+                state.isLoading = true
+                switch state.pickerSelection {
+                case .history:
+                    return .send(.internal(.loadData(isHistory: true)))
+                case .votes:
+                    return .send(.internal(.loadData(isHistory: false)))
                 }
                 
-            case .internal(.historyResponse(let result)):
-                state.isLoading = false
-                switch result {
-                case .success(let votes):
-                    state.historyData = votes
-                    
-                case .failure(let error):
-                    print("error \(error)")
+            case let .internal(.loadData(isHistory)):
+                return .run { [offset = state.offset, amount = state.loadAmount] send in
+                    let request = ReputationVotesRequest(
+                        userId: 236113,
+                        type: isHistory ? .from : .to,
+                        offset: offset,
+                        amount: amount
+                    )
+                    let result = await Result {
+                        try await apiClient.getReputationVotes(data: request)
+                    }
+                    await send(.internal(.historyResponse(result)))
                 }
+                
+            case let .internal(.historyResponse(.success(votes))):
+                state.isLoading = false
+                
+                if state.offset == 0 {
+                    state.historyData = votes
+                } else {
+                    state.historyData?.votes.append(contentsOf: votes.votes)
+                    state.historyData?.votesCount = votes.votesCount
+                }
+                
+                state.offset += state.loadAmount
+                return .none
+                
+            case let .internal(.historyResponse(.failure(error))):
+                state.isLoading = false
+                print("Error \(error)")
                 return .none
                 
             case .binding:

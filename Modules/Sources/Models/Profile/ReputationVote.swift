@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SFSafeSymbols
 
 public struct ReputationVote: Codable, Hashable, Sendable {
     public let id: Int
@@ -19,6 +20,29 @@ public struct ReputationVote: Codable, Hashable, Sendable {
     public let createdIn: VoteCreatedIn
     public let createdAt: Date
     public let isDown: Bool
+    
+    public var title: String {
+        switch createdIn {
+        case .profile:
+            return "Profile"
+        case let .topic(_, topicName, _):
+            return topicName
+        case let .site(_, articleName, _):
+            return articleName
+        }
+    }
+    
+    public var systemSymbol: SFSymbol {
+        switch createdIn {
+        case .profile:
+            return .person
+        case .topic:
+            // добавить варинат с фигмы для iOS 17
+            return .bubbleLeftAndBubbleRight
+        case .site:
+            return .docPlaintext
+        }
+    }
     
     public init(
         id: Int,
@@ -64,6 +88,8 @@ public struct ReputationVote: Codable, Hashable, Sendable {
         }
     }
 }
+
+// MARK: - Mocks
 
 public extension ReputationVote {
     static let mock = ReputationVote(
