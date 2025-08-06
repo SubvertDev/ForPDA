@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Complain" : {
+
+    },
     "History" : {
       "localizations" : {
         "ru" : {
@@ -12,6 +15,7 @@
       }
     },
     "Lowered" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -41,7 +45,11 @@
         }
       }
     },
+    "Profile" : {
+
+    },
     "Raised" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

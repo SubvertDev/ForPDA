@@ -27,7 +27,6 @@ public struct ReputationScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            // сделать онапир только при первом запуске(обновление только при рефреше)
             ZStack {
                 Color(.Background.primary)
                     .ignoresSafeArea()
@@ -58,9 +57,6 @@ public struct ReputationScreen: View {
             }
             .navigationTitle(Text("Reputation", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-//            .onAppear {
-//                send(.onAppear)
-//            }
         }
     }
     
@@ -85,6 +81,9 @@ public struct ReputationScreen: View {
                     }
                 }
                 .listStyle(.plain)
+                .refreshable {
+                    send(.refresh(isHistory))
+                }
             } else {
                 Spacer()
                 EmptyReputation(isHistory: isHistory)
@@ -113,29 +112,25 @@ public struct ReputationScreen: View {
     private func ReputationCell(vote: ReputationVote) -> some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(vote.authorName)
-                    .foregroundStyle(Color(.Labels.primary))
-                    .font(.system(size: 16, weight: .semibold))
+                Button {
+                    send(.profileTapped(vote.authorId))
+                } label: {
+                    Text(vote.authorName)
+                        .foregroundStyle(Color(.Labels.primary))
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .buttonStyle(.plain)
                 
                 Spacer()
                 
-                //change model - VOTE isUp
-                Text(vote.flag == 1 ? "Raised" : "Lowered")
+                Text(vote.markLabel)
                     .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
                     .font(.system(size: 12, weight: .medium))
                 
-                // сделать на модели arrowUpSymbol arrowDownSymbol - проверку сделать в модели
-                if #available(iOS 17.0, *) {
-                    Image(systemSymbol: vote.flag == 1 ? .arrowshapeUpFill : .arrowshapeDownFill)
-                        .resizable()
-                        .foregroundStyle(tintColor)
-                        .frame(maxWidth: 20, maxHeight: 20)
-                } else {
-                    Image(systemSymbol: vote.flag == 1 ? .arrowUp : .arrowDown)
-                        .resizable()
-                        .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
-                        .frame(maxWidth: 20, maxHeight: 20)
-                }
+                Image(systemSymbol: vote.arrowSymbol)
+                    .resizable()
+                    .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                    .frame(maxWidth: 20, maxHeight: 20)
             }
             .padding(.horizontal, 12)
             
@@ -145,10 +140,15 @@ public struct ReputationScreen: View {
                     .foregroundStyle(Color(.Labels.teritary))
                     .frame(width: 20, height: 16)
                 
-                Text(vote.title)
-                    .lineLimit(1)
-                    .foregroundStyle(Color(.Labels.teritary))
-                    .font(.system(size: 12, weight: .regular))
+                Button {
+                    send(.sourceTapped(vote.titleId, vote.title, vote.createdInType))
+                } label: {
+                    Text(vote.title)
+                        .lineLimit(1)
+                        .foregroundStyle(Color(.Labels.teritary))
+                        .font(.system(size: 12, weight: .regular))
+                }
+                .buttonStyle(.plain)
                 
                 Spacer()
             }
@@ -169,17 +169,22 @@ public struct ReputationScreen: View {
                 
                 Spacer()
                 
-                Button {
-                    print("options cell \(vote.id) tapped")
+                Menu {
+                    MenuButtons(id: vote.authorId)
                 } label: {
                     Image(systemSymbol: .ellipsis)
                         .foregroundStyle(Color(.Labels.teritary))
                 }
+                .menuStyle(.button)
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 12)
         }
+        .contentShape(Rectangle())
+        .contextMenu {
+            MenuButtons(id: vote.authorId)
+        }
     }
-    
     //MARK: - Empty View
     
     @ViewBuilder
@@ -204,6 +209,26 @@ public struct ReputationScreen: View {
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
                 .padding(.horizontal, 55)
         }
+    }
+    
+    // MARK: - MenuButtons
+    
+    @ViewBuilder
+    private func MenuButtons(id: Int) -> some View {
+        ContextButton(
+            text: "Profile",
+            symbol: .personCropCircle,
+            bundle: .module,
+            action: { send(.profileTapped(id)) }
+        )
+        
+        ContextButton(
+            text: "Complain",
+            symbol: .exclamationmarkTriangle,
+            bundle: .module,
+            action: { print("Complain") }
+        )
+        .disabled(true)
     }
     
     // MARK: - formatDate
@@ -247,7 +272,7 @@ where Label: View, SelectionValue: Hashable, Content: View {
     NavigationStack {
         ReputationScreen(
             store: Store(
-                initialState: ReputationFeature.State()
+                initialState: ReputationFeature.State(userId: 236113)
             ) {
                 ReputationFeature()
             }

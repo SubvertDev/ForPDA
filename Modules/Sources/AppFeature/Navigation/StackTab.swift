@@ -219,8 +219,8 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
-        case .profile(.delegate(.openReputation)):
-            state.path.append(.profile(.reputation(ReputationFeature.State())))
+        case .profile(.delegate(.openReputation(let id))):
+            state.path.append(.profile(.reputation(ReputationFeature.State(userId: id))))
             
         case .profile(.delegate(.openQms)):
             state.path.append(.qms(.qmsList(QMSListFeature.State())))
@@ -233,6 +233,16 @@ public struct StackTab: Reducer, Sendable {
             
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
+        case let .reputation(.delegate(.openProfile(id))):
+            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
+        case let .reputation(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
+        case let .reputation(.delegate(.openArticle(id: id))):
+            let preview = ArticlePreview.innerDeeplink(id: id)
+            state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
         default:
             break

@@ -8,7 +8,7 @@
 import Foundation
 import SFSafeSymbols
 
-public struct ReputationVote: Codable, Hashable, Sendable {
+public struct ReputationVote: Codable, Hashable, Sendable, Identifiable {
     public let id: Int
     public let flag: Int
     public let toId: Int
@@ -24,13 +24,36 @@ public struct ReputationVote: Codable, Hashable, Sendable {
     public var title: String {
         switch createdIn {
         case .profile:
-            return "Profile"
+            return "From profile"
         case let .topic(_, topicName, _):
             return topicName
         case let .site(_, articleName, _):
             return articleName
         }
     }
+    
+    public var titleId: Int {
+        switch createdIn {
+        case .profile:
+            return id
+        case .topic(let id, _, _):
+            return id
+        case .site(let id, _, _):
+            return id
+        }
+    }
+    
+    public var createdInType: String {
+        switch createdIn {
+        case .profile:
+            return "Profile"
+        case .topic(_, _, _,):
+            return "Topic"
+        case .site(_, _, _,):
+            return "Article"
+        }
+    }
+    
     
     public var systemSymbol: SFSymbol {
         switch createdIn {
@@ -41,6 +64,18 @@ public struct ReputationVote: Codable, Hashable, Sendable {
             return .bubbleLeftAndBubbleRight
         case .site:
             return .docPlaintext
+        }
+    }
+    
+    public var markLabel: String {
+        flag == 1 ? "Raised" : "Lowered"
+    }
+    
+    public var arrowSymbol: SFSymbol {
+        if #available(iOS 17.0, *) {
+            return flag == 1 ? .arrowshapeUpFill : .arrowshapeDownFill
+        } else {
+            return flag == 1 ? .arrowUp : .arrowDown
         }
     }
     
