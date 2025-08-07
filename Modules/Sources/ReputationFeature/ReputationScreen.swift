@@ -123,7 +123,7 @@ public struct ReputationScreen: View {
                 
                 Spacer()
                 
-                Text(vote.markLabel)
+                Text(LocalizedStringKey(vote.markLabel), bundle: .module)
                     .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
                     .font(.system(size: 12, weight: .medium))
                 
@@ -137,6 +137,7 @@ public struct ReputationScreen: View {
             HStack {
                 Image(systemSymbol: vote.systemSymbol)
                     .resizable()
+                    .scaledToFit()
                     .foregroundStyle(Color(.Labels.teritary))
                     .frame(width: 20, height: 16)
                 
@@ -196,13 +197,13 @@ public struct ReputationScreen: View {
                 .frame(width: 48, height: 48)
                 .padding(.bottom, 8)
             
-            Text("No reputation history")
+            Text("No reputation history", bundle: .module)
                 .font(.title3)
                 .bold()
                 .foregroundColor(Color(.Labels.primary))
                 .padding(.bottom, 6)
             
-            Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum")
+            Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum", bundle: .module)
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
@@ -272,7 +273,7 @@ where Label: View, SelectionValue: Hashable, Content: View {
     NavigationStack {
         ReputationScreen(
             store: Store(
-                initialState: ReputationFeature.State(userId: 236113)
+                initialState: ReputationFeature.State(userId: 0)
             ) {
                 ReputationFeature()
             }
