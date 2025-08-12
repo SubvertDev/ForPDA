@@ -55,7 +55,7 @@ public struct BBTokenizer {
                 
                 if currentIndex < input.endIndex {
                     let string = String(input[tagStartIndex..<currentIndex])
-                    let tag = BBTag(rawValue: string)
+                    let tag = BBTag(rawValue: string.lowercased())
                     if let tag {
                         advanceIndex()
                         return .closingTag(tag)
@@ -78,7 +78,7 @@ public struct BBTokenizer {
                 }
                 
                 let string = String(input[tagStartIndex..<currentIndex])
-                guard let tag = BBTag(rawValue: string) else {
+                guard let tag = BBTag(rawValue: string.lowercased()) else {
                     // Если мы встретили открывающий тег который не закрылся до конца сообщения, то advance делать не надо
                     if currentIndex < input.endIndex {
                         advanceIndex()
