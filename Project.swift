@@ -741,8 +741,9 @@ extension Dictionary where Key == String, Value == SettingValue {
     
     func useIPhoneAsSingleDestination() -> SettingsDictionary {
         return merging([
-            "TARGETED_DEVICE_FAMILY": "1",
-            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
+            "TARGETED_DEVICE_FAMILY": "1,2",
+            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO",
+            "SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD": "YES"
         ])
     }
     
