@@ -21,7 +21,7 @@
             "OrderedCollections": .framework,
             "Perception": .framework,
             "PerceptionCore": .framework,
-            "Sharing": .framework,
+            // "Sharing": .framework,
             "Sharing1": .framework,
             "Sharing2": .framework,
             "SwiftNavigation": .framework,
