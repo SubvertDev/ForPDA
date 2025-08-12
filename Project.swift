@@ -50,7 +50,7 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.TopicFeature,
-                    .Internal.WriteFormFeature,
+                    .Internal.FormFeature,
                     .SPM.AlertToast,
                     .SPM.TCA
                 ]
@@ -90,7 +90,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
-                    .Internal.WriteFormFeature,
+                    .Internal.FormFeature,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.SkeletonUI,
@@ -211,7 +211,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
-                    .Internal.WriteFormFeature,
+                    .Internal.FormFeature,
                     .SPM.NukeUI,
                     .SPM.TCA
                 ]
@@ -376,7 +376,7 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
-                    .Internal.WriteFormFeature,
+                    .Internal.FormFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
@@ -385,7 +385,7 @@ let project = Project(
             ),
         
             .feature(
-                name: "WriteFormFeature",
+                name: "FormFeature",
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.Models,
@@ -566,6 +566,16 @@ let project = Project(
                 .Internal.BBBuilder,
                 .Internal.Models,
                 .Internal.SharedUI
+            ]
+        ),
+        
+        .tests(
+            name: "FormFeatureTests",
+            dependencies: [
+                .Internal.APIClient,
+                .Internal.Models,
+                .Internal.FormFeature,
+                .SPM.TCA
             ]
         ),
         
@@ -832,6 +842,7 @@ extension TargetDependency.Internal {
     static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
+    static let FormFeature =            TargetDependency.target(name: "FormFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
@@ -844,7 +855,6 @@ extension TargetDependency.Internal {
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
-    static let WriteFormFeature =       TargetDependency.target(name: "WriteFormFeature")
     
     // Clients
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")

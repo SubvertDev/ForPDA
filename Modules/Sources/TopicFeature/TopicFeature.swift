@@ -15,7 +15,7 @@ import PersistenceKeys
 import ParsingClient
 import PasteboardClient
 import NotificationCenterClient
-import WriteFormFeature
+import FormFeature
 import TCAExtensions
 import AnalyticsClient
 import TopicBuilder
@@ -33,7 +33,7 @@ public struct TopicFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
         case editWarning
-        case writeForm(WriteFormFeature)
+        case form(FormFeature)
     }
     
     // MARK: - State
@@ -169,9 +169,8 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(.internal(.loadTopic(newOffset)))
                 ])
                 
-            case let .destination(.presented(.writeForm(.delegate(.writeFormSent(response))))):
-                if case let .post(data) = response,
-                   case let .success(post) = data {
+            case let .destination(.presented(.form(.delegate(.formSent(response))))):
+                if case let .post(data) = response, case let .success(post) = data {
                     return jumpTo(.post(id: post.id), true, &state)
                 }
                 return .none
@@ -210,25 +209,25 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: topic.id,
                             content: .simple("", [])
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
                     return .none
                     
                 case .writePostWithTemplate:
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: topic.id,
                             content: .template("")
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
                     return .none
                     
                 case .openInBrowser:
@@ -256,33 +255,33 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .view(.contextPostMenu(action)):
                 switch action {
-                case .reply(let postId, let authorName):
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                case let .reply(postId, authorName):
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: state.topicId,
                             content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
                     return .none
                     
-                case .edit(let post):
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
-                            type: .edit(postId: post.id),
-                            topicId: state.topicId,
-                            content: .simple(post.content, post.attachments.map { $0.id })
-                        )
-                    )
+                case let .edit(post):
                     if post.attachments.isEmpty {
-                        state.destination = .writeForm(feature)
+                        let formState = FormFeature.State(
+                            type: .post(
+                                type: .edit(postId: post.id),
+                                topicId: state.topicId,
+                                content: .simple(post.content, post.attachments.map { $0.id })
+                            )
+                        )
+                        state.destination = .form(formState)
                     } else {
                         state.destination = .editWarning
                     }
                     return .none
                     
-                case .delete(let id):
+                case let .delete(id):
                     return .concatenate(
                         .run { _ in
                             let status = try await apiClient.deletePosts(postIds: [id])

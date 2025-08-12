@@ -15,7 +15,7 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
-import WriteFormFeature
+import FormFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -28,7 +28,7 @@ public struct ForumFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
-        @Presents var writeForm: WriteFormFeature.State?
+        @Presents var writeForm: FormFeature.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -71,7 +71,7 @@ public struct ForumFeature: Reducer, Sendable {
         case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
         case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         
-        case writeForm(PresentationAction<WriteFormFeature.Action>)
+        case writeForm(PresentationAction<FormFeature.Action>)
         
         case pageNavigation(PageNavigationFeature.Action)
         
@@ -116,7 +116,7 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadForum(offset: newOffset))
                 
-            case let .writeForm(.presented(.delegate(.writeFormSent(response)))):
+            case let .writeForm(.presented(.delegate(.formSent(response)))):
                 if case let .template(status) = response {
                     switch status {
                     case .success(.topic(let id)):
@@ -162,8 +162,8 @@ public struct ForumFeature: Reducer, Sendable {
             case .contextOptionMenu(let action):
                 switch action {
                 case .createTopic:
-                    state.writeForm = WriteFormFeature.State(
-                        formFor: .topic(
+                    state.writeForm = FormFeature.State(
+                        type: .topic(
                             forumId: state.forumId,
                             content: ""
                         )
@@ -270,7 +270,7 @@ public struct ForumFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$writeForm, action: \.writeForm) {
-            WriteFormFeature()
+            FormFeature()
         }
         
         Analytics()

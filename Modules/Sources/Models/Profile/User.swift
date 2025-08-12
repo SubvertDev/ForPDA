@@ -260,32 +260,34 @@ public extension User {
 // MARK: - Mock
 
 public extension User {
-    static let mock = User(
-        id: 0,
-        nickname: "Test Nickname",
-        imageUrl: Links.defaultAvatar,
-        group: .active,
-        status: "Just a status",
-        signature: "[b][color=blue]Developer[/color][/b]",
-        aboutMe: "A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me.",
-        registrationDate: Date(timeIntervalSince1970: 1168875045),
-        lastSeenDate: Date(timeIntervalSince1970: 1200000000),
-        birthdate: "01.01.2000",
-        gender: .male,
-        userTime: 10800,
-        city: "Moscow",
-        devDBdevices: [],
-        karma: 1500,
-        posts: 23,
-        comments: 173,
-        reputation: 78,
-        topics: 5,
-        replies: 82,
-        qmsMessages: nil,
-        forumDevices: nil,
-        email: "some@email.com",
-        achievements: [
-            .init(
+    static let mock = mock()
+    
+    static func mock(
+        id: Int = 0,
+        nickname: String = "Test Nickname",
+        imageUrl: URL = Links.defaultAvatar,
+        group: Group = .active,
+        status: String? = "Just a status",
+        signature: String? = "[b][color=blue]Developer[/color][/b]",
+        aboutMe: String? = "A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me.",
+        registrationDate: Date = Date(timeIntervalSince1970: 1168875045),
+        lastSeenDate: Date = Date(timeIntervalSince1970: 1200000000),
+        birthdate: String? = "01.01.2000",
+        gender: Gender? = .male,
+        userTime: Int? = 10800,
+        city: String? = "Moscow",
+        devDBdevices: [Device] = [],
+        karma: Double = 1500,
+        posts: Int = 23,
+        comments: Int = 173,
+        reputation: Int = 78,
+        topics: Int = 5,
+        replies: Int = 82,
+        qmsMessages: Int? = nil,
+        forumDevices: [Device]? = nil,
+        email: String? = "some@email.com",
+        achievements: [Achievement] = [
+            Achievement(
                 name: "Призер Аллеи Славы",
                 description: "Описание награды",
                 count: 1,
@@ -294,5 +296,32 @@ public extension User {
                 presentationDate: .now
             )
         ]
-    )
+    ) -> User {
+        return User(
+            id: id,
+            nickname: nickname,
+            imageUrl: imageUrl,
+            group: group,
+            status: status,
+            signature: signature,
+            aboutMe: aboutMe,
+            registrationDate: registrationDate,
+            lastSeenDate: lastSeenDate,
+            birthdate: birthdate,
+            gender: gender,
+            userTime: userTime,
+            city: city,
+            devDBdevices: devDBdevices,
+            karma: karma,
+            posts: posts,
+            comments: comments,
+            reputation: reputation,
+            topics: topics,
+            replies: replies,
+            qmsMessages: qmsMessages,
+            forumDevices: forumDevices,
+            email: email,
+            achievements: achievements
+        )
+    }
 }

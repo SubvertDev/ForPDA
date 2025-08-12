@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import PageNavigationFeature
-import WriteFormFeature
+import FormFeature
 import SFSafeSymbols
 import SharedUI
 import NukeUI
@@ -371,9 +371,9 @@ struct NavigationModifier: ViewModifier {
         content
             .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
             .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+            .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
                 NavigationStack {
-                    WriteFormScreen(store: store)
+                    FormScreen(store: store)
                 }
             }
             .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
@@ -526,10 +526,12 @@ private extension Date {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
-                            type: .new, topicId: 0, content: .simple("Test Text", [])
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
+                            type: .new,
+                            topicId: 0,
+                            content: .simple("Test Text", [])
                         )
                     )
                 )
@@ -559,12 +561,14 @@ private extension Date {
     TopicScreen(
         store: Store(
             initialState: TopicFeature.State(
-                topicId: 0, 
+                topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
-                            type: .new, topicId: 0, content: .simple("Test Text", [])
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
+                            type: .new,
+                            topicId: 0,
+                            content: .simple("Test Text", [])
                         )
                     )
                 )

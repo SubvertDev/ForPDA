@@ -11,7 +11,7 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
-import WriteFormFeature
+import FormFeature
 
 public struct ForumScreen: View {
     
@@ -61,7 +61,7 @@ public struct ForumScreen: View {
             .navigationBarTitleDisplayMode(.large)
             .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
                 NavigationStack {
-                    WriteFormScreen(store: store)
+                    FormScreen(store: store)
                 }
             }
             .toolbar {
