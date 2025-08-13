@@ -13,7 +13,7 @@ import Testing
 import FormFeature
 
 @MainActor
-struct WriteFormFeatureTests {
+struct FormFeatureTests {
     
     // MARK: - Report Success
     

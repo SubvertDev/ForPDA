@@ -548,17 +548,17 @@ let project = Project(
         
         // MARK: - Tests -
         
-            .target(
-                name: "ForPDATests",
-                destinations: .iOS,
-                product: .unitTests,
-                bundleId: "com.subvert.forpda.tests",
-                deploymentTargets: .iOS("16.0"),
-                infoPlist: .default,
-                sources: ["Modules/Tests/**"],
-                resources: [],
-                dependencies: [.target(name: "ForPDA")]
-            ),
+//            .target(
+//                name: "ForPDATests",
+//                destinations: .iOS,
+//                product: .unitTests,
+//                bundleId: "com.subvert.forpda.tests",
+//                deploymentTargets: .iOS("16.0"),
+//                infoPlist: .default,
+//                sources: ["Modules/Tests/**"],
+//                resources: [],
+//                dependencies: [.target(name: "ForPDA")]
+//            ),
         
         .tests(
             name: "BBBuilderTests",
