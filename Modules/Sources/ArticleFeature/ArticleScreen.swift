@@ -205,8 +205,18 @@ public struct ArticleScreen: View {
             VStack(spacing: 0) {
                 ForEach(elements, id: \.self) { element in
                     WithPerceptionTracking {
-                        ArticleElementView(store: store, element: element)
-                            .padding(.vertical, 10)
+                        ArticleElementView(
+                            element: element,
+                            isShowingVoteResults: store.isShowingVoteResults,
+                            isUploadingPollVote: store.isUploadingPollVote,
+                            onPollVoteButtonTapped: { id, selections in
+                                store.send(.pollVoteButtonTapped(id, selections))
+                            },
+                            onLinkInTextTapped: { url in
+                                store.send(.linkInTextTapped(url))
+                            }
+                        )
+                        .padding(.vertical, 10)
                     }
                 }
             }
