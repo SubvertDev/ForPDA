@@ -12,6 +12,7 @@ import PersistenceKeys
 import APIClient
 import Models
 import ToastClient
+import ReputationChangeFeature
 import FormFeature
 
 public enum CommentContextMenuOptions {
@@ -29,6 +30,7 @@ public struct CommentFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
+        @Presents var changeReputation: ReputationChangeFeature.State?
         @Presents var writeForm: FormFeature.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
@@ -76,7 +78,9 @@ public struct CommentFeature: Reducer, Sendable {
         case hideButtonTapped
         case replyButtonTapped
         case likeButtonTapped
+        case changeReputationButtonTapped
         
+        case changeReputation(PresentationAction<ReputationChangeFeature.Action>)
         case writeForm(PresentationAction<FormFeature.Action>)
         
         case _likeResult(Bool)
@@ -128,7 +132,7 @@ public struct CommentFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .writeForm:
+            case .writeForm, .changeReputation:
                 return .none
                 
             case .hiddenLabelTapped:
@@ -144,6 +148,17 @@ public struct CommentFeature: Reducer, Sendable {
                         id: state.comment.id,
                         type: .comment
                     )
+                )
+                return .none
+                
+            case .changeReputationButtonTapped:
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
+                state.changeReputation = ReputationChangeFeature.State(
+                    userId: state.comment.authorId,
+                    username: state.comment.authorName,
+                    content: .comment(id: state.comment.id)
                 )
                 return .none
                 
@@ -189,6 +204,9 @@ public struct CommentFeature: Reducer, Sendable {
         }
         .ifLet(\.$writeForm, action: \.writeForm) {
             FormFeature()
+        }
+        .ifLet(\.$changeReputation, action: \.changeReputation) {
+            ReputationChangeFeature()
         }
         .ifLet(\.alert, action: \.alert)
     }

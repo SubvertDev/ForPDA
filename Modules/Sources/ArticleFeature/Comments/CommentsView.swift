@@ -12,6 +12,7 @@ import NukeUI
 import SharedUI
 import SkeletonUI
 import SFSafeSymbols
+import ReputationChangeFeature
 import FormFeature
 
 // MARK: - Comments View
@@ -123,6 +124,9 @@ struct CommentView: View {
                     FormScreen(store: store)
                 }
             }
+            .fittedSheet(item: $store.scope(state: \.changeReputation, action: \.changeReputation)) { store in
+                ReputationChangeView(store: store)
+            }
             .background(Color(.Background.primary))
             .alert($store.scope(state: \.alert, action: \.alert))
             .task {
@@ -209,6 +213,10 @@ struct CommentView: View {
     @ViewBuilder
     private func MenuButton() -> some View {
         Menu {
+            ContextButton(text: "Reputation", symbol: .plusminus, bundle: .module) {
+                store.send(.changeReputationButtonTapped)
+            }
+            
             ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
                 store.send(.reportButtonTapped)
             }

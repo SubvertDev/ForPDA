@@ -20,7 +20,7 @@ extension CommentFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onTask, ._timerTicked, ._likeResult, .alert, .delegate, .writeForm:
+                case .onTask, ._timerTicked, ._likeResult, .alert, .delegate, .writeForm, .changeReputation:
                     break
                     
                 case .profileTapped:
@@ -40,6 +40,9 @@ extension CommentFeature {
                     
                 case .likeButtonTapped:
                     analytics.log(CommentEvent.likeButtonTapped)
+                    
+                case .changeReputationButtonTapped:
+                    analytics.log(CommentEvent.changeReputationButtonTapped)
                 }
                 
                 return .none

@@ -1,12 +1,52 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Cannot change self reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы не можете менять репутацию самому себе"
+          }
+        }
+      }
+    },
+    "Change denied, this person recently downvoted you" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменение отклонено, т.к. вы недавно ставили минус этому человеку"
+          }
+        }
+      }
+    },
+    "Change denied, this person you recently downvoted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменение отклонено, т.к. он недавно поставил вам минус"
+          }
+        }
+      }
+    },
     "Error sending report" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка отправки жалобы"
+          }
+        }
+      }
+    },
+    "Not enough posts for reputation change" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас недостаточно постов, чтобы менять репутацию"
           }
         }
       }
@@ -47,6 +87,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Слишком короткая жалоба"
+          }
+        }
+      }
+    },
+    "Reputation change blocked" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменение репутации заблокировано"
+          }
+        }
+      }
+    },
+    "Reputation change error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка изменения репутации"
+          }
+        }
+      }
+    },
+    "Reputation changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация изменена"
           }
         }
       }
@@ -107,6 +177,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упс, что-то пошло не так.."
+          }
+        }
+      }
+    },
+    "You can no longer change reputation today" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы больше не можете менять репутацию сегодня"
+          }
+        }
+      }
+    },
+    "You can not change reputation for this post" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы больше не можете менять репутацию за этот пост"
+          }
+        }
+      }
+    },
+    "You can not change reputation for this user now" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В данный момент вы не можете изменить репутацию этому человеку"
+          }
+        }
+      }
+    },
+    "You can not change reputation for this user today" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы больше не можете менять репутацию этому человеку сегодня"
+          }
+        }
+      }
+    },
+    "Your reputation is too low" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У вас слишком низкая репутация"
           }
         }
       }
