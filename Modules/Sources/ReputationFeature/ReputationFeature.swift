@@ -39,7 +39,7 @@ public struct ReputationFeature: Reducer, Sendable {
         
         public let userId: Int
         public var isLoading = false
-        public var historyData: [ReputationVote]?
+        public var historyData: [ReputationVote] = []
         var pickerSection: PickerSection = .history
         
         public var loadAmount = 20
@@ -92,18 +92,17 @@ public struct ReputationFeature: Reducer, Sendable {
             switch action {
                 
             case .binding(\.pickerSection):
-                state.historyData = nil
+                state.historyData = []
                 state.offset = 0
                 state.isLoading = true
                 return .send(.view(.refresh))
                 
             case .view(.onAppear):
-                state.offset = 0
                 return .send(.internal(.loadData))
                 
             case .view(.loadMore):
                 guard !state.isLoading else { return .none }
-                guard state.historyData?.isEmpty == false else { return .none }
+                guard !state.historyData.isEmpty else { return .none }
                 return .send(.internal(.loadData))
                 
             case .view(.refresh):
@@ -113,19 +112,15 @@ public struct ReputationFeature: Reducer, Sendable {
                 return .send(.delegate(.openProfile(profileId: profileId)))
                 
             case let .view(.sourceTapped(vote)):
-                switch vote.createdInType {
-                case "Profile":
+                switch vote.createdIn {
+                case .profile:
                     return .send(.delegate(.openProfile(profileId: vote.authorId)))
                     
-                case "Topic":
-                    guard let id = vote.goToId else { return .none }
-                    return .send(.delegate(.openTopic(topicId: vote.titleId, name: vote.authorName, goTo: .post(id: id))))
+                case let .topic(id: topicId, topicName: topicName, postId: postId):
+                    return .send(.delegate(.openTopic(topicId: topicId, name: topicName, goTo: .post(id: postId))))
                     
-                case "Article":
-                    return .send(.delegate(.openArticle(articleId: vote.titleId)))
-                    
-                default:
-                    return .none
+                case let .site(id: articleId, _, _):
+                    return .send(.delegate(.openArticle(articleId: articleId)))
                 }
                 
             case .internal(.loadData):
@@ -145,13 +140,7 @@ public struct ReputationFeature: Reducer, Sendable {
                 
             case let .internal(.historyResponse(.success(votes))):
                 state.isLoading = false
-                
-                if state.offset == 0 {
-                    state.historyData = votes.votes
-                } else {
-                    state.historyData?.append(contentsOf: votes.votes)
-                }
-                
+                state.historyData.append(contentsOf: votes.votes)
                 state.offset += state.loadAmount
                 return .none
                 

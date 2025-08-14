@@ -5,7 +5,7 @@
 //  Created by Xialtal on 12.04.25.
 //
 
-public struct ReputationVotes: Codable, Hashable, Sendable {
+public struct ReputationVotes: Decodable, Hashable, Sendable {
     public var votes: [ReputationVote]
     public var votesCount: Int
     

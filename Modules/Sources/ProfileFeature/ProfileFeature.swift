@@ -87,7 +87,6 @@ public struct ProfileFeature: Reducer, Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.dismiss) private var dismiss
-    @Shared(.userSession) var userSession
     
     // MARK: - Body
     
@@ -111,11 +110,9 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .send(.delegate(.openHistory))
                 
             case .view(.reputationButtonTapped):
-                if let id = state.userId {
-                    return .send(.delegate(.openReputation(id)))
-                } else {
-                    return .send(.delegate(.openReputation(userSession!.userId)))
-                }
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openReputation(userId)))
                 
             case .view(.qmsButtonTapped):
                 if state.didAcceptQMSWarningMessage {

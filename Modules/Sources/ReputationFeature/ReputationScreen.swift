@@ -36,13 +36,13 @@ public struct ReputationScreen: View {
                 VStack {
                     SegmentPicker()
                     
-                    if !store.isLoading {
-                        ReputationSection()
-                    } else {
+                    if store.isLoading {
                         Spacer()
                         PDALoader()
                             .frame(width: 24, height: 24)
                         Spacer()
+                    } else {
+                        ReputationSection()
                     }
                 }
             }
@@ -63,12 +63,16 @@ public struct ReputationScreen: View {
             Color(.Background.primary)
                 .ignoresSafeArea()
             
-            if let votes = store.historyData, !votes.isEmpty {
-                List(votes, id: \.self) { vote in
+            if store.historyData.isEmpty {
+                Spacer()
+                EmptyReputation(isHistory: store.pickerSection == .history)
+                Spacer()
+            } else {
+                List(store.historyData, id: \.self) { vote in
                         ReputationRow(vote: vote)
                             .onAppear {
-                                if let index = votes.firstIndex(of: vote),
-                                   index == votes.count - 5 {
+                                if let index = store.historyData.firstIndex(of: vote),
+                                   index == store.historyData.count - 5 {
                                     send(.loadMore)
                                 }
                             }
@@ -77,10 +81,6 @@ public struct ReputationScreen: View {
                 .refreshable {
                     send(.refresh)
                 }
-            } else {
-                Spacer()
-                EmptyReputation(isHistory: store.pickerSection == .history)
-                Spacer()
             }
         }
     }
@@ -179,7 +179,7 @@ public struct ReputationScreen: View {
             MenuButtons(id: vote.authorId)
         }
     }
-    //MARK: - Empty Reputation
+    // MARK: - Empty Reputation
     
     @ViewBuilder
     private func EmptyReputation(isHistory: Bool) -> some View {

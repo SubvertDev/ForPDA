@@ -219,7 +219,7 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
-        case .profile(.delegate(.openReputation(let id))):
+        case let .profile(.delegate(.openReputation(id))):
             state.path.append(.profile(.reputation(ReputationFeature.State(userId: id))))
             
         case .profile(.delegate(.openQms)):

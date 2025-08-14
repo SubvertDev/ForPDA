@@ -8,7 +8,7 @@
 import Foundation
 import SFSafeSymbols
 
-public struct ReputationVote: Codable, Hashable, Sendable, Identifiable {
+public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     public let id: Int
     public let flag: Int
     public let toId: Int
@@ -55,7 +55,6 @@ public struct ReputationVote: Codable, Hashable, Sendable, Identifiable {
         case .profile:
             return .person
         case .topic:
-            // добавить варинат с фигмы для iOS 17
             return .bubbleLeftAndBubbleRight
         case .site:
             return .docPlaintext
