@@ -397,7 +397,9 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func ForumStatisticsSection(user: User) -> some View {
         Section {
-            Row(title: "Reputation", type: .description(String(user.reputation)))
+            Row(title: "Reputation", type: .navigationDescription(String(user.reputation))) {
+                send(.reputationButtonTapped)
+            }
             Row(title: "Topics", type: .description(String(user.topics)))
             Row(title: "Replies", type: .description(String(user.replies)))
         } header: {
@@ -497,6 +499,7 @@ public struct ProfileScreen: View {
         case basic
         case description(String)
         case navigation
+        case navigationDescription(String)
     }
     
     @ViewBuilder
@@ -533,6 +536,16 @@ public struct ProfileScreen: View {
                         Image(systemSymbol: .chevronRight)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundStyle(Color(.Labels.quintuple))
+                        
+                    case let .navigationDescription(text):
+                        Text(text)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .padding(.trailing, 16)
+                        
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(tintColor)
                     }
                 }
                 .contentShape(Rectangle())

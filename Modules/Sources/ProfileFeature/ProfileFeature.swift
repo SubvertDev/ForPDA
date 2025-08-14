@@ -60,6 +60,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
+            case reputationButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
             case sheetContinueButtonTapped
             case sheetCloseButtonTapped
@@ -75,6 +76,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openQms
             case openSettings
             case openHistory
+            case openReputation(Int)
             case userLoggedOut
             case handleUrl(URL)
         }
@@ -106,6 +108,11 @@ public struct ProfileFeature: Reducer, Sendable {
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
+                
+            case .view(.reputationButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openReputation(userId)))
                 
             case .view(.qmsButtonTapped):
                 if state.didAcceptQMSWarningMessage {

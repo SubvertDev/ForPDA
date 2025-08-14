@@ -7,15 +7,13 @@
 
 import SwiftUI
 
-// TODO: Do I need it?
-
 public extension View {
     func fittedSheet<Item: Identifiable, Content: View>(item binding: Binding<Item?>, onDismiss: @escaping () -> Void = {}, content: @escaping (Item) -> Content) -> some View {
         modifier(FittedSheetModifier(item: binding, onDismiss: onDismiss, itemContent: content))
     }
 }
 
-struct FittedSheetModifier<Item: Identifiable, ItemContent: View>: ViewModifier {
+private struct FittedSheetModifier<Item: Identifiable, ItemContent: View>: ViewModifier {
     @Binding var item: Item?
     let onDismiss: () -> Void
     let itemContent: (Item) -> ItemContent
@@ -33,7 +31,7 @@ struct FittedSheetModifier<Item: Identifiable, ItemContent: View>: ViewModifier 
     }
 }
 
-extension View {
+private extension View {
     func getSize(callback: @Sendable @escaping (CGSize) -> Void) -> some View {
         overlay {
             GeometryReader { proxy in

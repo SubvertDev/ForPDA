@@ -21,6 +21,7 @@ import AuthFeature
 import ProfileFeature
 import QMSListFeature
 import QMSFeature
+import ReputationFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature

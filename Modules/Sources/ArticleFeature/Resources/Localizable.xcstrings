@@ -151,6 +151,16 @@
         }
       }
     },
+    "Reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация"
+          }
+        }
+      }
+    },
     "Share Link" : {
       "localizations" : {
         "ru" : {
