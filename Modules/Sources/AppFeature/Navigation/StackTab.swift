@@ -228,7 +228,7 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
-        case .profile(.delegate(.handleUrl(let url))):
+        case let .profile(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
             
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
@@ -237,11 +237,11 @@ public struct StackTab: Reducer, Sendable {
         case let .reputation(.delegate(.openProfile(id))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
-        case let .reputation(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+        case let .reputation(.delegate(.openTopic(topicId: topicId, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: topicId, topicName: name, goTo: goTo))))
             
-        case let .reputation(.delegate(.openArticle(id: id))):
-            let preview = ArticlePreview.innerDeeplink(id: id)
+        case let .reputation(.delegate(.openArticle(articleId: articleId))):
+            let preview = ArticlePreview.innerDeeplink(id: articleId)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
         default:

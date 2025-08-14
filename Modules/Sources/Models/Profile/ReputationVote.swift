@@ -21,39 +21,34 @@ public struct ReputationVote: Codable, Hashable, Sendable, Identifiable {
     public let createdAt: Date
     public let isDown: Bool
     
-    public var title: String {
+    private var createdInDetails: (title: String, titleId: Int, createdInType: String, goToId: Int?) {
         switch createdIn {
         case .profile:
-            return "From profile"
-        case let .topic(_, topicName, _):
-            return topicName
-        case let .site(_, articleName, _):
-            return articleName
+            return ("From profile", id, "Profile", nil)
+            
+        case let .topic(id: id, topicName: topicName, postId: postId):
+            return (topicName, id, "Topic", postId)
+            
+        case .site(let id, let articleName, _):
+            return (articleName, id, "Article", nil)
         }
+    }
+    
+    public var title: String {
+        createdInDetails.title
     }
     
     public var titleId: Int {
-        switch createdIn {
-        case .profile:
-            return id
-        case .topic(let id, _, _):
-            return id
-        case .site(let id, _, _):
-            return id
-        }
+        createdInDetails.titleId
     }
     
     public var createdInType: String {
-        switch createdIn {
-        case .profile:
-            return "Profile"
-        case .topic(_, _, _,):
-            return "Topic"
-        case .site(_, _, _,):
-            return "Article"
-        }
+        createdInDetails.createdInType
     }
     
+    public var goToId: Int? {
+        createdInDetails.goToId
+    }
     
     public var systemSymbol: SFSymbol {
         switch createdIn {

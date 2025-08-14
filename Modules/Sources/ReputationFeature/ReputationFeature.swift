@@ -15,7 +15,18 @@ public struct ReputationFeature: Reducer, Sendable {
     
     public init() {}
     
-    enum PickerSelection: Int {
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination: Hashable {
+        case alert(AlertState<Alert>)
+        
+        public enum Alert { case ok }
+    }
+    
+    // MARK: - Picker Section
+    
+    enum PickerSection: Int {
         case history = 1
         case votes = 2
     }
@@ -24,13 +35,15 @@ public struct ReputationFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var destination: Destination.State?
+        
         public let userId: Int
         public var isLoading = false
-        public var historyData: ReputationVotes?
-        var pickerSelection: PickerSelection = .history
+        public var historyData: [ReputationVote]?
+        var pickerSection: PickerSection = .history
         
-        public var loadAmount: Int = 20
-        public var offset: Int = 0
+        public var loadAmount = 20
+        public var offset = 0
         
         public init(userId: Int) {
             self.userId = userId
@@ -38,87 +51,89 @@ public struct ReputationFeature: Reducer, Sendable {
     }
     
     // MARK: - Action
+    
     public enum Action: BindableAction, ViewAction {
+        case destination(PresentationAction<Destination.Action>)
         case binding(BindingAction<State>)
         
         case view(View)
         public enum View {
             case onAppear
             case loadMore
-            case refresh(Bool)
+            case refresh
             case profileTapped(Int)
-            case sourceTapped(Int, String, String)
+            case sourceTapped(ReputationVote)
         }
         
         case `internal`(Internal)
         public enum Internal {
-            case loadData(isHistory: Bool)
+            case loadData
             case historyResponse(Result<ReputationVotes, any Error>)
         }
         
         case delegate(Delegate)
         public enum Delegate {
-            case openProfile(Int)
-            case openTopic(id: Int, name: String, goTo: GoTo)
-            case openArticle(id: Int)
+            case openProfile(profileId: Int)
+            case openTopic(topicId: Int, name: String, goTo: GoTo)
+            case openArticle(articleId: Int)
         }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
-    @Shared(.userSession) var userSession
+    
+    // MARK: - body
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
         Reduce<State, Action> { state, action in
             switch action {
+                
+            case .binding(\.pickerSection):
+                state.historyData = nil
+                state.offset = 0
+                state.isLoading = true
+                return .send(.view(.refresh))
+                
             case .view(.onAppear):
                 state.offset = 0
-                switch state.pickerSelection {
-                case .history:
-                    return .send(.internal(.loadData(isHistory: true)))
-                case .votes:
-                    return .send(.internal(.loadData(isHistory: false)))
-                }
+                return .send(.internal(.loadData))
                 
             case .view(.loadMore):
                 guard !state.isLoading else { return .none }
-                guard state.historyData?.votes.isEmpty == false else { return .none }
-                switch state.pickerSelection {
-                case .history:
-                    return .send(.internal(.loadData(isHistory: true)))
-                case .votes:
-                    return .send(.internal(.loadData(isHistory: false)))
-                }
+                guard state.historyData?.isEmpty == false else { return .none }
+                return .send(.internal(.loadData))
                 
-            case let .view(.refresh(isHistory)):
-                return .send(.internal(.loadData(isHistory: isHistory)))
+            case .view(.refresh):
+                return .send(.internal(.loadData))
                 
-            case let .view(.profileTapped(id)):
-                return .send(.delegate(.openProfile(id)))
+            case let .view(.profileTapped(profileId)):
+                return .send(.delegate(.openProfile(profileId: profileId)))
                 
-            case let .view(.sourceTapped(id, name, type)):
-                switch type {
+            case let .view(.sourceTapped(vote)):
+                switch vote.createdInType {
                 case "Profile":
-                    return .send(.delegate(.openProfile(id)))
+                    return .send(.delegate(.openProfile(profileId: vote.authorId)))
                     
                 case "Topic":
-                    return .send(.delegate(.openTopic(id: id, name: name, goTo: .first)))
+                    guard let id = vote.goToId else { return .none }
+                    return .send(.delegate(.openTopic(topicId: vote.titleId, name: vote.authorName, goTo: .post(id: id))))
                     
                 case "Article":
-                    return .send(.delegate(.openArticle(id: id)))
+                    return .send(.delegate(.openArticle(articleId: vote.titleId)))
                     
                 default:
                     return .none
                 }
                 
-            case let .internal(.loadData(isHistory)):
+            case .internal(.loadData):
+                let type = state.pickerSection == .history
                 return .run { [userId = state.userId, offset = state.offset, amount = state.loadAmount] send in
                     let request = ReputationVotesRequest(
                         userId: userId,
-                        type: isHistory ? .from : .to,
+                        type: type ? .to : .from,
                         offset: offset,
                         amount: amount
                     )
@@ -132,10 +147,9 @@ public struct ReputationFeature: Reducer, Sendable {
                 state.isLoading = false
                 
                 if state.offset == 0 {
-                    state.historyData = votes
+                    state.historyData = votes.votes
                 } else {
-                    state.historyData?.votes.append(contentsOf: votes.votes)
-                    state.historyData?.votesCount = votes.votesCount
+                    state.historyData?.append(contentsOf: votes.votes)
                 }
                 
                 state.offset += state.loadAmount
@@ -143,15 +157,28 @@ public struct ReputationFeature: Reducer, Sendable {
                 
             case let .internal(.historyResponse(.failure(error))):
                 state.isLoading = false
+                state.destination = .alert(.error)
                 print("Error \(error)")
                 return .none
                 
-            case .delegate:
+            case .delegate, .binding, .destination:
                 return .none
                 
-            case .binding:
-                return .none
             }
         }
+    }
+}
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == ReputationFeature.Destination.Alert {
+    nonisolated(unsafe) static let error = Self {
+        TextState("Whoops!", bundle: .module)
+    } actions: {
+        ButtonState(role: .cancel, action: .ok) {
+            TextState("OK")
+        }
+    } message: {
+        TextState("Something went wrong while loading reputation :(", bundle: .module)
     }
 }

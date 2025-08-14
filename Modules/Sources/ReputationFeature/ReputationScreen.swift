@@ -19,6 +19,8 @@ public struct ReputationScreen: View {
     @Perception.Bindable public var store: StoreOf<ReputationFeature>
     @Environment(\.tintColor) private var tintColor
     
+    // MARK: - init
+    
     public init(store: StoreOf<ReputationFeature>) {
         self.store = store
     }
@@ -33,20 +35,9 @@ public struct ReputationScreen: View {
                 
                 VStack {
                     SegmentPicker()
+                    
                     if !store.isLoading {
-                        switch store.pickerSelection {
-                        case .history:
-                            ReputationSelection(isHistory: true)
-                                .onAppear {
-                                    send(.onAppear)
-                                }
-                            
-                        case .votes:
-                            ReputationSelection(isHistory: false)
-                                .onAppear {
-                                    send(.onAppear)
-                                }
-                        }
+                        ReputationSection()
                     } else {
                         Spacer()
                         PDALoader()
@@ -55,69 +46,73 @@ public struct ReputationScreen: View {
                     }
                 }
             }
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Reputation", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                send(.onAppear)
+            }
         }
     }
     
-    // MARK: - ReputationSelection
+    // MARK: - Reputation Section
     
     @ViewBuilder
-    private func ReputationSelection(isHistory: Bool) -> some View {
+    private func ReputationSection() -> some View {
         ZStack {
             Color(.Background.primary)
                 .ignoresSafeArea()
             
-            if let votes = store.historyData?.votes, !votes.isEmpty {
-                List {
-                    ForEach(votes, id: \.self) { vote in
-                        ReputationCell(vote: vote)
+            if let votes = store.historyData, !votes.isEmpty {
+                List(votes, id: \.self) { vote in
+                        ReputationRow(vote: vote)
                             .onAppear {
                                 if let index = votes.firstIndex(of: vote),
-                                   index == votes.count - 2 {
+                                   index == votes.count - 5 {
                                     send(.loadMore)
                                 }
                             }
-                    }
                 }
                 .listStyle(.plain)
                 .refreshable {
-                    send(.refresh(isHistory))
+                    send(.refresh)
                 }
             } else {
                 Spacer()
-                EmptyReputation(isHistory: isHistory)
+                EmptyReputation(isHistory: store.pickerSection == .history)
                 Spacer()
             }
         }
     }
     
-    // MARK: - SegmentPicker
+    // MARK: - Segment Picker
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
-        _Picker("", selection: $store.pickerSelection) {
+        _Picker("", selection: $store.pickerSection) {
             Text("History", bundle: .module)
-                .tag(ReputationFeature.PickerSelection.history)
+                .tag(ReputationFeature.PickerSection.history)
             Text("My votes", bundle: .module)
-                .tag(ReputationFeature.PickerSelection.votes)
+                .tag(ReputationFeature.PickerSection.votes)
         }
         .pickerStyle(.segmented)
         .padding(.horizontal, 18)
     }
     
-    // MARK: - ReputationCell
+    // MARK: - Reputation Row
     
     @ViewBuilder
-    private func ReputationCell(vote: ReputationVote) -> some View {
-        VStack(alignment: .leading) {
+    private func ReputationRow(vote: ReputationVote) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Button {
                     send(.profileTapped(vote.authorId))
                 } label: {
                     Text(vote.authorName)
                         .foregroundStyle(Color(.Labels.primary))
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.callout)
+                        .bold()
+                        .fontWeight(.semibold)
                 }
                 .buttonStyle(.plain)
                 
@@ -125,48 +120,45 @@ public struct ReputationScreen: View {
                 
                 Text(LocalizedStringKey(vote.markLabel), bundle: .module)
                     .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.caption)
+                    .fontWeight(.medium)
                 
                 Image(systemSymbol: vote.arrowSymbol)
-                    .resizable()
                     .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
-                    .frame(maxWidth: 20, maxHeight: 20)
+                    .font(.body)
             }
-            .padding(.horizontal, 12)
             
-            HStack {
+            HStack(spacing: 0) {
                 Image(systemSymbol: vote.systemSymbol)
-                    .resizable()
-                    .scaledToFit()
                     .foregroundStyle(Color(.Labels.teritary))
-                    .frame(width: 20, height: 16)
+                    .font(.caption)
+                    .padding(.trailing, 6)
                 
                 Button {
-                    send(.sourceTapped(vote.titleId, vote.title, vote.createdInType))
+                    send(.sourceTapped(vote))
                 } label: {
                     Text(vote.title)
                         .lineLimit(1)
                         .foregroundStyle(Color(.Labels.teritary))
-                        .font(.system(size: 12, weight: .regular))
+                        .font(.caption)
                 }
                 .buttonStyle(.plain)
                 
                 Spacer()
             }
-            .padding(.horizontal, 12)
+            .padding(.top, 4)
             
             Text(vote.reason)
                 .lineLimit(1)
                 .foregroundStyle(Color(.Labels.primary))
-                .font(.system(size: 15, weight: .regular))
+                .font(.subheadline)
                 .multilineTextAlignment(.leading)
-                .padding(.horizontal, 12)
                 .padding(.vertical, 8)
             
             HStack {
                 Text(formatDate(vote.createdAt))
                     .foregroundStyle(Color(.Labels.teritary))
-                    .font(.system(size: 12, weight: .regular))
+                    .font(.caption)
                 
                 Spacer()
                 
@@ -175,18 +167,19 @@ public struct ReputationScreen: View {
                 } label: {
                     Image(systemSymbol: .ellipsis)
                         .foregroundStyle(Color(.Labels.teritary))
+                        .font(.body)
                 }
                 .menuStyle(.button)
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 12)
         }
+        .padding(.horizontal, 12)
         .contentShape(Rectangle())
         .contextMenu {
             MenuButtons(id: vote.authorId)
         }
     }
-    //MARK: - Empty View
+    //MARK: - Empty Reputation
     
     @ViewBuilder
     private func EmptyReputation(isHistory: Bool) -> some View {
@@ -200,7 +193,7 @@ public struct ReputationScreen: View {
             Text("No reputation history", bundle: .module)
                 .font(.title3)
                 .bold()
-                .foregroundColor(Color(.Labels.primary))
+                .foregroundStyle(Color(.Labels.primary))
                 .padding(.bottom, 6)
             
             Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum", bundle: .module)
@@ -212,7 +205,7 @@ public struct ReputationScreen: View {
         }
     }
     
-    // MARK: - MenuButtons
+    // MARK: - Menu Buttons
     
     @ViewBuilder
     private func MenuButtons(id: Int) -> some View {
@@ -232,7 +225,7 @@ public struct ReputationScreen: View {
         .disabled(true)
     }
     
-    // MARK: - formatDate
+    // MARK: - format Date
     
     private func formatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
@@ -278,6 +271,5 @@ where Label: View, SelectionValue: Hashable, Content: View {
                 ReputationFeature()
             }
         )
-        .environment(\.locale, Locale(identifier: "ru"))
     }
 }
