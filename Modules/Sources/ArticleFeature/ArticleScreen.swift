@@ -174,7 +174,7 @@ public struct ArticleScreen: View {
                     HStack {
                         Text(store.articlePreview.authorName)
                         Spacer()
-                        Text(store.articlePreview.formattedDate)
+                        Text(store.articlePreview.formattedDate, bundle: .module)
                     }
                     .font(.caption)
                     .foregroundStyle(Color(.Labels.secondaryInvariably))

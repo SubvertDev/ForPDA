@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUICore
 
 public struct ArticlePreview: Sendable, Hashable, Identifiable {
     
@@ -19,10 +20,18 @@ public struct ArticlePreview: Sendable, Hashable, Identifiable {
     public var description: String
     public let tags: [Tag]
     
-    public var formattedDate: String {
+    public var formattedDate: LocalizedStringKey {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
-        return formatter.string(from: date)
+        formatter.dateFormat = "HH:mm"
+
+        if Calendar.current.isDateInToday(date) {
+            return LocalizedStringKey("Today, \(formatter.string(from: date))")
+        } else if Calendar.current.isDateInYesterday(date) {
+            return LocalizedStringKey("Yesterday, \(formatter.string(from: date))")
+        } else {
+            formatter.dateFormat = "dd MMM yyyy"
+            return LocalizedStringKey(formatter.string(from: date))
+        }
     }
     
     public var url: URL {
