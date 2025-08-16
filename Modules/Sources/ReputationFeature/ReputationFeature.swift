@@ -5,7 +5,7 @@
 //  Created by Рустам Ойтов on 11.07.2025.
 //
 
-import Foundation
+import AnalyticsClient
 import ComposableArchitecture
 import APIClient
 import Models
@@ -39,6 +39,7 @@ public struct ReputationFeature: Reducer, Sendable {
         
         public let userId: Int
         public var isLoading = true
+        public var didLoadOnce = false
         public var historyData: [ReputationVote] = []
         var pickerSection: PickerSection = .history
         
@@ -88,6 +89,7 @@ public struct ReputationFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - body
     
@@ -153,19 +155,25 @@ public struct ReputationFeature: Reducer, Sendable {
                 state.historyData.append(contentsOf: votes.votes)
                 state.offset += state.loadAmount
                 state.isLoading = false
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let .internal(.historyResponse(.failure(error))):
                 state.isLoading = false
                 state.destination = .alert(.error)
-                print("Error \(error)")
+                reportFullyDisplayed(&state)
                 return .none
                 
             case .delegate, .binding, .destination:
                 return .none
-                
             }
         }
+    }
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
 
