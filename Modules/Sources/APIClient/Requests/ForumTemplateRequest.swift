@@ -27,8 +27,8 @@ extension ForumTemplateRequest.TemplateAction {
     var transferType: ForumCommand.TemplateAction {
         switch self {
         case .get: return .get
-        case .preview(let data): return .preview(data)
-        case .send(let data): return .send(data)
+        case .preview(let data): return .preview(data.description)
+        case .send(let data): return .send(data.description)
         }
     }
 }
