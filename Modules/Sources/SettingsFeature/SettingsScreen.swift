@@ -65,6 +65,7 @@ public struct SettingsScreen: View {
         case backgroundPicker
         case themePicker
         case startPagePicker
+        case topicOpening
     }
         
     @ViewBuilder
@@ -159,6 +160,22 @@ public struct SettingsScreen: View {
                             }
                             .foregroundStyle(Color(.Labels.teritary))
                         }
+                        
+                    case .topicOpening:
+                        Menu {
+                            Picker(String(""), selection: $store.topicOpening) {
+                                ForEach(TopicOpeningStrategy.allCases, id: \.self) { open in
+                                    Text(open.title, bundle: ModelsResources.bundle)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                        } label: {
+                            HStack(spacing: 9) {
+                                Text(store.topicOpening.title, bundle: ModelsResources.bundle)
+                                Image(systemSymbol: .chevronUpChevronDown)
+                            }
+                            .foregroundStyle(Color(.Labels.teritary))
+                        }
                     }
                 }
                 .contentShape(Rectangle())
@@ -242,6 +259,8 @@ public struct SettingsScreen: View {
             Row(symbol: ._1Circle, title: "Starting page", type: .startPagePicker)
             
 //            Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
+            
+            Row(symbol: .rectangleAndHandPointUpLeft, title: "Topic opening", type: .topicOpening)
             
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
             

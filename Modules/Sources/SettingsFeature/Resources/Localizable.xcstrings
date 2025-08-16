@@ -434,6 +434,16 @@
         }
       }
     },
+    "Topic opening" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открытие темы"
+          }
+        }
+      }
+    },
     "Version %@" : {
       "localizations" : {
         "ru" : {

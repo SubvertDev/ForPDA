@@ -41,6 +41,26 @@
         }
       }
     },
+    "First page" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В начало"
+          }
+        }
+      }
+    },
+    "Last page" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В конец"
+          }
+        }
+      }
+    },
     "No comment text" : {
       "localizations" : {
         "ru" : {
@@ -97,6 +117,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неизвестная ошибка"
+          }
+        }
+      }
+    },
+    "Unread" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "К непрочитанному"
           }
         }
       }

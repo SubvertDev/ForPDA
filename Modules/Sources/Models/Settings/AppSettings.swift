@@ -20,6 +20,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var articlesListRowType: ArticleListRowType
     public var bookmarksListRowType: ArticleListRowType
     public var startPage: AppTab
+    public var topicOpeningStrategy: TopicOpeningStrategy
     public var appColorScheme: AppColorScheme
     public var backgroundTheme: BackgroundTheme
     public var appTintColor: AppTintColor
@@ -35,6 +36,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         articlesListRowType: ArticleListRowType,
         bookmarksListRowType: ArticleListRowType,
         startPage: AppTab,
+        topicOpeningStrategy: TopicOpeningStrategy,
         appColorScheme: AppColorScheme,
         backgroundTheme: BackgroundTheme,
         appTintColor: AppTintColor,
@@ -49,6 +51,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.articlesListRowType = articlesListRowType
         self.bookmarksListRowType = bookmarksListRowType
         self.startPage = startPage
+        self.topicOpeningStrategy = topicOpeningStrategy
         self.appColorScheme = appColorScheme
         self.backgroundTheme = backgroundTheme
         self.appTintColor = appTintColor
@@ -66,6 +69,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.articlesListRowType = try container.decodeIfPresent(ArticleListRowType.self, forKey: .articlesListRowType) ?? AppSettings.default.articlesListRowType
         self.bookmarksListRowType = try container.decodeIfPresent(ArticleListRowType.self, forKey: .bookmarksListRowType) ?? AppSettings.default.bookmarksListRowType
         self.startPage = try container.decodeIfPresent(AppTab.self, forKey: .startPage) ?? AppSettings.default.startPage
+        self.topicOpeningStrategy = try container.decodeIfPresent(TopicOpeningStrategy.self, forKey: .topicOpeningStrategy) ?? AppSettings.default.topicOpeningStrategy
         self.appColorScheme = try container.decodeIfPresent(AppColorScheme.self, forKey: .appColorScheme) ?? AppSettings.default.appColorScheme
         self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
@@ -84,6 +88,7 @@ public extension AppSettings {
         articlesListRowType: .short,
         bookmarksListRowType: .short,
         startPage: .articles,
+        topicOpeningStrategy: .first,
         appColorScheme: .system,
         backgroundTheme: .blue,
         appTintColor: .primary,

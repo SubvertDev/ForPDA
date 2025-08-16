@@ -154,7 +154,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                 if favorite.isForum {
                     return .send(.delegate(.openForum(id: favorite.topic.id, name: favorite.topic.name)))
                 } else {
-                    return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .first)))
+                    let goTo = state.appSettings.topicOpeningStrategy.asGoTo
+                    return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: goTo)))
                 }
  
             case .view(.contextOptionMenu(let action)):

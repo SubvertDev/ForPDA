@@ -215,7 +215,11 @@ public struct ForumFeature: Reducer, Sendable {
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
             case let .topicTapped(topic, showUnread):
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: showUnread ? .unread : .first)))
+                guard !showUnread else {
+                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                }
+                let goTo = state.appSettings.topicOpeningStrategy.asGoTo
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
                 
             case let .subforumTapped(forum):
                 return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
