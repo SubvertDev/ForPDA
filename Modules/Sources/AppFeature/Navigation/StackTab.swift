@@ -260,6 +260,9 @@ public struct StackTab: Reducer, Sendable {
         case .settings(.delegate(.openDeveloperMenu)):
             state.path.append(.settings(.developer(DeveloperFeature.State())))
             
+        case let .settings(.delegate(.openDeeplink(url))):
+            return handleDeeplink(url: url, state: &state)
+            
         default:
             break
         }

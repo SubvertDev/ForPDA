@@ -99,6 +99,7 @@ public struct SettingsFeature: Reducer, Sendable {
         public enum Delegate {
             case openNotificationsSettings
             case openDeveloperMenu
+            case openDeeplink(URL)
         }
     }
     
@@ -157,9 +158,7 @@ public struct SettingsFeature: Reducer, Sendable {
                 }
                 
             case .appDiscussionButtonTapped:
-                return .run { _ in
-                    await open(url: Links.appDiscussion)
-                }
+                return .send(.delegate(.openDeeplink(Links.appDiscussion)))
                 
             case .telegramChangelogButtonTapped:
                 return .run { _ in
