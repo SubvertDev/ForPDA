@@ -99,9 +99,9 @@ public struct ForumsListScreen: View {
                 Image(systemSymbol: .chevronUp)
                     .font(.body)
                     .foregroundStyle(Color(.Labels.quaternary))
-                    .offset(x: 16)
                     .rotationEffect(.degrees(isExpanded ? 0 : -180))
                     .animation(.easeInOut(duration: 0.3), value: isExpanded)
+                    .offset(x: 16)
             }
         }
     }
