@@ -54,6 +54,8 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostReply(userId))
                     case .edit(let post):
                         analytics.log(TopicEvent.menuPostEdit(post.id))
+                    case .report(let postId):
+                        analytics.log(TopicEvent.menuPostReport(postId))
                     case .delete(let postId):
                         analytics.log(TopicEvent.menuPostDelete(postId))
                     case .changeReputation(let postId, let userId, _):

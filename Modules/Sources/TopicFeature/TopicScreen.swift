@@ -309,6 +309,10 @@ public struct TopicScreen: View {
                 }
             }
             
+            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+                send(.contextPostMenu(.report(post.id)))
+            }
+            
             if post.canDelete {
                 ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
                     send(.contextPostMenu(.delete(post.id)))

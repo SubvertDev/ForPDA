@@ -273,6 +273,13 @@ public struct TopicFeature: Reducer, Sendable {
                     }
                     return .none
                     
+                case .report(let id):
+                    let feature = WriteFormFeature.State(
+                        formFor: .report(id: id, type: .post)
+                    )
+                    state.destination = .writeForm(feature)
+                    return .none
+                    
                 case .delete(let id):
                     return .concatenate(
                         .run { _ in
