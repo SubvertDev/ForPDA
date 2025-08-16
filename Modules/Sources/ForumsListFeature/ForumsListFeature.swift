@@ -40,7 +40,7 @@ public struct ForumsListFeature: Reducer, Sendable {
             case settingsButtonTapped
             case forumRedirectTapped(URL)
             case forumTapped(id: Int, name: String)
-            case toggleSection(Int)
+            case forumSectionExpandTapped(Int)
         }
         
         case `internal`(Internal)
@@ -85,7 +85,7 @@ public struct ForumsListFeature: Reducer, Sendable {
             case let .view(.forumRedirectTapped(url)):
                 return .send(.delegate(.handleForumRedirect(url)))
                 
-            case let .view(.toggleSection(id)):
+            case let .view(.forumSectionExpandTapped(id)):
                 state.isExpanded[id]?.toggle()
                 return .none
                 

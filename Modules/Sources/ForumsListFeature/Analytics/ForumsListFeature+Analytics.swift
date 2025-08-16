@@ -31,7 +31,7 @@ extension ForumsListFeature {
                 case let .view(.forumTapped(id: id, name: name)):
                     analytics.log(ForumsListEvent.forumTapped(id, name))
                     
-                case let .view(.toggleSection(id)):
+                case let .view(.forumSectionExpandTapped(id)):
                     analytics.log(ForumsListEvent.forumSectionExpanded(id))
                     
                 case let .internal(.forumsListResponse(response)):
