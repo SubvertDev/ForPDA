@@ -61,6 +61,16 @@
         }
       }
     },
+    "Post karma changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос засчитан"
+          }
+        }
+      }
+    },
     "Post not found" : {
       "localizations" : {
         "ru" : {
