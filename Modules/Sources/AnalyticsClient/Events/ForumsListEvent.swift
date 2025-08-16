@@ -13,6 +13,7 @@ public enum ForumsListEvent: Event {
     case forumTapped(Int, String)
     case forumListLoadSuccess
     case forumListLoadFailure(any Error)
+    case forumSectionExpanded(Int)
     
     public var name: String {
         return "Forums List " + eventName(for: self).inProperCase

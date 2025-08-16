@@ -400,7 +400,7 @@ struct ArticleElementView: View {
     }
     
     private func voteButtonBackgroundColor(poll: ArticlePoll) -> Color {
-        return (!hasSelection || store.isUploadingPollVote) ? Color(.Main.greyAlpha) : Color(.Main.primaryAlpha)
+        return (!hasSelection || store.isUploadingPollVote) ? Color(.Main.greyAlpha) : tintColor.opacity(0.12)
     }
     
     private func voteButtonDisabled() -> Bool {
