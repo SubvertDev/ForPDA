@@ -74,6 +74,7 @@ public struct ProfileScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {

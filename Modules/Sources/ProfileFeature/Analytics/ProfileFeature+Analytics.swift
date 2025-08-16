@@ -20,7 +20,7 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate, .binding:
+                case .view(.onAppear), .delegate, .binding, .destination:
                     break
                     
                 case .view(.sheetContinueButtonTapped):

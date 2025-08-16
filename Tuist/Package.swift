@@ -21,9 +21,9 @@
             "OrderedCollections": .framework,
             "Perception": .framework,
             "PerceptionCore": .framework,
-            "Sharing": .framework,
-            "Sharing1": .framework,
-            "Sharing2": .framework,
+            // "Sharing": .framework,
+            // "Sharing1": .framework,
+            // "Sharing2": .framework,
             "SwiftNavigation": .framework,
             "SwiftUINavigation": .framework,
             "UIKitNavigation": .framework,
@@ -34,7 +34,9 @@
             "NukeUI": .framework,
             "RichTextKit": .framework,
             "SkeletonUI": .framework,
-            "SFSafeSymbols": .framework
+            "SFSafeSymbols": .framework,
+            
+            "YouTubePlayerKit": .framework
         ]
     )
 #endif
@@ -50,7 +52,7 @@ let package = Package(
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", from: "8.52.1"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", branch: "main"),
-        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "2.0.0"),
+        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", exact: "2.0.1"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.12.0"),

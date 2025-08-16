@@ -174,7 +174,7 @@ public struct ArticleScreen: View {
                     HStack {
                         Text(store.articlePreview.authorName)
                         Spacer()
-                        Text(store.articlePreview.formattedDate)
+                        Text(store.articlePreview.formattedDate, bundle: .module)
                     }
                     .font(.caption)
                     .foregroundStyle(Color(.Labels.secondaryInvariably))
@@ -205,8 +205,18 @@ public struct ArticleScreen: View {
             VStack(spacing: 0) {
                 ForEach(elements, id: \.self) { element in
                     WithPerceptionTracking {
-                        ArticleElementView(store: store, element: element)
-                            .padding(.vertical, 10)
+                        ArticleElementView(
+                            element: element,
+                            isShowingVoteResults: store.isShowingVoteResults,
+                            isUploadingPollVote: store.isUploadingPollVote,
+                            onPollVoteButtonTapped: { id, selections in
+                                store.send(.pollVoteButtonTapped(id, selections))
+                            },
+                            onLinkInTextTapped: { url in
+                                store.send(.linkInTextTapped(url))
+                            }
+                        )
+                        .padding(.vertical, 10)
                     }
                 }
             }

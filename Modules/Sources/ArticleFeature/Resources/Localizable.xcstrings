@@ -191,6 +191,17 @@
         }
       }
     },
+    "Today, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
     "Unhide comment" : {
       "localizations" : {
         "ru" : {
@@ -227,6 +238,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скоро починим :)"
+          }
+        }
+      }
+    },
+    "Yesterday, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчера, %@"
           }
         }
       }

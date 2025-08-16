@@ -69,15 +69,18 @@ public struct ReputationScreen: View {
                 Spacer()
             } else {
                 List(store.historyData, id: \.self) { vote in
-                        ReputationRow(vote: vote)
-                            .onAppear {
-                                if let index = store.historyData.firstIndex(of: vote),
-                                   index == store.historyData.count - 5 {
-                                    send(.loadMore)
-                                }
+                    ReputationRow(vote: vote)
+                        .listRowBackground(Color(.Background.primary))
+                        .onAppear {
+                            if let index = store.historyData.firstIndex(of: vote),
+                               index == store.historyData.count - 5 {
+                                send(.loadMore)
                             }
+                        }
                 }
                 .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color(.Background.primary))
                 .refreshable {
                     send(.refresh)
                 }
@@ -175,6 +178,7 @@ public struct ReputationScreen: View {
         }
         .padding(.horizontal, 12)
         .contentShape(Rectangle())
+        .background(Color(.Background.primary))
         .contextMenu {
             MenuButtons(id: vote.authorId)
         }
