@@ -53,7 +53,14 @@
       }
     },
     "OK" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
     },
     "Profile" : {
       "localizations" : {
@@ -87,20 +94,34 @@
       }
     },
     "Something went wrong while loading reputation :(" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так во время загрузки репутации :("
+          }
+        }
+      }
     },
     "Vote for other users if you liked the topic on the forum" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Голосуте за других пользователей, если вам понравилась тема на форуме"
+            "value" : "Голосуйте за других пользователей, если вам понравилась тема на форуме"
           }
         }
       }
     },
     "Whoops!" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс!"
+          }
+        }
+      }
     },
     "Write topics on the forum and get reputation from other users" : {
       "localizations" : {

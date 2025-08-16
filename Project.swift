@@ -350,7 +350,8 @@ let project = Project(
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.Models,
-                    .SPM.TCA
+                    .Internal.SharedUI,
+                    .SPM.TCA,
                 ]
              ),
         
