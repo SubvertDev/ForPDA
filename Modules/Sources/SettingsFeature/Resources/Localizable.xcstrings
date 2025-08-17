@@ -364,6 +364,9 @@
         }
       }
     },
+    "Search" : {
+
+    },
     "Settings" : {
       "localizations" : {
         "ru" : {

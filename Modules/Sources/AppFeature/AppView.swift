@@ -21,6 +21,7 @@ import AuthFeature
 import ProfileFeature
 import QMSListFeature
 import QMSFeature
+import SearchFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature
@@ -34,7 +35,7 @@ public struct AppView: View {
     
     @Perception.Bindable public var store: StoreOf<AppFeature>
     @Environment(\.tintColor) private var tintColor
-    @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
+    @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false, false]
     
     public init(store: StoreOf<AppFeature>) {
         self.store = store
@@ -60,6 +61,9 @@ public struct AppView: View {
                     
                     StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
                         .tag(AppTab.profile)
+                    
+                    StackTabView(store: store.scope(state: \.searchTab, action: \.searchTab))
+                        .tag(AppTab.search)
                 }
                 
                 Group {

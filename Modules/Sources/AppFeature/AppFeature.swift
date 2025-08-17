@@ -22,6 +22,7 @@ import ProfileFeature
 import QMSListFeature
 import QMSFeature
 import ReputationFeature
+import SearchFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature
@@ -48,6 +49,7 @@ public struct AppFeature: Reducer, Sendable {
         public var favoritesTab: StackTab.State
         public var forumTab:     StackTab.State
         public var profileTab:   StackTab.State
+        public var searchTab:    StackTab.State
         
         @Presents public var auth: AuthFeature.State?
         @Presents public var alert: AlertState<Never>?
@@ -75,6 +77,7 @@ public struct AppFeature: Reducer, Sendable {
             favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesRootFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
             profileTab: StackTab.State = StackTab.State(root: .profile(.profile(ProfileFeature.State()))),
+            searchTab: StackTab.State = StackTab.State(root: .search(SearchFeature.State())),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articles,
@@ -88,6 +91,7 @@ public struct AppFeature: Reducer, Sendable {
             self.favoritesTab = favoritesTab
             self.forumTab = forumTab
             self.profileTab = profileTab
+            self.searchTab = searchTab
             
             self.auth = auth
             self.alert = alert
@@ -113,6 +117,7 @@ public struct AppFeature: Reducer, Sendable {
         case favoritesTab(StackTab.Action)
         case forumTab(StackTab.Action)
         case profileTab(StackTab.Action)
+        case searchTab(StackTab.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
         case alert(PresentationAction<Never>)
@@ -163,6 +168,10 @@ public struct AppFeature: Reducer, Sendable {
         }
         
         Scope(state: \.profileTab, action: \.profileTab) {
+            StackTab()
+        }
+        
+        Scope(state: \.searchTab, action: \.searchTab) {
             StackTab()
         }
         
@@ -313,7 +322,7 @@ public struct AppFeature: Reducer, Sendable {
                         var skipCategories: [Unread.Item.Category] = []
                         // TODO: Add more skip cases later
                         switch tab {
-                        case .articles, .forum, .profile:
+                        case .articles, .forum, .profile, .search:
                             break
                         case .favorites:
                             skipCategories.append(.forum)
@@ -335,6 +344,7 @@ public struct AppFeature: Reducer, Sendable {
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
                 let .forumTab(.delegate(.showTabBar(show))),
+                let .searchTab(.delegate(.showTabBar(show))),
                 let .profileTab(.delegate(.showTabBar(show))):
                 state.showTabBar = show
                 return .none
@@ -347,7 +357,7 @@ public struct AppFeature: Reducer, Sendable {
                 state.selectedTab = tab
                 return .none
                 
-            case .articlesTab, .favoritesTab, .forumTab, .profileTab:
+            case .articlesTab, .favoritesTab, .forumTab, .profileTab, .searchTab:
                 return .none
             }
         }
@@ -393,6 +403,9 @@ public struct AppFeature: Reducer, Sendable {
 
         case .profile:
             state.profileTab.path.removeAll()
+            
+        case .search:
+            state.searchTab.path.removeAll()
         }
         
         return removeNotifications(&state)
@@ -411,7 +424,7 @@ public struct AppFeature: Reducer, Sendable {
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
-            case .articles, .forum, .profile:
+            case .articles, .forum, .profile, .search:
                 break
             case .favorites:
                 await notificationsClient.removeNotifications(categories: [.forum, .topic])

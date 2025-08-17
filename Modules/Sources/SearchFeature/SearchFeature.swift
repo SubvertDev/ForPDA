@@ -18,6 +18,8 @@ public struct SearchFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         
+        public init() {}
+        
     }
     
     // MARK: - Action

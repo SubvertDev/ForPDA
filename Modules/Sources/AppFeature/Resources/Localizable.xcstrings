@@ -40,6 +40,16 @@
           }
         }
       }
+    },
+    "Search" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

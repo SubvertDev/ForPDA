@@ -19,6 +19,8 @@ extension AppTab {
             return "Forum"
         case .profile:
             return "Profile"
+        case .search:
+            return "Search"
         }
     }
 }
