@@ -48,6 +48,7 @@ let project = Project(
                     .Internal.QMSListFeature,
                     .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
+                    .Internal.SearchFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -354,6 +355,13 @@ let project = Project(
                     .SPM.TCA,
                 ]
              ),
+        
+            .feature(
+                name: "SearchFeature",
+                dependencies: [
+                    .SPM.TCA,
+                ]
+            ),
         
             .feature(
                 name: "SettingsFeature",
@@ -869,6 +877,7 @@ extension TargetDependency.Internal {
     static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
     static let ReputationChangeFeature = TargetDependency.target(name: "ReputationChangeFeature")
     static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
+    static let SearchFeature =          TargetDependency.target(name: "SearchFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
