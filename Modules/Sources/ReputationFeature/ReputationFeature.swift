@@ -36,6 +36,7 @@ public struct ReputationFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
+        @Shared(.userSession) private var userSession: UserSession?
         
         public let userId: Int
         public var isLoading = true
@@ -45,6 +46,10 @@ public struct ReputationFeature: Reducer, Sendable {
         
         public var loadAmount = 20
         public var offset = 0
+        
+        public var isOwnVotes: Bool {
+            return userSession?.userId == userId
+        }
         
         public init(userId: Int) {
             self.userId = userId

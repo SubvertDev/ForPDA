@@ -94,7 +94,7 @@ public struct ReputationScreen: View {
         _Picker("", selection: $store.pickerSection) {
             Text("History", bundle: .module)
                 .tag(ReputationFeature.PickerSection.history)
-            Text("My votes", bundle: .module)
+            Text(store.isOwnVotes ? "My votes" : "Left votes", bundle: .module)
                 .tag(ReputationFeature.PickerSection.votes)
         }
         .pickerStyle(.segmented)
@@ -199,12 +199,23 @@ public struct ReputationScreen: View {
                 .foregroundStyle(Color(.Labels.primary))
                 .padding(.bottom, 6)
             
-            Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum", bundle: .module)
+            Text(getEmptyReputationDescription(), bundle: .module)
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
                 .padding(.horizontal, 55)
+        }
+    }
+    
+    private func getEmptyReputationDescription() -> LocalizedStringKey {
+        switch store.pickerSection {
+        case .history:
+            return "Help other users on the forum and get reputation"
+        case .votes:
+            return store.isOwnVotes
+            ? "Change the reputation of users on the forum for their actions"
+            : "This user has not changed anyone's reputation yet"
         }
     }
     
