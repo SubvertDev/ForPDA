@@ -354,7 +354,7 @@ public struct BBBuilder {
         case .snapback(let postId):
             let image = UIImage(resource: .snapback)
             let attachment = AsyncTextAttachment(image: image, displaySize: CGSize(width: 16, height: 16))
-            Task { @MainActor [postId = postId.string] in attachment.accessibilityHint = postId }
+            attachment.postId = postId.string
             let textWithAttachment = NSMutableAttributedString(attachment: attachment)
             textWithAttachment.addAttributes([.baselineOffset: -2.5], range: NSRange(location: 0, length: textWithAttachment.length))
             if isFirst {
@@ -399,7 +399,7 @@ public struct BBBuilder {
             } else {
                 let image = UIImage(systemSymbol: .arrowDownDoc).withTintColor(.tintColor)//, withConfiguration: config)
                 let textAttachment = AsyncTextAttachment(image: image)//, displaySize: CGSize(width: 16, height: 16))
-                Task { @MainActor in textAttachment.accessibilityHint = String(id) }
+                textAttachment.postId = String(id)
                 
                 let mutableString = NSMutableAttributedString(attachment: textAttachment)
                 mutableString.addAttribute(.baselineOffset, value: -3, range: .fullRange(of: mutableString))

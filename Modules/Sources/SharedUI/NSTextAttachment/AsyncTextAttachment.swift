@@ -42,6 +42,8 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
     
     private var screenWidth: CGFloat?
     private var showPlaceholder: Bool
+    
+    public var postId: String?
 	
 	/// Designated initializer
 //    public init(imageURL: URL, showPlaceholder: Bool = true, delegate: AsyncTextAttachmentDelegate? = nil) {
@@ -66,11 +68,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
         
         self.image = image
         
-        Task {
-            await MainActor.run {
-                screenWidth = UIScreen.main.bounds.width
-            }
-        }
+        setScreenWidth()
     }
     
     public init(attachmentUrl: URL, showPlaceholder: Bool = true, delegate: AsyncTextAttachmentDelegate? = nil) {
@@ -80,11 +78,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
         
         super.init(data: nil, ofType: nil)
         
-        Task {
-            await MainActor.run {
-                screenWidth = UIScreen.main.bounds.width
-            }
-        }
+        setScreenWidth()
     }
 	
 	required public init?(coder aDecoder: NSCoder) {
@@ -98,6 +92,16 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 	}
 	
 	// MARK: - Helpers
+    
+    private func setScreenWidth() {
+        sendableClosure {
+            self.screenWidth = await UIScreen.main.bounds.width
+        }
+    }
+    
+    private func sendableClosure(_ closure: @Sendable @escaping () async -> Void) {
+        Task { await closure() }
+    }
     
 //    private func loadImage(from url: URL) async -> Data? {
 //        await withCheckedContinuation { continuation in
@@ -136,7 +140,8 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
             fatalError("Couldn't create attachment image")
         }
         
-        Task { @MainActor in
+        sendableClosure { [weak self, displaySizeChanged] in
+            guard let self else { return }
             showPlaceholder = false
             isDownloading = false
             // tell layout manager so that it should refresh
@@ -147,7 +152,9 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
             }
             
             // notify the optional delegate
-            self.delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
+            await MainActor.run {
+                delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
+            }
         }
         
 //        imageURL = url
@@ -223,7 +230,9 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 			self.textContainer = textContainer
 			
             if let attachmentUrl {
-                Task { await startDownload(url: attachmentUrl) }
+                sendableClosure { [weak self] in
+                    await self?.startDownload(url: attachmentUrl)
+                }
             }
 			
 			return nil
@@ -249,7 +258,8 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
                 displaySizeChanged = true
             }
             
-            Task { @MainActor in
+            sendableClosure { [weak self, displaySizeChanged] in
+                guard let self else { return }
                 if displaySizeChanged {
                     textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
                 } else {
