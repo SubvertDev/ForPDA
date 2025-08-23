@@ -1,5 +1,5 @@
 {
-  "originHash" : "30a1b7c92b6d5dc7c0c10022b8c6002f0cd15a41d1ab29537ac3e5f2e274737f",
+  "originHash" : "263e3a44c1c8280ba2daeda736e183cff780d4668fd40dec5b3961a6313e398f",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
       "state" : {
-        "revision" : "7270f306c36f7ea49af8e5e0ea879d840c224cc8",
-        "version" : "0.5.0"
+        "revision" : "18a9fd1bb306ebe6b35548736a960d91fce41bed",
+        "version" : "0.5.1"
       }
     },
     {
@@ -177,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "4c47829a080789cf20d82c64d8c27291352391d4",
-        "version" : "1.21.1"
+        "revision" : "d2c1bfb5859c81d1fd14437e9eb697137dd61bc9",
+        "version" : "1.22.1"
       }
     },
     {
