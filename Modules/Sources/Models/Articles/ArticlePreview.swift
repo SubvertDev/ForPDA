@@ -5,8 +5,7 @@
 //  Created by Ilia Lubianoi on 01.07.2024.
 //
 
-import Foundation
-import SwiftUICore
+import SwiftUI
 
 public struct ArticlePreview: Sendable, Hashable, Identifiable {
     

@@ -7,6 +7,14 @@
 
 import SwiftUI
 
+public var isLiquidGlass: Bool {
+    if #available(iOS 26, *) {
+        return true
+    } else {
+        return false
+    }
+}
+
 private struct TintKey: EnvironmentKey {
     static let defaultValue: Color = Color.blue
 }
