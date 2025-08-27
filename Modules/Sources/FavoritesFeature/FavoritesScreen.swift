@@ -60,27 +60,25 @@ public struct FavoritesScreen: View {
             .animation(.default, value: store.favorites)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        if store.isUserAuthorized {
-                            Menu {
-                                ContextButton(
-                                    text: "Sort",
-                                    symbol: .line3HorizontalDecrease,
-                                    bundle: .module
-                                ) {
-                                    send(.contextOptionMenu(.sort))
-                                }
-                                
-                                ContextButton(
-                                    text: "Read All",
-                                    symbol: .checkmarkCircle,
-                                    bundle: .module
-                                ) {
-                                    send(.contextOptionMenu(.markAllAsRead))
-                                }
-                            } label: {
-                                Image(systemSymbol: .ellipsisCircle)
+                    if store.isUserAuthorized {
+                        Menu {
+                            ContextButton(
+                                text: "Sort",
+                                symbol: .line3HorizontalDecrease,
+                                bundle: .module
+                            ) {
+                                send(.contextOptionMenu(.sort))
                             }
+                            
+                            ContextButton(
+                                text: "Read All",
+                                symbol: .checkmarkCircle,
+                                bundle: .module
+                            ) {
+                                send(.contextOptionMenu(.markAllAsRead))
+                            }
+                        } label: {
+                            Image(systemSymbol: .ellipsisCircle)
                         }
                     }
                 }
@@ -193,6 +191,7 @@ public struct FavoritesScreen: View {
             Navigation(isShown: !important)
             
             ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
+                let radius: CGFloat = isLiquidGlass ? 24 : 10
                 Group {
                     if favorite.isForum {
                         ForumRow(
@@ -226,10 +225,14 @@ public struct FavoritesScreen: View {
                 }
                 .listRowBackground(
                     Color(.Background.teritary)
-                        .clipShape(.rect(
-                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == favorites.count - 1 ? 10 : 0,
-                            bottomTrailingRadius: index == favorites.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
-                        ))
+                        .clipShape(
+                            .rect(
+                                topLeadingRadius: index == 0 ? radius : 0,
+                                bottomLeadingRadius: index == favorites.count - 1 ? radius : 0,
+                                bottomTrailingRadius: index == favorites.count - 1 ? radius : 0,
+                                topTrailingRadius: index == 0 ? radius : 0
+                            )
+                        )
                 )
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

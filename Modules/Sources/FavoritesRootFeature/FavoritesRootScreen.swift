@@ -36,19 +36,23 @@ public struct FavoritesRootScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                    VStack {
-                        SegmentPicker()
+                VStack {
+                    SegmentPicker()
+                    
+                    switch store.pickerSelection {
+                    case .favorites:
+                        FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
                         
-                        switch store.pickerSelection {
-                        case .favorites:
-                            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-                            
-                        case .bookmarks:
-                            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-                        }
+                    case .bookmarks:
+                        BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
                     }
+                }
             }
             .toolbar {
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .primaryAction)
+                }
+                
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         send(.settingsButtonTapped)
