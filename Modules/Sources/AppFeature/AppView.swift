@@ -274,7 +274,12 @@ struct OldTabView: View {
 extension UINavigationController {
     override open func viewDidLoad() {
         super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = nil
+        if #available(iOS 26.0, *) {
+            // swipe works from any point if back button is not disabled
+            // which is unnecessary with default luquid back button
+        } else {
+            interactivePopGestureRecognizer?.delegate = nil
+        }
     }
 }
 

@@ -17,6 +17,8 @@ import SmoothGradient
 
 public struct ArticleScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ArticleFeature>
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
@@ -26,6 +28,8 @@ public struct ArticleScreen: View {
     private var navBarFullyVisible: Bool {
         return navBarOpacity >= 1
     }
+    
+    // MARK: - Init
     
     public init(store: StoreOf<ArticleFeature>) {
         self.store = store
@@ -50,9 +54,7 @@ public struct ArticleScreen: View {
                 }
                 .safeAreaInset(edge: .bottom) { KeyboardView() }
                 .onTapGesture { focus = nil }
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarBackButtonHidden()
-                .toolbarBackground(.hidden, for: .navigationBar)
+                .modifier(NavigationBarSettings())
                 .toolbar { Toolbar() }
                 .overlay(alignment: .top) {
                     if !isLiquidGlass {
@@ -69,9 +71,14 @@ public struct ArticleScreen: View {
     
     @ToolbarContentBuilder
     private func Toolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
-                store.send(.backButtonTapped)
+        if #available(iOS 26.0, *) {
+            // default system back button
+            ToolbarSpacer(.fixed)
+        } else {
+            ToolbarItem(placement: .topBarLeading) {
+                ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
+                    store.send(.backButtonTapped)
+                }
             }
         }
         
@@ -346,6 +353,22 @@ public struct ArticleScreen: View {
         .background(Color(.Background.primaryAlpha))
         .background(.ultraThinMaterial)
         .animation(.default, value: store.replyComment)
+    }
+    
+    // MARK: - Navigation Bar Settings
+    
+    struct NavigationBarSettings: ViewModifier {
+        func body(content: Content) -> some View {
+            if #available(iOS 26.0, *) {
+                content
+                    .toolbarTitleDisplayMode(.inline)
+            } else {
+                content
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarBackButtonHidden()
+                    .toolbarBackground(.hidden, for: .navigationBar)
+            }
+        }
     }
     
     // MARK: - Toolbar Button
