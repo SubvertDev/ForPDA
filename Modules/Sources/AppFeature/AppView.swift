@@ -145,43 +145,45 @@ struct LiquidTabView: View {
     @Perception.Bindable var store: StoreOf<AppFeature>
     
     var body: some View {
-        TabView(selection: $store.selectedTab.sending(\.didSelectTab)) {
-            Tab(
-                AppTab.articles.title,
-                systemImage: AppTab.articles.iconSymbol.rawValue,
-                value: .articles
-            ) {
-                StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
+        WithPerceptionTracking {
+            TabView(selection: $store.selectedTab.sending(\.didSelectTab)) {
+                Tab(
+                    AppTab.articles.title,
+                    systemImage: AppTab.articles.iconSymbol.rawValue,
+                    value: .articles
+                ) {
+                    StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
+                }
+                
+                Tab(
+                    AppTab.favorites.title,
+                    systemImage: AppTab.favorites.iconSymbol.rawValue,
+                    value: .favorites
+                ) {
+                    StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+                }
+                
+                Tab(
+                    AppTab.forum.title,
+                    systemImage: AppTab.forum.iconSymbol.rawValue,
+                    value: .forum
+                ) {
+                    StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
+                }
+                
+                Tab(
+                    AppTab.profile.title,
+                    systemImage: AppTab.profile.iconSymbol.rawValue,
+                    value: .profile
+                ) {
+                    StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                }
             }
-            
-            Tab(
-                AppTab.favorites.title,
-                systemImage: AppTab.favorites.iconSymbol.rawValue,
-                value: .favorites
-            ) {
-                StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
-            }
-            
-            Tab(
-                AppTab.forum.title,
-                systemImage: AppTab.forum.iconSymbol.rawValue,
-                value: .forum
-            ) {
-                StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
-            }
-            
-            Tab(
-                AppTab.profile.title,
-                systemImage: AppTab.profile.iconSymbol.rawValue,
-                value: .profile
-            ) {
-                StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
-            }
+            .tabBarMinimizeBehavior(.onScrollDown)
+            // .tabViewBottomAccessory {
+            //     PageNavigation(store: pageStore)
+            // }
         }
-        .tabBarMinimizeBehavior(.onScrollDown)
-        // .tabViewBottomAccessory {
-        //     PageNavigation(store: pageStore)
-        // }
     }
 }
 
@@ -194,28 +196,30 @@ struct OldTabView: View {
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
 
     var body: some View {
-        TabView(selection: $store.selectedTab) {
-            StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
-                .tag(AppTab.articles)
-
-            StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
-                .tag(AppTab.favorites)
-            
-            StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
-                .tag(AppTab.forum)
-            
-            StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
-                .tag(AppTab.profile)
-        }
-        
-        Group {
-            if store.showTabBar {
-                PDATabView()
-                    .transition(.move(edge: .bottom))
+        WithPerceptionTracking {
+            TabView(selection: $store.selectedTab) {
+                StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
+                    .tag(AppTab.articles)
+                
+                StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+                    .tag(AppTab.favorites)
+                
+                StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
+                    .tag(AppTab.forum)
+                
+                StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                    .tag(AppTab.profile)
             }
+            
+            Group {
+                if store.showTabBar {
+                    PDATabView()
+                        .transition(.move(edge: .bottom))
+                }
+            }
+            // Animation on whole ZStack breaks safeareainset for next screens
+            .animation(.default, value: store.showTabBar)
         }
-        // Animation on whole ZStack breaks safeareainset for next screens
-        .animation(.default, value: store.showTabBar)
     }
     
     // MARK: - PDA Tab Item
