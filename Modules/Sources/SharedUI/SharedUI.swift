@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS, deprecated: 26.0)
 public var isLiquidGlass: Bool {
     if #available(iOS 26, *) {
         return true

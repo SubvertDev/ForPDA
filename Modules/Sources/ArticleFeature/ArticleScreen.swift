@@ -21,7 +21,7 @@ public struct ArticleScreen: View {
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
     
-    @State private var safeAreaTopHeight: CGFloat = UIApplication.topSafeArea + 44 // (status + navbar)
+    @State private var safeAreaTopHeight: CGFloat
     @State private var navBarOpacity: CGFloat = 0
     private var navBarFullyVisible: Bool {
         return navBarOpacity >= 1
@@ -29,6 +29,7 @@ public struct ArticleScreen: View {
     
     public init(store: StoreOf<ArticleFeature>) {
         self.store = store
+        self.safeAreaTopHeight = UIApplication.topSafeArea + 44 + (isLiquidGlass ? 10 : 0)
     }
     
     // MARK: - Body
@@ -53,7 +54,11 @@ public struct ArticleScreen: View {
                 .navigationBarBackButtonHidden()
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar { Toolbar() }
-                .overlay(alignment: .top) { ToolbarOverlay() }
+                .overlay(alignment: .top) {
+                    if !isLiquidGlass {
+                        ToolbarOverlay()
+                    }
+                }
                 .overlay { RefreshIndicator() }
                 .background(Color(.Background.primary))
                 .task { store.send(.onTask) }
@@ -81,8 +86,9 @@ public struct ArticleScreen: View {
         }
     }
     
-    // MARK: - Toolbar Overlay
+    // MARK: - Toolbar Overlay (Pre 26)
     
+    @available(iOS, deprecated: 26.0)
     @ViewBuilder
     private func ToolbarOverlay() -> some View {
         Color(.Background.primaryAlpha)
@@ -354,17 +360,30 @@ public struct ArticleScreen: View {
         } label: {
             Image(systemSymbol: symbol)
                 .font(.body)
-                .foregroundStyle(navBarFullyVisible ? Color(.Labels.teritary) : Color(.Labels.primaryInvariably))
-                .scaleEffect(0.8) // TODO: ?
-                .background(
-                    Circle()
-                        .fill(Color.clear)
-                        .background(.ultraThinMaterial)
-                        .frame(width: 32, height: 32)
-                        .clipShape(Circle())
-                )
+                .foregroundStyle(navBarButtonForegroundStyle())
+                .scaleEffect(isLiquidGlass ? 1 : 0.8)
+                .background {
+                    if !isLiquidGlass {
+                        Circle()
+                            .fill(Color.clear)
+                            .background(.ultraThinMaterial)
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    }
+                }
         }
         .animation(.default, value: navBarFullyVisible)
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    func navBarButtonForegroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else if navBarFullyVisible {
+            return AnyShapeStyle(Color(.Labels.teritary))
+        } else {
+            return AnyShapeStyle(Color(.Labels.primaryInvariably))
+        }
     }
     
     // MARK: - Article Loader
@@ -389,12 +408,15 @@ public struct ArticleScreen: View {
                     ZStack {
                         Circle()
                             .fill(Color.clear)
-                            .background(.ultraThinMaterial)
-                            .frame(width: 32, height: 32)
+                            .refreshClearBackground()
+                            .frame(
+                                width: isLiquidGlass ? 40 : 32,
+                                height: isLiquidGlass ? 40 : 32
+                            )
                             .clipShape(Circle())
                         
                         ProgressView()
-                            .tint(Color.white)
+                            .tint(.primary)
                             .progressViewStyle(.circular)
                             .controlSize(.regular)
                     }
@@ -466,6 +488,26 @@ extension UIApplication {
     
     static var topSafeArea: CGFloat {
         return UIApplication.shared.keyWindow?.safeAreaInsets.top ?? 0
+    }
+}
+
+// MARK: - Modifiers
+
+struct RefreshClearBackgroundModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .glassEffect(.regular)
+        } else {
+            content
+                .background(.ultraThinMaterial)
+        }
+    }
+}
+
+extension View {
+    func refreshClearBackground() -> some View {
+        modifier(RefreshClearBackgroundModifier())
     }
 }
 
