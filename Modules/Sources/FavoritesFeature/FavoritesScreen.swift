@@ -83,7 +83,10 @@ public struct FavoritesScreen: View {
                     }
                 }
             }
-            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort)) { store in
+            .fittedSheet(
+                item: $store.scope(state: \.sort, action: \.sort),
+                embedIntoNavStack: true
+            ) { store in
                 SortView(store: store)
             }
             .onChange(of: scenePhase) { newScenePhase in
@@ -314,10 +317,15 @@ public struct FavoritesScreen: View {
 // MARK: - Previews
 
 #Preview {
-    NavigationStack {
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .mock }
+    
+    return NavigationStack {
         FavoritesScreen(
             store: Store(
-                initialState: FavoritesFeature.State(favorites: [.mock, .mockUnread])
+                initialState: FavoritesFeature.State(
+                    favorites: [.mock, .mockUnread]
+                )
             ) {
                 FavoritesFeature()
             }
