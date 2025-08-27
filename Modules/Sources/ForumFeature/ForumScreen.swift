@@ -14,12 +14,18 @@ import Models
 
 public struct ForumScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ForumFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    // MARK: - Init
     
     public init(store: StoreOf<ForumFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -82,6 +88,15 @@ public struct ForumScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
+                .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(tintColor)
         }
     }
     
