@@ -92,6 +92,7 @@ public struct ForumScreen: View {
         }
     }
     
+    @available(iOS, deprecated: 26.0)
     private func foregroundStyle() -> AnyShapeStyle {
         if isLiquidGlass {
             return AnyShapeStyle(.foreground)
@@ -108,6 +109,7 @@ public struct ForumScreen: View {
             Navigation(pinned: pinned)
             
             ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
+                let radius: CGFloat = isLiquidGlass ? 24 : 10
                 TopicRow(
                     title: topic.name,
                     date: topic.lastPost.date,
@@ -127,8 +129,8 @@ public struct ForumScreen: View {
                 .listRowBackground(
                     Color(.Background.teritary)
                         .clipShape(.rect(
-                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == topics.count - 1 ? 10 : 0,
-                            bottomTrailingRadius: index == topics.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
+                            topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
+                            bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
                         ))
                 )
             }
