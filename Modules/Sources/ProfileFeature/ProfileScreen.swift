@@ -117,31 +117,34 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func Header(user: User) -> some View {
         VStack(alignment: .center, spacing: 0) {
-            LazyImage(url: user.imageUrl) { state in
-                Group {
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Color(.systemBackground)
+            HStack {
+                LazyImage(url: user.imageUrl) { state in
+                    Group {
+                        if let image = state.image {
+                            image.resizable().scaledToFill()
+                        } else {
+                            Color(.systemBackground)
+                        }
+                    }
+                    .skeleton(with: state.isLoading, shape: .circle)
+                }
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+                
+                VStack(alignment: .leading) {
+                    Text(user.nickname)
+                        .font(.headline)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    if !user.lastSeenDate.isOnlineHidden() {
+                        Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
+                            .font(.footnote)
+                            .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
+                            .padding(.bottom, 8)
                     }
                 }
-                .skeleton(with: state.isLoading, shape: .circle)
             }
-            .frame(width: 128, height: 128)
-            .clipShape(Circle())
             .padding(.bottom, 10)
-            
-            Text(user.nickname)
-                .font(.headline)
-                .foregroundStyle(Color(.Labels.primary))
-                .padding(.bottom, 4)
-            
-            if !user.lastSeenDate.isOnlineHidden() {
-                Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
-                    .padding(.bottom, 8)
-            }
             
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
