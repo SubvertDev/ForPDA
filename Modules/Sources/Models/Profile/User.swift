@@ -274,7 +274,18 @@ public extension User {
         gender: .male,
         userTime: 10800,
         city: "Moscow",
-        devDBdevices: [],
+        devDBdevices: [
+            .init(
+                id: "ip16pro",
+                name: "iPhone 16 Pro",
+                main: true
+            ),
+            .init(
+                id: "ip13",
+                name: "iPhone 13",
+                main: false
+            )
+        ],
         karma: 1500,
         posts: 23,
         comments: 173,
