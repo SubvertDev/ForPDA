@@ -140,7 +140,6 @@ public struct ProfileScreen: View {
                         Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
                             .font(.footnote)
                             .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
-                            .padding(.bottom, 8)
                     }
                 }
             }
