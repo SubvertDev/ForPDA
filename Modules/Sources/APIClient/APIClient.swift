@@ -38,6 +38,7 @@ public struct APIClient: Sendable {
     public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
     public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
+    public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -198,8 +199,14 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return ReputationChangeResponseType(rawValue: status)
             },
+            updateUserAvatar: { userId, image in
+                let command = MemberCommand.avatar(memberId: userId, avatar: image)
+                let response = try await api.get(command)
+                return try await parser.parseAvatarUrl(response: response)
+            },
             
             // MARK: - Bookmarks
+            
             getBookmarksList: {
                 let response = try await api.get(MemberCommand.Bookmarks.list)
                 return try await parser.parseBookmarksList(response)
@@ -459,6 +466,9 @@ extension APIClient: DependencyKey {
             },
             changeReputation: { _ in
                 return .success
+            },
+            updateUserAvatar: { _, _ in
+                return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
