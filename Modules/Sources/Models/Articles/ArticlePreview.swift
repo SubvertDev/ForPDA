@@ -71,7 +71,7 @@ public extension ArticlePreview {
         authorId: 123456,
         authorName: "Lorem Ipsum",
         commentsAmount: 69,
-        imageUrl: URL(string: "https://i.4pda.ws/s/Zy0hTlz0vbyz2C0NqwmGqhAbhbvNX1nQXZBLeBHoOUajz2n.jpg?v=1719840424")!,
+        imageUrl: URL(string: "https://4pda.to/s/PXtiYosey7pORnYXLoueiwueFP6x8vGFdz2VtBbuHsmYz1WaPnJV3GC4Axz1KI.jpg")!,
         title: "Enim amet excepteur consectetur quis velit id labore eiusmod.",
         description: "Occaecat enim duis dolor tempor nostrud ea veniam culpa magna incididunt nisi ut laborum amet. Commodo nulla Lorem cupidatat consectetur eu eu commodo.",
         tags: []

@@ -16,6 +16,13 @@ public var isLiquidGlass: Bool {
     }
 }
 
+public extension Bool {
+    var inverted: Self {
+        get { !self }
+        set { self = !newValue }
+    }
+}
+
 private struct TintKey: EnvironmentKey {
     static let defaultValue: Color = Color.blue
 }
