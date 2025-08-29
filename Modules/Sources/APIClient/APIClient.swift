@@ -39,6 +39,7 @@ public struct APIClient: Sendable {
     public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
+    public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -203,6 +204,22 @@ extension APIClient: DependencyKey {
                 let command = MemberCommand.avatar(memberId: userId, avatar: image)
                 let response = try await api.get(command)
                 return try await parser.parseAvatarUrl(response: response)
+            },
+            updateUserDevice: { userId, action, fullTag, isPrimary in
+                let action: MemberDeviceRequest.Action = switch action {
+                case .add:    .add
+                case .modify: .modify
+                case .remove: .remove
+                }
+                let command = MemberCommand.device(data: MemberDeviceRequest(
+                    memberId: userId,
+                    action: action,
+                    fullTag: fullTag,
+                    primary: isPrimary
+                ))
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Bookmarks
@@ -469,6 +486,9 @@ extension APIClient: DependencyKey {
             },
             updateUserAvatar: { _, _ in
                 return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
+            },
+            updateUserDevice: { _, _, _, _ in
+                return true
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
