@@ -32,25 +32,27 @@ struct KeyboardView: View {
                 }
             }
             
-            VStack(spacing: 10) {
-                if let comment = store.replyComment {
-                    ReplyView(comment: comment)
-                }
-                
-                HStack(alignment: .bottom, spacing: 8) {
-                    TextFieldView()
-                    
-                    if !store.commentText.isEmpty {
-                        SendButton()
+            if store.isAuthorized {
+                VStack(spacing: 10) {
+                    if let comment = store.replyComment {
+                        ReplyView(comment: comment)
                     }
+                    
+                    HStack(alignment: .bottom, spacing: 8) {
+                        TextFieldView()
+                        
+                        if !store.commentText.isEmpty {
+                            SendButton()
+                        }
+                    }
+                    .animation(.default, value: store.commentText.isEmpty)
                 }
-                .animation(.default, value: store.commentText.isEmpty)
+                .padding(.horizontal, 12)
+                .padding(.top, 8)
+                .padding(.bottom, 6)
+                .background(Color(.Background.primaryAlpha))
+                .background(.ultraThinMaterial)
             }
-            .padding(.horizontal, 12)
-            .padding(.top, 8)
-            .padding(.bottom, 6)
-            .background(Color(.Background.primaryAlpha))
-            .background(.ultraThinMaterial)
         }
         .animation(.default, value: store.replyComment)
         .animation(.default, value: isScrollDownVisible)

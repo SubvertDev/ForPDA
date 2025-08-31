@@ -76,26 +76,24 @@ public struct ArticleScreen: View {
     private func Keyboard() -> some View {
         WithPerceptionTracking {
             Group {
-                if store.isAuthorized {
-                    if #available(iOS 26.0, *) {
-                        LiquidKeyboardView(
-                            store: store,
-                            focus: $focus,
-                            isExpanded: $isCommentViewExpanded,
-                            isScrollDownVisible: $isCommentsViewVisible.inverted
-                        ) {
-                            withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
-                        }
-                    } else {
-                        KeyboardView(
-                            store: store,
-                            focus: $focus,
-                            isScrollDownVisible: $isCommentsViewVisible.inverted
-                        ) {
-                            withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
-                        }
-                        .transition(.push(from: .bottom))
+                if #available(iOS 26.0, *) {
+                    LiquidKeyboardView(
+                        store: store,
+                        focus: $focus,
+                        isExpanded: $isCommentViewExpanded,
+                        isScrollDownVisible: $isCommentsViewVisible.inverted
+                    ) {
+                        withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
                     }
+                } else {
+                    KeyboardView(
+                        store: store,
+                        focus: $focus,
+                        isScrollDownVisible: $isCommentsViewVisible.inverted
+                    ) {
+                        withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
+                    }
+                    .transition(.push(from: .bottom))
                 }
             }
             .animation(isLiquidGlass ? .bouncy : .default, value: store.canComment)
