@@ -14,12 +14,18 @@ import Models
 
 public struct ForumScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ForumFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    // MARK: - Init
     
     public init(store: StoreOf<ForumFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -82,6 +88,16 @@ public struct ForumScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
+                .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(tintColor)
         }
     }
     
@@ -93,6 +109,7 @@ public struct ForumScreen: View {
             Navigation(pinned: pinned)
             
             ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
+                let radius: CGFloat = isLiquidGlass ? 24 : 10
                 TopicRow(
                     title: topic.name,
                     date: topic.lastPost.date,
@@ -112,8 +129,8 @@ public struct ForumScreen: View {
                 .listRowBackground(
                     Color(.Background.teritary)
                         .clipShape(.rect(
-                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == topics.count - 1 ? 10 : 0,
-                            bottomTrailingRadius: index == topics.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
+                            topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
+                            bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
                         ))
                 )
             }

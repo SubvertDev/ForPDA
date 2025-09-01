@@ -13,12 +13,18 @@ import SFSafeSymbols
 
 public struct ArticlesListScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
     @State private var scrollProxy: ScrollViewProxy?
+    
+    // MARK: - Init
     
     public init(store: StoreOf<ArticlesListFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
         
     public var body: some View {
         WithPerceptionTracking {
@@ -45,12 +51,8 @@ public struct ArticlesListScreen: View {
             }
             .navigationTitle(Text("Articles", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(Color(.Background.primary), for: .navigationBar)
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    ToolbarButtons()
-                }
-            }
+            .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
+            .toolbar { Toolbar() }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .sheet(item: $store.destination.share, id: \.self) { url in
                 // FIXME: Perceptible warning despite tracking closure
@@ -134,21 +136,29 @@ public struct ArticlesListScreen: View {
         rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
     }
     
-    // MARK: - Toolbar Items
+    // MARK: - Toolbar
     
-    @ViewBuilder
-    private func ToolbarButtons() -> some View {
-        Button {
-            store.send(.listGridTypeButtonTapped)
-        } label: {
-            Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
-                .replaceDownUpByLayerEffect(value: true)
+    @ToolbarContentBuilder
+    private func Toolbar() -> some ToolbarContent {
+        ToolbarItem {
+            Button {
+                store.send(.listGridTypeButtonTapped)
+            } label: {
+                Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
+                    .replaceDownUpByLayerEffect(value: true)
+            }
         }
         
-        Button {
-            store.send(.settingsButtonTapped)
-        } label: {
-            Image(systemSymbol: .gearshape)
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed)
+        }
+        
+        ToolbarItem {
+            Button {
+                store.send(.settingsButtonTapped)
+            } label: {
+                Image(systemSymbol: .gearshape)
+            }
         }
     }
 }

@@ -149,13 +149,13 @@ public struct SettingsScreen: View {
                         Menu {
                             Picker(String(""), selection: $store.startPage) {
                                 ForEach(AppTab.allCases, id: \.self) { tab in
-                                    Text(tab.title, bundle: .module)
+                                    Text(tab.title)
                                 }
                             }
                             .pickerStyle(.inline)
                         } label: {
                             HStack(spacing: 9) {
-                                Text(store.startPage.title, bundle: .module)
+                                Text(store.startPage.title)
                                 Image(systemSymbol: .chevronUpChevronDown)
                             }
                             .foregroundStyle(Color(.Labels.teritary))

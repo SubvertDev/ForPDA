@@ -48,10 +48,12 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         public init(
             favorites: [FavoriteInfo] = [],
-            favoritesImportant: [FavoriteInfo] = []
+            favoritesImportant: [FavoriteInfo] = [],
+            sort: SortFeature.State? = nil
         ) {
             self.favorites = favorites
             self.favoritesImportant = favoritesImportant
+            self.sort = sort
         }
     }
     
