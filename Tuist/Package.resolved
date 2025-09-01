@@ -1,5 +1,5 @@
 {
-  "originHash" : "263e3a44c1c8280ba2daeda736e183cff780d4668fd40dec5b3961a6313e398f",
+  "originHash" : "940858b7c43e644d3f3e0151f356865c434d2a32db9395262293a18af6205287",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "912218721ca4c253cc0dddd863fd457c00f96e40",
-        "version" : "3.30.1"
+        "revision" : "f381818bc153f63fbe13d6822e65cc7233ba4647",
+        "version" : "3.31.0"
       }
     },
     {
@@ -177,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "d2c1bfb5859c81d1fd14437e9eb697137dd61bc9",
-        "version" : "1.22.1"
+        "revision" : "acd9bb8a7cf6e36a89d81a432c2e8eb3b1bb3771",
+        "version" : "1.22.2"
       }
     },
     {
