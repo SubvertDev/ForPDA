@@ -187,10 +187,11 @@ public struct BBBuilder {
                         }
                     }
                     let textNode = unwrap(node: node, with: mutableText, isAttachmentDelimeter: isAttachmentDelimeter)
-                    if !textNode.isEmptyText {
-                        mergedNodes.lastOrAppend = textNode
+                    guard !textNode.isEmptyText else { fatalError("File attachment textNode is empty") }
+                    if let lastNode = mergedNodes.last, lastNode.isSpoiler {
+                        mergedNodes.append(textNode)
                     } else {
-                        fatalError("File attachment textNode is empty")
+                        mergedNodes.lastOrAppend = textNode
                     }
                     continue
                     

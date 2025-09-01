@@ -271,6 +271,21 @@ struct BBBuilderTests {
             Issue.record("First node is not text or there's more nodes")
         }
     }
+    
+    @Test func fileAttachmentDoesNotOverrideSpoilerBefore() async throws {
+        let file = File(id: 0, name: "name.zip", size: 0, downloads: nil)
+        let text = "[spoiler=screenshots]some text inside[/spoiler]\n" + String.fileAttachment(id: file.id)
+        let nodes = BBBuilder.build(text: text, attachments: [.file(id: file.id)])
+        guard case .spoiler = nodes.first else {
+            Issue.record("First node is not spoiler")
+            return
+        }
+        if case let .text(text) = nodes.last, nodes.count == 2 {
+            #expect(text.string == fileConstructor(file))
+        } else {
+            Issue.record("Non text node or unexpected amount of nodes")
+        }
+    }
 }
 
 // MARK: - Helpers
