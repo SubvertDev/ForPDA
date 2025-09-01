@@ -826,7 +826,8 @@ extension InfoPlist {
             "NSPhotoLibraryUsageDescription": "To send attachments in QMS",
             
             "POSTHOG_TOKEN": "$(POSTHOG_TOKEN)",
-            "SENTRY_DSN": "$(SENTRY_DSN)"
+            "SENTRY_DSN": "$(SENTRY_DSN)",
+            "RELEASE_CHANNEL": "$(RELEASE_CHANNEL)"
         ]
     )
     

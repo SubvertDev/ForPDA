@@ -347,7 +347,7 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func AboutAppSection() -> some View {
         Section {
-            Row(symbol: .infoBubble, title: "Version \(store.appVersionAndBuild)", type: .basic) {}
+            Row(symbol: .infoBubble, title: "Version \(store.appVersionAndBuild) [\(store.releaseChannel)]", type: .basic) {}
             
             Row(symbol: .folderBadgeGearshape, title: "Check new versions on GitHub", type: .navigation) {
                 store.send(.checkVersionsButtonTapped)
