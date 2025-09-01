@@ -52,7 +52,7 @@ let package = Package(
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", exact: "8.55.0"),
         .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", branch: "main"),
-        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", exact: "2.0.1"),
+        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", branch: "feature/xcode-26"),
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.12.0"),

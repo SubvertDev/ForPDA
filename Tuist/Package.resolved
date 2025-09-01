@@ -1,5 +1,5 @@
 {
-  "originHash" : "940858b7c43e644d3f3e0151f356865c434d2a32db9395262293a18af6205287",
+  "originHash" : "683514eb620ecdc86c469efdae5a0885a2256da27a3a8087e7e456bbc1b0af7b",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -294,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SvenTiigi/YouTubePlayerKit.git",
       "state" : {
-        "revision" : "a0f3f0996c2d752faa654b69b82acaa444bed922",
-        "version" : "2.0.1"
+        "branch" : "feature/xcode-26",
+        "revision" : "b2ca1f17d212f7fb83e4c34da6e8e3e727df1825"
       }
     },
     {
