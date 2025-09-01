@@ -410,7 +410,10 @@ struct NavigationModifier: ViewModifier {
                 let state = store.withState { $0 }
                 TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
             }
-            .fittedSheet(item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation)) { store in
+            .fittedSheet(
+                item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                embedIntoNavStack: true
+            ) { store in
                 ReputationChangeView(store: store)
             }
             .sheet(isPresented: Binding($store.destination.editWarning)) {
