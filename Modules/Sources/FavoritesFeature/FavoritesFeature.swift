@@ -48,10 +48,12 @@ public struct FavoritesFeature: Reducer, Sendable {
         
         public init(
             favorites: [FavoriteInfo] = [],
-            favoritesImportant: [FavoriteInfo] = []
+            favoritesImportant: [FavoriteInfo] = [],
+            sort: SortFeature.State? = nil
         ) {
             self.favorites = favorites
             self.favoritesImportant = favoritesImportant
+            self.sort = sort
         }
     }
     
@@ -154,7 +156,8 @@ public struct FavoritesFeature: Reducer, Sendable {
                 if favorite.isForum {
                     return .send(.delegate(.openForum(id: favorite.topic.id, name: favorite.topic.name)))
                 } else {
-                    return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: .first)))
+                    let goTo = state.appSettings.topicOpeningStrategy.asGoTo
+                    return .send(.delegate(.openTopic(id: favorite.topic.id, name: favorite.topic.name, goTo: goTo)))
                 }
  
             case .view(.contextOptionMenu(let action)):

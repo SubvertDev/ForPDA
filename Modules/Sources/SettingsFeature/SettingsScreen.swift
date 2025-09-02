@@ -65,6 +65,7 @@ public struct SettingsScreen: View {
         case backgroundPicker
         case themePicker
         case startPagePicker
+        case topicOpening
     }
         
     @ViewBuilder
@@ -148,13 +149,29 @@ public struct SettingsScreen: View {
                         Menu {
                             Picker(String(""), selection: $store.startPage) {
                                 ForEach(AppTab.allCases, id: \.self) { tab in
-                                    Text(tab.title, bundle: .module)
+                                    Text(tab.title)
                                 }
                             }
                             .pickerStyle(.inline)
                         } label: {
                             HStack(spacing: 9) {
-                                Text(store.startPage.title, bundle: .module)
+                                Text(store.startPage.title)
+                                Image(systemSymbol: .chevronUpChevronDown)
+                            }
+                            .foregroundStyle(Color(.Labels.teritary))
+                        }
+                        
+                    case .topicOpening:
+                        Menu {
+                            Picker(String(""), selection: $store.topicOpening) {
+                                ForEach(TopicOpeningStrategy.allCases, id: \.self) { open in
+                                    Text(open.title, bundle: ModelsResources.bundle)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                        } label: {
+                            HStack(spacing: 9) {
+                                Text(store.topicOpening.title, bundle: ModelsResources.bundle)
                                 Image(systemSymbol: .chevronUpChevronDown)
                             }
                             .foregroundStyle(Color(.Labels.teritary))
@@ -243,6 +260,8 @@ public struct SettingsScreen: View {
             
 //            Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
             
+            Row(symbol: .rectangleAndHandPointUpLeft, title: "Topic opening", type: .topicOpening)
+            
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
             
             Row(symbol: .bell, title: "Notifications", type: .navigation) {
@@ -328,7 +347,7 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func AboutAppSection() -> some View {
         Section {
-            Row(symbol: .infoBubble, title: "Version \(store.appVersionAndBuild)", type: .basic) {}
+            Row(symbol: .infoBubble, title: "Version \(store.appVersionAndBuild) [\(store.releaseChannel)]", type: .basic) {}
             
             Row(symbol: .folderBadgeGearshape, title: "Check new versions on GitHub", type: .navigation) {
                 store.send(.checkVersionsButtonTapped)

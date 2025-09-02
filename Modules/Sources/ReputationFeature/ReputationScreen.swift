@@ -5,7 +5,6 @@
 //  Created by Рустам Ойтов on 11.07.2025.
 //
 
-import Foundation
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
@@ -69,17 +68,20 @@ public struct ReputationScreen: View {
                 Spacer()
             } else {
                 List(store.historyData, id: \.self) { vote in
-                        ReputationRow(vote: vote)
-                            .onAppear {
-                                if let index = store.historyData.firstIndex(of: vote),
-                                   index == store.historyData.count - 5 {
-                                    send(.loadMore)
-                                }
+                    ReputationRow(vote: vote)
+                        .listRowBackground(Color(.Background.primary))
+                        .onAppear {
+                            if let index = store.historyData.firstIndex(of: vote),
+                               index == store.historyData.count - 5 {
+                                send(.loadMore)
                             }
+                        }
                 }
                 .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color(.Background.primary))
                 .refreshable {
-                    send(.refresh)
+                    await send(.refresh).finish()
                 }
             }
         }
@@ -92,7 +94,7 @@ public struct ReputationScreen: View {
         _Picker("", selection: $store.pickerSection) {
             Text("History", bundle: .module)
                 .tag(ReputationFeature.PickerSection.history)
-            Text("My votes", bundle: .module)
+            Text(store.isOwnVotes ? "My votes" : "Left votes", bundle: .module)
                 .tag(ReputationFeature.PickerSection.votes)
         }
         .pickerStyle(.segmented)
@@ -149,7 +151,6 @@ public struct ReputationScreen: View {
             .padding(.top, 4)
             
             Text(vote.reason)
-                .lineLimit(1)
                 .foregroundStyle(Color(.Labels.primary))
                 .font(.subheadline)
                 .multilineTextAlignment(.leading)
@@ -173,8 +174,10 @@ public struct ReputationScreen: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 12)
+        .padding(.leading, 12)
+        .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
         .contentShape(Rectangle())
+        .background(Color(.Background.primary))
         .contextMenu {
             MenuButtons(id: vote.authorId)
         }
@@ -196,12 +199,23 @@ public struct ReputationScreen: View {
                 .foregroundStyle(Color(.Labels.primary))
                 .padding(.bottom, 6)
             
-            Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum", bundle: .module)
+            Text(getEmptyReputationDescription(), bundle: .module)
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
                 .padding(.horizontal, 55)
+        }
+    }
+    
+    private func getEmptyReputationDescription() -> LocalizedStringKey {
+        switch store.pickerSection {
+        case .history:
+            return "Help other users on the forum and get reputation"
+        case .votes:
+            return store.isOwnVotes
+            ? "Change the reputation of users on the forum for their actions"
+            : "This user has not changed anyone's reputation yet"
         }
     }
     
@@ -229,7 +243,7 @@ public struct ReputationScreen: View {
     
     private func formatDate(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "d MMMM yyyy HH:mm"
+        dateFormatter.dateFormat = "d MMMM yyyy · HH:mm"
         return dateFormatter.string(from: date)
     }
 }
@@ -269,7 +283,31 @@ where Label: View, SelectionValue: Hashable, Content: View {
                 initialState: ReputationFeature.State(userId: 0)
             ) {
                 ReputationFeature()
+            } withDependencies: {
+                $0.apiClient.getReputationVotes = { _ in
+                    try? await Task.sleep(for: .seconds(1))
+                    return .mock
+                }
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
 }
+
+#Preview("Empty") {
+    NavigationStack {
+        ReputationScreen(
+            store: Store(
+                initialState: ReputationFeature.State(userId: 0)
+            ) {
+                ReputationFeature()
+            } withDependencies: {
+                $0.apiClient.getReputationVotes = { _ in
+                    return ReputationVotes(votes: [], votesCount: 0)
+                }
+            }
+        )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+}
+

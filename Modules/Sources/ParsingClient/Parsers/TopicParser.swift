@@ -196,7 +196,7 @@ public struct TopicParser {
                     signature: authorSignature,
                     reputationCount: authorReputationCount
                 ),
-                karma: karma >> 3,
+                karma: karma,
                 attachments: try parseAttachment(attachments),
                 createdAt: Date(timeIntervalSince1970: createdAt),
                 lastEdit: try parseLastEdit(post)

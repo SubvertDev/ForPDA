@@ -36,19 +36,23 @@ public struct FavoritesRootScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                    VStack {
-                        SegmentPicker()
+                VStack {
+                    SegmentPicker()
+                    
+                    switch store.pickerSelection {
+                    case .favorites:
+                        FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
                         
-                        switch store.pickerSelection {
-                        case .favorites:
-                            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-                            
-                        case .bookmarks:
-                            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-                        }
+                    case .bookmarks:
+                        BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
                     }
+                }
             }
             .toolbar {
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer(.fixed, placement: .primaryAction)
+                }
+                
                 ToolbarItem(placement: .primaryAction) {
                     Button {
                         send(.settingsButtonTapped)
@@ -106,12 +110,19 @@ where Label: View, SelectionValue: Hashable, Content: View {
 // MARK: - Previews
 
 #Preview {
-    FavoritesRootScreen(
-        store: Store(
-            initialState: FavoritesRootFeature.State(),
-            reducer: {
-                FavoritesRootFeature()
-            }
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .mock }
+    
+    return NavigationStack {
+        FavoritesRootScreen(
+            store: Store(
+                initialState: FavoritesRootFeature.State(),
+                reducer: {
+                    FavoritesRootFeature()
+                }
+            )
         )
-    )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+    .tint(Color(.Theme.primary))
 }

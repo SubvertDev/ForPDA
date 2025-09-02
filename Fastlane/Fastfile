@@ -5,7 +5,7 @@ platform :ios do
     desc "Setups project"
     lane :setup do |options|
         print_lane_options("Setup Project", {
-            version: { description: "(REQUIRED) Sets version (e.g. 1.0.0)" }
+            master: { description: "(OPTIONAL) Registers devices UDID's" }
         })
         prepare_certificates(master: options[:master])
         run_tuist(open: true)

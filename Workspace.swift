@@ -4,6 +4,6 @@ let workspace = Workspace(
     name: "ForPDA",
     projects: ["**"],
     generationOptions: .options(
-        lastXcodeUpgradeCheck: "16.4.0"
+        lastXcodeUpgradeCheck: "26.0.0"
     )
 )

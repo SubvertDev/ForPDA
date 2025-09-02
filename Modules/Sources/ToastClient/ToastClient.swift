@@ -52,6 +52,7 @@ public enum ToastMessage: Equatable, Sendable {
     // Posts
     case postNotFound
     case postDeleted
+    case postKarmaChanged
     
     // Topics
     case topicSent
@@ -90,6 +91,8 @@ public enum ToastMessage: Equatable, Sendable {
             return "Post not found"
         case .postDeleted:
             return "Post deleted"
+        case .postKarmaChanged:
+            return "Post karma changed"
         case .topicSent:
             return "Topic sent"
         case .topicFieldsError:
@@ -143,7 +146,6 @@ public enum ToastMessage: Equatable, Sendable {
              .topicStatus,
              .topicFieldsError,
              .topicSentToPremoderation,
-             .whoopsSomethingWentWrong:
              .topicBadParameter,
              .reputationChangeError,
              .reputationChangeBlocked,
@@ -159,7 +161,7 @@ public enum ToastMessage: Equatable, Sendable {
              .whoopsSomethingWentWrong:
 			return true
 
-        case .custom, .reportSent, .postDeleted, .reputationChanged, .topicSent:
+        case .custom, .reportSent, .postDeleted, .postKarmaChanged, .reputationChanged, .topicSent:
             return false
         }
     }
@@ -176,7 +178,6 @@ public enum ToastMessage: Equatable, Sendable {
              .topicBadParameter,
              .topicFieldsError,
              .topicSentToPremoderation,
-             .whoopsSomethingWentWrong:
              .reputationChangeError,
              .reputationChangeBlocked,
              .reputationSelfChangeError,
@@ -191,7 +192,7 @@ public enum ToastMessage: Equatable, Sendable {
              .whoopsSomethingWentWrong:
             return .error
             
-        case .reportSent, .postDeleted, .reputationChanged, .topicSent:
+        case .reportSent, .postDeleted, .postKarmaChanged, .reputationChanged, .topicSent:
             return .success
         }
     }

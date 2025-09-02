@@ -124,7 +124,10 @@ struct CommentView: View {
                     FormScreen(store: store)
                 }
             }
-            .fittedSheet(item: $store.scope(state: \.changeReputation, action: \.changeReputation)) { store in
+            .fittedSheet(
+                item: $store.scope(state: \.changeReputation, action: \.changeReputation),
+                embedIntoNavStack: true
+            ) { store in
                 ReputationChangeView(store: store)
             }
             .background(Color(.Background.primary))

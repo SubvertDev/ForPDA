@@ -188,6 +188,7 @@ public struct CommentFeature: Reducer, Sendable {
                 return .run { [articleId = state.articleId, commentId = state.comment.id] send in
                     let success = try await apiClient.likeComment(articleId: articleId, commentId: commentId)
                     await send(._likeResult(success))
+                    await hapticClient.play(type: .selection)
                 }
                 
             case let ._likeResult(success):

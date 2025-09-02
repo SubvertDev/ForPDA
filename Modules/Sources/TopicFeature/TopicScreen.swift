@@ -21,16 +21,23 @@ import GalleryFeature
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<TopicFeature>
     
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.tintColor) private var tintColor
     @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
+    @State private var showKarmaConfirmation = false
+    
+    // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -133,6 +140,16 @@ public struct TopicScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
+                .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(tintColor)
         }
     }
     
@@ -309,10 +326,20 @@ public struct TopicScreen: View {
                 }
             }
             
+            if store.isUserAuthorized, store.userSession!.userId != post.author.id, post.canChangeKarma {
+                ContextButton(text: "Rate", symbol: .chevronUpChevronDown, bundle: .module) {
+                    send(.contextPostMenu(.karma(post.id)))
+                }
+            }
+            
             if post.canEdit {
                 ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
                     send(.contextPostMenu(.edit(post)))
                 }
+            }
+            
+            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+                send(.contextPostMenu(.report(post.id)))
             }
             
             if post.canDelete {
@@ -389,13 +416,29 @@ struct NavigationModifier: ViewModifier {
                 let state = store.withState { $0 }
                 TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
             }
-            .fittedSheet(item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation)) { store in
+            .fittedSheet(
+                item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                embedIntoNavStack: true
+            ) { store in
                 ReputationChangeView(store: store)
             }
             .sheet(isPresented: Binding($store.destination.editWarning)) {
                 EditWarningSheet()
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
+            }
+            .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text("") }) { postId in
+                Button {
+                    store.send(.view(.changeKarmaTapped(postId, true)))
+                } label: {
+                    Text("Up", bundle: .module)
+                }
+                
+                Button {
+                    store.send(.view(.changeKarmaTapped(postId, false)))
+                } label: {
+                    Text("Down", bundle: .module)
+                }
             }
     }
     

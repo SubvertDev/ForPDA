@@ -13,11 +13,15 @@ import SFSafeSymbols
 
 public struct AuthScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<AuthFeature>
     @Environment(\.tintColor) private var tintColor
     @FocusState public var focus: AuthFeature.State.Field?
     @State private var animateOnFocus = [false, false, false]
     @State private var safeAreaTopHeight: CGFloat = 0
+    
+    // MARK: - Init
     
     public init(store: StoreOf<AuthFeature>) {
         self.store = store
@@ -161,11 +165,11 @@ public struct AuthScreen: View {
                 }
             })
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         store.send(.cancelButtonTapped)
                     } label: {
-                        Text("Cancel", bundle: .module)
+                        Image(systemSymbol: .xmark)
                             .foregroundStyle(tintColor)
                     }
                 }
@@ -217,12 +221,14 @@ public struct AuthScreen: View {
                                 .font(.body)
                                 .foregroundStyle(Color(.Labels.quaternary))
                         }
+                        .textInputAutocapitalization(.never)
                     } else {
                         TextField(text: text) {
                             Text(placeholder, bundle: .module)
                                 .font(.body)
                                 .foregroundStyle(Color(.Labels.quaternary))
                         }
+                        .textInputAutocapitalization(.never)
                     }
                 }
                 .font(.body)

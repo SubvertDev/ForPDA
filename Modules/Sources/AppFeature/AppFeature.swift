@@ -351,6 +351,7 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
         }

@@ -34,6 +34,7 @@ public struct SettingsFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         
         public var startPage: AppTab
+        public var topicOpening: TopicOpeningStrategy
         public var appColorScheme: AppColorScheme
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
@@ -43,6 +44,10 @@ public struct SettingsFeature: Reducer, Sendable {
             let version = info?["CFBundleShortVersionString"] as? String ?? "-1"
             let build = info?["CFBundleVersion"] as? String ?? "-1"
             return "\(version) (\(build))"
+        }
+        
+        public var releaseChannel: String {
+            return (Bundle.main.infoDictionary?["RELEASE_CHANNEL"] as? String ?? "Unknown").capitalized
         }
         
         public var currentLanguage: String {
@@ -60,6 +65,7 @@ public struct SettingsFeature: Reducer, Sendable {
             self.destination = destination
 
             self.startPage = _appSettings.startPage.wrappedValue
+            self.topicOpening = _appSettings.topicOpeningStrategy.wrappedValue
             self.appColorScheme = _appSettings.appColorScheme.wrappedValue
             self.backgroundTheme = _appSettings.backgroundTheme.wrappedValue
             self.appTintColor = _appSettings.appTintColor.wrappedValue
@@ -99,6 +105,7 @@ public struct SettingsFeature: Reducer, Sendable {
         public enum Delegate {
             case openNotificationsSettings
             case openDeveloperMenu
+            case openDeeplink(URL)
         }
     }
     
@@ -157,9 +164,7 @@ public struct SettingsFeature: Reducer, Sendable {
                 }
                 
             case .appDiscussionButtonTapped:
-                return .run { _ in
-                    await open(url: Links.appDiscussion)
-                }
+                return .send(.delegate(.openDeeplink(Links.appDiscussion)))
                 
             case .telegramChangelogButtonTapped:
                 return .run { _ in
@@ -216,6 +221,10 @@ public struct SettingsFeature: Reducer, Sendable {
                 
             case .binding(\.startPage):
                 state.$appSettings.withLock { $0.startPage = state.startPage }
+                return .none
+                
+            case .binding(\.topicOpening):
+                state.$appSettings.withLock { $0.topicOpeningStrategy = state.topicOpening }
                 return .none
                 
             case .destination, .binding, .delegate:

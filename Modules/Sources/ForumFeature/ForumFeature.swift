@@ -22,6 +22,27 @@ public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Enums
+    
+    public struct SectionExpand: Equatable {
+        
+        public enum Kind: String, CaseIterable {
+            case announcements, subforums, topics, pinnedTopics
+        }
+        
+        private var values: [Kind: Bool] = Dictionary(
+            uniqueKeysWithValues: Kind.allCases.map { ($0, true) }
+        )
+        
+        func value(for kind: Kind) -> Bool {
+            values[kind, default: true]
+        }
+        
+        mutating func toggle(kind: Kind) {
+            values[kind]?.toggle()
+        }
+    }
+    
     // MARK: - State
     
     @ObservableState
@@ -36,6 +57,7 @@ public struct ForumFeature: Reducer, Sendable {
         public var forum: Forum?
         public var topics: [TopicInfo] = []
         public var topicsPinned: [TopicInfo] = []
+        public var sectionsExpandState = SectionExpand()
         
         public var isLoadingTopics = false
         public var isRefreshing = false
@@ -66,6 +88,7 @@ public struct ForumFeature: Reducer, Sendable {
         case subforumRedirectTapped(URL)
         case subforumTapped(ForumInfo)
         case announcementTapped(id: Int, name: String)
+        case sectionExpandTapped(SectionExpand.Kind)
         
         case contextOptionMenu(ForumOptionContextMenuAction)
         case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
@@ -112,6 +135,10 @@ public struct ForumFeature: Reducer, Sendable {
                 return .run { [offset = state.pageNavigation.offset] send in
                     await send(._loadForum(offset: offset))
                 }
+                
+            case let .sectionExpandTapped(kind):
+                state.sectionsExpandState.toggle(kind: kind)
+                return .none
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(._loadForum(offset: newOffset))
@@ -254,7 +281,11 @@ public struct ForumFeature: Reducer, Sendable {
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
             case let .topicTapped(topic, showUnread):
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: showUnread ? .unread : .first)))
+                guard !showUnread else {
+                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                }
+                let goTo = state.appSettings.topicOpeningStrategy.asGoTo
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
                 
             case let .subforumTapped(forum):
                 return .send(.delegate(.openForum(id: forum.id, name: forum.name)))

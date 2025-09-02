@@ -5,7 +5,7 @@
 //  Created by Рустам Ойтов on 11.07.2025.
 //
 
-import Foundation
+import AnalyticsClient
 import ComposableArchitecture
 import APIClient
 import Models
@@ -36,14 +36,20 @@ public struct ReputationFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
+        @Shared(.userSession) private var userSession: UserSession?
         
         public let userId: Int
-        public var isLoading = false
+        public var isLoading = true
+        public var didLoadOnce = false
         public var historyData: [ReputationVote] = []
         var pickerSection: PickerSection = .history
         
         public var loadAmount = 20
         public var offset = 0
+        
+        public var isOwnVotes: Bool {
+            return userSession?.userId == userId
+        }
         
         public init(userId: Int) {
             self.userId = userId
@@ -79,9 +85,16 @@ public struct ReputationFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - CancelID
+    
+    enum CancelID {
+        case loadData
+    }
+    
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - body
     
@@ -90,12 +103,12 @@ public struct ReputationFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-                
             case .binding(\.pickerSection):
                 state.historyData = []
                 state.offset = 0
                 state.isLoading = true
-                return .send(.view(.refresh))
+                return .send(.internal(.loadData))
+                    .merge(with: .cancel(id: CancelID.loadData))
                 
             case .view(.onAppear):
                 return .send(.internal(.loadData))
@@ -106,6 +119,7 @@ public struct ReputationFeature: Reducer, Sendable {
                 return .send(.internal(.loadData))
                 
             case .view(.refresh):
+                state.offset = 0
                 return .send(.internal(.loadData))
                 
             case let .view(.profileTapped(profileId)):
@@ -124,11 +138,11 @@ public struct ReputationFeature: Reducer, Sendable {
                 }
                 
             case .internal(.loadData):
-                let type = state.pickerSection == .history
+                let isHistory = state.pickerSection == .history
                 return .run { [userId = state.userId, offset = state.offset, amount = state.loadAmount] send in
                     let request = ReputationVotesRequest(
                         userId: userId,
-                        type: type ? .to : .from,
+                        type: isHistory ? .to : .from,
                         offset: offset,
                         amount: amount
                     )
@@ -137,24 +151,34 @@ public struct ReputationFeature: Reducer, Sendable {
                     }
                     await send(.internal(.historyResponse(result)))
                 }
+                .cancellable(id: CancelID.loadData)
                 
             case let .internal(.historyResponse(.success(votes))):
-                state.isLoading = false
+                if state.offset == 0 {
+                    state.historyData.removeAll()
+                }
                 state.historyData.append(contentsOf: votes.votes)
                 state.offset += state.loadAmount
+                state.isLoading = false
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let .internal(.historyResponse(.failure(error))):
                 state.isLoading = false
                 state.destination = .alert(.error)
-                print("Error \(error)")
+                reportFullyDisplayed(&state)
                 return .none
                 
             case .delegate, .binding, .destination:
                 return .none
-                
             }
         }
+    }
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
 

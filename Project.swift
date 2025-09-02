@@ -351,7 +351,8 @@ let project = Project(
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.Models,
-                    .SPM.TCA
+                    .Internal.SharedUI,
+                    .SPM.TCA,
                 ]
              ),
         
@@ -737,7 +738,9 @@ extension SettingsDictionary {
         .merging(.targetSettings)
         .setAppName(App.name)
         .setDevelopmentTeam("7353CQCGQC")
+    
         .includeAppIcon()
+        .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
             provisioningProfileSpecifier: "match Development com.subvert.forpda"
@@ -834,7 +837,8 @@ extension InfoPlist {
             "NSPhotoLibraryUsageDescription": "To send attachments in QMS",
             
             "POSTHOG_TOKEN": "$(POSTHOG_TOKEN)",
-            "SENTRY_DSN": "$(SENTRY_DSN)"
+            "SENTRY_DSN": "$(SENTRY_DSN)",
+            "RELEASE_CHANNEL": "$(RELEASE_CHANNEL)"
         ]
     )
     

@@ -5,7 +5,7 @@
 //  Created by Ilia Lubianoi on 01.07.2024.
 //
 
-import Foundation
+import SwiftUI
 
 public struct ArticlePreview: Sendable, Hashable, Identifiable {
     
@@ -19,10 +19,18 @@ public struct ArticlePreview: Sendable, Hashable, Identifiable {
     public var description: String
     public let tags: [Tag]
     
-    public var formattedDate: String {
+    public var formattedDate: LocalizedStringKey {
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
-        return formatter.string(from: date)
+        formatter.dateFormat = "HH:mm"
+
+        if Calendar.current.isDateInToday(date) {
+            return LocalizedStringKey("Today, \(formatter.string(from: date))")
+        } else if Calendar.current.isDateInYesterday(date) {
+            return LocalizedStringKey("Yesterday, \(formatter.string(from: date))")
+        } else {
+            formatter.dateFormat = "dd MMM yyyy"
+            return LocalizedStringKey(formatter.string(from: date))
+        }
     }
     
     public var url: URL {
@@ -63,7 +71,7 @@ public extension ArticlePreview {
         authorId: 123456,
         authorName: "Lorem Ipsum",
         commentsAmount: 69,
-        imageUrl: URL(string: "https://i.4pda.ws/s/Zy0hTlz0vbyz2C0NqwmGqhAbhbvNX1nQXZBLeBHoOUajz2n.jpg?v=1719840424")!,
+        imageUrl: URL(string: "https://4pda.to/s/PXtiYosey7pORnYXLoueiwueFP6x8vGFdz2VtBbuHsmYz1WaPnJV3GC4Axz1KI.jpg")!,
         title: "Enim amet excepteur consectetur quis velit id labore eiusmod.",
         description: "Occaecat enim duis dolor tempor nostrud ea veniam culpa magna incididunt nisi ut laborum amet. Commodo nulla Lorem cupidatat consectetur eu eu commodo.",
         tags: []
