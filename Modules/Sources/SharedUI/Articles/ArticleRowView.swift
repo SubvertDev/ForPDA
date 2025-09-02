@@ -111,6 +111,8 @@ public struct ArticleRowView: View {
                 VStack(spacing: 0) {
                     Description()
                     
+                    Spacer(minLength: 0)
+                    
                     Footer()
                 }
             }
