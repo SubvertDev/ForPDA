@@ -34,6 +34,16 @@ public struct User: Sendable, Hashable, Codable {
     public let email: String?
     public let achievements: [Achievement]
     
+    public var birthdayDate: Date? {
+        if let birthdate {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yyyy"
+            return dateFormatter.date(from: birthdate)
+        } else {
+            return nil
+        }
+    }
+    
     public var userTimeFormatted: String? {
         if let userTime {
             let currentDate = Date()
