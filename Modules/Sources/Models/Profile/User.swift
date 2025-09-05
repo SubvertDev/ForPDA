@@ -200,14 +200,14 @@ public extension User {
         case male
         case female
         
-        public var title: String {
+        public var title: LocalizedStringKey {
             switch self {
             case .unknown:
-                "Неизвестно"
+                "Not set"
             case .male:
-                "Мужчина"
+                "Male"
             case .female:
-                "Женщина"
+                "Female"
             }
         }
     }

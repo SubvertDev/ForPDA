@@ -302,7 +302,7 @@ public struct ProfileScreen: View {
                 Row(title: "Birthdate", type: .description(birthdate))
             }
             if let gender = user.gender, gender != .unknown {
-                Row(title: "Gender", type: .description(gender.title))
+                Row(title: "Gender", type: .localizedDescription(gender.title))
             }
             if let city = user.city {
                 Row(title: "City", type: .description(city))
@@ -503,6 +503,7 @@ public struct ProfileScreen: View {
         case description(String)
         case navigation
         case navigationDescription(String)
+        case localizedDescription(LocalizedStringKey)
     }
     
     @ViewBuilder
@@ -532,6 +533,11 @@ public struct ProfileScreen: View {
                         
                     case let .description(text):
                         Text(text)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                        
+                    case let .localizedDescription(text):
+                        Text(text, bundle: .module)
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
