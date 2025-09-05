@@ -24,38 +24,40 @@ struct KeyboardView: View {
     // MARK: - Body
     
     var body: some View {
-        VStack(alignment: .trailing, spacing: 8) {
-            // Not available below 18 due to scroll position detection
-            if #available(iOS 18.0, *) {
-                if isScrollDownVisible {
-                    ScrollButton()
-                }
-            }
-            
-            if store.isAuthorized {
-                VStack(spacing: 10) {
-                    if let comment = store.replyComment {
-                        ReplyView(comment: comment)
+        WithPerceptionTracking {
+            VStack(alignment: .trailing, spacing: 8) {
+                // Not available below 18 due to scroll position detection
+                if #available(iOS 18.0, *) {
+                    if isScrollDownVisible {
+                        ScrollButton()
                     }
-                    
-                    HStack(alignment: .bottom, spacing: 8) {
-                        TextFieldView()
-                        
-                        if !store.commentText.isEmpty {
-                            SendButton()
+                }
+                
+                if store.isAuthorized {
+                    VStack(spacing: 10) {
+                        if let comment = store.replyComment {
+                            ReplyView(comment: comment)
                         }
+                        
+                        HStack(alignment: .bottom, spacing: 8) {
+                            TextFieldView()
+                            
+                            if !store.commentText.isEmpty {
+                                SendButton()
+                            }
+                        }
+                        .animation(.default, value: store.commentText.isEmpty)
                     }
-                    .animation(.default, value: store.commentText.isEmpty)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+                    .padding(.bottom, 6)
+                    .background(Color(.Background.primaryAlpha))
+                    .background(.ultraThinMaterial)
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 8)
-                .padding(.bottom, 6)
-                .background(Color(.Background.primaryAlpha))
-                .background(.ultraThinMaterial)
             }
+            .animation(.default, value: store.replyComment)
+            .animation(.default, value: isScrollDownVisible)
         }
-        .animation(.default, value: store.replyComment)
-        .animation(.default, value: isScrollDownVisible)
     }
     
     // MARK: - Scroll Button
