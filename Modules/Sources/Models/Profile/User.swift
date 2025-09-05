@@ -6,22 +6,23 @@
 //
 
 import Foundation
+import SwiftUI
 
 public struct User: Sendable, Hashable, Codable {
     public let id: Int
     public let nickname: String
-    public let imageUrl: URL
-    public let group: Group
-    public let status: String?
-    public let signature: String?
-    public let aboutMe: String?
+    public var imageUrl: URL
+    public var group: Group
+    public var status: String?
+    public var signature: String?
+    public var aboutMe: String?
     public let registrationDate: Date
     public let lastSeenDate: Date
     public let birthdate: String?
-    public let gender: Gender?
+    public var gender: Gender?
     public let userTime: Int?
-    public let city: String?
-    public let devDBdevices: [Device]
+    public var city: String?
+    public var devDBdevices: [Device]
     public let karma: Double
     public let posts: Int
     public let comments: Int
@@ -217,7 +218,7 @@ public extension User {
     struct Device: Codable, Hashable, Sendable, Identifiable {
         public let id: String
         public let name: String
-        public let main: Bool
+        public var main: Bool
         
         public init(id: String, name: String, main: Bool) {
             self.id = id
