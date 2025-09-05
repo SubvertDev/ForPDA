@@ -126,7 +126,7 @@ struct KeyboardView: View {
     
     @ViewBuilder
     private func TextFieldView() -> some View {
-        TextField(text: $store.commentText.removeDuplicates()) {
+        TextField(text: $store.commentText.removeDuplicates(), axis: .vertical) {
             Text("Comment...", bundle: .module)
                 .font(.subheadline)
                 .foregroundStyle(Color(.Labels.quintuple))
