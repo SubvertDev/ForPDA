@@ -144,15 +144,16 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
             guard let self else { return }
             showPlaceholder = false
             isDownloading = false
-            // tell layout manager so that it should refresh
-            if displaySizeChanged {
-                textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
-            } else {
-                textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
-            }
             
-            // notify the optional delegate
+            // tell layout manager so that it should refresh
             await MainActor.run {
+                if displaySizeChanged {
+                    textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
+                } else {
+                    textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
+                }
+            
+                // notify the optional delegate
                 delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
             }
         }
