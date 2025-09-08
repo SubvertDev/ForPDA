@@ -271,15 +271,28 @@ struct OldTabView: View {
 
 // MARK: - UINC edge swipe enable
 
-extension UINavigationController {
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     override open func viewDidLoad() {
         super.viewDidLoad()
         if #available(iOS 26.0, *) {
             // swipe works from any point if back button is not disabled
             // which is unnecessary with default luquid back button
         } else {
-            interactivePopGestureRecognizer?.delegate = nil
+            // interactivePopGestureRecognizer?.delegate = nil
+            interactivePopGestureRecognizer?.delegate = self
         }
+    }
+    
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return gestureRecognizer.isKind(of: UIScreenEdgePanGestureRecognizer.self)
     }
 }
 
