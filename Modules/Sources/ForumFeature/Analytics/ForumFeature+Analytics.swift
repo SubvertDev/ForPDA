@@ -37,6 +37,9 @@ extension ForumFeature {
                 case let .announcementTapped(id: id, name: name):
                     analytics.log(ForumEvent.announcementTapped(id, name))
                     
+                case let .sectionExpandTapped(kind):
+                    analytics.log(ForumEvent.sectionExpandTapped(kind.rawValue))
+                    
                 case let .contextOptionMenu(option):
                     switch option {
                     case .sort:

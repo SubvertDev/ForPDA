@@ -3,6 +3,8 @@ import SwiftUI
 import SharedUI
 import Models
 import CustomDump
+import ComposableArchitecture
+import AnalyticsClient
 
 public final class BBRenderer {
     
@@ -591,11 +593,11 @@ public extension Array where Element == BBContainerNode {
 
 extension UIFont {
     func boldFont() -> UIFont? {
-        return addingSymbolicTraits(.traitBold)
+        return addingSymbolicTraits(.traitBold) ?? self
     }
 
     func italicFont() -> UIFont? {
-        return addingSymbolicTraits(.traitItalic)
+        return addingSymbolicTraits(.traitItalic) ?? self
     }
     
     func addingSymbolicTraits(of font: UIFont) -> UIFont? {
@@ -605,6 +607,8 @@ extension UIFont {
     func addingSymbolicTraits(_ traits: UIFontDescriptor.SymbolicTraits) -> UIFont? {
         let newTraits = fontDescriptor.symbolicTraits.union(traits)
         guard let descriptor = fontDescriptor.withSymbolicTraits(newTraits) else {
+            @Dependency(\.logger) var logger
+            logger.error("Failed to find symbolic trait \(traits.rawValue) for \(self.fontName), returning self")
             return nil
         }
 

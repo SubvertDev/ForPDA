@@ -8,13 +8,26 @@
 import SwiftUI
 
 public extension View {
-    func fittedSheet<Item: Identifiable, Content: View>(item binding: Binding<Item?>, onDismiss: @escaping () -> Void = {}, content: @escaping (Item) -> Content) -> some View {
-        modifier(FittedSheetModifier(item: binding, onDismiss: onDismiss, itemContent: content))
+    func fittedSheet<Item: Identifiable, Content: View>(
+        item binding: Binding<Item?>,
+        embedIntoNavStack: Bool = false,
+        onDismiss: @escaping () -> Void = {},
+        content: @escaping (Item) -> Content
+    ) -> some View {
+        modifier(
+            FittedSheetModifier(
+                item: binding,
+                embedIntoNavStack: embedIntoNavStack,
+                onDismiss: onDismiss,
+                itemContent: content
+            )
+        )
     }
 }
 
 private struct FittedSheetModifier<Item: Identifiable, ItemContent: View>: ViewModifier {
     @Binding var item: Item?
+    let embedIntoNavStack: Bool
     let onDismiss: () -> Void
     let itemContent: (Item) -> ItemContent
     
@@ -23,10 +36,19 @@ private struct FittedSheetModifier<Item: Identifiable, ItemContent: View>: ViewM
     func body(content: Content) -> some View {
         content
             .sheet(item: $item, onDismiss: onDismiss) { item in
-                itemContent(item)
-                    .storeSize(in: $size)
-                    .presentationDetents([.height(size.height)])
-                    .presentationDragIndicator(.visible)
+                Group {
+                    if embedIntoNavStack {
+                        NavigationStack {
+                            itemContent(item)
+                                .storeSize(in: $size, embedded: embedIntoNavStack)
+                        }
+                    } else {
+                        itemContent(item)
+                            .storeSize(in: $size, embedded: embedIntoNavStack)
+                    }
+                }
+                .presentationDetents([.height(size.height)])
+                .presentationDragIndicator(.visible)
             }
     }
 }
@@ -42,8 +64,15 @@ private extension View {
         .onPreferenceChange(SizePreferenceKey.self, perform: callback)
     }
     
-    func storeSize(in binding: Binding<CGSize>) -> some View {
-        getSize { binding.wrappedValue = $0 }
+    func storeSize(in binding: Binding<CGSize>, embedded: Bool) -> some View {
+        // TODO: Is it actually 70/60? Does drag indicator counts?
+        let additionalHeight: CGFloat = embedded ? (isLiquidGlass ? 70 : 60) : 0
+        return getSize {
+            binding.wrappedValue = CGSize(
+                width: $0.width,
+                height: $0.height + additionalHeight
+            )
+        }
     }
 }
 

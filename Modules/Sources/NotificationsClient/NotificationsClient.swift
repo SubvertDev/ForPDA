@@ -183,6 +183,7 @@ extension NotificationsClient {
             return [.badge, .banner, .list, .sound]
         }
         
+        @MainActor // Fix for Apple bug
         func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
             let identifier = response.notification.request.identifier
             try? await Task.sleep(for: .seconds(1))
@@ -190,3 +191,10 @@ extension NotificationsClient {
         }
     }
 }
+
+// This conformances and @MainActor for didRecieve func above is a fix of this bug:
+// NSInternalInconsistencyException Call must be made on main thread
+// More about it:
+// https://stackoverflow.com/questions/73750724/how-can-usernotificationcenter-didreceive-cause-a-crash-even-with-nothing-in
+extension UNUserNotificationCenter: @retroactive @unchecked Sendable {}
+extension UNNotificationResponse: @retroactive @unchecked Sendable {}

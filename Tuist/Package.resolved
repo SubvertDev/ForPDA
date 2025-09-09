@@ -1,5 +1,5 @@
 {
-  "originHash" : "30a1b7c92b6d5dc7c0c10022b8c6002f0cd15a41d1ab29537ac3e5f2e274737f",
+  "originHash" : "fdc0289e04b5ed4883d1d808a5959f5d14222c39cbdb125108355fb4a0ca8a54",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
       "state" : {
-        "revision" : "7270f306c36f7ea49af8e5e0ea879d840c224cc8",
-        "version" : "0.5.0"
+        "revision" : "5ff33d8a789728df65d93a868a5ef2e73060ea92",
+        "version" : "0.5.2"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "912218721ca4c253cc0dddd863fd457c00f96e40",
-        "version" : "3.30.1"
+        "revision" : "f381818bc153f63fbe13d6822e65cc7233ba4647",
+        "version" : "3.31.0"
       }
     },
     {
@@ -177,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
-        "revision" : "4c47829a080789cf20d82c64d8c27291352391d4",
-        "version" : "1.21.1"
+        "revision" : "acd9bb8a7cf6e36a89d81a432c2e8eb3b1bb3771",
+        "version" : "1.22.2"
       }
     },
     {
@@ -294,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SvenTiigi/YouTubePlayerKit.git",
       "state" : {
-        "revision" : "a0f3f0996c2d752faa654b69b82acaa444bed922",
-        "version" : "2.0.1"
+        "branch" : "feature/xcode-26",
+        "revision" : "b2ca1f17d212f7fb83e4c34da6e8e3e727df1825"
       }
     },
     {

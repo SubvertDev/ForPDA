@@ -46,6 +46,10 @@ public struct SettingsFeature: Reducer, Sendable {
             return "\(version) (\(build))"
         }
         
+        public var releaseChannel: String {
+            return (Bundle.main.infoDictionary?["RELEASE_CHANNEL"] as? String ?? "Unknown").capitalized
+        }
+        
         public var currentLanguage: String {
             guard let identifier = Locale.current.language.languageCode?.identifier else { return "Unknown" }
             switch identifier {

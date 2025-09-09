@@ -7,6 +7,22 @@
 
 import SwiftUI
 
+@available(iOS, deprecated: 26.0)
+public var isLiquidGlass: Bool {
+    if #available(iOS 26.0, *) {
+        return true
+    } else {
+        return false
+    }
+}
+
+public extension Bool {
+    var inverted: Self {
+        get { !self }
+        set { self = !newValue }
+    }
+}
+
 private struct TintKey: EnvironmentKey {
     static let defaultValue: Color = Color.blue
 }

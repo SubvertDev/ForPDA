@@ -98,6 +98,7 @@ public struct ForumsListScreen: View {
                     .offset(x: -16)
                 
                 Spacer()
+                
                 Image(systemSymbol: .chevronUp)
                     .font(.body)
                     .foregroundStyle(Color(.Labels.quaternary))

@@ -21,6 +21,8 @@ import GalleryFeature
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<TopicFeature>
     
     @Environment(\.scenePhase) private var scenePhase
@@ -29,9 +31,13 @@ public struct TopicScreen: View {
     @State private var scrollScale: CGFloat = 1
     @State private var showKarmaConfirmation = false
     
+    // MARK: - Init
+    
     public init(store: StoreOf<TopicFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -128,6 +134,16 @@ public struct TopicScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
+                .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(tintColor)
         }
     }
     
@@ -394,7 +410,10 @@ struct NavigationModifier: ViewModifier {
                 let state = store.withState { $0 }
                 TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
             }
-            .fittedSheet(item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation)) { store in
+            .fittedSheet(
+                item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                embedIntoNavStack: true
+            ) { store in
                 ReputationChangeView(store: store)
             }
             .sheet(isPresented: Binding($store.destination.editWarning)) {

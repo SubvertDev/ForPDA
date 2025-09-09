@@ -536,7 +536,9 @@ extension APIClient: DependencyKey {
                 return true
             },
             getFavorites: { _, _ in
-                .finished()
+                let (stream, continuation) = AsyncThrowingStream.makeStream(of: Favorite.self)
+                continuation.yield(with: .success(.mock))
+                return stream
             },
             setFavorite: { _ in
                 return true

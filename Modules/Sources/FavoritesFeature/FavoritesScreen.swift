@@ -60,32 +60,33 @@ public struct FavoritesScreen: View {
             .animation(.default, value: store.favorites)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        if store.isUserAuthorized {
-                            Menu {
-                                ContextButton(
-                                    text: "Sort",
-                                    symbol: .line3HorizontalDecrease,
-                                    bundle: .module
-                                ) {
-                                    send(.contextOptionMenu(.sort))
-                                }
-                                
-                                ContextButton(
-                                    text: "Read All",
-                                    symbol: .checkmarkCircle,
-                                    bundle: .module
-                                ) {
-                                    send(.contextOptionMenu(.markAllAsRead))
-                                }
-                            } label: {
-                                Image(systemSymbol: .ellipsisCircle)
+                    if store.isUserAuthorized {
+                        Menu {
+                            ContextButton(
+                                text: "Sort",
+                                symbol: .line3HorizontalDecrease,
+                                bundle: .module
+                            ) {
+                                send(.contextOptionMenu(.sort))
                             }
+                            
+                            ContextButton(
+                                text: "Read All",
+                                symbol: .checkmarkCircle,
+                                bundle: .module
+                            ) {
+                                send(.contextOptionMenu(.markAllAsRead))
+                            }
+                        } label: {
+                            Image(systemSymbol: .ellipsisCircle)
                         }
                     }
                 }
             }
-            .fittedSheet(item: $store.scope(state: \.sort, action: \.sort)) { store in
+            .fittedSheet(
+                item: $store.scope(state: \.sort, action: \.sort),
+                embedIntoNavStack: true
+            ) { store in
                 SortView(store: store)
             }
             .onChange(of: scenePhase) { newScenePhase in
@@ -193,6 +194,7 @@ public struct FavoritesScreen: View {
             Navigation(isShown: !important)
             
             ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
+                let radius: CGFloat = isLiquidGlass ? 24 : 10
                 Group {
                     if favorite.isForum {
                         ForumRow(
@@ -226,10 +228,14 @@ public struct FavoritesScreen: View {
                 }
                 .listRowBackground(
                     Color(.Background.teritary)
-                        .clipShape(.rect(
-                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == favorites.count - 1 ? 10 : 0,
-                            bottomTrailingRadius: index == favorites.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
-                        ))
+                        .clipShape(
+                            .rect(
+                                topLeadingRadius: index == 0 ? radius : 0,
+                                bottomLeadingRadius: index == favorites.count - 1 ? radius : 0,
+                                bottomTrailingRadius: index == favorites.count - 1 ? radius : 0,
+                                topTrailingRadius: index == 0 ? radius : 0
+                            )
+                        )
                 )
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -311,10 +317,15 @@ public struct FavoritesScreen: View {
 // MARK: - Previews
 
 #Preview {
-    NavigationStack {
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .mock }
+    
+    return NavigationStack {
         FavoritesScreen(
             store: Store(
-                initialState: FavoritesFeature.State(favorites: [.mock, .mockUnread])
+                initialState: FavoritesFeature.State(
+                    favorites: [.mock, .mockUnread]
+                )
             ) {
                 FavoritesFeature()
             }
