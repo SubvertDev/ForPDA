@@ -729,6 +729,7 @@ extension SettingsDictionary {
         .setDevelopmentTeam("7353CQCGQC")
     
         .includeAppIcon()
+        .enableBackwardCompatibleAppIcons()
         .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
@@ -785,6 +786,13 @@ extension Dictionary where Key == String, Value == SettingValue {
     
     func enableDsym() -> SettingsDictionary {
         return merging(["DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym"])
+    }
+    
+    func enableBackwardCompatibleAppIcons() -> SettingsDictionary {
+        return merging([
+            "ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS": true,
+            "ASSETCATALOG_OTHER_FLAGS": "--enable-icon-stack-fallback-generation=disabled"
+        ])
     }
 }
 
