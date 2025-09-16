@@ -151,6 +151,16 @@
         }
       }
     },
+    "Reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация"
+          }
+        }
+      }
+    },
     "Share Link" : {
       "localizations" : {
         "ru" : {
@@ -177,6 +187,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Что-то пошло не так во время загрузки статьи :("
+          }
+        }
+      }
+    },
+    "Today, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня, %@"
           }
         }
       }
@@ -217,6 +238,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скоро починим :)"
+          }
+        }
+      }
+    },
+    "Yesterday, %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вчера, %@"
           }
         }
       }

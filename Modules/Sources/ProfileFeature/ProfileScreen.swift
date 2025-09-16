@@ -74,12 +74,11 @@ public struct ProfileScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    ToolbarButtons()
-                }
+                ToolbarButtons()
             }
             .sheet(isPresented: $store.showQMSWarningSheet) {
                 WarningSheet()
@@ -94,19 +93,27 @@ public struct ProfileScreen: View {
     
     // MARK: - Toolbar Items
     
-    @ViewBuilder
-    private func ToolbarButtons() -> some View {
+    @ToolbarContentBuilder
+    private func ToolbarButtons() -> some ToolbarContent {
         if store.shouldShowToolbarButtons {
-            Button {
-                send(.settingsButtonTapped)
-            } label: {
-                Image(systemSymbol: .gearshape)
+            ToolbarItem {
+                Button {
+                    send(.logoutButtonTapped)
+                } label: {
+                    Image(systemSymbol: .rectanglePortraitAndArrowForward)
+                }
             }
             
-            Button {
-                send(.logoutButtonTapped)
-            } label: {
-                Image(systemSymbol: .rectanglePortraitAndArrowForward)
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed)
+            }
+            
+            ToolbarItem {
+                Button {
+                    send(.settingsButtonTapped)
+                } label: {
+                    Image(systemSymbol: .gearshape)
+                }
             }
         }
     }
@@ -397,7 +404,9 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func ForumStatisticsSection(user: User) -> some View {
         Section {
-            Row(title: "Reputation", type: .description(String(user.reputation)))
+            Row(title: "Reputation", type: .navigationDescription(String(user.reputation))) {
+                send(.reputationButtonTapped)
+            }
             Row(title: "Topics", type: .description(String(user.topics)))
             Row(title: "Replies", type: .description(String(user.replies)))
         } header: {
@@ -497,6 +506,7 @@ public struct ProfileScreen: View {
         case basic
         case description(String)
         case navigation
+        case navigationDescription(String)
     }
     
     @ViewBuilder
@@ -533,6 +543,16 @@ public struct ProfileScreen: View {
                         Image(systemSymbol: .chevronRight)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundStyle(Color(.Labels.quintuple))
+                        
+                    case let .navigationDescription(text):
+                        Text(text)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .padding(.trailing, 16)
+                        
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(tintColor)
                     }
                 }
                 .contentShape(Rectangle())

@@ -16,6 +16,7 @@ import ParsingClient
 import PasteboardClient
 import NotificationCenterClient
 import WriteFormFeature
+import ReputationChangeFeature
 import TCAExtensions
 import AnalyticsClient
 import TopicBuilder
@@ -32,8 +33,11 @@ public struct TopicFeature: Reducer, Sendable {
     public enum Destination {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
+        @ReducerCaseIgnored
+        case karmaChange(Int)
         case editWarning
         case writeForm(WriteFormFeature)
+        case changeReputation(ReputationChangeFeature)
     }
     
     // MARK: - State
@@ -103,6 +107,7 @@ public struct TopicFeature: Reducer, Sendable {
             case onSceneBecomeActive
             case finishedPostAnimation
             case topicHatOpenButtonTapped
+            case changeKarmaTapped(Int, Bool)
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
@@ -116,6 +121,7 @@ public struct TopicFeature: Reducer, Sendable {
             case load
             case refresh
             case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
+            case changeKarma(postId: Int, isUp: Bool)
             case loadTopic(Int)
             case loadTypes([[TopicTypeUI]])
             case topicResponse(Result<Topic, any Error>)
@@ -271,6 +277,13 @@ public struct TopicFeature: Reducer, Sendable {
                     }
                     return .none
                     
+                case .report(let id):
+                    let feature = WriteFormFeature.State(
+                        formFor: .report(id: id, type: .post)
+                    )
+                    state.destination = .writeForm(feature)
+                    return .none
+                    
                 case .delete(let id):
                     return .concatenate(
                         .run { _ in
@@ -280,7 +293,23 @@ public struct TopicFeature: Reducer, Sendable {
                         
                         jumpTo(.post(id: id), true, &state)
                     )
+                    
+                case .karma(let id):
+                    state.destination = .karmaChange(id)
+                    return .none
+
+                case .changeReputation(let postId, let userId, let username):
+                    let feature = ReputationChangeFeature.State(
+                        userId: userId,
+                        username: username,
+                        content: .post(id: postId)
+                    )
+                    state.destination = .changeReputation(feature)
+                    return .none
                 }
+                
+            case .view(.changeKarmaTapped(let postId, let isUp)):
+                return .send(.internal(.changeKarma(postId: postId, isUp: isUp)))
                 
             case let .view(.imageTapped(url)):
                 guard let topic = state.topic else { fatalError() }
@@ -322,6 +351,16 @@ public struct TopicFeature: Reducer, Sendable {
                 return .run { [offset = state.pageNavigation.offset] send in
                     await send(.internal(.loadTopic(offset)))
                 }
+                
+            case .internal(.changeKarma(let postId, let isUp)):
+                return .concatenate(
+                    .run { _ in
+                        let status = try await apiClient.postKarma(postId: postId, isUp: isUp)
+                        await toastClient.showToast(status ? .postKarmaChanged : .whoopsSomethingWentWrong)
+                    }.cancellable(id: CancelID.loading),
+                
+                    jumpTo(.post(id: postId), true, &state)
+                )
                 
             case let .internal(.loadTopic(offset)):
                 state.isFirstPage = offset == 0

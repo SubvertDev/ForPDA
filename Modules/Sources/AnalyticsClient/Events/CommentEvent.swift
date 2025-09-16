@@ -14,6 +14,7 @@ public enum CommentEvent: Event {
     case hideButtonTapped
     case replyButtonTapped
     case likeButtonTapped
+    case changeReputationButtonTapped
     
     public var name: String {
         return "Comment " + eventName(for: self).inProperCase

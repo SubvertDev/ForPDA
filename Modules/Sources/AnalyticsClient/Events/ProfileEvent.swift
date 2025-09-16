@@ -12,6 +12,7 @@ public enum ProfileEvent: Event {
     case settingsTapped
     case logoutTapped
     case historyTapped
+    case reputationTapped
     case userLoaded(Int)
     case userLoadingFailed
     case achievementTapped

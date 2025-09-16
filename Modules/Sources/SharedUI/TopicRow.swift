@@ -88,9 +88,11 @@ public struct TopicRow: View {
                                 .scaledToFit()
                                 .frame(width: 10, height: 10)
                                 .foregroundStyle(tintColor)
+                                .frame(maxWidth: 42, maxHeight: .infinity)
+                                .padding(.vertical, -8)
+                                .contentShape(.rect)
                         }
                         .buttonStyle(.plain)
-                        .frame(maxWidth: 42, maxHeight: .infinity)
                     }
                 }
             }
@@ -127,7 +129,7 @@ private extension Date {
             username: "qwerty",
             isClosed: false,
             isUnread: true,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: { print($0 ? "Unread tapped" : "Row tapped") }
         )
         
         TopicRow(
@@ -136,7 +138,7 @@ private extension Date {
             username: "subvertd",
             isClosed: false,
             isUnread: false,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: { print($0 ? "Unread tapped" : "Row tapped") }
         )
         
         TopicRow(
@@ -145,7 +147,7 @@ private extension Date {
             username: "asdf",
             isClosed: true,
             isUnread: false,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: { print($0 ? "Unread tapped" : "Row tapped") }
         )
         
         TopicRow(
@@ -154,9 +156,8 @@ private extension Date {
             username: "123456789",
             isClosed: true,
             isUnread: true,
-            onAction: { if $0 { print("Unread tapped") } }
+            onAction: { print($0 ? "Unread tapped" : "Row tapped") }
         )
     }
     .environment(\.tintColor, Color(.Theme.primary))
 }
-

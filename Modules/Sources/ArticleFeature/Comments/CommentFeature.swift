@@ -13,6 +13,7 @@ import APIClient
 import Models
 import ToastClient
 import WriteFormFeature
+import ReputationChangeFeature
 
 public enum CommentContextMenuOptions {
     case report
@@ -30,6 +31,7 @@ public struct CommentFeature: Reducer, Sendable {
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
         @Presents var writeForm: WriteFormFeature.State?
+        @Presents var changeReputation: ReputationChangeFeature.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
@@ -76,8 +78,10 @@ public struct CommentFeature: Reducer, Sendable {
         case hideButtonTapped
         case replyButtonTapped
         case likeButtonTapped
+        case changeReputationButtonTapped
         
         case writeForm(PresentationAction<WriteFormFeature.Action>)
+        case changeReputation(PresentationAction<ReputationChangeFeature.Action>)
         
         case _likeResult(Bool)
         case _timerTicked
@@ -128,7 +132,7 @@ public struct CommentFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .writeForm:
+            case .writeForm, .changeReputation:
                 return .none
                 
             case .hiddenLabelTapped:
@@ -143,6 +147,17 @@ public struct CommentFeature: Reducer, Sendable {
                     id: state.comment.id,
                     type: .comment
                 ))
+                return .none
+                
+            case .changeReputationButtonTapped:
+                guard state.isAuthorized else {
+                    return .send(.delegate(.unauthorizedAction))
+                }
+                state.changeReputation = ReputationChangeFeature.State(
+                    userId: state.comment.authorId,
+                    username: state.comment.authorName,
+                    content: .comment(id: state.comment.id)
+                )
                 return .none
                 
             case .hideButtonTapped:
@@ -171,6 +186,7 @@ public struct CommentFeature: Reducer, Sendable {
                 return .run { [articleId = state.articleId, commentId = state.comment.id] send in
                     let success = try await apiClient.likeComment(articleId: articleId, commentId: commentId)
                     await send(._likeResult(success))
+                    await hapticClient.play(type: .selection)
                 }
                 
             case let ._likeResult(success):
@@ -187,6 +203,9 @@ public struct CommentFeature: Reducer, Sendable {
         }
         .ifLet(\.$writeForm, action: \.writeForm) {
             WriteFormFeature()
+        }
+        .ifLet(\.$changeReputation, action: \.changeReputation) {
+            ReputationChangeFeature()
         }
         .ifLet(\.alert, action: \.alert)
     }

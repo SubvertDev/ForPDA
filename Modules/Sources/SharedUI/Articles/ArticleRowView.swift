@@ -11,6 +11,8 @@ import NukeUI
 
 public struct ArticleRowView: View {
     
+    // MARK: - Properties
+    
     @Namespace private var namespace
     @Environment(\.tintColor) private var tintColor
     
@@ -27,6 +29,8 @@ public struct ArticleRowView: View {
         return String(state.id)
     }
     
+    // MARK: - Init
+    
     public init(
         state: State,
         rowType: RowType,
@@ -38,6 +42,8 @@ public struct ArticleRowView: View {
         self.contextMenuActions = contextMenuActions
         self.bundle = bundle
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         Group {
@@ -105,6 +111,8 @@ public struct ArticleRowView: View {
                 VStack(spacing: 0) {
                     Description()
                     
+                    Spacer(minLength: 0)
+                    
                     Footer()
                 }
             }
@@ -146,12 +154,12 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func Description() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(state.authorName)
-                .font(isShort ? .caption : .footnote)
-                .fontWeight(.regular)
-                .foregroundStyle(Color(.Labels.secondary))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, 4)
+            // Text(state.authorName)
+            //     .font(isShort ? .caption : .footnote)
+            //     .fontWeight(.regular)
+            //     .foregroundStyle(Color(.Labels.secondary))
+            //     .frame(maxWidth: .infinity, alignment: .leading)
+            //     .padding(.bottom, 4)
             
             Text(state.title)
                 .font(isShort ? .callout : .title3)

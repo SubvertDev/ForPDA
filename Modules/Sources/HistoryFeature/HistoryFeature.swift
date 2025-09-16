@@ -86,7 +86,11 @@ public struct HistoryFeature: Reducer, Sendable {
                 return .none
                 
             case let .view(.topicTapped(topic, showUnread)):
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: showUnread ? .unread : .first)))
+                guard !showUnread else {
+                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                }
+                let goTo = state.appSettings.topicOpeningStrategy.asGoTo
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
                 
             case let .internal(.loadHistory(offset)):
                 state.isLoading = true

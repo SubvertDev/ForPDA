@@ -13,6 +13,7 @@ public enum ForumEvent: Event {
     case subforumRedirectTapped(URL)
     case subforumTapped(Int, String)
     case announcementTapped(Int, String)
+    case sectionExpandTapped(String)
     
     // case menuSort
     // case menuBookmarks
@@ -46,6 +47,9 @@ public enum ForumEvent: Event {
             
         case let .announcementTapped(id, name):
             return ["id": String(id), "name": name]
+            
+        case let .sectionExpandTapped(type):
+            return ["type": type]
             
         case let .menuOpen(id):
             return ["id": String(id)]

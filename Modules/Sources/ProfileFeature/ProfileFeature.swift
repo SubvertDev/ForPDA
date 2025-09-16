@@ -17,10 +17,18 @@ public struct ProfileFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination {
+        case alert(AlertState<ProfileFeature.Action.Alert>)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var destination: Destination.State?
         @Shared(.userSession) public var userSession: UserSession?
         @Shared(.appStorage("didAcceptQMSWarningMessage")) var didAcceptQMSWarningMessage = false
         public let userId: Int?
@@ -60,6 +68,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
+            case reputationButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
             case sheetContinueButtonTapped
             case sheetCloseButtonTapped
@@ -70,11 +79,17 @@ public struct ProfileFeature: Reducer, Sendable {
             case userResponse(Result<User, any Error>)
         }
         
+        case destination(PresentationAction<Destination.Action>)
+        public enum Alert: Equatable {
+            case logout
+        }
+        
         case delegate(Delegate)
         public enum Delegate {
             case openQms
             case openSettings
             case openHistory
+            case openReputation(Int)
             case userLoggedOut
             case handleUrl(URL)
         }
@@ -107,6 +122,11 @@ public struct ProfileFeature: Reducer, Sendable {
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
                 
+            case .view(.reputationButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openReputation(userId)))
+                
             case .view(.qmsButtonTapped):
                 if state.didAcceptQMSWarningMessage {
                     return .send(.delegate(.openQms))
@@ -131,14 +151,8 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .send(.delegate(.handleUrl(url)))
                 
             case .view(.logoutButtonTapped):
-                state.$userSession.withLock { $0 = nil }
-                state.isLoading = true
-                return .concatenate(
-                    .run { send in
-                        try await apiClient.logout()
-                    },
-                    .send(.delegate(.userLoggedOut))
-                )
+                state.destination = .alert(.warning)
+                return .none
                 
             case .internal(.userResponse(.success(let user))):
                 state.isLoading = false
@@ -152,10 +166,21 @@ public struct ProfileFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case .delegate, .binding:
+            case .destination(.presented(.alert(.logout))):
+                state.$userSession.withLock { $0 = nil }
+                state.isLoading = true
+                return .concatenate(
+                    .run { send in
+                        try await apiClient.logout()
+                    },
+                    .send(.delegate(.userLoggedOut))
+                )
+                
+            case .delegate, .binding, .destination:
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }
@@ -166,5 +191,20 @@ public struct ProfileFeature: Reducer, Sendable {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()
         state.didLoadOnce = true
+    }
+}
+
+// MARK: - Alert Extension
+
+private extension AlertState where Action == ProfileFeature.Action.Alert {
+    nonisolated(unsafe) static let warning = Self {
+        TextState("Are you sure you want to log out of your profile ?", bundle: .module)
+    } actions: {
+        ButtonState(role: .destructive, action: .logout) {
+            TextState("Logout", bundle: .module)
+        }
+        ButtonState(role: .cancel) {
+            TextState("Cancel", bundle: .module)
+        }
     }
 }

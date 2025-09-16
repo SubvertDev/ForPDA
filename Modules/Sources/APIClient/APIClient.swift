@@ -36,6 +36,8 @@ public struct APIClient: Sendable {
     
     // User
     public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
+    public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
+    public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -53,6 +55,7 @@ public struct APIClient: Sendable {
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
+    public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
     
     // Favorites
     public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
@@ -174,6 +177,27 @@ extension APIClient: DependencyKey {
                     policy: policy
                 )
             },
+            getReputationVotes: { request in
+                let command = MemberCommand.reputationVotes(data: MemberReputationVotesRequest(
+                    memberId: request.userId,
+                    type: request.transferType,
+                    offset: request.offset,
+                    count: request.amount
+                ))
+                let response = try await api.get(command)
+                return try await parser.parseReputationVotes(response: response)
+            },
+            changeReputation: { request in
+                let command = MemberCommand.reputation(data: MemberReputationRequest(
+                    memberId: request.userId,
+                    vote: request.transferVoteType,
+                    postId: request.transferContentType,
+                    reason: request.reason
+                ))
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return ReputationChangeResponseType(rawValue: status)
+            },
             
             // MARK: - Bookmarks
             getBookmarksList: {
@@ -279,6 +303,15 @@ extension APIClient: DependencyKey {
 			},
             deletePosts: { ids in
                 let command = ForumCommand.Post.delete(postIds: ids)
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            postKarma: { id, isUp in
+                let command = ForumCommand.Post.karma(
+                    postId: id,
+                    action: isUp ? .plus : .minus
+                )
                 let response = try await api.get(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -421,6 +454,12 @@ extension APIClient: DependencyKey {
             getUser: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }
             },
+            getReputationVotes: { _ in
+                return .mock
+            },
+            changeReputation: { _ in
+                return .success
+            },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
             },
@@ -463,8 +502,13 @@ extension APIClient: DependencyKey {
             deletePosts: { _ in
                 return true
             },
+            postKarma: { _, _ in
+                return true
+            },
             getFavorites: { _, _ in
-                .finished()
+                let (stream, continuation) = AsyncThrowingStream.makeStream(of: Favorite.self)
+                continuation.yield(with: .success(.mock))
+                return stream
             },
             setFavorite: { _ in
                 return true

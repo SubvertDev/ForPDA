@@ -21,6 +21,7 @@ import AuthFeature
 import ProfileFeature
 import QMSListFeature
 import QMSFeature
+import ReputationFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature
@@ -350,6 +351,7 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
         }

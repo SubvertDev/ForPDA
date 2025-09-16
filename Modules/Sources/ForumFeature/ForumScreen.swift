@@ -14,12 +14,18 @@ import Models
 
 public struct ForumScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ForumFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    // MARK: - Init
     
     public init(store: StoreOf<ForumFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -56,6 +62,7 @@ public struct ForumScreen: View {
                 }
             }
             .animation(.default, value: store.forum)
+            .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
@@ -82,6 +89,16 @@ public struct ForumScreen: View {
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
+                .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(tintColor)
         }
     }
     
@@ -90,39 +107,45 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func TopicsSection(topics: [TopicInfo], pinned: Bool) -> some View {
         Section {
-            Navigation(pinned: pinned)
-            
-            ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
-                TopicRow(
-                    title: topic.name,
-                    date: topic.lastPost.date,
-                    username: topic.lastPost.username,
-                    isClosed: topic.isClosed,
-                    isUnread: topic.isUnread
-                ) { unreadTapped in
-                    store.send(.topicTapped(topic, showUnread: unreadTapped))
-                }
-                .contextMenu {
-                    TopicContextMenu(topic: topic)
-                    
-                    Section {
-                        CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+            if store.sectionsExpandState.value(for: pinned ? .pinnedTopics : .topics) {
+                Navigation(pinned: pinned)
+                
+                ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
+                    let radius: CGFloat = isLiquidGlass ? 24 : 10
+                    TopicRow(
+                        title: topic.name,
+                        date: topic.lastPost.date,
+                        username: topic.lastPost.username,
+                        isClosed: topic.isClosed,
+                        isUnread: topic.isUnread
+                    ) { unreadTapped in
+                        store.send(.topicTapped(topic, showUnread: unreadTapped))
                     }
+                    .contextMenu {
+                        TopicContextMenu(topic: topic)
+                        
+                        Section {
+                            CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                        }
+                    }
+                    .listRowBackground(
+                        Color(.Background.teritary)
+                            .clipShape(.rect(
+                                topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
+                                bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
+                            ))
+                    )
                 }
-                .listRowBackground(
-                    Color(.Background.teritary)
-                        .clipShape(.rect(
-                            topLeadingRadius: index == 0 ? 10 : 0, bottomLeadingRadius: index == topics.count - 1 ? 10 : 0,
-                            bottomTrailingRadius: index == topics.count - 1 ? 10 : 0, topTrailingRadius: index == 0 ? 10 : 0
-                        ))
-                )
+                .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                
+                Navigation(pinned: pinned)
             }
-            .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            
-            Navigation(pinned: pinned)
         } header: {
-            Header(title: pinned ? "Pinned topics" : "Topics")
+            Header(
+                title: pinned ? "Pinned topics" : "Topics",
+                section: pinned ? .pinnedTopics : .topics
+            )
         }
         .listRowBackground(Color(.Background.teritary))
     }
@@ -160,28 +183,30 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func SubforumsSection(subforums: [ForumInfo]) -> some View {
         Section {
-            ForEach(subforums) { forum in
-                ForumRow(title: forum.name, isUnread: forum.isUnread) {
-                    if let redirectUrl = forum.redirectUrl {
-                        store.send(.subforumRedirectTapped(redirectUrl))
-                    } else {
-                        store.send(.subforumTapped(forum))
+            if store.sectionsExpandState.value(for: .subforums) {
+                ForEach(subforums) { forum in
+                    ForumRow(title: forum.name, isUnread: forum.isUnread) {
+                        if let redirectUrl = forum.redirectUrl {
+                            store.send(.subforumRedirectTapped(redirectUrl))
+                        } else {
+                            store.send(.subforumTapped(forum))
+                        }
+                    }
+                    .contextMenu {
+                        Section {
+                            CommonContextMenu(
+                                id: forum.id,
+                                isFavorite: forum.isFavorite,
+                                isUnread: forum.isUnread,
+                                isForum: true
+                            )
+                        }
                     }
                 }
-                .contextMenu {
-                    Section {
-                        CommonContextMenu(
-                            id: forum.id,
-                            isFavorite: forum.isFavorite,
-                            isUnread: forum.isUnread,
-                            isForum: true
-                        )
-                    }
-                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         } header: {
-            Header(title: "Subforums")
+            Header(title: "Subforums", section: .subforums)
         }
         .listRowBackground(Color(.Background.teritary))
     }
@@ -191,14 +216,16 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func AnnouncmentsSection(announcements: [AnnouncementInfo]) -> some View {
         Section {
-            ForEach(announcements) { announcement in
-                ForumRow(title: announcement.name, isUnread: false) {
-                    store.send(.announcementTapped(id: announcement.id, name: announcement.name))
+            if store.sectionsExpandState.value(for: .announcements) {
+                ForEach(announcements) { announcement in
+                    ForumRow(title: announcement.name, isUnread: false) {
+                        store.send(.announcementTapped(id: announcement.id, name: announcement.name))
+                    }
                 }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         } header: {
-            Header(title: "Announcements")
+            Header(title: "Announcements", section: .announcements)
         }
         .listRowBackground(Color(.Background.teritary))
     }
@@ -235,12 +262,27 @@ public struct ForumScreen: View {
     // MARK: - Header
     
     @ViewBuilder
-    private func Header(title: LocalizedStringKey) -> some View {
-        Text(title, bundle: .module)
-            .font(.subheadline)
-            .foregroundStyle(Color(.Labels.teritary))
-            .textCase(nil)
-            .offset(x: -16)
+    private func Header(
+        title: LocalizedStringKey,
+        section: ForumFeature.SectionExpand.Kind
+    ) -> some View {
+        Button {
+            store.send(.sectionExpandTapped(section))
+        } label: {
+            Text(title, bundle: .module)
+                .font(.subheadline)
+                .foregroundStyle(Color(.Labels.teritary))
+                .textCase(nil)
+                .offset(x: -16)
+            
+            Spacer()
+            
+            Image(systemSymbol: .chevronUp)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.quaternary))
+                .rotationEffect(.degrees(store.sectionsExpandState.value(for: section) ? 0 : -180))
+                .offset(x: 16)
+        }
     }
 }
 

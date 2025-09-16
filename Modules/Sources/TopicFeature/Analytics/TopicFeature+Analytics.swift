@@ -22,9 +22,11 @@ extension TopicFeature {
                 case .view(.onAppear),
                         .view(.onSceneBecomeActive),
                         .view(.finishedPostAnimation),
+                        .view(.changeKarmaTapped),
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
+                        .internal(.changeKarma),
                         .internal(.load),
                         .internal(.refresh),
                         .pageNavigation,
@@ -52,10 +54,16 @@ extension TopicFeature {
                     switch option {
                     case .reply(let userId, _):
                         analytics.log(TopicEvent.menuPostReply(userId))
+                    case .karma(let postId):
+                        analytics.log(TopicEvent.menuPostKarma(postId))
                     case .edit(let post):
                         analytics.log(TopicEvent.menuPostEdit(post.id))
+                    case .report(let postId):
+                        analytics.log(TopicEvent.menuPostReport(postId))
                     case .delete(let postId):
                         analytics.log(TopicEvent.menuPostDelete(postId))
+                    case .changeReputation(let postId, let userId, _):
+                        analytics.log(TopicEvent.menuChangeReputation(postId, userId))
                     }
                     
                 case let .view(.contextMenu(option)):

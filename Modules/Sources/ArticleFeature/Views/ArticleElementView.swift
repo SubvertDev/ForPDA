@@ -28,9 +28,25 @@ struct ArticleElementView: View {
         return pollSelection != nil || !pollSelections.isEmpty
     }
     
-    // TODO: Is it good to send store here?
-    let store: StoreOf<ArticleFeature>
     let element: ArticleElement
+    let isShowingVoteResults: Bool
+    let isUploadingPollVote: Bool
+    var onPollVoteButtonTapped: (Int, [Int]) -> Void
+    var onLinkInTextTapped: (URL) -> Void
+    
+    init(
+        element: ArticleElement,
+        isShowingVoteResults: Bool = false,
+        isUploadingPollVote: Bool = false,
+        onPollVoteButtonTapped: @escaping (Int, [Int]) -> Void = { _, _ in },
+        onLinkInTextTapped: @escaping (URL) -> Void = { _ in }
+    ) {
+        self.element = element
+        self.isShowingVoteResults = isShowingVoteResults
+        self.isUploadingPollVote = isUploadingPollVote
+        self.onPollVoteButtonTapped = onPollVoteButtonTapped
+        self.onLinkInTextTapped = onLinkInTextTapped
+    }
     
     var body: some View {
         switch element {
@@ -74,7 +90,7 @@ struct ArticleElementView: View {
             .font(element.isHeader ? .title3 : .callout)
             .foregroundStyle(Color(.Labels.primary))
             .environment(\.openURL, OpenURLAction { url in
-                store.send(.linkInTextTapped(url))
+                onLinkInTextTapped(url)
                 return .handled
             })
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -167,10 +183,17 @@ struct ArticleElementView: View {
         let player = YouTubePlayer(source: .video(id: element.id))
         YouTubePlayerView(player) { state in
             switch state {
-                // TODO: Handle error
-            case .idle, .error:
+            case .idle:
                 Color(.systemBackground)
                     .skeleton(with: true, shape: .rectangle)
+            case .error:
+                Color(.Background.teritary)
+                    .overlay {
+                        Image(.imageNotLoaded)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 36)
+                    }
             case .ready:
                 EmptyView()
             }
@@ -258,7 +281,7 @@ struct ArticleElementView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             
-            if store.isShowingVoteResults {
+            if isShowingVoteResults {
                 VStack(spacing: 12) {
                     ForEach(poll.options, id: \.self) { option in
                         VStack(spacing: 4) {
@@ -355,16 +378,16 @@ struct ArticleElementView: View {
                 }
             }
             
-            if !store.isShowingVoteResults {
+            if !isShowingVoteResults {
                 HStack {
                     Button {
                         if poll.singleChoice {
                             if let pollSelection {
-                                store.send(.pollVoteButtonTapped(poll.id, [pollSelection.id]))
+                                onPollVoteButtonTapped(poll.id, [pollSelection.id])
                             }
                         } else {
                             if !pollSelections.isEmpty {
-                                store.send(.pollVoteButtonTapped(poll.id, Array(pollSelections.map { $0.id })))
+                                onPollVoteButtonTapped(poll.id, Array(pollSelections.map { $0.id }))
                             }
                         }
                     } label: {
@@ -386,8 +409,8 @@ struct ArticleElementView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
-        .animation(.default, value: store.isShowingVoteResults)
-        .animation(.default, value: store.isUploadingPollVote)
+        .animation(.default, value: isShowingVoteResults)
+        .animation(.default, value: isUploadingPollVote)
         .padding(.horizontal, 16)
     }
     
@@ -396,15 +419,15 @@ struct ArticleElementView: View {
     }
     
     private func voteButtonForegroundColor(poll: ArticlePoll) -> Color {
-        return (!hasSelection || store.isUploadingPollVote) ? Color(.Labels.quintuple) : tintColor
+        return (!hasSelection || isUploadingPollVote) ? Color(.Labels.quintuple) : tintColor
     }
     
     private func voteButtonBackgroundColor(poll: ArticlePoll) -> Color {
-        return (!hasSelection || store.isUploadingPollVote) ? Color(.Main.greyAlpha) : Color(.Main.primaryAlpha)
+        return (!hasSelection || isUploadingPollVote) ? Color(.Main.greyAlpha) : tintColor.opacity(0.12)
     }
     
     private func voteButtonDisabled() -> Bool {
-        if store.isUploadingPollVote {
+        if isUploadingPollVote {
             return true
         } else {
             return !hasSelection
@@ -418,7 +441,7 @@ struct ArticleElementView: View {
         VStack(spacing: 8) {
             ForEach(elements, id: \.self) { element in
                 Button {
-                    store.send(.linkInTextTapped(element.linkUrl))
+                    onLinkInTextTapped(element.linkUrl)
                 } label: {
                     Text(element.buttonText)
                         .font(.title3)
@@ -436,17 +459,8 @@ struct ArticleElementView: View {
 
 // MARK: - Previews
 
-// TODO: Make multiple previews
 #Preview {
     ArticleElementView(
-        store: .init(
-            initialState: ArticleFeature.State(
-                articlePreview: .mock
-            ),
-            reducer: {
-                ArticleFeature()
-            }
-        ),
         element: .text(.init(text: Array(repeating: "Test ", count: 30).joined(), isQuote: true))
     )
     .frame(height: 100)
@@ -454,18 +468,12 @@ struct ArticleElementView: View {
 
 #Preview("Quote") {
     ArticleElementView(
-        store: .init(initialState: ArticleFeature.State(articlePreview: .mock), reducer: {
-            ArticleFeature()
-        }),
         element: .text(TextElement(text: "Adipisicing mollit pariatur magna ullamco mollit mollit sit quis. Pariatur irure fugiat consequat mollit aliqua pariatur cillum fugiat occaecat non fugiat id. Nostrud consequat enim elit veniam.", isQuote: true))
     )
 }
 
 #Preview("Poll") {
     ArticleElementView(
-        store: .init(initialState: ArticleFeature.State(articlePreview: .mock), reducer: {
-            ArticleFeature()
-        }),
         element: .poll(
             PollElement(
                 poll: ArticlePoll(
@@ -487,14 +495,6 @@ struct ArticleElementView: View {
 
 #Preview("Bullet List") {
     ArticleElementView(
-        store: .init(
-            initialState: ArticleFeature.State(
-                articlePreview: .mock
-            ),
-            reducer: {
-                ArticleFeature()
-            }
-        ),
         element: .bulletList(
             .init(
                 type: .dotted,
@@ -503,4 +503,10 @@ struct ArticleElementView: View {
         )
     )
     .frame(height: 100)
+}
+
+#Preview("Video") {
+    ArticleElementView(
+        element: .video(.init(id: "xvFZjo5PgG0"))
+    )
 }

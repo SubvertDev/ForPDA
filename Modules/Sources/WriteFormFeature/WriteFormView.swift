@@ -251,62 +251,6 @@ struct CheckBox: ToggleStyle {
     }
 }
 
-// MARK: - Field View
-
-struct Field: View {
-    
-    let text: Binding<String>
-    let description: String
-    let guideText: String
-    var isEditor = false
-    
-    @FocusState.Binding var isFocused: Bool
-    
-    var body: some View {
-        VStack {
-            Group {
-                TextField(text: text, axis: .vertical) {
-                    Text(guideText)
-                        .font(.body)
-                        .foregroundStyle(Color(.quaternaryLabel))
-                }
-                .focused($isFocused)
-                .font(.body)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-                .foregroundStyle(Color(.Labels.primary))
-                .frame(minHeight: isEditor ? 144 : nil, alignment: .top)
-            }
-            .padding(.vertical, 15)
-            .padding(.horizontal, 12)
-            .background {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.Background.teritary))
-                    .onTapGesture {
-                        isFocused = true
-                    }
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 14)
-                    .strokeBorder(Color(.Separator.primary))
-            }
-            
-            if !description.isEmpty {
-                Text(description)
-                    .font(.caption)
-                    .foregroundStyle(Color(.Labels.teritary))
-                    .textCase(nil)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 16)
-            }
-        }
-        .animation(.default, value: false)
-        .onAppear {
-            isFocused = true
-        }
-    }
-}
-
 // MARK: - Field View Preview
 
 @available(iOS 17, *)

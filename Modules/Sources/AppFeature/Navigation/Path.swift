@@ -19,6 +19,7 @@ import NotificationsFeature
 import ProfileFeature
 import QMSFeature
 import QMSListFeature
+import ReputationFeature
 import SettingsFeature
 import TopicFeature
 
@@ -41,6 +42,7 @@ public enum Path {
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
+        case reputation(ReputationFeature)
     }
     
     @Reducer(state: .equatable)
@@ -113,6 +115,10 @@ extension Path {
         case let .history(store):
             HistoryScreen(store: store)
                 .tracking(for: HistoryScreen.self)
+            
+        case let .reputation(store):
+            ReputationScreen(store: store)
+                .tracking(for: ReputationScreen.self)
         }
     }
     

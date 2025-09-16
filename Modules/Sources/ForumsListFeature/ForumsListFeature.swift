@@ -21,6 +21,7 @@ public struct ForumsListFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         public var forums: [ForumRowInfo]?
+        public var isExpanded: [Int: Bool] = [:]
         var didLoadOnce = false
         
         public init(
@@ -39,6 +40,7 @@ public struct ForumsListFeature: Reducer, Sendable {
             case settingsButtonTapped
             case forumRedirectTapped(URL)
             case forumTapped(id: Int, name: String)
+            case forumSectionExpandTapped(Int)
         }
         
         case `internal`(Internal)
@@ -83,6 +85,10 @@ public struct ForumsListFeature: Reducer, Sendable {
             case let .view(.forumRedirectTapped(url)):
                 return .send(.delegate(.handleForumRedirect(url)))
                 
+            case let .view(.forumSectionExpandTapped(id)):
+                state.isExpanded[id]?.toggle()
+                return .none
+                
             case let .internal(.forumsListResponse(.success(forums))):
                 var rows: [ForumRowInfo] = []
                 
@@ -90,6 +96,7 @@ public struct ForumsListFeature: Reducer, Sendable {
                     if forum.isCategory {
                         let category = ForumRowInfo(id: forum.id, title: forum.name, forums: [])
                         rows.append(category)
+                        state.isExpanded[forum.id] = true
                     } else {
                         rows[rows.count - 1].forums.append(forum)
                     }

@@ -34,26 +34,32 @@ public struct ForumsListScreen: View {
                 
                 if let forums = store.forums {
                     List(forums, id: \.id) { forumRow in
-                        Section {
-                            ForEach(forumRow.forums) { forum in
-                                ForumRow(
-                                    title: forum.name,
-                                    isUnread: forum.isUnread,
-                                    onAction: {
-                                        if let redirectUrl = forum.redirectUrl {
-                                            send(.forumRedirectTapped(redirectUrl))
-                                        } else {
-                                            send(.forumTapped(id: forum.id, name: forum.name))
-                                        }
+                        WithPerceptionTracking {
+                            Section {
+                                if store.isExpanded[forumRow.id]! {
+                                    ForEach(forumRow.forums) { forum in
+                                        ForumRow(
+                                            title: forum.name,
+                                            isUnread: forum.isUnread,
+                                            onAction: {
+                                                if let redirectUrl = forum.redirectUrl {
+                                                    send(.forumRedirectTapped(redirectUrl))
+                                                } else {
+                                                    send(.forumTapped(id: forum.id, name: forum.name))
+                                                }
+                                            }
+                                        )
                                     }
-                                )
+                                    
+                                }
+                            } header: {
+                                Header(forumRow: forumRow)
                             }
-                        } header: {
-                            Header(title: forumRow.title)
+                            .listRowBackground(Color(.Background.teritary))
                         }
-                        .listRowBackground(Color(.Background.teritary))
                     }
                     .scrollContentBackground(.hidden)
+                    .animation(.easeInOut(duration: 0.3), value: store.isExpanded)
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
@@ -80,12 +86,26 @@ public struct ForumsListScreen: View {
     // MARK: - Header
     
     @ViewBuilder
-    private func Header(title: String) -> some View {
-        Text(title)
-            .font(.subheadline)
-            .foregroundStyle(Color(.Labels.teritary))
-            .textCase(nil)
-            .offset(x: -16)
+    private func Header(forumRow: ForumRowInfo) -> some View {
+        Button {
+            send(.forumSectionExpandTapped(forumRow.id))
+        } label: {
+            HStack(spacing: 0) {
+                Text(forumRow.title)
+                    .font(.subheadline)
+                    .foregroundStyle(Color(.Labels.teritary))
+                    .textCase(nil)
+                    .offset(x: -16)
+                
+                Spacer()
+                
+                Image(systemSymbol: .chevronUp)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.quaternary))
+                    .rotationEffect(.degrees(store.isExpanded[forumRow.id]! ? 0 : -180))
+                    .offset(x: 16)
+            }
+        }
     }
 }
 

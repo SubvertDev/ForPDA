@@ -46,6 +46,8 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
+                    .Internal.ReputationChangeFeature,
+                    .Internal.ReputationFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -87,6 +89,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -330,6 +333,29 @@ let project = Project(
             ),
         
             .feature(
+                name: "ReputationChangeFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+             ),
+        
+            .feature(
+                name: "ReputationFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.TCA,
+                ]
+             ),
+        
+            .feature(
                 name: "SettingsFeature",
                 dependencies: [
                     .Internal.AnalyticsClient,
@@ -371,6 +397,7 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -700,7 +727,10 @@ extension SettingsDictionary {
         .merging(.targetSettings)
         .setAppName(App.name)
         .setDevelopmentTeam("7353CQCGQC")
+    
         .includeAppIcon()
+        .enableBackwardCompatibleAppIcons()
+        .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
             provisioningProfileSpecifier: "match Development com.subvert.forpda"
@@ -757,6 +787,13 @@ extension Dictionary where Key == String, Value == SettingValue {
     func enableDsym() -> SettingsDictionary {
         return merging(["DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym"])
     }
+    
+    func enableBackwardCompatibleAppIcons() -> SettingsDictionary {
+        return merging([
+            "ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS": true,
+            "ASSETCATALOG_OTHER_FLAGS": "--enable-icon-stack-fallback-generation=disabled"
+        ])
+    }
 }
 
 extension Array where Element == String {
@@ -797,7 +834,8 @@ extension InfoPlist {
             "NSPhotoLibraryUsageDescription": "To send attachments in QMS",
             
             "POSTHOG_TOKEN": "$(POSTHOG_TOKEN)",
-            "SENTRY_DSN": "$(SENTRY_DSN)"
+            "SENTRY_DSN": "$(SENTRY_DSN)",
+            "RELEASE_CHANNEL": "$(RELEASE_CHANNEL)"
         ]
     )
     
@@ -840,6 +878,8 @@ extension TargetDependency.Internal {
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
     static let QMSFeature =             TargetDependency.target(name: "QMSFeature")
     static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
+    static let ReputationChangeFeature = TargetDependency.target(name: "ReputationChangeFeature")
+    static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
