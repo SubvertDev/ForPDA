@@ -73,6 +73,9 @@ public struct APIClient: Sendable {
     public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
     public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
+    
+    //Search
+    public var startSearch: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
 }
 
 // MARK: - Dependency Key
@@ -413,7 +416,24 @@ extension APIClient: DependencyKey {
                 let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
                 let _ = try await api.get(QMSCommand.Message.send(data: request))
                 // Returns chatId + new messageId
-			}
+            },
+            
+            // MARK: - Start Search
+            
+            startSearch: { request in
+                let command = SearchCommand.content(
+                    on: .site, // Change
+                    authorId: request.authorId,
+                    text: request.text,
+                    sort: .dateAscSort, // Change
+                    offset: request.offset
+                )
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())
+
+                print("Status \(String(describing: status))")
+                return try await parser.parseSearch(response: response)
+            }
         )
     }
     
@@ -537,7 +557,12 @@ extension APIClient: DependencyKey {
             },
             sendQMSMessage: { _, _ in
                 
+            },
+            //Change
+            startSearch: { _ in
+                return SearchResponse(metadata: [], publications: [])
             }
+            
         )
     }
     

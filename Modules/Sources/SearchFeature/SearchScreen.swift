@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SharedUI
 import ComposableArchitecture
 
 @ViewAction(for: SearchFeature.self)
@@ -20,12 +21,18 @@ public struct SearchScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            VStack {
-                Text("Search Screen")
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                Button {
+                    store.send(.internal(.search("Test")))
+                } label: {
+                    Text("Search Screen")
+                }
             }
+            .navigationTitle("Search")
         }
     }
-    
 }
 
 #Preview {

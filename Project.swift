@@ -359,6 +359,8 @@ let project = Project(
             .feature(
                 name: "SearchFeature",
                 dependencies: [
+                    .Internal.APIClient,
+                    .Internal.SharedUI,
                     .SPM.TCA,
                 ]
             ),
