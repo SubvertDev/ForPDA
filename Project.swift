@@ -15,7 +15,8 @@ let project = Project(
             resources: ["Modules/Resources/**"],
             dependencies: [
                 .target(name: "AppFeature"),
-                .target(name: "SafariExtension")
+                .target(name: "SafariExtension"),
+                .SPM.TCA
             ],
             settings: .settings(base: .appSettings, defaultSettings: .recommended)
         ),
@@ -184,6 +185,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.NotificationCenterClient,
                     .Internal.PageNavigationFeature,
+                    .Internal.PasteboardClient,
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
@@ -211,6 +213,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -340,6 +343,8 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .Internal.TCAExtensions,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -390,6 +395,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
+                    .Internal.GalleryFeature,
                     .Internal.LoggerClient,
                     .Internal.Models,
                     .Internal.NotificationCenterClient,
@@ -455,6 +461,7 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.Models,
+                    .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
                 ]
@@ -583,7 +590,14 @@ let project = Project(
                 infoPlist: .default,
                 sources: ["Modules/Tests/**"],
                 resources: [],
-                dependencies: [.target(name: "ForPDA")]
+                dependencies: [
+                    .target(name: "ForPDA"),
+                    .Internal.ArticlesListFeature,
+                    .Internal.BBBuilder,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.TCA
+                ]
             ),
         
         .tests(
