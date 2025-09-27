@@ -108,9 +108,9 @@ public struct ReputationScreen: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Button {
-                    send(.profileTapped(vote.authorId))
+                    send(.profileTapped(store.pickerSection == .history ? vote.authorId : vote.toId))
                 } label: {
-                    Text(vote.authorName)
+                    Text(store.pickerSection == .history ? vote.authorName : vote.toName)
                         .foregroundStyle(Color(.Labels.primary))
                         .font(.callout)
                         .bold()
@@ -164,7 +164,7 @@ public struct ReputationScreen: View {
                 Spacer()
                 
                 Menu {
-                    MenuButtons(id: vote.authorId)
+                    MenuButtons(id: store.pickerSection == .history ? vote.authorId : vote.toId)
                 } label: {
                     Image(systemSymbol: .ellipsis)
                         .foregroundStyle(Color(.Labels.teritary))
