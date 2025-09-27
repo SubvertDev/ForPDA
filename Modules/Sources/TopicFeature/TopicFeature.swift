@@ -14,7 +14,6 @@ import Models
 import PersistenceKeys
 import ParsingClient
 import PasteboardClient
-import NotificationCenterClient
 import WriteFormFeature
 import ReputationChangeFeature
 import TCAExtensions
@@ -411,7 +410,7 @@ public struct TopicFeature: Reducer, Sendable {
                     
                     .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
-                            notificationCenter.send(notification: .favoritesUpdated)
+                            notificationCenter.post(name: .favoritesUpdated, object: nil)
                         }
                     }
                 )
@@ -434,7 +433,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .internal(.setFavoriteResponse(isFavorite)):
                 state.topic?.isFavorite = isFavorite
-                notificationCenter.send(.favoritesUpdated)
+                notificationCenter.post(name: .favoritesUpdated, object: nil)
                 return .none
                 
             case .internal(.jumpRequestFailed):

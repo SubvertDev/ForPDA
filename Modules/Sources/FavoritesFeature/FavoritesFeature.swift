@@ -12,7 +12,6 @@ import APIClient
 import Models
 import TCAExtensions
 import PasteboardClient
-import NotificationCenterClient
 import AnalyticsClient
 import ToastClient
 
@@ -128,7 +127,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                     updatePageNavigation(&state, offset: 0),
                     .send(.internal(.loadFavorites(offset: 0))),
                     .run { send in
-                        for await _ in notificationCenter.observe(.favoritesUpdated) {
+                        for await _ in notificationCenter.notifications(named: .favoritesUpdated) {
                             await send(.internal(.refresh))
                         }
                     }

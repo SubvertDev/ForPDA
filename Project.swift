@@ -183,7 +183,6 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.Models,
-                    .Internal.NotificationCenterClient,
                     .Internal.PageNavigationFeature,
                     .Internal.PasteboardClient,
                     .Internal.ParsingClient,
@@ -398,7 +397,6 @@ let project = Project(
                     .Internal.GalleryFeature,
                     .Internal.LoggerClient,
                     .Internal.Models,
-                    .Internal.NotificationCenterClient,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
@@ -491,15 +489,6 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.LoggerClient,
                     .Internal.ParsingClient,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "NotificationCenterClient",
-                hasResources: false,
-                dependencies: [
-                    .Internal.LoggerClient,
                     .SPM.TCA
                 ]
             ),
@@ -905,7 +894,6 @@ extension TargetDependency.Internal {
     static let CacheClient =         TargetDependency.target(name: "CacheClient")
     static let HapticClient =        TargetDependency.target(name: "HapticClient")
     static let LoggerClient =        TargetDependency.target(name: "LoggerClient")
-    static let NotificationCenterClient = TargetDependency.target(name: "NotificationCenterClient")
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
