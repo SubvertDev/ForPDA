@@ -198,7 +198,9 @@ public struct SettingsScreen: View {
         Section {
             HStack(spacing: 29) {
                 ForEach(AppColorScheme.allCases, id: \.self) { scheme in
-                    SchemeButton(scheme: scheme)
+                    WithPerceptionTracking {
+                        SchemeButton(scheme: scheme)
+                    }
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

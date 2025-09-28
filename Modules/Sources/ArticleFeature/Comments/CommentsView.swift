@@ -22,22 +22,24 @@ struct CommentsView: View {
     let store: StoreOf<ArticleFeature>
     
     var body: some View {
-        VStack(spacing: 0) {
-            Text("Comments (\(store.comments.count.description)):", bundle: .module)
-                .font(.title3)
-                .bold()
-                .padding(.vertical, 24)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            
-            LazyVStack(spacing: 0) {
-                ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
-                    WithPerceptionTracking {
-                        CommentView(store: store)
+        WithPerceptionTracking {
+            VStack(spacing: 0) {
+                Text("Comments (\(store.comments.count.description)):", bundle: .module)
+                    .font(.title3)
+                    .bold()
+                    .padding(.vertical, 24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
+                        WithPerceptionTracking {
+                            CommentView(store: store)
+                        }
                     }
                 }
             }
+            .padding(.horizontal, 16)
         }
-        .padding(.horizontal, 16)
     }
 }
 

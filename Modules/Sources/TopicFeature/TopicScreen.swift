@@ -399,42 +399,44 @@ struct NavigationModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        content
-            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
-            .navigationBarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
-                NavigationStack {
-                    WriteFormScreen(store: store)
+        WithPerceptionTracking {
+            content
+                .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+                .navigationBarTitleDisplayMode(.inline)
+                .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                    NavigationStack {
+                        WriteFormScreen(store: store)
+                    }
                 }
-            }
-            .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                let state = store.withState { $0 }
-                TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
-            }
-            .fittedSheet(
-                item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
-                embedIntoNavStack: true
-            ) { store in
-                ReputationChangeView(store: store)
-            }
-            .sheet(isPresented: Binding($store.destination.editWarning)) {
-                EditWarningSheet()
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
-            }
-            .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
-                Button {
-                    store.send(.view(.changeKarmaTapped(postId, true)))
-                } label: {
-                    Text("Up", bundle: .module)
+                .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
+                    let state = store.withState { $0 }
+                    TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
                 }
-                
-                Button {
-                    store.send(.view(.changeKarmaTapped(postId, false)))
-                } label: {
-                    Text("Down", bundle: .module)
+                .fittedSheet(
+                    item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                    embedIntoNavStack: true
+                ) { store in
+                    ReputationChangeView(store: store)
                 }
-            }
+                .sheet(isPresented: Binding($store.destination.editWarning)) {
+                    EditWarningSheet()
+                        .presentationDetents([.medium])
+                        .presentationDragIndicator(.visible)
+                }
+                .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
+                    Button {
+                        store.send(.view(.changeKarmaTapped(postId, true)))
+                    } label: {
+                        Text("Up", bundle: .module)
+                    }
+                    
+                    Button {
+                        store.send(.view(.changeKarmaTapped(postId, false)))
+                    } label: {
+                        Text("Down", bundle: .module)
+                    }
+                }
+        }
     }
     
     // TODO: Move to SharedUI?
