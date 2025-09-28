@@ -69,7 +69,7 @@ public struct FavoritesRootScreen: View {
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
-        _Picker("", selection: $store.pickerSelection) {
+        Picker(String(""), selection: $store.pickerSelection) {
             Text("Favorites", bundle: .module)
                 .tag(FavoritesRootFeature.PickerSelection.favorites)
             
@@ -78,32 +78,6 @@ public struct FavoritesRootScreen: View {
         }
         .pickerStyle(.segmented)
         .padding(.horizontal, 16)
-    }
-}
-
-// MARK: - Perception Picker
-// https://github.com/pointfreeco/swift-perception/issues/100
-
-struct _Picker<Label, SelectionValue, Content>: View
-where Label: View, SelectionValue: Hashable, Content: View {
-    let label: Label
-    let content: Content
-    let selection: Binding<SelectionValue>
-    
-    init(
-        _ titleKey: String,
-        selection: Binding<SelectionValue>,
-        @ViewBuilder content: () -> Content
-    ) where Label == Text {
-        self.label = Text(titleKey)
-        self.content = content()
-        self.selection = selection
-    }
-    
-    var body: some View {
-        _PerceptionLocals.$skipPerceptionChecking.withValue(true) {
-            Picker(selection: selection, content: { content }, label: { label })
-        }
     }
 }
 
