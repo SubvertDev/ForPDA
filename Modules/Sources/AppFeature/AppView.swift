@@ -66,9 +66,9 @@ public struct AppView: View {
                     OldTabView(store: store)
                 }
                 
-                if let toast = store.toastMessage {
-                    Toast(toast)
-                        .ignoresSafeArea(.keyboard, edges: .bottom)
+                ToastView(toast: store.toastMessage)
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
+            }
                 }
             }
             .animation(.default, value: store.toastMessage)
@@ -266,6 +266,72 @@ struct OldTabView: View {
         .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
         .shadow(color: Color(.Labels.primary).opacity(0.15), radius: 2)
         .offset(y: 34) // TODO: Check for different screens
+    }
+}
+
+// MARK: - Toast View
+
+struct ToastView: View {
+    
+    @Environment(\.tintColor) private var tintColor
+    
+    @State private var isPresented = false
+    @State private var isExpanded = true
+    @State private var duration = 5
+    @State private var pendingTask: Task<Void, Never>?
+    @State private var lastToast: ToastMessage!
+    
+    let toast: ToastMessage?
+
+    var body: some View {
+        ZStack {
+            if isPresented, let toast = lastToast {
+                HStack(spacing: 0) {
+                    Image(systemSymbol: toast.isError ? .xmarkCircleFill : .checkmarkCircleFill)
+                        .font(.body)
+                        .foregroundStyle(toast.isError ? Color(.Main.red) : tintColor)
+                        .frame(width: 32, height: 32)
+                    
+                    if isExpanded {
+                        Text(toast.text)
+                            .font(.caption)
+                            .foregroundStyle(Color(.Labels.primary))
+                            .padding(.trailing, 12)
+                            .transition(.opacity.combined(with: .move(edge: .trailing)))
+                    }
+                }
+                .background(Color(.Background.primary))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color(.Separator.secondary), lineWidth: 0.33)
+                }
+                .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
+                .padding(.bottom, 50 + 16)
+                .padding(.horizontal, 16)
+                .opacity(isExpanded ? 1 : 0)
+            }
+        }
+        .onChange(of: toast) { newValue in
+            pendingTask?.cancel()
+            
+            if let newValue {
+                withAnimation {
+                    lastToast = newValue
+                    isPresented = true
+                }
+            } else {
+                pendingTask = Task {
+                    try? await Task.sleep(for: .seconds(1))
+                    guard !Task.isCancelled else { return }
+                    withAnimation {
+                        isPresented = false
+                        lastToast = nil
+                        pendingTask = nil
+                    }
+                }
+            }
+        }
     }
 }
 

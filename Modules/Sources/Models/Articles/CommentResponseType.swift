@@ -39,18 +39,18 @@ public enum CommentResponseType: Int, Sendable {
         return [0,4,5,6,7,8,9,10,11,12,13]
     }
     
-    public var description: LocalizedStringKey {
+    public var description: LocalizedStringResource {
         switch self {
-        case .success:              return "Comment has been added"
-        case .accessDenied:         return "You're not allowed to comment"
-        case .emptyMessage:         return "No comment text"
-        case .postExpired:          return "Commenting on this post is closed"
-        case .hiddenDenied:         return "You cannot reply to a comment you have hidden"
-        case .limitExceeded:        return "You've hit the carmine limit"
-        case .repeatedComment:      return "Repeated comment"
-        case .hourLimitExceeded:    return "You've hit the hourly commenting limit"
-        case .dayLimitExceeded:     return "You've hit the daily commenting limit"
-        case .unknown:              return "Unknown error"
+        case .success:              return LocalizedStringResource("Comment has been added", bundle: .module)
+        case .accessDenied:         return LocalizedStringResource("You're not allowed to comment", bundle: .module)
+        case .emptyMessage:         return LocalizedStringResource("No comment text", bundle: .module)
+        case .postExpired:          return LocalizedStringResource("Commenting on this post is closed", bundle: .module)
+        case .hiddenDenied:         return LocalizedStringResource("You cannot reply to a comment you have hidden", bundle: .module)
+        case .limitExceeded:        return LocalizedStringResource("You've hit the carmine limit", bundle: .module)
+        case .repeatedComment:      return LocalizedStringResource("Repeated comment", bundle: .module)
+        case .hourLimitExceeded:    return LocalizedStringResource("You've hit the hourly commenting limit", bundle: .module)
+        case .dayLimitExceeded:     return LocalizedStringResource("You've hit the daily commenting limit", bundle: .module)
+        case .unknown:              return LocalizedStringResource("Unknown error", bundle: .module)
         }
     }
     

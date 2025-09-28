@@ -100,22 +100,22 @@ public struct TopicScreen: View {
         Menu {
             if let topic = store.topic, store.isUserAuthorized, topic.canPost {
                 Section {
-                    ContextButton(text: "Write Post", symbol: .plusCircle, bundle: .module) {
+                    ContextButton(text: LocalizedStringResource("Write Post", bundle: .module), symbol: .plusCircle) {
                         send(.contextMenu(.writePost))
                     }
                 }
             }
             
-            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                 send(.contextMenu(.copyLink))
             }
-            ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Open In Browser", bundle: .module), symbol: .safari) {
                 send(.contextMenu(.openInBrowser))
             }
             
             if !store.pageNavigation.isLastPage {
                 Section {
-                    ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
+                    ContextButton(text: LocalizedStringResource("Go To End", bundle: .module), symbol: .chevronRight2) {
                         send(.contextMenu(.goToEnd))
                     }
                 }
@@ -124,9 +124,10 @@ public struct TopicScreen: View {
             if let topic = store.topic, store.isUserAuthorized {
                 Section {
                     ContextButton(
-                        text: topic.isFavorite ? "Remove from favorites" : "Add to favorites",
-                        symbol: topic.isFavorite ? .starFill : .star,
-                        bundle: .module
+                        text: topic.isFavorite
+                        ? LocalizedStringResource("Remove from favorites", bundle: .module)
+                        : LocalizedStringResource("Add to favorites", bundle: .module),
+                        symbol: topic.isFavorite ? .starFill : .star
                     ) {
                         send(.contextMenu(.setFavorite))
                     }
@@ -315,36 +316,36 @@ public struct TopicScreen: View {
     private func OptionsPostMenu(_ post: Post) -> some View {
         Menu {
             Section {
-                ContextButton(text: "Reply", symbol: .arrowTurnUpRight, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
                     send(.contextPostMenu(.reply(post.id, post.author.name)))
                 }
             }
             
             if store.isUserAuthorized, store.userSession!.userId != post.author.id, post.canChangeKarma {
-                ContextButton(text: "Rate", symbol: .chevronUpChevronDown, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Rate", bundle: .module), symbol: .chevronUpChevronDown) {
                     send(.contextPostMenu(.karma(post.id)))
                 }
             }
             
             if post.canEdit {
-                ContextButton(text: "Edit", symbol: .squareAndPencil, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
                     send(.contextPostMenu(.edit(post)))
                 }
             }
             
-            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
                 send(.contextPostMenu(.report(post.id)))
             }
             
             if post.canDelete {
-                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
                     send(.contextPostMenu(.delete(post.id)))
                 }
             }
             
             if store.isUserAuthorized, post.author.id != store.userSession!.userId {
                 Section {
-                    ContextButton(text: "Reputation", symbol: .plusminus, bundle: .module) {
+                    ContextButton(text: LocalizedStringResource("Reputation", bundle: .module), symbol: .plusminus) {
                         send(.contextPostMenu(.changeReputation(post.id, post.author.id, post.author.name)))
                     }
                 }
@@ -421,7 +422,7 @@ struct NavigationModifier: ViewModifier {
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
             }
-            .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text("") }) { postId in
+            .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
                 Button {
                     store.send(.view(.changeKarmaTapped(postId, true)))
                 } label: {
@@ -503,7 +504,7 @@ struct NavigationModifier: ViewModifier {
             }
         }
     }
-        
+    
     @ViewBuilder
     private func ComingSoonTape() -> some View {
         HStack(spacing: 8) {
@@ -608,7 +609,7 @@ private extension Date {
     TopicScreen(
         store: Store(
             initialState: TopicFeature.State(
-                topicId: 0, 
+                topicId: 0,
                 topicName: "Test Topic",
                 destination: .writeForm(
                     WriteFormFeature.State(

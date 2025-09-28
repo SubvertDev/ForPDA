@@ -20,6 +20,7 @@ public enum ArticlesListEvent: Event {
     case settingsButtonTapped
     case refreshTriggered
     case loadMoreTriggered
+    case tryAgainButtonTapped
     case menuTapped
     case articlesHasLoaded // TODO: Rename?
     case articlesHasNotLoaded(String)

@@ -32,11 +32,19 @@ import BackgroundTasks
 import LoggerClient
 import NotificationsClient
 import ToastClient
+import Combine
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
     
     public init() {}
+    
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let connecting = LocalizedStringResource("Connecting...", bundle: .module)
+        static let noInternetConnection = LocalizedStringResource("No internet connection", bundle: .module)
+    }
     
     // MARK: - State
     
@@ -68,6 +76,9 @@ public struct AppFeature: Reducer, Sendable {
             let identifiers = Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String]
             return identifiers?.first ?? ""
         }
+        
+        public var connectionState: ConnectionState = .disconnected
+        public var isNetworkOnline = true
         
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
@@ -126,9 +137,19 @@ public struct AppFeature: Reducer, Sendable {
         case syncUnreadTaskInvoked
         case didFinishToastAnimation
         
+        case connectionStateChanged(ConnectionState)
+        case networkStateChanged(Bool)
+        case receivedNotification(String)
+        
         case _showToast(ToastMessage)
         case _showErrorToast
         case _failedToConnect(any Error)
+    }
+    
+    // MARK: - CancelID
+    
+    enum CancelID {
+        case showToast
     }
     
     // MARK: - Dependencies
@@ -185,42 +206,117 @@ public struct AppFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                return .run { send in
-                    await withTaskGroup { group in
-                        group.addTask {
-                            do {
-                                await apiClient.setLogResponses(.none)
-                                try await apiClient.connect()
-                            } catch {
-                                await send(._failedToConnect(error))
+                return .merge(
+                    .run { send in
+                        await withTaskGroup { group in
+                            group.addTask {
+                                do {
+                                    await apiClient.setLogResponses(.none)
+                                    try await apiClient.connect()
+                                } catch {
+                                    await send(._failedToConnect(error))
+                                }
+                            }
+                            
+                            group.addTask {
+                                for await toast in toastClient.queue() {
+                                    await send(._showToast(toast))
+                                }
+                            }
+                            
+                            group.addTask {
+                                for await identifier in notificationsClient.delegate() {
+                                    await send(.notificationDeeplink(identifier))
+                                }
                             }
                         }
-                        
-                        group.addTask {
-                            for await toast in toastClient.queue() {
-                                await send(._showToast(toast))
-                            }
-                        }
-                        
-                        group.addTask {
-                            for await identifier in notificationsClient.delegate() {
-                                await send(.notificationDeeplink(identifier))
-                            }
-                        }
+                    },
+                    .publisher {
+                        try! apiClient.connectionState()
+                            .map(Action.connectionStateChanged)
+                    },
+                    .publisher {
+                        try! apiClient.networkState()
+                            .map(Action.networkStateChanged)
+                    },
+                    .publisher {
+                        try! apiClient.notifications()
+                            .map(Action.receivedNotification)
                     }
+                )
+                
+            case let .connectionStateChanged(connectionState):
+                state.connectionState = connectionState
+                switch connectionState {
+                case .ready:
+                    state.toastMessage = nil
+                case .connecting:
+                    state.toastMessage = ToastMessage(
+                        text: Localization.connecting,
+                        duration: 999_999_999,
+                        priority: .high
+                    )
+                case .disconnected:
+                    if !state.isNetworkOnline {
+                        state.toastMessage = ToastMessage(
+                            text: Localization.noInternetConnection,
+                            isError: true,
+                            duration: 999_999_999,
+                            priority: .high
+                        )
+                    }
+                }
+                return .none
+                
+            case let .networkStateChanged(networkState):
+                let noInternet = ToastMessage(
+                    text: Localization.noInternetConnection,
+                    isError: true,
+                    duration: 999_999_999,
+                    priority: .high
+                )
+                state.toastMessage = networkState ? nil : noInternet
+                state.isNetworkOnline = networkState
+                return .none
+                
+            case let .receivedNotification(notification):
+                return .run { _ in
+                    await notificationsClient.showNotification(notification)
                 }
                 
             case let ._showToast(toast):
+                guard toast.priority >= state.toastMessage?.priority ?? .low else { return .none }
                 state.toastMessage = toast
-                return .none
+                return .run { send in
+                    try await Task.sleep(for: .seconds(toast.duration))
+                    guard !Task.isCancelled else { return }
+                    await send(.didFinishToastAnimation)
+                }
+                .cancellable(id: CancelID.showToast)
+                .merge(with: .cancel(id: CancelID.showToast))
                 
             case .didFinishToastAnimation:
                 state.toastMessage = nil
                 return .none
                 
-            case ._failedToConnect:
-                state.alert = .failedToConnect
-                return .none
+            case let ._failedToConnect(error):
+                return .run { _ in
+                    if let error = error as? PDAPIError {
+                        switch error {
+                        case .noInternet:
+                            let toast = ToastMessage(
+                                text: Localization.noInternetConnection,
+                                isError: true,
+                                duration: 999_999_999,
+                                priority: .high
+                            )
+                            await toastClient.showToast(toast)
+                        }
+                    } else {
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                        #warning("add analytics")
+                    }
+                }
                 
             case ._showErrorToast:
                 return .run { _ in
@@ -326,7 +422,7 @@ public struct AppFeature: Reducer, Sendable {
                         await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
                     } catch {
                         analyticsClient.capture(error)
-                        await send(._showErrorToast)
+                        // await send(._showErrorToast)
                     }
                     
                     await send(.registerBackgroundTask)

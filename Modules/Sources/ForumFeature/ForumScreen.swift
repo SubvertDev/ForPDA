@@ -155,12 +155,12 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func TopicContextMenu(topic: TopicInfo) -> some View {
         Section {
-            ContextButton(text: "Open", symbol: .eye, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Open", bundle: .module), symbol: .eye) {
                 store.send(.contextTopicMenu(.open, topic))
             }
             
             Section {
-                ContextButton(text: "Go To End", symbol: .chevronRight2, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Go To End", bundle: .module), symbol: .chevronRight2) {
                     store.send(.contextTopicMenu(.goToEnd, topic))
                 }
             }
@@ -232,26 +232,27 @@ public struct ForumScreen: View {
     
     @ViewBuilder
     private func CommonContextMenu(id: Int, isFavorite: Bool, isUnread: Bool, isForum: Bool) -> some View {
-        ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+        ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
             store.send(.contextCommonMenu(.copyLink, id, isForum))
         }
         
-        ContextButton(text: "Open In Browser", symbol: .safari, bundle: .module) {
+        ContextButton(text: LocalizedStringResource("Open In Browser", bundle: .module), symbol: .safari) {
             store.send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
         if store.isUserAuthorized {
             if isUnread {
-                ContextButton(text: "Mark Read", symbol: .checkmarkCircle, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
                     store.send(.contextCommonMenu(.markRead, id, isForum))
                 }
             }
             
             Section {
                 ContextButton(
-                    text: isFavorite ? "Remove from favorites" : "Add to favorites",
-                    symbol: isFavorite ? .starFill : .star,
-                    bundle: .module
+                    text: isFavorite
+                    ? LocalizedStringResource("Remove from favorites", bundle: .module)
+                    : LocalizedStringResource("Add to favorites", bundle: .module),
+                    symbol: isFavorite ? .starFill : .star
                 ) {
                     store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
                 }

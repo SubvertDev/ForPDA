@@ -1,15 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
-    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "В избранное"
+          }
+        }
+      }
+    },
+    "Added to favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавлено в избранное"
           }
         }
       }
@@ -120,6 +127,26 @@
         }
       }
     },
+    "Post deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост удален"
+          }
+        }
+      }
+    },
+    "Post karma changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос засчитан"
+          }
+        }
+      }
+    },
     "Rate" : {
       "localizations" : {
         "ru" : {
@@ -150,6 +177,16 @@
         }
       }
     },
+    "Removed from favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалено из избранного"
+          }
+        }
+      }
+    },
     "Reply" : {
       "localizations" : {
         "ru" : {
@@ -160,22 +197,22 @@
         }
       }
     },
-    "Reputation" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Репутация"
-          }
-        }
-      }
-    },
     "Report" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Жалоба"
+          }
+        }
+      }
+    },
+    "Reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация"
           }
         }
       }

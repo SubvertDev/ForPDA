@@ -224,16 +224,14 @@ public struct ReputationScreen: View {
     @ViewBuilder
     private func MenuButtons(id: Int) -> some View {
         ContextButton(
-            text: "Profile",
+            text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
-            bundle: .module,
             action: { send(.profileTapped(id)) }
         )
         
         ContextButton(
-            text: "Complain",
+            text: LocalizedStringResource("Complain", bundle: .module),
             symbol: .exclamationmarkTriangle,
-            bundle: .module,
             action: { print("Complain") }
         )
         .disabled(true)

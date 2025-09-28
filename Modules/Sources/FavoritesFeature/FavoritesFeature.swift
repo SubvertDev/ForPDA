@@ -278,7 +278,9 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let .internal(.favoritesResponse(.failure(error))):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
                 reportFullyDisplayed(&state)
-                return showToast(.whoopsSomethingWentWrong)
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case .delegate:
                 return .none
@@ -309,11 +311,5 @@ public struct FavoritesFeature: Reducer, Sendable {
                 )
             )
             .map(Action.pageNavigation)
-    }
-    
-    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
-        return .run { _ in
-            await toastClient.showToast(toast)
-        }
     }
 }

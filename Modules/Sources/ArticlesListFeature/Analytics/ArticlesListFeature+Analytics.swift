@@ -31,8 +31,6 @@ extension ArticlesListFeature {
                         analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
                     case .openInBrowser:
                         analyticsClient.log(ArticlesListEvent.articleOpenedInBrowser(article.url))
-                    case .report:
-                        analyticsClient.log(ArticlesListEvent.linkReported(article.url))
                     case .addToBookmarks:
                         analyticsClient.log(ArticlesListEvent.articleAddedToBookmarks(article.url))
                     }
@@ -61,6 +59,9 @@ extension ArticlesListFeature {
                     
                 case .loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
+                    
+                case .tryAgainButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.tryAgainButtonTapped)
                     
                 case .binding, ._articlesResponse, .scrollToTop, .destination, .delegate:
                     break

@@ -28,9 +28,6 @@ struct CommentsView: View {
                 .bold()
                 .padding(.vertical, 24)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .onLongPressGesture(minimumDuration: 5) {
-                    store.send(.commentBlockHeaderLongTapped)
-                }
             
             LazyVStack(spacing: 0) {
                 ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
@@ -216,20 +213,21 @@ struct CommentView: View {
     @ViewBuilder
     private func MenuButton() -> some View {
         Menu {
-            ContextButton(text: "Reputation", symbol: .plusminus, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Reputation", bundle: .module), symbol: .plusminus) {
                 store.send(.changeReputationButtonTapped)
             }
             
-            ContextButton(text: "Report", symbol: .exclamationmarkTriangle, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
                 store.send(.reportButtonTapped)
             }
             
             // If user not authorized - we show login sheet.
             if !store.isAuthorized || store.comment.canReact {
                 ContextButton(
-                    text: store.comment.isHidden ? "Unhide comment" : "Hide comment",
-                    symbol: store.comment.isHidden ? .eyeSlash : .eye,
-                    bundle: .module
+                    text: store.comment.isHidden
+                    ? LocalizedStringResource("Unhide comment", bundle: .module)
+                    : LocalizedStringResource("Hide comment", bundle: .module),
+                    symbol: store.comment.isHidden ? .eyeSlash : .eye
                 ) {
                     store.send(.hideButtonTapped)
                 }

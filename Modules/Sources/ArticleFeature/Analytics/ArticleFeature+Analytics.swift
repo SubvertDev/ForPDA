@@ -29,8 +29,7 @@ extension ArticleFeature {
                         ._checkLoading,
                         ._commentResponse,
                         ._pollVoteResponse,
-                        ._stopRefreshingIfFinished,
-                        .commentBlockHeaderLongTapped:
+                        ._stopRefreshingIfFinished:
                     break
                     
                 case .backButtonTapped:
@@ -54,8 +53,6 @@ extension ArticleFeature {
                         analytics.log(ArticleEvent.linkCopied(state.articlePreview.url))
                     case .shareLink:
                         analytics.log(ArticleEvent.linkShareOpened(state.articlePreview.url))
-                    case .report:
-                        analytics.log(ArticleEvent.linkReported(state.articlePreview.url))
                     }
                     
                 case let .linkShared(success, url):

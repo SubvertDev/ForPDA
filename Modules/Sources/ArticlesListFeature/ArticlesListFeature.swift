@@ -21,6 +21,29 @@ public struct ArticlesListFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - ViewState
+    
+    public enum ViewState: Equatable {
+        case loading
+        case loaded([ArticlePreview])
+        case networkError
+    }
+    
+    // MARK: - Enums
+    
+    public enum ContextMenuOptions: Sendable {
+        case shareLink
+        case copyLink
+        case openInBrowser
+        case addToBookmarks
+    }
+    
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+    }
+    
     // MARK: - Destinations
     
     @Reducer(state: .equatable)
@@ -36,6 +59,9 @@ public struct ArticlesListFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
         @Shared(.appSettings) public var appSettings: AppSettings
+        
+        public var viewState: ViewState = .loading
+        
         public var articles: [ArticlePreview]
         public var isLoading: Bool
         public var loadAmount: Int
@@ -84,6 +110,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case linkShared(Bool, URL)
         case listGridTypeButtonTapped
         case settingsButtonTapped
+        case tryAgainButtonTapped
         case onRefresh
         case loadMoreArticles
         case scrollToTop
@@ -128,6 +155,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 
             case .onAppear:
                 guard state.articles.isEmpty else { return .none }
+                state.viewState = .loading
                 return .run { [offset = state.offset, amount = state.loadAmount] send in
                     let result = await Result { try await apiClient.getArticlesList(offset, amount) }
                     await send(._articlesResponse(result))
@@ -166,6 +194,13 @@ public struct ArticlesListFeature: Reducer, Sendable {
                     await send(._articlesResponse(result))
                 }
                 
+            case .tryAgainButtonTapped:
+                state.viewState = .loading
+                return .run { [offset = state.offset, amount = state.loadAmount] send in
+                    let result = await Result { try await apiClient.getArticlesList(offset, amount) }
+                    await send(._articlesResponse(result))
+                }
+                
             case let ._articlesResponse(.success(articles)):
                 if state.offset == 0 {
                     state.articles = articles
@@ -175,11 +210,13 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 state.offset += state.loadAmount
                 state.isLoading = false
                 reportFullyDisplayed(&state)
+                state.viewState = .loaded(state.articles)
                 return .none
                 
             case ._articlesResponse(.failure):
                 state.isLoading = false
-                state.destination = .alert(.failedToConnect)
+                // state.destination = .alert(.failedToConnect)
+                state.viewState = .networkError
                 reportFullyDisplayed(&state)
                 return .none
                 
@@ -207,25 +244,18 @@ public struct ArticlesListFeature: Reducer, Sendable {
             
         case .copyLink:
             pasteboardClient.copy(article.url.absoluteString)
-            return showToast(for: action)
+            return .run { _ in
+                let toast = ToastMessage(text: Localization.linkCopied)
+                await toastClient.showToast(toast)
+            }
             
         case .openInBrowser:
             return .run { _ in await open(url: article.url) }
-            
-        case .report:
-            return showToast(for: action)
             
         case .addToBookmarks:
             state.destination = .alert(.notImplemented)
             return .run { _ in await hapticClient.play(.rigid) }
         }
         return .none
-    }
-    
-    private func showToast(for action: ContextMenuOptions) -> Effect<Action> {
-        return .run { _ in
-            let toast = ToastInfo(screen: .articlesList, message: action.rawValue)
-            await toastClient.show(toast)
-        }
     }
 }

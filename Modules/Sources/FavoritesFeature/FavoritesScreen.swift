@@ -63,17 +63,15 @@ public struct FavoritesScreen: View {
                     if store.isUserAuthorized {
                         Menu {
                             ContextButton(
-                                text: "Sort",
-                                symbol: .line3HorizontalDecrease,
-                                bundle: .module
+                                text: LocalizedStringResource("Sort", bundle: .module),
+                                symbol: .line3HorizontalDecrease
                             ) {
                                 send(.contextOptionMenu(.sort))
                             }
                             
                             ContextButton(
-                                text: "Read All",
-                                symbol: .checkmarkCircle,
-                                bundle: .module
+                                text: LocalizedStringResource("Read All", bundle: .module),
+                                symbol: .checkmarkCircle
                             ) {
                                 send(.contextOptionMenu(.markAllAsRead))
                             }
@@ -108,9 +106,10 @@ public struct FavoritesScreen: View {
         VStack(spacing: 0) {
             Section {
                 ContextButton(
-                    text: favorite.isImportant ? "From Important" : "To Important",
-                    symbol: favorite.isImportant ? .heartFill : .heart,
-                    bundle: .module
+                    text: favorite.isImportant
+                    ? LocalizedStringResource("From Important", bundle: .module)
+                    : LocalizedStringResource("To Important", bundle: .module),
+                    symbol: favorite.isImportant ? .heartFill : .heart
                 ) {
                     send(.commonContextMenu(
                         .setImportant(favorite.topic.id, favorite.isImportant ? false : true),
@@ -120,11 +119,11 @@ public struct FavoritesScreen: View {
             }
             
             Section {
-                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                     send(.commonContextMenu(.copyLink(favorite.topic.id), favorite.isForum))
                 }
                 
-                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
                     send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
                 }
             }
@@ -137,42 +136,37 @@ public struct FavoritesScreen: View {
         VStack(spacing: 0) {
             Section {
                 ContextButton(
-                    text: "Go To End",
-                    symbol: .chevronRight2,
-                    bundle: .module
+                    text: LocalizedStringResource("Go To End", bundle: .module),
+                    symbol: .chevronRight2
                 ) {
                     send(.topicContextMenu(.goToEnd, favorite))
                 }
                 
                 ContextButton(
-                    text: "Notify Hat Update",
-                    symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
-                    bundle: .module
+                    text: LocalizedStringResource("Notify Hat Update", bundle: .module),
+                    symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag
                 ) {
                     send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite))
                 }
                 
                 Menu {
                     ContextButton(
-                        text: "Always",
-                        symbol: favorite.notify == .always ? .bellFill : .bell,
-                        bundle: .module
+                        text: LocalizedStringResource("Always", bundle: .module),
+                        symbol: favorite.notify == .always ? .bellFill : .bell
                     ) {
                         send(.topicContextMenu(.notify(favorite.flag, .always), favorite))
                     }
                     
                     ContextButton(
-                        text: "Once",
-                        symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
-                        bundle: .module
+                        text: LocalizedStringResource("Once", bundle: .module),
+                        symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge
                     ) {
                         send(.topicContextMenu(.notify(favorite.flag, .once), favorite))
                     }
                     
                     ContextButton(
-                        text: "Do Not",
-                        symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
-                        bundle: .module
+                        text: LocalizedStringResource("Do Not", bundle: .module),
+                        symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash
                     ) {
                         send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite))
                     }

@@ -26,6 +26,15 @@ public struct TopicFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    private enum Localization {
+        static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
+        static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
+        static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
+        static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
+    }
+    
     // MARK: - Destinations
     
     @Reducer(state: .equatable)
@@ -239,9 +248,11 @@ public struct TopicFeature: Reducer, Sendable {
                         _ = try await apiClient.setFavorite(request)
                         await send(.internal(.setFavoriteResponse(!topic.isFavorite)))
                         
-                        #warning("toast")
+                        let text = topic.isFavorite ? Localization.favoriteRemoved : Localization.favoriteAdded
+                        await toastClient.showToast(ToastMessage(text: text))
                     } catch: { error, send in
-                        logger.error("Failed to set favorite: \(error)")
+                        analyticsClient.capture(error)
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
                     
                 case .goToEnd:
@@ -287,7 +298,8 @@ public struct TopicFeature: Reducer, Sendable {
                     return .concatenate(
                         .run { _ in
                             let status = try await apiClient.deletePosts(postIds: [id])
-                            await toastClient.showToast(status ? .postDeleted : .whoopsSomethingWentWrong)
+                            let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
+                            await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
                         }.cancellable(id: CancelID.loading),
                         
                         jumpTo(.post(id: id), true, &state)
@@ -355,7 +367,8 @@ public struct TopicFeature: Reducer, Sendable {
                 return .concatenate(
                     .run { _ in
                         let status = try await apiClient.postKarma(postId: postId, isUp: isUp)
-                        await toastClient.showToast(status ? .postKarmaChanged : .whoopsSomethingWentWrong)
+                        let postKarmaChangedToast = ToastMessage(text: Localization.postKarmaChanged, haptic: .success)
+                        await toastClient.showToast(status ? postKarmaChangedToast : .whoopsSomethingWentWrong)
                     }.cancellable(id: CancelID.loading),
                 
                     jumpTo(.post(id: postId), true, &state)
@@ -429,7 +442,9 @@ public struct TopicFeature: Reducer, Sendable {
             case .internal(.topicResponse(.failure)):
                 state.isRefreshing = false
                 reportFullyDisplayed(&state)
-                return showToast(.whoopsSomethingWentWrong)
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case let .internal(.setFavoriteResponse(isFavorite)):
                 state.topic?.isFavorite = isFavorite
@@ -437,7 +452,9 @@ public struct TopicFeature: Reducer, Sendable {
                 return .none
                 
             case .internal(.jumpRequestFailed):
-                return showToast(.whoopsSomethingWentWrong)
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case let .internal(.goToPost(postId: postId, offset: offset, forceRefresh)):
                 state.postId = postId
@@ -554,12 +571,6 @@ public struct TopicFeature: Reducer, Sendable {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()
         state.didLoadOnce = true
-    }
-    
-    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
-        return .run { _ in
-            await toastClient.showToast(toast)
-        }
     }
 }
 

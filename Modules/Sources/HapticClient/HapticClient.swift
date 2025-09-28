@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 // TODO: I don't think I need this as a dependency
 
-public enum HapticType {
+public enum HapticType: Sendable {
     case success
     case warning
     case error
