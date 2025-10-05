@@ -30,7 +30,7 @@ public struct ToastMessage: Equatable, Sendable {
         text: LocalizedStringResource,
         isError: Bool = false,
         haptic: HapticType? = nil,
-        duration: Int = 5,
+        duration: Int = 3,
         priority: Priority = .low
     ) {
         self.text = text
@@ -46,7 +46,7 @@ public extension ToastMessage {
         text: LocalizedStringResource("Whoops, something went wrong..", bundle: .module),
         isError: true,
         haptic: .error,
-        duration: 5,
+        duration: 3,
         priority: .low // .high?
     )
 }
