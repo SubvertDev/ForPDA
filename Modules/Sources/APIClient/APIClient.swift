@@ -6,12 +6,16 @@
 //
 
 import Foundation
+import Combine
 import PDAPI
 import Models
 import ParsingClient
 import CacheClient
 import ComposableArchitecture
 import PersistenceKeys
+
+public typealias ConnectionState = API.ConnectionState
+public typealias PDAPIError = APIError
 
 // MARK: - Client
 
@@ -73,13 +77,18 @@ public struct APIClient: Sendable {
     public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
     public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
+    
+    // PUBLISHERS
+    public var connectionState: @Sendable () throws -> AnyPublisher<API.ConnectionState, Never>
+    public var networkState: @Sendable () throws -> AnyPublisher<Bool, Never>
+    public var notifications: @Sendable () throws -> AnyPublisher<String, Never>
 }
 
 // MARK: - Dependency Key
 
 extension APIClient: DependencyKey {
     
-    private nonisolated(unsafe) static let api = try! PDAPI()
+    private static let api = try! API()
     
     // MARK: - Live Value
     
@@ -94,6 +103,7 @@ extension APIClient: DependencyKey {
             setLogResponses: { type in
                 api.setLogResponses(to: type)
             },
+            
             connect: {
                 @Shared(.userSession) var userSession
                 if let userSession {
@@ -107,32 +117,36 @@ extension APIClient: DependencyKey {
             // MARK: - Articles
             
             getArticlesList: { offset, amount in
-                let response = try await api.get(SiteCommand.articlesList(offset: offset, amount: amount))
+                let response = try await api.request(SiteCommand.articlesList(offset: offset, amount: amount))
                 return try await parser.parseArticlesList(response)
             },
+            
             getArticle: { id, policy in
                 fetch(
                     getCache: { await cache.getArticle(id) },
                     setCache: { await cache.setArticle($0) },
                     remote: {
                         let command = SiteCommand.article(id: id)
-                        let response = try await api.get(command)
+                        let response = try await api.request(command)
                         return try await parser.parseArticle(response)
                     },
                     policy: policy
                 )
             },
+            
             likeComment: { articleId, commentId in
-                let response = try await api.get(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
+                let response = try await api.request(SiteCommand.articleCommentLike(articleId: articleId, commentId: commentId))
                 return Int(response.getResponseStatus()) == 0
             },
+            
             hideComment: { articleId, commentId in
-                let response = try await api.get(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
+                let response = try await api.request(SiteCommand.articleCommentHide(articleId: articleId, commentId: commentId))
                 // Getting 3 on liked comment
                 return Int(response.getResponseStatus()) == 0
             },
+            
             replyToComment: { articleId, parentId, message in
-                let response = try await api.get(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
+                let response = try await api.request(SiteCommand.articleComment(articleId: articleId, parentId: parentId, msg: message))
                 let responseAsInt = Int(response.getResponseStatus())!
                 if CommentResponseType.codes.contains(responseAsInt) {
                     return CommentResponseType(rawValue: responseAsInt) ?? .unknown
@@ -140,8 +154,9 @@ extension APIClient: DependencyKey {
                     return CommentResponseType.success
                 }
             },
+            
             voteInPoll: { pollId, selections in
-                let response = try await api.get(SiteCommand.vote(pollId: pollId, selections: selections))
+                let response = try await api.request(SiteCommand.vote(pollId: pollId, selections: selections))
                 let responseAsInt = Int(response.getResponseStatus())!
                 return responseAsInt == 0
             },
@@ -150,17 +165,19 @@ extension APIClient: DependencyKey {
             
             getCaptcha: {
                 let request = LoginRequest(name: "", password: "", hidden: false)
-                let response = try await api.get(AuthCommand.login(data: request))
+                let response = try await api.request(AuthCommand.login(data: request))
                 return try await parser.parseCaptchaUrl(response)
             },
+            
             authorize: { login, password, hidden, captcha in
                 let request = LoginRequest(name: login, password: password, hidden: hidden, captcha: captcha)
-                let response = try await api.get(AuthCommand.login(data: request))
+                let response = try await api.request(AuthCommand.login(data: request))
                 return try await parser.parseLogin(response)
             },
+            
             logout: {
                 let request = AuthRequest(memberId: 0, token: "", hidden: false)
-                _ = try await api.get(AuthCommand.auth(data: request))
+                _ = try await api.request(AuthCommand.auth(data: request))
             },
             
             // MARK: - User
@@ -171,12 +188,13 @@ extension APIClient: DependencyKey {
                     setCache: { await cache.setUser($0) },
                     remote: {
                         let command = MemberCommand.info(memberId: userId)
-                        let response = try await api.get(command)
-                        return try await parser.parseUser(response: response)
+                        let response = try await api.request(command)
+                        return try await parser.parseUser(response)
                     },
                     policy: policy
                 )
             },
+            
             getReputationVotes: { request in
                 let command = MemberCommand.reputationVotes(data: MemberReputationVotesRequest(
                     memberId: request.userId,
@@ -184,9 +202,10 @@ extension APIClient: DependencyKey {
                     offset: request.offset,
                     count: request.amount
                 ))
-                let response = try await api.get(command)
-                return try await parser.parseReputationVotes(response: response)
+                let response = try await api.request(command)
+                return try await parser.parseReputationVotes(response)
             },
+            
             changeReputation: { request in
                 let command = MemberCommand.reputation(data: MemberReputationRequest(
                     memberId: request.userId,
@@ -194,14 +213,14 @@ extension APIClient: DependencyKey {
                     postId: request.transferContentType,
                     reason: request.reason
                 ))
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return ReputationChangeResponseType(rawValue: status)
             },
             
             // MARK: - Bookmarks
             getBookmarksList: {
-                let response = try await api.get(MemberCommand.Bookmarks.list)
+                let response = try await api.request(MemberCommand.Bookmarks.list)
                 return try await parser.parseBookmarksList(response)
             },
             
@@ -212,24 +231,26 @@ extension APIClient: DependencyKey {
                     getCache: { await cache.getForumsList() },
                     setCache: { await cache.setForumsList($0) },
                     remote: {
-                        let response = try await api.get(ForumCommand.list)
-                        return try await parser.parseForumsList(response: response)
+                        let response = try await api.request(ForumCommand.list)
+                        return try await parser.parseForumsList(response)
                     },
                     policy: policy
                 )
             },
+            
             getForum: { id, offset, perPage, policy in
                 fetch(
                     getCache: { await cache.getForum(id) },
                     setCache: { await cache.setForum(id, $0) },
                     remote: {
                         let command = ForumCommand.view(id: id, offset: offset, itemsPerPage: perPage)
-                        let response = try await api.get(command)
-                        return try await parser.parseForum(response: response)
+                        let response = try await api.request(command)
+                        return try await parser.parseForum(response)
                     },
                     policy: policy
                 )
             },
+            
             jumpForum: { request in
                 let command = ForumCommand.jump(data: ForumJumpRequest(
                     type: request.transferType,
@@ -237,36 +258,42 @@ extension APIClient: DependencyKey {
                     allPosts: request.allPosts,
                     topicId: request.topicId
                 ))
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 return try await parser.parseForumJump(response)
             },
+            
             markReadForum: { id, isTopic in
                 let command = ForumCommand.markRead(id: id, isTopic: isTopic)
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
+            
             getAnnouncement: { id in
-                let response = try await api.get(ForumCommand.announcement(linkId: id))
+                let response = try await api.request(ForumCommand.announcement(linkId: id))
                 return try await parser.parseAnnouncement(response)
             },
+            
             getTopic: { id, offset, perPage in
                 let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
-                let response = try await api.get(ForumCommand.Topic.view(data: request))
+                let response = try await api.request(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
+            
             getTemplate: { request, isTopic in
                 let command = ForumCommand.template(
                     type: isTopic ? .topic(forumId: request.id) : .post(topicId: request.id),
                     action: request.action.transferType
                 )
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 return try await parser.parseWriteForm(response)
             },
+            
 			getHistory: { offset, perPage in
-                let response = try await api.get(MemberCommand.history(page: offset, perPage: perPage))
+                let response = try await api.request(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
             },
+            
             previewPost: { request in
                 let command = ForumCommand.Post.preview(data: PostSendRequest(
                     topicId: request.post.topicId,
@@ -274,9 +301,10 @@ extension APIClient: DependencyKey {
                     attaches: request.post.attachments,
                     flag: request.post.flag
                 ), postId: request.id)
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 return try await parser.parsePostPreview(response)
             },
+            
             sendPost: { request in
                 let command = ForumCommand.Post.send(data: PostSendRequest(
                     topicId: request.topicId,
@@ -284,9 +312,10 @@ extension APIClient: DependencyKey {
                     attaches: request.attachments,
                     flag: request.flag
                 ))
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 return try await parser.parsePostSendResponse(response)
             },
+            
             editPost: { request in
                 let command = ForumCommand.Post.edit(
                     data: PostSendRequest(
@@ -298,21 +327,23 @@ extension APIClient: DependencyKey {
                     postId: request.postId,
                     reason: request.reason
                 )
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 return try await parser.parsePostSendResponse(response)
 			},
+            
             deletePosts: { ids in
                 let command = ForumCommand.Post.delete(postIds: ids)
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
+            
             postKarma: { id, isUp in
                 let command = ForumCommand.Post.karma(
                     postId: id,
                     action: isUp ? .plus : .minus
                 )
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
@@ -329,7 +360,7 @@ extension APIClient: DependencyKey {
                             offset: request.offset,
                             perPage: request.perPage
                         )
-                        let response = try await api.get(command)
+                        let response = try await api.request(command)
                         let favorites = try await parser.parseFavorites(response)
                         await cache.setFavorites(favorites)
                         return favorites
@@ -337,28 +368,31 @@ extension APIClient: DependencyKey {
                     policy: policy
                 )
             },
+            
             setFavorite: { request in
                 let command = MemberCommand.Favorites.modify(
                     id: request.id,
                     type: request.transferType,
                     action: request.transferAction
                 )
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
+            
             notifyFavorite: { request in
                 let command = MemberCommand.Favorites.notify(
                     id: request.id,
                     flag: request.flag,
                     new: request.transferType
                 )
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
+            
             readAllFavorites: {
-                let response = try await api.get(MemberCommand.Favorites.readAll)
+                let response = try await api.request(MemberCommand.Favorites.readAll)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
@@ -366,15 +400,16 @@ extension APIClient: DependencyKey {
             // MARK: - Extra
             
             getUnread: {
-                let response = try await api.get(CommonCommand.syncUnread)
+                let response = try await api.request(CommonCommand.syncUnread)
                 return try await parser.parseUnread(response)
             },
+            
             getAttachment: { id in
                 let stream = fetch(
                     getCache: { cache.getAttachmentURL(id) },
                     setCache: { cache.setAttachmentURL(id, $0) },
                     remote: {
-                        let response = try await api.get(ForumCommand.attachmentDownloadUrl(id: id))
+                        let response = try await api.request(ForumCommand.attachmentDownloadUrl(id: id))
                         let urlString = String(response.dropFirst(10).dropLast(2))
                         return URL(string: urlString)!
                     },
@@ -383,13 +418,14 @@ extension APIClient: DependencyKey {
                 for try await url in stream { return url } // I was too lazy to conform to AsyncStream on callsite
                 throw NSError(domain: "APIClient.getAttachment", code: 0)
             },
+            
             sendReport: { request in
                 let command = CommonCommand.report(
                     code: request.transferType,
                     id: request.id,
                     message: request.message
                 )
-                let response = try await api.get(command)
+                let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
                 return ReportResponseType(rawValue: status)
             },
@@ -397,23 +433,40 @@ extension APIClient: DependencyKey {
             // MARK: - QMS
             
             loadQMSList: {
-                let response = try await api.get(QMSCommand.list)
+                let response = try await api.request(QMSCommand.list)
                 return try await parser.parseQmsList(response)
             },
+            
             loadQMSUser: { id in
-                let response = try await api.get(QMSCommand.info(id: id))
+                let response = try await api.request(QMSCommand.info(id: id))
                 return try await parser.parseQmsUser(response)
             },
+            
             loadQMSChat: { id in
                 let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
-                let response = try await api.get(QMSCommand.Dialog.view(data: request))
+                let response = try await api.request(QMSCommand.Dialog.view(data: request))
                 return try await parser.parseQmsChat(response)
             },
+            
             sendQMSMessage: { chatId, message in
                 let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
-                let _ = try await api.get(QMSCommand.Message.send(data: request))
+                let _ = try await api.request(QMSCommand.Message.send(data: request))
                 // Returns chatId + new messageId
-			}
+			},
+            
+            // MARK: - PUBLISHERS
+            
+            connectionState: {
+                return api.connectionState
+            },
+            
+            networkState: {
+                return api.networkState
+            },
+            
+            notifications: {
+                return api.notifications
+            }
         )
     }
     
@@ -539,6 +592,15 @@ extension APIClient: DependencyKey {
             },
             sendQMSMessage: { _, _ in
                 
+            },
+            connectionState: {
+                return Just(.ready).eraseToAnyPublisher()
+            },
+            networkState: {
+                return Just(true).eraseToAnyPublisher()
+            },
+            notifications: {
+                return Just("123").eraseToAnyPublisher()
             }
         )
     }

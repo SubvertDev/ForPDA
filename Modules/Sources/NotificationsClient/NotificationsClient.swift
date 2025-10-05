@@ -12,6 +12,18 @@ import AnalyticsClient
 import LoggerClient
 import CacheClient
 import Models
+@preconcurrency import Combine
+
+public enum NotificationEvent: Equatable {
+    case site(Int)
+    case topic(Int)
+    case qms
+    
+    public var isTopic: Bool {
+        if case .topic = self { return true }
+        return false
+    }
+}
 
 @DependencyClient
 public struct NotificationsClient: Sendable {
@@ -20,8 +32,10 @@ public struct NotificationsClient: Sendable {
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
     public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
+    public var processNotification: @Sendable (String) async -> Void
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
     public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
+    public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
 }
 
 extension DependencyValues {
@@ -33,31 +47,88 @@ extension DependencyValues {
 
 extension NotificationsClient: DependencyKey {
     public static var liveValue: Self {
+        @Dependency(\.analyticsClient) var analyticsClient
         @Dependency(\.logger[.notifications]) var logger
+        
+        let subject = PassthroughSubject<NotificationEvent, Never>()
 
         return NotificationsClient(
             hasPermission: {
                 return await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .authorized
             },
+            
             requestPermission: {
                 return try await UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound])
             },
+            
             registerForRemoteNotifications: {
                 await UIApplication.shared.registerForRemoteNotifications()
             },
+            
             setDeviceToken: { deviceToken in
                 let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                 print("Device token: \(token)")
             },
+            
             delegate: {
                 AsyncStream { continuation in
-                  let delegate = Delegate(continuation: continuation)
-                  UNUserNotificationCenter.current().delegate = delegate
-                  continuation.onTermination = { _ in
-                    _ = delegate
-                  }
+                    let delegate = Delegate(continuation: continuation)
+                    UNUserNotificationCenter.current().delegate = delegate
+                    continuation.onTermination = { _ in
+                        _ = delegate
+                    }
                 }
             },
+            
+            processNotification: { notificationRaw in
+                do {
+                    let notification = try NotificationParser.parse(from: notificationRaw)
+                    
+                    enum EventError: Error {
+                        case unknownFlag(String)
+                        case unknownCase(String)
+                    }
+                    
+                    // TODO: Complete all cases
+                    switch notification.category {
+                    case .qms:
+                        if notification.flag == 1 {
+                            subject.send(.qms)
+                            return
+                        } else {
+                            analyticsClient.capture(EventError.unknownFlag(notificationRaw))
+                            return
+                        }
+                        
+                    case .topic:
+                        if notification.flag == 1 {
+                            subject.send(.topic(notification.id))
+                            return
+                        } else {
+                            analyticsClient.capture(EventError.unknownFlag(notificationRaw))
+                            return
+                        }
+                        
+                    case .site:
+                        if notification.id == 3 {
+                            // Article comment mention
+                            subject.send(.site(notification.id))
+                            return
+                        } else if notification.id == 2 {
+                            // Last article comment timestamp, unused
+                            return
+                        }
+                        
+                    case .unknown:
+                        break
+                    }
+                    
+                    analyticsClient.capture(EventError.unknownCase(notificationRaw))
+                } catch {
+                    analyticsClient.capture(error)
+                }
+            },
+            
             showUnreadNotifications: { unread, skipCategories in
                 @Dependency(\.cacheClient) var cacheClient
                 @Shared(.appSettings) var appSettings: AppSettings
@@ -141,6 +212,7 @@ extension NotificationsClient: DependencyKey {
                 
                 logger.info("Successfully processed notifications")
             },
+            
             removeNotifications: { categories in
                 let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
                 let filteredPending = pending.filter { notification in
@@ -163,6 +235,10 @@ extension NotificationsClient: DependencyKey {
                     return false
                 }
                 UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: filteredDelivered.map(\.request.identifier))
+            },
+            
+            eventPublisher: {
+                return subject.eraseToAnyPublisher()
             }
         )
     }

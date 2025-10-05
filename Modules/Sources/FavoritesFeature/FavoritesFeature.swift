@@ -14,6 +14,7 @@ import TCAExtensions
 import PasteboardClient
 import AnalyticsClient
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -95,6 +96,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.continuousClock) private var clock
     
     // MARK: - Body
@@ -130,6 +132,12 @@ public struct FavoritesFeature: Reducer, Sendable {
                         for await _ in notificationCenter.notifications(named: .favoritesUpdated) {
                             await send(.internal(.refresh))
                         }
+                    },
+                    .publisher {
+                        // TODO: Check if we have this topic among favorites?
+                        notificationsClient.eventPublisher()
+                            .filter(\.isTopic)
+                            .map { _ in Action.internal(.refresh) }
                     }
                 ])
                 

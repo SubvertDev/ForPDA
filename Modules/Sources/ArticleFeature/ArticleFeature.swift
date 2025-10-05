@@ -15,6 +15,7 @@ import PasteboardClient
 import HapticClient
 import AnalyticsClient
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {
@@ -121,7 +122,7 @@ public struct ArticleFeature: Reducer, Sendable {
         case menuActionTapped(ArticleMenuAction)
         case linkShared(Bool, URL)
         case linkInTextTapped(URL)
-        case onTask
+        case onAppear
         case onRefresh
         case pollVoteButtonTapped(Int, [Int])
         case comments(IdentifiedActionOf<CommentFeature>)
@@ -151,6 +152,7 @@ public struct ArticleFeature: Reducer, Sendable {
     @Dependency(\.parsingClient) var parsingClient
     @Dependency(\.analyticsClient) var analyticsClient
     @Dependency(\.pasteboardClient) var pasteboardClient
+    @Dependency(\.notificationsClient) var notificationsClient
     @Dependency(\.openURL) var openURL
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.continuousClock) var clock
@@ -210,13 +212,19 @@ public struct ArticleFeature: Reducer, Sendable {
                 state.destination = nil
                 return .none
                 
-            case .onTask:
+            case .onAppear:
                 guard state.article == nil else { return .none }
                 return .merge([
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id),
                     .publisher {
                         state.$userSession.publisher.dropFirst()
+                            .map { _ in Action.onRefresh }
+                    },
+                    .publisher { [id = state.articlePreview.id] in
+                        notificationsClient.eventPublisher()
+                            .dropFirst() // Notification with last comment always comes with article
+                            .filter { $0 == .site(id) }
                             .map { _ in Action.onRefresh }
                     }
                 ])

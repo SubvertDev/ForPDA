@@ -281,7 +281,7 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .receivedNotification(notification):
                 return .run { _ in
-                    await notificationsClient.showNotification(notification)
+                    await notificationsClient.processNotification(notification)
                 }
                 
             case let ._showToast(toast):
@@ -314,7 +314,7 @@ public struct AppFeature: Reducer, Sendable {
                         }
                     } else {
                         await toastClient.showToast(.whoopsSomethingWentWrong)
-                        #warning("add analytics")
+                        analyticsClient.capture(error)
                     }
                 }
                 
@@ -404,7 +404,6 @@ public struct AppFeature: Reducer, Sendable {
                         guard try await notificationsClient.hasPermission() else { return }
                         guard appSettings.notifications.isAnyEnabled else { return }
                         
-                        // try await apiClient.connect() // TODO: Do I need this?
                         let unread = try await apiClient.getUnread()
                         var skipCategories: [Unread.Item.Category] = []
                         // TODO: Add more skip cases later

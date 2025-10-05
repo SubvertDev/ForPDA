@@ -25,7 +25,7 @@ extension ArticleFeature {
                         .delegate,
                         .destination,
                         .notImplementedButtonTapped,
-                        .onTask,
+                        .onAppear,
                         ._checkLoading,
                         ._commentResponse,
                         ._pollVoteResponse,

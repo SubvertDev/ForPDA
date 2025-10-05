@@ -66,7 +66,7 @@ public struct ArticleScreen: View {
                 }
                 .overlay { RefreshIndicator() }
                 .background(Color(.Background.primary))
-                .task { store.send(.onTask) }
+                .onAppear { store.send(.onAppear) }
         }
     }
     
