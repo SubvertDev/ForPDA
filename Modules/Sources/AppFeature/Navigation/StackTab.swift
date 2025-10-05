@@ -88,8 +88,12 @@ public struct StackTab: Reducer, Sendable {
                 let hasArticle = path.contains(where: { $0.is(\.articles.article) })
                 let hasSettings = path.contains(where: { $0.is(\.settings) })
                 let hasQms = path.contains(where: { $0.is(\.qms) })
-                state.showTabBar = !hasArticle && !hasSettings && !hasQms
-                return .send(.delegate(.showTabBar(state.showTabBar)))
+                let showTabBar = !hasArticle && !hasSettings && !hasQms
+                if state.showTabBar != showTabBar {
+                    state.showTabBar = showTabBar
+                    return .send(.delegate(.showTabBar(state.showTabBar)))
+                }
+                return .none
             }
         }
     }
