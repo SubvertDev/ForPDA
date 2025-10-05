@@ -45,7 +45,9 @@ let package = Package(
     name: "ForPDA",
     dependencies: [
         // TCA
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.22.3"),
+//        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.22.3"),
+        .package(url: "https://github.com/lukeredpath/swift-composable-architecture/", branch: "lukeredpath/revert-change"),
+        
         // TCA Dependencies
         .package(url: "https://github.com/apple/swift-async-algorithms", from: "1.0.4"),
         .package(url: "https://github.com/pointfreeco/swift-clocks", from: "1.0.6"),
