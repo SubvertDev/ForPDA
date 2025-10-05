@@ -12,6 +12,7 @@ import SFSafeSymbols
 import SharedUI
 import Models
 
+@ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
     
     // MARK: - Properties
@@ -54,7 +55,7 @@ public struct ForumScreen: View {
                     .scrollContentBackground(.hidden)
                     .scrollDismissesKeyboard(.immediately)
                     .refreshable {
-                        await store.send(.onRefresh).finish()
+                        await send(.onRefresh).finish()
                     }
                 } else {
                     PDALoader()
@@ -69,7 +70,7 @@ public struct ForumScreen: View {
                 OptionsMenu()
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -119,7 +120,7 @@ public struct ForumScreen: View {
                         isClosed: topic.isClosed,
                         isUnread: topic.isUnread
                     ) { unreadTapped in
-                        store.send(.topicTapped(topic, showUnread: unreadTapped))
+                        send(.topicTapped(topic, showUnread: unreadTapped))
                     }
                     .contextMenu {
                         TopicContextMenu(topic: topic)
@@ -156,12 +157,12 @@ public struct ForumScreen: View {
     private func TopicContextMenu(topic: TopicInfo) -> some View {
         Section {
             ContextButton(text: LocalizedStringResource("Open", bundle: .module), symbol: .eye) {
-                store.send(.contextTopicMenu(.open, topic))
+                send(.contextTopicMenu(.open, topic))
             }
             
             Section {
                 ContextButton(text: LocalizedStringResource("Go To End", bundle: .module), symbol: .chevronRight2) {
-                    store.send(.contextTopicMenu(.goToEnd, topic))
+                    send(.contextTopicMenu(.goToEnd, topic))
                 }
             }
         }
@@ -187,9 +188,9 @@ public struct ForumScreen: View {
                 ForEach(subforums) { forum in
                     ForumRow(title: forum.name, isUnread: forum.isUnread) {
                         if let redirectUrl = forum.redirectUrl {
-                            store.send(.subforumRedirectTapped(redirectUrl))
+                            send(.subforumRedirectTapped(redirectUrl))
                         } else {
-                            store.send(.subforumTapped(forum))
+                            send(.subforumTapped(forum))
                         }
                     }
                     .contextMenu {
@@ -219,7 +220,7 @@ public struct ForumScreen: View {
             if store.sectionsExpandState.value(for: .announcements) {
                 ForEach(announcements) { announcement in
                     ForumRow(title: announcement.name, isUnread: false) {
-                        store.send(.announcementTapped(id: announcement.id, name: announcement.name))
+                        send(.announcementTapped(id: announcement.id, name: announcement.name))
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -233,17 +234,17 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func CommonContextMenu(id: Int, isFavorite: Bool, isUnread: Bool, isForum: Bool) -> some View {
         ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
-            store.send(.contextCommonMenu(.copyLink, id, isForum))
+            send(.contextCommonMenu(.copyLink, id, isForum))
         }
         
         ContextButton(text: LocalizedStringResource("Open In Browser", bundle: .module), symbol: .safari) {
-            store.send(.contextCommonMenu(.openInBrowser, id, isForum))
+            send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
         if store.isUserAuthorized {
             if isUnread {
                 ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
-                    store.send(.contextCommonMenu(.markRead, id, isForum))
+                    send(.contextCommonMenu(.markRead, id, isForum))
                 }
             }
             
@@ -254,7 +255,7 @@ public struct ForumScreen: View {
                     : LocalizedStringResource("Add to favorites", bundle: .module),
                     symbol: isFavorite ? .starFill : .star
                 ) {
-                    store.send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+                    send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
                 }
             }
         }
@@ -268,7 +269,7 @@ public struct ForumScreen: View {
         section: ForumFeature.SectionExpand.Kind
     ) -> some View {
         Button {
-            store.send(.sectionExpandTapped(section))
+            send(.sectionExpandTapped(section))
         } label: {
             Text(title, bundle: .module)
                 .font(.subheadline)
