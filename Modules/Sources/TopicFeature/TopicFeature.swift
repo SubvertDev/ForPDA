@@ -141,6 +141,7 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
+            case openedLastPage
         }
     }
     

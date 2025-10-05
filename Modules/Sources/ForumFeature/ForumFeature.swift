@@ -136,8 +136,11 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onAppear):
-                guard state.forum == nil else { return .none }
-                return .send(.internal(.loadForum(offset: 0)))
+                if state.forum == nil {
+                    return .send(.internal(.loadForum(offset: 0)))
+                } else {
+                    return .send(.internal(.refresh))
+                }
                 
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
