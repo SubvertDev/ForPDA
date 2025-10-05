@@ -27,6 +27,7 @@ public enum TopicEvent: Event {
     case menuPostDelete(Int)
     case menuPostReport(Int)
     case menuChangeReputation(Int, Int)
+    case menuPostCopyLink(Int)
     
     case loadingStart(Int)
     case loadingSuccess
@@ -45,7 +46,8 @@ public enum TopicEvent: Event {
             
         case let .menuPostDelete(postId),
              let .menuPostKarma(postId),
-             let .menuPostReport(postId):
+             let .menuPostReport(postId),
+             let .menuPostCopyLink(postId):
             return ["postId": String(postId)]
             
         case let .menuChangeReputation(postId, userId):

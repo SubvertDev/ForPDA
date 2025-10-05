@@ -107,6 +107,16 @@
         }
       }
     },
+    "Link copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
     "Loading..." : {
       "localizations" : {
         "ru" : {

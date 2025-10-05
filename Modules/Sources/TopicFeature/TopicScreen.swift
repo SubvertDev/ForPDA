@@ -350,6 +350,12 @@ public struct TopicScreen: View {
                     }
                 }
             }
+            
+            Section {
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                    send(.contextPostMenu(.copyLink(post.id)))
+                }
+            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)

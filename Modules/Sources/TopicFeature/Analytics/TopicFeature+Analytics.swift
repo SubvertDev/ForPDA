@@ -64,6 +64,8 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostDelete(postId))
                     case .changeReputation(let postId, let userId, _):
                         analytics.log(TopicEvent.menuChangeReputation(postId, userId))
+                    case .copyLink(let postId):
+                        analytics.log(TopicEvent.menuPostCopyLink(postId))
                     }
                     
                 case let .view(.contextMenu(option)):

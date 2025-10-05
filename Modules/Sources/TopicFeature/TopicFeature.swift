@@ -318,6 +318,14 @@ public struct TopicFeature: Reducer, Sendable {
                     )
                     state.destination = .changeReputation(feature)
                     return .none
+                    
+                case .copyLink(let postId):
+                    let link = "https://4pda.to/forum/index.php?showtopic=\(state.topicId)&view=findpost&p=\(postId)"
+                    pasteboardClient.copy(link)
+                    return .run { _ in
+                        let toast = ToastMessage(text: LocalizedStringResource("Link copied", bundle: .module), haptic: .success)
+                        await toastClient.showToast(toast)
+                    }
                 }
                 
             case .view(.changeKarmaTapped(let postId, let isUp)):
