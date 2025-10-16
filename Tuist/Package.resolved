@@ -1,5 +1,5 @@
 {
-  "originHash" : "fcbdd587433bcecc527e72ccd7b406d3914503201109278ab7e53d370c31c2fe",
+  "originHash" : "dd021bea1902407592c3572fefaca614a1419b91785dc0d9f0ec247bd963f43d",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "f381818bc153f63fbe13d6822e65cc7233ba4647",
-        "version" : "3.31.0"
+        "revision" : "ba5dd65d2341ab8ea1949f072594ef67c490af3a",
+        "version" : "3.34.0"
       }
     },
     {
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "3c2eee7773df58bdfb9e10e72d9a4be44253e0d9",
-        "version" : "8.55.0"
+        "revision" : "e9bcb13a491c00da6c9d100fe73954aea9e9d8a6",
+        "version" : "8.57.0"
       }
     },
     {
@@ -184,10 +184,10 @@
     {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/lukeredpath/swift-composable-architecture/",
+      "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "branch" : "lukeredpath/revert-change",
-        "revision" : "d1ba6b19654a8a45df550bed2be4d066782c716b"
+        "revision" : "a9c3fecb5d31fc8aad5d8ba5d830924966d7fb15",
+        "version" : "1.23.0"
       }
     },
     {
@@ -240,8 +240,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "91415670c91d41e8e1872ef6fe1bf118e20dee37",
-        "version" : "2.5.1"
+        "revision" : "bf498690e1f6b4af790260f542e8428a4ba10d78",
+        "version" : "2.6.0"
       }
     },
     {
@@ -294,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "b2ed9eabefe56202ee4939dd9fc46b6241c88317",
-        "version" : "1.6.1"
+        "revision" : "4c27acf5394b645b70d8ba19dc249c0472d5f618",
+        "version" : "1.7.0"
       }
     },
     {
