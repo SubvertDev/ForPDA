@@ -9,7 +9,6 @@ import Foundation
 
 public enum FavoritesEvent: Event {
     case onRefresh
-    case onSceneBecomeActive
     case favoriteTapped(Int, String, Int?, Bool, Bool)
     
     case sortButtonTapped

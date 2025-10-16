@@ -134,7 +134,7 @@ public struct AppFeature: Reducer, Sendable {
         case notificationDeeplink(String)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
-        case syncUnreadTaskInvoked
+        case backgroundTaskInvoked
         case didFinishToastAnimation
         
         case connectionStateChanged(ConnectionState)
@@ -160,6 +160,7 @@ public struct AppFeature: Reducer, Sendable {
     @Dependency(\.toastClient)          private var toastClient
     @Dependency(\.hapticClient)         private var hapticClient
     @Dependency(\.analyticsClient)      private var analyticsClient
+    @Dependency(\.notificationCenter)   private var notificationCenter
     @Dependency(\.notificationsClient)  private var notificationsClient
     
     // MARK: - Body
@@ -211,7 +212,6 @@ public struct AppFeature: Reducer, Sendable {
                         await withTaskGroup { group in
                             group.addTask {
                                 do {
-                                    await apiClient.setLogResponses(.none)
                                     try await apiClient.connect()
                                 } catch {
                                     await send(._failedToConnect(error))
@@ -229,19 +229,19 @@ public struct AppFeature: Reducer, Sendable {
                                     await send(.notificationDeeplink(identifier))
                                 }
                             }
+                            
+                            group.addTask {
+                                for await state in apiClient.connectionState() {
+                                    await send(.connectionStateChanged(state))
+                                }
+                            }
+                            
+                            group.addTask {
+                                for await notification in apiClient.notificationStream() {
+                                    await send(.receivedNotification(notification))
+                                }
+                            }
                         }
-                    },
-                    .publisher {
-                        try! apiClient.connectionState()
-                            .map(Action.connectionStateChanged)
-                    },
-                    .publisher {
-                        try! apiClient.networkState()
-                            .map(Action.networkStateChanged)
-                    },
-                    .publisher {
-                        try! apiClient.notifications()
-                            .map(Action.receivedNotification)
                     }
                 )
                 
@@ -301,21 +301,23 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let ._failedToConnect(error):
                 return .run { _ in
-                    if let error = error as? PDAPIError {
-                        switch error {
-                        case .noInternet:
-                            let toast = ToastMessage(
-                                text: Localization.noInternetConnection,
-                                isError: true,
-                                duration: 999_999_999,
-                                priority: .high
-                            )
-                            await toastClient.showToast(toast)
-                        }
-                    } else {
-                        await toastClient.showToast(.whoopsSomethingWentWrong)
-                        analyticsClient.capture(error)
-                    }
+                    // if let error = error as? PDAPIError {
+                    //     switch error {
+                    //     case .noInternet:
+                    //         let toast = ToastMessage(
+                    //             text: Localization.noInternetConnection,
+                    //             isError: true,
+                    //             duration: 999_999_999,
+                    //             priority: .high
+                    //         )
+                    //         await toastClient.showToast(toast)
+                    //     case .notDisconnected, .authStateNotSet, .invalidBootstrap:
+                    //         analyticsClient.capture(error)
+                    //     }
+                    // } else {
+                    //     await toastClient.showToast(.whoopsSomethingWentWrong)
+                    //     analyticsClient.capture(error)
+                    // }
                 }
                 
             case ._showErrorToast:
@@ -376,12 +378,17 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .scenePhaseDidChange(from: _, to: newPhase):
                 return .run { [isLoggedIn = state.userSession != nil] send in
-                    if newPhase == .background {
+                    if newPhase == .active {
+                        try? await apiClient.connect()
+                        notificationCenter.post(name: .sceneBecomeActive, object: nil)
+                    }
+                    
+                    if isLoggedIn, newPhase == .background {
                         await send(.registerBackgroundTask)
                     }
-                    if isLoggedIn && (newPhase == .background || newPhase == .active) {
-                        // Avoiding double invoke due to "active > inactive > background"
-                        await send(.syncUnreadTaskInvoked)
+                    
+                    if newPhase == .background {
+                        try await apiClient.disconnect()
                     }
                 }
                 
@@ -398,27 +405,16 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .syncUnreadTaskInvoked:
-                return .run { [appSettings = state.appSettings, tab = state.selectedTab] send in
+            case .backgroundTaskInvoked:
+                return .run { [appSettings = state.appSettings] send in
                     do {
                         guard try await notificationsClient.hasPermission() else { return }
                         guard appSettings.notifications.isAnyEnabled else { return }
                         
+                        try await apiClient.connect()
                         let unread = try await apiClient.getUnread()
-                        var skipCategories: [Unread.Item.Category] = []
-                        // TODO: Add more skip cases later
-                        switch tab {
-                        case .articles, .forum, .profile:
-                            break
-                        case .favorites:
-                            skipCategories.append(.forum)
-                            skipCategories.append(.topic)
-                        }
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories)
-                        
-                        // TODO: Make at an array?
-                        let invokeTime = Date().timeIntervalSince1970
-                        await cacheClient.setLastBackgroundTaskInvokeTime(invokeTime)
+                        await notificationsClient.showUnreadNotifications(unread, [])
+                        try await apiClient.disconnect()
                     } catch {
                         analyticsClient.capture(error)
                         // await send(._showErrorToast)

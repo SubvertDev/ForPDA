@@ -19,7 +19,6 @@ public struct FavoritesScreen: View {
     
     @Perception.Bindable public var store: StoreOf<FavoritesFeature>
     @Environment(\.tintColor) private var tintColor
-    @Environment(\.scenePhase) private var scenePhase
     
     // MARK: - Init
 
@@ -86,11 +85,6 @@ public struct FavoritesScreen: View {
                 embedIntoNavStack: true
             ) { store in
                 SortView(store: store)
-            }
-            .onChange(of: scenePhase) { newScenePhase in
-                if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
-                    send(.onSceneBecomeActive)
-                }
             }
             .onFirstAppear {
                 send(.onFirstAppear)

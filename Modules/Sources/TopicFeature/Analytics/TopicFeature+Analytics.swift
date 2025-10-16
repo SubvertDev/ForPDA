@@ -19,7 +19,8 @@ extension TopicFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear),
+                case .view(.onFirstAppear),
+                        .view(.onNextAppear),
                         .view(.onSceneBecomeActive),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),

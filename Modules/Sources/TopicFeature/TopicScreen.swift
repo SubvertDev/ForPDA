@@ -87,8 +87,10 @@ public struct TopicScreen: View {
                     send(.onSceneBecomeActive)
                 }
             }
-            .onAppear {
-                send(.onAppear)
+            .onFirstAppear {
+                send(.onFirstAppear)
+            } onNextAppear: {
+                send(.onNextAppear)
             }
         }
     }

@@ -9,4 +9,5 @@ import Foundation
 
 public extension Notification.Name {
     static let favoritesUpdated = Notification.Name("favoritesUpdated")
+    static let sceneBecomeActive = Notification.Name("sceneBecomeActive")
 }

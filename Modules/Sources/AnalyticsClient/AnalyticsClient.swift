@@ -62,7 +62,7 @@ extension AnalyticsClient: DependencyKey {
                 PostHogSDK.shared.capture(event.name, properties: event.properties)
             },
             capture: { error in
-                logger.error("Captured error via Sentry: \(error)")
+                logger.critical("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
             },
             reportFullyDisplayed: {

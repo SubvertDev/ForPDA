@@ -22,8 +22,9 @@ public typealias PDAPIError = APIError
 @DependencyClient
 public struct APIClient: Sendable {
     // Common
-    public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
+    public var setLogResponses: @Sendable (_ type: ResponsesLogType) -> Void
     public var connect: @Sendable () async throws -> Void
+    public var disconnect: @Sendable () async throws -> Void
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -78,17 +79,19 @@ public struct APIClient: Sendable {
     public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
     
-    // PUBLISHERS
-    public var connectionState: @Sendable () throws -> AnyPublisher<API.ConnectionState, Never>
-    public var networkState: @Sendable () throws -> AnyPublisher<Bool, Never>
-    public var notifications: @Sendable () throws -> AnyPublisher<String, Never>
+    // STREAMS
+    public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }
+    public var notificationStream: @Sendable () -> AsyncStream<String> = { .finished }
+    
+    // UPLOAD
+    public var upload: @Sendable (UploadRequest) -> AsyncStream<UploadProgressStatus> = { _ in .finished }
 }
 
 // MARK: - Dependency Key
 
 extension APIClient: DependencyKey {
     
-    private static let api = try! API()
+    private static let api = API()
     
     // MARK: - Live Value
     
@@ -112,6 +115,10 @@ extension APIClient: DependencyKey {
                 } else {
                     try await api.connect(as: .anonymous)
                 }
+            },
+            
+            disconnect: {
+                api.disconnect()
             },
             
             // MARK: - Articles
@@ -454,18 +461,21 @@ extension APIClient: DependencyKey {
                 // Returns chatId + new messageId
 			},
             
-            // MARK: - PUBLISHERS
+            // MARK: - Streams
             
             connectionState: {
-                return api.connectionState
+                return api.stateStream
             },
             
-            networkState: {
-                return api.networkState
+            notificationStream: {
+                return api.notificationStream
             },
             
-            notifications: {
-                return api.notifications
+            // MARK: - Upload
+            
+            upload: { request in
+                return .finished
+                // return api.upload(request: request)
             }
         )
     }
@@ -476,6 +486,7 @@ extension APIClient: DependencyKey {
         APIClient(
             setLogResponses: { _ in },
             connect: { },
+            disconnect: { },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
@@ -594,13 +605,13 @@ extension APIClient: DependencyKey {
                 
             },
             connectionState: {
-                return Just(.ready).eraseToAnyPublisher()
+                return .finished
             },
-            networkState: {
-                return Just(true).eraseToAnyPublisher()
+            notificationStream: {
+                return .finished
             },
-            notifications: {
-                return Just("123").eraseToAnyPublisher()
+            upload: { _ in
+                return .finished
             }
         )
     }

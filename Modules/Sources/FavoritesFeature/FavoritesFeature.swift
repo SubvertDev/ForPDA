@@ -133,11 +133,16 @@ public struct FavoritesFeature: Reducer, Sendable {
                             await send(.internal(.refresh))
                         }
                     },
-                    .publisher {
-                        // TODO: Check if we have this topic among favorites?
-                        notificationsClient.eventPublisher()
-                            .filter(\.isTopic)
-                            .map { _ in Action.internal(.refresh) }
+                    .run { send in
+                        for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
+                            await send(.view(.onSceneBecomeActive))
+                        }
+                    },
+                    .run { send in
+                        for await notification in notificationsClient.eventPublisher().values {
+                            guard notification.isTopic else { continue }
+                            await send(.internal(.refresh))
+                        }
                     }
                 ])
                 
@@ -149,11 +154,10 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.refresh))
                 
             case .view(.onSceneBecomeActive):
-                if state.isLoading {
-                    return .none
-                } else {
+                if !state.isLoading {
                     return .send(.internal(.refresh))
                 }
+                return .none
                 
             case let .view(.favoriteTapped(favorite, showUnread)):
                 guard !showUnread else {

@@ -46,6 +46,7 @@ extension DependencyValues {
 }
 
 extension NotificationsClient: DependencyKey {
+    
     public static var liveValue: Self {
         @Dependency(\.analyticsClient) var analyticsClient
         @Dependency(\.logger[.notifications]) var logger
@@ -101,20 +102,24 @@ extension NotificationsClient: DependencyKey {
                         }
                         
                     case .topic:
-                        if notification.flag == 1 {
+                        switch notification.flag {
+                        case 1:
                             subject.send(.topic(notification.id))
                             return
-                        } else {
+                        case 2:
+                            // Last message, unused
+                            return
+                        default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
                             return
                         }
                         
                     case .site:
-                        if notification.id == 3 {
+                        if notification.flag == 3 {
                             // Article comment mention
                             subject.send(.site(notification.id))
                             return
-                        } else if notification.id == 2 {
+                        } else if notification.flag == 2 {
                             // Last article comment timestamp, unused
                             return
                         }

@@ -20,6 +20,7 @@ import TCAExtensions
 import AnalyticsClient
 import TopicBuilder
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -110,7 +111,8 @@ public struct TopicFeature: Reducer, Sendable {
 
         case view(View)
         public enum View {
-            case onAppear
+            case onFirstAppear
+            case onNextAppear
             case onRefresh
             case onSceneBecomeActive
             case finishedPostAnimation
@@ -155,6 +157,7 @@ public struct TopicFeature: Reducer, Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Cancellable
     
@@ -194,9 +197,20 @@ public struct TopicFeature: Reducer, Sendable {
             case .destination, .pageNavigation, .binding:
                 return .none
                 
-            case .view(.onAppear):
-                guard state.topic == nil else { return .none }
-                return .send(.internal(.load))
+            case .view(.onFirstAppear):
+                return .merge(
+                    .run { [topicId = state.topicId] send in
+                        for await notification in notificationsClient.eventPublisher().values {
+                            if case let .topic(eventId) = notification, eventId == topicId {
+                                await send(.internal(.refresh))
+                            }
+                        }
+                    },
+                    .send(.internal(.load))
+                )
+                
+            case .view(.onNextAppear):
+                return .send(.internal(.refresh))
                 
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
