@@ -212,7 +212,7 @@ public struct AppFeature: Reducer, Sendable {
                         await withTaskGroup { group in
                             group.addTask {
                                 do {
-                                    try await apiClient.connect()
+                                    try await apiClient.connect(inBackground: false)
                                 } catch {
                                     await send(._failedToConnect(error))
                                 }
@@ -348,19 +348,32 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - Deeplink
                 
-            case .deeplink(let url):
+            case let .deeplink(url):
                 do {
                     let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
-                    // TODO: Handles only articles cases for now
-                    if case let .article(id: id, title: title, imageUrl: imageUrl) = deeplink {
+                    switch deeplink {
+                    case let .article(id, title, imageUrl):
                         let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                        // TODO: Do I need to set previous tab here?
-                        state.selectedTab = .articles
-                        state.articlesTab.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
+                        let articleState = ArticleFeature.State(articlePreview: preview)
+                        openScreenOnCurrentStack(.articles(.article(articleState)), state: &state)
+                    case let .announcement(id):
+                        let announceState = AnnouncementFeature.State(id: id)
+                        openScreenOnCurrentStack(.forum(.announcement(announceState)), state: &state)
+                    case let .topic(id, goTo):
+                        let topicState = TopicFeature.State(topicId: id!, goTo: goTo)
+                        openScreenOnCurrentStack(.forum(.topic(topicState)), state: &state)
+                    case let .forum(id, page):
+                        let forumState = ForumFeature.State(forumId: id, initialPage: page)
+                        openScreenOnCurrentStack(.forum(.forum(forumState)), state: &state)
+                    case let .user(id):
+                        let profileState = ProfileFeature.State(userId: id)
+                        openScreenOnCurrentStack(.profile(.profile(profileState)), state: &state)
                     }
                 } catch {
                     analyticsClient.capture(error)
-                    // TODO: Show error in UI?
+                    state.alert = AlertState {
+                        TextState("Unable to open link", bundle: .module)
+                    }
                 }
                 return .none
                 
@@ -379,7 +392,7 @@ public struct AppFeature: Reducer, Sendable {
             case let .scenePhaseDidChange(from: _, to: newPhase):
                 return .run { [isLoggedIn = state.userSession != nil] send in
                     if newPhase == .active {
-                        try? await apiClient.connect()
+                        try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
                     }
                     
@@ -408,16 +421,28 @@ public struct AppFeature: Reducer, Sendable {
             case .backgroundTaskInvoked:
                 return .run { [appSettings = state.appSettings] send in
                     do {
+                        // Refresh task might pause in background and resume in foreground
+                        // hence we need to always check current application state
+                        let appState = await UIApplication.shared.applicationState
+                        logger.warning("Background task invoked on '\(appState.description, privacy: .public)' state")
+                        
+                        guard await UIApplication.shared.applicationState == .background else { return }
                         guard try await notificationsClient.hasPermission() else { return }
                         guard appSettings.notifications.isAnyEnabled else { return }
                         
-                        try await apiClient.connect()
+                        try await apiClient.connect(inBackground: true)
                         let unread = try await apiClient.getUnread()
+                        
+                        guard await UIApplication.shared.applicationState == .background else { return }
+                        logger.warning("Preparing to show unread notifications")
                         await notificationsClient.showUnreadNotifications(unread, [])
+                        logger.warning("Did show unread notifications")
+                        
+                        guard await UIApplication.shared.applicationState == .background else { return }
+                        logger.warning("STOPPING CONNECTION ON BG TASK REQUEST")
                         try await apiClient.disconnect()
                     } catch {
                         analyticsClient.capture(error)
-                        // await send(._showErrorToast)
                     }
                     
                     await send(.registerBackgroundTask)
@@ -500,6 +525,15 @@ public struct AppFeature: Reducer, Sendable {
         return removeNotifications(&state)
     }
     
+    private func openScreenOnCurrentStack(_ element: Path.State, state: inout State) {
+        switch state.selectedTab {
+        case .articles:  state.articlesTab.path.append(element)
+        case .favorites: state.favoritesTab.path.append(element)
+        case .forum:     state.forumTab.path.append(element)
+        case .profile:   state.profileTab.path.append(element)
+        }
+    }
+    
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
@@ -542,9 +576,9 @@ public struct AppFeature: Reducer, Sendable {
         case let .announcement(id):
             targetState = .announcement(AnnouncementFeature.State(id: id))
         case let .topic(id, goTo):
-            targetState = .topic(TopicFeature.State(topicId: id, goTo: goTo))
-        case let .forum(id):
-            targetState = .forum(ForumFeature.State(forumId: id))
+            targetState = .topic(TopicFeature.State(topicId: id!, goTo: goTo))
+        case let .forum(id, page):
+            targetState = .forum(ForumFeature.State(forumId: id, initialPage: page))
         default:
             fatalError("Unhandled notifications deeplink")
         }
@@ -563,5 +597,20 @@ public struct AppFeature: Reducer, Sendable {
         }
         
         return .none
+    }
+}
+
+extension UIApplication.State {
+    var description: String {
+        switch self {
+        case .active:
+            return "active"
+        case .inactive:
+            return "inactive"
+        case .background:
+            return "background"
+        @unknown default:
+            fatalError()
+        }
     }
 }

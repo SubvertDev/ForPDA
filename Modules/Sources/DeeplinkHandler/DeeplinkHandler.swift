@@ -14,8 +14,8 @@ import Models
 public enum Deeplink {
     case article(id: Int, title: String, imageUrl: URL)
     case announcement(id: Int)
-    case topic(id: Int, goTo: GoTo)
-    case forum(id: Int)
+    case topic(id: Int?, goTo: GoTo)
+    case forum(id: Int, page: Int)
     case user(id: Int)
 }
 
@@ -35,6 +35,7 @@ public struct DeeplinkHandler {
         case unknownType(type: String, for: String)
         case noType(of: String, for: String)
         case noDeeplinkAvailable(for: URL)
+        case externalURL
     }
     
     @Dependency(\.logger[.deeplink]) private var logger
@@ -68,9 +69,42 @@ public struct DeeplinkHandler {
 
             return .article(id: id, title: title, imageUrl: imageUrl)
             
+        case "forum":
+            guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
+            if let offset = components.queryItems?.first?.value.flatMap({Int($0)}) {
+                @Shared(.appSettings) var appSettings: AppSettings
+                let page = getPage(forOffset: offset, userPerPage: appSettings.forumPerPage)
+                return .forum(id: id, page: page)
+            } else {
+                return .forum(id: id, page: 1)
+            }
+            
+        case "announce":
+            guard let _ = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) } // forumId
+            guard let announceId = components.queryItems?.first?.value.flatMap({Int($0)}) else { throw .badIdOnMatch(in: url) }
+            return .announcement(id: announceId)
+            
+        case "topic":
+            guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
+            if let offset = components.queryItems?.first?.value.flatMap({Int($0)}) {
+                @Shared(.appSettings) var appSettings: AppSettings
+                let page = getPage(forOffset: offset, userPerPage: appSettings.topicPerPage)
+                return .topic(id: id, goTo: .page(page))
+            } else {
+                return .topic(id: id, goTo: .first)
+            }
+            
+        case "user":
+            guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
+            return .user(id: id)
+            
         default:
             throw .noComponentsMatch(in: url)
         }
+    }
+    
+    private func getPage(forOffset offset: Int, userPerPage: Int) -> Int {
+        return Int(ceil(Double(offset + 1) / Double(userPerPage)))
     }
     
     // MARK: - Inner To Inner
@@ -83,7 +117,7 @@ public struct DeeplinkHandler {
             }
         }
         
-        guard let host = url.host, host == "4pda.to" else { throw .noDeeplinkAvailable(for: url) }
+        guard let host = url.host, host == "4pda.to" else { throw .externalURL }
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents(in: url) }
         
@@ -118,13 +152,14 @@ public struct DeeplinkHandler {
         // showforum
         
         if let forumItem = queryItems.first(where: { $0.name == "showforum" }), let value = forumItem.value, let forumId = Int(value) {
-            // https://4pda.to/forum/index.php?showforum=123
-            return .forum(id: forumId)
+            // https://4pda.to/forum/index.php?showtopic=1104159
+            return .forum(id: forumId, page: 1)
         }
         
         if let announcementItem = queryItems.first(where: { $0.name == "act" }), let actType = announcementItem.value {
             switch actType {
             case "announce":
+                // https://4pda.to/forum/index.php?act=announce&f=140&st=238
                  if let announceItem = queryItems.first(where: { $0.name == "st" }), let value = announceItem.value, let announceId = Int(value) {
                      return .announcement(id: announceId)
                  } else {
@@ -134,6 +169,14 @@ public struct DeeplinkHandler {
             case "boardrules":
                 // https://4pda.to/forum/index.php?act=boardrules
                 return .announcement(id: 0)
+                
+            case "findpost":
+                // https://4pda.to/forum/index.php?act=findpost&pid=136063497
+                if let postItem = queryItems.first(where: { $0.name == "pid" }), let value = postItem.value, let postId = Int(value) {
+                    return .topic(id: nil, goTo: .post(id: postId))
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "pid", for: url.absoluteString))
+                }
                 
             default:
                 analytics.capture(DeeplinkError.unknownType(type: actType, for: url.absoluteString))
@@ -164,6 +207,7 @@ public struct DeeplinkHandler {
     public func handleNotification(_ identifier: String) throws(DeeplinkError) -> Deeplink {
         let split = identifier.split(separator: "-")
         let url = URL(string: "notification://\(identifier)")!
+        
         guard let typeString = split.first,     let typeInt = Int(typeString)        else { throw .noDeeplinkAvailable(for: url) }
         guard let idString = split[safe: 1],    let id = Int(idString)               else { throw .noDeeplinkAvailable(for: url) }
         guard let timestampString = split.last, let timestamp = Int(timestampString) else { throw .noDeeplinkAvailable(for: url) }
@@ -175,8 +219,9 @@ public struct DeeplinkHandler {
             // TODO: Add
             break
         case .forum:
-            return Deeplink.forum(id: id)
+            return Deeplink.forum(id: id, page: 1)
         case .topic:
+            // Currently we don't have id of a post to jump due to limited api
             return Deeplink.topic(id: id, goTo: .unread)
         case .forumMention:
             // Forum mention has topic id in timestamp place

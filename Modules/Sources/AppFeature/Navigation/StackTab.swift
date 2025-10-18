@@ -318,33 +318,42 @@ public struct StackTab: Reducer, Sendable {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
             case let .topic(id: targetId, goTo: goTo):
-                if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
-                    if case let .post(goToId) = goTo {
-                        guard let hasPostOnTheSamePage = element.forum?.topic?.topic?.posts.map({ $0.id }).contains(goToId) else {
-                            analytics.capture(DeeplinkHandlingError.failedToParseSamePagePost)
-                            return .none
-                        }
-                        if hasPostOnTheSamePage {
-                            // Post is on the same page, scrolling to
-                            // TODO: send goTo via action or state?
-                            state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                            return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                if let targetId {
+                    // Deeplink in the same OR other topic
+                    if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
+                        if case let .post(goToId) = goTo {
+                            guard let hasPostOnTheSamePage = element.forum?.topic?.topic?.posts.map({ $0.id }).contains(goToId) else {
+                                analytics.capture(DeeplinkHandlingError.failedToParseSamePagePost)
+                                return .none
+                            }
+                            if hasPostOnTheSamePage {
+                                // Post is on the same page, scrolling to
+                                // TODO: send goTo via action or state?
+                                state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                                return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                            } else {
+                                // Post is NOT on the same page, opening new screen
+                                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                                return .none
+                            }
                         } else {
-                            // Post is NOT on the same page, opening new screen
-                            state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                            analytics.capture(DeeplinkHandlingError.unknownGoToType(goTo))
                             return .none
                         }
-                    } else {
-                        analytics.capture(DeeplinkHandlingError.unknownGoToType(goTo))
-                        return .none
+                    }
+                    
+                    // Different topic or announcement, using app navigation
+                    state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                } else {
+                    // Deeplink in the same topic ONLY (inner-inner deeplink case)
+                    if let (id, _) = state.path.last(is: \.forum.topic) {
+                        state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                        return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                     }
                 }
                 
-                // Different topic or announcement, using app navigation
-                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
-                
-            case let .forum(id: id):
-                state.path.append(.forum(.forum(ForumFeature.State(forumId: id))))
+            case let .forum(id: id, page: page):
+                state.path.append(.forum(.forum(ForumFeature.State(forumId: id, initialPage: page))))
                 
             case let .announcement(id: id):
                 state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id))))
@@ -359,7 +368,11 @@ public struct StackTab: Reducer, Sendable {
             
             return .none
         } catch {
-            analytics.capture(error)
+            if case .externalURL = error {
+                // Skipping externalURL case since it's not error per-se
+            } else {
+                analytics.capture(error)
+            }
         }
         
         return .run { [url] _ in await open(url: url) }

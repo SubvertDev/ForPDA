@@ -69,8 +69,10 @@ public struct ForumScreen: View {
             .toolbar {
                 OptionsMenu()
             }
-            .onAppear {
-                send(.onAppear)
+            .onFirstAppear {
+                send(.onFirstAppear)
+            } onNextAppear: {
+                send(.onNextAppear)
             }
         }
     }

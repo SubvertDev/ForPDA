@@ -108,6 +108,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 
             case .goToPage(let newPage):
                 state.offset = (newPage - 1) * state.perPage
+                state.page = String(state.currentPage)
                 
             case .onViewTapped:
                 state.focus = state.focus == nil ? .page : nil

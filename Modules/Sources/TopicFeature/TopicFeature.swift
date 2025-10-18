@@ -66,7 +66,7 @@ public struct TopicFeature: Reducer, Sendable {
         public var topic: Topic?
         public var goTo: GoTo
         
-        var types: [[TopicTypeUI]] = []
+        var posts: [UIPost] = []
         
         var isFirstPage = true
         var isLoadingTopic = true
@@ -114,7 +114,6 @@ public struct TopicFeature: Reducer, Sendable {
             case onFirstAppear
             case onNextAppear
             case onRefresh
-            case onSceneBecomeActive
             case finishedPostAnimation
             case topicHatOpenButtonTapped
             case changeKarmaTapped(Int, Bool)
@@ -177,6 +176,8 @@ public struct TopicFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
                 state.postId = nil
+                state.shouldShowTopicHatButton = newOffset == 0 ? false : true
+                state.posts.removeAll()
                 return .concatenate([
                     .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
                         if isLastPage {
@@ -206,6 +207,11 @@ public struct TopicFeature: Reducer, Sendable {
                             }
                         }
                     },
+                    .run { send in
+                        for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
+                            await send(.internal(.refresh))
+                        }
+                    },
                     .send(.internal(.load))
                 )
                 
@@ -215,17 +221,10 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
                 
-            case .view(.onSceneBecomeActive):
-                if state.isLoadingTopic || state.isRefreshing {
-                    return .none
-                } else {
-                    return .send(.internal(.refresh))
-                }
-                
             case .view(.topicHatOpenButtonTapped):
-                guard let topicHat = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
-                let topicHatNodes = TopicNodeBuilder(text: topicHat.content, attachments: topicHat.attachments).build()
-                state.types[0] = topicHatNodes
+                guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
+                let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
+                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
                 state.shouldShowTopicHatButton = false
                 return .none
                 
@@ -233,7 +232,7 @@ public struct TopicFeature: Reducer, Sendable {
                 return .send(.delegate(.openUser(id: id)))
                 
             case let .view(.urlTapped(url)):
-                return .send(.delegate(.handleUrl(url))) //handleUrl(url, &state)
+                return .send(.delegate(.handleUrl(url)))
                 
             case let .view(.contextMenu(action)):
                 guard let topic = state.topic else { return .none }
@@ -377,6 +376,7 @@ public struct TopicFeature: Reducer, Sendable {
                 case .first:            return loadPage(&state)
                 case .unread:           return jumpTo(.unread, false, &state)
                 case .post(id: let id): return jumpTo(.post(id: id), false, &state)
+                case .page(let page):   return jumpTo(.page(page), false, &state)
                 case .last:             return jumpTo(.last, false, &state)
                 }
                 
@@ -419,7 +419,11 @@ public struct TopicFeature: Reducer, Sendable {
                 return .concatenate(
                     updatePageNavigation(&state),
                     
-                    .run { [isFirstPage = state.isFirstPage, topicPerPage = state.appSettings.topicPerPage] send in
+                    .run { [
+                        isFirstPage = state.isFirstPage,
+                        topicPerPage = state.appSettings.topicPerPage,
+                        shouldShowTopicHatButton = state.shouldShowTopicHatButton
+                    ] send in
                         var topicTypes: [[TopicTypeUI]] = []
                         
                         topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
@@ -427,7 +431,7 @@ public struct TopicFeature: Reducer, Sendable {
                                 // guard index == 0 else { continue } // For test purposes
                                 var text = post.content
                                 // print(post)
-                                if index == 0 && !isFirstPage {
+                                if index == 0 && !isFirstPage && shouldShowTopicHatButton {
                                     text = "" // Not loading hat post for non-first page
                                 }
                                 taskGroup.addTask {
@@ -452,10 +456,16 @@ public struct TopicFeature: Reducer, Sendable {
                 )
                 
             case let .internal(.loadTypes(types)):
-                state.types = types
+                if state.posts.isEmpty {
+                    state.posts = zip(state.topic!.posts, types).map { post, types in
+                        return UIPost(post: post, content: types.map { .init(value: $0) })
+                    }
+                } else {
+                    state.posts = mergeUIPosts(old: state.posts, newPosts: state.topic!.posts, newTypes: types)
+                }
+                
                 state.isLoadingTopic = false
                 state.isRefreshing = false
-                state.shouldShowTopicHatButton = !state.isFirstPage
                 reportFullyDisplayed(&state)
                 return .none
 //                return PageNavigationFeature()
@@ -507,29 +517,60 @@ public struct TopicFeature: Reducer, Sendable {
         )
     }
     
+    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[TopicTypeUI]]) -> [UIPost] {
+        zip(newPosts, newTypes).map { newPost, newTypes in
+            if let oldPost = old.first(where: { $0.id == newPost.id }) {
+                let mergedContent = mergePostContent(
+                    old: oldPost.content,
+                    new: newTypes
+                )
+                return UIPost(post: newPost, content: mergedContent)
+            } else {
+                return UIPost(post: newPost, content: newTypes.map { .init(value: $0) })
+            }
+        }
+    }
+    
+    private func mergePostContent(old: [UIPost.Content], new: [TopicTypeUI]) -> [UIPost.Content] {
+        new.map { newType in
+            if let match = old.first(where: { $0.value.hashValue == newType.hashValue }) {
+                return match
+            } else {
+                return UIPost.Content(value: newType)
+            }
+        }
+    }
+    
     #warning("move")
     public enum JumpTo: Sendable {
         case unread
         case last
         case post(id: Int)
+        case page(Int)
         
         var postId: Int {
             switch self {
             case .unread, .last: return 0
             case let .post(id):  return id
+            case .page: fatalError("Unsupported interaction")
             }
         }
         
         var type: JumpForumRequest.ForumJumpType {
             switch self {
-            case .unread:      return .new
-            case .last:        return .last
-            case .post:        return .post
+            case .unread: return .new
+            case .last:   return .last
+            case .post:   return .post
+            case .page:   fatalError("Unsupported interaction")
             }
         }
     }
     
-    private func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
+    public func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
+        if case let .page(page) = jump {
+            return reduce(into: &state, action: .pageNavigation(.goToPage(newPage: page)))
+        }
+        
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
             let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
@@ -538,44 +579,6 @@ public struct TopicFeature: Reducer, Sendable {
         } catch: { error, send in
             await send(.internal(.jumpRequestFailed))
         }
-    }
-    
-    private func handleUrl(_ url: URL, _ state: inout State) -> Effect<Action> {
-        // If it's a snapback, we handle it locally (same or other page)
-//        if url.scheme == "snapback", let postIdString = url.host(), let postId = Int(postIdString) {
-//            return jumpTo(.post(id: postId), &state)
-//        }
-        
-//        do {
-//            let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
-//            if case let .topic(id: id, goTo: goTo) = deeplink {
-//                if id == state.topicId {
-//                    print("SAME TOPIC")
-//                    switch goTo {
-//                    case .first:            return loadPage(&state)
-//                    case .unread:           return jumpTo(.unread, &state)
-//                    case .post(id: let id): return jumpTo(.post(id: id), &state)
-//                    case .last:             return jumpTo(.last, &state)
-//                    }
-//                } else {
-//                    print("NON-SAME TOPIC")
-//                }
-//            }
-//        } catch {
-//            print(error)
-//        }
-        
-//        if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
-//            if let value = components.queryItems?.first(where: { $0.name == "showtopic" })?.value {
-//                if let topicId = Int(value) {
-//                    if topicId == state.topicId {
-//                        return jumpTo(.last, <#T##state: &State##State#>)
-//                    }
-//                }
-//            }
-//        }
-        // If it's not, then we delegate it a layer up, to open new screen
-        return .send(.delegate(.handleUrl(url)))
     }
     
     private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {

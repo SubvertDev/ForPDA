@@ -20,6 +20,16 @@
           }
         }
       }
+    },
+    "Unable to open link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось открыть ссылку"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

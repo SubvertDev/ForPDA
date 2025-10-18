@@ -25,7 +25,6 @@ public struct TopicScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TopicFeature>
     
-    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.tintColor) private var tintColor
     @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
@@ -45,35 +44,35 @@ public struct TopicScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if let topic = store.topic {
-                    ScrollViewReader { proxy in
-                        WithPerceptionTracking {
-                            ScrollView {
-                                LazyVStack(spacing: 16) {
+                ScrollViewReader { proxy in
+                    WithPerceptionTracking {
+                        ScrollView {
+                            LazyVStack(spacing: 16) {
+                                if store.topic != nil {
                                     Navigation()
-                                    
-                                    if !store.isLoadingTopic {
-                                        PostList(topic: topic)
-                                        
-                                        Navigation()
-                                    }
                                 }
-                                .padding(.bottom, 16)
+                                
+                                if !store.isLoadingTopic {
+                                    PostList()
+                                    
+                                    Navigation()
+                                }
                             }
-                            .onAppear {
-                                scrollProxy = proxy
-                            }
+                            .padding(.bottom, 16)
+                        }
+                        .onAppear {
+                            scrollProxy = proxy
                         }
                     }
-                    .scrollDismissesKeyboard(.immediately)
                 }
+                .scrollDismissesKeyboard(.immediately)
             }
             .refreshable {
                 // Wrapper around finish() due to SwiftUI bug
                 await Task { await send(.onRefresh).finish() }.value
             }
             .overlay {
-                if store.topic == nil || store.isLoadingTopic {
+                if store.topic == nil {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
@@ -82,11 +81,6 @@ public struct TopicScreen: View {
             .toolbar { OptionsMenu() }
             .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
             .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
-            .onChange(of: scenePhase) { newScenePhase in
-                if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
-                    send(.onSceneBecomeActive)
-                }
-            }
             .onFirstAppear {
                 send(.onFirstAppear)
             } onNextAppear: {
@@ -163,11 +157,11 @@ public struct TopicScreen: View {
     // MARK: - Post List
     
     @ViewBuilder
-    private func PostList(topic: Topic) -> some View {
-        ForEach(topic.posts, id: \.id) { post in
+    private func PostList() -> some View {
+        ForEach(store.posts) { post in
             WithPerceptionTracking {
                 VStack(spacing: 0) {
-                    if store.shouldShowTopicHatButton && topic.posts.first == post {
+                    if store.shouldShowTopicHatButton && store.posts.first == post {
                         Button {
                             send(.topicHatOpenButtonTapped)
                         } label: {
@@ -193,11 +187,11 @@ public struct TopicScreen: View {
     // MARK: - Post
     
     @ViewBuilder
-    private func Post(_ post: Post) -> some View {
+    private func Post(_ post: UIPost) -> some View {
         VStack(spacing: 8) {
-            PostHeader(post)
+            PostHeader(post.post)
             PostBody(post)
-            if let lastEdit = post.lastEdit {
+            if let lastEdit = post.post.lastEdit {
                 PostFooter(lastEdit)
             }
         }
@@ -280,17 +274,13 @@ public struct TopicScreen: View {
     // MARK: - Post Body
     
     @ViewBuilder
-    private func PostBody(_ post: Post) -> some View {
+    private func PostBody(_ post: UIPost) -> some View {
         VStack(spacing: 8) {
-            if let postIndex = store.topic?.posts.firstIndex(of: post) {
-                if store.types.count - 1 >= postIndex {
-                    ForEach(store.types[postIndex], id: \.self) { type in
-                        TopicView(type: type, attachments: post.attachments) { url in
-                            send(.urlTapped(url))
-                        } onImageTap: { url in
-                            send(.imageTapped(url))
-                        }
-                    }
+            ForEach(post.content, id: \.self) { type in
+                TopicView(type: type.value, attachments: post.post.attachments) { url in
+                    send(.urlTapped(url))
+                } onImageTap: { url in
+                    send(.imageTapped(url))
                 }
             }
         }

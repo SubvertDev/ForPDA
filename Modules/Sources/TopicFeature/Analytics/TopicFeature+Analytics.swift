@@ -21,7 +21,6 @@ extension TopicFeature {
                 switch action {
                 case .view(.onFirstAppear),
                         .view(.onNextAppear),
-                        .view(.onSceneBecomeActive),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
                         .internal(.loadTypes),

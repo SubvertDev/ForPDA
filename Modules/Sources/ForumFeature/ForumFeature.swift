@@ -51,6 +51,7 @@ public struct ForumFeature: Reducer, Sendable {
 
         public var forumId: Int
         public var forumName: String?
+        public let initialPage: Int?
         
         public var forum: Forum?
         public var topics: [TopicInfo] = []
@@ -70,10 +71,12 @@ public struct ForumFeature: Reducer, Sendable {
         
         public init(
             forumId: Int,
-            forumName: String? = nil
+            forumName: String? = nil,
+            initialPage: Int? = nil
         ) {
             self.forumId = forumId
             self.forumName = forumName
+            self.initialPage = initialPage
         }
     }
     
@@ -84,7 +87,8 @@ public struct ForumFeature: Reducer, Sendable {
 
         case view(View)
         public enum View {
-            case onAppear
+            case onFirstAppear
+            case onNextAppear
             case onRefresh
             case topicTapped(TopicInfo, showUnread: Bool)
             case subforumRedirectTapped(URL)
@@ -135,12 +139,15 @@ public struct ForumFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
-            case .view(.onAppear):
-                if state.forum == nil {
-                    return .send(.internal(.loadForum(offset: 0)))
+            case .view(.onFirstAppear):
+                if let page = state.initialPage {
+                    return .send(.pageNavigation(.goToPage(newPage: page)))
                 } else {
-                    return .send(.internal(.refresh))
+                    return .send(.internal(.loadForum(offset: 0)))
                 }
+                
+            case .view(.onNextAppear):
+                return .send(.internal(.refresh))
                 
             case .view(.onRefresh):
                 return .send(.internal(.refresh))

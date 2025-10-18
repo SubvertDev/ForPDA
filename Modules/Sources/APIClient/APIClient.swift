@@ -21,10 +21,11 @@ public typealias PDAPIError = APIError
 
 @DependencyClient
 public struct APIClient: Sendable {
+    
     // Common
-    public var setLogResponses: @Sendable (_ type: ResponsesLogType) -> Void
-    public var connect: @Sendable () async throws -> Void
+    public var connect: @Sendable (_ inBackground: Bool) async throws -> Void
     public var disconnect: @Sendable () async throws -> Void
+    public var setLogResponses: @Sendable (_ type: ResponsesLogType) -> Void
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -103,15 +104,11 @@ extension APIClient: DependencyKey {
             
             // MARK: - Common
             
-            setLogResponses: { type in
-                api.setLogResponses(to: type)
-            },
-            
-            connect: {
+            connect: { inBackground in
                 @Shared(.userSession) var userSession
                 if let userSession {
                     let request = AuthRequest(memberId: userSession.userId, token: userSession.token, hidden: userSession.isHidden)
-                    try await api.connect(as: .account(data: request))
+                    try await api.connect(as: .account(data: request), inBackground: inBackground)
                 } else {
                     try await api.connect(as: .anonymous)
                 }
@@ -119,6 +116,10 @@ extension APIClient: DependencyKey {
             
             disconnect: {
                 api.disconnect()
+            },
+            
+            setLogResponses: { type in
+                api.setLogResponses(to: type)
             },
             
             // MARK: - Articles
@@ -484,9 +485,9 @@ extension APIClient: DependencyKey {
     
     public static var previewValue: APIClient {
         APIClient(
-            setLogResponses: { _ in },
-            connect: { },
+            connect: { _ in },
             disconnect: { },
+            setLogResponses: { _ in },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },
