@@ -74,6 +74,9 @@ public struct AppView: View {
             .animation(.default, value: store.toastMessage)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
+            .sheet(item: $store.scope(state: \.logStore, action: \.logStore)) { store in
+                LogStoreScreen(store: store)
+            }
             .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
                 NavigationStack {
                     AuthScreen(store: store)
@@ -86,53 +89,9 @@ public struct AppView: View {
             .onAppear {
                 store.send(.onAppear)
             }
-        }
-    }
-    
-    // MARK: - Toast (Refactor)
-    
-    @State private var isExpanded = false
-    @State private var duration = 5
-
-    @ViewBuilder
-    private func Toast(_ toast: ToastMessage) -> some View {
-        HStack(spacing: 0) {
-            Image(systemSymbol: toast.isError ? .xmarkCircleFill : .checkmarkCircleFill)
-                .font(.body)
-                .foregroundStyle(toast.isError ? Color(.Main.red) : tintColor)
-                .frame(width: 32, height: 32)
-            
-            if isExpanded {
-                Text(toast.description, bundle: .toast)
-                    .font(.caption)
-                    .foregroundStyle(Color(.Labels.primary))
-                    .padding(.trailing, 12)
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+            .onShake {
+                store.send(.onShake)
             }
-        }
-        .background(Color(.Background.primary))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(.Separator.secondary), lineWidth: 0.33)
-        }
-        .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
-        .padding(.bottom, 50 + 16)
-        .padding(.horizontal, 16)
-        .opacity(isExpanded ? 1 : 0)
-        .task {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                isExpanded = true
-            }
-            
-            try? await Task.sleep(for: .seconds(duration - 1))
-            
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                isExpanded = false
-            }
-            
-            try? await Task.sleep(for: .seconds(0.4))
-            store.send(.didFinishToastAnimation)
         }
     }
 }

@@ -58,6 +58,7 @@ public struct AppFeature: Reducer, Sendable {
         public var profileTab:   StackTab.State
         
         @Presents public var auth: AuthFeature.State?
+        @Presents public var logStore: LogStoreFeature.State?
         @Presents public var alert: AlertState<Never>?
         
         @Shared(.userSession) public var userSession: UserSession?
@@ -117,6 +118,7 @@ public struct AppFeature: Reducer, Sendable {
     
     public enum Action: BindableAction {
         case onAppear
+        case onShake
         
         case appDelegate(AppDelegateFeature.Action)
         
@@ -126,6 +128,7 @@ public struct AppFeature: Reducer, Sendable {
         case profileTab(StackTab.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
+        case logStore(PresentationAction<LogStoreFeature.Action>)
         case alert(PresentationAction<Never>)
         
         case binding(BindingAction<State>) // For Toast
@@ -284,6 +287,15 @@ public struct AppFeature: Reducer, Sendable {
                     await notificationsClient.processNotification(notification)
                 }
                 
+            case .onShake:
+                #if DEBUG
+                state.logStore = LogStoreFeature.State()
+                #endif
+                return .none
+                
+            case .logStore:
+                return .none
+                
             case let ._showToast(toast):
                 guard toast.priority >= state.toastMessage?.priority ?? .low else { return .none }
                 state.toastMessage = toast
@@ -299,7 +311,7 @@ public struct AppFeature: Reducer, Sendable {
                 state.toastMessage = nil
                 return .none
                 
-            case let ._failedToConnect(error):
+            case ._failedToConnect:
                 return .run { _ in
                     // if let error = error as? PDAPIError {
                     //     switch error {
@@ -471,6 +483,9 @@ public struct AppFeature: Reducer, Sendable {
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
         }
+        .ifLet(\.$logStore, action: \.logStore) {
+            LogStoreFeature()
+        }
     }
     
     // MARK: - Private Functions
@@ -599,6 +614,8 @@ public struct AppFeature: Reducer, Sendable {
         return .none
     }
 }
+
+// MARK: - Extensions
 
 extension UIApplication.State {
     var description: String {
