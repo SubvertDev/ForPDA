@@ -140,6 +140,7 @@ public struct ArticlesListScreen: View {
                     .padding(.bottom, 20)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
+                    .listRowBackground(Color(.Background.primary))
             }
         }
         .listStyle(.plain)
