@@ -173,6 +173,16 @@
         }
       }
     },
+    "Hide tabbar on scroll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрывать таббар при скролле"
+          }
+        }
+      }
+    },
     "Instructions" : {
       "localizations" : {
         "ru" : {

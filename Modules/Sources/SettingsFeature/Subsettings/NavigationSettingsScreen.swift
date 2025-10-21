@@ -47,6 +47,11 @@ public struct NavigationSettingsScreen: View {
                         }
                         
                         if isLiquidGlass {
+                            Row(LocalizedStringResource("Hide tabbar on scroll", bundle: .module)) {
+                                Toggle(String(""), isOn: $store.hideTabBarOnScroll)
+                                    .labelsHidden()
+                            }
+                            
                             Row(LocalizedStringResource("Floating navigation", bundle: .module)) {
                                 Toggle(String(""), isOn: $store.floatingNavigation)
                                     .labelsHidden()

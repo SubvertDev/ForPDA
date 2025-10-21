@@ -138,7 +138,7 @@ struct LiquidTabView: View {
                     StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
                 }
             }
-            .tabBarMinimizeBehavior(.onScrollDown)
+            .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
             // .tabViewBottomAccessory {
             //     PageNavigation(store: pageStore)
             // }
