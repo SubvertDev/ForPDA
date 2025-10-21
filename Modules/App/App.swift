@@ -30,9 +30,10 @@ struct ForPDAApp: App {
                     .tint(Color(.Theme.primary))
             }
         }
-        .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
-            await appDelegate.store.send(.backgroundTaskInvoked)
-        }
+        // TEMPORARY DISABLED DUE TO BACKGROUND PAUSE BUG
+        // .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
+        //     await appDelegate.store.send(.backgroundTaskInvoked)
+        // }
     }
 }
 

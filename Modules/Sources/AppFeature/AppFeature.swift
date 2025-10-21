@@ -431,34 +431,38 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .backgroundTaskInvoked:
-                return .run { [appSettings = state.appSettings] send in
-                    do {
-                        // Refresh task might pause in background and resume in foreground
-                        // hence we need to always check current application state
-                        let appState = await UIApplication.shared.applicationState
-                        logger.warning("Background task invoked on '\(appState.description, privacy: .public)' state")
-                        
-                        guard await UIApplication.shared.applicationState == .background else { return }
-                        guard try await notificationsClient.hasPermission() else { return }
-                        guard appSettings.notifications.isAnyEnabled else { return }
-                        
-                        try await apiClient.connect(inBackground: true)
-                        let unread = try await apiClient.getUnread()
-                        
-                        guard await UIApplication.shared.applicationState == .background else { return }
-                        logger.warning("Preparing to show unread notifications")
-                        await notificationsClient.showUnreadNotifications(unread, [])
-                        logger.warning("Did show unread notifications")
-                        
-                        guard await UIApplication.shared.applicationState == .background else { return }
-                        logger.warning("STOPPING CONNECTION ON BG TASK REQUEST")
-                        try await apiClient.disconnect()
-                    } catch {
-                        analyticsClient.capture(error)
-                    }
-                    
-                    await send(.registerBackgroundTask)
-                }
+                return .none
+                
+                // TEMPORARY DISABLED DUE TO BACKGROUND PAUSE BUG
+                
+                // return .run { [appSettings = state.appSettings] send in
+                //     do {
+                //         // Refresh task might pause in background and resume in foreground
+                //         // hence we need to always check current application state
+                //         let appState = await UIApplication.shared.applicationState
+                //         logger.warning("Background task invoked on '\(appState.description, privacy: .public)' state")
+                //
+                //         guard await UIApplication.shared.applicationState == .background else { return }
+                //         guard try await notificationsClient.hasPermission() else { return }
+                //         guard appSettings.notifications.isAnyEnabled else { return }
+                //
+                //         try await apiClient.connect(inBackground: true)
+                //         let unread = try await apiClient.getUnread()
+                //
+                //         guard await UIApplication.shared.applicationState == .background else { return }
+                //         logger.warning("Preparing to show unread notifications")
+                //         await notificationsClient.showUnreadNotifications(unread, [])
+                //         logger.warning("Did show unread notifications")
+                //
+                //         guard await UIApplication.shared.applicationState == .background else { return }
+                //         logger.warning("STOPPING CONNECTION ON BG TASK REQUEST")
+                //         try await apiClient.disconnect()
+                //     } catch {
+                //         analyticsClient.capture(error)
+                //     }
+                //
+                //     await send(.registerBackgroundTask)
+                // }
                 
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
