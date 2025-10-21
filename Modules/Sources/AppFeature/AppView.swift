@@ -139,9 +139,6 @@ struct LiquidTabView: View {
                 }
             }
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
-            // .tabViewBottomAccessory {
-            //     PageNavigation(store: pageStore)
-            // }
         }
     }
 }

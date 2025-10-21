@@ -250,36 +250,36 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .connectionStateChanged(connectionState):
                 state.connectionState = connectionState
-                switch connectionState {
-                case .ready:
-                    state.toastMessage = nil
-                case .connecting:
-                    state.toastMessage = ToastMessage(
-                        text: Localization.connecting,
-                        duration: 999_999_999,
-                        priority: .high
-                    )
-                case .disconnected:
-                    if !state.isNetworkOnline {
-                        state.toastMessage = ToastMessage(
-                            text: Localization.noInternetConnection,
-                            isError: true,
-                            duration: 999_999_999,
-                            priority: .high
-                        )
-                    }
-                }
+                // switch connectionState {
+                // case .ready:
+                //     state.toastMessage = nil
+                // case .connecting:
+                //     state.toastMessage = ToastMessage(
+                //         text: Localization.connecting,
+                //         duration: 999_999_999,
+                //         priority: .high
+                //     )
+                // case .disconnected:
+                //     if !state.isNetworkOnline {
+                //         state.toastMessage = ToastMessage(
+                //             text: Localization.noInternetConnection,
+                //             isError: true,
+                //             duration: 999_999_999,
+                //             priority: .high
+                //         )
+                //     }
+                // }
                 return .none
                 
             case let .networkStateChanged(networkState):
-                let noInternet = ToastMessage(
-                    text: Localization.noInternetConnection,
-                    isError: true,
-                    duration: 999_999_999,
-                    priority: .high
-                )
-                state.toastMessage = networkState ? nil : noInternet
-                state.isNetworkOnline = networkState
+                // let noInternet = ToastMessage(
+                //     text: Localization.noInternetConnection,
+                //     isError: true,
+                //     duration: 999_999_999,
+                //     priority: .high
+                // )
+                // state.toastMessage = networkState ? nil : noInternet
+                // state.isNetworkOnline = networkState
                 return .none
                 
             case let .receivedNotification(notification):
