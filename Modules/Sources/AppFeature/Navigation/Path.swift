@@ -56,6 +56,7 @@ public enum Path {
     @Reducer(state: .equatable)
     public enum Settings {
         case settings(SettingsFeature)
+        case navigation(NavigationSettingsFeature)
         case notifications(NotificationsFeature)
         case developer(DeveloperFeature)
     }
@@ -149,6 +150,10 @@ extension Path {
         case let .settings(store):
             SettingsScreen(store: store)
                 .tracking(for: SettingsScreen.self)
+            
+        case let .navigation(store):
+            NavigationSettingsScreen(store: store)
+                .tracking(for: NavigationSettingsScreen.self)
             
         case let .notifications(store):
             NotificationsScreen(store: store)

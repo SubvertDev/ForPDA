@@ -399,6 +399,7 @@ let project = Project(
                     .Internal.GalleryFeature,
                     .Internal.LoggerClient,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,

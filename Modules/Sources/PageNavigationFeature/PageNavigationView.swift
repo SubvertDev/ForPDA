@@ -29,14 +29,123 @@ public struct PageNavigation: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            PageNavigation()
+            if #available(iOS 26, *), store.appSettings.floatingNavigation {
+                LiquidNavigation()
+            } else {
+                LegacyNavigation()
+            }
         }
     }
     
-    // MARK: - Page Navigation
+    // MARK: - Liquid Navigation
+    
+    @available(iOS 26, *)
+    @ViewBuilder
+    private func LiquidNavigation() -> some View {
+        HStack(spacing: 0) {
+            Button {
+                store.send(.firstPageTapped)
+            } label: {
+                NavigationArrow(symbol: .chevronLeft2)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.currentPage == 1)
+            .padding(.leading, 16)
+            
+            Spacer()
+            
+            Button {
+                store.send(.previousPageTapped)
+            } label: {
+                NavigationArrow(symbol: .chevronLeft)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.currentPage == 1)
+            
+            Spacer()
+            
+            HStack(spacing: 8) {
+                TextField(String(""), text: $store.page)
+                    .font(.subheadline.monospacedDigit())
+                    .keyboardType(.numberPad)
+                    .focused($focus, equals: PageNavigationFeature.State.Field.page)
+                    .fixedSize()
+                    .onChange(of: store.page) { newValue in
+                        guard !store.page.isEmpty else { return }
+                        store.page = String(min(Int(store.page.filter(\.isNumber))!, store.totalPages))
+                    }
+                    .toolbar {
+                        if focus == .page {
+                            ToolbarItemGroup(placement: .keyboard) {
+                                Spacer()
+                                
+                                Button {
+                                    store.send(.doneButtonTapped)
+                                } label: {
+                                    Text("Done", bundle: .module)
+                                }
+                            }
+                        }
+                    }
+                    .opacity(store.focus == nil ? 0 : 1)
+                    .overlay {
+                        Text(store.page)
+                            .font(.subheadline)
+                            .fixedSize()
+                            .opacity(store.focus == nil ? 1 : 0)
+                            .contentTransition(.numericText())
+                            .animation(.default, value: store.page)
+                    }
+                
+                Text(verbatim: "/")
+                    .font(.subheadline.monospacedDigit())
+                
+                Text(verbatim: "\(store.totalPages)")
+                    .font(.subheadline.monospacedDigit())
+            }
+            .padding(.vertical, 6)
+            .padding(.horizontal, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .foregroundStyle(Color(.Background.teritary))
+                    .glassEffect(.identity)
+            )
+            .onTapGesture {
+                store.send(.onViewTapped)
+            }
+            
+            Spacer()
+            
+            Button {
+                store.send(.nextPageTapped)
+            } label: {
+                NavigationArrow(symbol: .chevronRight)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.currentPage + 1 > store.totalPages)
+            
+            Spacer()
+            
+            Button {
+                store.send(.lastPageTapped)
+            } label: {
+                NavigationArrow(symbol: .chevronRight2)
+            }
+            .buttonStyle(.plain)
+            .disabled(store.currentPage + 1 > store.totalPages)
+            .padding(.trailing, 16)
+        }
+        .padding(.vertical, 8)
+        .contentShape(.rect)
+        .frame(maxWidth: .infinity)
+        .glassEffect(.regular.interactive())
+        .bind($store.focus, to: $focus)
+    }
+    
+    // MARK: - Legacy Navigation
     
     @ViewBuilder
-    private func PageNavigation() -> some View {
+    private func LegacyNavigation() -> some View {
         HStack(spacing: 32) {
             Button {
                 store.send(.firstPageTapped)
@@ -138,12 +247,29 @@ public struct PageNavigation: View {
 
 // MARK: - Previews
 
+@available(iOS 17, *)
 #Preview {
-    PageNavigation(
-        store: Store(
-            initialState: PageNavigationFeature.State(type: .forum)
-        ) {
-            PageNavigationFeature()
-        }
-    )
+    @Previewable @State var store = Store(
+        initialState: PageNavigationFeature.State(type: .forum)
+    ) {
+        PageNavigationFeature()
+    }
+    
+    @Shared(.appSettings) var appSettings
+    let _ = $appSettings.floatingNavigation.withLock { $0 = true }
+    
+    ZStack {
+        LinearGradient(
+            colors: [.red, .blue],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+        
+        PageNavigation(store: store)
+            .padding(.horizontal, 16)
+            .onAppear {
+                store.send(.update(count: 5000, offset: 0))
+            }
+    }
 }

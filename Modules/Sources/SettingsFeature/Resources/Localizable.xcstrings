@@ -51,17 +51,6 @@
         }
       }
     },
-    "Background color" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цвет фона"
-          }
-        }
-      }
-    },
     "Basic" : {
       "localizations" : {
         "ru" : {
@@ -164,6 +153,16 @@
         }
       }
     },
+    "Floating navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Плавающая навигация"
+          }
+        }
+      }
+    },
     "GitHub repository" : {
       "localizations" : {
         "ru" : {
@@ -230,6 +229,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Список изменений в Telegram"
+          }
+        }
+      }
+    },
+    "Navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Навигация"
           }
         }
       }

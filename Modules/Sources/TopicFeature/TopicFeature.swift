@@ -68,11 +68,11 @@ public struct TopicFeature: Reducer, Sendable {
         
         var posts: [UIPost] = []
         
-        var isFirstPage = true
         var isLoadingTopic = true
         var isRefreshing = false
         
         var pageNavigation = PageNavigationFeature.State(type: .topic)
+        var floatingNavigation: Bool
         
         var didLoadOnce = false
         
@@ -93,6 +93,7 @@ public struct TopicFeature: Reducer, Sendable {
             self.topicName = topicName
             self.goTo = goTo
             self.destination = destination
+            self.floatingNavigation = _appSettings.floatingNavigation.wrappedValue
             
             // If we open this screen with Go To End usage then we can get offset like 99
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
@@ -176,7 +177,6 @@ public struct TopicFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
                 state.postId = nil
-                state.shouldShowTopicHatButton = newOffset == 0 ? false : true
                 state.posts.removeAll()
                 return .concatenate([
                     .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
@@ -398,7 +398,6 @@ public struct TopicFeature: Reducer, Sendable {
                 )
                 
             case let .internal(.loadTopic(offset)):
-                state.isFirstPage = offset == 0
                 if !state.isRefreshing {
                     state.isLoadingTopic = true
                 }
@@ -420,7 +419,7 @@ public struct TopicFeature: Reducer, Sendable {
                     updatePageNavigation(&state),
                     
                     .run { [
-                        isFirstPage = state.isFirstPage,
+                        isFirstPage = state.pageNavigation.isFirstPage,
                         topicPerPage = state.appSettings.topicPerPage,
                         shouldShowTopicHatButton = state.shouldShowTopicHatButton
                     ] send in
@@ -466,11 +465,10 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 state.isLoadingTopic = false
                 state.isRefreshing = false
+                state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
+                
                 reportFullyDisplayed(&state)
                 return .none
-//                return PageNavigationFeature()
-//                    .reduce(into: &state.pageNavigation, action: .nextPageTapped)
-//                    .map(Action.pageNavigation)
                 
             case .internal(.topicResponse(.failure)):
                 state.isRefreshing = false

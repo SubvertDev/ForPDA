@@ -54,6 +54,7 @@ public struct NotificationsScreen: View {
                     .frame(minHeight: 60)
                 }
                 .scrollContentBackground(.hidden)
+                ._contentMargins(.top, 16)
             }
             .navigationTitle(Text("Notifications", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)

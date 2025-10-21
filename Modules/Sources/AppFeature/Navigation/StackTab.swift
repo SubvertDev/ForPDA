@@ -263,6 +263,9 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleSettingsPathNavigation(action: Path.Settings.Action, state: inout State) -> Effect<Action> {
         switch action {
+        case .settings(.delegate(.openNavigationSettings)):
+            state.path.append(.settings(.navigation(NavigationSettingsFeature.State())))
+            
         case .settings(.delegate(.openNotificationsSettings)):
             state.path.append(.settings(.notifications(NotificationsFeature.State())))
             

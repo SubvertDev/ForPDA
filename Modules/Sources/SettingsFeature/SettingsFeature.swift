@@ -34,7 +34,6 @@ public struct SettingsFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         
         public var startPage: AppTab
-        public var topicOpening: TopicOpeningStrategy
         public var appColorScheme: AppColorScheme
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
@@ -65,7 +64,6 @@ public struct SettingsFeature: Reducer, Sendable {
             self.destination = destination
 
             self.startPage = _appSettings.startPage.wrappedValue
-            self.topicOpening = _appSettings.topicOpeningStrategy.wrappedValue
             self.appColorScheme = _appSettings.appColorScheme.wrappedValue
             self.backgroundTheme = _appSettings.backgroundTheme.wrappedValue
             self.appTintColor = _appSettings.appTintColor.wrappedValue
@@ -79,10 +77,10 @@ public struct SettingsFeature: Reducer, Sendable {
         case languageButtonTapped
         case schemeButtonTapped(AppColorScheme)
         case notificationsButtonTapped
+        case navigationButtonTapped
         case onDeveloperMenuTapped
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
-        // case copyPushTokenButtonTapped
         case clearCacheButtonTapped
         case supportOnBoostyButtonTapped
         case appDiscussionButtonTapped
@@ -103,6 +101,7 @@ public struct SettingsFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openNavigationSettings
             case openNotificationsSettings
             case openDeveloperMenu
             case openDeeplink(URL)
@@ -136,6 +135,9 @@ public struct SettingsFeature: Reducer, Sendable {
             case .notificationsButtonTapped:
                 return .send(.delegate(.openNotificationsSettings))
                 
+            case .navigationButtonTapped:
+                return .send(.delegate(.openNavigationSettings))
+                
             case .onDeveloperMenuTapped:
                 return .send(.delegate(.openDeveloperMenu))
                 
@@ -149,10 +151,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
                 pasteboardClient.copy(analyticsId)
                 return .none
-                
-            // case .copyPushTokenButtonTapped:
-            //     state.destination = .alert(.notImplemented)
-            //     return .none
                 
             case .clearCacheButtonTapped:
                 state.destination = .alert(.clearCache)
@@ -221,10 +219,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 
             case .binding(\.startPage):
                 state.$appSettings.withLock { $0.startPage = state.startPage }
-                return .none
-                
-            case .binding(\.topicOpening):
-                state.$appSettings.withLock { $0.topicOpeningStrategy = state.topicOpening }
                 return .none
                 
             case .destination, .binding, .delegate:

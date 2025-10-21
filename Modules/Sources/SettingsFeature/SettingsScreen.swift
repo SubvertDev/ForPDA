@@ -65,7 +65,6 @@ public struct SettingsScreen: View {
         case backgroundPicker
         case themePicker
         case startPagePicker
-        case topicOpening
     }
         
     @ViewBuilder
@@ -108,16 +107,11 @@ public struct SettingsScreen: View {
                             .foregroundStyle(Color(.Labels.quintuple))
                         
                     case .backgroundPicker:
-                        Menu {
-                            Picker(String(""), selection: $store.backgroundTheme) {
-                                ForEach(BackgroundTheme.allCases, id: \.self) { theme in
-                                    HStack(spacing: 0) {
-                                        Text(theme.title, bundle: .module)
-                                        theme.image
-                                    }
-                                }
+                        EnumPickerMenu(selection: $store.backgroundTheme) { theme in
+                            HStack(spacing: 0) {
+                                Text(theme.title, bundle: .module)
+                                theme.image
                             }
-                            .pickerStyle(.inline)
                         } label: {
                             HStack(spacing: 9) {
                                 Text(store.backgroundTheme.title, bundle: .module)
@@ -127,16 +121,11 @@ public struct SettingsScreen: View {
                         }
                         
                     case .themePicker:
-                        Menu {
-                            Picker(String(""), selection: $store.appTintColor) {
-                                ForEach(AppTintColor.allCases, id: \.self) { tint in
-                                    HStack(spacing: 0) {
-                                        Text(tint.title, bundle: .module)
-                                        tint.image
-                                    }
-                                }
+                        EnumPickerMenu(selection: $store.appTintColor) { tint in
+                            HStack(spacing: 0) {
+                                Text(tint.title, bundle: .module)
+                                tint.image
                             }
-                            .pickerStyle(.inline)
                         } label: {
                             HStack(spacing: 9) {
                                 Text(store.appTintColor.title, bundle: .module)
@@ -146,32 +135,11 @@ public struct SettingsScreen: View {
                         }
                         
                     case .startPagePicker:
-                        Menu {
-                            Picker(String(""), selection: $store.startPage) {
-                                ForEach(AppTab.allCases, id: \.self) { tab in
-                                    Text(tab.title)
-                                }
-                            }
-                            .pickerStyle(.inline)
+                        EnumPickerMenu(selection: $store.startPage) { tab in
+                            Text(tab.title)
                         } label: {
                             HStack(spacing: 9) {
                                 Text(store.startPage.title)
-                                Image(systemSymbol: .chevronUpChevronDown)
-                            }
-                            .foregroundStyle(Color(.Labels.teritary))
-                        }
-                        
-                    case .topicOpening:
-                        Menu {
-                            Picker(String(""), selection: $store.topicOpening) {
-                                ForEach(TopicOpeningStrategy.allCases, id: \.self) { open in
-                                    Text(open.title, bundle: ModelsResources.bundle)
-                                }
-                            }
-                            .pickerStyle(.inline)
-                        } label: {
-                            HStack(spacing: 9) {
-                                Text(store.topicOpening.title, bundle: ModelsResources.bundle)
                                 Image(systemSymbol: .chevronUpChevronDown)
                             }
                             .foregroundStyle(Color(.Labels.teritary))
@@ -260,19 +228,19 @@ public struct SettingsScreen: View {
         Section {
             Row(symbol: ._1Circle, title: "Starting page", type: .startPagePicker)
             
-//            Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
+            // Row(symbol: .paintpalette, title: "Background color", type: .backgroundPicker)
             
-            Row(symbol: .rectangleAndHandPointUpLeft, title: "Topic opening", type: .topicOpening)
+            // Row(symbol: .rectangleAndHandPointUpLeft, title: "Topic opening", type: .topicOpening)
             
             Row(symbol: .swatchpalette, title: "Accent color", type: .themePicker)
+            
+            Row(symbol: .rectangleAndHandPointUpLeft, title: "Navigation", type: .navigation) {
+                store.send(.navigationButtonTapped)
+            }
             
             Row(symbol: .bell, title: "Notifications", type: .navigation) {
                 store.send(.notificationsButtonTapped)
             }
-            
-//            Row(symbol: .textformatSize, title: "Text size", type: .navigation) {
-//                store.send(.notImplementedFeatureTapped)
-//            }
             
             Row(symbol: .globe, title: "Language", type: .navigation) {
                 store.send(.languageButtonTapped)
@@ -296,19 +264,15 @@ public struct SettingsScreen: View {
                 store.send(.copyDebugIdButtonTapped)
             }
             
-            // Row(symbol: .docOnDoc, title: "Copy Push Token", type: .navigation) {
-            //     store.send(.copyPushTokenButtonTapped)
-            // }
-            
             Row(symbol: .trash, title: "Clear cache", type: .navigation) {
                 store.send(.clearCacheButtonTapped)
             }
         } header: {
             Header(title: "Advanced")
                 .onTapGesture {
-                    if isDebug {
-                        store.send(.onDeveloperMenuTapped)
-                    }
+                    #if DEBUG
+                    store.send(.onDeveloperMenuTapped)
+                    #endif
                 }
         }
         .listRowBackground(Color(.Background.teritary))
@@ -428,25 +392,6 @@ extension AppTintColor {
     }
 }
 
-// MARK: - Extensions
-
-private extension Bundle {
-    static var models: Bundle? {
-        return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
-    }
-}
-
-// MARK: - Helpers
-
-private var isDebug: Bool {
-    #if DEBUG
-        return true
-    #else
-        return false
-    #endif
-}
-
-
 // MARK: - Previews
 
 #Preview {
@@ -460,5 +405,4 @@ private var isDebug: Bool {
         )
     }
     .environment(\.tintColor, Color(.Theme.primary))
-    .environment(\.locale, Locale(identifier: "ru"))
 }

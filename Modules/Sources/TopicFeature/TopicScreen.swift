@@ -30,6 +30,18 @@ public struct TopicScreen: View {
     @State private var scrollScale: CGFloat = 1
     @State private var showKarmaConfirmation = false
     
+    // MARK: - Computed Properties
+    
+    private var shouldShowTopNavigation: Bool {
+        let shouldShow = store.topic != nil
+        return shouldShow && (!isLiquidGlass || !store.appSettings.floatingNavigation)
+    }
+    
+    private var shouldShowBottomNavigation: Bool {
+        let shouldShow = store.topic != nil && !store.isLoadingTopic
+        return shouldShow && (!isLiquidGlass || !store.appSettings.floatingNavigation)
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
@@ -48,13 +60,15 @@ public struct TopicScreen: View {
                     WithPerceptionTracking {
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                if store.topic != nil {
+                                if shouldShowTopNavigation {
                                     Navigation()
                                 }
                                 
                                 if !store.isLoadingTopic {
                                     PostList()
-                                    
+                                }
+                                
+                                if shouldShowBottomNavigation {
                                     Navigation()
                                 }
                             }
@@ -79,6 +93,12 @@ public struct TopicScreen: View {
             }
             .navigations(store: store)
             .toolbar { OptionsMenu() }
+            .safeAreaInset(edge: .bottom) {
+                if isLiquidGlass, store.appSettings.floatingNavigation {
+                    Navigation()
+                        .padding(.bottom, 8)
+                }
+            }
             .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
             .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
             .onFirstAppear {
@@ -401,26 +421,8 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
                 .navigationBarTitleDisplayMode(.inline)
-                .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
-                    NavigationStack {
-                        WriteFormScreen(store: store)
-                    }
-                }
-                .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                    let state = store.withState { $0 }
-                    TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
-                }
-                .fittedSheet(
-                    item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
-                    embedIntoNavStack: true
-                ) { store in
-                    ReputationChangeView(store: store)
-                }
-                .sheet(isPresented: Binding($store.destination.editWarning)) {
-                    EditWarningSheet()
-                        .presentationDetents([.medium])
-                        .presentationDragIndicator(.visible)
-                }
+                .modifier(FullScreenCoverModifier(store: store))
+                .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
                     Button {
                         store.send(.view(.changeKarmaTapped(postId, true)))
@@ -437,87 +439,137 @@ struct NavigationModifier: ViewModifier {
         }
     }
     
-    // TODO: Move to SharedUI?
-    // MARK: - Edit Warning Sheet
-    
-    @ViewBuilder
-    private func EditWarningSheet() -> some View {
-        VStack(spacing: 0) {
-            Spacer()
-            
-            Image(systemSymbol: .hammer)
-                .font(.title)
-                .foregroundStyle(tintColor)
-                .padding(.bottom, 8)
-            
-            Text("Editing posts with attachments is not yet supported", bundle: .module)
-                .font(.title3)
-                .bold()
-                .foregroundStyle(Color(.Labels.primary))
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 6)
-            
-            Spacer()
-            
-            Button {
-                store.send(.view(.editWarningSheetCloseButtonTapped))
-            } label: {
-                Text("Understood", bundle: .module)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(tintColor)
-            .frame(height: 48)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(ignoresSafeAreaEdges: .bottom)
+    struct FullScreenCoverModifier: ViewModifier {
+        @Perception.Bindable private var store: StoreOf<TopicFeature>
+        @Environment(\.tintColor) private var tintColor
+        
+        init(store: StoreOf<TopicFeature>) {
+            self.store = store
         }
-        .background {
-            VStack(spacing: 0) {
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: 12))
-                    .padding(.top, 32)
-                
-                Spacer()
-                
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: -12))
-                    .padding(.bottom, 96)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .topTrailing) {
-            Button {
-                store.send(.view(.editWarningSheetCloseButtonTapped))
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color(.Background.quaternary))
-                        .frame(width: 30, height: 30)
-                    
-                    Image(systemSymbol: .xmark)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.top, 14)
-                .padding(.trailing, 16)
+        
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                        NavigationStack {
+                            WriteFormScreen(store: store)
+                        }
+                    }
+                    .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
+                        let state = store.withState { $0 }
+                        TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+                    }
             }
         }
     }
     
-    @ViewBuilder
-    private func ComingSoonTape() -> some View {
-        HStack(spacing: 8) {
-            ForEach(0..<6, id: \.self) { index in
-                Text("IN DEVELOPMENT", bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(Color(.Labels.primaryInvariably))
-                    .fixedSize(horizontal: true, vertical: false)
-                    .lineLimit(1)
+    struct SheetModifier: ViewModifier {
+        @Perception.Bindable private var store: StoreOf<TopicFeature>
+        @Environment(\.tintColor) private var tintColor
+        
+        init(store: StoreOf<TopicFeature>) {
+            self.store = store
+        }
+        
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .fittedSheet(
+                        item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                        embedIntoNavStack: true
+                    ) { store in
+                        ReputationChangeView(store: store)
+                    }
+                    .sheet(isPresented: Binding($store.destination.editWarning)) {
+                        EditWarningSheet()
+                            .presentationDetents([.medium])
+                            .presentationDragIndicator(.visible)
+                    }
             }
         }
-        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-        .background(tintColor)
+        
+        // TODO: Move to SharedUI?
+        // MARK: - Edit Warning Sheet
+        
+        @ViewBuilder
+        private func EditWarningSheet() -> some View {
+            VStack(spacing: 0) {
+                Spacer()
+                
+                Image(systemSymbol: .hammer)
+                    .font(.title)
+                    .foregroundStyle(tintColor)
+                    .padding(.bottom, 8)
+                
+                Text("Editing posts with attachments is not yet supported", bundle: .module)
+                    .font(.title3)
+                    .bold()
+                    .foregroundStyle(Color(.Labels.primary))
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 6)
+                
+                Spacer()
+                
+                Button {
+                    store.send(.view(.editWarningSheetCloseButtonTapped))
+                } label: {
+                    Text("Understood", bundle: .module)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(tintColor)
+                .frame(height: 48)
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+                .background(ignoresSafeAreaEdges: .bottom)
+            }
+            .background {
+                VStack(spacing: 0) {
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: 12))
+                        .padding(.top, 32)
+                    
+                    Spacer()
+                    
+                    ComingSoonTape()
+                        .rotationEffect(Angle(degrees: -12))
+                        .padding(.bottom, 96)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    store.send(.view(.editWarningSheetCloseButtonTapped))
+                } label: {
+                    ZStack {
+                        Circle()
+                            .fill(Color(.Background.quaternary))
+                            .frame(width: 30, height: 30)
+                        
+                        Image(systemSymbol: .xmark)
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(Color(.Labels.teritary))
+                    }
+                    .padding(.top, 14)
+                    .padding(.trailing, 16)
+                }
+            }
+        }
+        
+        @ViewBuilder
+        private func ComingSoonTape() -> some View {
+            HStack(spacing: 8) {
+                ForEach(0..<6, id: \.self) { index in
+                    Text("IN DEVELOPMENT", bundle: .module)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.Labels.primaryInvariably))
+                        .fixedSize(horizontal: true, vertical: false)
+                        .lineLimit(1)
+                }
+            }
+            .frame(width: UIScreen.main.bounds.width * 2, height: 26)
+            .background(tintColor)
+        }
     }
 }
 
@@ -551,18 +603,21 @@ private extension Date {
 #Preview {
     @Shared(.userSession) var userSession = UserSession.mock
     
-    TopicScreen(
-        store: Store(
-            initialState: TopicFeature.State(topicId: 0, topicName: "Test Topic")
-        ) {
-            TopicFeature()
-        } withDependencies: {
-            $0.apiClient.getTopic = { @Sendable _, _, _ in
-                return .mock
+    ScreenWrapper(hasBackButton: true) {
+        TopicScreen(
+            store: Store(
+                initialState: TopicFeature.State(topicId: 0, topicName: "Test Topic")
+            ) {
+                TopicFeature()
+            } withDependencies: {
+                $0.apiClient.getTopic = { @Sendable _, _, _ in
+                    return .mock
+                }
             }
-        }
-    )
+        )
+    }
     .tint(Color(.Theme.primary))
+    .environment(\.locale, Locale(identifier: "en"))
 }
 
 #Preview("New post requests attach") {
