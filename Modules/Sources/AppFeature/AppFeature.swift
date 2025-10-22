@@ -409,7 +409,7 @@ public struct AppFeature: Reducer, Sendable {
                     }
                     
                     if isLoggedIn, newPhase == .background {
-                        await send(.registerBackgroundTask)
+                        // await send(.registerBackgroundTask)
                     }
                     
                     if newPhase == .background {
