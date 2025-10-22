@@ -64,7 +64,7 @@ public struct PageNavigation: View {
             
             Spacer()
             
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 TextField(String(""), text: $store.page)
                     .font(.subheadline.monospacedDigit())
                     .keyboardType(.numberPad)
@@ -90,7 +90,7 @@ public struct PageNavigation: View {
                     .opacity(store.focus == nil ? 0 : 1)
                     .overlay {
                         Text(store.page)
-                            .font(.subheadline)
+                            .font(.subheadline.monospacedDigit())
                             .fixedSize()
                             .opacity(store.focus == nil ? 1 : 0)
                             .contentTransition(.numericText())
@@ -269,7 +269,7 @@ public struct PageNavigation: View {
         PageNavigation(store: store)
             .padding(.horizontal, 16)
             .onAppear {
-                store.send(.update(count: 5000, offset: 0))
+                store.send(.update(count: 50000, offset: 0))
             }
     }
 }

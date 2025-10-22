@@ -124,7 +124,7 @@ public extension Topic {
                 )
             ]
         ),
-        postsCount: 1709,
+        postsCount: 5005,
         posts: [
             .mock(id: 0), .mock(id: 1), .mock(id: 2)
         ],
