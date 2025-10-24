@@ -326,9 +326,12 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.BBBuilder,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.TCAExtensions,
                     .SPM.ExyteChat,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,

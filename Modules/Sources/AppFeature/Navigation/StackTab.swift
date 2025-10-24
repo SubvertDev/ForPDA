@@ -288,6 +288,9 @@ public struct StackTab: Reducer, Sendable {
         case let .qmsList(.chatRowTapped(id)):
             state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
             
+        case let .qms(.delegate(.handleUrl(url))):
+            return handleDeeplink(url: url, state: &state)
+            
         default:
             break
         }

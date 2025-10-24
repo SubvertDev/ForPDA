@@ -44,6 +44,7 @@ public struct QMSListScreen: View {
                         }
                     }
                     .scrollContentBackground(.hidden)
+                    ._contentMargins(.top, 16)
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
@@ -66,7 +67,7 @@ public struct QMSListScreen: View {
             store.send(.userRowTapped(user.id))
         } label: {
             HStack(spacing: 8) {
-                LazyImage(url: user.avatarUrl) { state in
+                LazyImage(url: user.avatarUrl ?? Links.defaultQMSAvatar) { state in
                     Group {
                         if let image = state.image {
                             image.resizable().scaledToFill()

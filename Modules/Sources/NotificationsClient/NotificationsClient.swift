@@ -17,7 +17,7 @@ import Models
 public enum NotificationEvent: Equatable {
     case site(Int)
     case topic(Int)
-    case qms
+    case qms(Int)
     
     public var isTopic: Bool {
         if case .topic = self { return true }
@@ -94,7 +94,7 @@ extension NotificationsClient: DependencyKey {
                     switch notification.category {
                     case .qms:
                         if notification.flag == 1 {
-                            subject.send(.qms)
+                            subject.send(.qms(notification.id))
                             return
                         } else {
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))

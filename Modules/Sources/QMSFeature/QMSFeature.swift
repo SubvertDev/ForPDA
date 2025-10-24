@@ -12,6 +12,8 @@ import PersistenceKeys
 import Models
 import ExyteChat
 import AnalyticsClient
+import NotificationsClient
+import TCAExtensions
 
 @Reducer
 public struct QMSFeature: Reducer, Sendable {
@@ -22,7 +24,10 @@ public struct QMSFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Presents var alert: AlertState<Action.Alert>?
+        
         @Shared(.userSession) var userSession: UserSession?
+        
         public let chatId: Int
         public var chat: QMSChat?
         public var messages: [Message] = []
@@ -37,86 +42,117 @@ public struct QMSFeature: Reducer, Sendable {
             }
         }
         
-        public init(
-            chatId: Int
-        ) {
+        public init(chatId: Int) {
             self.chatId = chatId
         }
     }
     
     // MARK: - Action
     
-    public enum Action: BindableAction {
-        case onAppear
-        case onDisappear
+    public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
-        case sendMessageButtonTapped(String)
         
-        case _refreshChatPeriodically
-        case _loadChat
-        case _chatLoaded(Result<QMSChat, any Error>)
+        case alert(PresentationAction<Alert>)
+        public enum Alert {
+            case ok
+        }
+        
+        case view(View)
+        public enum View {
+            case onAppear
+            case sendMessageButtonTapped(String)
+            case urlTapped(URL)
+        }
+        
+        case `internal`(Internal)
+        public enum Internal {
+            case loadChat
+            case chatLoaded(Result<QMSChat, any Error>)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case handleUrl(URL)
+        }
     }
     
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
-    @Dependency(\.continuousClock) private var clock
-    
-    // MARK: - Cancellable
-    
-    private enum CancelID { case timer }
+    @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
+            case .alert, .delegate:
+                return .none
+                
+            case .view(.onAppear):
                 return .merge([
-                    .send(._loadChat),
-                    .send(._refreshChatPeriodically)
+                    .send(.internal(.loadChat)),
+                    .run { send in
+                        for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
+                            await send(.internal(.loadChat))
+                        }
+                    },
+                    .run { [chatId = state.chatId] send in
+                        for await notification in notificationsClient.eventPublisher().values {
+                            if case let .qms(id) = notification, chatId == id {
+                                await send(.internal(.loadChat))
+                            }
+                        }
+                    }
                 ])
                 
-            case .onDisappear:
-                return .cancel(id: CancelID.timer)
-                
-            case let .sendMessageButtonTapped(message):
+            case let .view(.sendMessageButtonTapped(message)):
+                // let sendingMessage = Message(
+                //     id: message,
+                //     user: User(id: String(state.userSession!.userId), name: "You", avatarURL: nil, isCurrentUser: true),
+                //     status: .sending,
+                //     createdAt: .now,
+                //     text: message
+                // )
+                // state.messages.append(sendingMessage)
                 return .run { [chatId = state.chatId] send in
                     try await apiClient.sendQMSMessage(chatId, message)
-                    await send(._loadChat)
                 }
                 
-            case ._refreshChatPeriodically:
-                return .run { send in
-                    // TODO: Remove on socket connect
-                    for await _ in self.clock.timer(interval: .seconds(5)) {
-                        await send(._loadChat)
-                    }
-                }
-                .cancellable(id: CancelID.timer)
+            case let .view(.urlTapped(url)):
+                return .send(.delegate(.handleUrl(url)))
                 
-            case ._loadChat:
+            case .internal(.loadChat):
                 return .run { [id = state.chatId] send in
                     let result = await Result { try await apiClient.loadQMSChat(id) }
-                    await send(._chatLoaded(result))
+                    await send(.internal(.chatLoaded(result)))
                 }
                 
-            case let ._chatLoaded(result):
+            case let .internal(.chatLoaded(result)):
                 switch result {
                 case let .success(chat):
-                    // customDump(chat)
                     state.chat = chat
                     
                     for message in chat.messages {
+                        // Skip already processed messages
                         if state.messages.contains(where: { $0.id == String(message.id) }) { continue }
+                        
+                        // Set .none status on sent messages and skip
+                        if let index = state.messages.firstIndex(where: { $0.id == message.text }) {
+                            state.messages[index].status = .none
+                            continue
+                        }
+                        
+                        // Creating new messages
                         let isCurrentUser = state.userSession!.userId == message.senderId
                         let newMessage = Message(
                             id: String(message.id),
                             user: User(
                                 id: String(message.senderId),
                                 name: isCurrentUser ? "You" : chat.partnerName,
-                                avatarURL: isCurrentUser ? nil : chat.avatarUrl,
+                                avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
                                 isCurrentUser: isCurrentUser
                             ),
                             createdAt: message.date,
@@ -126,9 +162,10 @@ public struct QMSFeature: Reducer, Sendable {
                     }
                     
                 case let .failure(error):
-                    print(error)
-                    // TODO: Handle error
+                    analyticsClient.capture(error)
+                    state.alert = .somethingWentWrong
                 }
+                
                 reportFullyDisplayed(&state)
                 return .none
                 
