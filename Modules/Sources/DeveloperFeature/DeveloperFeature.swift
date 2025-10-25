@@ -142,7 +142,7 @@ public struct DeveloperScreen: View {
                 .padding(16)
             }
             .navigationTitle("Developer menu")
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .onAppear {
                 store.send(.onAppear)
             }

@@ -47,7 +47,7 @@ public struct ReputationScreen: View {
             }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Reputation", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .onAppear {
                 send(.onAppear)
             }

@@ -65,7 +65,7 @@ public struct ForumScreen: View {
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
             .toolbar {
                 OptionsMenu()
             }

@@ -68,7 +68,7 @@ public struct QMSScreen: View {
                 }
             }
             .navigationTitle(store.title)
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .onAppear {
                 send(.onAppear)
             }

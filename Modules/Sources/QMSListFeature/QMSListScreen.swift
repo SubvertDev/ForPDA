@@ -51,7 +51,7 @@ public struct QMSListScreen: View {
                 }
             }
             .navigationTitle("QMS")
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .animation(.default, value: store.expandedGroups)
             .onAppear {
                 store.send(.onAppear)

@@ -67,7 +67,7 @@ public struct ForumsListScreen: View {
             }
             .animation(.default, value: store.forums)
             .navigationTitle(Text("Forum", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
             .onAppear {
                 send(.onAppear)
             }

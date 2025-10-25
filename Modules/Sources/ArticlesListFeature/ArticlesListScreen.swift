@@ -64,7 +64,7 @@ public struct ArticlesListScreen: View {
                 }
             }
             .navigationTitle(Text("Articles", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
             .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
             .toolbar { Toolbar() }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))

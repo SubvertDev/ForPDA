@@ -49,7 +49,7 @@ public struct AnnouncementScreen: View {
                 }
             }
             .navigationTitle(Text(store.name ?? "Загружаем..."))
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .toolbar {
                 // TODO: Announcement Info?
             }

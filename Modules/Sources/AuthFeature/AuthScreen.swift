@@ -151,7 +151,7 @@ public struct AuthScreen: View {
                     .tint(tintColor)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(Color(.Background.primary), for: .navigationBar)
             .overlay(alignment: .top) {

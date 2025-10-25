@@ -45,7 +45,7 @@ public struct HistoryScreen: View {
             }
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
             .overlay {
                 if store.isLoading {
                     PDALoader()

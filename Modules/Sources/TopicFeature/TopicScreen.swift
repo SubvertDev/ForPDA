@@ -420,7 +420,7 @@ struct NavigationModifier: ViewModifier {
         WithPerceptionTracking {
             content
                 .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
-                .navigationBarTitleDisplayMode(.inline)
+                ._toolbarTitleDisplayMode(.inline)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in

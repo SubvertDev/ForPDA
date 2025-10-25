@@ -67,7 +67,7 @@ public struct NavigationSettingsScreen: View {
                 ._contentMargins(.top, 16)
             }
             .navigationTitle(Text("Navigation", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .animation(.default, value: store.state)
             .onAppear {
                 send(.onAppear)
