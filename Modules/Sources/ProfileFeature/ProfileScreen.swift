@@ -14,6 +14,7 @@ import SFSafeSymbols
 import Models
 import RichTextKit
 import ParsingClient
+import BBBuilder
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -153,10 +154,7 @@ public struct ProfileScreen: View {
                 RichText(text: signature, onUrlTap: { url in
                     send(.deeplinkTapped(url, .signature))
                 }) {
-                    ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
-                    ($0 as? UITextView)?.isEditable = false
-                    ($0 as? UITextView)?.isScrollEnabled = false
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
@@ -331,8 +329,6 @@ public struct ProfileScreen: View {
                 RichText(text: aboutMe, onUrlTap: { url in
                     send(.deeplinkTapped(url, .about))
                 })
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primary))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -735,19 +731,20 @@ private struct ListSectionSpacing: ViewModifier {
 
 extension User {
     var signatureAttributed: NSAttributedString? {
-        return BBCodeParser.parse(signature, fontStyle: .footnote)
+        guard let signature, !signature.isEmpty else { return nil }
+        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .footnote)])
+            .render(text: signature)
     }
     
     var statusAttributed: NSAttributedString? {
-        if let status {
-            let trimmed = status.trimmingCharacters(in: .whitespacesAndNewlines)
-            return !trimmed.isEmpty ? BBCodeParser.parse(status) : nil
-        }
-        return nil
+        guard let status, !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer().render(text: status)
     }
     
     var aboutMeAttributed: NSAttributedString? {
-        return BBCodeParser.parse(aboutMe, fontStyle: .body)
+        guard let aboutMe, !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .body)])
+            .render(text: aboutMe)
     }
 }
 
