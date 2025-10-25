@@ -110,6 +110,8 @@ public struct ForumsListFeature: Reducer, Sendable {
             
             return .none
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic
