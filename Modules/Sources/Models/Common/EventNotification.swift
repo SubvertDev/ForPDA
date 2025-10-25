@@ -15,7 +15,7 @@ public struct EventNotification {
         case qms = "q"
         case topic = "t"
         case site = "s"
-        // case forum = "f"
+        case forum = "f"
         // case u?
         // case g?
         case unknown

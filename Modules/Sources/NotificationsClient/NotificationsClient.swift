@@ -17,6 +17,7 @@ import Models
 public enum NotificationEvent: Equatable {
     case site(Int)
     case topic(Int)
+    case forum(Int)
     case qms(Int)
     
     public var isTopic: Bool {
@@ -32,7 +33,7 @@ public struct NotificationsClient: Sendable {
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
     public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
-    public var processNotification: @Sendable (String) async -> Void
+    public var processNotification: @Sendable (String) async -> Bool = { _ in false }
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
     public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
     public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
@@ -93,44 +94,72 @@ extension NotificationsClient: DependencyKey {
                     // TODO: Complete all cases
                     switch notification.category {
                     case .qms:
-                        if notification.flag == 1 {
+                        switch notification.flag {
+                        case 1:
+                            // Last api request was NOT the chat of this message
                             subject.send(.qms(notification.id))
-                            return
-                        } else {
+                            
+                        case 2:
+                            // Last api request was the chat of this message
+                            // No need to mark it processed to avoid unread sync
+                            return false
+                            
+                        case 101:
+                            // 0 - User is typing text
+                            // 1 - User is uploading files
+                            // Currently unused
+                            return false
+                            
+                        case 102:
+                            // User did read chat fully (not sure)
+                            subject.send(.qms(notification.id))
+                            // No need to update unread for that
+                            return false
+                            
+                        default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
-                            return
+                            return false
                         }
                         
                     case .topic:
                         switch notification.flag {
                         case 1:
                             subject.send(.topic(notification.id))
-                            return
                         case 2:
                             // Last message, unused
-                            return
+                            return false
                         default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
-                            return
+                            return false
+                        }
+                        
+                    case .forum:
+                        switch notification.flag {
+                        case 2:
+                            subject.send(.forum(notification.id))
+                        default:
+                            analyticsClient.capture(EventError.unknownFlag(notificationRaw))
+                            return false
                         }
                         
                     case .site:
                         if notification.flag == 3 {
                             // Article comment mention
                             subject.send(.site(notification.id))
-                            return
                         } else if notification.flag == 2 {
                             // Last article comment timestamp, unused
-                            return
+                            return false
                         }
                         
                     case .unknown:
-                        break
+                        analyticsClient.capture(EventError.unknownCase(notificationRaw))
+                        return false
                     }
                     
-                    analyticsClient.capture(EventError.unknownCase(notificationRaw))
+                    return true
                 } catch {
                     analyticsClient.capture(error)
+                    return false
                 }
             },
             

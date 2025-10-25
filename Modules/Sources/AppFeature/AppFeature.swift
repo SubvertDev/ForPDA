@@ -271,7 +271,7 @@ public struct AppFeature: Reducer, Sendable {
                 // }
                 return .none
                 
-            case let .networkStateChanged(networkState):
+            case .networkStateChanged(_):
                 // let noInternet = ToastMessage(
                 //     text: Localization.noInternetConnection,
                 //     isError: true,
@@ -284,7 +284,12 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .receivedNotification(notification):
                 return .run { _ in
-                    await notificationsClient.processNotification(notification)
+                    let isProcessed = await notificationsClient.processNotification(notification)
+                    if isProcessed {
+                        let unread = try await apiClient.getUnread()
+                        let skipCategories: [Unread.Item.Category] = [.topic, .forum]
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: skipCategories)
+                    }
                 }
                 
             case .onShake:
@@ -358,29 +363,14 @@ public struct AppFeature: Reducer, Sendable {
             case .auth:
                 return .none
                 
-                // MARK: - Deeplink
+                // MARK: - Deeplinks
+                
+                #warning("merge these two actions somehow")
                 
             case let .deeplink(url):
                 do {
                     let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
-                    switch deeplink {
-                    case let .article(id, title, imageUrl):
-                        let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                        let articleState = ArticleFeature.State(articlePreview: preview)
-                        openScreenOnCurrentStack(.articles(.article(articleState)), state: &state)
-                    case let .announcement(id):
-                        let announceState = AnnouncementFeature.State(id: id)
-                        openScreenOnCurrentStack(.forum(.announcement(announceState)), state: &state)
-                    case let .topic(id, goTo):
-                        let topicState = TopicFeature.State(topicId: id!, goTo: goTo)
-                        openScreenOnCurrentStack(.forum(.topic(topicState)), state: &state)
-                    case let .forum(id, page):
-                        let forumState = ForumFeature.State(forumId: id, initialPage: page)
-                        openScreenOnCurrentStack(.forum(.forum(forumState)), state: &state)
-                    case let .user(id):
-                        let profileState = ProfileFeature.State(userId: id)
-                        openScreenOnCurrentStack(.profile(.profile(profileState)), state: &state)
-                    }
+                    return showScreenForDeeplink(deeplink, &state)
                 } catch {
                     analyticsClient.capture(error)
                     state.alert = AlertState {
@@ -392,10 +382,12 @@ public struct AppFeature: Reducer, Sendable {
             case let .notificationDeeplink(identifier):
                 do {
                     let deeplink = try DeeplinkHandler().handleNotification(identifier)
-                    return handleNotificationDeeplink(deeplink, &state)
+                    return showScreenForDeeplink(deeplink, &state)
                 } catch {
                     analyticsClient.capture(error)
-                    // TODO: Show error in UI?
+                    state.alert = AlertState {
+                        TextState("Unable to open link", bundle: .module)
+                    }
                 }
                 return .none
                 
@@ -544,15 +536,6 @@ public struct AppFeature: Reducer, Sendable {
         return removeNotifications(&state)
     }
     
-    private func openScreenOnCurrentStack(_ element: Path.State, state: inout State) {
-        switch state.selectedTab {
-        case .articles:  state.articlesTab.path.append(element)
-        case .favorites: state.favoritesTab.path.append(element)
-        case .forum:     state.forumTab.path.append(element)
-        case .profile:   state.profileTab.path.append(element)
-        }
-    }
-    
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
@@ -570,52 +553,34 @@ public struct AppFeature: Reducer, Sendable {
             .map(Action.favoritesTab)
     }
     
-    private func handleNotificationDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
-        if case .user = deeplink {
-            return .none
-        }
-        
-        // Handling article deeplink
-        
-        if case let .article(id, _, _) = deeplink {
-            if state.selectedTab != .articles {
-                state.previousTab = state.selectedTab
-                state.selectedTab = .articles
-            }
-            state.articlesTab.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: ArticlePreview.innerDeeplink(id: id)))))
-            return .none
-        }
-        
-        // Handling forum deeplinks
-        
-        let isOnForumHandledTab = state.selectedTab == .favorites || state.selectedTab == .forum
-        
-        let targetState: Path.Forum.Body.State
+    private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
+        let screen: Path.State
         switch deeplink {
+        case let .article(id, _, _):
+            let preview = ArticlePreview.innerDeeplink(id: id)
+            screen = .articles(.article(ArticleFeature.State(articlePreview: preview)))
         case let .announcement(id):
-            targetState = .announcement(AnnouncementFeature.State(id: id))
+            screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
         case let .topic(id, goTo):
-            targetState = .topic(TopicFeature.State(topicId: id!, goTo: goTo))
+            screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
         case let .forum(id, page):
-            targetState = .forum(ForumFeature.State(forumId: id, initialPage: page))
-        default:
-            fatalError("Unhandled notifications deeplink")
+            screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
+        case let .user(id):
+            screen = .profile(.profile(ProfileFeature.State(userId: id)))
         }
         
-        if isOnForumHandledTab {
-            if state.selectedTab == .favorites {
-                state.favoritesTab.path.append(.forum(targetState))
-            }
-            if state.selectedTab == .forum {
-                state.forumTab.path.append(.forum(targetState))
-            }
-        } else {
-            state.previousTab = state.selectedTab
-            state.selectedTab = .forum
-            state.forumTab.path.append(.forum(targetState))
-        }
+        openScreenOnCurrentStack(screen, state: &state)
         
         return .none
+    }
+    
+    private func openScreenOnCurrentStack(_ element: Path.State, state: inout State) {
+        switch state.selectedTab {
+        case .articles:  state.articlesTab.path.append(element)
+        case .favorites: state.favoritesTab.path.append(element)
+        case .forum:     state.forumTab.path.append(element)
+        case .profile:   state.profileTab.path.append(element)
+        }
     }
 }
 

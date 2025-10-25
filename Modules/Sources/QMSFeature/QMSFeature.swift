@@ -136,8 +136,12 @@ public struct QMSFeature: Reducer, Sendable {
                     state.chat = chat
                     
                     for message in chat.messages {
-                        // Skip already processed messages
+                        // Skip already processed messages while setting them status to sent
                         if state.messages.contains(where: { $0.id == String(message.id) }) { continue }
+                        if let msgIndex = state.messages.firstIndex(where: { $0.id == String(message.id) }) {
+                            state.messages[msgIndex].status = .sent
+                            continue
+                        }
                         
                         // Set .none status on sent messages and skip
                         if let index = state.messages.firstIndex(where: { $0.id == message.text }) {
@@ -155,10 +159,19 @@ public struct QMSFeature: Reducer, Sendable {
                                 avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
                                 isCurrentUser: isCurrentUser
                             ),
+                            status: .sent,
                             createdAt: message.date,
-                            text: message.text
+                            text: message.processedText
                         )
                         state.messages.append(newMessage)
+                    }
+                    
+                    // Setting non-read status for our messages if we have an unread count
+                    let myMessages = state.messages.filter { $0.user.isCurrentUser }
+                    for (index, message) in myMessages.reversed().enumerated() where index < chat.unreadCount {
+                        if let messageIndex = state.messages.firstIndex(of: message) {
+                            state.messages[messageIndex].status = .none
+                        }
                     }
                     
                 case let .failure(error):

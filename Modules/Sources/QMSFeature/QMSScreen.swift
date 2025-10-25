@@ -49,9 +49,12 @@ public struct QMSScreen: View {
                                     mainBG: Color(.Background.primary),
                                     messageMyBG: Color(.Background.quaternary),
                                     messageMyText: Color(.Labels.primary),
+                                    messageMyTimeText: Color(.systemGray),
                                     messageFriendBG: Color(.Background.quaternary),
                                     messageFriendText: Color(.Labels.primary),
-                                    sendButtonBackground: tintColor
+                                    messageFriendTimeText: Color(.systemGray),
+                                    statusGray: Color(.Theme.primary),
+                                    sendButtonBackground: Color(.Theme.primary)
                                 )
                         )
                     )
