@@ -8,7 +8,6 @@
 import Foundation
 
 public enum FavoritesRootEvent: Event {
-    case settingsButtonTapped
     case tabChanged(Int)
     
     public var name: String {
@@ -19,8 +18,6 @@ public enum FavoritesRootEvent: Event {
         switch self {
         case let .tabChanged(tab):
             return ["tab": String(tab)]
-        default:
-            return nil
         }
     }
 }

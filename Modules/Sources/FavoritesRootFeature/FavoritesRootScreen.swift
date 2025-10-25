@@ -48,19 +48,6 @@ public struct FavoritesRootScreen: View {
                     }
                 }
             }
-            .toolbar {
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer(.fixed, placement: .primaryAction)
-                }
-                
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        send(.settingsButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .gearshape)
-                    }
-                }
-            }
             .animation(.default, value: store.pickerSelection)
         }
     }

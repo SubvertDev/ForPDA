@@ -129,9 +129,6 @@ public struct StackTab: Reducer, Sendable {
         case let .articlesList(.delegate(.openArticle(preview))):
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        case .articlesList(.delegate(.openSettings)):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
-            
         case let .article(.delegate(.handleDeeplink(id))):
             let preview = ArticlePreview.innerDeeplink(id: id)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
@@ -155,9 +152,6 @@ public struct StackTab: Reducer, Sendable {
         case let .favorites(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
-        case .delegate(.openSettings):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
-            
         default:
             break
         }
@@ -170,9 +164,6 @@ public struct StackTab: Reducer, Sendable {
         switch action {
             
             // Forum List
-            
-        case .forumList(.delegate(.openSettings)):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
             
         case let .forumList(.delegate(.openForum(id: id, name: name))):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))

@@ -109,7 +109,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case cellMenuOpened(ArticlePreview, ContextMenuOptions)
         case linkShared(Bool, URL)
         case listGridTypeButtonTapped
-        case settingsButtonTapped
         case tryAgainButtonTapped
         case onRefresh
         case loadMoreArticles
@@ -120,7 +119,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case openArticle(ArticlePreview)
-            case openSettings
         }
     }
     
@@ -179,9 +177,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 return .run { _ in
                     await hapticClient.play(.selection)
                 }
-                
-            case .settingsButtonTapped:
-                return .send(.delegate(.openSettings))
                 
             case .loadMoreArticles:
                 guard !state.isLoading else { return .none }

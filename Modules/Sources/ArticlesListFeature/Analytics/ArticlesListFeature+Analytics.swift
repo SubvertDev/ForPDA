@@ -41,9 +41,6 @@ extension ArticlesListFeature {
                 case .listGridTypeButtonTapped:
                     analyticsClient.log(ArticlesListEvent.listGridTypeChanged(state.listRowType.rawValue))
                     
-                case .settingsButtonTapped:
-                    analyticsClient.log(ArticlesListEvent.settingsButtonTapped)
-                    
                 case .onAppear:
                     break // TODO: Make First App Open/App Session here?
                     

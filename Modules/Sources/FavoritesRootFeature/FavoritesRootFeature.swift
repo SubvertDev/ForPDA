@@ -46,14 +46,10 @@ public struct FavoritesRootFeature: Reducer {
         case bookmarks(BookmarksFeature.Action)
         
         case view(View)
-        public enum View {
-            case settingsButtonTapped
-        }
+        public enum View { }
         
         case delegate(Delegate)
-        public enum Delegate {
-            case openSettings
-        }
+        public enum Delegate { }
     }
     
     // MARK: - Body
@@ -71,11 +67,8 @@ public struct FavoritesRootFeature: Reducer {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .favorites, .bookmarks, .delegate, .binding:
+            case .favorites, .bookmarks, .delegate, .binding, .view:
                 return .none
-                
-            case .view(.settingsButtonTapped):
-                return .send(.delegate(.openSettings))
             }
         }
         

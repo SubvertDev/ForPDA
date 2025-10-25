@@ -68,15 +68,6 @@ public struct ForumsListScreen: View {
             .animation(.default, value: store.forums)
             .navigationTitle(Text("Forum", bundle: .module))
             .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        send(.settingsButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .gearshape)
-                    }
-                }
-            }
             .onAppear {
                 send(.onAppear)
             }

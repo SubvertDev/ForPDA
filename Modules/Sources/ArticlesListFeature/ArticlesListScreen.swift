@@ -162,18 +162,6 @@ public struct ArticlesListScreen: View {
                     .replaceDownUpByLayerEffect(value: true)
             }
         }
-        
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.fixed)
-        }
-        
-        ToolbarItem {
-            Button {
-                store.send(.settingsButtonTapped)
-            } label: {
-                Image(systemSymbol: .gearshape)
-            }
-        }
     }
 }
 
