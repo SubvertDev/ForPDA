@@ -56,6 +56,7 @@ public struct ArticleScreen: View {
                     }
                 }
                 ._safeAreaBar(edge: .bottom) { Keyboard() }
+                ._scrollEdgeEffectHidden(!isCommentViewExpanded, for: .bottom)
                 .onTapGesture { focus = nil }
                 .modifier(NavigationBarSettings())
                 .toolbar { Toolbar() }
