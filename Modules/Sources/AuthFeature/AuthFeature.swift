@@ -50,6 +50,8 @@ public struct AuthFeature: Reducer, Sendable {
             return login.isEmpty || password.isEmpty || captcha.count < 4 || isLoading
         }
         
+        var didLoadOnce = false
+        
         public init(
             openReason: AuthOpenReason,
             isLoading: Bool = true,
@@ -113,6 +115,7 @@ public struct AuthFeature: Reducer, Sendable {
     @Dependency(\.dismiss) private var dismiss
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.hapticClient) private var hapticClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - Body
     
@@ -184,16 +187,26 @@ public struct AuthFeature: Reducer, Sendable {
                     // TODO: Send error
                     state.alert = .failedToConnect
                 }
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let .internal(.loginResponse(.success(loginState))):
-                state.isLoading = false
+                if case .success = loginState {
+                    // Not setting isLoading to avoid login button blink
+                } else {
+                    state.isLoading = false
+                }
+                
                 return .run { [isHidden = state.isHiddenEntry, reason = state.openReason] send in
                     switch loginState {
                     case .success(userId: let userId, token: let token):
                         @Shared(.userSession) var userSession
                         $userSession.withLock { $0 = UserSession(userId: userId, token: token, isHidden: isHidden) }
-                        await send(.delegate(.loginSuccess(reason: reason, userId: userId)))
+                        // Action should not be called if we've opened this screen as root
+                        // since it will be sent after this feature is already nil-ed out
+                        if reason != .profile {
+                            await send(.delegate(.loginSuccess(reason: reason, userId: userId)))
+                        }
                         
                     case .wrongPassword:
                         await send(.internal(.wrongPassword))
@@ -241,6 +254,15 @@ public struct AuthFeature: Reducer, Sendable {
         }
         
         Analytics()
+    }
+    
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
 

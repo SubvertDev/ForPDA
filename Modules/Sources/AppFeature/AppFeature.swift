@@ -55,7 +55,7 @@ public struct AppFeature: Reducer, Sendable {
         public var articlesTab:  StackTab.State
         public var favoritesTab: StackTab.State
         public var forumTab:     StackTab.State
-        public var profileTab:   StackTab.State
+        public var profileFlow:  ProfileFlow.State
         
         @Presents public var auth: AuthFeature.State?
         @Presents public var logStore: LogStoreFeature.State?
@@ -86,7 +86,6 @@ public struct AppFeature: Reducer, Sendable {
             articlesTab: StackTab.State = StackTab.State(root: .articles(.articlesList(ArticlesListFeature.State()))),
             favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesRootFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
-            profileTab: StackTab.State = StackTab.State(root: .profile(.profile(ProfileFeature.State()))),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articles,
@@ -99,7 +98,12 @@ public struct AppFeature: Reducer, Sendable {
             self.articlesTab = articlesTab
             self.favoritesTab = favoritesTab
             self.forumTab = forumTab
-            self.profileTab = profileTab
+            
+            if let session = _userSession.wrappedValue {
+                self.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: session.userId)))))
+            } else {
+                self.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
+            }
             
             self.auth = auth
             self.alert = alert
@@ -125,7 +129,7 @@ public struct AppFeature: Reducer, Sendable {
         case articlesTab(StackTab.Action)
         case favoritesTab(StackTab.Action)
         case forumTab(StackTab.Action)
-        case profileTab(StackTab.Action)
+        case profileFlow(ProfileFlow.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
         case logStore(PresentationAction<LogStoreFeature.Action>)
@@ -143,6 +147,9 @@ public struct AppFeature: Reducer, Sendable {
         case connectionStateChanged(ConnectionState)
         case networkStateChanged(Bool)
         case receivedNotification(String)
+        
+        case userDidLogin(userId: Int)
+        case userDidLogout
         
         case _showToast(ToastMessage)
         case _showErrorToast
@@ -187,8 +194,8 @@ public struct AppFeature: Reducer, Sendable {
             StackTab()
         }
         
-        Scope(state: \.profileTab, action: \.profileTab) {
-            StackTab()
+        Scope(state: \.profileFlow, action: \.profileFlow) {
+            ProfileFlow.body
         }
         
         // Authorization actions interceptor
@@ -210,44 +217,47 @@ public struct AppFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                if !state.isAuthorized, state.profileTab.root[case: \.auth] == nil {
-                    state.profileTab.root = .auth(AuthFeature.State(openReason: .profile))
-                }
-                
                 return .merge(
+                    .run { [userSession = state.$userSession] send in
+                        for await session in userSession.publisher.values.dropFirst() {
+                            notificationCenter.post(name: .favoritesUpdated, object: nil)
+                            if let session {
+                                await send(.userDidLogin(userId: session.userId))
+                            } else {
+                                await send(.userDidLogout)
+                            }
+                        }
+                    }.animation(),
+                    
                     .run { send in
-                        await withTaskGroup { group in
-                            group.addTask {
-                                do {
-                                    try await apiClient.connect(inBackground: false)
-                                } catch {
-                                    await send(._failedToConnect(error))
-                                }
-                            }
-                            
-                            group.addTask {
-                                for await toast in toastClient.queue() {
-                                    await send(._showToast(toast))
-                                }
-                            }
-                            
-                            group.addTask {
-                                for await identifier in notificationsClient.delegate() {
-                                    await send(.notificationDeeplink(identifier))
-                                }
-                            }
-                            
-                            group.addTask {
-                                for await state in apiClient.connectionState() {
-                                    await send(.connectionStateChanged(state))
-                                }
-                            }
-                            
-                            group.addTask {
-                                for await notification in apiClient.notificationStream() {
-                                    await send(.receivedNotification(notification))
-                                }
-                            }
+                        do {
+                            try await apiClient.connect(inBackground: false)
+                        } catch {
+                            await send(._failedToConnect(error))
+                        }
+                    },
+                    
+                    .run { send in
+                        for await state in apiClient.connectionState() {
+                            await send(.connectionStateChanged(state))
+                        }
+                    },
+                    
+                    .run { send in
+                        for await notification in apiClient.notificationStream() {
+                            await send(.receivedNotification(notification))
+                        }
+                    },
+                    
+                    .run { send in
+                        for await identifier in notificationsClient.delegate() {
+                            await send(.notificationDeeplink(identifier))
+                        }
+                    },
+                    
+                    .run { send in
+                        for await toast in toastClient.queue() {
+                            await send(._showToast(toast))
                         }
                     }
                 )
@@ -351,7 +361,12 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .didSelectTab(tab):
                 if state.selectedTab == tab {
-                    return handleSameTabSelection(&state)
+                    if #available(iOS 26, *) {
+                        // System tabbar handles scrolls/pops by itself
+                        return removeNotifications(&state)
+                    } else {
+                        return handleSameTabSelection(&state)
+                    }
                 } else {
                     return handleOtherTabSelection(newTab: tab, &state)
                 }
@@ -361,7 +376,6 @@ public struct AppFeature: Reducer, Sendable {
                 switch reason {
                 case .commentAction, .sendComment:
                     state.auth = nil
-                    state.profileTab.root = .profile(.profile(ProfileFeature.State()))
                 case .profile:
                     let error = NSError(domain: "Profile login success is caught in AppFeature", code: 0)
                     analyticsClient.capture(error)
@@ -372,6 +386,15 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .auth:
                 return .none
+                
+            case let .userDidLogin(userId: userId):
+                state.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: userId)))))
+                return .none
+                
+            case .userDidLogout:
+                state.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
+                return .none
+                
                 
                 // MARK: - Deeplinks
                 
@@ -469,19 +492,21 @@ public struct AppFeature: Reducer, Sendable {
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
                 let .forumTab(.delegate(.showTabBar(show))),
-                let .profileTab(.delegate(.showTabBar(show))):
+                let .profileFlow(.loggedIn(.delegate(.showTabBar(show)))),
+                let .profileFlow(.loggedOut(.delegate(.showTabBar(show)))):
                 state.showTabBar = show
                 return .none
                 
             case let .articlesTab(.delegate(.switchTab(to: tab))),
                 let .favoritesTab(.delegate(.switchTab(to: tab))),
                 let .forumTab(.delegate(.switchTab(to: tab))),
-                let .profileTab(.delegate(.switchTab(to: tab))):
+                let .profileFlow(.loggedIn(.delegate(.switchTab(to: tab)))),
+                let .profileFlow(.loggedOut(.delegate(.switchTab(to: tab)))):
                 state.previousTab = state.selectedTab
                 state.selectedTab = tab
                 return .none
                 
-            case .articlesTab, .favoritesTab, .forumTab, .profileTab:
+            case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
                 return .none
             }
         }
@@ -496,6 +521,7 @@ public struct AppFeature: Reducer, Sendable {
     
     // MARK: - Private Functions
     
+    @available(iOS, deprecated: 26, message: "System tabbar handles scrolls/pops by itself")
     private func handleSameTabSelection(_ state: inout State) -> Effect<Action> {
         if state.selectedTab == .articles, state.articlesTab.path.isEmpty {
             // Scroll to top of articles
@@ -518,19 +544,24 @@ public struct AppFeature: Reducer, Sendable {
             }
             
         case .favorites:
-            if !state.favoritesTab.path.isEmpty {
-                state.favoritesTab.path.removeAll()
-                return .concatenate(
-                    removeNotifications(&state),
-                    refreshFavoritesTab(&state)
-                )
-            }
+            state.favoritesTab.path.removeAll()
             
         case .forum:
             state.forumTab.path.removeAll()
 
         case .profile:
-            state.profileTab.path.removeAll()
+            switch state.profileFlow {
+            case var .loggedIn(flow):
+                if !flow.path.isEmpty {
+                    flow.path.removeAll()
+                    state.profileFlow[case: \.loggedIn] = flow
+                }
+            case var .loggedOut(flow):
+                if !flow.path.isEmpty {
+                    flow.path.removeAll()
+                    state.profileFlow[case: \.loggedOut] = flow
+                }
+            }
         }
         
         return removeNotifications(&state)
@@ -585,7 +616,15 @@ public struct AppFeature: Reducer, Sendable {
         case .articles:  state.articlesTab.path.append(element)
         case .favorites: state.favoritesTab.path.append(element)
         case .forum:     state.forumTab.path.append(element)
-        case .profile:   state.profileTab.path.append(element)
+        case .profile:
+            switch state.profileFlow {
+            case var .loggedIn(flow):
+                flow.path.append(element)
+                state.profileFlow[case: \.loggedIn] = flow
+            case var .loggedOut(flow):
+                flow.path.append(element)
+                state.profileFlow[case: \.loggedOut] = flow
+            }
         }
     }
 }

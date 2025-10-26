@@ -135,7 +135,7 @@ struct LiquidTabView: View {
                     systemImage: AppTab.profile.iconSymbol.rawValue,
                     value: .profile
                 ) {
-                    StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                    ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                 }
             }
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
@@ -163,7 +163,7 @@ struct OldTabView: View {
                 StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
                     .tag(AppTab.forum)
                 
-                StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                     .tag(AppTab.profile)
             }
             
@@ -204,12 +204,14 @@ struct OldTabView: View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 ForEach(AppTab.allCases, id: \.self) { tab in
-                    Button {
-                        store.send(.didSelectTab(tab))
-                        shouldAnimatedTabItem[tab.rawValue].toggle()
-                    } label: {
-                        PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)
-                            .padding(.top, 2.5)
+                    WithPerceptionTracking {
+                        Button {
+                            store.send(.didSelectTab(tab))
+                            shouldAnimatedTabItem[tab.rawValue].toggle()
+                        } label: {
+                            PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)
+                                .padding(.top, 2.5)
+                        }
                     }
                 }
             }

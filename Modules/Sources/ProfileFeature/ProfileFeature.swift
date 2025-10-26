@@ -90,7 +90,6 @@ public struct ProfileFeature: Reducer, Sendable {
             case openSettings
             case openHistory
             case openReputation(Int)
-            case userLoggedOut
             case handleUrl(URL)
         }
     }
@@ -170,14 +169,9 @@ public struct ProfileFeature: Reducer, Sendable {
             case .destination(.presented(.alert(.logout))):
                 state.$userSession.withLock { $0 = nil }
                 state.isLoading = true
-                return .merge(
-                    .run { send in
-                        try await apiClient.logout()
-                        // FavoritesUpdated notification should be called AFTER logout
-                        notificationCenter.post(name: .favoritesUpdated, object: nil)
-                    },
-                    .send(.delegate(.userLoggedOut))
-                )
+                return .run { send in
+                    try await apiClient.logout()
+                }
                 
             case .delegate, .binding, .destination:
                 return .none

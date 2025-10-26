@@ -218,10 +218,6 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleProfilePathNavigation(action: Path.Profile.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .profile(.delegate(.userLoggedOut)):
-            state.root = .auth(AuthFeature.State(openReason: .profile))
-            return .none
-            
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
@@ -300,15 +296,7 @@ public struct StackTab: Reducer, Sendable {
         // Also make necessary changes to delegate actions in AppFeature
         switch action {
         case let .delegate(.loginSuccess(reason, userId)):
-            if reason != .profile {
-                let error = NSError(domain: "Non-profile login success is caught in StackTab", code: 0)
-                analytics.capture(error)
-                return .none
-            }
-            state.root = .profile(.profile(ProfileFeature.State(userId: userId)))
-            return .run { _ in
-                notificationCenter.post(name: .favoritesUpdated, object: nil)
-            }
+            fatalError("Auth navigation must be handled in ProfileFlow enum reducer")
             
         case .delegate(.showSettings):
             state.path.append(.settings(.settings(SettingsFeature.State())))

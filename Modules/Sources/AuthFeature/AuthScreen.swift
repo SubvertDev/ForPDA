@@ -157,7 +157,6 @@ public struct AuthScreen: View {
                     .tint(tintColor)
                 }
             }
-            .navigationBarHidden(false)
             ._toolbarTitleDisplayMode(.inline)
             .toolbar {
                 // Profile is used as root in this case so we don't need close button
