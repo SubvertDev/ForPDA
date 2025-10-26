@@ -38,6 +38,8 @@ public struct SettingsFeature: Reducer, Sendable {
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
         
+        var didLoadOnce = false
+        
         public var appVersionAndBuild: String {
             let info = Bundle.main.infoDictionary
             let version = info?["CFBundleShortVersionString"] as? String ?? "-1"
@@ -74,6 +76,8 @@ public struct SettingsFeature: Reducer, Sendable {
     
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
+        
+        case onAppear
         case languageButtonTapped
         case schemeButtonTapped(AppColorScheme)
         case notificationsButtonTapped
@@ -111,6 +115,7 @@ public struct SettingsFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.pasteboardClient) var pasteboardClient
+    @Dependency(\.analyticsClient) var analyticsClient
     @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.openURL) var openURL
     
@@ -121,6 +126,10 @@ public struct SettingsFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .onAppear:
+                reportFullyDisplayed(&state)
+                return .none
+                
             case .languageButtonTapped:
                 return .run { _ in
                     guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -228,6 +237,15 @@ public struct SettingsFeature: Reducer, Sendable {
         .ifLet(\.$destination, action: \.destination)
         
         Analytics()
+    }
+    
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
 

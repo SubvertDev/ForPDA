@@ -40,6 +40,9 @@ public struct SettingsScreen: View {
             ._toolbarTitleDisplayMode(.inline)
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .animation(.default, value: colorScheme)
+            .onAppear {
+                store.send(.onAppear)
+            }
         }
     }
     
