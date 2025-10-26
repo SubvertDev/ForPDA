@@ -135,6 +135,7 @@ public struct AuthScreen: View {
                 VStack(spacing: 0) {
                     Spacer()
                     
+                ._safeAreaBar(edge: .bottom) {
                     Button {
                         store.send(.loginButtonTapped)
                     } label: {

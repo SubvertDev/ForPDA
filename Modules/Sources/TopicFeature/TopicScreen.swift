@@ -93,7 +93,7 @@ public struct TopicScreen: View {
             }
             .navigations(store: store)
             .toolbar { OptionsMenu() }
-            .safeAreaInset(edge: .bottom) {
+            ._safeAreaBar(edge: .bottom) {
                 if isLiquidGlass, store.appSettings.floatingNavigation {
                     Navigation()
                         .padding(.bottom, 8)

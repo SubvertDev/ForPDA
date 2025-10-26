@@ -55,7 +55,7 @@ public struct ArticleScreen: View {
                         .presentationDetents([.medium])
                     }
                 }
-                .safeAreaInset(edge: .bottom) { Keyboard() }
+                ._safeAreaBar(edge: .bottom) { Keyboard() }
                 .onTapGesture { focus = nil }
                 .modifier(NavigationBarSettings())
                 .toolbar { Toolbar() }
