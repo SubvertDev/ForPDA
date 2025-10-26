@@ -20,8 +20,11 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate, .binding, .destination:
+                case .view(.onAppear), .delegate, .binding:
                     break
+                    
+                case .destination(.presented(.alert(.logout))):
+                    analyticsClient.logout()
                     
                 case .view(.sheetContinueButtonTapped):
                     analyticsClient.log(ProfileEvent.sheetContinueButtonTapped)
@@ -37,7 +40,6 @@ extension ProfileFeature {
                     
                 case .view(.logoutButtonTapped):
                     analyticsClient.log(ProfileEvent.logoutTapped)
-                    analyticsClient.logout()
                     
                 case .view(.historyButtonTapped):
                     analyticsClient.log(ProfileEvent.historyTapped)
@@ -60,6 +62,9 @@ extension ProfileFeature {
                     
                 case .internal(.userResponse(.failure)):
                     analyticsClient.log(ProfileEvent.userLoadingFailed)
+                    
+                case .destination:
+                    break
                 }
                 return .none
             }

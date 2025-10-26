@@ -210,6 +210,10 @@ public struct AppFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
+                if !state.isAuthorized, state.profileTab.root[case: \.auth] == nil {
+                    state.profileTab.root = .auth(AuthFeature.State(openReason: .profile))
+                }
+                
                 return .merge(
                     .run { send in
                         await withTaskGroup { group in
@@ -353,12 +357,18 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 
             case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
-                state.auth = nil
-                if reason == .profile {
-                    state.previousTab = state.selectedTab
-                    state.selectedTab = .profile
+                // Also make necessary changes to delegate actions in StackTab
+                switch reason {
+                case .commentAction, .sendComment:
+                    state.auth = nil
+                    state.profileTab.root = .profile(.profile(ProfileFeature.State()))
+                case .profile:
+                    let error = NSError(domain: "Profile login success is caught in AppFeature", code: 0)
+                    analyticsClient.capture(error)
                 }
-                return .none
+                return .run { _ in
+                    notificationCenter.post(name: .favoritesUpdated, object: nil)
+                }
                 
             case .auth:
                 return .none
@@ -527,12 +537,8 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     private func handleOtherTabSelection(newTab: AppTab, _ state: inout State) -> Effect<Action> {
-        if newTab == .profile && !state.isAuthorized {
-            state.auth = AuthFeature.State(openReason: .profile)
-        } else {
-            state.previousTab = state.selectedTab
-            state.selectedTab = newTab
-        }
+        state.previousTab = state.selectedTab
+        state.selectedTab = newTab
         return removeNotifications(&state)
     }
     

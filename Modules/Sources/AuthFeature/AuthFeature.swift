@@ -75,18 +75,26 @@ public struct AuthFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action: BindableAction {
+    public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
-        case cancelButtonTapped
-        case loginButtonTapped
-        case onTask
-        case onSubmit(State.Field)
         
-        case _captchaResponse(Result<URL, any Error>)
-        case _loginResponse(Result<AuthResponse, any Error>)
-        case _wrongPassword
-        case _wrongCaptcha(url: URL)
-        case _somethingWentWrong(Int)
+        case view(View)
+        public enum View {
+            case onAppear
+            case onSubmit(State.Field)
+            case closeButtonTapped
+            case settingsButtonTapped
+            case loginButtonTapped
+        }
+        
+        case `internal`(Internal)
+        public enum Internal {
+            case captchaResponse(Result<URL, any Error>)
+            case loginResponse(Result<AuthResponse, any Error>)
+            case wrongPassword
+            case wrongCaptcha(url: URL)
+            case somethingWentWrong(Int)
+        }
         
         case alert(PresentationAction<Alert>)
         public enum Alert {
@@ -96,6 +104,7 @@ public struct AuthFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case loginSuccess(reason: AuthOpenReason, userId: Int)
+            case showSettings
         }
     }
     
@@ -125,7 +134,7 @@ public struct AuthFeature: Reducer, Sendable {
             case .delegate:
                 return .none
             
-            case .onSubmit(let field):
+            case let .view(.onSubmit(field)):
                 switch field {
                 case .login:    state.focus = .password
                 case .password: state.focus = .captcha
@@ -133,10 +142,13 @@ public struct AuthFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .cancelButtonTapped:
+            case .view(.closeButtonTapped):
                 return .run { _ in await dismiss() }
                 
-            case .loginButtonTapped:
+            case .view(.settingsButtonTapped):
+                return .send(.delegate(.showSettings))
+                
+            case .view(.loginButtonTapped):
                 state.isLoading = true
                 state.loginErrorReason = nil
                 return .run { [
@@ -148,22 +160,22 @@ public struct AuthFeature: Reducer, Sendable {
                     // TODO: Rename name to login
                     do {
                         let response = try await apiClient.authorize(login, password, isHiddenEntry, Int(captcha)!)
-                        await send(._loginResponse(.success(response)))
+                        await send(.internal(.loginResponse(.success(response))))
                     } catch {
-                        await send(._loginResponse(.failure(error)))
+                        await send(.internal(.loginResponse(.failure(error))))
                     }
                 }
                 
-            case .onTask:
+            case .view(.onAppear):
                 return .run { send in
                     let result = await Result { try await apiClient.getCaptcha() }
-                    await send(._captchaResponse(result))
+                    await send(.internal(.captchaResponse(result)))
                 }
                 .animation()
                 
                 // MARK: - Internal
                 
-            case ._captchaResponse(let response):
+            case let .internal(.captchaResponse(response)):
                 state.isLoading = false
                 switch response {
                 case .success(let url):
@@ -174,7 +186,7 @@ public struct AuthFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case ._loginResponse(.success(let loginState)):
+            case let .internal(.loginResponse(.success(loginState))):
                 state.isLoading = false
                 return .run { [isHidden = state.isHiddenEntry, reason = state.openReason] send in
                     switch loginState {
@@ -184,23 +196,23 @@ public struct AuthFeature: Reducer, Sendable {
                         await send(.delegate(.loginSuccess(reason: reason, userId: userId)))
                         
                     case .wrongPassword:
-                        await send(._wrongPassword)
+                        await send(.internal(.wrongPassword))
                         
                     case .wrongCaptcha(let url):
-                        await send(._wrongCaptcha(url: url))
+                        await send(.internal(.wrongCaptcha(url: url)))
                         
                     case .unknown(let id):
-                        await send(._somethingWentWrong(id))
+                        await send(.internal(.somethingWentWrong(id)))
                     }
                 }
                 
-            case ._loginResponse(.failure(let error)):
+            case let .internal(.loginResponse(.failure(error))):
                 state.isLoading = false
                 print(error, #line)
                 state.alert = .failedToConnect
                 return .none
                 
-            case ._wrongPassword:
+            case .internal(.wrongPassword):
                 state.password = ""
                 state.captcha = ""
 //                state.focus = .password
@@ -208,10 +220,10 @@ public struct AuthFeature: Reducer, Sendable {
                 return .run { send in
                     await hapticClient.play(.error)
                     let result = await Result { try await apiClient.getCaptcha() }
-                    await send(._captchaResponse(result))
+                    await send(.internal(.captchaResponse(result)))
                 }
 
-            case let ._wrongCaptcha(url: url):
+            case let .internal(.wrongCaptcha(url: url)):
                 state.captcha = ""
                 state.captchaUrl = url
                 state.focus = .captcha
@@ -220,7 +232,7 @@ public struct AuthFeature: Reducer, Sendable {
                     await hapticClient.play(.error)
                 }
                 
-            case ._somethingWentWrong:
+            case .internal(.somethingWentWrong):
                 state.password = ""
                 state.captcha = ""
                 state.alert = .somethingWentWrong

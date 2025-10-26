@@ -99,6 +99,7 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.dismiss) private var dismiss
     
     // MARK: - Body
@@ -169,9 +170,11 @@ public struct ProfileFeature: Reducer, Sendable {
             case .destination(.presented(.alert(.logout))):
                 state.$userSession.withLock { $0 = nil }
                 state.isLoading = true
-                return .concatenate(
+                return .merge(
                     .run { send in
                         try await apiClient.logout()
+                        // FavoritesUpdated notification should be called AFTER logout
+                        notificationCenter.post(name: .favoritesUpdated, object: nil)
                     },
                     .send(.delegate(.userLoggedOut))
                 )

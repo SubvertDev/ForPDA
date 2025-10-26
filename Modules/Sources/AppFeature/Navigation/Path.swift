@@ -22,6 +22,7 @@ import QMSListFeature
 import ReputationFeature
 import SettingsFeature
 import TopicFeature
+import AuthFeature
 
 @Reducer(state: .equatable)
 public enum Path {
@@ -31,6 +32,7 @@ public enum Path {
     case profile(Profile.Body = Profile.body)
     case settings(Settings.Body = Settings.body)
     case qms(QMS.Body = QMS.body)
+    case auth(AuthFeature)
     
     @Reducer(state: .equatable)
     public enum Articles {
@@ -90,6 +92,10 @@ extension Path {
             
         case let .qms(path):
             QMSViews(path)
+            
+        case let .auth(store):
+            AuthScreen(store: store)
+                .tracking(for: AuthScreen.self)
         }
     }
     

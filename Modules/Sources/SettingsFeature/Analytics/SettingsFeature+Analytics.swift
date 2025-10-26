@@ -23,6 +23,9 @@ extension SettingsFeature {
                 case .destination, .binding, .delegate:
                     break
                     
+                case .onAppear:
+                    break
+                    
                 case .languageButtonTapped:
                     analyticsClient.log(SettingsEvent.languageTapped)
                     
