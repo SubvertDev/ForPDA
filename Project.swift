@@ -284,6 +284,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.BBBuilder,
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
