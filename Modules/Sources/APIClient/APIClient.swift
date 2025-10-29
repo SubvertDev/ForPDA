@@ -76,6 +76,7 @@ public struct APIClient: Sendable {
     
     //Search
     public var startSearch: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
+    public var members: @Sendable (_ request: MembersRequest) async throws -> MembersResponse
 }
 
 // MARK: - Dependency Key
@@ -422,10 +423,10 @@ extension APIClient: DependencyKey {
             
             startSearch: { request in
                 let command = SearchCommand.content(
-                    on: .site, // Change
+                    on: request.on.toPDAPISearchOn(),
                     authorId: request.authorId,
                     text: request.text,
-                    sort: .dateAscSort, // Change
+                    sort: request.sort.toPDAPISearchSort(),
                     offset: request.offset
                 )
                 let response = try await api.get(command)
@@ -433,6 +434,16 @@ extension APIClient: DependencyKey {
 
                 print("Status \(String(describing: status))")
                 return try await parser.parseSearch(response: response)
+            },
+            members: { request in
+                let command = SearchCommand.members(
+                    term: request.term,
+                    offset: request.offset,
+                    number: request.number
+                )
+                let response = try await api.get(command)
+                let status = Int(response.getResponseStatus())
+                return try await parser.parseMembers(response: response)
             }
         )
     }
@@ -561,8 +572,10 @@ extension APIClient: DependencyKey {
             //Change
             startSearch: { _ in
                 return SearchResponse(metadata: [], publications: [])
+            },
+            members: { _ in
+                return MembersResponse(metadata: [], members: [])
             }
-            
         )
     }
     

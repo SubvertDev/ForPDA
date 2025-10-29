@@ -360,6 +360,7 @@ let project = Project(
                 name: "SearchFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.Models,
                     .Internal.SharedUI,
                     .SPM.TCA,
                 ]

@@ -42,6 +42,7 @@ public struct ParsingClient: Sendable {
     
     //Search
     public var parseSearch: @Sendable (_ response: String) async throws -> SearchResponse
+    public var parseMembers: @Sendable (_ response: String) async throws -> MembersResponse
     
     // Write Form
     public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
@@ -115,6 +116,9 @@ extension ParsingClient: DependencyKey {
         },
         parseSearch: { response in
             return try SearchParser.parse(from: response)
+        },
+        parseMembers: { response in
+            return try MembersParser.parse(from: response)
         },
         parseWriteForm: { response in
             return try WriteFormParser.parse(from: response)
