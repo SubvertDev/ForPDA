@@ -30,7 +30,9 @@ public struct PageNavigation: View {
     public var body: some View {
         WithPerceptionTracking {
             if #available(iOS 26, *), store.appSettings.floatingNavigation {
-                LiquidNavigation()
+                if store.totalPages > 1 {
+                    LiquidNavigation()
+                }
             } else {
                 LegacyNavigation()
             }
@@ -135,11 +137,14 @@ public struct PageNavigation: View {
             .disabled(store.currentPage + 1 > store.totalPages)
             .padding(.trailing, 16)
         }
-        .padding(.vertical, 8)
-        .contentShape(.rect)
-        .frame(maxWidth: .infinity)
-        .glassEffect(.regular.interactive())
         .bind($store.focus, to: $focus)
+        .if(!store.appSettings.experimentalFloatingNavigation) { content in
+            content
+                .padding(.vertical, 8)
+                .contentShape(.rect)
+                .frame(maxWidth: .infinity)
+                .glassEffect(.regular.interactive())
+        }
     }
     
     // MARK: - Legacy Navigation

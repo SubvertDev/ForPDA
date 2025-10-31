@@ -139,6 +139,66 @@ struct LiquidTabView: View {
                 }
             }
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
+            .if(store.appSettings.experimentalFloatingNavigation) { content in
+                content
+                    .tabViewBottomAccessory {
+                        BottomAccessory()
+                    }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func BottomAccessory() -> some View {
+        switch store.selectedTab {
+        case .articles:
+            Page(for: store.scope(state: \.articlesTab, action: \.articlesTab))
+        case .favorites:
+            Page(for: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+        case .forum:
+            Page(for: store.scope(state: \.forumTab, action: \.forumTab))
+        case .profile:
+            switch store.scope(state: \.profileFlow, action: \.profileFlow).case {
+            case let .loggedIn(store), let .loggedOut(store):
+                Page(for: store)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func Page(for tab: Store<StackTab.State, StackTab.Action>) -> some View {
+        if tab.path.isEmpty {
+            _Page(for: tab.scope(state: \.root, action: \.root))
+        } else if let id = tab.path.ids.last {
+            if let path = tab.scope(state: \.path[id: id], action: \.path[id: id]) {
+                _Page(for: path)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func _Page(for store: Store<Path.State, Path.Action>) -> some View {
+        switch store.case {
+        case let .favorites(store):
+            PageNavigation(store: store.scope(state: \.favorites.pageNavigation, action: \.favorites.pageNavigation))
+        case let .forum(path):
+            switch path.case {
+            case let .forum(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            case let .topic(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            default:
+                EmptyView()
+            }
+        case let .profile(path):
+            switch path.case {
+            case let .history(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            default:
+                EmptyView()
+            }
+        default:
+            EmptyView()
         }
     }
 }

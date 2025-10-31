@@ -24,11 +24,13 @@ public struct NavigationSettingsFeature: Reducer, Sendable {
         public var topicOpening: TopicOpeningStrategy
         public var hideTabBarOnScroll: Bool
         public var floatingNavigation: Bool
+        public var experimentalFloatingNavigation: Bool
 
         public init() {
             self.topicOpening = _appSettings.topicOpeningStrategy.wrappedValue
             self.hideTabBarOnScroll = _appSettings.hideTabBarOnScroll.wrappedValue
             self.floatingNavigation = _appSettings.floatingNavigation.wrappedValue
+            self.experimentalFloatingNavigation = _appSettings.experimentalFloatingNavigation.wrappedValue
         }
     }
     
@@ -70,6 +72,14 @@ public struct NavigationSettingsFeature: Reducer, Sendable {
                 
             case .binding(\.floatingNavigation):
                 state.$appSettings.floatingNavigation.withLock { $0 = state.floatingNavigation }
+                if !state.appSettings.floatingNavigation {
+                    state.$appSettings.experimentalFloatingNavigation.withLock { $0 = false }
+                    state.experimentalFloatingNavigation = false
+                }
+
+            case .binding(\.experimentalFloatingNavigation):
+                guard state.floatingNavigation else { return .none }
+                state.$appSettings.experimentalFloatingNavigation.withLock { $0 = state.experimentalFloatingNavigation }
                 
             case .binding:
                 break

@@ -34,12 +34,14 @@ public struct TopicScreen: View {
     
     private var shouldShowTopNavigation: Bool {
         let shouldShow = store.topic != nil
-        return shouldShow && (!isLiquidGlass || !store.appSettings.floatingNavigation)
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
     private var shouldShowBottomNavigation: Bool {
         let shouldShow = store.topic != nil && !store.isLoadingTopic
-        return shouldShow && (!isLiquidGlass || !store.appSettings.floatingNavigation)
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
     // MARK: - Init
@@ -94,7 +96,9 @@ public struct TopicScreen: View {
             .navigations(store: store)
             .toolbar { OptionsMenu() }
             ._safeAreaBar(edge: .bottom) {
-                if isLiquidGlass, store.appSettings.floatingNavigation {
+                if isLiquidGlass,
+                   store.appSettings.floatingNavigation,
+                   !store.appSettings.experimentalFloatingNavigation{
                     Navigation()
                         .padding(.bottom, 8)
                 }

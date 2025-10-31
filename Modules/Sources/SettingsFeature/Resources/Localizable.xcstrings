@@ -153,6 +153,16 @@
         }
       }
     },
+    "Experimental navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспериментальная навигация"
+          }
+        }
+      }
+    },
     "Floating navigation" : {
       "localizations" : {
         "ru" : {

@@ -71,7 +71,7 @@ public struct TopicFeature: Reducer, Sendable {
         var isLoadingTopic = true
         var isRefreshing = false
         
-        var pageNavigation = PageNavigationFeature.State(type: .topic)
+        public var pageNavigation = PageNavigationFeature.State(type: .topic)
         var floatingNavigation: Bool
         
         var didLoadOnce = false

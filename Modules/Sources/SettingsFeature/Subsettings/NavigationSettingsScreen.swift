@@ -56,6 +56,12 @@ public struct NavigationSettingsScreen: View {
                                 Toggle(String(""), isOn: $store.floatingNavigation)
                                     .labelsHidden()
                             }
+                            
+                            Row(LocalizedStringResource("Experimental navigation", bundle: .module)) {
+                                Toggle(String(""), isOn: $store.experimentalFloatingNavigation)
+                                    .labelsHidden()
+                            }
+                            .disabled(!store.floatingNavigation)
                         }
                     }
                     .tint(tintColor)

@@ -25,7 +25,7 @@ public struct FavoritesRootFeature: Reducer {
     public struct State: Equatable {
         var pickerSelection: PickerSelection = .favorites
         
-        var favorites: FavoritesFeature.State
+        public var favorites: FavoritesFeature.State
         var bookmarks: BookmarksFeature.State
         
         public init(
