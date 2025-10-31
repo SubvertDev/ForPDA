@@ -29,6 +29,7 @@ public struct TopicScreen: View {
     @State private var scrollProxy: ScrollViewProxy?
     @State private var scrollScale: CGFloat = 1
     @State private var showKarmaConfirmation = false
+    @State private var navigationMinimized = false
     
     // MARK: - Computed Properties
     
@@ -76,6 +77,7 @@ public struct TopicScreen: View {
                             }
                             .padding(.bottom, 16)
                         }
+                        ._inScrollContentDetector(state: $navigationMinimized)
                         .onAppear {
                             scrollProxy = proxy
                         }
@@ -98,9 +100,13 @@ public struct TopicScreen: View {
             ._safeAreaBar(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation{
-                    Navigation()
-                        .padding(.bottom, 8)
+                   !store.appSettings.experimentalFloatingNavigation {
+                    PageNavigation(
+                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        minimized: $navigationMinimized
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
                 }
             }
             .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }

@@ -19,6 +19,12 @@ public struct ForumScreen: View {
     
     @Perception.Bindable public var store: StoreOf<ForumFeature>
     @Environment(\.tintColor) private var tintColor
+    @State private var navigationMinimized = false
+    
+    private var shouldShowNavigation: Bool {
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
     
     // MARK: - Init
     
@@ -54,6 +60,7 @@ public struct ForumScreen: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollDismissesKeyboard(.immediately)
+                    ._inScrollContentDetector(state: $navigationMinimized)
                     .refreshable {
                         await send(.onRefresh).finish()
                     }
@@ -66,6 +73,18 @@ public struct ForumScreen: View {
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             ._toolbarTitleDisplayMode(.large)
+            ._safeAreaBar(edge: .bottom) {
+                if isLiquidGlass,
+                   store.appSettings.floatingNavigation,
+                   !store.appSettings.experimentalFloatingNavigation {
+                    PageNavigation(
+                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        minimized: $navigationMinimized
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
+            }
             .toolbar {
                 OptionsMenu()
             }
@@ -174,7 +193,7 @@ public struct ForumScreen: View {
     
     @ViewBuilder
     private func Navigation(pinned: Bool) -> some View {
-        if !pinned, store.pageNavigation.shouldShow {
+        if !pinned, shouldShowNavigation {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
