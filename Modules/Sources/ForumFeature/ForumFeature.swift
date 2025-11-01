@@ -123,6 +123,7 @@ public struct ForumFeature: Reducer, Sendable {
     @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
+    @Dependency(\.notificationCenter) private var notificationCenter
     
     // MARK: - Body
     
@@ -217,6 +218,7 @@ public struct ForumFeature: Reducer, Sendable {
                             type: isForum ? .forum : .topic
                         )
                         let _ = try await apiClient.setFavorite(request)
+                        notificationCenter.post(name: .favoritesUpdated, object: nil)
                         await send(.internal(.refresh))
                         // TODO: We don't know if it's added or removed from api
                         // let text: LocalizedStringResource
