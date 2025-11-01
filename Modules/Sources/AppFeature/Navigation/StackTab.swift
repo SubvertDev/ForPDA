@@ -377,6 +377,9 @@ public struct StackTab: Reducer, Sendable {
             case let .user(id: id):
                 state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
                 
+            case let .qms(id: id):
+                state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
+                
             case let .article(id: id, title: title, imageUrl: imageUrl):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
                 state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))

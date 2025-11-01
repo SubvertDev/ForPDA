@@ -17,6 +17,7 @@ public enum Deeplink {
     case topic(id: Int?, goTo: GoTo)
     case forum(id: Int, page: Int)
     case user(id: Int)
+    case qms(id: Int)
 }
 
 public struct DeeplinkHandler {
@@ -216,8 +217,7 @@ public struct DeeplinkHandler {
         
         switch type {
         case .qms:
-            // TODO: Add
-            break
+            return Deeplink.qms(id: id)
         case .forum:
             return Deeplink.forum(id: id, page: 1)
         case .topic:
@@ -229,8 +229,6 @@ public struct DeeplinkHandler {
         case .siteMention:
             return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
         }
-        
-        throw .noDeeplinkAvailable(for: url)
     }
 }
 

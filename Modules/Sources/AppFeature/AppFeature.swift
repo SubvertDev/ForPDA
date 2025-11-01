@@ -604,6 +604,8 @@ public struct AppFeature: Reducer, Sendable {
             screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
         case let .user(id):
             screen = .profile(.profile(ProfileFeature.State(userId: id)))
+        case let .qms(id: id):
+            screen = .qms(.qms(QMSFeature.State(chatId: id)))
         }
         
         openScreenOnCurrentStack(screen, state: &state)
