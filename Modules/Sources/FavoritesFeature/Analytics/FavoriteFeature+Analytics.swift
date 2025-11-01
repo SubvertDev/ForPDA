@@ -19,14 +19,14 @@ extension FavoritesFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onFirstAppear), .view(.onNextAppear), .delegate:
+                case .view(.onFirstAppear),
+                        .view(.onNextAppear),
+                        .view(.onSceneBecomeActive),
+                        .delegate:
                     break
                     
                 case .view(.onRefresh):
                     analytics.log(FavoritesEvent.onRefresh)
-                    
-                case .view(.onSceneBecomeActive):
-                    analytics.log(FavoritesEvent.onSceneBecomeActive)
                     
                 case let .view(.favoriteTapped(favorite, showUnread)):
                     analytics.log(FavoritesEvent.favoriteTapped(favorite.topic.id, favorite.topic.name, nil, favorite.isForum, showUnread))
@@ -43,6 +43,8 @@ extension FavoritesFeature {
                     switch option {
                     case let .setImportant(id, pinned):
                         analytics.log(FavoritesEvent.setImportant(id, pinned))
+                    case let .markRead(id):
+                        analytics.log(FavoritesEvent.markRead(id, isForum))
                     case let .copyLink(id):
                         analytics.log(FavoritesEvent.linkCopied(id, isForum))
                     case let .delete(id):

@@ -13,14 +13,21 @@ import SFSafeSymbols
 import SharedUI
 import Models
 
+@ViewAction(for: AnnouncementFeature.self)
 public struct AnnouncementScreen: View {
+    
+    // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<AnnouncementFeature>
     @Environment(\.tintColor) private var tintColor
     
+    // MARK: - Init
+    
     public init(store: StoreOf<AnnouncementFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -42,12 +49,12 @@ public struct AnnouncementScreen: View {
                 }
             }
             .navigationTitle(Text(store.name ?? "Загружаем..."))
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .toolbar {
                 // TODO: Announcement Info?
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -60,7 +67,7 @@ public struct AnnouncementScreen: View {
             ForEach(store.types, id: \.self) { main in
                 ForEach(main, id: \.self) { type in
                     TopicView(type: type, attachments: []) { url in
-                        store.send(.urlTapped(url))
+                        send(.urlTapped(url))
                     } // TODO: attachments
                 }
             }

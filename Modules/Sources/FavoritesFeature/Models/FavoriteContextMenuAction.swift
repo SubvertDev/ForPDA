@@ -7,6 +7,7 @@
 
 public enum FavoriteContextMenuAction: Sendable {
     case setImportant(Int, Bool)
+    case markRead(Int)
     case copyLink(Int)
     case delete(Int)
 }

@@ -8,7 +8,6 @@
 import Foundation
 
 public enum ForumsListEvent: Event {
-    case settingsButtonTapped
     case forumRedirectTapped(URL)
     case forumTapped(Int, String)
     case forumListLoadSuccess

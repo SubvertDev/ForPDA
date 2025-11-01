@@ -39,15 +39,12 @@ public struct MenuButtons: View {
             }
             
             Section {
-                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: bundle) {
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                     contextMenuActions.copyAction()
                 }
-                ContextButton(text: "Open In Browser", symbol: .safari, bundle: bundle) {
+                ContextButton(text: LocalizedStringResource("Open In Browser", bundle: .module), symbol: .safari) {
                     contextMenuActions.openInBrowserAction()
                 }
-//                ContextButton(text: "Problems with article?", symbol: .exclamationmarkBubble, bundle: .module) {
-//                    contextMenuActions.reportAction()
-//                }
             }
             
 //            Section {

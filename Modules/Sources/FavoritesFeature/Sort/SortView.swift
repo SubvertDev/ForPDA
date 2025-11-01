@@ -101,7 +101,7 @@ struct SortView: View {
                     Color(.Background.primary)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .modifier(NavigationTitle())
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

@@ -25,6 +25,14 @@ public struct CommentFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let errorSendingReport = LocalizedStringResource("Error sending report", bundle: .module)
+        static let reportTooShort = LocalizedStringResource("Report too short", bundle: .module)
+        static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+    }
+    
     // MARK: - State
     
     @ObservableState
@@ -124,10 +132,17 @@ public struct CommentFeature: Reducer, Sendable {
 
             case .writeForm(.presented(.delegate(.writeFormSent(let response)))):
                 if case let .report(result) = response {
-                    return switch result {
-                    case .error:    showToast(.reportSendError)
-                    case .tooShort: showToast(.reportTooShort)
-                    case .success:  showToast(.reportSent)
+                    let toast: ToastMessage
+                    switch result {
+                    case .error:
+                        toast = ToastMessage(text: Localization.errorSendingReport, isError: true, haptic: .error)
+                    case .tooShort:
+                        toast = ToastMessage(text: Localization.reportTooShort, isError: true, haptic: .error)
+                    case .success:
+                        toast = ToastMessage(text: Localization.reportSent, haptic: .success)
+                    }
+                    return .run { _ in
+                        await toastClient.showToast(toast)
                     }
                 }
                 return .none
@@ -208,11 +223,5 @@ public struct CommentFeature: Reducer, Sendable {
             ReputationChangeFeature()
         }
         .ifLet(\.alert, action: \.alert)
-    }
-    
-    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
-        return .run { _ in
-            await toastClient.showToast(toast)
-        }
     }
 }

@@ -16,7 +16,16 @@ public final class BBRenderer {
     private let baseAttributes: [NSAttributedString.Key: Any]
     
     public init(baseAttributes: [NSAttributedString.Key: Any]? = nil) {
-        self.baseAttributes = baseAttributes ?? BBRenderer.defaultAttributes
+        var attributes = baseAttributes ?? BBRenderer.defaultAttributes
+        
+        // Setting custom font disables dynamic foregroundColor
+        if attributes.count == 1,
+           attributes[.font] != nil,
+           attributes[.foregroundColor] == nil {
+            attributes[.foregroundColor] = UIColor(resource: .Labels.primary)
+        }
+        
+        self.baseAttributes = attributes
     }
     
     public func render(text: String) -> NSAttributedString {

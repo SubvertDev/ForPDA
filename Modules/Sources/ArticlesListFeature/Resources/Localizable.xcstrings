@@ -11,26 +11,42 @@
         }
       }
     },
-    "Copy Link" : {
-      "comment" : "Временный фикс Bundle",
-      "extractionState" : "manual",
+    "Failed to load" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скопировать ссылку"
+            "value" : "Не удалось загрузить"
           }
         }
       }
     },
-    "Open In Browser" : {
-      "comment" : "Временный фикс Bundle",
-      "extractionState" : "manual",
+    "Link copied" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть в браузере"
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторить"
+          }
+        }
+      }
+    },
+    "Try again later" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повторите попытку позже"
           }
         }
       }

@@ -192,40 +192,42 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
 // MARK: - Mocks
 
 extension Post {
-    static let mock = Post(
-        id: 12,
-        flag: 384,
-        content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
-        author: Author(
-            id: 6176341,
-            name: "AirFlare",
-            groupId: 8,
-            avatarUrl: "https://4pda.to/s/Zy0hVVliEZZvbylgfQy11QiIjvDIhLJBjheakj4yIz2ohhN2F.jpg",
-            lastSeenDate: Date(timeIntervalSince1970: 1725706883),
-            signature: "",
-            reputationCount: 312
-        ),
-        karma: 1,
-        attachments: [
-            Attachment(
-                id: 14308454,
-                type: .image,
-                name: "IMG_2369.png",
-                size: 62246,
-                metadata: Attachment.Metadata(
-                    width: 281,
-                    height: 500,
-                    url: URL(string: "https://cs2c9f.4pda.ws/14308454.png")!
-                ),
-                downloadCount: nil
+    static func mock(id: Int = 0) -> Post {
+        return Post(
+            id: id,
+            flag: 384,
+            content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
+            author: Author(
+                id: 6176341,
+                name: "AirFlare",
+                groupId: 8,
+                avatarUrl: "https://4pda.to/s/Zy0hVVliEZZvbylgfQy11QiIjvDIhLJBjheakj4yIz2ohhN2F.jpg",
+                lastSeenDate: Date(timeIntervalSince1970: 1725706883),
+                signature: "",
+                reputationCount: 312
+            ),
+            karma: 1,
+            attachments: [
+                Attachment(
+                    id: 14308454,
+                    type: .image,
+                    name: "IMG_2369.png",
+                    size: 62246,
+                    metadata: Attachment.Metadata(
+                        width: 281,
+                        height: 500,
+                        url: URL(string: "https://cs2c9f.4pda.ws/14308454.png")!
+                    ),
+                    downloadCount: nil
+                )
+            ],
+            createdAt: Date(timeIntervalSince1970: 1725706321),
+            lastEdit: LastEdit(
+                userId: 6176341,
+                username: "AirFlare",
+                reason: "for fun",
+                date: Date(timeIntervalSince1970: 1725706883)
             )
-        ],
-        createdAt: Date(timeIntervalSince1970: 1725706321),
-        lastEdit: LastEdit(
-            userId: 6176341,
-            username: "AirFlare",
-            reason: "for fun",
-            date: Date(timeIntervalSince1970: 1725706883)
         )
-    )
+    }
 }

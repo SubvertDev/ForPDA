@@ -14,4 +14,5 @@ public enum TopicPostContextMenuAction {
     case karma(Int)
     case report(Int)
     case changeReputation(Int, Int, String)
+    case copyLink(Int)
 }

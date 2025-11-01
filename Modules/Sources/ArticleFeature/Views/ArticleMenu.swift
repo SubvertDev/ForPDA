@@ -11,6 +11,7 @@ import SharedUI
 import Models
 
 public struct ArticleMenu: View {
+    
     public let store: StoreOf<ArticleFeature>
     public let isDark: Bool
     
@@ -21,15 +22,12 @@ public struct ArticleMenu: View {
     
     public var body: some View {
         Menu {
-            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                 store.send(.menuActionTapped(.copyLink))
             }
-            ContextButton(text: "Share Link", symbol: .squareAndArrowUp, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Share Link", bundle: .module), symbol: .squareAndArrowUp) {
                 store.send(.menuActionTapped(.shareLink))
             }
-//            ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
-//                store.send(.menuActionTapped(.report))
-//            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)

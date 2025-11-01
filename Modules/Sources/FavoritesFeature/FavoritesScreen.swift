@@ -18,8 +18,13 @@ public struct FavoritesScreen: View {
     // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<FavoritesFeature>
+    @State private var navigationMinimized = false
     @Environment(\.tintColor) private var tintColor
-    @Environment(\.scenePhase) private var scenePhase
+    
+    private var shouldShowNavigation: Bool {
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
     
     // MARK: - Init
 
@@ -46,6 +51,7 @@ public struct FavoritesScreen: View {
                         FavoritesSection(favorites: store.favorites, important: false)
                     }
                     .scrollContentBackground(.hidden)
+                    ._inScrollContentDetector(state: $navigationMinimized)
                     .refreshable {
                         await send(.onRefresh).finish()
                     }
@@ -55,7 +61,19 @@ public struct FavoritesScreen: View {
                 }
             }
             .navigationTitle(Text("Favorites", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
+            ._safeAreaBar(edge: .bottom) {
+                if isLiquidGlass,
+                   store.appSettings.floatingNavigation,
+                   !store.appSettings.experimentalFloatingNavigation {
+                    PageNavigation(
+                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        minimized: $navigationMinimized
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
+            }
             .animation(.default, value: store.favoritesImportant)
             .animation(.default, value: store.favorites)
             .toolbar {
@@ -63,17 +81,15 @@ public struct FavoritesScreen: View {
                     if store.isUserAuthorized {
                         Menu {
                             ContextButton(
-                                text: "Sort",
-                                symbol: .line3HorizontalDecrease,
-                                bundle: .module
+                                text: LocalizedStringResource("Sort", bundle: .module),
+                                symbol: .line3HorizontalDecrease
                             ) {
                                 send(.contextOptionMenu(.sort))
                             }
                             
                             ContextButton(
-                                text: "Read All",
-                                symbol: .checkmarkCircle,
-                                bundle: .module
+                                text: LocalizedStringResource("Read All", bundle: .module),
+                                symbol: .checkmarkCircle
                             ) {
                                 send(.contextOptionMenu(.markAllAsRead))
                             }
@@ -89,11 +105,6 @@ public struct FavoritesScreen: View {
             ) { store in
                 SortView(store: store)
             }
-            .onChange(of: scenePhase) { newScenePhase in
-                if (scenePhase == .inactive || scenePhase == .background) && newScenePhase == .active {
-                    send(.onSceneBecomeActive)
-                }
-            }
             .onFirstAppear {
                 send(.onFirstAppear)
             } onNextAppear: {
@@ -108,23 +119,33 @@ public struct FavoritesScreen: View {
         VStack(spacing: 0) {
             Section {
                 ContextButton(
-                    text: favorite.isImportant ? "From Important" : "To Important",
-                    symbol: favorite.isImportant ? .heartFill : .heart,
-                    bundle: .module
+                    text: favorite.isImportant
+                    ? LocalizedStringResource("From Important", bundle: .module)
+                    : LocalizedStringResource("To Important", bundle: .module),
+                    symbol: favorite.isImportant ? .heartFill : .heart
                 ) {
                     send(.commonContextMenu(
                         .setImportant(favorite.topic.id, favorite.isImportant ? false : true),
                         favorite.isForum
                     ))
                 }
+                
+                if favorite.topic.isUnread {
+                    ContextButton(
+                        text: LocalizedStringResource("Mark As Read", bundle: .module),
+                        symbol: .checkmarkCircle
+                    ){
+                        send(.commonContextMenu(.markRead(favorite.id), favorite.isForum))
+                    }
+                }
             }
             
             Section {
-                ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                     send(.commonContextMenu(.copyLink(favorite.topic.id), favorite.isForum))
                 }
                 
-                ContextButton(text: "Delete", symbol: .trash, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
                     send(.commonContextMenu(.delete(favorite.topic.id), favorite.isForum))
                 }
             }
@@ -137,42 +158,37 @@ public struct FavoritesScreen: View {
         VStack(spacing: 0) {
             Section {
                 ContextButton(
-                    text: "Go To End",
-                    symbol: .chevronRight2,
-                    bundle: .module
+                    text: LocalizedStringResource("Go To End", bundle: .module),
+                    symbol: .chevronRight2
                 ) {
                     send(.topicContextMenu(.goToEnd, favorite))
                 }
                 
                 ContextButton(
-                    text: "Notify Hat Update",
-                    symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag,
-                    bundle: .module
+                    text: LocalizedStringResource("Notify Hat Update", bundle: .module),
+                    symbol: favorite.isNotifyHatUpdate ? .flagFill : .flag
                 ) {
                     send(.topicContextMenu(.notifyHatUpdate(favorite.flag), favorite))
                 }
                 
                 Menu {
                     ContextButton(
-                        text: "Always",
-                        symbol: favorite.notify == .always ? .bellFill : .bell,
-                        bundle: .module
+                        text: LocalizedStringResource("Always", bundle: .module),
+                        symbol: favorite.notify == .always ? .bellFill : .bell
                     ) {
                         send(.topicContextMenu(.notify(favorite.flag, .always), favorite))
                     }
                     
                     ContextButton(
-                        text: "Once",
-                        symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge,
-                        bundle: .module
+                        text: LocalizedStringResource("Once", bundle: .module),
+                        symbol: favorite.notify == .once ? .bellBadgeFill : .bellBadge
                     ) {
                         send(.topicContextMenu(.notify(favorite.flag, .once), favorite))
                     }
                     
                     ContextButton(
-                        text: "Do Not",
-                        symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash,
-                        bundle: .module
+                        text: LocalizedStringResource("Do Not", bundle: .module),
+                        symbol: favorite.notify == .doNot ? .bellSlashFill : .bellSlash
                     ) {
                         send(.topicContextMenu(.notify(favorite.flag, .doNot), favorite))
                     }
@@ -191,7 +207,9 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
         Section {
-            Navigation(isShown: !important)
+            if shouldShowNavigation {
+                Navigation(isShown: !important)
+            }
             
             ForEach(Array(favorites.enumerated()), id: \.element) { index, favorite in
                 let radius: CGFloat = isLiquidGlass ? 24 : 10
@@ -240,7 +258,9 @@ public struct FavoritesScreen: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            Navigation(isShown: !important)
+            if shouldShowNavigation {
+                Navigation(isShown: !important)
+            }
         } header: {
             if !favorites.isEmpty {
                 Header(title: important

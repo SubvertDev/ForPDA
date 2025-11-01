@@ -17,9 +17,9 @@ public enum ArticlesListEvent: Event {
     case linkReported(URL)
     case articleAddedToBookmarks(URL)
     case listGridTypeChanged(String)
-    case settingsButtonTapped
     case refreshTriggered
     case loadMoreTriggered
+    case tryAgainButtonTapped
     case menuTapped
     case articlesHasLoaded // TODO: Rename?
     case articlesHasNotLoaded(String)

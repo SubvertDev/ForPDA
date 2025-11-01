@@ -34,10 +34,11 @@ public struct SettingsFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         
         public var startPage: AppTab
-        public var topicOpening: TopicOpeningStrategy
         public var appColorScheme: AppColorScheme
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
+        
+        var didLoadOnce = false
         
         public var appVersionAndBuild: String {
             let info = Bundle.main.infoDictionary
@@ -65,7 +66,6 @@ public struct SettingsFeature: Reducer, Sendable {
             self.destination = destination
 
             self.startPage = _appSettings.startPage.wrappedValue
-            self.topicOpening = _appSettings.topicOpeningStrategy.wrappedValue
             self.appColorScheme = _appSettings.appColorScheme.wrappedValue
             self.backgroundTheme = _appSettings.backgroundTheme.wrappedValue
             self.appTintColor = _appSettings.appTintColor.wrappedValue
@@ -76,13 +76,15 @@ public struct SettingsFeature: Reducer, Sendable {
     
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
+        
+        case onAppear
         case languageButtonTapped
         case schemeButtonTapped(AppColorScheme)
         case notificationsButtonTapped
+        case navigationButtonTapped
         case onDeveloperMenuTapped
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
-        // case copyPushTokenButtonTapped
         case clearCacheButtonTapped
         case supportOnBoostyButtonTapped
         case appDiscussionButtonTapped
@@ -103,6 +105,7 @@ public struct SettingsFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openNavigationSettings
             case openNotificationsSettings
             case openDeveloperMenu
             case openDeeplink(URL)
@@ -112,6 +115,7 @@ public struct SettingsFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.pasteboardClient) var pasteboardClient
+    @Dependency(\.analyticsClient) var analyticsClient
     @Dependency(\.cacheClient) var cacheClient
     @Dependency(\.openURL) var openURL
     
@@ -122,6 +126,10 @@ public struct SettingsFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .onAppear:
+                reportFullyDisplayed(&state)
+                return .none
+                
             case .languageButtonTapped:
                 return .run { _ in
                     guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
@@ -136,6 +144,9 @@ public struct SettingsFeature: Reducer, Sendable {
             case .notificationsButtonTapped:
                 return .send(.delegate(.openNotificationsSettings))
                 
+            case .navigationButtonTapped:
+                return .send(.delegate(.openNavigationSettings))
+                
             case .onDeveloperMenuTapped:
                 return .send(.delegate(.openDeveloperMenu))
                 
@@ -149,10 +160,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
                 pasteboardClient.copy(analyticsId)
                 return .none
-                
-            // case .copyPushTokenButtonTapped:
-            //     state.destination = .alert(.notImplemented)
-            //     return .none
                 
             case .clearCacheButtonTapped:
                 state.destination = .alert(.clearCache)
@@ -223,10 +230,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 state.$appSettings.withLock { $0.startPage = state.startPage }
                 return .none
                 
-            case .binding(\.topicOpening):
-                state.$appSettings.withLock { $0.topicOpeningStrategy = state.topicOpening }
-                return .none
-                
             case .destination, .binding, .delegate:
                 return .none
             }
@@ -234,6 +237,15 @@ public struct SettingsFeature: Reducer, Sendable {
         .ifLet(\.$destination, action: \.destination)
         
         Analytics()
+    }
+    
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
 

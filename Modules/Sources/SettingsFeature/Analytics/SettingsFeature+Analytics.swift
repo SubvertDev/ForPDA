@@ -23,11 +23,17 @@ extension SettingsFeature {
                 case .destination, .binding, .delegate:
                     break
                     
+                case .onAppear:
+                    break
+                    
                 case .languageButtonTapped:
                     analyticsClient.log(SettingsEvent.languageTapped)
                     
                 case .schemeButtonTapped:
                     analyticsClient.log(SettingsEvent.themeTapped)
+                    
+                case .navigationButtonTapped:
+                    analyticsClient.log(SettingsEvent.navigationTapped)
                     
                 case .notificationsButtonTapped:
                     analyticsClient.log(SettingsEvent.notificationsTapped)

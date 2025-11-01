@@ -55,7 +55,8 @@ public struct ArticleScreen: View {
                         .presentationDetents([.medium])
                     }
                 }
-                .safeAreaInset(edge: .bottom) { Keyboard() }
+                ._safeAreaBar(edge: .bottom) { Keyboard() }
+                ._scrollEdgeEffectHidden(!isCommentViewExpanded, for: .bottom)
                 .onTapGesture { focus = nil }
                 .modifier(NavigationBarSettings())
                 .toolbar { Toolbar() }
@@ -66,7 +67,7 @@ public struct ArticleScreen: View {
                 }
                 .overlay { RefreshIndicator() }
                 .background(Color(.Background.primary))
-                .task { store.send(.onTask) }
+                .onAppear { store.send(.onAppear) }
         }
     }
     

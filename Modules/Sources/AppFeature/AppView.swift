@@ -66,14 +66,17 @@ public struct AppView: View {
                     OldTabView(store: store)
                 }
                 
-                if let toast = store.toastMessage {
-                    Toast(toast)
-                        .ignoresSafeArea(.keyboard, edges: .bottom)
+                ToastView(toast: store.toastMessage)
+                    .ignoresSafeArea(.keyboard, edges: .bottom)
+            }
                 }
             }
             .animation(.default, value: store.toastMessage)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
+            .sheet(item: $store.scope(state: \.logStore, action: \.logStore)) { store in
+                LogStoreScreen(store: store)
+            }
             .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
                 NavigationStack {
                     AuthScreen(store: store)
@@ -86,53 +89,9 @@ public struct AppView: View {
             .onAppear {
                 store.send(.onAppear)
             }
-        }
-    }
-    
-    // MARK: - Toast (Refactor)
-    
-    @State private var isExpanded = false
-    @State private var duration = 5
-
-    @ViewBuilder
-    private func Toast(_ toast: ToastMessage) -> some View {
-        HStack(spacing: 0) {
-            Image(systemSymbol: toast.isError ? .xmarkCircleFill : .checkmarkCircleFill)
-                .font(.body)
-                .foregroundStyle(toast.isError ? Color(.Main.red) : tintColor)
-                .frame(width: 32, height: 32)
-            
-            if isExpanded {
-                Text(toast.description, bundle: .toast)
-                    .font(.caption)
-                    .foregroundStyle(Color(.Labels.primary))
-                    .padding(.trailing, 12)
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
+            .onShake {
+                store.send(.onShake)
             }
-        }
-        .background(Color(.Background.primary))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(.Separator.secondary), lineWidth: 0.33)
-        }
-        .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
-        .padding(.bottom, 50 + 16)
-        .padding(.horizontal, 16)
-        .opacity(isExpanded ? 1 : 0)
-        .task {
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                isExpanded = true
-            }
-            
-            try? await Task.sleep(for: .seconds(duration - 1))
-            
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                isExpanded = false
-            }
-            
-            try? await Task.sleep(for: .seconds(0.4))
-            store.send(.didFinishToastAnimation)
         }
     }
 }
@@ -176,13 +135,70 @@ struct LiquidTabView: View {
                     systemImage: AppTab.profile.iconSymbol.rawValue,
                     value: .profile
                 ) {
-                    StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                    ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                 }
             }
-            .tabBarMinimizeBehavior(.onScrollDown)
-            // .tabViewBottomAccessory {
-            //     PageNavigation(store: pageStore)
-            // }
+            .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
+            .if(store.appSettings.experimentalFloatingNavigation) { content in
+                content
+                    .tabViewBottomAccessory {
+                        BottomAccessory()
+                    }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func BottomAccessory() -> some View {
+        switch store.selectedTab {
+        case .articles:
+            Page(for: store.scope(state: \.articlesTab, action: \.articlesTab))
+        case .favorites:
+            Page(for: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+        case .forum:
+            Page(for: store.scope(state: \.forumTab, action: \.forumTab))
+        case .profile:
+            switch store.scope(state: \.profileFlow, action: \.profileFlow).case {
+            case let .loggedIn(store), let .loggedOut(store):
+                Page(for: store)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func Page(for tab: Store<StackTab.State, StackTab.Action>) -> some View {
+        if tab.path.isEmpty {
+            _Page(for: tab.scope(state: \.root, action: \.root))
+        } else if let id = tab.path.ids.last {
+            if let path = tab.scope(state: \.path[id: id], action: \.path[id: id]) {
+                _Page(for: path)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func _Page(for store: Store<Path.State, Path.Action>) -> some View {
+        switch store.case {
+        case let .favorites(store):
+            PageNavigation(store: store.scope(state: \.favorites.pageNavigation, action: \.favorites.pageNavigation))
+        case let .forum(path):
+            switch path.case {
+            case let .forum(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            case let .topic(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            default:
+                EmptyView()
+            }
+        case let .profile(path):
+            switch path.case {
+            case let .history(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            default:
+                EmptyView()
+            }
+        default:
+            EmptyView()
         }
     }
 }
@@ -207,7 +223,7 @@ struct OldTabView: View {
                 StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
                     .tag(AppTab.forum)
                 
-                StackTabView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                     .tag(AppTab.profile)
             }
             
@@ -248,12 +264,14 @@ struct OldTabView: View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 ForEach(AppTab.allCases, id: \.self) { tab in
-                    Button {
-                        store.send(.didSelectTab(tab))
-                        shouldAnimatedTabItem[tab.rawValue].toggle()
-                    } label: {
-                        PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)
-                            .padding(.top, 2.5)
+                    WithPerceptionTracking {
+                        Button {
+                            store.send(.didSelectTab(tab))
+                            shouldAnimatedTabItem[tab.rawValue].toggle()
+                        } label: {
+                            PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)
+                                .padding(.top, 2.5)
+                        }
                     }
                 }
             }
@@ -266,6 +284,72 @@ struct OldTabView: View {
         .clipShape(.rect(topLeadingRadius: 16, bottomLeadingRadius: 0, bottomTrailingRadius: 0, topTrailingRadius: 16))
         .shadow(color: Color(.Labels.primary).opacity(0.15), radius: 2)
         .offset(y: 34) // TODO: Check for different screens
+    }
+}
+
+// MARK: - Toast View
+
+struct ToastView: View {
+    
+    @Environment(\.tintColor) private var tintColor
+    
+    @State private var isPresented = false
+    @State private var isExpanded = true
+    @State private var duration = 5
+    @State private var pendingTask: Task<Void, Never>?
+    @State private var lastToast: ToastMessage!
+    
+    let toast: ToastMessage?
+
+    var body: some View {
+        ZStack {
+            if isPresented, let toast = lastToast {
+                HStack(spacing: 0) {
+                    Image(systemSymbol: toast.isError ? .xmarkCircleFill : .checkmarkCircleFill)
+                        .font(.body)
+                        .foregroundStyle(toast.isError ? Color(.Main.red) : tintColor)
+                        .frame(width: 32, height: 32)
+                    
+                    if isExpanded {
+                        Text(toast.text)
+                            .font(.caption)
+                            .foregroundStyle(Color(.Labels.primary))
+                            .padding(.trailing, 12)
+                            .transition(.opacity.combined(with: .move(edge: .trailing)))
+                    }
+                }
+                .background(Color(.Background.primary))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color(.Separator.secondary), lineWidth: 0.33)
+                }
+                .shadow(color: Color.black.opacity(0.04), radius: 10, y: 4)
+                .padding(.bottom, 50 + 16)
+                .padding(.horizontal, 16)
+                .opacity(isExpanded ? 1 : 0)
+            }
+        }
+        .onChange(of: toast) { newValue in
+            pendingTask?.cancel()
+            
+            if let newValue {
+                withAnimation {
+                    lastToast = newValue
+                    isPresented = true
+                }
+            } else {
+                pendingTask = Task {
+                    try? await Task.sleep(for: .seconds(1))
+                    guard !Task.isCancelled else { return }
+                    withAnimation {
+                        isPresented = false
+                        lastToast = nil
+                        pendingTask = nil
+                    }
+                }
+            }
+        }
     }
 }
 
