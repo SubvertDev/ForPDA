@@ -15,6 +15,7 @@ import ComposableArchitecture
 import PersistenceKeys
 
 public typealias ConnectionState = API.ConnectionState
+public typealias UploadProgressStatus = PDAPI.UploadProgressStatus
 public typealias PDAPIError = APIError
 
 // MARK: - Client
@@ -475,8 +476,7 @@ extension APIClient: DependencyKey {
             // MARK: - Upload
             
             upload: { request in
-                return .finished
-                // return api.upload(request: request)
+                return api.upload(request: request)
             }
         )
     }
