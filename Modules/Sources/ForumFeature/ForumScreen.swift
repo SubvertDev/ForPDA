@@ -133,30 +133,32 @@ public struct ForumScreen: View {
                 Navigation(pinned: pinned)
                 
                 ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
-                    let radius: CGFloat = isLiquidGlass ? 24 : 10
-                    TopicRow(
-                        title: topic.name,
-                        date: topic.lastPost.date,
-                        username: topic.lastPost.username,
-                        isClosed: topic.isClosed,
-                        isUnread: topic.isUnread
-                    ) { unreadTapped in
-                        send(.topicTapped(topic, showUnread: unreadTapped))
-                    }
-                    .contextMenu {
-                        TopicContextMenu(topic: topic)
-                        
-                        Section {
-                            CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                    WithPerceptionTracking {
+                        let radius: CGFloat = isLiquidGlass ? 24 : 10
+                        TopicRow(
+                            title: topic.name,
+                            date: topic.lastPost.date,
+                            username: topic.lastPost.username,
+                            isClosed: topic.isClosed,
+                            isUnread: topic.isUnread
+                        ) { unreadTapped in
+                            send(.topicTapped(topic, showUnread: unreadTapped))
                         }
+                        .contextMenu {
+                            TopicContextMenu(topic: topic)
+                            
+                            Section {
+                                CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                            }
+                        }
+                        .listRowBackground(
+                            Color(.Background.teritary)
+                                .clipShape(.rect(
+                                    topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
+                                    bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
+                                ))
+                        )
                     }
-                    .listRowBackground(
-                        Color(.Background.teritary)
-                            .clipShape(.rect(
-                                topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
-                                bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
-                            ))
-                    )
                 }
                 .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -207,21 +209,23 @@ public struct ForumScreen: View {
         Section {
             if store.sectionsExpandState.value(for: .subforums) {
                 ForEach(subforums) { forum in
-                    ForumRow(title: forum.name, isUnread: forum.isUnread) {
-                        if let redirectUrl = forum.redirectUrl {
-                            send(.subforumRedirectTapped(redirectUrl))
-                        } else {
-                            send(.subforumTapped(forum))
+                    WithPerceptionTracking {
+                        ForumRow(title: forum.name, isUnread: forum.isUnread) {
+                            if let redirectUrl = forum.redirectUrl {
+                                send(.subforumRedirectTapped(redirectUrl))
+                            } else {
+                                send(.subforumTapped(forum))
+                            }
                         }
-                    }
-                    .contextMenu {
-                        Section {
-                            CommonContextMenu(
-                                id: forum.id,
-                                isFavorite: forum.isFavorite,
-                                isUnread: forum.isUnread,
-                                isForum: true
-                            )
+                        .contextMenu {
+                            Section {
+                                CommonContextMenu(
+                                    id: forum.id,
+                                    isFavorite: forum.isFavorite,
+                                    isUnread: forum.isUnread,
+                                    isForum: true
+                                )
+                            }
                         }
                     }
                 }
