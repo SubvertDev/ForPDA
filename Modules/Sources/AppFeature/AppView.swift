@@ -69,8 +69,6 @@ public struct AppView: View {
                 ToastView(toast: store.toastMessage)
                     .ignoresSafeArea(.keyboard, edges: .bottom)
             }
-                }
-            }
             .animation(.default, value: store.toastMessage)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
