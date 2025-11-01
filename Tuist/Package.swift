@@ -70,7 +70,7 @@ let package = Package(
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
         .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.12.0"),
-        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.5.2"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.6.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
         .package(url: "https://github.com/exyte/Chat.git", exact: "2.4.2"), // 2.5.0+ is iOS 17+
         .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro.git", from: "0.5.2")
