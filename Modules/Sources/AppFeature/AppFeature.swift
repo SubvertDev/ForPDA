@@ -300,7 +300,7 @@ public struct AppFeature: Reducer, Sendable {
                 return .run { _ in
                     let isProcessed = await notificationsClient.processNotification(notification)
                     if isProcessed {
-                        let unread = try await apiClient.getUnread()
+                        let unread = try await apiClient.getUnread(type: 0, value: 0)
                         let skipCategories: [Unread.Item.Category] = [.topic, .forum]
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: skipCategories)
                     }

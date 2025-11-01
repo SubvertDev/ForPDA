@@ -70,7 +70,7 @@ public struct APIClient: Sendable {
     public var readAllFavorites: @Sendable () async throws -> Bool
     
     // Extra
-    public var getUnread: @Sendable () async throws -> Unread
+    public var getUnread: @Sendable (_ type: Int, _ value: Int) async throws -> Unread
     public var getAttachment: @Sendable (_ id: Int) async throws -> URL
     public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
@@ -407,8 +407,8 @@ extension APIClient: DependencyKey {
             
             // MARK: - Extra
             
-            getUnread: {
-                let response = try await api.request(CommonCommand.syncUnread)
+            getUnread: { type, value in
+                let response = try await api.request(CommonCommand.syncUnread(type: type, value: value))
                 return try await parser.parseUnread(response)
             },
             
@@ -584,7 +584,7 @@ extension APIClient: DependencyKey {
             readAllFavorites: {
                 return true
             },
-            getUnread: {
+            getUnread: { _, _ in
                 return .mock
             },
             getAttachment: { _ in
