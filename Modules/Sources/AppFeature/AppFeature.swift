@@ -231,6 +231,7 @@ public struct AppFeature: Reducer, Sendable {
                     
                     .run { send in
                         do {
+                            apiClient.setLogResponses(.none)
                             try await apiClient.connect(inBackground: false)
                         } catch {
                             await send(._failedToConnect(error))
