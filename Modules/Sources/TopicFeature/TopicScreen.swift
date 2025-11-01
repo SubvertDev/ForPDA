@@ -68,6 +68,9 @@ public struct TopicScreen: View {
                                 }
                                 
                                 if !store.isLoadingTopic {
+                                    if let poll = store.topic!.poll {
+                                        Poll(poll)
+                                    }
                                     PostList()
                                 }
                                 
@@ -181,6 +184,32 @@ public struct TopicScreen: View {
         if store.pageNavigation.shouldShow {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .padding(.horizontal, 16)
+        }
+    }
+    
+    // MARK: - Poll
+    
+    @ViewBuilder
+    private func Poll(_ poll: Topic.Poll) -> some View {
+        VStack(spacing: 0) {
+            if store.shouldShowTopicPollButton {
+                Button {
+                    send(.topicPollOpenButtonTapped)
+                } label: {
+                    Text("Poll", bundle: .module)
+                        .font(.headline)
+                        .bold()
+                        .padding(16)
+                }
+            } else {
+                PollView(poll: poll, onVoteButtonTapped: {
+                    // TODO: Implement...
+                })
+            }
+            
+            Rectangle()
+                .foregroundStyle(Color(.Separator.post))
+                .frame(height: 10)
         }
     }
     

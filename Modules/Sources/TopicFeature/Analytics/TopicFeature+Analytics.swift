@@ -41,6 +41,9 @@ extension TopicFeature {
                 case .view(.topicHatOpenButtonTapped):
                     analytics.log(TopicEvent.topicHatOpenButtonTapped)
                     
+                case .view(.topicPollOpenButtonTapped):
+                    analytics.log(TopicEvent.topicPollOpenButtonTapped)
+                    
                 case let .view(.userTapped(userId: userId)):
                     analytics.log(TopicEvent.userTapped(userId))
                     

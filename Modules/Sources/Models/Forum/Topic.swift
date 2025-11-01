@@ -41,7 +41,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
             self.options = options
         }
         
-        public struct Choice: Sendable, Codable, Hashable {
+        public struct Choice: Sendable, Codable, Hashable, Identifiable {
             public let id: Int
             public let votes: Int
             public let name: String

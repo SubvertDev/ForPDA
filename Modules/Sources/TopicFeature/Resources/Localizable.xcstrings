@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld people voted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проголосовало %lld чел."
+          }
+        }
+      }
+    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {
@@ -133,6 +143,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть в браузере"
+          }
+        }
+      }
+    },
+    "Poll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Опрос"
           }
         }
       }

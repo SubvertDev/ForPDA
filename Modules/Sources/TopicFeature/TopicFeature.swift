@@ -81,6 +81,7 @@ public struct TopicFeature: Reducer, Sendable {
         }
         
         var shouldShowTopicHatButton = false
+        var shouldShowTopicPollButton = true
         
         public init(
             topicId: Int,
@@ -117,6 +118,7 @@ public struct TopicFeature: Reducer, Sendable {
             case onRefresh
             case finishedPostAnimation
             case topicHatOpenButtonTapped
+            case topicPollOpenButtonTapped
             case changeKarmaTapped(Int, Bool)
             case userTapped(Int)
             case urlTapped(URL)
@@ -226,6 +228,10 @@ public struct TopicFeature: Reducer, Sendable {
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
                 state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
                 state.shouldShowTopicHatButton = false
+                return .none
+                
+            case .view(.topicPollOpenButtonTapped):
+                state.shouldShowTopicPollButton = false
                 return .none
                 
             case let .view(.userTapped(id)):
@@ -465,6 +471,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 state.isLoadingTopic = false
                 state.isRefreshing = false
+                state.shouldShowTopicPollButton = true
                 state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
                 reportFullyDisplayed(&state)
