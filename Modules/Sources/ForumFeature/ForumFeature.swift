@@ -204,8 +204,8 @@ public struct ForumFeature: Reducer, Sendable {
                     return .run { _ in await open(url: url) }
                     
                 case .markRead:
-                    return .run { [id = id, isForum = isForum] send in
-                        let _ = try await apiClient.markReadForum(id, !isForum)
+                    return .run { [id, isForum] send in
+                        let _ = try await apiClient.markRead(id: id, isTopic: !isForum)
                         await send(.internal(.refresh))
                     }
                     

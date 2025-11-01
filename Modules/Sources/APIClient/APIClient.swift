@@ -52,7 +52,7 @@ public struct APIClient: Sendable {
     public var getForumsList: @Sendable (_ policy: CachePolicy) async throws -> AsyncThrowingStream<[ForumInfo], any Error>
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Forum, any Error>
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
-    public var markReadForum: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
+    public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
@@ -270,7 +270,7 @@ extension APIClient: DependencyKey {
                 return try await parser.parseForumJump(response)
             },
             
-            markReadForum: { id, isTopic in
+            markRead: { id, isTopic in
                 let command = ForumCommand.markRead(id: id, isTopic: isTopic)
                 let response = try await api.request(command)
                 let status = Int(response.getResponseStatus())!
@@ -537,7 +537,7 @@ extension APIClient: DependencyKey {
             jumpForum: { _ in
                 return .mock
             },
-            markReadForum: { _, _ in
+            markRead: { _, _ in
                 return true
             },
             getAnnouncement: { _ in

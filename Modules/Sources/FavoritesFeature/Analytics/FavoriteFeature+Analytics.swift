@@ -43,6 +43,8 @@ extension FavoritesFeature {
                     switch option {
                     case let .setImportant(id, pinned):
                         analytics.log(FavoritesEvent.setImportant(id, pinned))
+                    case let .markRead(id):
+                        analytics.log(FavoritesEvent.markRead(id, isForum))
                     case let .copyLink(id):
                         analytics.log(FavoritesEvent.linkCopied(id, isForum))
                     case let .delete(id):

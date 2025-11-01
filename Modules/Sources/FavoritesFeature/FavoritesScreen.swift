@@ -129,6 +129,15 @@ public struct FavoritesScreen: View {
                         favorite.isForum
                     ))
                 }
+                
+                if favorite.topic.isUnread {
+                    ContextButton(
+                        text: LocalizedStringResource("Mark As Read", bundle: .module),
+                        symbol: .checkmarkCircle
+                    ){
+                        send(.commonContextMenu(.markRead(favorite.id), favorite.isForum))
+                    }
+                }
             }
             
             Section {

@@ -210,6 +210,12 @@ public struct FavoritesFeature: Reducer, Sendable {
                         
                         await send(.internal(.refresh))
                     }
+                    
+                case .markRead(let id):
+                    return .run { [id, isForum] send in
+                        let _ = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        await send(.internal(.refresh))
+                    }
                 }
                 
             case let .view(.topicContextMenu(action, favorite)):
