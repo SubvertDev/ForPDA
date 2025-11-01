@@ -30,7 +30,6 @@ public struct ProfileFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
         @Shared(.userSession) public var userSession: UserSession?
-        @Shared(.appStorage("didAcceptQMSWarningMessage")) var didAcceptQMSWarningMessage = false
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
@@ -41,18 +40,14 @@ public struct ProfileFeature: Reducer, Sendable {
         
         var didLoadOnce = false
         
-        public var showQMSWarningSheet: Bool
-        
         public init(
             userId: Int? = nil,
             isLoading: Bool = true,
-            user: User? = nil,
-            showQMSWarningSheet: Bool = false
+            user: User? = nil
         ) {
             self.userId = userId
             self.isLoading = isLoading
             self.user = user
-            self.showQMSWarningSheet = showQMSWarningSheet
         }
     }
     
@@ -70,8 +65,6 @@ public struct ProfileFeature: Reducer, Sendable {
             case historyButtonTapped
             case reputationButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
-            case sheetContinueButtonTapped
-            case sheetCloseButtonTapped
         }
         
         case `internal`(Internal)
@@ -128,21 +121,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .send(.delegate(.openReputation(userId)))
                 
             case .view(.qmsButtonTapped):
-                if state.didAcceptQMSWarningMessage {
-                    return .send(.delegate(.openQms))
-                } else {
-                    state.showQMSWarningSheet = true
-                    return .none
-                }
-                
-            case .view(.sheetContinueButtonTapped):
-                state.$didAcceptQMSWarningMessage.withLock { $0 = true }
-                state.showQMSWarningSheet = false
                 return .send(.delegate(.openQms))
-                
-            case .view(.sheetCloseButtonTapped):
-                state.showQMSWarningSheet = false
-                return .none
                 
             case .view(.settingsButtonTapped):
                 return .send(.delegate(.openSettings))

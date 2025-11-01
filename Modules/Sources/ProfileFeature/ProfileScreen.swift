@@ -29,14 +29,6 @@ public struct ProfileScreen: View {
     }
     @State private var pickerSelection: PickerSelection = .general
     
-    // MARK: - Timer properties
-    
-    @State private var timeRemaining = 5
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    var isSheetTimerFinished: Bool {
-        return timeRemaining <= 0
-    }
-    
     // MARK: - Init
     
     public init(store: StoreOf<ProfileFeature>) {
@@ -80,11 +72,6 @@ public struct ProfileScreen: View {
             ._toolbarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarButtons()
-            }
-            .sheet(isPresented: $store.showQMSWarningSheet) {
-                WarningSheet()
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
             }
             .onAppear {
                 send(.onAppear)
@@ -560,7 +547,7 @@ public struct ProfileScreen: View {
     }
     
     @ViewBuilder
-    private func informationRow(title: LocalizedStringKey, description: String) -> some View {
+    private func InformationRow(title: LocalizedStringKey, description: String) -> some View {
         HStack {
             Text(title, bundle: .module)
             
@@ -572,7 +559,7 @@ public struct ProfileScreen: View {
     }
     
     @ViewBuilder
-    private func informationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
+    private func InformationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
         HStack {
             Text(title, bundle: .module)
             
@@ -581,101 +568,6 @@ public struct ProfileScreen: View {
             Text(description, bundle: .module)
                 .foregroundStyle(.secondary)
         }
-    }
-    
-    // MARK: - Warning Sheet
-    
-    @ViewBuilder
-    private func WarningSheet() -> some View {
-        VStack(spacing: 0) {
-            Spacer()
-            
-            Image(systemSymbol: .hammer)
-                .font(.title)
-                .foregroundStyle(tintColor)
-                .padding(.bottom, 8)
-            
-            Text("This functionality is presented as-is", bundle: .module)
-                .font(.title3)
-                .bold()
-                .foregroundStyle(Color(.Labels.primary))
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 6)
-            
-            Text("Chats do not (yet) support: BB-codes, attachments, caching, push-notifications and some other functionality", bundle: .module)
-                .font(.footnote)
-                .foregroundStyle(Color(.Labels.teritary))
-                .multilineTextAlignment(.center)
-            
-            Spacer()
-            
-            Button {
-                send(.sheetContinueButtonTapped)
-            } label: {
-                Text(isSheetTimerFinished ? "Understood, continue" : "Continue in (\(timeRemaining))", bundle: .module)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(tintColor)
-            .frame(height: 48)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(ignoresSafeAreaEdges: .bottom)
-            .disabled(!isSheetTimerFinished)
-        }
-        .background {
-            VStack(spacing: 0) {
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: 12))
-                    .padding(.top, 32)
-                
-                Spacer()
-                
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: -12))
-                    .padding(.bottom, 96)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .topTrailing) {
-            Button {
-                send(.sheetCloseButtonTapped)
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color(.Background.quaternary))
-                        .frame(width: 30, height: 30)
-                    
-                    Image(systemSymbol: .xmark)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.top, 14)
-                .padding(.trailing, 16)
-            }
-        }
-        .onReceive(timer) { input in
-            if timeRemaining > 0 {
-                timeRemaining -= 1
-            }
-        }
-    }
-    
-    // MARK: - Coming Soon Tape
-    
-    @ViewBuilder
-    private func ComingSoonTape() -> some View {
-        HStack(spacing: 8) {
-            ForEach(0..<6, id: \.self) { index in
-                Text("IN DEVELOPMENT", bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(Color(.Labels.primaryInvariably))
-                    .fixedSize(horizontal: true, vertical: false)
-                    .lineLimit(1)
-            }
-        }
-        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-        .background(tintColor)
     }
 }
 

@@ -26,12 +26,6 @@ extension ProfileFeature {
                 case .destination(.presented(.alert(.logout))):
                     analyticsClient.logout()
                     
-                case .view(.sheetContinueButtonTapped):
-                    analyticsClient.log(ProfileEvent.sheetContinueButtonTapped)
-                    
-                case .view(.sheetCloseButtonTapped):
-                    analyticsClient.log(ProfileEvent.sheetCloseButtonTapped)
-                    
                 case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)
                     
