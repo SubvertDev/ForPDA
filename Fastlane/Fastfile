@@ -187,6 +187,12 @@ platform :ios do
 	        suppress_xcode_output: true,
 	        skip_package_pkg: true,
 	        export_method: "app-store",
+	        export_options: {
+	            provisioningProfiles: {
+	                "com.subvert.forpda" => "match AppStore com.subvert.forpda",
+	                "com.subvert.forpda.safariextension" => "match AppStore com.subvert.forpda.safariextension"
+	            }
+	        },
 	        export_team_id: "7353CQCGQC"
         )
     end
