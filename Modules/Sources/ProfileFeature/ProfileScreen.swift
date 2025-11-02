@@ -70,7 +70,7 @@ public struct ProfileScreen: View {
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            .toolbar(id: "profile_toolbar") {
+            .toolbar {
                 ToolbarButtons()
             }
             .onAppear {
@@ -82,9 +82,9 @@ public struct ProfileScreen: View {
     // MARK: - Toolbar Items
     
     @ToolbarContentBuilder
-    private func ToolbarButtons() -> some CustomizableToolbarContent {
+    private func ToolbarButtons() -> some ToolbarContent {
         if store.shouldShowToolbarButtons {
-            ToolbarItem(id: "profile_logout_button") {
+            ToolbarItem {
                 Button {
                     send(.logoutButtonTapped)
                 } label: {
@@ -96,7 +96,7 @@ public struct ProfileScreen: View {
                 ToolbarSpacer(.fixed)
             }
             
-            ToolbarItem(id: "profile_settings_button") {
+            ToolbarItem {
                 Button {
                     send(.settingsButtonTapped)
                 } label: {

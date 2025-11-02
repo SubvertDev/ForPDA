@@ -158,8 +158,35 @@ public struct AuthScreen: View {
                 }
             }
             ._toolbarTitleDisplayMode(.inline)
-            .toolbar(id: "auth_toolbar") {
-                ToolbarButtons()
+            .toolbar {
+                // Profile is used as root in this case so we don't need close button
+                if store.openReason != .profile {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if #available(iOS 26, *) {
+                            Button(role: .close) {
+                                send(.closeButtonTapped)
+                            }
+                        } else {
+                            Button {
+                                send(.closeButtonTapped)
+                            } label: {
+                                Text("Close", bundle: .module)
+                                    .foregroundStyle(tintColor)
+                            }
+                        }
+                    }
+                }
+                
+                // We're showing app settings only if it's opened from profile tab
+                if store.openReason == .profile {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            send(.settingsButtonTapped)
+                        } label: {
+                            Image(systemSymbol: .gearshape)
+                        }
+                    }
+                }
             }
             .alert($store.scope(state: \.alert, action: \.alert))
             .bind($store.focus, to: $focus)
@@ -177,40 +204,6 @@ public struct AuthScreen: View {
             }
             .onAppear {
                 send(.onAppear)
-            }
-        }
-    }
-    
-    // MARK: - Toolbar Buttons
-    
-    @ToolbarContentBuilder
-    private func ToolbarButtons() -> some CustomizableToolbarContent {
-        // Profile is used as root in this case so we don't need close button
-        if store.openReason != .profile {
-            ToolbarItem(id: "auth_close_button", placement: .topBarTrailing) {
-                if #available(iOS 26, *) {
-                    Button(role: .close) {
-                        send(.closeButtonTapped)
-                    }
-                } else {
-                    Button {
-                        send(.closeButtonTapped)
-                    } label: {
-                        Text("Close", bundle: .module)
-                            .foregroundStyle(tintColor)
-                    }
-                }
-            }
-        }
-        
-        // We're showing app settings only if it's opened from profile tab
-        if store.openReason == .profile {
-            ToolbarItem(id: "auth_settings_button", placement: .topBarTrailing) {
-                Button {
-                    send(.settingsButtonTapped)
-                } label: {
-                    Image(systemSymbol: .gearshape)
-                }
             }
         }
     }
