@@ -110,26 +110,39 @@ public extension Topic {
         authorName: "4spander",
         curatorId: 6176341,
         curatorName: "AirFlare",
-        poll: Poll(
-            name: "Some simple poll...",
-            voted: false,
-            totalVotes: 2134,
-            options: [
-                Poll.Option(
-                    name: "Select this choise...",
-                    several: false,
-                    choices: [
-                        Poll.Choice(id: 2, name: "First choice", votes: 2)
-                    ]
-                )
-            ]
-        ),
+        poll: .mock,
         postsCount: 5005,
         posts: [
             .mock(id: 0), .mock(id: 1), .mock(id: 2)
         ],
         navigation: [
             ForumInfo(id: 1, name: "iOS - Apps", flag: 32)
+        ]
+    )
+}
+
+public extension Topic.Poll {
+    static let mock = Topic.Poll(
+        name: "Some simple poll...",
+        voted: false,
+        totalVotes: 12,
+        options: [
+            .init(
+                name: "Select not several...",
+                several: false,
+                choices: [
+                    .init(id: 2, name: "First choice", votes: 2),
+                    .init(id: 3, name: "Second choice", votes: 4)
+                ]
+            ),
+            .init(
+                name: "Select several...",
+                several: true,
+                choices: [
+                    .init(id: 4, name: "First choice", votes: 4),
+                    .init(id: 5, name: "Second choice", votes: 2)
+                ]
+            ),
         ]
     )
 }
