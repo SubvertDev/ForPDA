@@ -218,7 +218,7 @@ extension APIClient: DependencyKey {
                         birthday: request.birthdayDate
                     )
                 )
-                let response = try await api.get(command)
+                let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
@@ -246,7 +246,7 @@ extension APIClient: DependencyKey {
             },
             updateUserAvatar: { userId, image in
                 let command = MemberCommand.avatar(memberId: userId, avatar: image)
-                let response = try await api.get(command)
+                let response = try await api.send(command)
                 return try await parser.parseAvatarUrl(response: response)
             },
             updateUserDevice: { userId, action, fullTag, isPrimary in
@@ -261,7 +261,7 @@ extension APIClient: DependencyKey {
                     fullTag: fullTag,
                     primary: isPrimary
                 ))
-                let response = try await api.get(command)
+                let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
