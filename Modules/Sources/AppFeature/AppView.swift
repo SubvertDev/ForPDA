@@ -106,7 +106,7 @@ struct LiquidTabView: View {
             TabView(selection: $store.selectedTab.sending(\.didSelectTab)) {
                 Tab(
                     AppTab.articles.title,
-                    systemImage: AppTab.articles.iconSymbol.rawValue,
+                    systemSymbol: AppTab.articles.iconSymbol,
                     value: .articles
                 ) {
                     StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
@@ -114,7 +114,7 @@ struct LiquidTabView: View {
                 
                 Tab(
                     AppTab.favorites.title,
-                    systemImage: AppTab.favorites.iconSymbol.rawValue,
+                    systemSymbol: AppTab.favorites.iconSymbol,
                     value: .favorites
                 ) {
                     StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
@@ -122,7 +122,7 @@ struct LiquidTabView: View {
                 
                 Tab(
                     AppTab.forum.title,
-                    systemImage: AppTab.forum.iconSymbol.rawValue,
+                    systemSymbol: AppTab.forum.iconSymbol,
                     value: .forum
                 ) {
                     StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
@@ -130,7 +130,7 @@ struct LiquidTabView: View {
                 
                 Tab(
                     AppTab.profile.title,
-                    systemImage: AppTab.profile.iconSymbol.rawValue,
+                    systemSymbol: AppTab.profile.iconSymbol,
                     value: .profile
                 ) {
                     ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
