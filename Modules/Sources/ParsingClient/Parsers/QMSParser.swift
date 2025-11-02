@@ -51,12 +51,19 @@ public struct QMSChatParser {
     
     private static func parseAttachments(_ array: [[Any]]) -> [QMSMessage.Attachment] {
         return array.map { attachment in
+            let type = attachment[1] as! Int
+            let downloadCount = if type == 1 {
+                1 // FIXME: Quickfix for images. In normal situation they should handling by another way.
+            } else {
+                attachment[4] as! Int
+            }
+            
             return QMSMessage.Attachment(
                 id: attachment[0] as! Int,
                 flag: attachment[1] as! Int,
                 name: attachment[2] as! String,
                 size: attachment[3] as! Int,
-                downloadsCount: attachment[4] as! Int
+                downloadsCount: downloadCount
             )
         }
     }
