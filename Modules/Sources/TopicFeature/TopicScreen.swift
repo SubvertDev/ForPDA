@@ -202,7 +202,7 @@ public struct TopicScreen: View {
                         .padding(16)
                 }
             } else {
-                PollView(poll: poll, onVoteButtonTapped: {
+                PollView(poll: poll, onVoteButtonTapped: { selections in
                     // TODO: Implement...
                 })
             }
