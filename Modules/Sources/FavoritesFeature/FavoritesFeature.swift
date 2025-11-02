@@ -12,9 +12,9 @@ import APIClient
 import Models
 import TCAExtensions
 import PasteboardClient
-import NotificationCenterClient
 import AnalyticsClient
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
@@ -96,6 +96,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.continuousClock) private var clock
     
     // MARK: - Body
@@ -128,7 +129,18 @@ public struct FavoritesFeature: Reducer, Sendable {
                     updatePageNavigation(&state, offset: 0),
                     .send(.internal(.loadFavorites(offset: 0))),
                     .run { send in
-                        for await _ in notificationCenter.observe(.favoritesUpdated) {
+                        for await _ in notificationCenter.notifications(named: .favoritesUpdated) {
+                            await send(.internal(.refresh))
+                        }
+                    },
+                    .run { send in
+                        for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
+                            await send(.view(.onSceneBecomeActive))
+                        }
+                    },
+                    .run { send in
+                        for await notification in notificationsClient.eventPublisher().values {
+                            guard notification.isTopic else { continue }
                             await send(.internal(.refresh))
                         }
                     }
@@ -142,11 +154,10 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.refresh))
                 
             case .view(.onSceneBecomeActive):
-                if state.isLoading {
-                    return .none
-                } else {
+                if !state.isLoading {
                     return .send(.internal(.refresh))
                 }
+                return .none
                 
             case let .view(.favoriteTapped(favorite, showUnread)):
                 guard !showUnread else {
@@ -197,6 +208,12 @@ public struct FavoritesFeature: Reducer, Sendable {
                         _ = try await apiClient.setFavorite(request)
                         // TODO: Display toast on success/error.
                         
+                        await send(.internal(.refresh))
+                    }
+                    
+                case .markRead(let id):
+                    return .run { [id, isForum] send in
+                        let _ = try await apiClient.markRead(id: id, isTopic: !isForum)
                         await send(.internal(.refresh))
                     }
                 }
@@ -279,7 +296,9 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let .internal(.favoritesResponse(.failure(error))):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
                 reportFullyDisplayed(&state)
-                return showToast(.whoopsSomethingWentWrong)
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case .delegate:
                 return .none
@@ -310,11 +329,5 @@ public struct FavoritesFeature: Reducer, Sendable {
                 )
             )
             .map(Action.pageNavigation)
-    }
-    
-    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
-        return .run { _ in
-            await toastClient.showToast(toast)
-        }
     }
 }

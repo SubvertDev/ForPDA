@@ -47,7 +47,7 @@ public struct ReputationScreen: View {
             }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Reputation", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .onAppear {
                 send(.onAppear)
             }
@@ -91,7 +91,7 @@ public struct ReputationScreen: View {
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
-        _Picker("", selection: $store.pickerSection) {
+        Picker(String(""), selection: $store.pickerSection) {
             Text("History", bundle: .module)
                 .tag(ReputationFeature.PickerSection.history)
             Text(store.isOwnVotes ? "My votes" : "Left votes", bundle: .module)
@@ -224,16 +224,14 @@ public struct ReputationScreen: View {
     @ViewBuilder
     private func MenuButtons(id: Int) -> some View {
         ContextButton(
-            text: "Profile",
+            text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
-            bundle: .module,
             action: { send(.profileTapped(id)) }
         )
         
         ContextButton(
-            text: "Complain",
+            text: LocalizedStringResource("Complain", bundle: .module),
             symbol: .exclamationmarkTriangle,
-            bundle: .module,
             action: { print("Complain") }
         )
         .disabled(true)
@@ -245,32 +243,6 @@ public struct ReputationScreen: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMMM yyyy · HH:mm"
         return dateFormatter.string(from: date)
-    }
-}
-
-// MARK: - Perception Picker
-// https://github.com/pointfreeco/swift-perception/issues/100
-
-struct _Picker<Label, SelectionValue, Content>: View
-where Label: View, SelectionValue: Hashable, Content: View {
-    let label: Label
-    let content: Content
-    let selection: Binding<SelectionValue>
-    
-    init(
-        _ titleKey: String,
-        selection: Binding<SelectionValue>,
-        @ViewBuilder content: () -> Content
-    ) where Label == Text {
-        self.label = Text(titleKey)
-        self.content = content()
-        self.selection = selection
-    }
-    
-    var body: some View {
-        _PerceptionLocals.$skipPerceptionChecking.withValue(true) {
-            Picker(selection: selection, content: { content }, label: { label })
-        }
     }
 }
 

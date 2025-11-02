@@ -1,7 +1,36 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-
+    "Connecting..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подключаемся"
+          }
+        }
+      }
+    },
+    "No internet connection" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет интернет соединения"
+          }
+        }
+      }
+    },
+    "Unable to open link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось открыть ссылку"
+          }
+        }
+      }
+    }
   },
   "version" : "1.0"
 }

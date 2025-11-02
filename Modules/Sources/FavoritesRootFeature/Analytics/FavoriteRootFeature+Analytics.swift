@@ -19,11 +19,9 @@ extension FavoritesRootFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.settingsButtonTapped):
-                    analytics.log(FavoritesRootEvent.settingsButtonTapped)
                 case .binding(\.pickerSelection):
                     analytics.log(FavoritesRootEvent.tabChanged(state.pickerSelection.rawValue))
-                case .binding, .favorites, .bookmarks, .delegate:
+                case .binding, .favorites, .bookmarks, .delegate, .view:
                     break
                 }
                 return .none

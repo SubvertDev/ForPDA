@@ -9,13 +9,13 @@ import Foundation
 
 public enum FavoritesEvent: Event {
     case onRefresh
-    case onSceneBecomeActive
     case favoriteTapped(Int, String, Int?, Bool, Bool)
     
     case sortButtonTapped
     case readAllButtonTapped
     
     case setImportant(Int, Bool)
+    case markRead(Int, Bool)
     case linkCopied(Int, Bool)
     case delete(Int)
     
@@ -48,10 +48,9 @@ public enum FavoritesEvent: Event {
                 "showUnread": showUnread.description
             ]
             
-        case let .setImportant(id, isForum):
-            return ["id": String(id), "isForum": isForum.description]
-            
-        case let .linkCopied(id, isForum):
+        case let .setImportant(id, isForum),
+            let .markRead(id, isForum),
+            let .linkCopied(id, isForum):
             return ["id": String(id), "isForum": isForum.description]
             
         case let .delete(id):

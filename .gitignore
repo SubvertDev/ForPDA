@@ -6,7 +6,7 @@ devices.txt
 *.p8
 Scripts/build_phases/
 SourcePackages/
-ipa_builds/
+Builds/
 .swiftpm
 
 ## App packaging ###

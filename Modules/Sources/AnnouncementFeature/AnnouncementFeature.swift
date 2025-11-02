@@ -41,13 +41,19 @@ public struct AnnouncementFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action {
-        case onAppear
-        case urlTapped(URL)
+    public enum Action: ViewAction {
+        case view(View)
+        public enum View {
+            case onAppear
+            case urlTapped(URL)
+        }
 
-        case _loadAnnouncement
-        case _loadTypes([[TopicTypeUI]])
-        case _announcementResponse(Result<Announcement, any Error>)
+        case `internal`(Internal)
+        public enum Internal {
+            case loadAnnouncement
+            case loadTypes([[TopicTypeUI]])
+            case announcementResponse(Result<Announcement, any Error>)
+        }
         
         case delegate(Delegate)
         public enum Delegate {
@@ -66,20 +72,20 @@ public struct AnnouncementFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
-                return .send(._loadAnnouncement)
+            case .view(.onAppear):
+                return .send(.internal(.loadAnnouncement))
                 
-            case ._loadAnnouncement:
+            case .internal(.loadAnnouncement):
                 guard state.announcement == nil else { return .none }
                 return .run { [id = state.announcementId] send in
                     let result = await Result { try await apiClient.getAnnouncement(id) }
-                    await send(._announcementResponse(result))
+                    await send(.internal(.announcementResponse(result)))
                 }
                 
-            case let .urlTapped(url):
+            case let .view(.urlTapped(url)):
                 return .send(.delegate(.handleUrl(url)))
                    
-            case let ._announcementResponse(.success(announcement)):
+            case let .internal(.announcementResponse(.success(announcement))):
                 // customDump(announcement)
                 state.announcement = announcement
                 state.name = state.name ?? announcement.name
@@ -90,15 +96,15 @@ public struct AnnouncementFeature: Reducer, Sendable {
                     let types = TopicNodeBuilder(text: announcement.content, attachments: []).build()
                     topicTypes.append(types)
                     
-                    await send(._loadTypes(topicTypes))
+                    await send(.internal(.loadTypes(topicTypes)))
                 }
                 
-            case let ._loadTypes(types):
+            case let .internal(.loadTypes(types)):
                 state.types = types
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case ._announcementResponse(.failure):
+            case .internal(.announcementResponse(.failure)):
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
@@ -107,7 +113,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
             }
         }
         
-        #warning("no analytics")
+        Analytics()
     }
     
     // MARK: - Shared Logic

@@ -47,6 +47,14 @@ Uploads to TestFlight
 
 One-off upload to TF without tests/notify/bump
 
+### ios build_ipa_oneoff
+
+```sh
+[bundle exec] fastlane ios build_ipa_oneoff
+```
+
+One-off ipa build
+
 ### ios prepare_certificates
 
 ```sh
@@ -94,6 +102,14 @@ Builds and signs ipa file
 ```
 
 Uploads DSYM files to Sentry
+
+### ios upload_bundle_to_tuist
+
+```sh
+[bundle exec] fastlane ios upload_bundle_to_tuist
+```
+
+Uploads bundle to tuist for inspection
 
 ### ios upload_app_to_testflight
 

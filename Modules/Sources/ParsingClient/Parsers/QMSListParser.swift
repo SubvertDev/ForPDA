@@ -51,7 +51,7 @@ public struct QMSListParser {
         return array.map { user in
             return QMSUser(
                 userId: user[0] as! Int,
-                name: user[1] as! String,
+                name: (user[1] as! String).convertCodes(),
                 flag: user[2] as! Int,
                 avatarUrl: URL(string: user[3] as! String),
                 lastSeenOnline: Date(timeIntervalSince1970: user[4] as! TimeInterval),

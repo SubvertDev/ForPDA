@@ -5,10 +5,4 @@
 //  Created by Ilia Lubianoi on 27.09.2024.
 //
 
-import SwiftUI
-
 struct Models { }
-
-public extension Bundle {
-    static let models = Bundle.module
-}

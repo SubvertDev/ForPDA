@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+//public let shared = Bundle.module
+
+public extension Bundle {
+    static let shared = Bundle.module
+}
+
 @available(iOS, deprecated: 26.0)
 public var isLiquidGlass: Bool {
     if #available(iOS 26.0, *) {

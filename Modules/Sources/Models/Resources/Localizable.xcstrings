@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "addToBookmarks" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить в закладки"
-          }
-        }
-      }
-    },
     "Articles" : {
       "localizations" : {
         "ru" : {
@@ -37,26 +27,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментирование этого поста окончено"
-          }
-        }
-      }
-    },
-    "Copied" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скопировано"
-          }
-        }
-      }
-    },
-    "Favorites" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Избранное"
           }
         }
       }
@@ -101,42 +71,12 @@
         }
       }
     },
-    "Male" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Мужской"
-          }
-        }
-      }
-    },
     "No comment text" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет текста комментария"
-          }
-        }
-      }
-    },
-    "Not set" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не указано"
-          }
-        }
-      }
-    },
-    "openInBrowser" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открыть в браузере"
           }
         }
       }
@@ -157,16 +97,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Повторный комментарий"
-          }
-        }
-      }
-    },
-    "shareLink" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
           }
         }
       }
@@ -197,16 +127,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "К непрочитанному"
-          }
-        }
-      }
-    },
-    "Will be fixed soon :)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скоро будет исправлено :)"
           }
         }
       }
