@@ -131,7 +131,7 @@ public struct TopicParser {
     
     private static func parsePollOptions(_ optionsRaw: [[Any]]) throws(ParsingError) -> [Topic.Poll.Option] {
         var options: [Topic.Poll.Option] = []
-        for option in optionsRaw {
+        for (idx, option) in optionsRaw.enumerated() {
             guard let name = option[safe: 0] as? String,
                   let several = option[safe: 1] as? Int,
                   let names = option[safe: 2] as? [String],
@@ -151,6 +151,7 @@ public struct TopicParser {
             }
             
             let option = Topic.Poll.Option(
+                id: idx,
                 name: name,
                 several: several == 1 ? true : false,
                 choices: choices

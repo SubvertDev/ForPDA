@@ -307,6 +307,16 @@
         }
       }
     },
+    "Vote approved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос засчитан"
+          }
+        }
+      }
+    },
     "Write Post" : {
       "localizations" : {
         "ru" : {

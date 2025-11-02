@@ -14,14 +14,28 @@ struct PollView: View {
     @Environment(\.tintColor) private var tintColor
     
     let poll: Topic.Poll
-    let onVoteButtonTapped: ([String: [Int]]) -> Void
+    let onVoteButtonTapped: ([Int: Set<Int>]) -> Void
     
+    @State private var isSending = false
     @State private var showVoteResultsButtonTapped = false
-    @State private var selections: [String: Set<Int>] = [:]
+    @State private var selections: [Int: Set<Int>] = [:]
+    
+    private var isVotable: Bool {
+        for option in poll.options {
+            if selections[option.id] == nil {
+                return false
+            }
+            if selections[option.id] != nil,
+               selections[option.id]!.isEmpty {
+                return false
+            }
+        }
+        return true
+    }
     
     init(
         poll: Topic.Poll,
-        onVoteButtonTapped: @escaping ([String: [Int]]) -> Void
+        onVoteButtonTapped: @escaping ([Int: Set<Int>]) -> Void
     ) {
         self.poll = poll
         self.onVoteButtonTapped = onVoteButtonTapped
@@ -44,7 +58,7 @@ struct PollView: View {
                             .foregroundStyle(Color(.Labels.primary))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        if showVoteResultsButtonTapped {
+                        if showVoteResultsButtonTapped || poll.voted {
                             OptionChoices(choices: option.choices)
                         } else {
                             OptionChoicesSelect(option: option)
@@ -58,7 +72,9 @@ struct PollView: View {
                 .foregroundStyle(Color(.Labels.teritary))
                 .frame(maxWidth: .infinity, alignment: .leading)
             
-            PollActionButtons()
+            if !poll.voted {
+                PollActionButtons()
+            }
         }
         .padding(16)
     }
@@ -72,16 +88,18 @@ struct PollView: View {
                 if showVoteResultsButtonTapped {
                     showVoteResultsButtonTapped = false
                 } else {
-                    // TODO: Implement selection data sending...
+                    isSending = true
+                    onVoteButtonTapped(selections)
                 }
             } label: {
                 Text("Vote", bundle: .module)
                     .padding(.horizontal, 18)
                     .padding(.vertical, 9)
             }
-            .foregroundStyle(tintColor)
-            .background(tintColor.opacity(0.12))
+            .foregroundStyle(voteButtonForegroundColor())
+            .background(voteButtonBackgroundColor())
             .clipShape(RoundedRectangle(cornerRadius: 10))
+            .disabled(!showVoteResultsButtonTapped && !isVotable)
             
             Spacer()
             
@@ -93,9 +111,10 @@ struct PollView: View {
                         .padding(.horizontal, 18)
                         .padding(.vertical, 9)
                 }
-                .foregroundStyle(tintColor)
-                .background(tintColor.opacity(0.12))
+                .foregroundStyle(isSending ? Color(.Labels.quintuple) : tintColor)
+                .background(isSending ? Color(.Main.greyAlpha) : tintColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+                .disabled(isSending)
             }
         }
     }
@@ -109,10 +128,10 @@ struct PollView: View {
                 HStack(alignment: .top, spacing: 11) {
                     if option.several {
                         Toggle(isOn: Binding(
-                            get: { isSelected(option.name, choice.id) },
+                            get: { isSelected(option.id, choice.id) },
                             set: { isSelected in
                                 withAnimation {
-                                    updateMultiSelections(option.name, choice.id, isSelected)
+                                    updateMultiSelections(option.id, choice.id, isSelected)
                                 }
                             }
                         )) {}
@@ -120,10 +139,10 @@ struct PollView: View {
                     } else {
                         Button {
                             withAnimation {
-                                selections[option.name] = Set([choice.id])
+                                selections[option.id] = Set([choice.id])
                             }
                         } label: {
-                            if isSelected(option.name, choice.id) {
+                            if isSelected(option.id, choice.id) {
                                 ZStack {
                                     Circle()
                                         .strokeBorder(Color(.Labels.quintuple))
@@ -195,21 +214,29 @@ struct PollView: View {
         return CGFloat(choice.votes) / CGFloat(totalVotes)
     }
     
-    private func isSelected(_ option: String, _ choiceId: Int) -> Bool {
-        return if selections[option] != nil {
-            selections[option]!.contains(choiceId)
+    private func voteButtonForegroundColor() -> Color {
+        return (!isVotable && !showVoteResultsButtonTapped || isSending) ? Color(.Labels.quintuple) : tintColor
+    }
+    
+    private func voteButtonBackgroundColor() -> Color {
+        return (!isVotable && !showVoteResultsButtonTapped || isSending) ? Color(.Main.greyAlpha) : tintColor.opacity(0.12)
+    }
+    
+    private func isSelected(_ optionId: Int, _ choiceId: Int) -> Bool {
+        return if selections[optionId] != nil {
+            selections[optionId]!.contains(choiceId)
         } else { false }
     }
 
-    private func updateMultiSelections(_ option: String, _ choiceId: Int, _ isSelected: Bool) {
-        if selections[option] != nil {
+    private func updateMultiSelections(_ optionId: Int, _ choiceId: Int, _ isSelected: Bool) {
+        if selections[optionId] != nil {
             if isSelected {
-                selections[option]!.insert(choiceId)
+                selections[optionId]!.insert(choiceId)
             } else {
-                selections[option]!.remove(choiceId)
+                selections[optionId]!.remove(choiceId)
             }
         } else {
-            selections[option] = Set([choiceId])
+            selections[optionId] = Set([choiceId])
         }
     }
 }

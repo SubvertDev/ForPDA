@@ -203,7 +203,7 @@ public struct TopicScreen: View {
                 }
             } else {
                 PollView(poll: poll, onVoteButtonTapped: { selections in
-                    // TODO: Implement...
+                    send(.topicPollVoteButtonTapped(selections))
                 })
             }
             

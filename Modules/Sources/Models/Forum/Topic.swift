@@ -53,12 +53,14 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
             }
         }
         
-        public struct Option: Sendable, Codable, Hashable {
+        public struct Option: Sendable, Codable, Hashable, Identifiable {
+            public let id: Int
             public let name: String
             public let several: Bool
             public let choices: [Choice]
             
-            public init(name: String, several: Bool, choices: [Choice]) {
+            public init(id: Int, name: String, several: Bool, choices: [Choice]) {
+                self.id = id
                 self.name = name
                 self.several = several
                 self.choices = choices
@@ -128,6 +130,7 @@ public extension Topic.Poll {
         totalVotes: 12,
         options: [
             .init(
+                id: 0,
                 name: "Select not several...",
                 several: false,
                 choices: [
@@ -136,6 +139,7 @@ public extension Topic.Poll {
                 ]
             ),
             .init(
+                id: 1,
                 name: "Select several...",
                 several: true,
                 choices: [
