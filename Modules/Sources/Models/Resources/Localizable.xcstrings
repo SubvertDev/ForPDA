@@ -41,6 +41,16 @@
         }
       }
     },
+    "Female" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Женский"
+          }
+        }
+      }
+    },
     "First page" : {
       "localizations" : {
         "ru" : {
@@ -71,12 +81,32 @@
         }
       }
     },
+    "Male" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мужской"
+          }
+        }
+      }
+    },
     "No comment text" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет текста комментария"
+          }
+        }
+      }
+    },
+    "Not set" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не указан"
           }
         }
       }

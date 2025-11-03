@@ -70,6 +70,11 @@ public struct ProfileScreen: View {
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.editProfile, action: \.destination.editProfile)) { store in
+                NavigationStack {
+                    EditScreen(store: store)
+                }
+            }
             .toolbar {
                 ToolbarButtons()
             }
@@ -101,6 +106,14 @@ public struct ProfileScreen: View {
                     send(.settingsButtonTapped)
                 } label: {
                     Image(systemSymbol: .gearshape)
+                }
+            }
+            
+            ToolbarItem {
+                Button {
+                    send(.editButtonTapped)
+                } label: {
+                    Image(systemSymbol: .pencil)
                 }
             }
         }
