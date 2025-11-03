@@ -109,11 +109,15 @@ public struct ProfileScreen: View {
                 }
             }
             
-            ToolbarItem {
-                Button {
-                    send(.editButtonTapped)
-                } label: {
-                    Image(systemSymbol: .pencil)
+            if let userId = store.userId,
+               let userSession = store.userSession,
+               userSession.userId == userId {
+                ToolbarItem {
+                    Button {
+                        send(.editButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .pencil)
+                    }
                 }
             }
         }
