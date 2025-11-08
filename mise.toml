@@ -1,4 +1,4 @@
 [tools]
 ruby = "3.4.7"
-tuist = "4.97.2"
+tuist = "4.101.0"
 swiftlint = "0.62.2"
