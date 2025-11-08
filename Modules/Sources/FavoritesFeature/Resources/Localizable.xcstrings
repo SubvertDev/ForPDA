@@ -131,6 +131,16 @@
         }
       }
     },
+    "Mark As Read" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прочитано"
+          }
+        }
+      }
+    },
     "No favorites" : {
       "localizations" : {
         "ru" : {

@@ -54,7 +54,7 @@ public struct ReputationParser {
                 toId: toId,
                 toName: toName,
                 authorId: authorId,
-                authorName: authorName,
+                authorName: authorName.convertCodes(),
                 reason: reason.convertHtmlCodes(),
                 modified: try parseVoteModified(vote, flag),
                 createdIn: try parseVoteCreatedIn(vote),

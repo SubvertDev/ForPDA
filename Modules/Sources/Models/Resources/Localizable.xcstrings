@@ -1,12 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "addToBookmarks" : {
+    "Articles" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить в закладки"
+            "value" : "Статьи"
           }
         }
       }
@@ -31,12 +31,12 @@
         }
       }
     },
-    "Copied" : {
+    "Favorites" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скопировано"
+            "value" : "Избранное"
           }
         }
       }
@@ -47,6 +47,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В начало"
+          }
+        }
+      }
+    },
+    "Forum" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Форум"
           }
         }
       }
@@ -71,12 +81,12 @@
         }
       }
     },
-    "openInBrowser" : {
+    "Profile" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть в браузере"
+            "value" : "Профиль"
           }
         }
       }
@@ -91,15 +101,8 @@
         }
       }
     },
-    "shareLink" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
-          }
-        }
-      }
+    "Search" : {
+
     },
     "Today, %@" : {
       "localizations" : {
@@ -127,16 +130,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "К непрочитанному"
-          }
-        }
-      }
-    },
-    "Will be fixed soon :)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скоро будет исправлено :)"
           }
         }
       }

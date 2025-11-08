@@ -13,12 +13,18 @@ import SFSafeSymbols
 
 public struct ArticlesListScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
     @State private var scrollProxy: ScrollViewProxy?
+    
+    // MARK: - Init
     
     public init(store: StoreOf<ArticlesListFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
         
     public var body: some View {
         WithPerceptionTracking {
@@ -26,31 +32,41 @@ public struct ArticlesListScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                ScrollViewReader { proxy in
-                    WithPerceptionTracking {
-                        ArticlesList()
-                            .refreshable {
-                                await store.send(.onRefresh).finish()
-                            }
-                            .onAppear {
-                                scrollProxy = proxy
-                            }
-                    }
-                }
-                
-                if store.isLoading && store.articles.isEmpty {
+                switch store.viewState {
+                case .loading:
                     PDALoader()
                         .frame(width: 24, height: 24)
+                    
+                case let .loaded(articles):
+                    ScrollViewReader { proxy in
+                        WithPerceptionTracking {
+                            ArticlesList(articles: articles)
+                                .refreshable {
+                                    await store.send(.onRefresh).finish()
+                                }
+                                .onAppear {
+                                    scrollProxy = proxy
+                                }
+                        }
+                    }
+                    
+                case .networkError:
+                    UnavailableView(
+                        symbol: .exclamationmarkTriangleFill,
+                        title: "Failed to load",
+                        description: "Try again later",
+                        actionTitle: "Try again",
+                        action: {
+                            store.send(.tryAgainButtonTapped)
+                        },
+                        bundle: .module
+                    )
                 }
             }
             .navigationTitle(Text("Articles", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbarBackground(Color(.Background.primary), for: .navigationBar)
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    ToolbarButtons()
-                }
-            }
+            ._toolbarTitleDisplayMode(.large)
+            .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
+            .toolbar { Toolbar() }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .sheet(item: $store.destination.share, id: \.self) { url in
                 // FIXME: Perceptible warning despite tracking closure
@@ -75,9 +91,9 @@ public struct ArticlesListScreen: View {
     // MARK: - Articles List
         
     @ViewBuilder
-    private func ArticlesList() -> some View {
+    private func ArticlesList(articles: [ArticlePreview]) -> some View {
         List {
-            ForEach(store.articles) { article in
+            ForEach(articles) { article in
                 WithPerceptionTracking {
                     Button {
                         store.send(.articleTapped(article))
@@ -92,19 +108,19 @@ public struct ArticlesListScreen: View {
                                 date: article.date
                             ),
                             rowType: settingsToRow(store.listRowType),
-                            contextMenuActions: ContextMenuActions(
-                                shareAction:          { store.send(.cellMenuOpened(article, .shareLink)) },
-                                copyAction:           { store.send(.cellMenuOpened(article, .copyLink)) },
-                                openInBrowserAction:  { store.send(.cellMenuOpened(article, .openInBrowser)) },
-                                reportAction:         { store.send(.cellMenuOpened(article, .report)) },
-                                addToBookmarksAction: { store.send(.cellMenuOpened(article, .addToBookmarks)) }
-                            ),
                             bundle: .module
-                        )
+                        ) { action in
+                            switch action {
+                            case .shareLink:     store.send(.cellMenuOpened(article, .shareLink))
+                            case .copyLink:      store.send(.cellMenuOpened(article, .copyLink))
+                            case .openInBrowser: store.send(.cellMenuOpened(article, .openInBrowser))
+                            }
+                        }
                     }
                     .id(article.id)
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 14)
                     .listRowSeparator(.hidden)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color(.Background.primary))
@@ -124,9 +140,9 @@ public struct ArticlesListScreen: View {
                     .padding(.bottom, 20)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
+                    .listRowBackground(Color(.Background.primary))
             }
         }
-        .listRowSpacing(14)
         .listStyle(.plain)
     }
     
@@ -134,21 +150,17 @@ public struct ArticlesListScreen: View {
         rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
     }
     
-    // MARK: - Toolbar Items
+    // MARK: - Toolbar
     
-    @ViewBuilder
-    private func ToolbarButtons() -> some View {
-        Button {
-            store.send(.listGridTypeButtonTapped)
-        } label: {
-            Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
-                .replaceDownUpByLayerEffect(value: true)
-        }
-        
-        Button {
-            store.send(.settingsButtonTapped)
-        } label: {
-            Image(systemSymbol: .gearshape)
+    @ToolbarContentBuilder
+    private func Toolbar() -> some ToolbarContent {
+        ToolbarItem {
+            Button {
+                store.send(.listGridTypeButtonTapped)
+            } label: {
+                Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
+                    .replaceDownUpByLayerEffect(value: true)
+            }
         }
     }
 }

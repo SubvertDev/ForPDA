@@ -12,6 +12,19 @@ import AnalyticsClient
 import LoggerClient
 import CacheClient
 import Models
+@preconcurrency import Combine
+
+public enum NotificationEvent: Equatable {
+    case site(Int)
+    case topic(Int)
+    case forum(Int)
+    case qms(Int)
+    
+    public var isTopic: Bool {
+        if case .topic = self { return true }
+        return false
+    }
+}
 
 @DependencyClient
 public struct NotificationsClient: Sendable {
@@ -20,8 +33,10 @@ public struct NotificationsClient: Sendable {
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
     public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
+    public var processNotification: @Sendable (String) async -> Bool = { _ in false }
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
     public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
+    public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
 }
 
 extension DependencyValues {
@@ -32,32 +47,122 @@ extension DependencyValues {
 }
 
 extension NotificationsClient: DependencyKey {
+    
     public static var liveValue: Self {
+        @Dependency(\.analyticsClient) var analyticsClient
         @Dependency(\.logger[.notifications]) var logger
+        
+        let subject = PassthroughSubject<NotificationEvent, Never>()
 
         return NotificationsClient(
             hasPermission: {
                 return await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .authorized
             },
+            
             requestPermission: {
                 return try await UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound])
             },
+            
             registerForRemoteNotifications: {
                 await UIApplication.shared.registerForRemoteNotifications()
             },
+            
             setDeviceToken: { deviceToken in
                 let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                 print("Device token: \(token)")
             },
+            
             delegate: {
                 AsyncStream { continuation in
-                  let delegate = Delegate(continuation: continuation)
-                  UNUserNotificationCenter.current().delegate = delegate
-                  continuation.onTermination = { _ in
-                    _ = delegate
-                  }
+                    let delegate = Delegate(continuation: continuation)
+                    UNUserNotificationCenter.current().delegate = delegate
+                    continuation.onTermination = { _ in
+                        _ = delegate
+                    }
                 }
             },
+            
+            processNotification: { notificationRaw in
+                do {
+                    let notification = try NotificationParser.parse(from: notificationRaw)
+                    
+                    enum EventError: Error {
+                        case unknownFlag(String)
+                        case unknownCase(String)
+                    }
+                    
+                    // TODO: Complete all cases
+                    switch notification.category {
+                    case .qms:
+                        switch notification.flag {
+                        case 1:
+                            // Last api request was NOT the chat of this message
+                            subject.send(.qms(notification.id))
+                            
+                        case 2:
+                            // Last api request was the chat of this message
+                            // No need to mark it processed to avoid unread sync
+                            return false
+                            
+                        case 101:
+                            // 0 - User is typing text
+                            // 1 - User is uploading files
+                            // Currently unused
+                            return false
+                            
+                        case 102:
+                            // User did read chat fully (not sure)
+                            subject.send(.qms(notification.id))
+                            // No need to update unread for that
+                            return false
+                            
+                        default:
+                            analyticsClient.capture(EventError.unknownFlag(notificationRaw))
+                            return false
+                        }
+                        
+                    case .topic:
+                        switch notification.flag {
+                        case 1:
+                            subject.send(.topic(notification.id))
+                        case 2:
+                            // Last message, unused
+                            return false
+                        default:
+                            analyticsClient.capture(EventError.unknownFlag(notificationRaw))
+                            return false
+                        }
+                        
+                    case .forum:
+                        switch notification.flag {
+                        case 2:
+                            subject.send(.forum(notification.id))
+                        default:
+                            analyticsClient.capture(EventError.unknownFlag(notificationRaw))
+                            return false
+                        }
+                        
+                    case .site:
+                        if notification.flag == 3 {
+                            // Article comment mention
+                            subject.send(.site(notification.id))
+                        } else if notification.flag == 2 {
+                            // Last article comment timestamp, unused
+                            return false
+                        }
+                        
+                    case .unknown:
+                        analyticsClient.capture(EventError.unknownCase(notificationRaw))
+                        return false
+                    }
+                    
+                    return true
+                } catch {
+                    analyticsClient.capture(error)
+                    return false
+                }
+            },
+            
             showUnreadNotifications: { unread, skipCategories in
                 @Dependency(\.cacheClient) var cacheClient
                 @Shared(.appSettings) var appSettings: AppSettings
@@ -141,6 +246,7 @@ extension NotificationsClient: DependencyKey {
                 
                 logger.info("Successfully processed notifications")
             },
+            
             removeNotifications: { categories in
                 let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
                 let filteredPending = pending.filter { notification in
@@ -163,6 +269,10 @@ extension NotificationsClient: DependencyKey {
                     return false
                 }
                 UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: filteredDelivered.map(\.request.identifier))
+            },
+            
+            eventPublisher: {
+                return subject.eraseToAnyPublisher()
             }
         )
     }
@@ -183,6 +293,7 @@ extension NotificationsClient {
             return [.badge, .banner, .list, .sound]
         }
         
+        @MainActor // Fix for Apple bug
         func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
             let identifier = response.notification.request.identifier
             try? await Task.sleep(for: .seconds(1))
@@ -190,3 +301,10 @@ extension NotificationsClient {
         }
     }
 }
+
+// This conformances and @MainActor for didRecieve func above is a fix of this bug:
+// NSInternalInconsistencyException Call must be made on main thread
+// More about it:
+// https://stackoverflow.com/questions/73750724/how-can-usernotificationcenter-didreceive-cause-a-crash-even-with-nothing-in
+extension UNUserNotificationCenter: @retroactive @unchecked Sendable {}
+extension UNNotificationResponse: @retroactive @unchecked Sendable {}

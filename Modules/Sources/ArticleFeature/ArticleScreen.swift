@@ -17,18 +17,26 @@ import SmoothGradient
 
 public struct ArticleScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<ArticleFeature>
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
     
-    @State private var safeAreaTopHeight: CGFloat = UIApplication.topSafeArea + 44 // (status + navbar)
+    @State private var scrollProxy: ScrollViewProxy?
+    @State private var safeAreaTopHeight: CGFloat
     @State private var navBarOpacity: CGFloat = 0
+    @State private var isCommentsViewVisible = false
+    @State private var isCommentViewExpanded = false
     private var navBarFullyVisible: Bool {
         return navBarOpacity >= 1
     }
     
+    // MARK: - Init
+    
     public init(store: StoreOf<ArticleFeature>) {
         self.store = store
+        self.safeAreaTopHeight = UIApplication.topSafeArea + 44 + (isLiquidGlass ? 10 : 0)
     }
     
     // MARK: - Body
@@ -47,16 +55,49 @@ public struct ArticleScreen: View {
                         .presentationDetents([.medium])
                     }
                 }
-                .safeAreaInset(edge: .bottom) { KeyboardView() }
+                ._safeAreaBar(edge: .bottom) { Keyboard() }
+                ._scrollEdgeEffectHidden(!isCommentViewExpanded, for: .bottom)
                 .onTapGesture { focus = nil }
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarBackButtonHidden()
-                .toolbarBackground(.hidden, for: .navigationBar)
+                .modifier(NavigationBarSettings())
                 .toolbar { Toolbar() }
-                .overlay(alignment: .top) { ToolbarOverlay() }
+                .overlay(alignment: .top) {
+                    if !isLiquidGlass {
+                        ToolbarOverlay()
+                    }
+                }
                 .overlay { RefreshIndicator() }
                 .background(Color(.Background.primary))
-                .task { store.send(.onTask) }
+                .onAppear { store.send(.onAppear) }
+        }
+    }
+    
+    // MARK: - Keyboard
+    
+    @ViewBuilder
+    private func Keyboard() -> some View {
+        WithPerceptionTracking {
+            Group {
+                if #available(iOS 26.0, *) {
+                    LiquidKeyboardView(
+                        store: store,
+                        focus: $focus,
+                        isExpanded: $isCommentViewExpanded,
+                        isScrollDownVisible: $isCommentsViewVisible.inverted
+                    ) {
+                        withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
+                    }
+                } else {
+                    KeyboardView(
+                        store: store,
+                        focus: $focus,
+                        isScrollDownVisible: $isCommentsViewVisible.inverted
+                    ) {
+                        withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
+                    }
+                    .transition(.push(from: .bottom))
+                }
+            }
+            .animation(isLiquidGlass ? .bouncy : .default, value: store.canComment)
         }
     }
     
@@ -64,9 +105,14 @@ public struct ArticleScreen: View {
     
     @ToolbarContentBuilder
     private func Toolbar() -> some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
-                store.send(.backButtonTapped)
+        if #available(iOS 26.0, *) {
+            // default system back button
+            ToolbarSpacer(.fixed)
+        } else {
+            ToolbarItem(placement: .topBarLeading) {
+                ToolbarButton(placement: .topBarLeading, symbol: .chevronLeft) {
+                    store.send(.backButtonTapped)
+                }
             }
         }
         
@@ -81,8 +127,9 @@ public struct ArticleScreen: View {
         }
     }
     
-    // MARK: - Toolbar Overlay
+    // MARK: - Toolbar Overlay (Pre 26)
     
+    @available(iOS, deprecated: 26.0)
     @ViewBuilder
     private func ToolbarOverlay() -> some View {
         Color(.Background.primaryAlpha)
@@ -96,42 +143,49 @@ public struct ArticleScreen: View {
     
     @ViewBuilder
     private func ArticleScrollView() -> some View {
-        ScrollView(.vertical) {
-            VStack(spacing: 0) {
-                ParallaxHeader(
-                    coordinateSpace: "scroll",
-                    defaultHeight: UIScreen.main.bounds.width,
-                    safeAreaTopHeight: safeAreaTopHeight
-                ) {
-                    WithPerceptionTracking {
-                        ArticleHeader()
-                    }
-                }
-                
-                if store.isLoading {
-                    ArticleLoader()
-                        .padding(.top, 32)
+        ScrollViewReader { proxy in
+            WithPerceptionTracking {
+                ScrollView(.vertical) {
+                    VStack(spacing: 0) {
+                        ParallaxHeader(
+                            coordinateSpace: "scroll",
+                            defaultHeight: UIScreen.main.bounds.width,
+                            safeAreaTopHeight: safeAreaTopHeight
+                        ) {
+                            WithPerceptionTracking {
+                                ArticleHeader()
+                            }
+                        }
                         
-                } else if let elements = store.elements {
-                    ArticleView(elements: elements)
-                        .background(Color(.Background.primary))
+                        if store.isLoading {
+                            ArticleLoader()
+                                .padding(.top, 32)
+                            
+                        } else if let elements = store.elements {
+                            ArticleView(elements: elements)
+                                .background(Color(.Background.primary))
+                        }
+                    }
+                    .animation(.default, value: store.elements)
+                    .modifier(
+                        ScrollViewOffsetObserver(
+                            safeAreaTopHeight: safeAreaTopHeight,
+                            navBarOpacity: $navBarOpacity
+                        ) {
+                            if !store.isRefreshing {
+                                store.send(.onRefresh)
+                            }
+                        }
+                    )
+                }
+                .ignoresSafeArea(.all, edges: .top)
+                .scrollIndicators(.hidden)
+                .coordinateSpace(name: "scroll")
+                .onAppear {
+                    scrollProxy = proxy
                 }
             }
-            .animation(.default, value: store.elements)
-            .modifier(
-                ScrollViewOffsetObserver(
-                    safeAreaTopHeight: safeAreaTopHeight,
-                    navBarOpacity: $navBarOpacity
-                ) {
-                    if !store.isRefreshing {
-                        store.send(.onRefresh)
-                    }
-                }
-            )
         }
-        .ignoresSafeArea(.all, edges: .top)
-        .scrollIndicators(.hidden)
-        .coordinateSpace(name: "scroll")
     }
     
     // MARK: - Article Header
@@ -227,119 +281,42 @@ public struct ArticleScreen: View {
                 .foregroundStyle(Color(.Background.teritary))
             
             CommentsView(store: store)
+                .modifier(ScrollVisibility(threshold: 0.01, isVisible: $isCommentsViewVisible))
+                .id(69)
         }
     }
     
-    // MARK: - Keyboard View
-    
-    @ViewBuilder
-    private func KeyboardView() -> some View {
-        Group {
-            if store.isAuthorized && store.canComment {
-                Keyboard()
-                    .transition(.push(from: .bottom))
+    struct ScrollVisibility: ViewModifier {
+        
+        let threshold: Double
+        @Binding var isVisible: Bool
+        
+        func body(content: Content) -> some View {
+            if #available(iOS 18.0, *) {
+                content
+                    .onScrollVisibilityChange(threshold: threshold) { value in
+                        isVisible = value
+                    }
+            } else {
+                content
             }
         }
-        .animation(.default, value: store.canComment)
     }
     
-    // MARK: - Keyboard
+    // MARK: - Navigation Bar Settings
     
-    @ViewBuilder
-    private func Keyboard() -> some View {
-        VStack(spacing: 10) {
-            if let comment = store.replyComment {
-                HStack(spacing: 0) {
-                    Rectangle()
-                        .fill(tintColor)
-                        .frame(width: 1)
-                        .padding(.trailing, 8)
-                    
-                    VStack(spacing: 2) {
-                        HStack(spacing: 6) {
-                            LazyImage(url: store.replyComment?.avatarUrl) { state in
-                                if let image = state.image { image.resizable().scaledToFill() }
-                            }
-                            .clipShape(Circle())
-                            .frame(width: 20, height: 20)
-                            
-                            Text(comment.authorName)
-                                .font(.caption2)
-                                .bold()
-                                .foregroundStyle(Color(.Labels.teritary))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        
-                        Text(comment.text)
-                            .lineLimit(2)
-                            .font(.footnote)
-                            .foregroundStyle(Color(.Labels.primary))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(.trailing, 6)
-                    
-                    Button {
-                        store.send(.removeReplyCommentButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .xmark)
-                            .font(.body)
-                    }
-                    .frame(width: 32, height: 32)
-                }
-                .fixedSize(horizontal: false, vertical: true)
+    struct NavigationBarSettings: ViewModifier {
+        func body(content: Content) -> some View {
+            if #available(iOS 26.0, *) {
+                content
+                    .toolbarTitleDisplayMode(.inline)
+            } else {
+                content
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarBackButtonHidden()
+                    .toolbarBackground(.hidden, for: .navigationBar)
             }
-            
-            HStack(alignment: .bottom, spacing: 8) {
-                TextField(text: $store.commentText.removeDuplicates()) {
-                    Text("Comment...", bundle: .module)
-                        .font(.subheadline)
-                        .foregroundStyle(Color(.Labels.quintuple))
-                }
-                .font(.subheadline)
-                .foregroundStyle(Color(.Labels.primary))
-                .lineLimit(1...10)
-                .focused($focus, equals: ArticleFeature.State.Field.comment)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 7)
-                .background(Color(.Background.teritary))
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 18)
-                        .stroke(Color(.Separator.secondary), lineWidth: 0.33)
-                    }
-                
-                if !store.commentText.isEmpty {
-                    Button {
-                        store.send(.sendCommentButtonTapped)
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(tintColor)
-                            
-                            if store.isUploadingComment {
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                                    .tint(Color(.Labels.primaryInvariably))
-                            } else {
-                                Image(systemSymbol: .arrowUp)
-                                    .font(.body)
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(Color(.Labels.primaryInvariably))
-                            }
-                        }
-                        .frame(width: 34, height: 34)
-                    }
-                    .disabled(store.isUploadingComment)
-                }
-            }
-            .animation(.default, value: store.commentText.isEmpty)
         }
-        .padding(.horizontal, 12)
-        .padding(.top, 8)
-        .padding(.bottom, 6)
-        .background(Color(.Background.primaryAlpha))
-        .background(.ultraThinMaterial)
-        .animation(.default, value: store.replyComment)
     }
     
     // MARK: - Toolbar Button
@@ -354,17 +331,30 @@ public struct ArticleScreen: View {
         } label: {
             Image(systemSymbol: symbol)
                 .font(.body)
-                .foregroundStyle(navBarFullyVisible ? Color(.Labels.teritary) : Color(.Labels.primaryInvariably))
-                .scaleEffect(0.8) // TODO: ?
-                .background(
-                    Circle()
-                        .fill(Color.clear)
-                        .background(.ultraThinMaterial)
-                        .frame(width: 32, height: 32)
-                        .clipShape(Circle())
-                )
+                .foregroundStyle(navBarButtonForegroundStyle())
+                .scaleEffect(isLiquidGlass ? 1 : 0.8)
+                .background {
+                    if !isLiquidGlass {
+                        Circle()
+                            .fill(Color.clear)
+                            .background(.ultraThinMaterial)
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    }
+                }
         }
         .animation(.default, value: navBarFullyVisible)
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    func navBarButtonForegroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else if navBarFullyVisible {
+            return AnyShapeStyle(Color(.Labels.teritary))
+        } else {
+            return AnyShapeStyle(Color(.Labels.primaryInvariably))
+        }
     }
     
     // MARK: - Article Loader
@@ -389,12 +379,15 @@ public struct ArticleScreen: View {
                     ZStack {
                         Circle()
                             .fill(Color.clear)
-                            .background(.ultraThinMaterial)
-                            .frame(width: 32, height: 32)
+                            .refreshClearBackground()
+                            .frame(
+                                width: isLiquidGlass ? 40 : 32,
+                                height: isLiquidGlass ? 40 : 32
+                            )
                             .clipShape(Circle())
                         
                         ProgressView()
-                            .tint(Color.white)
+                            .tint(.primary)
                             .progressViewStyle(.circular)
                             .controlSize(.regular)
                     }
@@ -427,15 +420,19 @@ extension ArticleScreen {
                         .preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin)
                 })
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-                    MainActor.assumeIsolated {
-                        let percentage = 0.8
-                        let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
-                        let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
-                        let opacity = min(coefficient, 1)
-                        if lastValue != opacity {
-                            navBarOpacity = opacity
+                    if #available(iOS 26.0, *) {
+                        // skip since navBarOpacity is not used on 26+
+                    } else {
+                        MainActor.assumeIsolated {
+                            let percentage = 0.8
+                            let adjustedValue = max(0, abs(value.y) - (UIScreen.main.bounds.width * percentage))
+                            let coefficient = abs(adjustedValue) / (UIScreen.main.bounds.width * (1 - percentage))
+                            let opacity = min(coefficient, 1)
+                            if lastValue != opacity {
+                                navBarOpacity = opacity
+                            }
+                            lastValue = opacity
                         }
-                        lastValue = opacity
                     }
                 }
                 .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
@@ -469,21 +466,48 @@ extension UIApplication {
     }
 }
 
+// MARK: - Modifiers
+
+struct RefreshClearBackgroundModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .glassEffect(.regular)
+        } else {
+            content
+                .background(.ultraThinMaterial)
+        }
+    }
+}
+
+extension View {
+    func refreshClearBackground() -> some View {
+        modifier(RefreshClearBackgroundModifier())
+    }
+}
+
 // MARK: - Previews
 
 #Preview {
     NavigationStack {
         ArticleScreen(
             store: Store(
-                initialState: ArticleFeature.State(
-                    articlePreview: .mock,
-                    article: .mock
-                )
+                initialState: ArticleFeature.State(articlePreview: .mock)
             ) {
                 ArticleFeature()
+            } withDependencies: {
+                $0.apiClient.getArticle = { @Sendable _, _ in
+                    return AsyncThrowingStream { continuation in
+                        Task {
+                            try? await Task.sleep(for: .seconds(1))
+                            continuation.yield(.mock)
+                        }
+                    }
+                }
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
 }
 
 #Preview("Infinite loading") {
@@ -498,17 +522,19 @@ extension UIApplication {
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
 }
 
 #Preview("Test comments") {
     @Shared(.userSession) var userSession
     $userSession.withLock { $0 = UserSession.mock }
+    
     return NavigationStack {
         ArticleScreen(
             store: Store(
                 initialState: ArticleFeature.State(
                     articlePreview: .mock,
-                    commentText: "Test"
+                    commentText: ""
                 )
             ) {
                 ArticleFeature()
@@ -517,7 +543,7 @@ extension UIApplication {
                     return AsyncThrowingStream { continuation in
                         continuation.yield(.mockWithComment)
                         Task {
-                            try? await Task.sleep(for: .seconds(5))
+                            try? await Task.sleep(for: .seconds(2))
                             continuation.yield(.mockWithTwoComments)
                         }
                     }
@@ -529,4 +555,5 @@ extension UIApplication {
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.scarlet))
 }

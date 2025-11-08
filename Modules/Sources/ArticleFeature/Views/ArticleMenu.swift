@@ -11,6 +11,7 @@ import SharedUI
 import Models
 
 public struct ArticleMenu: View {
+    
     public let store: StoreOf<ArticleFeature>
     public let isDark: Bool
     
@@ -21,30 +22,40 @@ public struct ArticleMenu: View {
     
     public var body: some View {
         Menu {
-            ContextButton(text: "Copy Link", symbol: .docOnDoc, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                 store.send(.menuActionTapped(.copyLink))
             }
-            ContextButton(text: "Share Link", symbol: .squareAndArrowUp, bundle: .module) {
+            ContextButton(text: LocalizedStringResource("Share Link", bundle: .module), symbol: .squareAndArrowUp) {
                 store.send(.menuActionTapped(.shareLink))
             }
-//            ContextButton(text: "Problems with article?", symbol: .questionmarkCircle, bundle: .module) {
-//                store.send(.menuActionTapped(.report))
-//            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)
-                .foregroundStyle(isDark ? Color(.Labels.teritary) : Color(.Labels.primaryInvariably))
-                .scaleEffect(0.8) // TODO: ?
-                .background(
-                    Circle()
-                        .fill(Color.clear)
-                        .background(.ultraThinMaterial)
-                        .frame(width: 32, height: 32)
-                        .clipShape(Circle())
-                )
+                .foregroundStyle(foregroundStyle())
+                .scaleEffect(isLiquidGlass ? 1 : 0.8)
+                .background {
+                    if !isLiquidGlass {
+                        Circle()
+                            .fill(Color.clear)
+                            .background(.ultraThinMaterial)
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    }
+                }
                 .animation(.default, value: isDark)
                 .frame(width: 24, height: 24)
                 .contentShape(Rectangle())
+        }
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else if isDark {
+            return AnyShapeStyle(Color(.Labels.teritary))
+        } else {
+            return AnyShapeStyle(Color(.Labels.primaryInvariably))
         }
     }
 }

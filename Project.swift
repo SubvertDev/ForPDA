@@ -15,7 +15,8 @@ let project = Project(
             resources: ["Modules/Resources/**"],
             dependencies: [
                 .target(name: "AppFeature"),
-                .target(name: "SafariExtension")
+                .target(name: "SafariExtension"),
+                .SPM.TCA
             ],
             settings: .settings(base: .appSettings, defaultSettings: .recommended)
         ),
@@ -88,6 +89,7 @@ let project = Project(
                     .Internal.GalleryFeature,
                     .Internal.HapticClient,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.ReputationChangeFeature,
@@ -183,8 +185,9 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.Models,
-                    .Internal.NotificationCenterClient,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
+                    .Internal.PasteboardClient,
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
@@ -212,6 +215,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -281,6 +285,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.BBBuilder,
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
@@ -323,9 +328,12 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.BBBuilder,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.TCAExtensions,
                     .SPM.ExyteChat,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,
@@ -341,6 +349,8 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .Internal.TCAExtensions,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -401,9 +411,10 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
+                    .Internal.GalleryFeature,
                     .Internal.LoggerClient,
                     .Internal.Models,
-                    .Internal.NotificationCenterClient,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
@@ -466,6 +477,7 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.Models,
+                    .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
                 ]
@@ -495,15 +507,6 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.LoggerClient,
                     .Internal.ParsingClient,
-                    .SPM.TCA
-                ]
-            ),
-        
-            .feature(
-                name: "NotificationCenterClient",
-                hasResources: false,
-                dependencies: [
-                    .Internal.LoggerClient,
                     .SPM.TCA
                 ]
             ),
@@ -594,7 +597,14 @@ let project = Project(
                 infoPlist: .default,
                 sources: ["Modules/Tests/**"],
                 resources: [],
-                dependencies: [.target(name: "ForPDA")]
+                dependencies: [
+                    .target(name: "ForPDA"),
+                    .Internal.ArticlesListFeature,
+                    .Internal.BBBuilder,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.TCA
+                ]
             ),
         
         .tests(
@@ -738,7 +748,9 @@ extension SettingsDictionary {
         .merging(.targetSettings)
         .setAppName(App.name)
         .setDevelopmentTeam("7353CQCGQC")
+    
         .includeAppIcon()
+        .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
             provisioningProfileSpecifier: "match Development com.subvert.forpda"
@@ -835,7 +847,8 @@ extension InfoPlist {
             "NSPhotoLibraryUsageDescription": "To send attachments in QMS",
             
             "POSTHOG_TOKEN": "$(POSTHOG_TOKEN)",
-            "SENTRY_DSN": "$(SENTRY_DSN)"
+            "SENTRY_DSN": "$(SENTRY_DSN)",
+            "RELEASE_CHANNEL": "$(RELEASE_CHANNEL)"
         ]
     )
     
@@ -892,7 +905,6 @@ extension TargetDependency.Internal {
     static let CacheClient =         TargetDependency.target(name: "CacheClient")
     static let HapticClient =        TargetDependency.target(name: "HapticClient")
     static let LoggerClient =        TargetDependency.target(name: "LoggerClient")
-    static let NotificationCenterClient = TargetDependency.target(name: "NotificationCenterClient")
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")

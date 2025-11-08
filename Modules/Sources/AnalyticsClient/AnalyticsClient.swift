@@ -62,7 +62,7 @@ extension AnalyticsClient: DependencyKey {
                 PostHogSDK.shared.capture(event.name, properties: event.properties)
             },
             capture: { error in
-                logger.error("Captured error via Sentry: \(error)")
+                logger.critical("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
             },
             reportFullyDisplayed: {
@@ -158,7 +158,10 @@ extension AnalyticsClient {
             options.dsn = Secrets.get(.SENTRY_DSN)
             options.debug = isDebugEnabled
             options.enabled = isEnabled
-            options.enableAppLaunchProfiling = true
+            options.configureProfiling = {
+                $0.sessionSampleRate = 1
+                $0.profileAppStarts = true
+            }
             options.enableMetricKit = true
             options.enableAppHangTracking = false // Not working properly
             options.enableAppHangTrackingV2 = false // Not working properly

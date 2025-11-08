@@ -36,24 +36,15 @@ public struct FavoritesRootScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                    VStack {
-                        SegmentPicker()
+                VStack {
+                    SegmentPicker()
+                    
+                    switch store.pickerSelection {
+                    case .favorites:
+                        FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
                         
-                        switch store.pickerSelection {
-                        case .favorites:
-                            FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-                            
-                        case .bookmarks:
-                            BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-                        }
-                    }
-            }
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        send(.settingsButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .gearshape)
+                    case .bookmarks:
+                        BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
                     }
                 }
             }
@@ -65,7 +56,7 @@ public struct FavoritesRootScreen: View {
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
-        _Picker("", selection: $store.pickerSelection) {
+        Picker(String(""), selection: $store.pickerSelection) {
             Text("Favorites", bundle: .module)
                 .tag(FavoritesRootFeature.PickerSelection.favorites)
             
@@ -77,41 +68,22 @@ public struct FavoritesRootScreen: View {
     }
 }
 
-// MARK: - Perception Picker
-// https://github.com/pointfreeco/swift-perception/issues/100
-
-struct _Picker<Label, SelectionValue, Content>: View
-where Label: View, SelectionValue: Hashable, Content: View {
-    let label: Label
-    let content: Content
-    let selection: Binding<SelectionValue>
-    
-    init(
-        _ titleKey: String,
-        selection: Binding<SelectionValue>,
-        @ViewBuilder content: () -> Content
-    ) where Label == Text {
-        self.label = Text(titleKey)
-        self.content = content()
-        self.selection = selection
-    }
-    
-    var body: some View {
-        _PerceptionLocals.$skipPerceptionChecking.withValue(true) {
-            Picker(selection: selection, content: { content }, label: { label })
-        }
-    }
-}
-
 // MARK: - Previews
 
 #Preview {
-    FavoritesRootScreen(
-        store: Store(
-            initialState: FavoritesRootFeature.State(),
-            reducer: {
-                FavoritesRootFeature()
-            }
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .mock }
+    
+    return NavigationStack {
+        FavoritesRootScreen(
+            store: Store(
+                initialState: FavoritesRootFeature.State(),
+                reducer: {
+                    FavoritesRootFeature()
+                }
+            )
         )
-    )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+    .tint(Color(.Theme.primary))
 }

@@ -12,7 +12,6 @@ import Models
 
 @DependencyClient
 public struct ToastClient: Sendable {
-    public var show: @Sendable (ToastInfo) async -> Void
     public var showToast: @Sendable (ToastMessage) async -> Void
     public var queue: @Sendable () -> AsyncStream<ToastMessage> = { .finished }
 }
@@ -20,13 +19,10 @@ public struct ToastClient: Sendable {
 extension ToastClient: DependencyKey {
     public static var liveValue: ToastClient {
         @Dependency(\.hapticClient) var haptic
+        
         let (stream, continuation) = AsyncStream.makeStream(of: ToastMessage.self)
 
         return ToastClient(
-            show: { info in
-                print("(DEPRECATED) SHOWING TOAST: \(info)")
-            },
-            
             showToast: { toast in
                 if let hapticType = toast.haptic {
                     await haptic.play(hapticType)
@@ -43,132 +39,5 @@ extension DependencyValues {
     public var toastClient: ToastClient {
         get { self[ToastClient.self] }
         set { self[ToastClient.self] = newValue }
-    }
-}
-
-public enum ToastMessage: Equatable, Sendable {
-    case custom(String)
-
-    // Posts
-    case postNotFound
-    case postDeleted
-    case postKarmaChanged
-    
-    // Report
-    case reportSent
-    case reportTooShort
-    case reportSendError
-    
-    // Reputation
-    case reputationChanged
-    case reputationChangeError
-    case reputationChangeBlocked
-    case reputationSelfChangeError
-    case reputationChangeNotEnoughPosts
-    case reputationChangeTooLowReputation
-    case reputationChangeCannotChangeToday
-    case reputationChangeCannotChangeForThisPost
-    case reputationChangeCannotChangeForThisUserNow
-    case reputationChangeCannotChangeTodayForThisUser
-    case reputationChangeThisPersonYouRecentlyDownvoted
-    case reputationChangeThisPersonRecentlyDownvotedYou
-    
-    // Common
-    case whoopsSomethingWentWrong
-    
-    public var description: LocalizedStringKey {
-        switch self {
-        case .custom(let text):
-            return LocalizedStringKey(text)
-        case .postNotFound:
-            return "Post not found"
-        case .postDeleted:
-            return "Post deleted"
-        case .postKarmaChanged:
-            return "Post karma changed"
-        case .reportSent:
-            return "Report sent"
-        case .reportTooShort:
-            return "Report too short"
-        case .reportSendError:
-            return "Error sending report"
-        case .reputationChanged:
-            return "Reputation changed"
-        case .reputationChangeError:
-            return "Reputation change error"
-        case .reputationChangeBlocked:
-            return "Reputation change blocked"
-        case .reputationSelfChangeError:
-            return "Cannot change self reputation"
-        case .reputationChangeNotEnoughPosts:
-            return "Not enough posts for reputation change"
-        case .reputationChangeTooLowReputation:
-            return "Your reputation is too low"
-        case .reputationChangeCannotChangeToday:
-            return "You can no longer change reputation today"
-        case .reputationChangeCannotChangeForThisPost:
-            return "You can not change reputation for this post"
-        case .reputationChangeCannotChangeForThisUserNow:
-            return "You can not change reputation for this user now"
-        case .reputationChangeCannotChangeTodayForThisUser:
-            return "You can not change reputation for this user today"
-        case .reputationChangeThisPersonYouRecentlyDownvoted:
-            return "Change denied, this person you recently downvoted"
-        case .reputationChangeThisPersonRecentlyDownvotedYou:
-            return "Change denied, this person recently downvoted you"
-        case .whoopsSomethingWentWrong:
-            return "Whoops, something went wrong.."
-        }
-    }
-    
-    public var isError: Bool {
-        switch self {
-        case .postNotFound,
-             .reportTooShort,
-             .reportSendError,
-             .reputationChangeError,
-             .reputationChangeBlocked,
-             .reputationSelfChangeError,
-             .reputationChangeNotEnoughPosts,
-             .reputationChangeTooLowReputation,
-             .reputationChangeCannotChangeToday,
-             .reputationChangeCannotChangeForThisPost,
-             .reputationChangeCannotChangeForThisUserNow,
-             .reputationChangeCannotChangeTodayForThisUser,
-             .reputationChangeThisPersonYouRecentlyDownvoted,
-             .reputationChangeThisPersonRecentlyDownvotedYou,
-             .whoopsSomethingWentWrong:
-			return true
-
-        case .custom, .reportSent, .postDeleted, .postKarmaChanged, .reputationChanged:
-            return false
-        }
-    }
-    
-    public var haptic: HapticType? {
-        switch self {
-        case .custom:
-            return .none
-
-        case .postNotFound,
-             .reportTooShort,
-             .reportSendError,
-             .reputationChangeError,
-             .reputationChangeBlocked,
-             .reputationSelfChangeError,
-             .reputationChangeNotEnoughPosts,
-             .reputationChangeTooLowReputation,
-             .reputationChangeCannotChangeToday,
-             .reputationChangeCannotChangeForThisPost,
-             .reputationChangeCannotChangeForThisUserNow,
-             .reputationChangeCannotChangeTodayForThisUser,
-             .reputationChangeThisPersonYouRecentlyDownvoted,
-             .reputationChangeThisPersonRecentlyDownvotedYou,
-             .whoopsSomethingWentWrong:
-            return .error
-            
-        case .reportSent, .postDeleted, .postKarmaChanged, .reputationChanged:
-            return .success
-        }
     }
 }

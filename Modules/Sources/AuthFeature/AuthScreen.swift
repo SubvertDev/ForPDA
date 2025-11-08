@@ -11,13 +11,22 @@ import SharedUI
 import NukeUI
 import SFSafeSymbols
 
+@ViewAction(for: AuthFeature.self)
 public struct AuthScreen: View {
+    
+    // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<AuthFeature>
     @Environment(\.tintColor) private var tintColor
     @FocusState public var focus: AuthFeature.State.Field?
     @State private var animateOnFocus = [false, false, false]
     @State private var safeAreaTopHeight: CGFloat = 0
+    
+    private var releaseChannel: String {
+        return (Bundle.main.infoDictionary?["RELEASE_CHANNEL"] as? String ?? "Stable").capitalized
+    }
+    
+    // MARK: - Init
     
     public init(store: StoreOf<AuthFeature>) {
         self.store = store
@@ -29,17 +38,13 @@ public struct AuthScreen: View {
         WithPerceptionTracking {
             ZStack {
                 Color(.Background.primary)
+                    .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 0) {
-                        Image(.logoLight)
+                        Image("AppIcon-\(releaseChannel)", bundle: .shared)
                             .resizable()
                             .frame(width: 104, height: 104)
-                            .clipShape(RoundedRectangle(cornerRadius: 24))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 24)
-                                    .stroke(Color(.Separator.primary), lineWidth: 0.33)
-                            )
                             .padding(.top, 16)
                             .padding(.bottom, 12)
                         
@@ -55,7 +60,7 @@ public struct AuthScreen: View {
                                 text: $store.login,
                                 placeholder: "Login",
                                 focusEqual: .login,
-                                onSubmit: { store.send(.onSubmit(.login)) }
+                                onSubmit: { send(.onSubmit(.login)) }
                             )
                             .bounceUpByLayerEffect(value: animateOnFocus[0])
                             
@@ -67,7 +72,7 @@ public struct AuthScreen: View {
                                 isSecure: true,
                                 errorMessage: "Login or password is incorrect",
                                 showError: store.loginErrorReason == .wrongLoginOrPassword,
-                                onSubmit: { store.send(.onSubmit(.password)) }
+                                onSubmit: { send(.onSubmit(.password)) }
                             )
                             .bounceUpByLayerEffect(value: animateOnFocus[1])
                             
@@ -114,7 +119,7 @@ public struct AuthScreen: View {
                             focusEqual: .captcha,
                             errorMessage: "Captcha is incorrect",
                             showError: store.loginErrorReason == .wrongCaptcha,
-                            onSubmit: { store.send(.onSubmit(.captcha)) }
+                            onSubmit: { send(.onSubmit(.captcha)) }
                         )
                         .bounceUpByLayerEffect(value: animateOnFocus[2])
                         .keyboardType(.numberPad)
@@ -127,46 +132,59 @@ public struct AuthScreen: View {
                     }
                     .padding(.horizontal, 16)
                 }
-                
-                VStack(spacing: 0) {
-                    Spacer()
-                    
+                .scrollIndicators(.hidden)
+                ._safeAreaBar(edge: .bottom) {
                     Button {
-                        store.send(.loginButtonTapped)
+                        send(.loginButtonTapped)
                     } label: {
                         Text("Log in", bundle: .module)
                             .font(.body)
                             .frame(maxWidth: .infinity, maxHeight: 48)
                     }
-                    .frame(maxHeight: 48)
                     .buttonStyle(.borderedProminent)
+                    .frame(maxHeight: 48)
                     .disabled(store.isLoginButtonDisabled)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(Color(.Background.primary))
+                    // .background(Color(.Background.primary))
+                    .background {
+                        if #available(iOS 26, *) {
+                            // No background
+                        } else {
+                            Color(.Background.primary)
+                        }
+                    }
                     .tint(tintColor)
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(Color(.Background.primary), for: .navigationBar)
-            .overlay(alignment: .top) {
-                Color(.Background.primary)
-                    .frame(width: UIScreen.main.bounds.width, height: safeAreaTopHeight)
-                    .ignoresSafeArea()
-            }
-            .background(GeometryReader { proxy in
-                Color.clear.task(id: proxy.size.width) {
-                    safeAreaTopHeight = proxy.safeAreaInsets.top
-                }
-            })
+            ._toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        store.send(.cancelButtonTapped)
-                    } label: {
-                        Text("Cancel", bundle: .module)
-                            .foregroundStyle(tintColor)
+                // Profile is used as root in this case so we don't need close button
+                if store.openReason != .profile {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if #available(iOS 26, *) {
+                            Button(role: .close) {
+                                send(.closeButtonTapped)
+                            }
+                        } else {
+                            Button {
+                                send(.closeButtonTapped)
+                            } label: {
+                                Text("Close", bundle: .module)
+                                    .foregroundStyle(tintColor)
+                            }
+                        }
+                    }
+                }
+                
+                // We're showing app settings only if it's opened from profile tab
+                if store.openReason == .profile {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            send(.settingsButtonTapped)
+                        } label: {
+                            Image(systemSymbol: .gearshape)
+                        }
                     }
                 }
             }
@@ -184,8 +202,8 @@ public struct AuthScreen: View {
             .onTapGesture {
                 focus = nil
             }
-            .task {
-                store.send(.onTask)
+            .onAppear {
+                send(.onAppear)
             }
         }
     }
@@ -217,12 +235,14 @@ public struct AuthScreen: View {
                                 .font(.body)
                                 .foregroundStyle(Color(.Labels.quaternary))
                         }
+                        .textInputAutocapitalization(.never)
                     } else {
                         TextField(text: text) {
                             Text(placeholder, bundle: .module)
                                 .font(.body)
                                 .foregroundStyle(Color(.Labels.quaternary))
                         }
+                        .textInputAutocapitalization(.never)
                     }
                 }
                 .font(.body)
@@ -256,7 +276,7 @@ public struct AuthScreen: View {
 // MARK: - Previews
 
 #Preview {
-    NavigationStack {
+    ScreenWrapper {
         AuthScreen(
             store: Store(
                 initialState: AuthFeature.State(openReason: .profile)
@@ -268,6 +288,7 @@ public struct AuthScreen: View {
         )
     }
     .environment(\.tintColor, Color(.Theme.primary))
+    .environment(\.locale, Locale(identifier: "en"))
 }
 
 #Preview("Wrong Credentials") {

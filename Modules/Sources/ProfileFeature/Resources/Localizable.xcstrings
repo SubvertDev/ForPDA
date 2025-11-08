@@ -51,16 +51,6 @@
         }
       }
     },
-    "Chats do not (yet) support: BB-codes, attachments, caching, push-notifications and some other functionality" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Чаты (ещё) не поддерживают: ББ-коды, вложения, кеширование, пуш-уведомления и некоторый другой функционал"
-          }
-        }
-      }
-    },
     "City" : {
       "localizations" : {
         "ru" : {
@@ -77,16 +67,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментариев"
-          }
-        }
-      }
-    },
-    "Continue in (%lld)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Продолжить через (%lld)"
           }
         }
       }
@@ -157,16 +137,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "История"
-          }
-        }
-      }
-    },
-    "IN DEVELOPMENT" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В РАЗРАБОТКЕ"
           }
         }
       }
@@ -331,32 +301,12 @@
         }
       }
     },
-    "This functionality is presented as-is" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Функционал предоставлен как есть"
-          }
-        }
-      }
-    },
     "Topics" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тем"
-          }
-        }
-      }
-    },
-    "Understood, continue" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Понятно, продолжить"
           }
         }
       }

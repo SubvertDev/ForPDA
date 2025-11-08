@@ -14,9 +14,6 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
     case forum
     case profile
     case search
-    
-    // TODO: Title is in two places: AppFeature & AppSettings due to localization headache
-    
     public var iconSymbol: SFSymbol {
         switch self {
         case .articles:
@@ -29,6 +26,21 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
             return .personCropCircle
         case .search:
             return .magnifyingglass
+        }
+    }
+    
+    public var title: LocalizedStringResource {
+        switch self {
+        case .articles:
+            return LocalizedStringResource("Articles", bundle: .module)
+        case .favorites:
+            return LocalizedStringResource("Favorites", bundle: .module)
+        case .forum:
+            return LocalizedStringResource("Forum", bundle: .module)
+        case .profile:
+            return LocalizedStringResource("Profile", bundle: .module)
+        case .search:
+            return LocalizedStringResource("Search", bundle: .module)
         }
     }
 }

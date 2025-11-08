@@ -67,16 +67,7 @@ public struct ForumsListScreen: View {
             }
             .animation(.default, value: store.forums)
             .navigationTitle(Text("Forum", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        send(.settingsButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .gearshape)
-                    }
-                }
-            }
+            ._toolbarTitleDisplayMode(.large)
             .onAppear {
                 send(.onAppear)
             }
@@ -98,6 +89,7 @@ public struct ForumsListScreen: View {
                     .offset(x: -16)
                 
                 Spacer()
+                
                 Image(systemSymbol: .chevronUp)
                     .font(.body)
                     .foregroundStyle(Color(.Labels.quaternary))

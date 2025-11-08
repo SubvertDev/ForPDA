@@ -15,11 +15,25 @@ import PasteboardClient
 import HapticClient
 import AnalyticsClient
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {
     
     public init() {}
+    
+    // MARK: - Enums
+    
+    public enum ArticleMenuAction: Sendable {
+        case copyLink
+        case shareLink
+    }
+    
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link Copied", bundle: .module)
+    }
     
     // MARK: - Destinations
     
@@ -108,13 +122,12 @@ public struct ArticleFeature: Reducer, Sendable {
         case menuActionTapped(ArticleMenuAction)
         case linkShared(Bool, URL)
         case linkInTextTapped(URL)
-        case onTask
+        case onAppear
         case onRefresh
         case pollVoteButtonTapped(Int, [Int])
         case comments(IdentifiedActionOf<CommentFeature>)
         case sendCommentButtonTapped
         case removeReplyCommentButtonTapped
-        case commentBlockHeaderLongTapped
         
         case _checkLoading
         case _stopRefreshingIfFinished
@@ -139,6 +152,7 @@ public struct ArticleFeature: Reducer, Sendable {
     @Dependency(\.parsingClient) var parsingClient
     @Dependency(\.analyticsClient) var analyticsClient
     @Dependency(\.pasteboardClient) var pasteboardClient
+    @Dependency(\.notificationsClient) var notificationsClient
     @Dependency(\.openURL) var openURL
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.continuousClock) var clock
@@ -166,11 +180,6 @@ public struct ArticleFeature: Reducer, Sendable {
                     }
                 }
                 return .none
-                
-            case .commentBlockHeaderLongTapped:
-                return .run { [isAuthorized = state.isAuthorized, isArticleExpired = state.isArticleExpired, canComment = state.canComment, flag = state.article?.flag, id = state.articlePreview.id] _ in
-                    await toastClient.showToast(.custom("A:\(isAuthorized) E:\(isArticleExpired) C:\(canComment) (\(flag ?? -12345)) - \(id)"))
-                }
                 
             case .comments:
                 return .none
@@ -203,13 +212,19 @@ public struct ArticleFeature: Reducer, Sendable {
                 state.destination = nil
                 return .none
                 
-            case .onTask:
+            case .onAppear:
                 guard state.article == nil else { return .none }
                 return .merge([
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id),
                     .publisher {
                         state.$userSession.publisher.dropFirst()
+                            .map { _ in Action.onRefresh }
+                    },
+                    .publisher { [id = state.articlePreview.id] in
+                        notificationsClient.eventPublisher()
+                            .dropFirst() // Notification with last comment always comes with article
+                            .filter { $0 == .site(id) }
                             .map { _ in Action.onRefresh }
                     }
                 ])
@@ -338,12 +353,12 @@ public struct ArticleFeature: Reducer, Sendable {
             case let ._commentResponse(.success(type)):
                 state.isUploadingComment = false
                 state.focus = nil
-                guard !type.isError else { return showToast(for: type) }
+                guard !type.isError else { return showToast(type: type) }
                 state.commentText.removeAll()
                 state.replyComment = nil
                 return .concatenate([
                     getArticle(id: state.articlePreview.id, useCache: false),
-                    showToast(for: type)
+                    showToast(type: type)
                 ])
                 
             case let ._commentResponse(.failure(error)):
@@ -426,33 +441,26 @@ public struct ArticleFeature: Reducer, Sendable {
         switch action {
         case .copyLink:
             pasteboardClient.copy(state.articlePreview.url.absoluteString)
-            return showToast(for: action)
+            return .run { _ in
+                let toast = ToastMessage(text: Localization.linkCopied, haptic: .success)
+                await toastClient.showToast(toast)
+            }
             
         case .shareLink:
             state.destination = .share(state.articlePreview.url)
-            
-        case .report:
-            return showToast(for: action)
         }
         
         return .none
     }
     
-    private func showToast(for type: CommentResponseType) -> Effect<Action> {
-        #warning("test if it's working")
+    private func showToast(type: CommentResponseType) -> Effect<Action> {
         return .run { _ in
-            await hapticClient.play(type.isError ? .error : .success)
-            
-            let toast = ToastInfo(screen: .article, message: type.description)
-            await toastClient.show(toast)
-        }
-    }
-    
-    private func showToast(for action: ArticleMenuAction) -> Effect<Action> {
-        #warning("connect with func above?")
-        return .run { _ in
-            let toast = ToastInfo(screen: .article, message: action.rawValue)
-            await toastClient.show(toast)
+            let toast = ToastMessage(
+                text: type.description,
+                isError: type.isError,
+                haptic: type.isError ? .error : .success
+            )
+            await toastClient.showToast(toast)
         }
     }
 }

@@ -12,20 +12,17 @@ import SFSafeSymbols
 
 public struct ContextButton: View {
     
-    public let text: LocalizedStringKey
+    public let text: LocalizedStringResource
     public let symbol: SFSymbol
-    public let bundle: Bundle
     public let action: (() -> Void)
     
     public init(
-        text: LocalizedStringKey,
+        text: LocalizedStringResource,
         symbol: SFSymbol,
-        bundle: Bundle,
         action: @escaping () -> Void
     ) {
         self.text = text
         self.symbol = symbol
-        self.bundle = bundle
         self.action = action
     }
     
@@ -34,7 +31,7 @@ public struct ContextButton: View {
             action()
         } label: {
             HStack {
-                Text(text, bundle: bundle)
+                Text(text)
                 Image(systemSymbol: symbol)
             }
         }

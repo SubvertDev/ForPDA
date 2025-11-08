@@ -31,8 +31,6 @@ extension ArticlesListFeature {
                         analyticsClient.log(ArticlesListEvent.linkCopied(article.url))
                     case .openInBrowser:
                         analyticsClient.log(ArticlesListEvent.articleOpenedInBrowser(article.url))
-                    case .report:
-                        analyticsClient.log(ArticlesListEvent.linkReported(article.url))
                     case .addToBookmarks:
                         analyticsClient.log(ArticlesListEvent.articleAddedToBookmarks(article.url))
                     }
@@ -42,9 +40,6 @@ extension ArticlesListFeature {
                     
                 case .listGridTypeButtonTapped:
                     analyticsClient.log(ArticlesListEvent.listGridTypeChanged(state.listRowType.rawValue))
-                    
-                case .settingsButtonTapped:
-                    analyticsClient.log(ArticlesListEvent.settingsButtonTapped)
                     
                 case .onAppear:
                     break // TODO: Make First App Open/App Session here?
@@ -61,6 +56,9 @@ extension ArticlesListFeature {
                     
                 case .loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
+                    
+                case .tryAgainButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.tryAgainButtonTapped)
                     
                 case .binding, ._articlesResponse, .scrollToTop, .destination, .delegate:
                     break

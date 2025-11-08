@@ -1,52 +1,43 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Articles" : {
+    "Connecting..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Статьи"
+            "value" : "Подключаемся"
           }
         }
       }
     },
-    "Favorites" : {
+    "No internet connection" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Избранное"
-          }
-        }
-      }
-    },
-    "Forum" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Форум"
-          }
-        }
-      }
-    },
-    "Profile" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
+            "value" : "Нет интернет соединения"
           }
         }
       }
     },
     "Search" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Поиск"
+          }
+        }
+      }
+    },
+    "Unable to open link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не получилось открыть ссылку"
           }
         }
       }

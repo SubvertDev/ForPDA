@@ -152,7 +152,7 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     }
     
     func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if let postIdString = textAttachment.accessibilityHint, let postId = Int(postIdString) {
+        if let postIdString = (textAttachment as? AsyncTextAttachment)?.postId, let postId = Int(postIdString) {
             let url = URL(string: "snapback://\(postId)")!
             onUrlTap?(url)
         } else {

@@ -17,6 +17,9 @@ import SwiftUI
 // MARK: - TabViewGallery
 
 public struct TabViewGallery: View {
+    
+    // MARK: - Properties
+    
     @State var gallery: [URL]
     let ids: [Int]?
     @Environment(\.dismiss) private var dismiss
@@ -28,6 +31,8 @@ public struct TabViewGallery: View {
     @State private var activityItems: [Any] = []
     @State private var tempFileUrls: [Int: URL] = [:]
     
+    // MARK: - Init
+    
     public init(
         gallery: [URL],
         ids: [Int]? = nil,
@@ -38,13 +43,16 @@ public struct TabViewGallery: View {
         self.selectedImageID = selectedImageID
     }
     
+    // MARK: - Body
+    
     public var body: some View {
         ZStack {
             if isTouched {
                 withAnimation(.easeInOut) {
                     VStack {
                         ToolBarView()
-                            .background(Color.clear)
+                            .background(.clear)
+                        
                         Spacer()
                     }
                     .frame(alignment: .top)
@@ -60,12 +68,9 @@ public struct TabViewGallery: View {
                     isZooming: $isZooming,
                     isTouched: $isTouched,
                     backgroundOpacity: $backgroundOpacity,
-                    onClose: {
-                        dismiss()
-                    })
-                .clipShape(
-                    .rect
+                    onClose: { dismiss() }
                 )
+                .clipShape(.rect)
             }
             .ignoresSafeArea()
         }
@@ -99,11 +104,11 @@ public struct TabViewGallery: View {
             Spacer()
             
             Menu {
-                ContextButton(text: "Save", symbol: .arrowDownToLine, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Save", bundle: .module), symbol: .arrowDownToLine) {
                     saveImage()
                 }
                 
-                ContextButton(text: "Share", symbol: .squareAndArrowUp, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Share", bundle: .module), symbol: .squareAndArrowUp) {
                     configureShareSheet()
                 }
                 
@@ -202,21 +207,36 @@ public struct TabViewGallery: View {
         } label: {
             Image(systemSymbol: symbol)
                 .font(.body)
-                .foregroundStyle(.white)
-                .scaleEffect(0.8) // TODO: ?
-                .background(
-                    Circle()
-                        .fill(.ultraThinMaterial.opacity(backgroundOpacity))
-                        .frame(width: 32, height: 32)
-                )
+                .foregroundStyle(foregroundStyle())
+                .scaleEffect(isLiquidGlass ? 1 : 0.8)
+                .background {
+                    if !isLiquidGlass {
+                        Circle()
+                            .fill(.ultraThinMaterial.opacity(backgroundOpacity))
+                            .frame(width: 32, height: 32)
+                    }
+                }
                 .highPriorityGesture(
                     TapGesture().onEnded {
                         dismiss()
                     }
                 )
         }
-        .frame(width: 32, height: 32)
+        .frame(
+            width: isLiquidGlass ? 44 : 32,
+            height: isLiquidGlass ? 44 : 32
+        )
         .contentShape(Rectangle())
+        .liquidIfAvailable(isInteractive: true)
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(.white)
+        }
     }
 }
 

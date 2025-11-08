@@ -47,7 +47,7 @@ public struct ReputationScreen: View {
             }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Reputation", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .onAppear {
                 send(.onAppear)
             }
@@ -91,10 +91,10 @@ public struct ReputationScreen: View {
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
-        _Picker("", selection: $store.pickerSection) {
+        Picker(String(""), selection: $store.pickerSection) {
             Text("History", bundle: .module)
                 .tag(ReputationFeature.PickerSection.history)
-            Text("My votes", bundle: .module)
+            Text(store.isOwnVotes ? "My votes" : "Left votes", bundle: .module)
                 .tag(ReputationFeature.PickerSection.votes)
         }
         .pickerStyle(.segmented)
@@ -199,7 +199,7 @@ public struct ReputationScreen: View {
                 .foregroundStyle(Color(.Labels.primary))
                 .padding(.bottom, 6)
             
-            Text(isHistory ? "Write topics on the forum and get reputation from other users" : "Vote for other users if you liked the topic on the forum", bundle: .module)
+            Text(getEmptyReputationDescription(), bundle: .module)
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color(.Labels.teritary))
@@ -208,21 +208,30 @@ public struct ReputationScreen: View {
         }
     }
     
+    private func getEmptyReputationDescription() -> LocalizedStringKey {
+        switch store.pickerSection {
+        case .history:
+            return "Help other users on the forum and get reputation"
+        case .votes:
+            return store.isOwnVotes
+            ? "Change the reputation of users on the forum for their actions"
+            : "This user has not changed anyone's reputation yet"
+        }
+    }
+    
     // MARK: - Menu Buttons
     
     @ViewBuilder
     private func MenuButtons(id: Int) -> some View {
         ContextButton(
-            text: "Profile",
+            text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
-            bundle: .module,
             action: { send(.profileTapped(id)) }
         )
         
         ContextButton(
-            text: "Complain",
+            text: LocalizedStringResource("Complain", bundle: .module),
             symbol: .exclamationmarkTriangle,
-            bundle: .module,
             action: { print("Complain") }
         )
         .disabled(true)
@@ -234,32 +243,6 @@ public struct ReputationScreen: View {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "d MMMM yyyy · HH:mm"
         return dateFormatter.string(from: date)
-    }
-}
-
-// MARK: - Perception Picker
-// https://github.com/pointfreeco/swift-perception/issues/100
-
-struct _Picker<Label, SelectionValue, Content>: View
-where Label: View, SelectionValue: Hashable, Content: View {
-    let label: Label
-    let content: Content
-    let selection: Binding<SelectionValue>
-    
-    init(
-        _ titleKey: String,
-        selection: Binding<SelectionValue>,
-        @ViewBuilder content: () -> Content
-    ) where Label == Text {
-        self.label = Text(titleKey)
-        self.content = content()
-        self.selection = selection
-    }
-    
-    var body: some View {
-        _PerceptionLocals.$skipPerceptionChecking.withValue(true) {
-            Picker(selection: selection, content: { content }, label: { label })
-        }
     }
 }
 

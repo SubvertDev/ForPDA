@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Change the reputation of users on the forum for their actions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменяйте репутацию пользователей на форуме за их действия"
+          }
+        }
+      }
+    },
     "Complain" : {
       "localizations" : {
         "ru" : {
@@ -11,12 +21,32 @@
         }
       }
     },
+    "Help other users on the forum and get reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помогайте другим пользователям на форуме и получайте репутацию"
+          }
+        }
+      }
+    },
     "History" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "История"
+          }
+        }
+      }
+    },
+    "Left votes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оставил"
           }
         }
       }
@@ -103,12 +133,12 @@
         }
       }
     },
-    "Vote for other users if you liked the topic on the forum" : {
+    "This user has not changed anyone's reputation yet" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Голосуйте за других пользователей, если вам понравилась тема на форуме"
+            "value" : "Этот пользователь еще не изменял ничью репутацию"
           }
         }
       }
@@ -119,16 +149,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упс!"
-          }
-        }
-      }
-    },
-    "Write topics on the forum and get reputation from other users" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пишите темы на форуме и получайте репутацию от других пользователей"
           }
         }
       }

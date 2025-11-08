@@ -20,25 +20,35 @@ extension AuthFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .binding, .onTask, .onSubmit, ._captchaResponse, ._loginResponse, .alert, .cancelButtonTapped:
+                case .binding,
+                        .alert,
+                        .view(.onAppear),
+                        .view(.onSubmit),
+                        .view(.closeButtonTapped),
+                        .view(.settingsButtonTapped),
+                        .internal(.captchaResponse),
+                        .internal(.loginResponse):
                     break
                     
-                case .loginButtonTapped:
+                case .view(.loginButtonTapped):
                     analyticsClient.log(AuthEvent.loginTapped)
                     
-                case ._wrongPassword:
+                case .internal(.wrongPassword):
                     analyticsClient.log(AuthEvent.wrongPassword)
                     
-                case ._wrongCaptcha:
+                case .internal(.wrongCaptcha):
                     analyticsClient.log(AuthEvent.wrongCaptcha)
                     
-                case ._somethingWentWrong(let id):
+                case let .internal(.somethingWentWrong(id)):
                     analyticsClient.log(AuthEvent.somethingWentWrong(id: id))
                     analyticsClient.capture(NSError(domain: "Auth unknown response", code: id))
                     
                 case let .delegate(.loginSuccess(reason, userId)):
                     analyticsClient.log(AuthEvent.loginSuccess(reason: reason.rawValue, userId: userId))
                     analyticsClient.identify(String(userId))
+                    
+                case .delegate(.showSettings):
+                    break
                 }
                 return .none
             }

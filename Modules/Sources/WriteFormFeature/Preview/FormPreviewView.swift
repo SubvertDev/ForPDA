@@ -40,7 +40,7 @@ struct FormPreviewView: View {
                     }
                 }
                 .padding(16)
-                .navigationBarTitleDisplayMode(.inline)
+                ._toolbarTitleDisplayMode(.inline)
                 .navigationTitle(Text("Preview", bundle: .module))
             }
             .background(Color(.Background.primary))

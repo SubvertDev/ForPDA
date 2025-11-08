@@ -57,6 +57,7 @@ platform :ios do
         tests if run_tests
         build_ipa
         upload_dsym_to_sentry
+        upload_bundle_to_tuist
         upload_app_to_testflight
         notify_all
         run_tuist(testflight: false)
@@ -83,8 +84,25 @@ platform :ios do
         run_tuist(testflight: true)
         build_ipa
         upload_dsym_to_sentry
+        upload_bundle_to_tuist
         upload_app_to_testflight
         run_tuist(testflight: false)
+    end
+    
+    desc "One-off ipa build"
+    lane :build_ipa_oneoff do |options|
+        release_channel = (options[:release] || "beta").capitalize
+        
+        update_xcconfig_value(
+            path: 'Configs/App.xcconfig',
+            name: 'RELEASE_CHANNEL',
+            value: release_channel
+        )
+        
+        prepare_certificates
+        update_build_number(build_number: options[:build_number])
+        run_tuist(testflight: true)
+        build_ipa
     end
     
     # --------------------------------------------------
@@ -161,7 +179,7 @@ platform :ios do
         
         build_app(
             scheme: "ForPDA",
-            output_directory: "ipa_builds/",
+            output_directory: "Builds/",
 	        output_name: output_name,
             cloned_source_packages_path: "SourcePackages",
             configuration: "Release",
@@ -169,6 +187,12 @@ platform :ios do
 	        suppress_xcode_output: true,
 	        skip_package_pkg: true,
 	        export_method: "app-store",
+	        export_options: {
+	            provisioningProfiles: {
+	                "com.subvert.forpda" => "match AppStore com.subvert.forpda",
+	                "com.subvert.forpda.safariextension" => "match AppStore com.subvert.forpda.safariextension"
+	            }
+	        },
 	        export_team_id: "7353CQCGQC"
         )
     end
@@ -188,6 +212,16 @@ platform :ios do
         )
     end
     
+    desc "Uploads bundle to tuist for inspection"
+    lane :upload_bundle_to_tuist do
+        version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
+        build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
+        directory = "Builds/ForPDA_#{version}_#{build}.ipa"
+        Dir.chdir("..") do
+            sh("tuist inspect bundle #{directory}")
+        end
+    end
+    
     desc "Uploads app to TestFlight"
     lane :upload_app_to_testflight do
         app_store_connect_api_key(
@@ -202,7 +236,7 @@ platform :ios do
         ipa_name = "ForPDA_#{version}_#{build}.ipa"
 
         upload_to_testflight(
-            ipa: "./ipa_builds/#{ipa_name}"
+            ipa: "./Builds/#{ipa_name}"
 	    )
     end
     

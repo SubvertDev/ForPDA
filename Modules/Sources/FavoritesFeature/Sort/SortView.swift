@@ -13,41 +13,24 @@ import SharedUI
 
 struct SortView: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable var store: StoreOf<SortFeature>
     @Environment(\.tintColor) private var tintColor
     @State private var sortSelection: FavoriteSortType?
     @State private var sortSelections: Set<FavoriteSortType> = .init()
     
+    // MARK: - Init
+    
     init(store: StoreOf<SortFeature>) {
         self.store = store
     }
     
+    // MARK: - Body
+    
     var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Text("Sort", bundle: .module)
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 16)
-                        .padding(.bottom, 22)
-                    
-                    Button {
-                        store.send(.cancelButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .xmark)
-                            .font(.body)
-                            .foregroundStyle(Color(.Labels.teritary))
-                            .frame(width: 30, height: 30)
-                            .background(
-                                Circle()
-                                    .fill(Color(.Background.quaternary))
-                                    .clipShape(Circle())
-                            )
-                    }
-                }
-                
                 HStack {
                     Menu {
                         Button {
@@ -113,9 +96,58 @@ struct SortView: View {
                 .padding(.vertical, 8)
             }
             .padding(.horizontal, 16)
-            .background(Color(.Background.primary))
+            .background {
+                if !isLiquidGlass {
+                    Color(.Background.primary)
+                }
+            }
+            ._toolbarTitleDisplayMode(.inline)
+            .modifier(NavigationTitle())
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        store.send(.cancelButtonTapped)
+                    } label: {
+                        if isLiquidGlass {
+                            Image(systemSymbol: .xmark)
+                        } else {
+                            Image(systemSymbol: .xmark)
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundStyle(Color(.Labels.teritary))
+                                .frame(width: 30, height: 30)
+                                .background(
+                                    Circle()
+                                        .fill(Color(.Background.quaternary))
+                                        .clipShape(Circle())
+                                )
+                        }
+                    }
+                }
+            }
         }
     }
+    
+    @available(iOS, deprecated: 26.0)
+    private struct NavigationTitle: ViewModifier {
+        func body(content: Content) -> some View {
+            if isLiquidGlass {
+                content
+                    .navigationTitle(Text("Sort", bundle: .module))
+            } else {
+                content
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Text("Sort", bundle: .module)
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                        }
+                    }
+            }
+        }
+    }
+    
+    // MARK: - Row
     
     @ViewBuilder
     private func Row(_ title: LocalizedStringKey, value: Binding<Bool>) -> some View {

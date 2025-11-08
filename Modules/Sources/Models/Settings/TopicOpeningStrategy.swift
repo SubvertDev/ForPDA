@@ -8,18 +8,16 @@
 import SwiftUI
 
 public enum TopicOpeningStrategy: CaseIterable, Codable, Sendable {
+    
     case first
     case unread
     case last
     
-    public var title: LocalizedStringKey {
+    public var text: LocalizedStringResource {
         switch self {
-        case .first:
-            return "First page"
-        case .unread:
-            return "Unread"
-        case .last:
-            return "Last page"
+        case .first:  return .init("First page", bundle: .module)
+        case .unread: return .init("Unread",     bundle: .module)
+        case .last:   return .init("Last page",  bundle: .module)
         }
     }
     

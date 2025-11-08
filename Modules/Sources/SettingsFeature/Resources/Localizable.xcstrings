@@ -51,27 +51,6 @@
         }
       }
     },
-    "Articles" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Статьи"
-          }
-        }
-      }
-    },
-    "Background color" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цвет фона"
-          }
-        }
-      }
-    },
     "Basic" : {
       "localizations" : {
         "ru" : {
@@ -174,22 +153,22 @@
         }
       }
     },
-    "Favorites" : {
+    "Experimental navigation" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Избранное"
+            "value" : "Экспериментальная навигация"
           }
         }
       }
     },
-    "Forum" : {
+    "Floating navigation" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Форум"
+            "value" : "Плавающая навигация"
           }
         }
       }
@@ -200,6 +179,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub репозиторий"
+          }
+        }
+      }
+    },
+    "Hide tabbar on scroll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрывать таббар при скролле"
           }
         }
       }
@@ -264,6 +253,16 @@
         }
       }
     },
+    "Navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Навигация"
+          }
+        }
+      }
+    },
     "Notifications" : {
       "localizations" : {
         "ru" : {
@@ -324,16 +323,6 @@
         }
       }
     },
-    "Profile" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
-          }
-        }
-      }
-    },
     "Purple" : {
       "localizations" : {
         "ru" : {
@@ -363,9 +352,6 @@
           }
         }
       }
-    },
-    "Search" : {
-
     },
     "Settings" : {
       "localizations" : {
@@ -447,12 +433,18 @@
         }
       }
     },
-    "Version %@" : {
+    "Version %@ [%@]" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Version %1$@ [%2$@]"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Версия %@"
+            "value" : "Версия %1$@ [%2$@]"
           }
         }
       }

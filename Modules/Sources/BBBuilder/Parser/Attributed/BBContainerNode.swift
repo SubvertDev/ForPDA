@@ -54,6 +54,13 @@ public enum BBContainerNode: Equatable {
         }
     }
     
+    public var isSpoiler: Bool {
+        if case .spoiler = self {
+            return true
+        }
+        return false
+    }
+    
     public var isEmptyTrimmedText: Bool {
         if case let .text(text) = self {
             return text.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

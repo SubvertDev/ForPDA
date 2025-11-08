@@ -124,9 +124,9 @@ public extension Topic {
                 )
             ]
         ),
-        postsCount: 1709,
+        postsCount: 5005,
         posts: [
-            .mock
+            .mock(id: 0), .mock(id: 1), .mock(id: 2)
         ],
         navigation: [
             ForumInfo(id: 1, name: "iOS - Apps", flag: 32)

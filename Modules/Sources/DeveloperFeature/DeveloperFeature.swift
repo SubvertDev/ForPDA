@@ -123,12 +123,8 @@ public struct DeveloperScreen: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("ID: \(store.analyticsId)")
                     
-                    ForEach(store.lastBackgroundTaskInvokeTime, id: \.self) { date in
-                        Text("Refresh on \(date.formatted())")
-                    }
-                    
                     HStack(spacing: 8) {
-                        Text("Is Mixpanel enabled: ")
+                        Text("Is analytics enabled: ")
                         Toggle("", isOn: $store.isAnalyticsEnabled)
                     }
                     
@@ -146,7 +142,7 @@ public struct DeveloperScreen: View {
                 .padding(16)
             }
             .navigationTitle("Developer menu")
-            .navigationBarTitleDisplayMode(.inline)
+            ._toolbarTitleDisplayMode(.inline)
             .onAppear {
                 store.send(.onAppear)
             }
@@ -155,16 +151,18 @@ public struct DeveloperScreen: View {
     
 }
 
-#Preview {
-    DeveloperScreen(store: Store(initialState: DeveloperFeature.State()) {
-        DeveloperFeature()
-    })
-}
-
 private var isDebug: Bool {
     #if DEBUG
         return true
     #else
         return false
     #endif
+}
+
+// MARK: - Previews
+
+#Preview {
+    DeveloperScreen(store: Store(initialState: DeveloperFeature.State()) {
+        DeveloperFeature()
+    })
 }
