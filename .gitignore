@@ -1,12 +1,14 @@
 ### Custom ###
 Credentials.json
-Secrets.xcconfig
+Secrets.local.xcconfig
 .env
 devices.txt
 *.p8
 Scripts/build_phases/
 SourcePackages/
 Builds/
+vendor/
+.bundle/
 .swiftpm
 
 ## App packaging ###
