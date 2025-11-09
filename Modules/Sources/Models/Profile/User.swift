@@ -206,21 +206,12 @@ public extension User {
     
     // MARK: Gender
     
-    enum Gender: Int, Codable, Hashable, Sendable {
+    enum Gender: Int, CaseIterable, Codable, Hashable, Sendable, Identifiable {
         case unknown = 0
         case male
         case female
         
-        public var title: LocalizedStringKey {
-            switch self {
-            case .unknown:
-                "Not set"
-            case .male:
-                "Male"
-            case .female:
-                "Female"
-            }
-        }
+        public var id: Self { self }
     }
     
     // MARK: Device

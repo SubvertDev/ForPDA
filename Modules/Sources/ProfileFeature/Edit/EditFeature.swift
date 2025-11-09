@@ -100,7 +100,6 @@ public struct EditFeature: Reducer, Sendable {
             
             case wipeBirthdayDate
             case setBirthdayDate
-            case selectGenderType(User.Gender)
             
             case saveButtonTapped
             case cancelButtonTapped
@@ -152,10 +151,6 @@ public struct EditFeature: Reducer, Sendable {
             
             case .view(.avatarBadFileSizeTooBig):
                 return showToast(ToastMessage(text: Localization.avatarFileSizeError, haptic: .error))
-                
-            case .view(.selectGenderType(let type)):
-                state.draftUser.gender = type
-                return .none
                 
             case .view(.setBirthdayDate):
                 state.birthdayDate = state.draftUser.birthdayDate ?? Date()

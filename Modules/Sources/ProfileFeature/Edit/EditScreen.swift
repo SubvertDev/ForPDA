@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import NukeUI
+import Models
 import SharedUI
 import PhotosUI
 
@@ -168,47 +169,18 @@ public struct EditScreen: View {
     
     @ViewBuilder
     private func UserGender() -> some View {
-        Menu {
-            Button {
-                send(.selectGenderType(.unknown))
-            } label: {
-                Text("Not set", bundle: .module)
+        Picker(
+            LocalizedStringResource("Gender", bundle: .module),
+            selection: Binding(unwrapping: $store.draftUser.gender, default: .unknown)
+        ) {
+            ForEach(User.Gender.allCases) { gender in
+                Text(gender.title, bundle: .module)
+                    .tag(gender)
             }
-            
-            Button {
-                send(.selectGenderType(.male))
-            } label: {
-                Text("Male", bundle: .module)
-            }
-            
-            Button {
-                send(.selectGenderType(.female))
-            } label: {
-                Text("Female", bundle: .module)
-            }
-        } label: {
-            HStack {
-                Text("Gender", bundle: .module)
-                    .font(.body)
-                    .foregroundStyle(Color(.Labels.primary))
-                
-                Spacer()
-                
-                HStack {
-                    let gender = store.draftUser.gender ?? .unknown
-                    Text(gender.title, bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.quaternary))
-                        .padding(.leading, 16)
-                    
-                    Image(systemSymbol: .chevronUpChevronDown)
-                        .foregroundStyle(Color(.Labels.quaternary))
-                }
-            }
-            .padding(12)
-            .frame(height: 60)
-            .cornerRadius(10)
         }
+        .padding(12)
+        .frame(height: 60)
+        .cornerRadius(10)
     }
     
     // MARK: - Avatar
