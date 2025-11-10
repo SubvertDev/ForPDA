@@ -86,7 +86,9 @@ struct PollView: View {
         HStack {
             Button {
                 if showVoteResultsButtonTapped {
-                    showVoteResultsButtonTapped = false
+                    withAnimation {
+                        showVoteResultsButtonTapped = false
+                    }
                 } else {
                     isSending = true
                     onVoteButtonTapped(selections)
@@ -105,7 +107,9 @@ struct PollView: View {
             
             if !showVoteResultsButtonTapped {
                 Button {
-                    showVoteResultsButtonTapped = true
+                    withAnimation {
+                        showVoteResultsButtonTapped = true
+                    }
                 } label: {
                     Text("Show results", bundle: .module)
                         .padding(.horizontal, 18)
