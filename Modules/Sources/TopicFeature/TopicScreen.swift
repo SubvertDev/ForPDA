@@ -45,6 +45,11 @@ public struct TopicScreen: View {
         return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
+    private var isPollAvailable: Bool {
+        let topicLoaded = store.topic != nil && !store.isLoadingTopic
+        return topicLoaded && store.topic!.poll != nil
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
@@ -68,9 +73,12 @@ public struct TopicScreen: View {
                                 }
                                 
                                 if !store.isLoadingTopic {
+                                    Header()
+                                    
                                     if let poll = store.topic!.poll {
                                         Poll(poll)
                                     }
+                                    
                                     PostList()
                                 }
                                 
@@ -187,29 +195,50 @@ public struct TopicScreen: View {
         }
     }
     
-    // MARK: - Poll
+    // MARK: - Header
     
     @ViewBuilder
-    private func Poll(_ poll: Topic.Poll) -> some View {
-        VStack(spacing: 0) {
-            if store.shouldShowTopicPollButton {
+    private func Header() -> some View {
+        HStack {
+            if isPollAvailable, store.shouldShowTopicPollButton {
                 Button {
                     send(.topicPollOpenButtonTapped)
                 } label: {
                     Text("Poll", bundle: .module)
                         .font(.headline)
                         .bold()
-                        .padding(16)
                 }
-            } else {
+            }
+            
+            if store.shouldShowTopicHatButton {
+                Button {
+                    send(.topicHatOpenButtonTapped)
+                } label: {
+                    Text("Topic Hat", bundle: .module)
+                        .font(.headline)
+                        .bold()
+                }
+            }
+        }
+    }
+    
+    // MARK: - Poll
+    
+    @ViewBuilder
+    private func Poll(_ poll: Topic.Poll) -> some View {
+        VStack(spacing: 0) {
+            if !store.shouldShowTopicPollButton {
+                if store.shouldShowTopicHatButton {
+                    PostSeparator()
+                }
+                
                 PollView(poll: poll, onVoteButtonTapped: { selections in
                     send(.topicPollVoteButtonTapped(selections))
                 })
+                .padding(.top, store.shouldShowTopicHatButton ? 16 : 0)
             }
             
-            Rectangle()
-                .foregroundStyle(Color(.Separator.post))
-                .frame(height: 10)
+            PostSeparator()
         }
     }
     
@@ -219,28 +248,28 @@ public struct TopicScreen: View {
     private func PostList() -> some View {
         ForEach(store.posts) { post in
             WithPerceptionTracking {
-                VStack(spacing: 0) {
-                    if store.shouldShowTopicHatButton && store.posts.first == post {
-                        Button {
-                            send(.topicHatOpenButtonTapped)
-                        } label: {
-                            Text("Topic Hat", bundle: .module)
-                                .font(.headline)
-                                .bold()
-                                .padding(16)
-                        }
-                    } else {
+                if store.shouldShowTopicHatButton && store.posts.first == post {
+                    if !isPollAvailable {
+                        PostSeparator()
+                    }
+                } else {
+                    VStack(spacing: 0) {
                         Post(post)
                             .padding(.horizontal, 16)
                             .padding(.bottom, 16)
+                        
+                        PostSeparator()
                     }
-                    
-                    Rectangle()
-                        .foregroundStyle(Color(.Separator.post))
-                        .frame(height: 10)
                 }
             }
         }
+    }
+    
+    @ViewBuilder
+    private func PostSeparator() -> some View {
+        Rectangle()
+            .foregroundStyle(Color(.Separator.post))
+            .frame(height: 10)
     }
     
     // MARK: - Post

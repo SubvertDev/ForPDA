@@ -76,7 +76,7 @@ struct PollView: View {
                 PollActionButtons()
             }
         }
-        .padding(16)
+        .padding([.bottom, .horizontal], 16)
     }
     
     // MARK: - Poll Action Buttons
