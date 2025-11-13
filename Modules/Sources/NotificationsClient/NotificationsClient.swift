@@ -128,6 +128,12 @@ extension NotificationsClient: DependencyKey {
                         case 2:
                             // Last message, unused
                             return false
+                        case 3:
+                            // User mention, processing in showUnreadNotifications
+                            return false
+                        case 4:
+                            // Hat update
+                            subject.send(.topic(notification.id))
                         default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
                             return false
