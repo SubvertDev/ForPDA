@@ -224,7 +224,7 @@ extension NotificationsClient: DependencyKey {
                         content.title = "Новое на форуме"
                         content.body = item.name
                     case .topic:
-                        content.title = "\(item.authorName.convertCodes()) в теме"
+                        content.title = item.unreadCount & 4 != 0 ? "Обновилась шапка" : "\(item.authorName.convertCodes()) в теме"
                         content.body = item.name
                     case .forumMention:
                         content.title = "Упоминание в теме \(item.name)"
