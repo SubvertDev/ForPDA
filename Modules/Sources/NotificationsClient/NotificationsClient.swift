@@ -141,8 +141,11 @@ extension NotificationsClient: DependencyKey {
                         
                     case .forum:
                         switch notification.flag {
-                        case 2:
+                        case 1:
                             subject.send(.forum(notification.id))
+                        case 2:
+                            // Silent update, unused
+                            return false
                         default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
                             return false
