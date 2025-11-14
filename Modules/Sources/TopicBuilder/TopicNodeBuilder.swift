@@ -12,9 +12,9 @@ import BBBuilder
 public struct TopicNodeBuilder {
     
     private let text: String
-    private let attachments: [Post.Attachment]
+    private let attachments: [Attachment]
     
-    public init(text: String, attachments: [Post.Attachment]) {
+    public init(text: String, attachments: [Attachment]) {
         self.text = text
         self.attachments = attachments
     }
