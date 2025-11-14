@@ -49,7 +49,7 @@ public struct ArticleParser {
                     imageUrl: URL(string: (fields[10] as! String))!,
                     title: (fields[11] as! String).convertHtmlCodes(),
                     description: (fields[12] as! String).convertHtmlCodes(),
-                    attachments: AttachmentParser.parseArticleAttachment(from: fields[13] as! [[Any]]),
+                    attachments: try AttachmentParser.parseArticleAttachment(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
                     comments: extractComments(from: fields[15] as! [[Any]]),
                     poll: extractPoll(from: pollFields)

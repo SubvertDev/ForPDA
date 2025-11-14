@@ -20,18 +20,29 @@ struct AttachmentParser {
     4. "description" - description
     5. "https..." - (optional) full image url
     */
-    static func parseArticleAttachment(from array: [[Any]]) -> [Attachment] {
-        return array.map { fields in
+    static func parseArticleAttachment(from array: [[Any]]) throws -> [Attachment] {
+        return try array.map { fields in
+            guard let id = fields[safe: 0] as? Int,
+                  let url = fields[safe: 1] as? String,
+                  let width = fields[safe: 2] as? Int,
+                  let height = fields[safe: 3] as? Int,
+                  let description = fields[4] as? String else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            let fullUrl = fields[safe: 5] as? String
+            
             return Attachment(
-                id: fields[0] as! Int,
+                id: id,
                 type: .image,
                 name: "",
                 size: 0,
                 metadata: .init(
-                    width: fields[2] as! Int,
-                    height: fields[3] as! Int,
-                    url: URL(string: fields[1] as! String)!,
-                    fullUrl: URL(string: fields[5] as! String)
+                    width: width,
+                    height: height,
+                    url: URL(string: url)!,
+                    fullUrl: URL(string: fullUrl ?? ""),
+                    description: description
                 ),
                 downloadCount: nil
             )
