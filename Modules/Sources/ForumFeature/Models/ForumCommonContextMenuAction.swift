@@ -6,6 +6,7 @@
 //
 
 public enum ForumCommonContextMenuAction {
+    case stat
     case markRead
     case copyLink
     case openInBrowser

@@ -21,6 +21,13 @@ public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Destinations
+    
+    @Reducer(state: .equatable)
+    public enum Destination {
+        case stat(StatFeature)
+    }
+    
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -46,6 +53,8 @@ public struct ForumFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var destination: Destination.State?
+        
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
 
@@ -100,6 +109,8 @@ public struct ForumFeature: Reducer, Sendable {
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
+        
+        case destination(PresentationAction<Destination.Action>)
                 
         case `internal`(Internal)
         public enum Internal {
@@ -210,6 +221,10 @@ public struct ForumFeature: Reducer, Sendable {
                         await send(.internal(.refresh))
                     }
                     
+                case .stat:
+                    state.destination = .stat(StatFeature.State(forumId: id))
+                    return .none
+                    
                 case .setFavorite(let isFavorite):
                     return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in
                         let request = SetFavoriteRequest(
@@ -286,10 +301,11 @@ public struct ForumFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
-            case .delegate:
+            case .delegate, .destination:
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }
