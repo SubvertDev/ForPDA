@@ -8,10 +8,58 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  on_pull_request:
+    if: github.event_name == 'pull_request'
+    name: Run tuist
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        
+      - name: Mise (Ruby + Tuist + SwiftLint)
+        uses: jdx/mise-action@v3
+        
+      - name: Cache gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/cache
+          key: ${{ runner.os }}-mise-gems-${{ hashFiles('Gemfile.lock') }}
+
+      - name: Install Fastlane with cache
+        run: |
+          bundle cache
+          
+      - name: Set Xcode 26.0.1
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.0.1.app
+          
+      - name: Cache Tuist .build
+        uses: actions/cache@v4
+        with:
+          path: Tuist/.build
+          key: tuist-cache-${{ hashFiles('Tuist/Package.resolved') }}
+          restore-keys: |
+            tuist-cache-
+            
+      - name: Run Fastlane Install
+        run: |
+          bundle exec fastlane github_ci
+        env:
+          CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          TUIST_CONFIG_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
+          SENTRY_DSYM_TOKEN: ${{ secrets.SENTRY_DSYM_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+
+    
+  on_developer_push:
+    if: github.event_name == 'push'
     name: Build iOS App
     runs-on: macos-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v5

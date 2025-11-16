@@ -113,6 +113,20 @@ platform :ios do
         build_ipa
     end
     
+    desc "GitHub Actions CI"
+    lane :github_ci
+        setup_ci if ENV['CI']
+        prepare_certificates
+        update_build_number(build_number: "1")
+        Dir.chdir("..") do
+            sh("tuist install")
+            sh("tuist build ForPDA --generate")
+            sh("tuist test ForPDA")
+            sh("tuist share ForPDA")
+            sh("tuist inspect build")
+        end
+    end
+    
     # --------------------------------------------------
     
     desc "Prepare certificates via match"
