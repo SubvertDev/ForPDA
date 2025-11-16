@@ -55,6 +55,14 @@ One-off upload to TF without tests/notify/bump
 
 One-off ipa build
 
+### ios github_ci
+
+```sh
+[bundle exec] fastlane ios github_ci
+```
+
+GitHub Actions CI
+
 ### ios prepare_certificates
 
 ```sh

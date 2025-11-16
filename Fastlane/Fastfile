@@ -114,7 +114,7 @@ platform :ios do
     end
     
     desc "GitHub Actions CI"
-    lane :github_ci
+    lane :github_ci do
         setup_ci if ENV['CI']
         prepare_certificates
         update_build_number(build_number: "1")
