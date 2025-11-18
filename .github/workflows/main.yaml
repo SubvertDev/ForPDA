@@ -10,7 +10,7 @@ on:
 jobs:
   on_pull_request:
     if: github.event_name == 'pull_request'
-    name: Run tuist
+    name: Pull request checks
     runs-on: macos-26
     steps:
       - name: Checkout
@@ -58,7 +58,7 @@ jobs:
     
   on_developer_push:
     if: github.event_name == 'push'
-    name: Build iOS App
+    name: Cache warmup
     runs-on: macos-26
     steps:
       - name: Checkout
