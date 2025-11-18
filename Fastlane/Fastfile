@@ -111,19 +111,31 @@ platform :ios do
         update_build_number(build_number: options[:build_number])
         run_tuist(testflight: true)
         build_ipa
+        run_tuist(testflight: false)
     end
     
-    desc "GitHub Actions CI"
-    lane :github_ci do
+    desc "CI pull requests checks"
+    lane :ci_pull_request do
         setup_ci if ENV['CI']
         prepare_certificates
         update_build_number(build_number: "1")
         Dir.chdir("..") do
             sh("tuist install")
             sh("tuist build ForPDA --generate")
+            sh("tuist inspect build")
             sh("tuist test ForPDA")
             sh("tuist share ForPDA")
-            sh("tuist inspect build")
+        end
+    end
+    
+    desc "CI cache warm up"
+    lane :ci_cache_warmup do
+        setup_ci if ENV['CI']
+        prepare_certificates
+        update_build_number(build_number: "1")
+        Dir.chdir("..") do
+            sh("tuist install")
+            sh("tuist cache --external-only")
         end
     end
     
