@@ -63,7 +63,11 @@ public extension ForumStat {
         postsCount: 81734,
         moderators: [
             .init(id: 0, name: "Admins", group: .admin),
-            .init(id: 1, name: "AirFlare", group: .regular)
+            .init(id: 1, name: "AirFlare", group: .regular),
+            .init(id: 2, name: "subvertd", group: .regular),
+            .init(id: 3, name: "Test1", group: .moderator),
+            .init(id: 4, name: "LongNickName999", group: .moderator),
+            .init(id: 5, name: "Lia", group: .supermoderator)
         ]
     )
 }
