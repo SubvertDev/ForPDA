@@ -74,6 +74,8 @@ public struct TabViewGallery: View {
             }
             .ignoresSafeArea()
         }
+        .statusBarHidden(!isTouched)
+        .animation(.easeInOut, value: !isTouched)
         .onAppear {
             deleteTempFiles()
             preloadImage()
