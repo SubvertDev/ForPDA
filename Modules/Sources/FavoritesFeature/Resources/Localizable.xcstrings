@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Action completed" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Действие выполнено"
-          }
-        }
-      }
-    },
     "Always" : {
       "localizations" : {
         "ru" : {
@@ -237,6 +227,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сортировка"
+          }
+        }
+      }
+    },
+    "Sort filters are changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтры сортировки обновлены"
           }
         }
       }

@@ -24,7 +24,6 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     public enum Localization {
-        static let actionCompleted = LocalizedStringResource("Action completed", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
         static let notifyTypeChanged = LocalizedStringResource("Notify type changed", bundle: .module)
         static let sortFiltersChanged = LocalizedStringResource("Sort filters are changed", bundle: .module)
@@ -214,8 +213,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         .run { send in
                             let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
                             let status = try await apiClient.setFavorite(request)
-                            let actionCompleted = ToastMessage(text: Localization.actionCompleted, haptic: .success)
-                            await toastClient.showToast(status ? actionCompleted : .whoopsSomethingWentWrong)
+                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                         },
                         
                         .send(.internal(.refresh))
@@ -226,8 +224,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         .run { send in
                             let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
                             let status = try await apiClient.setFavorite(request)
-                            let actionCompleted = ToastMessage(text: Localization.actionCompleted, haptic: .success)
-                            await toastClient.showToast(status ? actionCompleted : .whoopsSomethingWentWrong)
+                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                         },
                         
                         .send(.internal(.refresh))
@@ -237,8 +234,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                     return .concatenate(
                         .run { [id, isForum] send in
                             let status = try await apiClient.markRead(id: id, isTopic: !isForum)
-                            let actionCompleted = ToastMessage(text: Localization.actionCompleted, haptic: .success)
-                            await toastClient.showToast(status ? actionCompleted : .whoopsSomethingWentWrong)
+                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                         },
                         
                         .send(.internal(.refresh))
