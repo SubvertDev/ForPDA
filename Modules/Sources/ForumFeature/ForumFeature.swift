@@ -21,6 +21,13 @@ public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
+    }
+    
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -197,7 +204,9 @@ public struct ForumFeature: Reducer, Sendable {
                 case .copyLink:
                     let show = isForum ? "showforum" : "showtopic"
                     pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .openInBrowser:
                     let show = isForum ? "showforum" : "showtopic"
@@ -205,10 +214,15 @@ public struct ForumFeature: Reducer, Sendable {
                     return .run { _ in await open(url: url) }
                     
                 case .markRead:
-                    return .run { [id, isForum] send in
-                        let _ = try await apiClient.markRead(id: id, isTopic: !isForum)
-                        await send(.internal(.refresh))
-                    }
+                    return .concatenate(
+                        .run { [id, isForum] send in
+                            let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                            let markedAsRead = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                            await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
+                        },
+                        
+                        .send(.internal(.refresh))
+                    )
                     
                 case .setFavorite(let isFavorite):
                     return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in
@@ -217,18 +231,10 @@ public struct ForumFeature: Reducer, Sendable {
                             action: isFavorite ? .delete : .add,
                             type: isForum ? .forum : .topic
                         )
-                        let _ = try await apiClient.setFavorite(request)
+                        let status = try await apiClient.setFavorite(request)
                         notificationCenter.post(name: .favoritesUpdated, object: nil)
                         await send(.internal(.refresh))
-                        // TODO: We don't know if it's added or removed from api
-                        // let text: LocalizedStringResource
-                        // if isAdded {
-                        //     text = LocalizedStringResource("Added to favorites", bundle: .module)
-                        // } else {
-                        //     text = LocalizedStringResource("Removed from favorites", bundle: .module)
-                        // }
-                        // let toast = ToastMessage(text: text, haptic: .success)
-                        // await toastClient.showToast(toast)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                     } catch: { _, _ in
                         await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
