@@ -21,6 +21,15 @@ public struct FavoritesFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let actionCompleted = LocalizedStringResource("Action completed", bundle: .module)
+        static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
+        static let notifyTypeChanged = LocalizedStringResource("Notify type changed", bundle: .module)
+        static let sortFiltersChanged = LocalizedStringResource("Sort filters are changed", bundle: .module)
+    }
+    
     // MARK: - State
     
     @ObservableState
@@ -112,10 +121,14 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.loadFavorites(offset: newOffset)))
                 
             case .sort(.presented(.saveButtonTapped)):
-                return .run { send in
-                    await send(.internal(.refresh))
-                    await send(.sort(.presented(.cancelButtonTapped)))
-                }
+                return .concatenate(
+                    .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
+                    },
+                    
+                    .send(.internal(.refresh)),
+                    .send(.sort(.presented(.cancelButtonTapped)))
+                )
                 
             case .sort(.presented(.cancelButtonTapped)):
                 state.sort = nil
@@ -178,12 +191,15 @@ public struct FavoritesFeature: Reducer, Sendable {
                     return .none
                     
                 case .markAllAsRead:
-                    return .run { send in
-                        _ = try await apiClient.readAllFavorites()
-                        // TODO: Display toast on success/error.
+                    return .concatenate(
+                        .run { send in
+                            let status = try await apiClient.readAllFavorites()
+                            let success = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                            await toastClient.showToast(status ? success : .whoopsSomethingWentWrong)
+                        },
                         
-                        await send(.internal(.refresh))
-                    }
+                        .send(.internal(.refresh))
+                    )
                 }
                 
             case .view(.commonContextMenu(let action, let isForum)):
@@ -194,28 +210,39 @@ public struct FavoritesFeature: Reducer, Sendable {
                     return .none
                     
                 case .delete(let id):
-                    return .run { send in
-                        let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
-                        _ = try await apiClient.setFavorite(request)
-                        // TODO: Display toast on success/error.
+                    return .concatenate(
+                        .run { send in
+                            let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
+                            let status = try await apiClient.setFavorite(request)
+                            let actionCompleted = ToastMessage(text: Localization.actionCompleted, haptic: .success)
+                            await toastClient.showToast(status ? actionCompleted : .whoopsSomethingWentWrong)
+                        },
                         
-                        await send(.internal(.refresh))
-                    }
+                        .send(.internal(.refresh))
+                    )
                     
                 case .setImportant(let id, let pin):
-                    return .run { send in
-                        let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
-                        _ = try await apiClient.setFavorite(request)
-                        // TODO: Display toast on success/error.
+                    return .concatenate(
+                        .run { send in
+                            let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
+                            let status = try await apiClient.setFavorite(request)
+                            let actionCompleted = ToastMessage(text: Localization.actionCompleted, haptic: .success)
+                            await toastClient.showToast(status ? actionCompleted : .whoopsSomethingWentWrong)
+                        },
                         
-                        await send(.internal(.refresh))
-                    }
+                        .send(.internal(.refresh))
+                    )
                     
                 case .markRead(let id):
-                    return .run { [id, isForum] send in
-                        let _ = try await apiClient.markRead(id: id, isTopic: !isForum)
-                        await send(.internal(.refresh))
-                    }
+                    return .concatenate(
+                        .run { [id, isForum] send in
+                            let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                            let actionCompleted = ToastMessage(text: Localization.actionCompleted, haptic: .success)
+                            await toastClient.showToast(status ? actionCompleted : .whoopsSomethingWentWrong)
+                        },
+                        
+                        .send(.internal(.refresh))
+                    )
                 }
                 
             case let .view(.topicContextMenu(action, favorite)):
@@ -229,13 +256,16 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                     
                 case .notify(let flag, let notify):
-                    return .run { send in
-                        let request = NotifyFavoriteRequest(id: favorite.topic.id, flag: flag, type: notify)
-                        _ = try await apiClient.notifyFavorite(request)
-                        // TODO: Display toast on success/error.
+                    return .concatenate(
+                        .run { send in
+                            let request = NotifyFavoriteRequest(id: favorite.topic.id, flag: flag, type: notify)
+                            let status = try await apiClient.notifyFavorite(request)
+                            let notifyTypeChangedToast = ToastMessage(text: Localization.notifyTypeChanged, haptic: .success)
+                            await toastClient.showToast(status ? notifyTypeChangedToast : .whoopsSomethingWentWrong)
+                        },
                         
-                        await send(.internal(.refresh))
-                    }
+                        .send(.internal(.refresh))
+                    )
                 }
                 
             case .internal(.refresh):

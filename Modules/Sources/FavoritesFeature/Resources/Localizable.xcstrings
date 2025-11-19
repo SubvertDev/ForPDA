@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Action completed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Действие выполнено"
+          }
+        }
+      }
+    },
     "Always" : {
       "localizations" : {
         "ru" : {
@@ -141,6 +151,16 @@
         }
       }
     },
+    "Marked as read" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмечено прочитанным"
+          }
+        }
+      }
+    },
     "No favorites" : {
       "localizations" : {
         "ru" : {
@@ -167,6 +187,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Уведомлять"
+          }
+        }
+      }
+    },
+    "Notify type changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип уведомлений изменен"
           }
         }
       }
