@@ -24,6 +24,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
         static let notifyTypeChanged = LocalizedStringResource("Notify type changed", bundle: .module)
         static let sortFiltersChanged = LocalizedStringResource("Sort filters are changed", bundle: .module)
@@ -206,7 +207,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                 case .copyLink(let id):
                     let show = isForum ? "showforum" : "showtopic"
                     pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .delete(let id):
                     return .concatenate(
