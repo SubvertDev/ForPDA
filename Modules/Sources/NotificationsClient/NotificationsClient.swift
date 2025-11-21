@@ -128,6 +128,12 @@ extension NotificationsClient: DependencyKey {
                         case 2:
                             // Last message, unused
                             return false
+                        case 3:
+                            // User mention, processing in showUnreadNotifications
+                            return false
+                        case 4:
+                            // Hat update
+                            subject.send(.topic(notification.id))
                         default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
                             return false
@@ -135,8 +141,11 @@ extension NotificationsClient: DependencyKey {
                         
                     case .forum:
                         switch notification.flag {
-                        case 2:
+                        case 1:
                             subject.send(.forum(notification.id))
+                        case 2:
+                            // Silent update, unused
+                            return false
                         default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
                             return false
@@ -224,7 +233,7 @@ extension NotificationsClient: DependencyKey {
                         content.title = "Новое на форуме"
                         content.body = item.name
                     case .topic:
-                        content.title = "\(item.authorName.convertCodes()) в теме"
+                        content.title = item.unreadCount & 4 != 0 ? "Обновилась шапка" : "\(item.authorName.convertCodes()) в теме"
                         content.body = item.name
                     case .forumMention:
                         content.title = "Упоминание в теме \(item.name)"
