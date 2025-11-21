@@ -247,14 +247,14 @@ public struct EditScreen: View {
                 return
             }
             
-            if data.count <= 32768 {
+            if data.count <= 32768 /* should be max 32kb size */ {
                 if image.size.width <= 100, image.size.height <= 100 {
                     send(.avatarSelected(data))
                 } else {
-                    send(.avatarBadWidthHeight)
+                    send(.onAvatarBadWidthHeightProvided)
                 }
             } else {
-                send(.avatarBadFileSizeTooBig)
+                send(.onAvatarBadFileSizeProvided)
             }
 
             // Drop last selected avatar.

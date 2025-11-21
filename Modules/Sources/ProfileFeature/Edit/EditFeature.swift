@@ -95,8 +95,9 @@ public struct EditFeature: Reducer, Sendable {
             case onAppear
             case avatarSelected(Data)
             case deleteAvatar
-            case avatarBadWidthHeight
-            case avatarBadFileSizeTooBig
+            
+            case onAvatarBadFileSizeProvided
+            case onAvatarBadWidthHeightProvided
             
             case wipeBirthdayDate
             case setBirthdayDate
@@ -145,12 +146,12 @@ public struct EditFeature: Reducer, Sendable {
             case .view(.deleteAvatar):
                 let empty = Data()
                 return .send(.internal(.updateAvatar(empty)))
-                
-            case .view(.avatarBadWidthHeight):
-                return showToast(ToastMessage(text: Localization.avatarWidthHeightError, haptic: .error))
             
-            case .view(.avatarBadFileSizeTooBig):
+            case .view(.onAvatarBadFileSizeProvided):
                 return showToast(ToastMessage(text: Localization.avatarFileSizeError, haptic: .error))
+                
+            case .view(.onAvatarBadWidthHeightProvided):
+                return showToast(ToastMessage(text: Localization.avatarWidthHeightError, haptic: .error))
                 
             case .view(.setBirthdayDate):
                 state.birthdayDate = state.draftUser.birthdayDate ?? Date()
