@@ -70,7 +70,7 @@ public struct EditScreen: View {
             }
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
+            ._safeAreaBar(edge: .bottom) {
                 SendButton()
             }
             .toolbar {
@@ -115,7 +115,13 @@ public struct EditScreen: View {
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
+        .background {
+            if #available(iOS 26, *) {
+                // No background
+            } else {
+                Color(.Background.primary)
+            }
+        }
     }
     
     // MARK: - User Birthday Picker
@@ -286,6 +292,7 @@ public struct EditScreen: View {
                         Image(systemSymbol: .trash)
                     }
                 }
+                .tint(.red)
             }
         } label: {
             Image(systemSymbol: .ellipsis)
