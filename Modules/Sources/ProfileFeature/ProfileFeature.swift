@@ -11,17 +11,26 @@ import APIClient
 import PersistenceKeys
 import Models
 import AnalyticsClient
+import ToastClient
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    private enum Localization {
+        static let profileUpdated = LocalizedStringResource("Profile updated", bundle: .module)
+        static let profileUpdateError = LocalizedStringResource("Profile update error", bundle: .module)
+    }
+    
     // MARK: - Destinations
     
     @Reducer(state: .equatable)
     public enum Destination {
         case alert(AlertState<ProfileFeature.Action.Alert>)
+        case editProfile(EditFeature)
     }
     
     // MARK: - State
@@ -60,6 +69,7 @@ public struct ProfileFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case qmsButtonTapped
+            case editButtonTapped
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
@@ -92,6 +102,7 @@ public struct ProfileFeature: Reducer, Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.dismiss) private var dismiss
     
     // MARK: - Body
@@ -120,6 +131,12 @@ public struct ProfileFeature: Reducer, Sendable {
                 guard let userId else { return .none }
                 return .send(.delegate(.openReputation(userId)))
                 
+            case .view(.editButtonTapped):
+                if let user = state.user {
+                    state.destination = .editProfile(EditFeature.State(user: user))
+                }
+                return .none
+                
             case .view(.qmsButtonTapped):
                 return .send(.delegate(.openQms))
                 
@@ -145,6 +162,17 @@ public struct ProfileFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
+            case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):
+                return .concatenate(
+                    .run { _ in
+                        await toastClient.showToast(ToastMessage(
+                            text: status ? Localization.profileUpdated : Localization.profileUpdateError,
+                            haptic: status ? .success : .error
+                        ))
+                    },
+                    .send(.view(.onAppear))
+                )
+            
             case .destination(.presented(.alert(.logout))):
                 state.$userSession.withLock { $0 = nil }
                 state.isLoading = true

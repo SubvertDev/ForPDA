@@ -6,22 +6,23 @@
 //
 
 import Foundation
+import SwiftUI
 
 public struct User: Sendable, Hashable, Codable {
     public let id: Int
     public let nickname: String
-    public let imageUrl: URL
-    public let group: Group
-    public let status: String?
-    public let signature: String?
-    public let aboutMe: String?
+    public var imageUrl: URL
+    public var group: Group
+    public var status: String?
+    public var signature: String?
+    public var aboutMe: String?
     public let registrationDate: Date
     public let lastSeenDate: Date
     public let birthdate: String?
-    public let gender: Gender?
+    public var gender: Gender?
     public let userTime: Int?
-    public let city: String?
-    public let devDBdevices: [Device]
+    public var city: String?
+    public var devDBdevices: [Device]
     public let karma: Double
     public let posts: Int
     public let comments: Int
@@ -32,6 +33,16 @@ public struct User: Sendable, Hashable, Codable {
     public let forumDevices: [Device]?
     public let email: String?
     public let achievements: [Achievement]
+    
+    public var birthdayDate: Date? {
+        if let birthdate {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd.MM.yyyy"
+            return dateFormatter.date(from: birthdate)
+        } else {
+            return nil
+        }
+    }
     
     public var userTimeFormatted: String? {
         if let userTime {
@@ -195,21 +206,12 @@ public extension User {
     
     // MARK: Gender
     
-    enum Gender: Int, Codable, Hashable, Sendable {
+    enum Gender: Int, CaseIterable, Codable, Hashable, Sendable, Identifiable {
         case unknown = 0
         case male
         case female
         
-        public var title: String {
-            switch self {
-            case .unknown:
-                "Неизвестно"
-            case .male:
-                "Мужчина"
-            case .female:
-                "Женщина"
-            }
-        }
+        public var id: Self { self }
     }
     
     // MARK: Device
@@ -217,7 +219,7 @@ public extension User {
     struct Device: Codable, Hashable, Sendable, Identifiable {
         public let id: String
         public let name: String
-        public let main: Bool
+        public var main: Bool
         
         public init(id: String, name: String, main: Bool) {
             self.id = id
@@ -274,7 +276,18 @@ public extension User {
         gender: .male,
         userTime: 10800,
         city: "Moscow",
-        devDBdevices: [],
+        devDBdevices: [
+            .init(
+                id: "ip16pro",
+                name: "iPhone 16 Pro",
+                main: true
+            ),
+            .init(
+                id: "ip13",
+                name: "iPhone 13",
+                main: false
+            )
+        ],
         karma: 1500,
         posts: 23,
         comments: 173,
