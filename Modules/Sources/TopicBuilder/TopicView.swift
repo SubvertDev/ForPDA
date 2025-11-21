@@ -20,7 +20,7 @@ public struct TopicView: View {
     
     let type: TopicTypeUI
     let nestLevel: Int
-    let attachments: [Post.Attachment]
+    let attachments: [Attachment]
     let textAlignment: NSTextAlignment?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
@@ -28,7 +28,7 @@ public struct TopicView: View {
     public init(
         type: TopicTypeUI,
         nestLevel: Int = 1,
-        attachments: [Post.Attachment] = [],
+        attachments: [Attachment] = [],
         alignment: NSTextAlignment? = nil,
         lineLimit: Int? = nil,
         onUrlTap: URLTapHandler? = nil,
@@ -234,7 +234,7 @@ struct SpoilerView: View {
     let types: [TopicTypeUI]
     let nestLevel: Int
     let info: AttributedString?
-    let attachments: [Post.Attachment]
+    let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     private let text: AttributedString
@@ -250,7 +250,7 @@ struct SpoilerView: View {
         types: [TopicTypeUI],
         nestLevel: Int,
         info: AttributedString?,
-        attachments: [Post.Attachment],
+        attachments: [Attachment],
         onUrlTap: URLTapHandler?,
         onImageTap: ImageTapHandler?
     ) {
@@ -327,7 +327,7 @@ struct QuoteView: View {
     let types: [TopicTypeUI]
     let nestLevel: Int
     let info: QuoteType?
-    let attachments: [Post.Attachment]
+    let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     private let text: AttributedString
@@ -344,7 +344,7 @@ struct QuoteView: View {
         types: [TopicTypeUI],
         nestLevel: Int,
         info: QuoteType?,
-        attachments: [Post.Attachment],
+        attachments: [Attachment],
         onUrlTap: URLTapHandler?,
         onImageTap: ImageTapHandler?
     ) {
@@ -510,7 +510,7 @@ struct HideView: View {
     let types: [TopicTypeUI]
     let nestLevel: Int
     let info: Int?
-    let attachments: [Post.Attachment]
+    let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     
@@ -521,7 +521,7 @@ struct HideView: View {
         types: [TopicTypeUI],
         nestLevel: Int,
         info: Int?,
-        attachments: [Post.Attachment],
+        attachments: [Attachment],
         onUrlTap: URLTapHandler?,
         onImageTap: ImageTapHandler?
     ) {
@@ -602,7 +602,7 @@ struct NoticeView: View {
     let types: [TopicTypeUI]
     let nestLevel: Int
     let info: NoticeType
-    let attachments: [Post.Attachment]
+    let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     

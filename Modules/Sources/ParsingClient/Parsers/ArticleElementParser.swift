@@ -138,9 +138,9 @@ public struct ArticleElementParser {
         }
         
         let attachment = attachments[id - 1]
-        var url = attachment.smallUrl
-        if let fullUrl = attachment.fullUrl { url = fullUrl }
-        return ImageElement(url: url, width: attachment.width, height: attachment.height)
+        var url = attachment.metadata!.url
+        if let fullUrl = attachment.metadata!.fullUrl { url = fullUrl }
+        return ImageElement(url: url, width: attachment.metadata!.width, height: attachment.metadata!.height)
     }
     
     // MARK: - Images
@@ -153,9 +153,9 @@ public struct ArticleElementParser {
         
         for match in text.matches(of: pattern) {
             let attachment = attachments[Int(match.output.1)! - 1]
-            var url: URL = attachment.smallUrl
-            if let fullUrl = attachment.fullUrl { url = fullUrl }
-            let element = ImageElement(url: url, width: attachment.width, height: attachment.height)
+            var url = attachment.metadata!.url
+            if let fullUrl = attachment.metadata!.fullUrl { url = fullUrl }
+            let element = ImageElement(url: url, width: attachment.metadata!.width, height: attachment.metadata!.height)
             imageElements.append(element)
         }
         

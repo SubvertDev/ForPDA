@@ -90,7 +90,7 @@ struct BBBuilderTests {
         let id = 0
         let text = String.imageAttachment(id: id)
         let nodes = BBBuilder.build(text: text, attachments: [.image(id: id)])
-        let imageAttachmentAttribute = "\"\(Post.Attachment.image(id: id).id):\(Post.Attachment.image(id: 0).name)\""
+        let imageAttachmentAttribute = "\"\(Attachment.image(id: id).id):\(Attachment.image(id: 0).name)\""
         #expect(nodes == [.attachment(imageAttachmentAttribute.asAttributed())])
     }
     
@@ -99,8 +99,8 @@ struct BBBuilderTests {
         let secondId = 1
         let text = String.imageAttachment(id: firstId) + String.imageAttachment(id: secondId)
         let nodes = BBBuilder.build(text: text, attachments: [.image(id: firstId), .image(id: secondId)])
-        let firstImageAttachmentAttribute = "\"\(Post.Attachment.image(id: firstId).id):\(Post.Attachment.image(id: firstId).name)\""
-        let secondImageAttachmentAttribute = "\"\(Post.Attachment.image(id: secondId).id):\(Post.Attachment.image(id: secondId).name)\""
+        let firstImageAttachmentAttribute = "\"\(Attachment.image(id: firstId).id):\(Attachment.image(id: firstId).name)\""
+        let secondImageAttachmentAttribute = "\"\(Attachment.image(id: secondId).id):\(Attachment.image(id: secondId).name)\""
         #expect(nodes == [
             .attachment(firstImageAttachmentAttribute.asAttributed()),
             .attachment(secondImageAttachmentAttribute.asAttributed())
@@ -112,8 +112,8 @@ struct BBBuilderTests {
         let secondId = 1
         let text = String.imageAttachment(id: firstId) + " " + String.imageAttachment(id: secondId)
         let nodes = BBBuilder.build(text: text, attachments: [.image(id: firstId), .image(id: secondId)])
-        let firstImageAttachmentAttribute = "\"\(Post.Attachment.image(id: firstId).id):\(Post.Attachment.image(id: firstId).name)\""
-        let secondImageAttachmentAttribute = "\"\(Post.Attachment.image(id: secondId).id):\(Post.Attachment.image(id: secondId).name)\""
+        let firstImageAttachmentAttribute = "\"\(Attachment.image(id: firstId).id):\(Attachment.image(id: firstId).name)\""
+        let secondImageAttachmentAttribute = "\"\(Attachment.image(id: secondId).id):\(Attachment.image(id: secondId).name)\""
         #expect(nodes == [
             .attachment(firstImageAttachmentAttribute.asAttributed()),
             .attachment(secondImageAttachmentAttribute.asAttributed())
@@ -305,39 +305,39 @@ private func fileConstructor(_ file: File) -> String {
     return result
 }
 
-private extension Post.Attachment {
-    static func image(id: Int) -> Post.Attachment {
-        return Post.Attachment(
+private extension Models.Attachment {
+    static func image(id: Int) -> Models.Attachment {
+        return Attachment(
             id: id, type: .image, name: "name.jpg", size: 0,
-            metadata: Post.Attachment.Metadata(
+            metadata: Attachment.Metadata(
                 width: 32, height: 32, url: URL(string: "https://4pda.to/s/Zy0hEHci0VoolKcVH289BigH8f5BA5xRz0kvtrjCPBWYZz2rtz1.png")!
             ),
             downloadCount: nil
         )
     }
     
-    static func file(id: Int, name: String = "name.zip", size: Int = 0, downloads: Int? = nil) -> Post.Attachment {
-        return Post.Attachment(id: id, type: .file, name: name, size: size, metadata: nil, downloadCount: downloads)
+    static func file(id: Int, name: String = "name.zip", size: Int = 0, downloads: Int? = nil) -> Models.Attachment {
+        return Attachment(id: id, type: .file, name: name, size: size, metadata: nil, downloadCount: downloads)
     }
 }
 
 private extension String {
     static func imageAttachment(id: Int) -> String {
-        return "[attachment=\"\(Post.Attachment.image(id: id).id):\(Post.Attachment.image(id: id).name)\"]"
+        return "[attachment=\"\(Attachment.image(id: id).id):\(Attachment.image(id: id).name)\"]"
     }
 
     static func fileAttachment(id: Int) -> String {
-        return "[attachment=\"\(Post.Attachment.file(id: id).id):\(Post.Attachment.file(id: id).name)\"]"
+        return "[attachment=\"\(Attachment.file(id: id).id):\(Attachment.file(id: id).name)\"]"
     }
 }
 
 private extension NSAttributedString {
     static func imageAttachmentAttribute(id: Int) -> NSAttributedString {
-        return NSAttributedString(string: "\"\(Post.Attachment.image(id: id).id):\(Post.Attachment.image(id: id).name)\"")
+        return NSAttributedString(string: "\"\(Attachment.image(id: id).id):\(Attachment.image(id: id).name)\"")
     }
     
     static func fileAttachmentAttribute(id: Int) -> NSAttributedString {
-        return NSAttributedString(string: "\"\(Post.Attachment.file(id: id).id):\(Post.Attachment.file(id: id).name)\"")
+        return NSAttributedString(string: "\"\(Attachment.file(id: id).id):\(Attachment.file(id: id).name)\"")
     }
 }
 

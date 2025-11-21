@@ -8,29 +8,6 @@
 import Foundation
 
 public struct QMSMessage: Sendable, Codable, Hashable, Identifiable {
-    
-    public struct Attachment: Sendable, Codable, Hashable, Identifiable {
-        public let id: Int
-        public let flag: Int
-        public let name: String
-        public let size: Int
-        public let downloadsCount: Int
-        
-        public init(
-            id: Int,
-            flag: Int,
-            name: String,
-            size: Int,
-            downloadsCount: Int
-        ) {
-            self.id = id
-            self.flag = flag
-            self.name = name
-            self.size = size
-            self.downloadsCount = downloadsCount
-        }
-    }
-    
     public let id: Int
     public let senderId: Int
     public let date: Date
