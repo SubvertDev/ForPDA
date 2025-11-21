@@ -34,6 +34,7 @@ public struct TopicFeature: Reducer, Sendable {
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
+        static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
     }
     
     // MARK: - Destinations
@@ -81,6 +82,7 @@ public struct TopicFeature: Reducer, Sendable {
         }
         
         var shouldShowTopicHatButton = false
+        var shouldShowTopicPollButton = true
         
         public init(
             topicId: Int,
@@ -117,6 +119,8 @@ public struct TopicFeature: Reducer, Sendable {
             case onRefresh
             case finishedPostAnimation
             case topicHatOpenButtonTapped
+            case topicPollOpenButtonTapped
+            case topicPollVoteButtonTapped([Int: Set<Int>])
             case changeKarmaTapped(Int, Bool)
             case userTapped(Int)
             case urlTapped(URL)
@@ -132,6 +136,7 @@ public struct TopicFeature: Reducer, Sendable {
             case refresh
             case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
             case changeKarma(postId: Int, isUp: Bool)
+            case voteInPoll(selections: [[Int]])
             case loadTopic(Int)
             case loadTypes([[TopicTypeUI]])
             case topicResponse(Result<Topic, any Error>)
@@ -227,6 +232,16 @@ public struct TopicFeature: Reducer, Sendable {
                 state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
                 state.shouldShowTopicHatButton = false
                 return .none
+                
+            case .view(.topicPollOpenButtonTapped):
+                state.shouldShowTopicPollButton = false
+                return .none
+                
+            case let .view(.topicPollVoteButtonTapped(selections)):
+                let values = selections.sorted(by: { $0.key < $1.key }).map {
+                    Array($0.value)
+                }
+                return .send(.internal(.voteInPoll(selections: values)))
                 
             case let .view(.userTapped(id)):
                 return .send(.delegate(.openUser(id: id)))
@@ -397,6 +412,20 @@ public struct TopicFeature: Reducer, Sendable {
                     jumpTo(.post(id: postId), true, &state)
                 )
                 
+            case let .internal(.voteInPoll(selections)):
+                return .concatenate(
+                    .run { [topicId = state.topicId] _ in
+                        let status = try await apiClient.voteInTopicPoll(
+                            topicId: topicId,
+                            selections: selections
+                        )
+                        let voteApproved = ToastMessage(text: Localization.topicVoteApproved, haptic: .success)
+                        await toastClient.showToast(status ? voteApproved : .whoopsSomethingWentWrong)
+                    }.cancellable(id: CancelID.loading),
+                    
+                    .send(.internal(.refresh))
+                )
+                
             case let .internal(.loadTopic(offset)):
                 if !state.isRefreshing {
                     state.isLoadingTopic = true
@@ -465,6 +494,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 state.isLoadingTopic = false
                 state.isRefreshing = false
+                state.shouldShowTopicPollButton = true
                 state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
                 reportFullyDisplayed(&state)

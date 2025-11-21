@@ -23,10 +23,12 @@ extension TopicFeature {
                         .view(.onNextAppear),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
+                        .view(.topicPollVoteButtonTapped),
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
                         .internal(.changeKarma),
+                        .internal(.voteInPoll),
                         .internal(.load),
                         .internal(.refresh),
                         .pageNavigation,
@@ -40,6 +42,9 @@ extension TopicFeature {
                     
                 case .view(.topicHatOpenButtonTapped):
                     analytics.log(TopicEvent.topicHatOpenButtonTapped)
+                    
+                case .view(.topicPollOpenButtonTapped):
+                    analytics.log(TopicEvent.topicPollOpenButtonTapped)
                     
                 case let .view(.userTapped(userId: userId)):
                     analytics.log(TopicEvent.userTapped(userId))

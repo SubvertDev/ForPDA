@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld people voted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проголосовало %lld чел."
+          }
+        }
+      }
+    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {
@@ -137,6 +147,16 @@
         }
       }
     },
+    "Poll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Опрос"
+          }
+        }
+      }
+    },
     "Post deleted" : {
       "localizations" : {
         "ru" : {
@@ -227,6 +247,16 @@
         }
       }
     },
+    "Show results" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Результаты"
+          }
+        }
+      }
+    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {
@@ -263,6 +293,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошо"
+          }
+        }
+      }
+    },
+    "Vote" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голосовать"
+          }
+        }
+      }
+    },
+    "Vote approved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос засчитан"
           }
         }
       }

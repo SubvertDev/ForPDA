@@ -63,6 +63,7 @@ public struct APIClient: Sendable {
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
     public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
+    public var voteInTopicPoll: @Sendable (_ topicId: Int, _ selections: [[Int]]) async throws -> Bool
     
     // Favorites
     public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
@@ -357,6 +358,13 @@ extension APIClient: DependencyKey {
                 return status == 0
             },
             
+            voteInTopicPoll: { topicId, selections in
+                let command = ForumCommand.Topic.Poll.vote(topicId: topicId, selections: selections)
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            
             // MARK: - Favorites
             
             getFavorites: { request, policy in
@@ -568,6 +576,9 @@ extension APIClient: DependencyKey {
                 return true
             },
             postKarma: { _, _ in
+                return true
+            },
+            voteInTopicPoll: { _, _ in
                 return true
             },
             getFavorites: { _, _ in
