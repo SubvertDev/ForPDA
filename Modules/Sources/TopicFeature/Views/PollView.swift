@@ -11,14 +11,18 @@ import SharedUI
 
 struct PollView: View {
     
-    @Environment(\.tintColor) private var tintColor
+    // MARK: - Properties
     
-    let poll: Topic.Poll
-    let onVoteButtonTapped: ([Int: Set<Int>]) -> Void
+    @Environment(\.tintColor) private var tintColor
     
     @State private var isSending = false
     @State private var showVoteResultsButtonTapped = false
     @State private var selections: [Int: Set<Int>] = [:]
+    
+    let poll: Topic.Poll
+    let onVoteButtonTapped: ([Int: Set<Int>]) -> Void
+    
+    // MARK: - Computed Properties
     
     private var isVotable: Bool {
         for option in poll.options {
@@ -33,6 +37,8 @@ struct PollView: View {
         return true
     }
     
+    // MARK: - Init
+    
     init(
         poll: Topic.Poll,
         onVoteButtonTapped: @escaping ([Int: Set<Int>]) -> Void
@@ -40,6 +46,8 @@ struct PollView: View {
         self.poll = poll
         self.onVoteButtonTapped = onVoteButtonTapped
     }
+    
+    // MARK: - Body
     
     var body: some View {
         VStack(spacing: 12) {
@@ -245,6 +253,8 @@ struct PollView: View {
     }
 }
 
+// MARK: - CheckBox Toggle Style
+
 struct CheckBoxToggleStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         HStack {
@@ -271,6 +281,8 @@ struct CheckBoxToggleStyle: ToggleStyle {
         }
     }
 }
+
+// MARK: - Previews
 
 #Preview {
     VStack {

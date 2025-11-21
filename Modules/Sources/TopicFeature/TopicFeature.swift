@@ -237,7 +237,7 @@ public struct TopicFeature: Reducer, Sendable {
                 state.shouldShowTopicPollButton = false
                 return .none
                 
-            case .view(.topicPollVoteButtonTapped(let selections)):
+            case let .view(.topicPollVoteButtonTapped(selections)):
                 let values = selections.sorted(by: { $0.key < $1.key }).map {
                     Array($0.value)
                 }
@@ -412,7 +412,7 @@ public struct TopicFeature: Reducer, Sendable {
                     jumpTo(.post(id: postId), true, &state)
                 )
                 
-            case .internal(.voteInPoll(let selections)):
+            case let .internal(.voteInPoll(selections)):
                 return .concatenate(
                     .run { [topicId = state.topicId] _ in
                         let status = try await apiClient.voteInTopicPoll(

@@ -75,7 +75,7 @@ public struct TopicScreen: View {
                                 if !store.isLoadingTopic {
                                     Header()
                                     
-                                    if let poll = store.topic!.poll {
+                                    if let poll = store.topic?.poll {
                                         Poll(poll)
                                     }
                                     
