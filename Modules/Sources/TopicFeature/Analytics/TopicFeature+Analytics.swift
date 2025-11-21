@@ -40,8 +40,8 @@ extension TopicFeature {
                 case .view(.onRefresh):
                     analytics.log(TopicEvent.onRefresh)
                     
-                case .view(.topicHatOpenButtonTapped):
-                    analytics.log(TopicEvent.topicHatOpenButtonTapped)
+                case .view(.topicHatButtonTapped):
+                    analytics.log(TopicEvent.topicHatButtonTapped)
                     
                 case .view(.topicPollOpenButtonTapped):
                     analytics.log(TopicEvent.topicPollOpenButtonTapped)

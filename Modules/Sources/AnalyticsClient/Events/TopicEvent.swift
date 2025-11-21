@@ -9,7 +9,7 @@ import Foundation
 
 public enum TopicEvent: Event {
     case onRefresh
-    case topicHatOpenButtonTapped
+    case topicHatButtonTapped
     case topicPollOpenButtonTapped
     case userTapped(Int)
     case urlTapped(URL)
