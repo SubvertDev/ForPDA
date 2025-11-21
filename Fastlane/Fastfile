@@ -122,7 +122,6 @@ platform :ios do
         Dir.chdir("..") do
             sh("tuist install")
             sh("tuist build ForPDA --generate")
-            sh("tuist inspect build")
             sh("tuist test ForPDA")
             sh("tuist share ForPDA")
         end
