@@ -241,6 +241,16 @@
         }
       }
     },
+    "Input..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите…"
+          }
+        }
+      }
+    },
     "Karma" : {
       "localizations" : {
         "ru" : {

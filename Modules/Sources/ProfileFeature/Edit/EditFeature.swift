@@ -41,11 +41,13 @@ public struct EditFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        public enum Field: CaseIterable { case status, signature, about, city }
+        
         @Presents public var destination: Destination.State?
         
         let user: User
         var draftUser: User
-        var avatarReloadId = UUID()
+        var focus: Field?
         
         var isSending = false
         var isAvatarUploading = false
