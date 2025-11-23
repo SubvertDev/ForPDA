@@ -214,15 +214,12 @@ public struct ForumFeature: Reducer, Sendable {
                     return .run { _ in await open(url: url) }
                     
                 case .markRead:
-                    return .concatenate(
-                        .run { [id, isForum] send in
-                            let status = try await apiClient.markRead(id: id, isTopic: !isForum)
-                            let markedAsRead = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
-                            await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
-                        },
-                        
-                        .send(.internal(.refresh))
-                    )
+                    return .run { [id, isForum] send in
+                        let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        let markedAsRead = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                        await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
                     
                 case .setFavorite(let isFavorite):
                     return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in
