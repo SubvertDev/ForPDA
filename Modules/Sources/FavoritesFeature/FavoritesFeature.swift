@@ -191,15 +191,12 @@ public struct FavoritesFeature: Reducer, Sendable {
                     return .none
                     
                 case .markAllAsRead:
-                    return .concatenate(
-                        .run { send in
-                            let status = try await apiClient.readAllFavorites()
-                            let success = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
-                            await toastClient.showToast(status ? success : .whoopsSomethingWentWrong)
-                        },
-                        
-                        .send(.internal(.refresh))
-                    )
+                    return .run { send in
+                        let status = try await apiClient.readAllFavorites()
+                        let success = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                        await toastClient.showToast(status ? success : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
                 }
                 
             case .view(.commonContextMenu(let action, let isForum)):
@@ -212,36 +209,27 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                     
                 case .delete(let id):
-                    return .concatenate(
-                        .run { send in
-                            let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
-                            let status = try await apiClient.setFavorite(request)
-                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
-                        },
-                        
-                        .send(.internal(.refresh))
-                    )
+                    return .run { send in
+                        let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
+                        let status = try await apiClient.setFavorite(request)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
                     
                 case .setImportant(let id, let pin):
-                    return .concatenate(
-                        .run { send in
-                            let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
-                            let status = try await apiClient.setFavorite(request)
-                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
-                        },
-                        
-                        .send(.internal(.refresh))
-                    )
+                    return .run { send in
+                        let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
+                        let status = try await apiClient.setFavorite(request)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
                     
                 case .markRead(let id):
-                    return .concatenate(
-                        .run { [id, isForum] send in
-                            let status = try await apiClient.markRead(id: id, isTopic: !isForum)
-                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
-                        },
-                        
-                        .send(.internal(.refresh))
-                    )
+                    return .run { [id, isForum] send in
+                        let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
                 }
                 
             case let .view(.topicContextMenu(action, favorite)):
@@ -255,16 +243,13 @@ public struct FavoritesFeature: Reducer, Sendable {
                     }
                     
                 case .notify(let flag, let notify):
-                    return .concatenate(
-                        .run { send in
-                            let request = NotifyFavoriteRequest(id: favorite.topic.id, flag: flag, type: notify)
-                            let status = try await apiClient.notifyFavorite(request)
-                            let notifyTypeChangedToast = ToastMessage(text: Localization.notifyTypeChanged, haptic: .success)
-                            await toastClient.showToast(status ? notifyTypeChangedToast : .whoopsSomethingWentWrong)
-                        },
-                        
-                        .send(.internal(.refresh))
-                    )
+                    return .run { send in
+                        let request = NotifyFavoriteRequest(id: favorite.topic.id, flag: flag, type: notify)
+                        let status = try await apiClient.notifyFavorite(request)
+                        let notifyTypeChangedToast = ToastMessage(text: Localization.notifyTypeChanged, haptic: .success)
+                        await toastClient.showToast(status ? notifyTypeChangedToast : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
                 }
                 
             case .internal(.refresh):
