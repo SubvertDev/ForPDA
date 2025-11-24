@@ -30,6 +30,7 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     private enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
@@ -269,7 +270,9 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .copyLink:
                     pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .setFavorite:
                     return .run { [id = state.topicId] send in
@@ -351,8 +354,7 @@ public struct TopicFeature: Reducer, Sendable {
                     let link = "https://4pda.to/forum/index.php?showtopic=\(state.topicId)&view=findpost&p=\(postId)"
                     pasteboardClient.copy(link)
                     return .run { _ in
-                        let toast = ToastMessage(text: LocalizedStringResource("Link copied", bundle: .module), haptic: .success)
-                        await toastClient.showToast(toast)
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
                 }
                 
