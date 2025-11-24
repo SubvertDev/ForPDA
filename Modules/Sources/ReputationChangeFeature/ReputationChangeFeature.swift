@@ -20,8 +20,8 @@ public struct ReputationChangeFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     public enum Localization {
-        static let reputationChangeError = LocalizedStringResource("Reputation changed", bundle: .module)
-        static let reputationChanged = LocalizedStringResource("Reputation change error", bundle: .module)
+        static let reputationChanged = LocalizedStringResource("Reputation changed", bundle: .module)
+        static let reputationChangeError = LocalizedStringResource("Reputation change error", bundle: .module)
         static let reputationChangeBlocked = LocalizedStringResource("Reputation change blocked", bundle: .module)
         static let reputationSelfChangeError = LocalizedStringResource("Cannot change self reputation", bundle: .module)
         static let reputationChangeNotEnoughPosts = LocalizedStringResource("Not enough posts for reputation change", bundle: .module)

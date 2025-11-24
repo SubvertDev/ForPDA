@@ -42,6 +42,8 @@ platform :ios do
             release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
         
+        setup_ci if ENV['CI']
+        
         release_channel = (options[:release] || "beta").capitalize
         
         update_xcconfig_value(
@@ -60,7 +62,9 @@ platform :ios do
         upload_bundle_to_tuist
         upload_app_to_testflight
         notify_all
-        run_tuist(testflight: false)
+        unless ENV['CI']
+            run_tuist(testflight: false)
+        end
         bump_and_tag
     end
     
@@ -70,6 +74,8 @@ platform :ios do
             build_number: { description: "Sets specific build number" },
             release: { desctiption: "Release channel: beta or stable", default: "beta" }   
         })
+        
+        setup_ci if ENV['CI']
         
         release_channel = (options[:release] || "beta").capitalize
         
@@ -86,7 +92,9 @@ platform :ios do
         upload_dsym_to_sentry
         upload_bundle_to_tuist
         upload_app_to_testflight
-        run_tuist(testflight: false)
+        unless ENV['CI']
+            run_tuist(testflight: false)
+        end
     end
     
     desc "One-off ipa build"
@@ -103,6 +111,31 @@ platform :ios do
         update_build_number(build_number: options[:build_number])
         run_tuist(testflight: true)
         build_ipa
+        run_tuist(testflight: false)
+    end
+    
+    desc "CI pull requests checks"
+    lane :ci_pull_request do
+        setup_ci if ENV['CI']
+        prepare_certificates
+        update_build_number(build_number: "1")
+        Dir.chdir("..") do
+            sh("tuist install")
+            sh("tuist build ForPDA --generate")
+            sh("tuist test ForPDA")
+            sh("tuist share ForPDA")
+        end
+    end
+    
+    desc "CI cache warm up"
+    lane :ci_cache_warmup do
+        setup_ci if ENV['CI']
+        prepare_certificates
+        update_build_number(build_number: "1")
+        Dir.chdir("..") do
+            sh("tuist install")
+            sh("tuist cache --external-only")
+        end
     end
     
     # --------------------------------------------------
@@ -181,10 +214,7 @@ platform :ios do
             scheme: "ForPDA",
             output_directory: "Builds/",
 	        output_name: output_name,
-            cloned_source_packages_path: "SourcePackages",
             configuration: "Release",
-	        silent: true,
-	        suppress_xcode_output: true,
 	        skip_package_pkg: true,
 	        export_method: "app-store",
 	        export_options: {
@@ -199,11 +229,8 @@ platform :ios do
     
     desc "Uploads DSYM files to Sentry"
     lane :upload_dsym_to_sentry do
-        auth_token = get_xcconfig_value(
-            path: 'Configs/Secrets.xcconfig',
-            name: 'SENTRY_DSYM_TOKEN'
-        )
-        
+        auth_token = get_secret_value('SENTRY_DSYM_TOKEN')
+                
         sentry_debug_files_upload(
             auth_token: auth_token,
             org_slug: 'forpda',
@@ -224,11 +251,24 @@ platform :ios do
     
     desc "Uploads app to TestFlight"
     lane :upload_app_to_testflight do
-        app_store_connect_api_key(
-            key_id: "X36R58TMRJ",
-            issuer_id: "814e488e-06ba-40ba-a16c-a63e7164023f",
-            key_filepath: "Fastlane/AuthKey_X36R58TMRJ.p8"
-        )
+        key_id = "X36R58TMRJ"
+        issuer_id = "814e488e-06ba-40ba-a16c-a63e7164023f"
+        
+        if ENV['CI']
+            key_content = ENV['CONNECT_API_KEY']
+            app_store_connect_api_key(
+                key_id: key_id,
+                issuer_id: issuer_id,
+                key_content: key_content
+            )
+        else
+            key_filepath = "Fastlane/AuthKey_X36R58TMRJ.p8"
+            app_store_connect_api_key(
+                key_id: key_id,
+                issuer_id: issuer_id,
+                key_filepath: key_filepath
+            )
+        end
         
         version = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'MARKETING_VERSION')
         build = get_xcconfig_value(path: 'Configs/App.xcconfig', name: 'CURRENT_PROJECT_VERSION')
@@ -288,3 +328,22 @@ def print_lane_options(lane_name, options = {})
     UI.message("• #{key}: #{value[:description]}#{default_str}")
   end
 end 
+
+def get_secret_value(name)
+  is_ci = ENV['CI'] == 'true'
+
+  if is_ci
+    value = ENV[name]
+    UI.message("Using #{name} from environment (CI=true)")
+  else
+    xcconfig_path = 'Configs/Secrets.local.xcconfig'
+    value = get_xcconfig_value(path: xcconfig_path, name: name)
+    UI.message("Using #{name} from #{xcconfig_path} (CI=false)")
+  end
+
+  if value.nil? || value.empty?
+    UI.user_error("Error: #{name} is not set")
+  end
+
+  value
+end

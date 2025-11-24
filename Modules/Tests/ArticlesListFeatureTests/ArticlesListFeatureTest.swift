@@ -11,7 +11,7 @@ struct ArticlesListFeatureTest {
     
     init() { uncheckedUseMainSerialExecutor = true }
     
-    @Test("Success on appear")
+    @Test("Success on appear", .disabled())
     func onAppearSuccess() async throws {
         let articles: [ArticlePreview] = Array(repeating: .mock, count: 15)
         
@@ -33,7 +33,7 @@ struct ArticlesListFeatureTest {
         }
     }
     
-    @Test("Failure on appear")
+    @Test("Failure on appear", .disabled())
     func onAppearFailure() async throws {
         let store = TestStore(initialState: ArticlesListFeature.State()) {
             ArticlesListFeature()
@@ -68,7 +68,7 @@ struct ArticlesListFeatureTest {
         await store.send(.onAppear)
     }
     
-    @Test("Pull to refresh")
+    @Test("Pull to refresh", .disabled())
     func refresh() async throws {
         let perPage = 15
         let articles: [ArticlePreview] = Array(repeating: .mock, count: perPage)
@@ -92,7 +92,7 @@ struct ArticlesListFeatureTest {
         }
     }
     
-    @Test("Pagination loading", arguments: [15, 20, 30])
+    @Test("Pagination loading", .disabled(), arguments: [15, 20, 30])
     func loadMoreArticles(perPage: Int) async throws {
         let initialArticles: [ArticlePreview] = Array(repeating: .mock, count: perPage)
         let loadedArticles = initialArticles

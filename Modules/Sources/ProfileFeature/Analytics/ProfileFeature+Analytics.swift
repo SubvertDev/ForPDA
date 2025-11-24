@@ -29,6 +29,9 @@ extension ProfileFeature {
                 case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)
                     
+                case .view(.editButtonTapped):
+                    analyticsClient.log(ProfileEvent.editTapped)
+                
                 case .view(.settingsButtonTapped):
                     analyticsClient.log(ProfileEvent.settingsTapped)
                     

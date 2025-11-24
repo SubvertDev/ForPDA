@@ -41,7 +41,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
             self.options = options
         }
         
-        public struct Choice: Sendable, Codable, Hashable {
+        public struct Choice: Sendable, Codable, Hashable, Identifiable {
             public let id: Int
             public let votes: Int
             public let name: String
@@ -53,12 +53,14 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
             }
         }
         
-        public struct Option: Sendable, Codable, Hashable {
+        public struct Option: Sendable, Codable, Hashable, Identifiable {
+            public let id: Int
             public let name: String
             public let several: Bool
             public let choices: [Choice]
             
-            public init(name: String, several: Bool, choices: [Choice]) {
+            public init(id: Int, name: String, several: Bool, choices: [Choice]) {
+                self.id = id
                 self.name = name
                 self.several = several
                 self.choices = choices
@@ -110,26 +112,41 @@ public extension Topic {
         authorName: "4spander",
         curatorId: 6176341,
         curatorName: "AirFlare",
-        poll: Poll(
-            name: "Some simple poll...",
-            voted: false,
-            totalVotes: 2134,
-            options: [
-                Poll.Option(
-                    name: "Select this choise...",
-                    several: false,
-                    choices: [
-                        Poll.Choice(id: 2, name: "First choice", votes: 2)
-                    ]
-                )
-            ]
-        ),
+        poll: .mock,
         postsCount: 5005,
         posts: [
             .mock(id: 0), .mock(id: 1), .mock(id: 2)
         ],
         navigation: [
             ForumInfo(id: 1, name: "iOS - Apps", flag: 32)
+        ]
+    )
+}
+
+public extension Topic.Poll {
+    static let mock = Topic.Poll(
+        name: "Some simple poll...",
+        voted: false,
+        totalVotes: 12,
+        options: [
+            .init(
+                id: 0,
+                name: "Select not several...",
+                several: false,
+                choices: [
+                    .init(id: 2, name: "First choice", votes: 2),
+                    .init(id: 3, name: "Second choice", votes: 4)
+                ]
+            ),
+            .init(
+                id: 1,
+                name: "Select several...",
+                several: true,
+                choices: [
+                    .init(id: 4, name: "First choice", votes: 4),
+                    .init(id: 5, name: "Second choice", votes: 2)
+                ]
+            ),
         ]
     )
 }

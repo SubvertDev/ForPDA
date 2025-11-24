@@ -70,6 +70,11 @@ public struct ProfileScreen: View {
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.editProfile, action: \.destination.editProfile)) { store in
+                NavigationStack {
+                    EditScreen(store: store)
+                }
+            }
             .toolbar {
                 ToolbarButtons()
             }
@@ -98,6 +103,14 @@ public struct ProfileScreen: View {
             
             ToolbarItem {
                 Button {
+                    send(.editButtonTapped)
+                } label: {
+                    Image(systemSymbol: .pencil)
+                }
+            }
+            
+            ToolbarItem {
+                Button {
                     send(.settingsButtonTapped)
                 } label: {
                     Image(systemSymbol: .gearshape)
@@ -111,31 +124,33 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func Header(user: User) -> some View {
         VStack(alignment: .center, spacing: 0) {
-            LazyImage(url: user.imageUrl) { state in
-                Group {
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Color(.systemBackground)
+            HStack {
+                LazyImage(url: user.imageUrl) { state in
+                    Group {
+                        if let image = state.image {
+                            image.resizable().scaledToFill()
+                        } else {
+                            Color(.systemBackground)
+                        }
+                    }
+                    .skeleton(with: state.isLoading, shape: .circle)
+                }
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+                
+                VStack(alignment: .leading) {
+                    Text(user.nickname)
+                        .font(.headline)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    if !user.lastSeenDate.isOnlineHidden() {
+                        Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
+                            .font(.footnote)
+                            .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
                     }
                 }
-                .skeleton(with: state.isLoading, shape: .circle)
             }
-            .frame(width: 128, height: 128)
-            .clipShape(Circle())
             .padding(.bottom, 10)
-            
-            Text(user.nickname)
-                .font(.headline)
-                .foregroundStyle(Color(.Labels.primary))
-                .padding(.bottom, 4)
-            
-            if !user.lastSeenDate.isOnlineHidden() {
-                Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
-                    .padding(.bottom, 8)
-            }
             
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
@@ -291,7 +306,7 @@ public struct ProfileScreen: View {
                 Row(title: "Birthdate", type: .description(birthdate))
             }
             if let gender = user.gender, gender != .unknown {
-                Row(title: "Gender", type: .description(gender.title))
+                Row(title: "Gender", type: .localizedDescription(gender.title))
             }
             if let city = user.city {
                 Row(title: "City", type: .description(city))
@@ -490,6 +505,7 @@ public struct ProfileScreen: View {
         case description(String)
         case navigation
         case navigationDescription(String)
+        case localizedDescription(LocalizedStringKey)
     }
     
     @ViewBuilder
@@ -519,6 +535,11 @@ public struct ProfileScreen: View {
                         
                     case let .description(text):
                         Text(text)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                        
+                    case let .localizedDescription(text):
+                        Text(text, bundle: .module)
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
