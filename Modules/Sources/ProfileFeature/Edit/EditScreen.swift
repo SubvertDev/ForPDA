@@ -20,7 +20,7 @@ public struct EditScreen: View {
     
     @State private var pickerItem: PhotosPickerItem?
     
-    @FocusState var isStatusFocused: Bool
+    @FocusState var focus: EditFeature.State.Field?
     
     public init(store: StoreOf<EditFeature>) {
         self.store = store
@@ -38,7 +38,8 @@ public struct EditScreen: View {
                     if store.isUserCanEditStatus {
                         Field(
                             content: Binding(unwrapping: $store.draftUser.status, default: ""),
-                            title: LocalizedStringKey("Status")
+                            title: LocalizedStringKey("Status"),
+                            focusEqual: .status
                         )
                     } else {
                         // TODO: Some notify about it?
@@ -46,12 +47,14 @@ public struct EditScreen: View {
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.signature, default: ""),
-                        title: LocalizedStringKey("Signature")
+                        title: LocalizedStringKey("Signature"),
+                        focusEqual: .signature
                     )
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
-                        title: LocalizedStringKey("About me")
+                        title: LocalizedStringKey("About me"),
+                        focusEqual: .about
                     )
                     
                     Section {
@@ -63,14 +66,15 @@ public struct EditScreen: View {
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.city, default: ""),
-                        title: LocalizedStringKey("City")
+                        title: LocalizedStringKey("City"),
+                        focusEqual: .city
                     )
                 }
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
+            ._safeAreaBar(edge: .bottom) {
                 SendButton()
             }
             .toolbar {
@@ -83,6 +87,10 @@ public struct EditScreen: View {
                     }
                     .disabled(store.isSending)
                 }
+            }
+            .bind($store.focus, to: $focus)
+            .onTapGesture {
+                focus = nil
             }
             .onAppear {
                 send(.onAppear)
@@ -115,7 +123,13 @@ public struct EditScreen: View {
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
+        .background {
+            if #available(iOS 26, *) {
+                // No background
+            } else {
+                Color(.Background.primary)
+            }
+        }
     }
     
     // MARK: - User Birthday Picker
@@ -286,6 +300,7 @@ public struct EditScreen: View {
                         Image(systemSymbol: .trash)
                     }
                 }
+                .tint(.red)
             }
         } label: {
             Image(systemSymbol: .ellipsis)
@@ -306,15 +321,43 @@ public struct EditScreen: View {
     @ViewBuilder
     private func Field(
         content: Binding<String>,
-        title: LocalizedStringKey
+        title: LocalizedStringKey,
+        focusEqual: EditFeature.State.Field
     ) -> some View {
         Section {
-            SharedUI.Field(
-                text: content,
-                description: "",
-                guideText: "",
-                isFocused: $isStatusFocused
-            )
+            Group {
+                TextField(text: content, axis: .vertical) {
+                    Text("Input...", bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.quaternary))
+                }
+                .focused($focus, equals: focusEqual)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.primary))
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minHeight: nil, alignment: .top)
+            }
+            .padding(.vertical, 15)
+            .padding(.horizontal, 12)
+            .background {
+                if #available(iOS 26, *) {
+                    ConcentricRectangle()
+                        .fill(Color(.Background.teritary))
+                } else {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color(.Background.teritary))
+                }
+            }
+            .overlay {
+                if #available(iOS 26, *) {
+                    ConcentricRectangle()
+                        .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
+                } else {
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
+                }
+            }
         } header: {
             Header(title: title)
         }

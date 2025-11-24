@@ -103,21 +103,17 @@ public struct ProfileScreen: View {
             
             ToolbarItem {
                 Button {
-                    send(.settingsButtonTapped)
+                    send(.editButtonTapped)
                 } label: {
-                    Image(systemSymbol: .gearshape)
+                    Image(systemSymbol: .pencil)
                 }
             }
             
-            if let userId = store.userId,
-               let userSession = store.userSession,
-               userSession.userId == userId {
-                ToolbarItem {
-                    Button {
-                        send(.editButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .pencil)
-                    }
+            ToolbarItem {
+                Button {
+                    send(.settingsButtonTapped)
+                } label: {
+                    Image(systemSymbol: .gearshape)
                 }
             }
         }
