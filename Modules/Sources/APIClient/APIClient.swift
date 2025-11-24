@@ -87,7 +87,7 @@ public struct APIClient: Sendable {
 
     // Search
     public var search: @Sendable (_ request: SearchRequest) async throws -> [SearchContent]
-    public var searchMembers: @Sendable (_ request: MembersRequest) async throws -> MembersResponse
+    public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // STREAMS
     public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }
@@ -528,15 +528,14 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 return try await parser.parseSearch(response: response)
             },
-            searchMembers: { request in
+            searchUsers: { request in
                 let command = SearchCommand.members(
                     term: request.term,
                     offset: request.offset,
                     number: request.number
                 )
                 let response = try await api.send(command)
-                let status = Int(response.getResponseStatus())
-                return try await parser.parseMembers(response: response)
+                return try await parser.parseSearchUsers(response: response)
             },
             
             // MARK: - Streams
@@ -696,8 +695,8 @@ extension APIClient: DependencyKey {
             search: { _ in
                 return [.article(.mock), .topic(.mockToday), .post(.mock)]
             },
-            searchMembers: { _ in
-                return MembersResponse(metadata: [], members: [])
+            searchUsers: { _ in
+                return .mock
             },
             connectionState: {
                 return .finished

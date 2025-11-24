@@ -7,13 +7,12 @@
 
 import Foundation
 import Models
-import ComposableArchitecture
 
-public struct MembersParser {
+public struct SearchUsersParser {
     
-    // MARK: - parse
+    // MARK: - Parse
     
-    public static func parse(from string: String) throws(ParsingError) -> MembersResponse {
+    public static func parse(from string: String) throws(ParsingError) -> SearchUsersResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -22,23 +21,21 @@ public struct MembersParser {
             throw ParsingError.failedToCastDataToAny
         }
         
-        guard let meta0 = array[safe: 0] as? Int,
-              let meta1 = array[safe: 1] as? Int,
-              let meta2 = array[safe: 2] as? Int,
-              let membersArray = array[safe: 3] as? [[Any]] else {
+        guard let usersCount = array[safe: 2] as? Int,
+              let usersRaw = array[safe: 3] as? [[Any]] else {
             throw ParsingError.failedToCastFields
         }
         
-        return MembersResponse(
-            metadata: [meta0, meta1, meta2],
-            members: try parseMembers(membersArray)
+        return SearchUsersResponse(
+            users: try parseUsers(usersRaw),
+            usersCount: usersCount
         )
     }
     
-    // MARK: - parse members
+    // MARK: - Parse Users
     
-    private static func parseMembers(_ rawMembers: [[Any]]) throws(ParsingError) -> [Member] {
-        var members: [Member] = []
+    private static func parseUsers(_ rawMembers: [[Any]]) throws(ParsingError) -> [SearchUsersResponse.SimplifiedUser] {
+        var members: [SearchUsersResponse.SimplifiedUser] = []
         
         for memberRaw in rawMembers {
             guard let id = memberRaw[safe: 0] as? Int,
@@ -48,13 +45,13 @@ public struct MembersParser {
                 throw ParsingError.failedToCastFields
             }
             
-            let member = Member(
+            let user = SearchUsersResponse.SimplifiedUser(
                 id: id,
-                nickname: name.convertCodes(),
-                unknown3: groupId,
+                name: name,
+                groupId: groupId,
                 avatarUrl: avatarUrl
             )
-            members.append(member)
+            members.append(user)
         }
         return members
     }

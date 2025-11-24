@@ -5,10 +5,7 @@
 //  Created by Рустам Ойтов on 29.10.2025.
 //
 
-import PDAPI
-import Models
-
-public struct MembersRequest: Sendable, Equatable {
+public struct SearchUsersRequest: Sendable, Equatable {
     
     public let term: String
     public let offset: Int

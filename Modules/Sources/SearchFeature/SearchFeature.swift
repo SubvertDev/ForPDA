@@ -27,7 +27,7 @@ public struct SearchFeature: Reducer, Sendable {
         var sortBy = "Relevance(matching the query)"
         var whereSerchForum = "Everywhere"
         var showMembers = false
-        var members: [Member] = []
+        var members: [SearchUsersResponse.SimplifiedUser] = []
         
         public init() {}
     }
@@ -49,7 +49,7 @@ public struct SearchFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case search(SearchRequest)
-            case addMembers(MembersResponse)
+            case addMembers(SearchUsersResponse)
         }
     }
     
@@ -78,8 +78,8 @@ public struct SearchFeature: Reducer, Sendable {
                 
             case let .view(.searchAuthorName(nickname)):
                 return .run { send in
-                    let request = MembersRequest(term: nickname, offset: 0, number: 3)
-                    let result = try await apiClient.searchMembers(request: request)
+                    let request = SearchUsersRequest(term: nickname, offset: 0, number: 10)
+                    let result = try await apiClient.searchUsers(request: request)
                     await send(.internal(.addMembers(result)))
                 }
                 
@@ -96,9 +96,9 @@ public struct SearchFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.addMembers(data)):
-                state.members = data.members
+                state.members = data.users
                 print("from internal  = \(state.members)")
-                state.showMembers = !data.members.isEmpty
+                state.showMembers = !data.users.isEmpty
                 print("from internal  = \(state.showMembers)")
                 return .none
                 
