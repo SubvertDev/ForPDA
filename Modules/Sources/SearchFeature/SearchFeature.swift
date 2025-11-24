@@ -78,8 +78,8 @@ public struct SearchFeature: Reducer, Sendable {
                 
             case let .view(.searchAuthorName(nickname)):
                 return .run { send in
-                    let request = MembersRequest(term: nickname, offset: 10, number: 3)
-                    let result = try await apiClient.members(request: request)
+                    let request = MembersRequest(term: nickname, offset: 0, number: 3)
+                    let result = try await apiClient.searchMembers(request: request)
                     await send(.internal(.addMembers(result)))
                 }
                 
@@ -91,8 +91,8 @@ public struct SearchFeature: Reducer, Sendable {
                 
             case let .internal(.search(request)):
                 return .run { send in
-                    let result = try await apiClient.startSearch(request: request)
-                    print(result.publications)
+                    let result = try await apiClient.search(request: request)
+                    customDump(result)
                 }
                 
             case let .internal(.addMembers(data)):

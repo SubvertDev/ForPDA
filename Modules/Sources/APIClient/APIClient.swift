@@ -86,8 +86,8 @@ public struct APIClient: Sendable {
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
 
     // Search
-    public var startSearch: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
-    public var members: @Sendable (_ request: MembersRequest) async throws -> MembersResponse
+    public var search: @Sendable (_ request: SearchRequest) async throws -> [SearchContent]
+    public var searchMembers: @Sendable (_ request: MembersRequest) async throws -> MembersResponse
     
     // STREAMS
     public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }
@@ -517,7 +517,7 @@ extension APIClient: DependencyKey {
 
 			// MARK: - Search
 
-            startSearch: { request in
+            search: { request in
                 let command = SearchCommand.content(
                     on: request.on.toPDAPISearchOn(),
                     authorId: request.authorId,
@@ -526,12 +526,9 @@ extension APIClient: DependencyKey {
                     offset: request.offset
                 )
                 let response = try await api.send(command)
-                let status = Int(response.getResponseStatus())
-
-                print("Status \(String(describing: status))")
                 return try await parser.parseSearch(response: response)
             },
-            members: { request in
+            searchMembers: { request in
                 let command = SearchCommand.members(
                     term: request.term,
                     offset: request.offset,
@@ -696,10 +693,10 @@ extension APIClient: DependencyKey {
             sendQMSMessage: { _, _ in
                 
             },
-            startSearch: { _ in
-                return SearchResponse(metadata: [], publications: [])
+            search: { _ in
+                return [.article(.mock), .topic(.mockToday), .post(.mock)]
             },
-            members: { _ in
+            searchMembers: { _ in
                 return MembersResponse(metadata: [], members: [])
             },
             connectionState: {

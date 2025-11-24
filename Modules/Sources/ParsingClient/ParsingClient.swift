@@ -41,8 +41,8 @@ public struct ParsingClient: Sendable {
     public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
     
-    //Search
-    public var parseSearch: @Sendable (_ response: String) async throws -> SearchResponse
+    // Search
+    public var parseSearch: @Sendable (_ response: String) async throws -> [SearchContent]
     public var parseMembers: @Sendable (_ response: String) async throws -> MembersResponse
     
     // Write Form
