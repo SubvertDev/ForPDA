@@ -536,7 +536,7 @@ extension APIClient: DependencyKey {
                     number: request.number
                 )
                 let response = try await api.send(command)
-                return try await parser.parseSearchUsers(response: response)
+                return try await parser.parseSearchUsers(response)
             },
             
             // MARK: - Streams

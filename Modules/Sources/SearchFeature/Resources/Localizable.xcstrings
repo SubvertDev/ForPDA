@@ -1,102 +1,155 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Articles" : {
+    "Author nickname" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Статьи"
+            "value" : "Ник автора"
           }
         }
       }
     },
-    "Comment has been added" : {
+    "By Date (newest to oldest)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Комментарий добавлен"
+            "value" : "По возрастанию даты"
           }
         }
       }
     },
-    "Commenting on this post is closed" : {
+    "By Date (oldest to newest)" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Комментирование этого поста окончено"
+            "value" : "По убыванию даты"
           }
         }
       }
     },
-    "Favorites" : {
+    "By Relevance" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Избранное"
+            "value" : "По соответствию"
           }
         }
       }
     },
-    "First page" : {
+    "Everywhere" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "В начало"
+            "value" : "Везде"
           }
         }
       }
     },
-    "Forum" : {
+    "Fewer parameters" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Форум"
+            "value" : "Меньше параметров"
           }
         }
       }
     },
-    "Last page" : {
+    "HEllo" : {
+
+    },
+    "Input..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "В конец"
+            "value" : "Введите…"
           }
         }
       }
     },
-    "No comment text" : {
+    "More parameters" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Нет текста комментария"
+            "value" : "Ещё параметры"
           }
         }
       }
     },
-    "Profile" : {
+    "On %@" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Профиль"
+            "value" : "В %@"
           }
         }
       }
     },
-    "Repeated comment" : {
+    "On Forum" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Повторный комментарий"
+            "value" : "На форуме"
+          }
+        }
+      }
+    },
+    "On Site" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "На сайте"
+          }
+        }
+      }
+    },
+    "On Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В теме"
+          }
+        }
+      }
+    },
+    "Only in posts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только в сообщениях"
+          }
+        }
+      }
+    },
+    "Only in titles" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только в заголовках"
+          }
+        }
+      }
+    },
+    "Result as topics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Результат в виде тем"
           }
         }
       }
@@ -111,96 +164,36 @@
         }
       }
     },
-    "Today, %@" : {
+    "Search on forum" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сегодня, %@"
+            "value" : "Искать на форуме"
           }
         }
       }
     },
-    "Unknown error" : {
+    "Sort" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Неизвестная ошибка"
+            "value" : "Сортировка"
           }
         }
       }
     },
-    "Unread" : {
+    "Where" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "К непрочитанному"
-          }
-        }
-      }
-    },
-    "Yesterday, %@" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вчера, %@"
-          }
-        }
-      }
-    },
-    "You cannot reply to a comment you have hidden" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы не можете ответить на свернутый вами комментарий"
-          }
-        }
-      }
-    },
-    "You're not allowed to comment" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вам запрещено комментировать"
-          }
-        }
-      }
-    },
-    "You've hit the carmine limit" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы достигли кармического лимита комментирования"
-          }
-        }
-      }
-    },
-    "You've hit the daily commenting limit" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы достигли дневного лимита комментирования"
-          }
-        }
-      }
-    },
-    "You've hit the hourly commenting limit" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы достигли часового лимита комментирования"
+            "value" : "Искать"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

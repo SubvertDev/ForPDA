@@ -19,17 +19,32 @@ public struct SearchFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        var searchText = ""
-        var toggleRes = false
-        var nicknameAuthor = ""
-        var authorId: Int? = nil
-        var whereSearch = "Everywhere"
-        var sortBy = "Relevance(matching the query)"
-        var whereSerchForum = "Everywhere"
-        var showMembers = false
-        var members: [SearchUsersResponse.SimplifiedUser] = []
+        public enum Field { case authorName }
         
-        public init() {}
+        let searchOn: SearchOn
+        let navigation: [ForumInfo]
+        
+        var focus: Field?
+        
+        var authorId: Int? = nil
+        var searchSort: SearchSort = .relevance
+        var whereSearch: SearchWhere = .site
+        var forumSearchIn: ForumSearchIn = .all
+        
+        var searchText = ""
+        var authorName = ""
+        var isAuthorsLoading = false
+        var shouldShowAuthorsList = false
+        var searchResultsAsTopics = false
+        var authors: [SearchUsersResponse.SimplifiedUser] = []
+        
+        public init(
+            on: SearchOn = .site,
+            navigation: [ForumInfo] = [.mock]
+        ) {
+            self.searchOn = on
+            self.navigation = navigation
+        }
     }
     
     // MARK: - Action
@@ -41,15 +56,14 @@ public struct SearchFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case startSearch
-            case additionalHidenToggle
             case searchAuthorName(String)
             case selectUser(Int, String)
         }
         
         case `internal`(Internal)
         public enum Internal {
-            case search(SearchRequest)
-            case addMembers(SearchUsersResponse)
+            case search(SearchOn)
+            case searchUsersResponse(SearchUsersResponse)
         }
     }
     
@@ -64,100 +78,78 @@ public struct SearchFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-                
-            case .view(.startSearch):
-                return .send(.internal(.search(formatData(
-                    searchText: state.searchText,
-                    isTopicFormat: state.toggleRes,
-                    nicknameAuthor: state.nicknameAuthor,
-                    authorId: state.authorId,
-                    whereSearch: state.whereSearch,
-                    whereSearchForum: state.whereSerchForum,
-                    sortBy: state.sortBy
-                ))))
-                
-            case let .view(.searchAuthorName(nickname)):
-                return .run { send in
-                    let request = SearchUsersRequest(term: nickname, offset: 0, number: 10)
-                    let result = try await apiClient.searchUsers(request: request)
-                    await send(.internal(.addMembers(result)))
+            case .view(.onAppear):
+                switch state.searchOn {
+                case .site:
+                    state.whereSearch = .site
+                case .topic:
+                    state.whereSearch = .topic
+                case .forum(_, let sIn, let asTopics):
+                    state.forumSearchIn = sIn
+                    state.searchResultsAsTopics = asTopics
                 }
-                
-            case let .view(.selectUser(id, nickname)):
-                state.nicknameAuthor = nickname
-                state.authorId = id
-                state.showMembers = false
                 return .none
                 
-            case let .internal(.search(request)):
+            case .view(.startSearch):
+                let searchOn: SearchOn = switch state.whereSearch {
+                case .site:  .site
+                case .topic: state.searchOn
+                case .forum:
+                    if case .forum(let id, _, _) = state.searchOn {
+                        .forum(id: id, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                    } else {
+                        .forum(id: nil, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                    }
+                case .custom:
+                    if let info = state.navigation.last, !info.isCategory {
+                        .forum(id: info.id, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                    } else {
+                        fatalError("Unexpected case. Info: [\(state.navigation)]")
+                    }
+                }
+                return .send(.internal(.search(searchOn)))
+                
+            case let .view(.searchAuthorName(nickname)):
+                state.isAuthorsLoading = true
                 return .run { send in
+                    let request = SearchUsersRequest(term: nickname, offset: 0, number: 12)
+                    let result = try await apiClient.searchUsers(request: request)
+                    await send(.internal(.searchUsersResponse(result)))
+                }
+                
+            case let .view(.selectUser(id, name)):
+                state.authorId = id
+                state.authorName = name
+                state.shouldShowAuthorsList = false
+                return .none
+                
+            case let .internal(.search(searchOn)):
+                return .run { [
+                    authorId = state.authorId,
+                    text = state.searchText,
+                    sort = state.searchSort
+                ] send in
+                    let request = SearchRequest(
+                        on: searchOn,
+                        authorId: authorId,
+                        text: text,
+                        sort: sort,
+                        offset: 0,
+                        amount: 10
+                    )
                     let result = try await apiClient.search(request: request)
                     customDump(result)
                 }
                 
-            case let .internal(.addMembers(data)):
-                state.members = data.users
-                print("from internal  = \(state.members)")
-                state.showMembers = !data.users.isEmpty
-                print("from internal  = \(state.showMembers)")
+            case let .internal(.searchUsersResponse(data)):
+                state.authors = data.users
+                state.isAuthorsLoading = false
+                state.shouldShowAuthorsList = data.usersCount > 0
                 return .none
                 
             case .binding:
                 return .none
-                
-            default:
-                return .none
             }
         }
-    }
-    
-    private func formatData(
-        searchText: String,
-        isTopicFormat: Bool,
-        nicknameAuthor: String,
-        authorId: Int?,
-        whereSearch: String,
-        whereSearchForum: String,
-        sortBy: String
-    ) -> SearchRequest {
-        
-        let searchIn: SearchRequest.ForumSearchIn
-        let searchOn: SearchRequest.SearchOn
-        
-        switch whereSearchForum {
-        case "Everywhere":
-            searchIn = .all
-        case "In topic titles only":
-            searchIn = .titles
-        case "Only in messages":
-            searchIn = .posts
-        default:
-            searchIn = .all
-        }
-        
-        switch whereSearch {
-        case "Everywhere":
-            searchOn = .site
-        case "On the forum":
-            searchOn = .forum(id: nil, sIn: searchIn, asTopics: isTopicFormat)
-        case "On the site":
-            searchOn = .site
-        default:
-            searchOn = .site
-        }
-        
-        let sort: SearchRequest.SearchSort
-        switch sortBy {
-        case "Relevance(matching the query)":
-            sort = .relevance
-        case "Date (newest to oldest)":
-            sort = .dateAscSort
-        case "Date (oldest to newest)":
-            sort = .dateDescSort
-        default:
-            sort = .relevance
-        }
-        
-        return SearchRequest(on: searchOn, authorId: authorId, text: searchText, sort: sort, offset: 10)
     }
 }

@@ -8,10 +8,15 @@
 import SwiftUI
 import SharedUI
 import ComposableArchitecture
+import Models
 
 @ViewAction(for: SearchFeature.self)
 public struct SearchScreen: View {
+    
     @Perception.Bindable public var store: StoreOf<SearchFeature>
+    
+    @FocusState public var focus: SearchFeature.State.Field?
+    
     @State private var additionalHidden = true
     
     public init(store: StoreOf<SearchFeature>) {
@@ -25,93 +30,102 @@ public struct SearchScreen: View {
             ZStack {
                 Color(.Background.primary)
                     .ignoresSafeArea()
-                NavigationStack {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            RowFilters(
-                                name: "Search",
-                                values: [
-                                    "Everywhere",
-                                    "On the forum",
-                                    "On the site"
-                                ],
-                                selectedValue: $store.whereSearch
-                            )
-                            .padding(.horizontal, 16)
-                            
-                            if !additionalHidden {
-                                additionalFilters()
-                                
-                                if store.showMembers {
-                                    ForEach(store.members, id: \.id) { member in
-                                        memberRow(id: member.id, name: member.nickname)
-                                    }
-                                }
-                            }
-                            showParametersButton()
+                
+                List {
+                    ParametersSection()
+                    
+                    if !additionalHidden {
+                        AuthorSection()
+                        
+                        if store.shouldShowAuthorsList {
+                            AuthorsList()
                         }
-                    }
-                    .background(Color(.Background.primary))
-                    .navigationTitle("Search")
-                    .searchable(text: $store.searchText)
-                    .onSubmit(of: .search) {
-                        send(.startSearch)
                     }
                     
+                    ShowParametersButton()
+                }
+                .scrollContentBackground(.hidden)
+            }
+            .navigationTitle(Text("Search", bundle: .module))
+            .background(Color(.Background.primary))
+            .searchable(text: $store.searchText)
+            .onSubmit(of: .search) {
+                send(.startSearch)
+            }
+            .bind($store.focus, to: $focus)
+        }
+    }
+    
+    @ViewBuilder
+    private func ParametersSection() -> some View {
+        Section {
+            WhereSearch()
+            
+            if !additionalHidden {
+                SortSearch()
+                
+                if store.whereSearch != .site {
+                    if store.whereSearch != .topic {
+                        ResultAsTopicsRow()
+                    }
+                    
+                    SearchOnForum()
                 }
             }
         }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
-    // MARK: - row filters
-    
     @ViewBuilder
-    private func RowFilters(name: String, values: [String], selectedValue: Binding<String>) -> some View {
-        if name == "Nickname" {
-            authorNicknameFilter()
-        } else if values.isEmpty {
-            viewTopicFilter(name: name)
-        } else {
-            menuFilter(name: name, values: values, selectedValue: selectedValue)
-        }
-    }
-    
-    // MARK: - author nickname filter
-    
-    @ViewBuilder
-    private func authorNicknameFilter() -> some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("Nickname author")
-                .foregroundStyle(Color(.Labels.teritary))
-                .font(.footnote)
-                .fontWeight(.semibold)
-                .padding(.bottom, 6)
+    private func WhereSearch() -> some View {
+        Picker(
+            LocalizedStringResource("Where", bundle: .module),
+            selection: $store.whereSearch
+        ) {
+            Text(SearchWhere.site.title, bundle: .module)
+                .tag(SearchWhere.site)
             
-            HStack(spacing: 0) {
-                TextField("Input...", text: $store.nicknameAuthor)
-                    .padding(.horizontal, 12)
-                    .textFieldStyle(.plain)
-                    .frame(height: 52)
-                    .background(Color(.Background.teritary))
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14)
-                            .stroke(Color(.Separator.primary), lineWidth: 0.33)
-                    )
-                    .onChange(of: store.nicknameAuthor) { text in
-                        send(.searchAuthorName(text))
-                    }
+            Text(SearchWhere.forum.title, bundle: .module)
+                .tag(SearchWhere.forum)
+            
+            Text(SearchWhere.topic.title, bundle: .module)
+                .tag(SearchWhere.topic)
+            
+            if let forum = store.navigation.last, !forum.isCategory {
+                Text("On \(forum.name)", bundle: .module)
+                    .tag(SearchWhere.custom)
             }
         }
-        .padding(.bottom, 11)
+        .padding(12)
+        .frame(height: 60)
+        .cornerRadius(10)
     }
     
-    // MARK: - view topic filter
+    @ViewBuilder
+    private func SortSearch() -> some View {
+        Picker(
+            LocalizedStringResource("Sort", bundle: .module),
+            selection: $store.searchSort
+        ) {
+            Text(SearchSort.relevance.title, bundle: .module)
+                .tag(SearchSort.relevance)
+            
+            Text(SearchSort.dateAscSort.title, bundle: .module)
+                .tag(SearchSort.dateAscSort)
+            
+            Text(SearchSort.dateDescSort.title, bundle: .module)
+                .tag(SearchSort.dateDescSort)
+        }
+        .padding(12)
+        .frame(height: 60)
+        .cornerRadius(10)
+    }
     
     @ViewBuilder
-    private func viewTopicFilter(name: String) -> some View {
+    private func ResultAsTopicsRow() -> some View {
         HStack(spacing: 0) {
-            Text(name)
+            Text("Result as topics", bundle: .module)
                 .foregroundStyle(.primary)
                 .font(.body)
                 .padding(.leading, 16)
@@ -119,130 +133,110 @@ public struct SearchScreen: View {
             
             Spacer()
             
-            Toggle(isOn: $store.toggleRes) {}
+            Toggle(isOn: $store.searchResultsAsTopics) {}
                 .padding(.trailing, 16)
         }
-        .background(Color(.Background.teritary))
     }
     
-    // MARK: - additional filters
+    // MARK: - Search on Forum Picker
     
     @ViewBuilder
-    private func additionalFilters() -> some View {
-        Group {
-            RowFilters(
-                name: "Sort",
-                values: [
-                    "Relevance(matching the query)",
-                    "Date (newest to oldest)",
-                    "Date (oldest to newest)"
-                ],
-                selectedValue: $store.sortBy
-            )
+    private func SearchOnForum() -> some View {
+        Picker(
+            LocalizedStringResource("Search on forum", bundle: .module),
+            selection: $store.forumSearchIn
+        ) {
+            Text(ForumSearchIn.all.title, bundle: .module)
+                .tag(ForumSearchIn.all)
             
-            RowFilters(
-                name: "Result in view topic",
-                values: [],
-                selectedValue: .constant("")
-            )
+            Text(ForumSearchIn.titles.title, bundle: .module)
+                .tag(ForumSearchIn.titles)
             
-            RowFilters(
-                name: "Search the forum",
-                values: [
-                    "Everywhere",
-                    "In posts",
-                    "In titles"
-                ],
-                selectedValue: $store.whereSerchForum
-            )
-            .padding(.bottom, 28)
-            
-            RowFilters(
-                name: "Nickname",
-                values: [],
-                selectedValue: .constant("")
-            )
+            Text(ForumSearchIn.posts.title, bundle: .module)
+                .tag(ForumSearchIn.posts)
         }
-        .padding(.horizontal, 16)
-        .transition(.opacity)
+        .padding(12)
+        .frame(minHeight: 60)
+        .cornerRadius(10)
     }
     
-    // MARK: - menu filter
+    // MARK: - Author Section
     
-    @ViewBuilder
-    private func menuFilter(name: String, values: [String], selectedValue: Binding<String>) -> some View {
-        HStack(spacing: 0) {
-            Text(name)
-                .foregroundStyle(.primary)
-                .font(.body)
-                .padding(.leading, 16)
-                .padding(.vertical, 19)
-            
-            Spacer()
-            
-            Menu {
-                ForEach(values, id: \.self) { value in
-                    Button {
-                        selectedValue.wrappedValue = value
-                        print("\(value) tapped")
-                    } label: {
-                        HStack {
-                            Text(value)
-                            if selectedValue.wrappedValue == value {
-                                Image(systemName: "checkmark")
-                            }
-                        }
-                    }
+    private func AuthorSection() -> some View {
+        Section {
+            SharedUI.ForField(
+                content: $store.authorName,
+                placeholder: LocalizedStringResource("Input...", bundle: .module),
+                focusEqual: SearchFeature.State.Field.authorName,
+                focus: $focus,
+                characterLimit: 26
+            )
+            .overlay(alignment: .trailing) {
+                if store.isAuthorsLoading {
+                    ProgressView()
+                        .frame(width: 22, height: 22)
+                        .padding(.horizontal, 12)
                 }
-            } label: {
-                Text(selectedValue.wrappedValue)
-                    .foregroundStyle(Color(.Labels.quaternary))
-                
-                Image(systemName: "chevron.compact.up.chevron.compact.down")
-                    .foregroundStyle(Color(.Labels.quaternary))
-                    .padding(.trailing, 16)
             }
+            .onChange(of: store.authorName) { name in
+                if !name.isEmpty, name.count >= 3 {
+                    send(.searchAuthorName(name))
+                }
+            }
+        } header: {
+            Text("Author nickname", bundle: .module)
+                .font(.footnote)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color(.Labels.teritary))
+                .textCase(nil)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(Color(.Background.teritary))
+        .onTapGesture {
+            focus = nil
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
-    // MARK: - member row
-    
-    @ViewBuilder
-    private func memberRow(id: Int, name: String) -> some View {
-        Button {
-            print("user \(id) was tapped")
-            send(.selectUser(id, name))
-        } label: {
-            HStack {
-                Text(name)
-                    .foregroundStyle(Color(.Labels.primary))
-                    .font(.body)
-                    .lineLimit(1)
-                    .padding(.horizontal, 28)
-                
-                Spacer()
+    private func AuthorsList() -> some View {
+        Section {
+            ForEach(store.authors) { author in
+                Button {
+                    send(.selectUser(author.id, author.name))
+                } label: {
+                    HStack {
+                        Text(author.name)
+                            .foregroundStyle(Color(.Labels.primary))
+                            .font(.body)
+                            .lineLimit(1)
+                            .padding(.horizontal, 28)
+                        
+                        Spacer()
+                    }
+                    .padding(.vertical, 16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(.Background.teritary))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
-            .padding(.vertical, 20)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.Background.teritary))
-            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
-        .padding(.horizontal, 16)
+        .padding(.vertical, 0)
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
-    // MARK: - show parameters button
+    // MARK: - Show Parameters Button
     
     @ViewBuilder
-    private func showParametersButton() -> some View {
+    private func ShowParametersButton() -> some View {
         Button {
             withAnimation(.easeInOut) {
                 additionalHidden.toggle()
             }
         } label: {
             HStack(spacing: 0) {
-                Text(additionalHidden ? "More parameters" : "Fewer parameters")
+                Text(additionalHidden ? "More parameters" : "Fewer parameters", bundle: .module)
                     .foregroundStyle(Color(.Labels.teritary))
                     .font(.callout)
                     .padding(.trailing, 8)
@@ -252,8 +246,8 @@ public struct SearchScreen: View {
                     .font(.body)
                     .rotationEffect(.degrees(additionalHidden ? 0 : -180))
             }
-            .padding(.top, additionalHidden ? 28 : 16)
         }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
@@ -262,7 +256,10 @@ public struct SearchScreen: View {
 #Preview {
     SearchScreen(
         store: Store(
-            initialState: SearchFeature.State(),
+            initialState: SearchFeature.State(
+                on: .site,
+                navigation: [.mock]
+            ),
         ) {
             SearchFeature()
         }
