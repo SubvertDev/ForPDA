@@ -15,41 +15,39 @@ public struct SearchRequest: Sendable, Equatable {
     public let text: String
     public let sort: SearchSort
     public let offset: Int
-    
-    public enum SearchOn: Sendable, Equatable {
-        case site
-        case forum(id: Int?, sIn: ForumSearchIn, asTopics: Bool = false)
-        case topic(id: Int)
-    }
-    
-    public enum ForumSearchIn : Sendable {
-        case all
-        case posts
-        case titles
-    }
-    
-    public enum SearchSort: Sendable {
-        case dateDescSort
-        case dateAscSort
-        case relevance
-    }
+    public let amount: Int
     
     public init(
         on: SearchOn,
         authorId: Int?,
         text: String,
         sort: SearchSort,
-        offset: Int
+        offset: Int,
+        amount: Int,
     ) {
         self.on = on
         self.authorId = authorId
         self.text = text
         self.sort = sort
         self.offset = offset
+        self.amount = amount
     }
 }
 
-extension SearchRequest.SearchOn {
+extension Models.SearchSort {
+    func toPDAPISearchSort() -> SearchCommand.SearchSort {
+        switch self {
+        case .dateAscSort:
+            return .dateAscSort
+        case .dateDescSort:
+            return .dateDescSort
+        case .relevance:
+            return .matchSort
+        }
+    }
+}
+
+extension Models.SearchOn {
     func toPDAPISearchOn() -> SearchCommand.SearchOn {
         switch self {
         case .site:
@@ -62,7 +60,7 @@ extension SearchRequest.SearchOn {
     }
 }
 
-extension SearchRequest.ForumSearchIn {
+fileprivate extension Models.ForumSearchIn {
     func toPDAPIForumSearchIn() -> SearchCommand.ForumSearchIn {
         switch self {
         case .all:
@@ -71,19 +69,6 @@ extension SearchRequest.ForumSearchIn {
             return .posts
         case .titles:
             return .titles
-        }
-    }
-}
-
-extension SearchRequest.SearchSort {
-    func toPDAPISearchSort() -> SearchCommand.SearchSort {
-        switch self {
-        case .dateAscSort:
-            return .dateAscSort
-        case .dateDescSort:
-            return .dateDescSort
-        case .relevance:
-            return .ascSort
         }
     }
 }

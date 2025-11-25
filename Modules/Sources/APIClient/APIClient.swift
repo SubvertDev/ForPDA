@@ -523,10 +523,11 @@ extension APIClient: DependencyKey {
                     authorId: request.authorId,
                     text: request.text,
                     sort: request.sort.toPDAPISearchSort(),
-                    offset: request.offset
+                    offset: request.offset,
+                    amount: request.amount
                 )
                 let response = try await api.send(command)
-                return try await parser.parseSearch(response: response)
+                return try await parser.parseSearch(response)
             },
             searchUsers: { request in
                 let command = SearchCommand.members(
