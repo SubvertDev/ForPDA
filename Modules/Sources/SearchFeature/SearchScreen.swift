@@ -53,6 +53,9 @@ public struct SearchScreen: View {
                 send(.startSearch)
             }
             .bind($store.focus, to: $focus)
+            .onAppear {
+                send(.onAppear)
+            }
         }
     }
     
