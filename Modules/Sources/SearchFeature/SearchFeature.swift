@@ -58,6 +58,8 @@ public struct SearchFeature: Reducer, Sendable {
             case startSearch
             case searchAuthorName(String)
             case selectUser(Int, String)
+            
+            case authorProfileButtonTapped
         }
         
         case `internal`(Internal)
@@ -90,6 +92,27 @@ public struct SearchFeature: Reducer, Sendable {
                 }
                 return .none
                 
+                
+            case .view(.authorProfileButtonTapped):
+                // TODO: Handle tap.
+                return .none
+                
+            case let .view(.searchAuthorName(nickname)):
+                state.authorId = nil
+                state.isAuthorsLoading = true
+                state.shouldShowAuthorsList = false
+                return .run { send in
+                    let request = SearchUsersRequest(term: nickname, offset: 0, number: 12)
+                    let result = try await apiClient.searchUsers(request: request)
+                    await send(.internal(.searchUsersResponse(result)))
+                }
+                
+            case let .view(.selectUser(id, name)):
+                state.authorName = name
+                state.authorId = id
+                state.shouldShowAuthorsList = false
+                return .none
+                
             case .view(.startSearch):
                 let searchOn: SearchOn = switch state.whereSearch {
                 case .site:  .site
@@ -108,20 +131,6 @@ public struct SearchFeature: Reducer, Sendable {
                     }
                 }
                 return .send(.internal(.search(searchOn)))
-                
-            case let .view(.searchAuthorName(nickname)):
-                state.isAuthorsLoading = true
-                return .run { send in
-                    let request = SearchUsersRequest(term: nickname, offset: 0, number: 12)
-                    let result = try await apiClient.searchUsers(request: request)
-                    await send(.internal(.searchUsersResponse(result)))
-                }
-                
-            case let .view(.selectUser(id, name)):
-                state.authorId = id
-                state.authorName = name
-                state.shouldShowAuthorsList = false
-                return .none
                 
             case let .internal(.search(searchOn)):
                 return .run { [

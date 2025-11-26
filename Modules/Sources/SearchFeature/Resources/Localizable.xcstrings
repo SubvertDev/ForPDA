@@ -61,9 +61,6 @@
         }
       }
     },
-    "HEllo" : {
-
-    },
     "Input..." : {
       "localizations" : {
         "ru" : {
@@ -140,6 +137,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Только в заголовках"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль"
           }
         }
       }

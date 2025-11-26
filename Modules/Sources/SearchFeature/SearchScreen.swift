@@ -14,6 +14,7 @@ import Models
 public struct SearchScreen: View {
     
     @Perception.Bindable public var store: StoreOf<SearchFeature>
+    @Environment(\.tintColor) private var tintColor
     
     @FocusState public var focus: SearchFeature.State.Field?
     
@@ -179,6 +180,8 @@ public struct SearchScreen: View {
                     ProgressView()
                         .frame(width: 22, height: 22)
                         .padding(.horizontal, 12)
+                } else if store.authorId != nil {
+                    AuthorProfileLinkButton()
                 }
             }
             .onChange(of: store.authorName) { name in
@@ -199,6 +202,24 @@ public struct SearchScreen: View {
         }
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    private func AuthorProfileLinkButton() -> some View {
+        Button {
+            send(.authorProfileButtonTapped)
+        } label: {
+            HStack(spacing: 0) {
+                Text("Profile", bundle: .module)
+                    .font(.caption)
+                    .foregroundStyle(Color(.Labels.teritary))
+                
+                Image(systemSymbol: .arrowUpRight)
+                    .frame(width: 32, height: 32)
+                    .foregroundStyle(tintColor)
+            }
+            .padding(.horizontal, 16)
+        }
+        .buttonStyle(.plain)
     }
     
     private func AuthorsList() -> some View {
