@@ -694,7 +694,7 @@ extension APIClient: DependencyKey {
                 
             },
             search: { _ in
-                return [.article(.mock), .topic(.mockToday), .post(.mock)]
+                return .mock
             },
             searchUsers: { _ in
                 return .mock

@@ -12,7 +12,7 @@ public struct SearchParser {
     
     // MARK: - Search Response
     
-    public static func parse(from string: String) throws(ParsingError) -> [SearchContent] {
+    public static func parse(from string: String) throws(ParsingError) -> SearchResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -21,11 +21,15 @@ public struct SearchParser {
             throw ParsingError.failedToCastDataToAny
         }
         
-        guard let content = array[safe: 3] as? [[Any]] else {
+        guard let contentCount = array[safe: 2] as? Int,
+              let content = array[safe: 3] as? [[Any]] else {
             throw ParsingError.failedToCastFields
         }
         
-        return try parseSearchContent(content)
+        return SearchResponse(
+            content: try parseSearchContent(content),
+            contentCount: contentCount
+        )
     }
     
     // MARK: - Content
