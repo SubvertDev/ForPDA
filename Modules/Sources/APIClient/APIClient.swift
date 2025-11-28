@@ -86,7 +86,7 @@ public struct APIClient: Sendable {
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
 
     // Search
-    public var search: @Sendable (_ request: SearchRequest) async throws -> [SearchContent]
+    public var search: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
     public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // STREAMS
