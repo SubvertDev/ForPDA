@@ -123,9 +123,9 @@ public struct SearchFeature: Reducer, Sendable {
                     } else {
                         .forum(id: nil, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     }
-                case .custom:
-                    if let info = state.navigation.last, !info.isCategory {
-                        .forum(id: info.id, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                case .forumById:
+                    if let forum = state.navigation.last, !forum.isCategory {
+                        .forum(id: forum.id, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     } else {
                         fatalError("Unexpected case. Info: [\(state.navigation)]")
                     }

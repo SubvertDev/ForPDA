@@ -12,7 +12,7 @@ public enum SearchWhere: Sendable {
     case site
     case topic
     case forum
-    case custom
+    case forumById
 }
 
 extension SearchWhere {
@@ -21,7 +21,7 @@ extension SearchWhere {
         case .site:  "On Site"
         case .topic: "On Topic"
         case .forum: "On Forum"
-        case .custom:
+        case .forumById:
             fatalError("Unexpected usage")
         }
     }

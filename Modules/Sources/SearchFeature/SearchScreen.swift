@@ -24,7 +24,7 @@ public struct SearchScreen: View {
         self.store = store
     }
     
-    // MARK: - body
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -98,7 +98,7 @@ public struct SearchScreen: View {
             
             if let forum = store.navigation.last, !forum.isCategory {
                 Text("On \(forum.name)", bundle: .module)
-                    .tag(SearchWhere.custom)
+                    .tag(SearchWhere.forumById)
             }
         }
         .padding(12)
@@ -271,6 +271,7 @@ public struct SearchScreen: View {
                     .rotationEffect(.degrees(additionalHidden ? 0 : -180))
             }
         }
+        .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .center)
     }
 }
