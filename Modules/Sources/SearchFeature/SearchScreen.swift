@@ -153,11 +153,11 @@ public struct SearchScreen: View {
             Text(ForumSearchIn.all.title, bundle: .module)
                 .tag(ForumSearchIn.all)
             
-            Text(ForumSearchIn.titles.title, bundle: .module)
-                .tag(ForumSearchIn.titles)
-            
             Text(ForumSearchIn.posts.title, bundle: .module)
                 .tag(ForumSearchIn.posts)
+            
+            Text(ForumSearchIn.titles.title, bundle: .module)
+                .tag(ForumSearchIn.titles)
         }
         .padding(12)
         .frame(minHeight: 60)
