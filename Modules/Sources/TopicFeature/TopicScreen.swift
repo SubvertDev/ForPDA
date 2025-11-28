@@ -276,176 +276,47 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func Post(_ post: UIPost) -> some View {
-        VStack(spacing: 8) {
-            PostHeader(post.post)
-            PostBody(post)
-            if let lastEdit = post.post.lastEdit {
-                PostFooter(lastEdit)
+        PostRowView(
+            state: .init(
+                post: post,
+                sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
+                canPostInTopic: store.topic?.canPost ?? false,
+                isUserAuthorized: store.isUserAuthorized,
+                isContextMenuAvailable: true
+            ),
+            action: { action in
+                switch action {
+                case .userTapped:
+                    send(.userTapped(post.post.author.id))
+                case .urlTapped(let url):
+                    send(.urlTapped(url))
+                case .imageTapped(let url):
+                    send(.imageTapped(url))
+                }
+            },
+            menuAction: { action in
+                switch action {
+                case .reply(let id, let authorName):
+                    send(.contextPostMenu(.reply(id, authorName)))
+                case .edit(let post):
+                    send(.contextPostMenu(.edit(post)))
+                case .delete(let postId):
+                    send(.contextPostMenu(.delete(postId)))
+                case .karma(let postId):
+                    send(.contextPostMenu(.karma(postId)))
+                case .report(let postId):
+                    send(.contextPostMenu(.report(postId)))
+                case .changeReputation(let postId, let userId, let username):
+                    send(.contextPostMenu(.changeReputation(postId, userId, username)))
+                case .copyLink(let postId):
+                    send(.contextPostMenu(.copyLink(postId)))
+                }
             }
-        }
+        )
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
         .scaleEffect(store.postId == post.id ? scrollScale : 1)
         .id(post.id)
-    }
-    
-    // MARK: - Post Header
-    
-    @ViewBuilder
-    private func PostHeader(_ post: Post) -> some View {
-        HStack(spacing: 8) {
-            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
-                if let image = state.image {
-                    image.resizable().scaledToFill()
-                } else {
-                    Image(.avatarDefault).resizable().scaledToFill()
-                }
-            }
-            .frame(width: 32, height: 32)
-            .clipShape(Circle())
-            .onTapGesture {
-                send(.userTapped(post.author.id))
-            }
-            
-            VStack(spacing: 4) {
-                HStack(spacing: 8) {
-                    Group {
-                        Text(post.author.name)
-                            .font(.subheadline)
-                            .bold()
-                            .foregroundStyle(Color(.Labels.primary))
-                            .lineLimit(1)
-                        
-                        Text(String(post.author.reputationCount))
-                            .font(.caption)
-                            .foregroundStyle(Color(.Labels.secondary))
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 6)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .foregroundStyle(Color(.Background.teritary))
-                            )
-                    }
-                    .onTapGesture {
-                        send(.userTapped(post.author.id))
-                    }
-                    
-                    Spacer()
-                    
-                    if post.karma != 0 {
-                        Text(String(post.karma))
-                            .font(.caption)
-                            .foregroundStyle(Color(.Labels.primary))
-                    }
-                }
-                
-                HStack(spacing: 8) {
-                    Text(User.Group(rawValue: post.author.groupId)!.title)
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.teritary))
-                    
-                    Spacer()
-                    
-                    Text(post.createdAt.formattedDate(), bundle: .module)
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.quaternary))
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                }
-            }
-            
-            if store.isUserAuthorized, let topic = store.topic, topic.canPost {
-                OptionsPostMenu(post)
-            }
-        }
-    }
-    
-    // MARK: - Post Body
-    
-    @ViewBuilder
-    private func PostBody(_ post: UIPost) -> some View {
-        VStack(spacing: 8) {
-            ForEach(post.content, id: \.self) { type in
-                TopicView(type: type.value, attachments: post.post.attachments) { url in
-                    send(.urlTapped(url))
-                } onImageTap: { url in
-                    send(.imageTapped(url))
-                }
-            }
-        }
-    }
-    
-    // MARK: - Post Footer
-    
-    @ViewBuilder
-    private func PostFooter(_ lastEdit: Post.LastEdit) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Edited: \(lastEdit.username) • \(lastEdit.date.formatted())", bundle: .module)
-            if !lastEdit.reason.isEmpty {
-                Text("Reason: \(lastEdit.reason)", bundle: .module)
-            }
-        }
-        .font(.caption2)
-        .foregroundStyle(Color(.Labels.teritary))
-        .padding(.top, 6)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    
-    // MARK: - Options Post Menu
-    
-    @ViewBuilder
-    private func OptionsPostMenu(_ post: Post) -> some View {
-        Menu {
-            Section {
-                ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
-                    send(.contextPostMenu(.reply(post.id, post.author.name)))
-                }
-            }
-            
-            if store.isUserAuthorized, store.userSession!.userId != post.author.id, post.canChangeKarma {
-                ContextButton(text: LocalizedStringResource("Rate", bundle: .module), symbol: .chevronUpChevronDown) {
-                    send(.contextPostMenu(.karma(post.id)))
-                }
-            }
-            
-            if post.canEdit {
-                ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
-                    send(.contextPostMenu(.edit(post)))
-                }
-            }
-            
-            ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
-                send(.contextPostMenu(.report(post.id)))
-            }
-            
-            if post.canDelete {
-                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    send(.contextPostMenu(.delete(post.id)))
-                }
-            }
-            
-            if store.isUserAuthorized, post.author.id != store.userSession!.userId {
-                Section {
-                    ContextButton(text: LocalizedStringResource("Reputation", bundle: .module), symbol: .plusminus) {
-                        send(.contextPostMenu(.changeReputation(post.id, post.author.id, post.author.name)))
-                    }
-                }
-            }
-            
-            Section {
-                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
-                    send(.contextPostMenu(.copyLink(post.id)))
-                }
-            }
-        } label: {
-            Image(systemSymbol: .ellipsis)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.teritary))
-                .padding(.horizontal, 8) // Padding for tap area
-                .padding(.vertical, 16)
-                .rotationEffect(.degrees(90))
-        }
-        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
-        .frame(width: 8, height: 22)
     }
     
     // MARK: - Helpers

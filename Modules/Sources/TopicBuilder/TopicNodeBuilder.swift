@@ -8,6 +8,7 @@
 import Foundation
 import Models
 import BBBuilder
+import SharedUI
 
 public struct TopicNodeBuilder {
     
@@ -19,13 +20,13 @@ public struct TopicNodeBuilder {
         self.attachments = attachments
     }
     
-    public func build() -> [TopicTypeUI] {
+    public func build() -> [UITopicType] {
         let nodes = BBBuilder.build(text: text, attachments: attachments)
         return convert(nodes)
     }
     
-    private func convert(_ nodes: [BBContainerNode]) -> [TopicTypeUI] {
-        var elements: [TopicTypeUI] = []
+    private func convert(_ nodes: [BBContainerNode]) -> [UITopicType] {
+        var elements: [UITopicType] = []
         for node in nodes {
             switch node {
             case .text(let string):

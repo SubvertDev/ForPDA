@@ -6,6 +6,7 @@
 //
 
 import Models
+import SharedUI
 
 struct UIPost: Identifiable, Equatable {
     var id: Int { post.id }
@@ -13,6 +14,6 @@ struct UIPost: Identifiable, Equatable {
     let content: [Content]
     
     struct Content: Hashable {
-        let value: TopicTypeUI
+        let value: UITopicType
     }
 }

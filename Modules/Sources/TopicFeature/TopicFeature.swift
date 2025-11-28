@@ -11,6 +11,7 @@ import PageNavigationFeature
 import APIClient
 import DeeplinkHandler
 import Models
+import SharedUI
 import PersistenceKeys
 import ParsingClient
 import PasteboardClient
@@ -127,7 +128,7 @@ public struct TopicFeature: Reducer, Sendable {
             case urlTapped(URL)
             case imageTapped(URL)
             case contextMenu(TopicContextMenuAction)
-            case contextPostMenu(TopicPostContextMenuAction)
+            case contextPostMenu(PostMenuAction)
             case editWarningSheetCloseButtonTapped
         }
         
@@ -139,7 +140,7 @@ public struct TopicFeature: Reducer, Sendable {
             case changeKarma(postId: Int, isUp: Bool)
             case voteInPoll(selections: [[Int]])
             case loadTopic(Int)
-            case loadTypes([[TopicTypeUI]])
+            case loadTypes([[UITopicType]])
             case topicResponse(Result<Topic, any Error>)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
@@ -454,9 +455,9 @@ public struct TopicFeature: Reducer, Sendable {
                         topicPerPage = state.appSettings.topicPerPage,
                         shouldShowTopicHatButton = state.shouldShowTopicHatButton
                     ] send in
-                        var topicTypes: [[TopicTypeUI]] = []
+                        var topicTypes: [[UITopicType]] = []
                         
-                        topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
+                        topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
                             for (index, post) in topic.posts.enumerated() {
                                 // guard index == 0 else { continue } // For test purposes
                                 var text = post.content
@@ -469,7 +470,7 @@ public struct TopicFeature: Reducer, Sendable {
                                 }
                             }
                             
-                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topicPerPage + 1)
+                            var types = Array<[UITopicType]?>(repeating: nil, count: topicPerPage + 1)
                             for await (index, result) in taskGroup {
                                 types[index] = result
                             }
@@ -547,7 +548,7 @@ public struct TopicFeature: Reducer, Sendable {
         )
     }
     
-    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[TopicTypeUI]]) -> [UIPost] {
+    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[UITopicType]]) -> [UIPost] {
         zip(newPosts, newTypes).map { newPost, newTypes in
             if let oldPost = old.first(where: { $0.id == newPost.id }) {
                 let mergedContent = mergePostContent(
@@ -561,7 +562,7 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    private func mergePostContent(old: [UIPost.Content], new: [TopicTypeUI]) -> [UIPost.Content] {
+    private func mergePostContent(old: [UIPost.Content], new: [UITopicType]) -> [UIPost.Content] {
         new.map { newType in
             if let match = old.first(where: { $0.value.hashValue == newType.hashValue }) {
                 return match

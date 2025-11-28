@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Code" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -13,6 +14,7 @@
     },
     "Code: " : {
       "comment" : "Has space after colon",
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -23,6 +25,7 @@
       }
     },
     "Hidden text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

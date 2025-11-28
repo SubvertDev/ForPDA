@@ -7,7 +7,7 @@
 
 import Models
 
-public enum TopicPostContextMenuAction {
+public enum PostMenuAction {
     case reply(Int, String)
     case edit(Post)
     case delete(Int)
