@@ -56,7 +56,7 @@ public struct SearchResultFeature: Reducer, Sendable {
             case onAppear
             
             case postTapped
-            case topicTapped
+            case topicTapped(Int, String, Bool)
             case articleTapped
         }
         
@@ -65,6 +65,11 @@ public struct SearchResultFeature: Reducer, Sendable {
             case loadContent(offset: Int)
             case buildContent([SearchContent])
             case searchResponse(Result<SearchResponse, any Error>)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openTopic(id: Int, name: String, goTo: GoTo)
         }
     }
     
@@ -93,8 +98,8 @@ public struct SearchResultFeature: Reducer, Sendable {
             case .view(.postTapped):
                 return .none
                 
-            case .view(.topicTapped):
-                return .none
+            case let .view(.topicTapped(id, name, isUnreadTapped)):
+                return .send(.delegate(.openTopic(id: id, name: name, goTo: isUnreadTapped ? .unread : .first)))
                 
             case .view(.articleTapped):
                 return .none
@@ -140,6 +145,9 @@ public struct SearchResultFeature: Reducer, Sendable {
             case let .internal(.searchResponse(.failure(error))):
                 print(error)
                 // TODO: Toast.
+                return .none
+                
+            case .delegate:
                 return .none
             }
         }

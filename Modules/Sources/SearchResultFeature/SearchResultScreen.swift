@@ -117,7 +117,7 @@ public struct SearchResultScreen: View {
                 isClosed: topic.isClosed,
                 isUnread: topic.isUnread,
                 onAction: { isUnreadTapped in
-                    
+                    send(.topicTapped(topic.id, topic.name, isUnreadTapped))
                 }
             )
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
