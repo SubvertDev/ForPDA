@@ -223,7 +223,7 @@ struct PollView: View {
     // MARK: - Helpers
     
     private func progressPercentage(_ choice: Topic.Poll.Choice, _ totalVotes: Int) -> CGFloat {
-        return CGFloat(choice.votes) / CGFloat(totalVotes)
+        return totalVotes != 0 ? CGFloat(choice.votes) / CGFloat(totalVotes) : 0
     }
     
     private func voteButtonForegroundColor() -> Color {
