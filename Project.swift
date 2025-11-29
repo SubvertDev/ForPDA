@@ -314,6 +314,7 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
+                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.QMSClient,
                     .Internal.SharedUI,

@@ -5,10 +5,11 @@
 //  Created by Ilia Lubianoi on 17.11.2024.
 //
 
-import Foundation
+import CacheClient
 import ComposableArchitecture
-import QMSClient
+import Foundation
 import Models
+import QMSClient
 
 @Reducer
 public struct QMSListFeature: Reducer, Sendable {
@@ -40,8 +41,9 @@ public struct QMSListFeature: Reducer, Sendable {
     
     // MARK: - Dependency
     
-    @Dependency(\.qmsClient) private var qmsClient
     @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.cacheClient) private var cacheClient
+    @Dependency(\.qmsClient) private var qmsClient
     
     // MARK: - Body
     
@@ -80,6 +82,7 @@ public struct QMSListFeature: Reducer, Sendable {
             case let ._qmsLoaded(result):
                 switch result {
                 case let .success(qms):
+                    var qms = qms
                     // customDump(qms)
                     
                     // Populating expandedGroups on first load
@@ -87,6 +90,12 @@ public struct QMSListFeature: Reducer, Sendable {
                     if qms.users.count > state.qms?.users.count ?? 0 {
                         state.expandedGroups.removeAll()
                         qms.users.forEach { _ in state.expandedGroups.append(false) }
+                    }
+                    
+                    for (index, user) in qms.users.enumerated() where user.chats.isEmpty {
+                        if let cachedChats = cacheClient.getQMSChats(user.id) {
+                            qms.users[index].chats = cachedChats
+                        }
                     }
                     
                     state.qms = qms
@@ -106,6 +115,7 @@ public struct QMSListFeature: Reducer, Sendable {
                        let index = qms.users.firstIndex(where: { $0.id == user.id }) {
                         qms.users[index].chats = user.chats
                         state.qms = qms
+                        cacheClient.setQMSChats(qms.users[index].id, user.chats)
                     }
                     
                 case let .failure(error):

@@ -44,6 +44,10 @@ public struct CacheClient: Sendable {
     public var setAttachmentURL: @Sendable (_ id: Int, _ url: URL) -> Void
     public var getAttachmentURL: @Sendable (_ id: Int) -> URL?
     
+    // QMS
+    public var setQMSChats: @Sendable (_ id: Int, _ chats: [QMSChatInfo]) -> Void
+    public var getQMSChats: @Sendable (_ id: Int) -> [QMSChatInfo]?
+    
     // Background Tasks
     public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
     public var getLastBackgroundTaskInvokeTime: @Sendable () async -> [TimeInterval]
@@ -79,6 +83,7 @@ extension CacheClient: DependencyKey {
                 try await favoritesStorage.async.removeAll()
                 try await forumsListStorage.async.removeAll()
                 try await forumsStorage.async.removeAll()
+                try await qmsChatsStorage.async.removeAll()
                 try await lastBackgroundTaskInvokeTimeStorage.async.removeAll()
                 try await notificationsStorage.async.removeAll()
             },
@@ -138,6 +143,15 @@ extension CacheClient: DependencyKey {
             },
             getAttachmentURL: { id in
                 return try? attachmentURLsStorage.object(forKey: id)
+            },
+            
+            // MARK: - QMS
+            
+            setQMSChats: { id, chats in
+                try? qmsChatsStorage.setObject(chats, forKey: id)
+            },
+            getQMSChats: { id in
+                return try? qmsChatsStorage.object(forKey: id)
             },
             
             // MARK: - Background Tasks
@@ -229,6 +243,15 @@ private extension CacheClient {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: URL.self)
+        )
+    }
+    
+    private static var qmsChatsStorage: Storage<Int, [QMSChatInfo]> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "QMSChats", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: [QMSChatInfo].self)
         )
     }
     
