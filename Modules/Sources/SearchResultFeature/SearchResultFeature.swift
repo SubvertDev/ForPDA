@@ -7,9 +7,11 @@
 
 import Foundation
 import ComposableArchitecture
+import APIClient
 import Models
 import PersistenceKeys
 import SharedUI
+import TopicBuilder
 
 @Reducer
 public struct SearchResultFeature: Reducer, Sendable {
@@ -22,16 +24,21 @@ public struct SearchResultFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Shared(.userSession) var userSession: UserSession?
         
-        public let response: SearchResponse
+        public let request: SearchRequest
         
         public var isUserAuthorized: Bool {
             return userSession != nil
         }
         
+        var contentCount = 0
+        var content: [SearchContent] = []
+        
+        var isLoading = false
+        
         public init(
-            response: SearchResponse
+            request: SearchRequest
         ) {
-            self.response = response
+            self.request = request
         }
     }
     
@@ -49,9 +56,15 @@ public struct SearchResultFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum `Internal` {
+            case loadContent
+            case searchResponse(Result<SearchResponse, any Error>)
             case loadPostTypes([UITopicType])
         }
     }
+    
+    // MARK: - Dependencies
+    
+    @Dependency(\.apiClient) private var apiClient
     
     // MARK: - Body
     
@@ -59,7 +72,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                return .none
+                return .send(.internal(.loadContent))
                 
             case .view(.postTapped):
                 return .none
@@ -70,7 +83,25 @@ public struct SearchResultFeature: Reducer, Sendable {
             case .view(.articleTapped):
                 return .none
                 
+            case .internal(.loadContent):
+                state.isLoading = true
+                return .run { [request = state.request] send in
+                    let respone = try await apiClient.search(request: request)
+                    await send(.internal(.searchResponse(.success(respone))))
+                }
+                
             case .internal(.loadPostTypes(let types)):
+                return .none
+                
+            case let .internal(.searchResponse(.success(response))):
+                state.content = response.content
+                state.contentCount = response.contentCount
+                
+                state.isLoading = false
+                return .none
+                
+            case let .internal(.searchResponse(.failure(error))):
+                print(error)
                 return .none
             }
         }

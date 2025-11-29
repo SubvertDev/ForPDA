@@ -11,7 +11,7 @@ import Models
 import SharedUI
 
 @ViewAction(for: SearchResultFeature.self)
-public struct SearchResultView: View {
+public struct SearchResultScreen: View {
     
     @Perception.Bindable public var store: StoreOf<SearchResultFeature>
     
@@ -24,33 +24,46 @@ public struct SearchResultView: View {
     // MARK: - Body
     
     public var body: some View {
-        ZStack {
-            Color(.Background.primary)
-                .ignoresSafeArea()
-            
-            List {
-                ForEach(store.response.content) { type in
-                    switch type {
-                    case .post(let post):
-                        PostSection(post)
-                    case .topic(let topic):
-                        TopicSection(topic)
-                    case .article(let article):
-                        ArticleRow(article)
+        WithPerceptionTracking {
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                if !store.content.isEmpty {
+                    List {
+                        ForEach(store.content) { type in
+                            switch type {
+                            case .post(let post):
+                                PostSection(post)
+                            case .topic(let topic):
+                                TopicSection(topic)
+                            case .article(let article):
+                                ArticleRow(article)
+                            }
+                        }
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
             }
-            .listStyle(.plain)
-            .scrollContentBackground(.hidden)
+            .overlay {
+                if store.content.isEmpty {
+                    PDALoader()
+                        .frame(width: 24, height: 24)
+                }
+            }
+            .navigationTitle(Text("Search", bundle: .module))
+            .background(Color(.Background.primary))
+            .onAppear {
+                send(.onAppear)
+            }
         }
-        .navigationTitle(Text("Search", bundle: .module))
-        .background(Color(.Background.primary))
     }
     
     // MARK: - Post Row
     
     private func PostSection(_ post: SearchContent.HybridPost) -> some View {
-        VStack {
+        VStack(alignment: .leading) {
             Button {
                 send(.topicTapped)
             } label: {
@@ -116,10 +129,17 @@ public struct SearchResultView: View {
 
 #Preview {
     NavigationStack {
-        SearchResultView(
+        SearchResultScreen(
             store: Store(
                 initialState: SearchResultFeature.State(
-                    response: .mock
+                    request: .init(
+                        on: .site,
+                        authorId: nil,
+                        text: "ForPDA",
+                        sort: .relevance,
+                        offset: 0,
+                        amount: 10
+                    )
                 ),
             ) {
                 SearchResultFeature()

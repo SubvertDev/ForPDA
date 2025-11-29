@@ -50,6 +50,7 @@ let project = Project(
                     .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
                     .Internal.SearchFeature,
+                    .Internal.SearchResultFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -289,6 +290,7 @@ let project = Project(
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.PersistenceKeys,
+                    .Internal.SearchResultFeature,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .SPM.NukeUI,
@@ -374,6 +376,19 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .SPM.TCA,
+                ]
+            ),
+            
+            .feature(
+                name: "SearchResultFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TopicBuilder,
                     .SPM.TCA,
                 ]
             ),
@@ -896,6 +911,7 @@ extension TargetDependency.Internal {
     static let ReputationChangeFeature = TargetDependency.target(name: "ReputationChangeFeature")
     static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
     static let SearchFeature =          TargetDependency.target(name: "SearchFeature")
+    static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
