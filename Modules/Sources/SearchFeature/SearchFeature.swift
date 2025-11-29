@@ -103,7 +103,8 @@ public struct SearchFeature: Reducer, Sendable {
             case .view(.cancelButtonTapped):
                 return .run { _ in await dismiss() }
                 
-            case .delegate(.searchOptionsConstructed):
+            case .delegate(.userProfileTapped),
+                 .delegate(.searchOptionsConstructed):
                 return .run { _ in await dismiss() }
                 
             case .view(.authorProfileButtonTapped):
