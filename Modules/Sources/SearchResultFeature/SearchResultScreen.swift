@@ -62,7 +62,7 @@ public struct SearchResultScreen: View {
     
     // MARK: - Post Row
     
-    private func PostSection(_ post: SearchContent.HybridPost) -> some View {
+    private func PostSection(_ post: UIContent.UIHybridPost) -> some View {
         VStack(alignment: .leading) {
             Button {
                 send(.topicTapped)
@@ -74,7 +74,13 @@ public struct SearchResultScreen: View {
             }
             .buttonStyle(.plain)
             
-            
+            PostRowView(
+                state: .init(post: post.post),
+                action: { _ in
+                    
+                },
+                menuAction: { _ in }
+            )
         }
     }
     

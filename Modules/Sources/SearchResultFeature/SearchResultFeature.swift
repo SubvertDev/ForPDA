@@ -31,7 +31,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         }
         
         var contentCount = 0
-        var content: [SearchContent] = []
+        var content: [UIContent] = []
         
         var isLoading = false
         
@@ -57,8 +57,8 @@ public struct SearchResultFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum `Internal` {
             case loadContent
+            case buildContent([SearchContent])
             case searchResponse(Result<SearchResponse, any Error>)
-            case loadPostTypes([UITopicType])
         }
     }
     
@@ -88,20 +88,33 @@ public struct SearchResultFeature: Reducer, Sendable {
                 return .run { [request = state.request] send in
                     let respone = try await apiClient.search(request: request)
                     await send(.internal(.searchResponse(.success(respone))))
+                } catch: { error, send in
+                    await send(.internal(.searchResponse(.failure(error))))
                 }
                 
-            case .internal(.loadPostTypes(let types)):
-                return .none
-                
             case let .internal(.searchResponse(.success(response))):
-                state.content = response.content
                 state.contentCount = response.contentCount
+                return .send(.internal(.buildContent(response.content)))
                 
+            case let .internal(.buildContent(content)):
+                for type in content {
+                    switch type {
+                    case .post(let post):
+                        let topicTypes = TopicNodeBuilder(text: post.post.content, attachments: post.post.attachments).build()
+                        let uiPost = UIPost(post: post.post, content: topicTypes.map { .init(value: $0) } )
+                        state.content.append(.post(.init(topicId: post.topicId, topicName: post.topicName, post: uiPost)))
+                    case .topic(let topic):
+                        state.content.append(.topic(topic))
+                    case .article(let article):
+                        state.content.append(.article(article))
+                    }
+                }
                 state.isLoading = false
                 return .none
                 
             case let .internal(.searchResponse(.failure(error))):
                 print(error)
+                // TODO: Toast.
                 return .none
             }
         }
