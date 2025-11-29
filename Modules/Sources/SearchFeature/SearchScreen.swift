@@ -87,18 +87,22 @@ public struct SearchScreen: View {
             LocalizedStringResource("Where", bundle: .module),
             selection: $store.whereSearch
         ) {
-            Text(SearchWhere.site.title, bundle: .module)
-                .tag(SearchWhere.site)
-            
-            Text(SearchWhere.forum.title, bundle: .module)
-                .tag(SearchWhere.forum)
-            
-            Text(SearchWhere.topic.title, bundle: .module)
-                .tag(SearchWhere.topic)
-            
-            if let forum = store.navigation.last, !forum.isCategory {
-                Text("On \(forum.name)", bundle: .module)
-                    .tag(SearchWhere.forumById)
+            if store.whereSearch == .site {
+                Text(SearchWhere.site.title, bundle: .module)
+                    .tag(SearchWhere.site)
+            } else {
+                Text(SearchWhere.forum.title, bundle: .module)
+                    .tag(SearchWhere.forum)
+                
+                if store.whereSearch == .topic {
+                    Text(SearchWhere.topic.title, bundle: .module)
+                        .tag(SearchWhere.topic)
+                }
+                
+                if let forum = store.navigation.last, !forum.isCategory {
+                    Text("On \(forum.name)", bundle: .module)
+                        .tag(SearchWhere.forumById)
+                }
             }
         }
         .padding(12)
