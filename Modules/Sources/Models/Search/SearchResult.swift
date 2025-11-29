@@ -5,8 +5,6 @@
 //  Created by Xialtal on 29.11.25.
 //
 
-import Models
-
 public struct SearchResult: Sendable, Equatable {
     public let on: SearchOn
     public let authorId: Int?
@@ -26,7 +24,7 @@ public struct SearchResult: Sendable, Equatable {
     }
 }
 
-extension SearchResult {
+public extension SearchResult {
     static let mock = SearchResult(
         on: .site,
         authorId: nil,
