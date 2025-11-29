@@ -65,8 +65,13 @@ public struct SearchFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            case search(SearchOn)
             case searchUsersResponse(SearchUsersResponse)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case userProfileTapped(Int)
+            case searchOptionsConstructed(SearchResult)
         }
     }
     
@@ -98,9 +103,11 @@ public struct SearchFeature: Reducer, Sendable {
             case .view(.cancelButtonTapped):
                 return .run { _ in await dismiss() }
                 
+            case .delegate(.searchOptionsConstructed):
+                return .run { _ in await dismiss() }
+                
             case .view(.authorProfileButtonTapped):
-                // TODO: Handle tap.
-                return .none
+                return .send(.delegate(.userProfileTapped(state.authorId!)))
                 
             case let .view(.searchAuthorName(nickname)):
                 state.authorId = nil
@@ -135,25 +142,12 @@ public struct SearchFeature: Reducer, Sendable {
                         fatalError("Unexpected case. Info: [\(state.navigation)]")
                     }
                 }
-                return .send(.internal(.search(searchOn)))
-                
-            case let .internal(.search(searchOn)):
-                return .run { [
-                    authorId = state.authorId,
-                    text = state.searchText,
-                    sort = state.searchSort
-                ] send in
-                    let request = SearchRequest(
-                        on: searchOn,
-                        authorId: authorId,
-                        text: text,
-                        sort: sort,
-                        offset: 0,
-                        amount: 10
-                    )
-                    let result = try await apiClient.search(request: request)
-                    customDump(result)
-                }
+                return .send(.delegate(.searchOptionsConstructed(SearchResult(
+                    on: searchOn,
+                    authorId: state.authorId,
+                    text: state.searchText,
+                    sort: state.searchSort
+                ))))
                 
             case let .internal(.searchUsersResponse(data)):
                 state.authors = data.users
@@ -161,7 +155,7 @@ public struct SearchFeature: Reducer, Sendable {
                 state.shouldShowAuthorsList = data.usersCount > 0
                 return .none
                 
-            case .binding:
+            case .binding, .delegate:
                 return .none
             }
         }
