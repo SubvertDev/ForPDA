@@ -164,6 +164,7 @@ public struct ReputationFeature: Reducer, Sendable {
                 return .none
                 
             case let .internal(.historyResponse(.failure(error))):
+                print(error)
                 state.isLoading = false
                 state.destination = .alert(.error)
                 reportFullyDisplayed(&state)
