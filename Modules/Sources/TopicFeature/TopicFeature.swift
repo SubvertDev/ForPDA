@@ -40,7 +40,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
@@ -629,6 +629,8 @@ public struct TopicFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension TopicFeature.Destination.State: Equatable {}
 
 func measureElapsedTime(_ operation: () throws -> Void) throws -> UInt64 {
     let startTime = DispatchTime.now()

@@ -27,7 +27,7 @@ public struct EditFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination: Hashable, Equatable {
         case alert(AlertState<Alert>)
         case avatarPicker
@@ -225,6 +225,8 @@ public struct EditFeature: Reducer, Sendable {
         }
     }
 }
+
+extension EditFeature.Destination.State: Equatable {}
 
 private extension Date {
     func toProfileString() -> String {
