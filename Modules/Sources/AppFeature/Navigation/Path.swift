@@ -24,7 +24,7 @@ import SettingsFeature
 import TopicFeature
 import AuthFeature
 
-@Reducer(state: .equatable)
+@Reducer
 public enum Path {
     case articles(Articles.Body = Articles.body)
     case favorites(FavoritesRootFeature)
@@ -34,20 +34,20 @@ public enum Path {
     case qms(QMS.Body = QMS.body)
     case auth(AuthFeature)
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Articles {
         case articlesList(ArticlesListFeature)
         case article(ArticleFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
         case reputation(ReputationFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Forum {
         case forumList(ForumsListFeature)
         case forum(ForumFeature)
@@ -55,7 +55,7 @@ public enum Path {
         case topic(TopicFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Settings {
         case settings(SettingsFeature)
         case navigation(NavigationSettingsFeature)
@@ -63,12 +63,19 @@ public enum Path {
         case developer(DeveloperFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum QMS {
         case qmsList(QMSListFeature)
         case qms(QMSFeature)
     }
 }
+
+extension Path.State: Equatable {}
+extension Path.Articles.State: Equatable {}
+extension Path.Profile.State: Equatable {}
+extension Path.Forum.State: Equatable {}
+extension Path.Settings.State: Equatable {}
+extension Path.QMS.State: Equatable {}
 
 extension Path {
     @MainActor @ViewBuilder

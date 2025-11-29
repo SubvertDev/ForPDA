@@ -582,10 +582,9 @@ struct HideView: View {
         }
         .animation(.default, value: isShown)
         .task {
-            #warning("What is happening here?")
             @Dependency(\.cacheClient) var cache
             if let userId = shouldLoadUser, let info {
-                if let currentUser = await cache.getUser(userId) {
+                if let currentUser = cache.getUser(userId) {
                     if currentUser.replies >= info {
                         isShown = true
                     }

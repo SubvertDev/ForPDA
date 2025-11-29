@@ -20,7 +20,7 @@ public struct SettingsFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         case alert(AlertState<SettingsFeature.Action.Alert>)
     }
@@ -248,6 +248,8 @@ public struct SettingsFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension SettingsFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extensions
 

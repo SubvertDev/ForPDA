@@ -40,7 +40,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
@@ -571,31 +571,6 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    #warning("move")
-    public enum JumpTo: Sendable {
-        case unread
-        case last
-        case post(id: Int)
-        case page(Int)
-        
-        var postId: Int {
-            switch self {
-            case .unread, .last: return 0
-            case let .post(id):  return id
-            case .page: fatalError("Unsupported interaction")
-            }
-        }
-        
-        var type: JumpForumRequest.ForumJumpType {
-            switch self {
-            case .unread: return .new
-            case .last:   return .last
-            case .post:   return .post
-            case .page:   fatalError("Unsupported interaction")
-            }
-        }
-    }
-    
     public func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
         if case let .page(page) = jump {
             return reduce(into: &state, action: .pageNavigation(.goToPage(newPage: page)))
@@ -629,6 +604,8 @@ public struct TopicFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension TopicFeature.Destination.State: Equatable {}
 
 func measureElapsedTime(_ operation: () throws -> Void) throws -> UInt64 {
     let startTime = DispatchTime.now()

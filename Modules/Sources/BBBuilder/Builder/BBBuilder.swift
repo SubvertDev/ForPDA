@@ -161,8 +161,8 @@ public struct BBBuilder {
                 }
                 
             case .img:
+                // TODO: Finish image case
                 logger.info("Image case")
-                #warning("todo")
                 mergedNodes.lastOrAppend = unwrap(node: node, with: mutableText)
                 
             case let .attachment(attribute):

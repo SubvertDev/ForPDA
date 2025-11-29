@@ -101,7 +101,8 @@ public struct ForumsListFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 
             case let .internal(.forumsListResponse(.failure(error))):
-                #warning("add toast")
+                print(error)
+                // TODO: Add toast
                 reportFullyDisplayed(&state)
                 
             case .delegate:

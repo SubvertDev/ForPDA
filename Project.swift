@@ -815,9 +815,9 @@ extension Dictionary where Key == String, Value == SettingValue {
 extension Array where Element == String {
     static let longTypeCheckingFlags = [
         "-Xfrontend",
-        "-warn-long-function-bodies=600",
+        "-warn-long-function-bodies=700",
         "-Xfrontend",
-        "-warn-long-expression-type-checking=100"
+        "-warn-long-expression-type-checking=150"
     ]
 }
 

@@ -399,7 +399,7 @@ public struct AppFeature: Reducer, Sendable {
                 
                 // MARK: - Deeplinks
                 
-                #warning("merge these two actions somehow")
+                // TODO: Merge these two actions below somehow
                 
             case let .deeplink(url):
                 do {

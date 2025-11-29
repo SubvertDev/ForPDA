@@ -25,7 +25,7 @@ public struct WriteFormFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         case preview(FormPreviewFeature)
         case alert(AlertState<Alert>)
@@ -316,6 +316,7 @@ public struct WriteFormFeature: Reducer, Sendable {
     }
 }
 
+extension WriteFormFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extension
 
