@@ -7,7 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
-import APIClient
+import QMSClient
 import Models
 
 @Reducer
@@ -40,7 +40,7 @@ public struct QMSListFeature: Reducer, Sendable {
     
     // MARK: - Dependency
     
-    @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.qmsClient) private var qmsClient
     @Dependency(\.analyticsClient) private var analyticsClient
     
     // MARK: - Body
@@ -52,7 +52,7 @@ public struct QMSListFeature: Reducer, Sendable {
             switch action {
             case .onAppear:
                 return .run { send in
-                    let result = await Result { try await apiClient.loadQMSList() }
+                    let result = await Result { try await qmsClient.loadQMSList() }
                     await send(._qmsLoaded(result))
                 }
                 
@@ -68,7 +68,7 @@ public struct QMSListFeature: Reducer, Sendable {
                    let user = qms.users.first(where: { $0.id == id }) {
                     if user.chats.isEmpty {
                         return .run { send in
-                            let result = await Result { try await apiClient.loadQMSUser(id) }
+                            let result = await Result { try await qmsClient.loadQMSUser(id) }
                             await send(._userLoaded(result))
                         }
                     } else if let index = qms.users.firstIndex(of: user) {
