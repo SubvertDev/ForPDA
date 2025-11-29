@@ -28,15 +28,26 @@ public struct QMSListFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action: BindableAction {
-        case onAppear
+    public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
         
-        case chatRowTapped(Int)
-        case userRowTapped(Int)
+        case view(View)
+        public enum View {
+            case onAppear
+            case chatRowTapped(Int)
+            case userRowTapped(Int)
+        }
         
-        case _qmsLoaded(Result<QMSList, any Error>)
-        case _userLoaded(Result<QMSUser, any Error>)
+        case `internal`(Internal)
+        public enum Internal {
+            case qmsLoaded(Result<QMSList, any Error>)
+            case userLoaded(Result<QMSUser, any Error>)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openQMSChat(Int)
+        }
     }
     
     // MARK: - Dependency
@@ -52,26 +63,26 @@ public struct QMSListFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
+            case .binding, .delegate:
+                return .none
+                
+            case .view(.onAppear):
                 return .run { send in
                     let result = await Result { try await qmsClient.loadQMSList() }
-                    await send(._qmsLoaded(result))
+                    await send(.internal(.qmsLoaded(result)))
                 }
+
+            case let .view(.chatRowTapped(id)):
+                return .send(.delegate(.openQMSChat(id)))
                 
-            case .binding:
-                return .none
-                
-            case .chatRowTapped:
-                return .none
-                
-            case let .userRowTapped(id):
+            case let .view(.userRowTapped(id)):
                 // Refactor later
                 if let qms = state.qms,
                    let user = qms.users.first(where: { $0.id == id }) {
                     if user.chats.isEmpty {
                         return .run { send in
                             let result = await Result { try await qmsClient.loadQMSUser(id) }
-                            await send(._userLoaded(result))
+                            await send(.internal(.userLoaded(result)))
                         }
                     } else if let index = qms.users.firstIndex(of: user) {
                         state.expandedGroups[index].toggle()
@@ -79,14 +90,12 @@ public struct QMSListFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case let ._qmsLoaded(result):
+            case let .internal(.qmsLoaded(result)):
                 switch result {
                 case let .success(qms):
                     var qms = qms
                     // customDump(qms)
                     
-                    // Populating expandedGroups on first load
-                    // Refactor later
                     if qms.users.count > state.qms?.users.count ?? 0 {
                         state.expandedGroups.removeAll()
                         qms.users.forEach { _ in state.expandedGroups.append(false) }
@@ -106,11 +115,9 @@ public struct QMSListFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case let ._userLoaded(result):
+            case let .internal(.userLoaded(result)):
                 switch result {
                 case let .success(user):
-                    
-                    // Refactor later
                     if var qms = state.qms,
                        let index = qms.users.firstIndex(where: { $0.id == user.id }) {
                         qms.users[index].chats = user.chats
