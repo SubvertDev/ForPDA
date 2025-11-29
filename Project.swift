@@ -314,8 +314,9 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
-                    .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.Models,
+                    .Internal.QMSClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,
@@ -325,14 +326,13 @@ let project = Project(
         
             .feature(
                 name: "QMSFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
-                    .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
+                    .Internal.QMSClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .SPM.ExyteChat,
@@ -498,6 +498,18 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.LoggerClient,
                     .Internal.ParsingClient,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "QMSClient",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .Internal.NotificationsClient,
+                    .SPM.PDAPI,
                     .SPM.TCA
                 ]
             ),
@@ -898,6 +910,7 @@ extension TargetDependency.Internal {
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
+    static let QMSClient =           TargetDependency.target(name: "QMSClient")
     static let ToastClient =         TargetDependency.target(name: "ToastClient")
     
     // Shared

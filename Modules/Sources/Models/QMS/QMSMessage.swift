@@ -43,3 +43,19 @@ public struct QMSMessage: Sendable, Codable, Hashable, Identifiable {
         self.attachments = attachments
     }
 }
+
+// MARK: - Mock
+
+public extension QMSMessage {
+    
+    static func mock() -> QMSMessage {
+        let id = Int.random(in: 0...100000)
+        return QMSMessage(
+            id: id,
+            senderId: 1,
+            date: .now,
+            text: "test \(id)",
+            attachments: []
+        )
+    }
+}

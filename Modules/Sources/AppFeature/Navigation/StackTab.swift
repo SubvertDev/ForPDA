@@ -278,7 +278,7 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleQMSPathNavigation(action: Path.QMS.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .qmsList(.chatRowTapped(id)):
+        case let .qmsList(.delegate(.openQMSChat(id))):
             state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
             
         case let .qms(.delegate(.handleUrl(url))):

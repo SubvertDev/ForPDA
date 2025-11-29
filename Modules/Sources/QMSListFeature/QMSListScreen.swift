@@ -11,14 +11,21 @@ import SharedUI
 import NukeUI
 import Models
 
+@ViewAction(for: QMSListFeature.self)
 public struct QMSListScreen: View {
+    
+    // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<QMSListFeature>
     @Environment(\.tintColor) private var tintColor
     
+    // MARK: - Init
+    
     public init(store: StoreOf<QMSListFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -54,7 +61,7 @@ public struct QMSListScreen: View {
             ._toolbarTitleDisplayMode(.inline)
             .animation(.default, value: store.expandedGroups)
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -64,7 +71,7 @@ public struct QMSListScreen: View {
     @ViewBuilder
     private func UserRow(_ user: QMSUser) -> some View {
         Button {
-            store.send(.userRowTapped(user.id))
+            send(.userRowTapped(user.id))
         } label: {
             HStack(spacing: 8) {
                 LazyImage(url: user.avatarUrl ?? Links.defaultQMSAvatar) { state in
@@ -102,7 +109,7 @@ public struct QMSListScreen: View {
     private func ChatRow(_ chat: QMSChatInfo) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
-                store.send(.chatRowTapped(chat.id))
+                send(.chatRowTapped(chat.id))
             } label: {
                 HStack(spacing: 8) {
                     VStack(alignment: .leading, spacing: 4) {
@@ -135,6 +142,8 @@ public struct QMSListScreen: View {
         }
     }
 }
+
+// MARK: - Previews
 
 #Preview {
     QMSListScreen(store: Store(initialState: QMSListFeature.State()) {

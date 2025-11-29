@@ -7,13 +7,13 @@
 
 import Foundation
 import ComposableArchitecture
-import APIClient
+import QMSClient
 import PersistenceKeys
 import Models
-import ExyteChat
 import AnalyticsClient
 import NotificationsClient
 import TCAExtensions
+import ExyteChat
 
 @Reducer
 public struct QMSFeature: Reducer, Sendable {
@@ -31,6 +31,7 @@ public struct QMSFeature: Reducer, Sendable {
         public let chatId: Int
         public var chat: QMSChat?
         public var messages: [Message] = []
+        var idMap: [Int: String] = [:] // Remote -> Local
         
         var didLoadOnce = false
         
@@ -60,7 +61,7 @@ public struct QMSFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
-            case sendMessageButtonTapped(String)
+            case sendMessageButtonTapped(DraftMessage)
             case urlTapped(URL)
         }
         
@@ -68,6 +69,7 @@ public struct QMSFeature: Reducer, Sendable {
         public enum Internal {
             case loadChat
             case chatLoaded(Result<QMSChat, any Error>)
+            case messageSendError(id: String, message: String)
         }
         
         case delegate(Delegate)
@@ -78,7 +80,7 @@ public struct QMSFeature: Reducer, Sendable {
     
     // MARK: - Dependencies
     
-    @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.qmsClient) private var qmsClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.notificationsClient) private var notificationsClient
@@ -108,25 +110,46 @@ public struct QMSFeature: Reducer, Sendable {
                     }
                 ])
                 
-            case let .view(.sendMessageButtonTapped(message)):
-                // let sendingMessage = Message(
-                //     id: message,
-                //     user: User(id: String(state.userSession!.userId), name: "You", avatarURL: nil, isCurrentUser: true),
-                //     status: .sending,
-                //     createdAt: .now,
-                //     text: message
-                // )
-                // state.messages.append(sendingMessage)
-                return .run { [chatId = state.chatId] send in
-                    try await apiClient.sendQMSMessage(chatId, message)
+            case let .view(.sendMessageButtonTapped(draftMessage)):
+                let id: String
+                
+                if let index = state.messages.firstIndex(where: { $0.id == draftMessage.id }) {
+                    // If this message is already exists with same id it means that it's errored out and we're retrying
+                    state.messages[index].status = .sending
+                    id = draftMessage.id!
+                } else {
+                    // If the same id doesn't exists it's a new message
+                    id = UUID().uuidString
+                    let localMessage = Message(
+                        id: id,
+                        user: User(id: String(state.userSession!.userId), name: "You", avatarURL: nil, isCurrentUser: true),
+                        status: .sending,
+                        createdAt: .now,
+                        text: draftMessage.text
+                    )
+                    state.messages.append(localMessage)
                 }
+
+                return .run { [chatId = state.chatId, message = draftMessage.text] send in
+                    try await qmsClient.sendQMSMessage(chatId: chatId, message: message)
+                } catch: { [id, message = draftMessage.text] error, send in
+                    await send(.internal(.messageSendError(id: id, message: message)))
+                }
+                
+            case let .internal(.messageSendError(id, message)):
+                let draft = DraftMessage(
+                    id: id, text: message, medias: [], giphyMedia: nil, recording: nil, replyMessage: nil, createdAt: .now
+                )
+                let index = state.messages.firstIndex(where: { $0.id == id })!
+                state.messages[index].status = .error(draft)
+                return .none
                 
             case let .view(.urlTapped(url)):
                 return .send(.delegate(.handleUrl(url)))
                 
             case .internal(.loadChat):
                 return .run { [id = state.chatId] send in
-                    let result = await Result { try await apiClient.loadQMSChat(id) }
+                    let result = await Result { try await qmsClient.loadQMSChat(id) }
                     await send(.internal(.chatLoaded(result)))
                 }
                 
@@ -134,43 +157,42 @@ public struct QMSFeature: Reducer, Sendable {
                 switch result {
                 case let .success(chat):
                     state.chat = chat
-                    
-                    for message in chat.messages {
-                        // Skip already processed messages while setting them status to sent
-                        if state.messages.contains(where: { $0.id == String(message.id) }) { continue }
-                        if let msgIndex = state.messages.firstIndex(where: { $0.id == String(message.id) }) {
-                            state.messages[msgIndex].status = .sent
+                                        
+                    for remoteMessage in chat.messages {
+                        // Skip if message is already mapped
+                        guard state.idMap[remoteMessage.id] == nil else { continue }
+                        
+                        // Matching with currently 'sending' statuses
+                        if let pending = state.messages.last(where: { $0.status == .sending }) {
+                            state.idMap[remoteMessage.id] = pending.id
                             continue
                         }
                         
-                        // Set .none status on sent messages and skip
-                        if let index = state.messages.firstIndex(where: { $0.id == message.text }) {
-                            state.messages[index].status = .none
-                            continue
-                        }
-                        
-                        // Creating new messages
-                        let isCurrentUser = state.userSession!.userId == message.senderId
-                        let newMessage = Message(
-                            id: String(message.id),
-                            user: User(
-                                id: String(message.senderId),
-                                name: isCurrentUser ? "You" : chat.partnerName,
-                                avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
-                                isCurrentUser: isCurrentUser
-                            ),
-                            status: .sent,
-                            createdAt: message.date,
-                            text: message.processedText
+                        // No 'sending' status, treating as remote-only message
+                        let isCurrentUser = state.userSession!.userId == remoteMessage.senderId
+                        let user = User(
+                            id: String(remoteMessage.senderId),
+                            name: isCurrentUser ? "You" : chat.partnerName,
+                            avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
+                            isCurrentUser: isCurrentUser
                         )
-                        state.messages.append(newMessage)
+                        
+                        let newLocalMessage = Message(
+                            id: UUID().uuidString,
+                            user: user,
+                            status: .none,
+                            createdAt: remoteMessage.date,
+                            text: remoteMessage.processedText
+                        )
+                        
+                        state.messages.append(newLocalMessage)
+                        state.idMap[remoteMessage.id] = newLocalMessage.id
                     }
                     
-                    // Setting non-read status for our messages if we have an unread count
-                    let myMessages = state.messages.filter { $0.user.isCurrentUser }
-                    for (index, message) in myMessages.reversed().enumerated() where index < chat.unreadCount {
+                    let messages = state.messages.filter { $0.user.isCurrentUser }
+                    for (index, message) in messages.reversed().enumerated() {
                         if let messageIndex = state.messages.firstIndex(of: message) {
-                            state.messages[messageIndex].status = .none
+                            state.messages[messageIndex].status = index < chat.unreadCount ? .none : .sent
                         }
                     }
                     
