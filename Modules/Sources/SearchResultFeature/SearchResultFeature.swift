@@ -12,6 +12,7 @@ import Models
 import PersistenceKeys
 import SharedUI
 import TopicBuilder
+import PageNavigationFeature
 
 @Reducer
 public struct SearchResultFeature: Reducer, Sendable {
@@ -22,29 +23,34 @@ public struct SearchResultFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
         
-        public let request: SearchRequest
+        public let search: SearchResult
         
         public var isUserAuthorized: Bool {
             return userSession != nil
         }
         
-        var contentCount = 0
-        var content: [UIContent] = []
+        public var pageNavigation = PageNavigationFeature.State(type: .topic)
+        
+        public var contentCount = 0
+        public var content: [UIContent] = []
         
         var isLoading = false
         
         public init(
-            request: SearchRequest
+            search: SearchResult
         ) {
-            self.request = request
+            self.search = search
         }
     }
     
     // MARK: - Action
     
     public enum Action: ViewAction {
+        case pageNavigation(PageNavigationFeature.Action)
+        
         case view(View)
         public enum View {
             case onAppear
@@ -56,7 +62,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum `Internal` {
-            case loadContent
+            case loadContent(offset: Int)
             case buildContent([SearchContent])
             case searchResponse(Result<SearchResponse, any Error>)
         }
@@ -69,10 +75,20 @@ public struct SearchResultFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
+        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+            PageNavigationFeature()
+        }
+        
         Reduce<State, Action> { state, action in
             switch action {
+            case let .pageNavigation(.offsetChanged(to: newOffset)):
+                return .send(.internal(.loadContent(offset: newOffset)))
+                
+            case .pageNavigation:
+                return .none
+                
             case .view(.onAppear):
-                return .send(.internal(.loadContent))
+                return .send(.internal(.loadContent(offset: 0)))
                 
             case .view(.postTapped):
                 return .none
@@ -83,9 +99,17 @@ public struct SearchResultFeature: Reducer, Sendable {
             case .view(.articleTapped):
                 return .none
                 
-            case .internal(.loadContent):
+            case let .internal(.loadContent(offset)):
                 state.isLoading = true
-                return .run { [request = state.request] send in
+                return .run { [request = state.search, amount = state.appSettings.topicPerPage] send in
+                    let request = SearchRequest(
+                        on: request.on,
+                        authorId: request.authorId,
+                        text: request.text,
+                        sort: request.sort,
+                        offset: offset,
+                        amount: amount
+                    )
                     let respone = try await apiClient.search(request: request)
                     await send(.internal(.searchResponse(.success(respone))))
                 } catch: { error, send in
@@ -94,6 +118,7 @@ public struct SearchResultFeature: Reducer, Sendable {
                 
             case let .internal(.searchResponse(.success(response))):
                 state.contentCount = response.contentCount
+                state.pageNavigation.count = response.contentCount
                 return .send(.internal(.buildContent(response.content)))
                 
             case let .internal(.buildContent(content)):

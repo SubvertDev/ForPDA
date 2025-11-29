@@ -9,13 +9,23 @@ import SwiftUI
 import ComposableArchitecture
 import Models
 import SharedUI
+import PageNavigationFeature
 
 @ViewAction(for: SearchResultFeature.self)
 public struct SearchResultScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<SearchResultFeature>
     
     @Environment(\.tintColor) private var tintColor
+    
+    @State private var navigationMinimized = false
+    
+    private var shouldShowNavigation: Bool {
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
     
     public init(store: StoreOf<SearchResultFeature>) {
         self.store = store
@@ -54,6 +64,18 @@ public struct SearchResultScreen: View {
             }
             .navigationTitle(Text("Search", bundle: .module))
             .background(Color(.Background.primary))
+            ._safeAreaBar(edge: .bottom) {
+                if isLiquidGlass,
+                   store.appSettings.floatingNavigation,
+                   !store.appSettings.experimentalFloatingNavigation {
+                    PageNavigation(
+                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        minimized: $navigationMinimized
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
+            }
             .onAppear {
                 send(.onAppear)
             }
@@ -138,14 +160,7 @@ public struct SearchResultScreen: View {
         SearchResultScreen(
             store: Store(
                 initialState: SearchResultFeature.State(
-                    request: .init(
-                        on: .site,
-                        authorId: nil,
-                        text: "ForPDA",
-                        sort: .relevance,
-                        offset: 0,
-                        amount: 10
-                    )
+                    search: .mock
                 ),
             ) {
                 SearchResultFeature()
