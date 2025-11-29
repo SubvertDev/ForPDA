@@ -36,12 +36,15 @@ public struct QMSScreen: View {
                 if store.chat != nil {
                     ChatView(messages: store.messages) { message in
                         send(.sendMessageButtonTapped(message))
+                    } messageMenuAction: { (action: ChatAction, _, message) in
+                        if case .copy = action {
+                            UIPasteboard.general.string = message.text
+                        }
                     }
                     .messageUseStyler { string in
                         return QMSBuilder(text: string).build()
                     }
                     .setAvailableInputs([.text])
-                    .showMessageMenuOnLongPress(false)
                     .chatTheme(
                         ChatTheme(
                             colors: ChatTheme
@@ -75,6 +78,8 @@ public struct QMSScreen: View {
         }
     }
 }
+
+// MARK: - Previews
 
 #Preview {
     @Shared(.userSession) var userSession

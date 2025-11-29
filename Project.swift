@@ -325,7 +325,6 @@ let project = Project(
         
             .feature(
                 name: "QMSFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.BBBuilder,
