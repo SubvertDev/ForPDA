@@ -28,11 +28,6 @@ public enum FavoritesEvent: Event {
     case sortCancelButtonTapped
     case sortTypeSelected(String)
     
-    case loadingStart(Int)
-    case loadingSuccess
-    case loadingFailure(any Error)
-    case startUnreadLoadingIndicator(Int)
-    
     public var name: String {
         return "Favorites " + eventName(for: self).inProperCase
     }
@@ -67,15 +62,6 @@ public enum FavoritesEvent: Event {
             
         case let .sortTypeSelected(type):
             return ["type": type]
-            
-        case let .loadingStart(offset):
-            return ["offset": String(offset)]
-            
-        case let .loadingFailure(error):
-            return ["error": error.localizedDescription]
-            
-        case let .startUnreadLoadingIndicator(id):
-            return ["id": String(id)]
             
         default:
             return nil
