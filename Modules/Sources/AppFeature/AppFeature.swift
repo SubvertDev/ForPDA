@@ -22,7 +22,6 @@ import ProfileFeature
 import QMSListFeature
 import QMSFeature
 import ReputationFeature
-import SearchFeature
 import SettingsFeature
 import NotificationsFeature
 import DeveloperFeature
@@ -57,7 +56,6 @@ public struct AppFeature: Reducer, Sendable {
         public var favoritesTab: StackTab.State
         public var forumTab:     StackTab.State
         public var profileFlow:  ProfileFlow.State
-        public var searchTab:    StackTab.State
         
         @Presents public var auth: AuthFeature.State?
         @Presents public var logStore: LogStoreFeature.State?
@@ -88,7 +86,6 @@ public struct AppFeature: Reducer, Sendable {
             articlesTab: StackTab.State = StackTab.State(root: .articles(.articlesList(ArticlesListFeature.State()))),
             favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesRootFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
-			searchTab: StackTab.State = StackTab.State(root: .search(SearchFeature.State())),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articles,
@@ -101,7 +98,6 @@ public struct AppFeature: Reducer, Sendable {
             self.articlesTab = articlesTab
             self.favoritesTab = favoritesTab
             self.forumTab = forumTab
-            self.searchTab = searchTab
 
             if let session = _userSession.wrappedValue {
                 self.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: session.userId)))))
@@ -134,7 +130,6 @@ public struct AppFeature: Reducer, Sendable {
         case favoritesTab(StackTab.Action)
         case forumTab(StackTab.Action)
         case profileFlow(ProfileFlow.Action)
-        case searchTab(StackTab.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
         case logStore(PresentationAction<LogStoreFeature.Action>)
@@ -201,10 +196,6 @@ public struct AppFeature: Reducer, Sendable {
         
         Scope(state: \.profileFlow, action: \.profileFlow) {
             ProfileFlow.body
-        }
-        
-        Scope(state: \.searchTab, action: \.searchTab) {
-            StackTab()
         }
         
         // Authorization actions interceptor
@@ -502,7 +493,6 @@ public struct AppFeature: Reducer, Sendable {
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
                 let .forumTab(.delegate(.showTabBar(show))),
-                let .searchTab(.delegate(.showTabBar(show))),
                 let .profileFlow(.loggedIn(.delegate(.showTabBar(show)))),
                 let .profileFlow(.loggedOut(.delegate(.showTabBar(show)))):
                 state.showTabBar = show
@@ -511,14 +501,13 @@ public struct AppFeature: Reducer, Sendable {
             case let .articlesTab(.delegate(.switchTab(to: tab))),
                 let .favoritesTab(.delegate(.switchTab(to: tab))),
                 let .forumTab(.delegate(.switchTab(to: tab))),
-                let .searchTab(.delegate(.switchTab(to: tab))),
                 let .profileFlow(.loggedIn(.delegate(.switchTab(to: tab)))),
                 let .profileFlow(.loggedOut(.delegate(.switchTab(to: tab)))):
                 state.previousTab = state.selectedTab
                 state.selectedTab = tab
                 return .none
                 
-            case .articlesTab, .favoritesTab, .forumTab, .profileFlow, .searchTab:
+            case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
                 return .none
             }
         }
@@ -560,9 +549,6 @@ public struct AppFeature: Reducer, Sendable {
             
         case .forum:
             state.forumTab.path.removeAll()
-            
-        case .search:
-            state.forumTab.path.removeAll()
 
         case .profile:
             switch state.profileFlow {
@@ -591,7 +577,7 @@ public struct AppFeature: Reducer, Sendable {
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
-            case .articles, .forum, .profile, .search:
+            case .articles, .forum, .profile:
                 break
             case .favorites:
                 await notificationsClient.removeNotifications(categories: [.forum, .topic])
@@ -633,7 +619,6 @@ public struct AppFeature: Reducer, Sendable {
         case .articles:  state.articlesTab.path.append(element)
         case .favorites: state.favoritesTab.path.append(element)
         case .forum:     state.forumTab.path.append(element)
-        case .search:    state.searchTab.path.append(element)
         case .profile:
             switch state.profileFlow {
             case var .loggedIn(flow):

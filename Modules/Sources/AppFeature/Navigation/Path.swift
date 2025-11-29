@@ -20,7 +20,6 @@ import ProfileFeature
 import QMSFeature
 import QMSListFeature
 import ReputationFeature
-import SearchFeature
 import SettingsFeature
 import TopicFeature
 import AuthFeature
@@ -31,7 +30,6 @@ public enum Path {
     case favorites(FavoritesRootFeature)
     case forum(Forum.Body = Forum.body)
     case profile(Profile.Body = Profile.body)
-    case search(SearchFeature)
     case settings(Settings.Body = Settings.body)
     case qms(QMS.Body = QMS.body)
     case auth(AuthFeature)
@@ -55,11 +53,6 @@ public enum Path {
         case forum(ForumFeature)
         case announcement(AnnouncementFeature)
         case topic(TopicFeature)
-    }
-    
-    @Reducer(state: .equatable)
-    public enum Search {
-        case search(SearchFeature)
     }
     
     @Reducer(state: .equatable)
@@ -93,10 +86,6 @@ extension Path {
             
         case let .forum(path):
             ForumViews(path)
-            
-        case let .search(store):
-            SearchScreen(store: store)
-                .tracking(for: SearchScreen.self)
             
         case let .settings(path):
             SettingsViews(path)

@@ -24,7 +24,6 @@ import ProfileFeature
 import QMSFeature
 import QMSListFeature
 import SettingsFeature
-import SearchFeature
 import SFSafeSymbols
 import SharedUI
 import SwiftUI
@@ -136,15 +135,6 @@ struct LiquidTabView: View {
                 ) {
                     ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                 }
-
-				Tab(
-					AppTab.search.title,
-					systemSymbol: AppTab.search.iconSymbol,
-					value: .search
-//                    role: .search
-				) {
-                    StackTabView(store: store.scope(state: \.searchTab, action: \.searchTab))
-				}
             }
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
             .if(store.appSettings.experimentalFloatingNavigation) { content in
@@ -170,8 +160,6 @@ struct LiquidTabView: View {
             case let .loggedIn(store), let .loggedOut(store):
                 Page(for: store)
             }
-        case .search:
-            Page(for: store.scope(state: \.searchTab, action: \.searchTab))
         }
     }
     
@@ -235,9 +223,6 @@ struct OldTabView: View {
                 
                 ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                     .tag(AppTab.profile)
-
-                StackTabView(store: store.scope(state: \.searchTab, action: \.searchTab))
-                    .tag(AppTab.search)
             }
             
             Group {

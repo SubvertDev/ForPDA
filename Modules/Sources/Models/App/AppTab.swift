@@ -13,7 +13,7 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
     case favorites
     case forum
     case profile
-    case search
+    
     public var iconSymbol: SFSymbol {
         switch self {
         case .articles:
@@ -24,8 +24,6 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
             return .bubbleLeftAndBubbleRight
         case .profile:
             return .personCropCircle
-        case .search:
-            return .magnifyingglass
         }
     }
     
@@ -39,8 +37,6 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
             return LocalizedStringResource("Forum", bundle: .module)
         case .profile:
             return LocalizedStringResource("Profile", bundle: .module)
-        case .search:
-            return LocalizedStringResource("Search", bundle: .module)
         }
     }
 }

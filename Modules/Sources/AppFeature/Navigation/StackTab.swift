@@ -21,7 +21,6 @@ import ForumFeature
 import TopicFeature
 import FavoritesRootFeature
 import ProfileFeature
-import SearchFeature
 import AnnouncementFeature
 import HistoryFeature
 import QMSListFeature
@@ -116,9 +115,6 @@ public struct StackTab: Reducer, Sendable {
             
         case let .profile(action):
             return handleProfilePathNavigation(action: action, state: &state)
-            
-        case let .search(action):
-            return handleSearchPathNavigation(action: action, state: &state)
             
         case let .settings(action):
             return handleSettingsPathNavigation(action: action, state: &state)
@@ -250,16 +246,6 @@ public struct StackTab: Reducer, Sendable {
             let preview = ArticlePreview.innerDeeplink(id: articleId)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        default:
-            break
-        }
-        return .none
-    }
-    
-    // MARK: - Search
-    
-    private func handleSearchPathNavigation(action: SearchFeature.Action, state: inout State) -> Effect<Action> {
-        switch action {
         default:
             break
         }

@@ -101,16 +101,6 @@
         }
       }
     },
-    "Search" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поиск"
-          }
-        }
-      }
-    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {
