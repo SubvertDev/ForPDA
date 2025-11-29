@@ -5,7 +5,7 @@
 //  Created by Xialtal on 26.11.25.
 //
 
-public struct SearchResponse: Sendable {
+public struct SearchResponse: Sendable, Equatable {
     public let content: [SearchContent]
     public let contentCount: Int
     
