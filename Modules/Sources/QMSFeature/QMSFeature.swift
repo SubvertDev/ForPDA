@@ -157,30 +157,36 @@ public struct QMSFeature: Reducer, Sendable {
                 switch result {
                 case let .success(chat):
                     state.chat = chat
-                    
-                    for remoteMessage in chat.messages where state.idMap[remoteMessage.id] == nil {
-                        if let localMessage = state.messages.first(where: { $0.text == remoteMessage.text }) {
-                            // If local messages contain same message as remote but it doesn't have an id mapping
-                            // it means that it were sending and now successfully processed
-                            state.idMap[remoteMessage.id] = localMessage.id
-                        } else {
-                            // If local messages doesn't contain a message it means we've got it from remote
-                            let isCurrentUser = state.userSession!.userId == remoteMessage.senderId
-                            let newLocalMessage = Message(
-                                id: UUID().uuidString,
-                                user: User(
-                                    id: String(remoteMessage.senderId),
-                                    name: isCurrentUser ? "You" : chat.partnerName,
-                                    avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
-                                    isCurrentUser: isCurrentUser
-                                ),
-                                status: .none,
-                                createdAt: remoteMessage.date,
-                                text: remoteMessage.processedText
-                            )
-                            state.messages.append(newLocalMessage)
-                            state.idMap[remoteMessage.id] = newLocalMessage.id
+                                        
+                    for remoteMessage in chat.messages {
+                        // Skip if message is already mapped
+                        guard state.idMap[remoteMessage.id] == nil else { continue }
+                        
+                        // Matching with currently 'sending' statuses
+                        if let pending = state.messages.last(where: { $0.status == .sending }) {
+                            state.idMap[remoteMessage.id] = pending.id
+                            continue
                         }
+                        
+                        // No 'sending' status, treating as remote-only message
+                        let isCurrentUser = state.userSession!.userId == remoteMessage.senderId
+                        let user = User(
+                            id: String(remoteMessage.senderId),
+                            name: isCurrentUser ? "You" : chat.partnerName,
+                            avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
+                            isCurrentUser: isCurrentUser
+                        )
+                        
+                        let newLocalMessage = Message(
+                            id: UUID().uuidString,
+                            user: user,
+                            status: .none,
+                            createdAt: remoteMessage.date,
+                            text: remoteMessage.processedText
+                        )
+                        
+                        state.messages.append(newLocalMessage)
+                        state.idMap[remoteMessage.id] = newLocalMessage.id
                     }
                     
                     let messages = state.messages.filter { $0.user.isCurrentUser }
