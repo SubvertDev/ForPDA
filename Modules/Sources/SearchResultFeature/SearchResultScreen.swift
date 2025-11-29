@@ -63,6 +63,7 @@ public struct SearchResultScreen: View {
                 }
             }
             .navigationTitle(Text("Search", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
             ._safeAreaBar(edge: .bottom) {
                 if isLiquidGlass,
