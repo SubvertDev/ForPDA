@@ -87,7 +87,7 @@ public struct SearchResultScreen: View {
     private func PostSection(_ post: UIContent.UIHybridPost) -> some View {
         VStack(alignment: .leading) {
             Button {
-                send(.topicTapped)
+                send(.topicTapped(post.topicId, post.topicName, false))
             } label: {
                 Text(verbatim: "\(post.topicName)")
                     .font(.subheadline)
