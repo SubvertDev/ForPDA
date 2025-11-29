@@ -27,6 +27,7 @@ import QMSListFeature
 import QMSFeature
 import ReputationFeature
 import AuthFeature
+import SearchResultFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -186,6 +187,12 @@ public struct StackTab: Reducer, Sendable {
             
         case let .forum(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
+        case let .forum(.delegate(.openUserProfile(id))):
+            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
+        case let .forum(.delegate(.openSearch(options))):
+            state.path.append(.forum(.search(SearchResultFeature.State(search: options))))
             
         case let .forum(.delegate(.handleRedirect(url))):
             return handleDeeplink(url: url, state: &state)

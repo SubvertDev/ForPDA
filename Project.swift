@@ -217,6 +217,8 @@ let project = Project(
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
+                    .Internal.SearchFeature,
+                    .Internal.SearchResultFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,

@@ -20,6 +20,7 @@ import ProfileFeature
 import QMSFeature
 import QMSListFeature
 import ReputationFeature
+import SearchResultFeature
 import SettingsFeature
 import TopicFeature
 import AuthFeature
@@ -53,6 +54,7 @@ public enum Path {
         case forum(ForumFeature)
         case announcement(AnnouncementFeature)
         case topic(TopicFeature)
+        case search(SearchResultFeature)
     }
     
     @Reducer(state: .equatable)
@@ -135,6 +137,10 @@ extension Path {
         case let .forumList(store):
             ForumsListScreen(store: store)
                 .tracking(for: ForumsListScreen.self)
+            
+        case let .search(store):
+            SearchResultScreen(store: store)
+                .tracking(for: SearchResultScreen.self)
             
         case let .forum(store):
             ForumScreen(store: store)

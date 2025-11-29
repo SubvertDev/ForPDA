@@ -11,6 +11,7 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
+import SearchFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -72,6 +73,11 @@ public struct ForumScreen: View {
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
+            .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
+                NavigationStack {
+                    SearchScreen(store: store)
+                }
+            }
             ._toolbarTitleDisplayMode(.large)
             ._safeAreaBar(edge: .bottom) {
                 if isLiquidGlass,
@@ -86,7 +92,22 @@ public struct ForumScreen: View {
                 }
             }
             .toolbar {
-                OptionsMenu()
+                ToolbarItem {
+                    Button {
+                        send(.searchButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .magnifyingglass)
+                            .foregroundStyle(foregroundStyle())
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
+                }
+                
+                ToolbarItem {
+                    OptionsMenu()
+                }
             }
             .onFirstAppear {
                 send(.onFirstAppear)
