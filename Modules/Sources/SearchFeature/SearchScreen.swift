@@ -48,10 +48,26 @@ public struct SearchScreen: View {
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Search", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
             .searchable(text: $store.searchText)
             .onSubmit(of: .search) {
                 send(.startSearch)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        send(.cancelButtonTapped)
+                    } label: {
+                        if #available(iOS 26.0, *) {
+                            Image(systemSymbol: .xmark)
+                                .foregroundStyle(tintColor)
+                        } else {
+                            Text("Cancel", bundle: .module)
+                                .foregroundStyle(tintColor)
+                        }
+                    }
+                }
             }
             .bind($store.focus, to: $focus)
             .onAppear {

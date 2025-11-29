@@ -59,6 +59,7 @@ public struct SearchFeature: Reducer, Sendable {
             case searchAuthorName(String)
             case selectUser(Int, String)
             
+            case cancelButtonTapped
             case authorProfileButtonTapped
         }
         
@@ -71,6 +72,7 @@ public struct SearchFeature: Reducer, Sendable {
     
     // MARK: - Dependencies
     
+    @Dependency(\.dismiss) private var dismiss
     @Dependency(\.apiClient) private var apiClient
     
     // MARK: - Body
@@ -87,11 +89,14 @@ public struct SearchFeature: Reducer, Sendable {
                 case .topic:
                     state.whereSearch = .topic
                 case .forum(_, let sIn, let asTopics):
+                    state.whereSearch = !state.navigation.isEmpty ? .forumById : .forum
                     state.forumSearchIn = sIn
                     state.searchResultsAsTopics = asTopics
                 }
                 return .none
-                
+            
+            case .view(.cancelButtonTapped):
+                return .run { _ in await dismiss() }
                 
             case .view(.authorProfileButtonTapped):
                 // TODO: Handle tap.

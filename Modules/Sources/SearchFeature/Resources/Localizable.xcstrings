@@ -41,6 +41,16 @@
         }
       }
     },
+    "Cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
     "Everywhere" : {
       "localizations" : {
         "ru" : {
