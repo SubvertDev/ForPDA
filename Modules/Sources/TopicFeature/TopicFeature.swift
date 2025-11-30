@@ -119,7 +119,7 @@ public struct TopicFeature: Reducer, Sendable {
             case onNextAppear
             case onRefresh
             case finishedPostAnimation
-            case topicHatOpenButtonTapped
+            case topicHatButtonTapped(forOpen: Bool)
             case topicPollOpenButtonTapped
             case topicPollVoteButtonTapped([Int: Set<Int>])
             case changeKarmaTapped(Int, Bool)
@@ -227,11 +227,13 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
                 
-            case .view(.topicHatOpenButtonTapped):
-                guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
-                let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
-                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
-                state.shouldShowTopicHatButton = false
+            case .view(.topicHatButtonTapped(let forOpen)):
+                if forOpen {
+                    guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
+                    let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
+                    state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
+                }
+                state.shouldShowTopicHatButton = !forOpen
                 return .none
                 
             case .view(.topicPollOpenButtonTapped):

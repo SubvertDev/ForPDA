@@ -88,6 +88,7 @@ public struct TopicScreen: View {
                             }
                             .padding(.bottom, 16)
                         }
+                        .id(UUID().uuidString) // bugfix for Hat hiding
                         ._inScrollContentDetector(state: $navigationMinimized)
                         .onAppear {
                             scrollProxy = proxy
@@ -212,7 +213,7 @@ public struct TopicScreen: View {
             
             if store.shouldShowTopicHatButton {
                 Button {
-                    send(.topicHatOpenButtonTapped)
+                    send(.topicHatButtonTapped(forOpen: true))
                 } label: {
                     Text("Topic Hat", bundle: .module)
                         .font(.headline)
@@ -434,6 +435,12 @@ public struct TopicScreen: View {
             Section {
                 ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
                     send(.contextPostMenu(.copyLink(post.id)))
+                }
+                
+                if store.posts.first?.id == post.id, !store.pageNavigation.isFirstPage, !store.shouldShowTopicHatButton {
+                    ContextButton(text: LocalizedStringResource("Close Hat", bundle: .module), symbol: .eyeSlash) {
+                        send(.topicHatButtonTapped(forOpen: false))
+                    }
                 }
             }
         } label: {

@@ -31,6 +31,16 @@
         }
       }
     },
+    "Close Hat" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть шапку"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
