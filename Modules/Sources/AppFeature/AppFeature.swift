@@ -16,6 +16,7 @@ import ForumFeature
 import TopicFeature
 import AnnouncementFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import HistoryFeature
 import AuthFeature
 import ProfileFeature
@@ -84,7 +85,7 @@ public struct AppFeature: Reducer, Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesTab: StackTab.State = StackTab.State(root: .articles(.articlesList(ArticlesListFeature.State()))),
-            favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesRootFeature.State())),
+            favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
@@ -587,7 +588,7 @@ public struct AppFeature: Reducer, Sendable {
     
     private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
         return StackTab()
-            .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.internal(.refresh)))))
+            .reduce(into: &state.favoritesTab, action: .root(.favorites(.internal(.refresh))))
             .map(Action.favoritesTab)
     }
     

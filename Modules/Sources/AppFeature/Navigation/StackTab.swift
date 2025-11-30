@@ -20,6 +20,7 @@ import DeveloperFeature
 import ForumFeature
 import TopicFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import ProfileFeature
 import AnnouncementFeature
 import HistoryFeature
@@ -149,12 +150,12 @@ public struct StackTab: Reducer, Sendable {
     
     // MARK: - Favorites
     
-    private func handleFavoritesPathNavigation(action: FavoritesRootFeature.Action, state: inout State) -> Effect<Action> {
+    private func handleFavoritesPathNavigation(action: FavoritesFeature.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .favorites(.delegate(.openForum(id: id, name: name))):
+        case let .delegate(.openForum(id: id, name: name)):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
             
-        case let .favorites(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+        case let .delegate(.openTopic(id: id, name: name, goTo: goTo)):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         default:

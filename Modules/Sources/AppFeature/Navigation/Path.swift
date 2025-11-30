@@ -12,6 +12,7 @@ import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
@@ -27,7 +28,7 @@ import AuthFeature
 @Reducer
 public enum Path {
     case articles(Articles.Body = Articles.body)
-    case favorites(FavoritesRootFeature)
+    case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
     case profile(Profile.Body = Profile.body)
     case settings(Settings.Body = Settings.body)
@@ -85,8 +86,8 @@ extension Path {
             ArticlesViews(path)
             
         case let .favorites(store):
-            FavoritesRootScreen(store: store)
-                .tracking(for: FavoritesRootScreen.self)
+            FavoritesScreen(store: store)
+                .tracking(for: FavoritesScreen.self)
             
         case let .profile(path):
             ProfileViews(path)
