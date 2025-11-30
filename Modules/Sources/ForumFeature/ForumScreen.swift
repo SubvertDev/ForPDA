@@ -157,7 +157,7 @@ public struct ForumScreen: View {
                     WithPerceptionTracking {
                         let radius: CGFloat = isLiquidGlass ? 24 : 10
                         TopicRow(
-                            title: topic.name,
+                            title: .plain(topic.name),
                             date: topic.lastPost.date,
                             username: topic.lastPost.username,
                             isClosed: topic.isClosed,

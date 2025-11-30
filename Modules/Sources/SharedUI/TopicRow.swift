@@ -13,7 +13,7 @@ public struct TopicRow: View {
     
     @Environment(\.tintColor) private var tintColor
     
-    public let title: String
+    public let title: UITitleType
     public let date: Date
     public let username: String
     public let isClosed: Bool
@@ -21,7 +21,7 @@ public struct TopicRow: View {
     public let onAction: (_ unreadTapped: Bool) -> Void
     
     public init(
-        title: String,
+        title: UITitleType,
         date: Date,
         username: String,
         isClosed: Bool,
@@ -46,12 +46,14 @@ public struct TopicRow: View {
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.teritary))
                     
-                    RichText(
-                        text: AttributedString(title),
-                        isSelectable: false,
-                        font: .body,
-                        foregroundStyle: Color(.Labels.primary)
-                    )
+                    switch title {
+                    case .plain(let title):
+                        Text(verbatim: title)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                    case .render(let attributedTitle):
+                        RichText(text: attributedTitle)
+                    }
                     
                     HStack(spacing: 4) {
                         Image(systemSymbol: .personCircle)
@@ -108,7 +110,7 @@ public struct TopicRow: View {
 #Preview {
     List {
         TopicRow(
-            title: "Обсуждение клиента",
+            title: .plain("Обсуждение клиента"),
             date: .now,
             username: "qwerty",
             isClosed: false,
@@ -117,7 +119,7 @@ public struct TopicRow: View {
         )
         
         TopicRow(
-            title: "ForPDA [iOS]",
+            title: .plain("ForPDA [iOS]"),
             date: .now,
             username: "subvertd",
             isClosed: false,
@@ -126,7 +128,7 @@ public struct TopicRow: View {
         )
         
         TopicRow(
-            title: "За особые достижения отмечены",
+            title: .plain("За особые достижения отмечены"),
             date: .now,
             username: "asdf",
             isClosed: true,
@@ -135,7 +137,7 @@ public struct TopicRow: View {
         )
         
         TopicRow(
-            title: "Что нового было, пока вас не было?",
+            title: .plain("Что нового было, пока вас не было?"),
             date: .now,
             username: "123456789",
             isClosed: true,

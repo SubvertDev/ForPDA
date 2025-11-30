@@ -224,7 +224,7 @@ public struct FavoritesScreen: View {
                         )
                     } else {
                         TopicRow(
-                            title: favorite.topic.name,
+                            title: .plain(favorite.topic.name),
                             date: favorite.topic.lastPost.date,
                             username: favorite.topic.lastPost.username,
                             isClosed: favorite.topic.isClosed,

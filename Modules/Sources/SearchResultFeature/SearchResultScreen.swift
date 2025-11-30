@@ -131,7 +131,7 @@ public struct SearchResultScreen: View {
     private func TopicSection(_ topic: TopicInfo) -> some View {
         Section {
             TopicRow(
-                title: topic.name,
+                title: .render(makeAttributed(topic.name.fixBBCode(), .body)!),
                 date: topic.lastPost.date,
                 username: topic.lastPost.username,
                 isClosed: topic.isClosed,
@@ -166,7 +166,7 @@ public struct SearchResultScreen: View {
                 rowType: settingsToRow(store.appSettings.articlesListRowType),
                 bundle: .module
             ) { action in
-                
+                // TODO: Actions.
             }
         }
         .buttonStyle(.plain)
