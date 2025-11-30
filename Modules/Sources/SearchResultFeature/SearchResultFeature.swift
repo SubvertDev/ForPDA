@@ -55,7 +55,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             
-            case postTapped
+            case postTapped(Int, String, Int)
             case topicTapped(Int, String, Bool)
             case articleTapped
         }
@@ -95,8 +95,8 @@ public struct SearchResultFeature: Reducer, Sendable {
             case .view(.onAppear):
                 return .send(.internal(.loadContent(offset: 0)))
                 
-            case .view(.postTapped):
-                return .none
+            case let .view(.postTapped(topicId, topicName, postId)):
+                return .send(.delegate(.openTopic(id: topicId, name: topicName, goTo: .post(id: postId))))
                 
             case let .view(.topicTapped(id, name, isUnreadTapped)):
                 return .send(.delegate(.openTopic(id: id, name: name, goTo: isUnreadTapped ? .unread : .first)))

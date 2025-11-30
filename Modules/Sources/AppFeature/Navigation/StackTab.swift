@@ -215,6 +215,11 @@ public struct StackTab: Reducer, Sendable {
         case let .announcement(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
             
+            // Search
+            
+        case let .search(.delegate(.openTopic(id, name, goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
         default:
             break
         }

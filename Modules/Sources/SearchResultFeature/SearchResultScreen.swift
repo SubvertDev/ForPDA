@@ -103,10 +103,14 @@ public struct SearchResultScreen: View {
             
             PostRowView(
                 state: .init(post: post.post),
-                action: { _ in
-                    
-                },
+                action: { _ in },
                 menuAction: { _ in }
+            )
+            .highPriorityGesture(
+                TapGesture()
+                    .onEnded {
+                        send(.postTapped(post.topicId, post.topicName, post.id))
+                    }
             )
         }
     }
