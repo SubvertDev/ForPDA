@@ -22,6 +22,7 @@ import AnalyticsClient
 import TopicBuilder
 import ToastClient
 import NotificationsClient
+import SearchFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -48,6 +49,7 @@ public struct TopicFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case karmaChange(Int)
         case editWarning
+        case search(SearchFeature)
         case writeForm(WriteFormFeature)
         case changeReputation(ReputationChangeFeature)
     }
@@ -124,6 +126,7 @@ public struct TopicFeature: Reducer, Sendable {
             case topicPollOpenButtonTapped
             case topicPollVoteButtonTapped([Int: Set<Int>])
             case changeKarmaTapped(Int, Bool)
+            case searchButtonTapped
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
@@ -150,6 +153,7 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
+            case openSearch(SearchResult)
             case openedLastPage
         }
     }
@@ -202,6 +206,12 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case let .destination(.presented(.search(.delegate(.userProfileTapped(id))))):
+                return .send(.delegate(.openUser(id: id)))
+                
+            case let .destination(.presented(.search(.delegate(.searchOptionsConstructed(options))))):
+                return .send(.delegate(.openSearch(options)))
+                
             case .destination, .pageNavigation, .binding:
                 return .none
                 
@@ -227,6 +237,16 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
+                
+            case .view(.searchButtonTapped):
+                let navigation: [ForumInfo] = if let topic = state.topic {
+                    !topic.navigation.isEmpty ? [topic.navigation.first!] : []
+                } else { [] }
+                state.destination = .search(SearchFeature.State(
+                    on: .topic(id: state.topicId),
+                    navigation: navigation
+                ))
+                return .none
                 
             case .view(.topicHatOpenButtonTapped):
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }

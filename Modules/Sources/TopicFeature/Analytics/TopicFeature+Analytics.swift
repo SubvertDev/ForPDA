@@ -24,6 +24,7 @@ extension TopicFeature {
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
                         .view(.topicPollVoteButtonTapped),
+                        .view(.searchButtonTapped),
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),

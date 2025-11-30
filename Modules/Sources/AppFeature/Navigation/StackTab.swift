@@ -205,6 +205,9 @@ public struct StackTab: Reducer, Sendable {
         case let .topic(.delegate(.openUser(id: id))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
+        case let .topic(.delegate(.openSearch(options))):
+            state.path.append(.forum(.search(SearchResultFeature.State(search: options))))
+            
         case .topic(.delegate(.openedLastPage)):
             for (id, element) in zip(state.path.ids, state.path).reversed() where element.is(\.forum.forum) {
                 return reduce(into: &state, action: .path(.element(id: id, action: .forum(.forum(.internal(.refresh))))))

@@ -17,6 +17,7 @@ import ParsingClient
 import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
+import SearchFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -107,7 +108,23 @@ public struct TopicScreen: View {
                 }
             }
             .navigations(store: store)
-            .toolbar { OptionsMenu() }
+            .toolbar {
+                ToolbarItem {
+                    Button {
+                        send(.searchButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .magnifyingglass)
+                            .foregroundStyle(foregroundStyle())
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
+                }
+                ToolbarItem {
+                    OptionsMenu()
+                }
+            }
             ._safeAreaBar(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
@@ -397,6 +414,11 @@ struct NavigationModifier: ViewModifier {
                     .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
                         let state = store.withState { $0 }
                         TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+                    }
+                    .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
+                        NavigationStack {
+                            SearchScreen(store: store)
+                        }
                     }
             }
         }

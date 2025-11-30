@@ -439,6 +439,7 @@ let project = Project(
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
                     .Internal.ReputationChangeFeature,
+                    .Internal.SearchFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
