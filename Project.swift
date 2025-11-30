@@ -116,6 +116,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
+                    .Internal.SearchFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,

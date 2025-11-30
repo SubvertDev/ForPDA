@@ -135,12 +135,21 @@ public struct StackTab: Reducer, Sendable {
         case let .articlesList(.delegate(.openArticle(preview))):
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
+        case let .articlesList(.delegate(.openSearch(options))):
+            state.path.append(.articles(.search(SearchResultFeature.State(search: options))))
+            
         case let .article(.delegate(.handleDeeplink(id))):
             let preview = ArticlePreview.innerDeeplink(id: id)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        case let .article(.comments(.element(id: _, action: .profileTapped(userId: id)))):
+        case .articlesList(.delegate(.openUserProfile(let id))),
+             .article(.comments(.element(id: _, action: .profileTapped(let id)))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
+            // Search
+            
+        case let .search(.delegate(.openArticle(preview))):
+            state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
         default:
             break

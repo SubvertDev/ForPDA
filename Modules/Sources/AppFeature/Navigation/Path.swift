@@ -39,6 +39,7 @@ public enum Path {
     public enum Articles {
         case articlesList(ArticlesListFeature)
         case article(ArticleFeature)
+        case search(SearchResultFeature)
     }
     
     @Reducer(state: .equatable)
@@ -107,6 +108,10 @@ extension Path {
         case let .articlesList(store):
             ArticlesListScreen(store: store)
                 .tracking(for: ArticlesListScreen.self)
+            
+        case let .search(store):
+            SearchResultScreen(store: store)
+                .tracking(for: SearchResultScreen.self)
             
         case let .article(store):
             ArticleScreen(store: store)

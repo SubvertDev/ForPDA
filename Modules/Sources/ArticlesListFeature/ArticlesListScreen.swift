@@ -10,6 +10,7 @@ import ComposableArchitecture
 import SharedUI
 import Models
 import SFSafeSymbols
+import SearchFeature
 
 public struct ArticlesListScreen: View {
     
@@ -75,6 +76,11 @@ public struct ArticlesListScreen: View {
                         store.send(.linkShared(success, url))
                     }
                     .presentationDetents([.medium])
+                }
+            }
+            .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
+                NavigationStack {
+                    SearchScreen(store: store)
                 }
             }
             .onChange(of: store.shouldScrollToTop) { _ in
@@ -154,6 +160,18 @@ public struct ArticlesListScreen: View {
     
     @ToolbarContentBuilder
     private func Toolbar() -> some ToolbarContent {
+        ToolbarItem {
+            Button {
+                store.send(.searchButtonTapped)
+            } label: {
+                Image(systemSymbol: .magnifyingglass)
+            }
+        }
+        
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer()
+        }
+        
         ToolbarItem {
             Button {
                 store.send(.listGridTypeButtonTapped)
