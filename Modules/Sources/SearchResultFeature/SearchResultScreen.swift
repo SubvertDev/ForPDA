@@ -39,25 +39,29 @@ public struct SearchResultScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if !store.content.isEmpty {
-                    List {
-                        ForEach(store.content) { type in
-                            switch type {
-                            case .post(let post):
-                                PostSection(post)
-                            case .topic(let topic):
-                                TopicSection(topic)
-                            case .article(let article):
-                                ArticleRow(article)
+                if !store.isLoading {
+                    if !store.content.isEmpty {
+                        List {
+                            ForEach(store.content) { type in
+                                switch type {
+                                case .post(let post):
+                                    PostSection(post)
+                                case .topic(let topic):
+                                    TopicSection(topic)
+                                case .article(let article):
+                                    ArticleRow(article)
+                                }
                             }
                         }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
+                    } else {
+                        NothingFound()
                     }
-                    .listStyle(.plain)
-                    .scrollContentBackground(.hidden)
                 }
             }
             .overlay {
-                if store.content.isEmpty {
+                if store.isLoading {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
@@ -153,6 +157,31 @@ public struct SearchResultScreen: View {
         .listRowSeparator(.hidden)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color(.Background.primary))
+    }
+    
+    // MARK: - Nothing Found
+    
+    private func NothingFound() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .magnifyingglass)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 8)
+            
+            Text("Nothing found", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundStyle(Color(.Labels.primary))
+                .padding(.bottom, 6)
+            
+            Text("Try entering a different query or changing your search parameters", bundle: .module)
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.Labels.teritary))
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
+        }
     }
 }
 

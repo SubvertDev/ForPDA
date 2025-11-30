@@ -1,8 +1,35 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Nothing found" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ничего не нашли"
+          }
+        }
+      }
+    },
     "Search" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск"
+          }
+        }
+      }
+    },
+    "Try entering a different query or changing your search parameters" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробуйте ввести другой запрос или изменить параметры поиска"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
