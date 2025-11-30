@@ -73,7 +73,7 @@ public struct ForumScreen: View {
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             ._toolbarTitleDisplayMode(.large)
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {

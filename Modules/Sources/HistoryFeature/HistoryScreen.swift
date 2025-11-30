@@ -59,7 +59,7 @@ public struct HistoryScreen: View {
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {

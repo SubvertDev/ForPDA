@@ -62,7 +62,7 @@ public struct FavoritesScreen: View {
             }
             .navigationTitle(Text("Favorites", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {

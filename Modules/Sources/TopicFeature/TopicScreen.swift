@@ -108,7 +108,7 @@ public struct TopicScreen: View {
             }
             .navigations(store: store)
             .toolbar { OptionsMenu() }
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
