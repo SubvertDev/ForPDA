@@ -138,7 +138,7 @@ public struct SearchResultScreen: View {
     
     private func ArticleRow(_ article: ArticlePreview) -> some View {
         Button {
-            //send(.articleTapped(article))
+            send(.articleTapped(article))
         } label: {
             ArticleRowView(
                 state: ArticleRowView.State(

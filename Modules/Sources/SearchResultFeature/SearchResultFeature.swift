@@ -57,7 +57,7 @@ public struct SearchResultFeature: Reducer, Sendable {
             
             case postTapped(Int, String, Int)
             case topicTapped(Int, String, Bool)
-            case articleTapped
+            case articleTapped(ArticlePreview)
         }
         
         case `internal`(Internal)
@@ -69,6 +69,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openArticle(ArticlePreview)
             case openTopic(id: Int, name: String, goTo: GoTo)
         }
     }
@@ -101,8 +102,8 @@ public struct SearchResultFeature: Reducer, Sendable {
             case let .view(.topicTapped(id, name, isUnreadTapped)):
                 return .send(.delegate(.openTopic(id: id, name: name, goTo: isUnreadTapped ? .unread : .first)))
                 
-            case .view(.articleTapped):
-                return .none
+            case let .view(.articleTapped(preview)):
+                return .send(.delegate(.openArticle(preview)))
                 
             case let .internal(.loadContent(offset)):
                 state.isLoading = true
