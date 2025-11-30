@@ -12,11 +12,11 @@ extension SearchSort {
     var title: LocalizedStringKey {
         switch self {
         case .dateDescSort:
-            return "By Relevance"
+            return "By Date (oldest to newest)"
         case .dateAscSort:
             return "By Date (newest to oldest)"
         case .relevance:
-            return "By Date (oldest to newest)"
+            return "By Relevance"
         }
     }
 }
