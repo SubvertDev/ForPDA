@@ -145,7 +145,7 @@ public struct SearchResultScreen: View {
                     commentsAmount: article.commentsAmount,
                     date: article.date
                 ),
-                rowType: .short, // From settings?
+                rowType: settingsToRow(store.appSettings.articlesListRowType),
                 bundle: .module
             ) { action in
                 
@@ -157,6 +157,10 @@ public struct SearchResultScreen: View {
         .listRowSeparator(.hidden)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color(.Background.primary))
+    }
+    
+    private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
+        rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
     }
     
     // MARK: - Nothing Found
