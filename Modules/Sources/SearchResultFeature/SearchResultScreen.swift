@@ -27,6 +27,8 @@ public struct SearchResultScreen: View {
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
+    // MARK: - Init
+    
     public init(store: StoreOf<SearchResultFeature>) {
         self.store = store
     }
@@ -42,6 +44,10 @@ public struct SearchResultScreen: View {
                 if !store.isLoading {
                     if !store.content.isEmpty {
                         List {
+                            if shouldShowNavigation {
+                                Navigation()
+                            }
+                            
                             ForEach(store.content) { type in
                                 switch type {
                                 case .post(let post):
@@ -51,6 +57,10 @@ public struct SearchResultScreen: View {
                                 case .article(let article):
                                     ArticleRow(article)
                                 }
+                            }
+                            
+                            if shouldShowNavigation {
+                                Navigation()
                             }
                         }
                         .listStyle(.plain)
@@ -165,6 +175,16 @@ public struct SearchResultScreen: View {
     
     private func settingsToRow(_ rowType: AppSettings.ArticleListRowType) -> ArticleRowView.RowType {
         rowType == AppSettings.ArticleListRowType.normal ? ArticleRowView.RowType.normal : ArticleRowView.RowType.short
+    }
+    
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation() -> some View {
+        if store.pageNavigation.shouldShow {
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+                .padding(.horizontal, 16)
+        }
     }
     
     // MARK: - Nothing Found
