@@ -122,6 +122,7 @@ public struct SearchResultFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.searchResponse(.success(response))):
+                state.content = []
                 state.contentCount = response.contentCount
                 state.pageNavigation.count = response.contentCount
                 return .send(.internal(.buildContent(response.content)))
