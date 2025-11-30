@@ -107,7 +107,7 @@ public struct ArticlesListScreen: View {
                         ArticleRowView(
                             state: ArticleRowView.State(
                                 id: article.id,
-                                title: article.title,
+                                title: .plain(article.title),
                                 authorName: article.authorName,
                                 imageUrl: article.imageUrl,
                                 commentsAmount: article.commentsAmount,

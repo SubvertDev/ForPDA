@@ -132,9 +132,9 @@ public struct SearchResultFeature: Reducer, Sendable {
                 for type in content {
                     switch type {
                     case .post(let post):
-                        let topicTypes = TopicNodeBuilder(text: post.post.content, attachments: post.post.attachments).build()
+                        let topicTypes = TopicNodeBuilder(text: post.post.content.fixBBCode(), attachments: post.post.attachments).build()
                         let uiPost = UIPost(post: post.post, content: topicTypes.map { .init(value: $0) } )
-                        state.content.append(.post(.init(topicId: post.topicId, topicName: post.topicName, post: uiPost)))
+                        state.content.append(.post(.init(topicId: post.topicId, topicName: post.topicName.fixBBCode(), post: uiPost)))
                     case .topic(let topic):
                         state.content.append(.topic(topic))
                     case .article(let article):

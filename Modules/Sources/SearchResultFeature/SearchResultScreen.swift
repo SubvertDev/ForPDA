@@ -10,6 +10,7 @@ import ComposableArchitecture
 import Models
 import SharedUI
 import PageNavigationFeature
+import BBBuilder
 
 @ViewAction(for: SearchResultFeature.self)
 public struct SearchResultScreen: View {
@@ -153,7 +154,10 @@ public struct SearchResultScreen: View {
             ArticleRowView(
                 state: ArticleRowView.State(
                     id: article.id,
-                    title: article.title,
+                    title: .render(makeAttributed(
+                        "[b]\(article.title.fixBBCode())[/b]",
+                        store.appSettings.articlesListRowType == .short ? .callout : .title3
+                    )!),
                     authorName: article.authorName,
                     imageUrl: article.imageUrl,
                     commentsAmount: article.commentsAmount,
@@ -212,6 +216,16 @@ public struct SearchResultScreen: View {
         }
     }
 }
+
+extension SearchResultScreen {
+    func makeAttributed(_ text: String, _ font: UIFont.TextStyle) -> NSAttributedString? {
+        guard !text.isEmpty else { return nil }
+        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: font)])
+            .render(text: text)
+    }
+}
+
+// MARK: - Previews
 
 #Preview {
     NavigationStack {
