@@ -298,6 +298,7 @@ public struct SearchScreen: View {
             }
         }
         .buttonStyle(.plain)
+        .listRowBackground(Color.clear)
         .frame(maxWidth: .infinity, alignment: .center)
     }
 }
