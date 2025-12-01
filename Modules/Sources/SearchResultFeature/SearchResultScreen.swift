@@ -84,8 +84,8 @@ public struct SearchResultScreen: View {
                     .padding(.bottom, 8)
                 }
             }
-            .onAppear {
-                send(.onAppear)
+            .onFirstAppear {
+                send(.onFirstAppear)
             }
         }
     }

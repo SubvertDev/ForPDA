@@ -53,7 +53,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         
         case view(View)
         public enum View {
-            case onAppear
+            case onFirstAppear
             
             case postTapped(Int, Int)
             case topicTapped(Int, Bool)
