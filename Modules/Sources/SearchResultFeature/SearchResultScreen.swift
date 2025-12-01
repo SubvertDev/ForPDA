@@ -112,14 +112,17 @@ public struct SearchResultScreen: View {
     
     private func PostRow(_ post: UIContent.UIHybridPost) -> some View {
         VStack(alignment: .leading) {
-            RichText(text: makeAttributed("[b]\(post.topicName.fixBBCode())[/b]", .subheadline)!)
-                .padding(.top, 12)
-                .highPriorityGesture(
-                    TapGesture()
-                        .onEnded {
-                            send(.topicTapped(post.topicId, false))
-                        }
+            Button {
+                send(.topicTapped(post.topicId, false))
+            } label: {
+                RichText(
+                    text: makeAttributed("[b]\(post.topicName.fixBBCode())[/b]", .subheadline)!,
+                    isSelectable: false
                 )
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 4)
+            .padding(.top, 8)
             
             PostRowView(
                 state: .init(post: post.post),
