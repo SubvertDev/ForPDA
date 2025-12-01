@@ -162,7 +162,7 @@ public struct ArticleRowView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.bottom, isShort ? 8 : 12)
             case .render(let attributedTitle):
-                RichText(text: attributedTitle)
+                RichText(text: attributedTitle, isSelectable: false)
             }
         }
     }

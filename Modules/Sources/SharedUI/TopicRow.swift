@@ -52,7 +52,7 @@ public struct TopicRow: View {
                             .font(.body)
                             .foregroundStyle(Color(.Labels.primary))
                     case .render(let attributedTitle):
-                        RichText(text: attributedTitle)
+                        RichText(text: attributedTitle, isSelectable: false)
                     }
                     
                     HStack(spacing: 4) {
