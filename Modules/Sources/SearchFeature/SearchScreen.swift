@@ -76,6 +76,8 @@ public struct SearchScreen: View {
         }
     }
     
+    // MARK: - Search Parameters Section
+    
     @ViewBuilder
     private func ParametersSection() -> some View {
         Section {
@@ -94,6 +96,8 @@ public struct SearchScreen: View {
         .listRowBackground(Color(.Background.teritary))
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
+    
+    // MARK: - Where Search Picker
     
     @ViewBuilder
     private func WhereSearch() -> some View {
@@ -120,9 +124,11 @@ public struct SearchScreen: View {
             }
         }
         .padding(12)
-        .frame(height: 60)
+        .frame(minHeight: 60)
         .cornerRadius(10)
     }
+    
+    // MARK: - Search Sort Picker
     
     @ViewBuilder
     private func SortSearch() -> some View {
@@ -140,9 +146,11 @@ public struct SearchScreen: View {
                 .tag(SearchSort.dateDescSort)
         }
         .padding(12)
-        .frame(height: 60)
+        .frame(minHeight: 60)
         .cornerRadius(10)
     }
+    
+    // MARK: - Search Result as Topics Row Toggle
     
     @ViewBuilder
     private func ResultAsTopicsRow() -> some View {
