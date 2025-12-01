@@ -84,10 +84,8 @@ public struct SearchScreen: View {
             if !additionalHidden {
                 SortSearch()
                 
-                if store.whereSearch != .site {
-                    if store.whereSearch != .topic {
-                        ResultAsTopicsRow()
-                    }
+                if store.whereSearch == .forum || store.whereSearch == .forumById {
+                    ResultAsTopicsRow()
                     
                     SearchOnForum()
                 }
