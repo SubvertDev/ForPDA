@@ -8,7 +8,7 @@
 import Models
 import SharedUI
 
-public enum UIContent: Equatable, Identifiable {
+public enum UIContent: Equatable, Hashable, Identifiable {
     case post(UIHybridPost)
     case topic(TopicInfo)
     case article(ArticlePreview)
@@ -24,7 +24,7 @@ public enum UIContent: Equatable, Identifiable {
         }
     }
     
-    public struct UIHybridPost: Equatable, Identifiable {
+    public struct UIHybridPost: Equatable, Hashable, Identifiable {
         public let topicId: Int
         public let topicName: String
         public let post: UIPost

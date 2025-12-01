@@ -7,7 +7,7 @@
 
 import Models
 
-public struct UIPost: Identifiable, Equatable {
+public struct UIPost: Identifiable, Hashable, Equatable {
     public var id: Int { post.id }
     public let post: Post
     public let content: [Content]

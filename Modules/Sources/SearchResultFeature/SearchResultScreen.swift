@@ -49,16 +49,7 @@ public struct SearchResultScreen: View {
                                 Navigation()
                             }
                             
-                            ForEach(store.content) { type in
-                                switch type {
-                                case .post(let post):
-                                    PostSection(post)
-                                case .topic(let topic):
-                                    TopicSection(topic)
-                                case .article(let article):
-                                    ArticleRow(article)
-                                }
-                            }
+                            ContentSection()
                             
                             if shouldShowNavigation {
                                 Navigation()
@@ -66,6 +57,7 @@ public struct SearchResultScreen: View {
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
+                        ._inScrollContentDetector(state: $navigationMinimized)
                     } else {
                         NothingFound()
                     }
@@ -98,11 +90,30 @@ public struct SearchResultScreen: View {
         }
     }
     
+    // MARK: - Search Content Section
+    
+    private func ContentSection() -> some View {
+        Section {
+            ForEach(Array(store.content.enumerated()), id: \.element) { index, type in
+                switch type {
+                case .post(let post):
+                    PostRow(post)
+                case .topic(let topic):
+                    TopicRow(index, topic)
+                case .article(let article):
+                    ArticleRow(article)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+    
     // MARK: - Post Row
     
-    private func PostSection(_ post: UIContent.UIHybridPost) -> some View {
+    private func PostRow(_ post: UIContent.UIHybridPost) -> some View {
         VStack(alignment: .leading) {
             RichText(text: makeAttributed("[b]\(post.topicName.fixBBCode())[/b]", .subheadline)!)
+                .padding(.top, 12)
                 .highPriorityGesture(
                     TapGesture()
                         .onEnded {
@@ -122,25 +133,43 @@ public struct SearchResultScreen: View {
                     }
             )
         }
+        .padding(.vertical, 12)
+        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color(.Background.primary))
     }
     
-    // MARK: - Topic Section
+    // MARK: - Topic Row
     
-    private func TopicSection(_ topic: TopicInfo) -> some View {
-        Section {
-            TopicRow(
-                title: .render(makeAttributed(topic.name.fixBBCode(), .body)!),
-                date: topic.lastPost.date,
-                username: topic.lastPost.username,
-                isClosed: topic.isClosed,
-                isUnread: topic.isUnread,
-                onAction: { isUnreadTapped in
-                    send(.topicTapped(topic.id, topic.name, isUnreadTapped))
-                }
-            )
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    private func TopicRow(_ index: Int, _ topic: TopicInfo) -> some View {
+        WithPerceptionTracking {
+            VStack(spacing: 0) {
+                let radius: CGFloat = isLiquidGlass ? 24 : 10
+                SharedUI.TopicRow(
+                    title: .render(makeAttributed(topic.name.fixBBCode(), .body)!),
+                    date: topic.lastPost.date,
+                    username: topic.lastPost.username,
+                    isClosed: topic.isClosed,
+                    isUnread: topic.isUnread,
+                    onAction: { isUnreadTapped in
+                        send(.topicTapped(topic.id, topic.name, isUnreadTapped))
+                    }
+                )
+                .padding(.leading, 16)
+                .background(
+                    Color(.Background.teritary)
+                        .clipShape(
+                            .rect(
+                                topLeadingRadius: index == 0 ? radius : 0,
+                                bottomLeadingRadius: index == store.contentCount - 1 ? radius : 0,
+                                bottomTrailingRadius: index == store.contentCount - 1 ? radius : 0,
+                                topTrailingRadius: index == 0 ? radius : 0
+                            )
+                        )
+                )
+            }
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color(.Background.primary))
         }
-        .listRowBackground(Color(.Background.teritary))
     }
     
     // MARK: - Article Row
@@ -168,7 +197,6 @@ public struct SearchResultScreen: View {
             }
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 16)
         .padding(.bottom, 14)
         .listRowSeparator(.hidden)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -183,11 +211,8 @@ public struct SearchResultScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        if store.pageNavigation.shouldShow {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
-                .padding(.horizontal, 16)
-                .listRowBackground(Color.clear)
-        }
+        PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            .listRowBackground(Color(.Background.primary))
     }
     
     // MARK: - Nothing Found
