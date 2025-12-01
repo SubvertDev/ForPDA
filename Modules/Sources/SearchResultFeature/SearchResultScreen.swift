@@ -186,6 +186,7 @@ public struct SearchResultScreen: View {
         if store.pageNavigation.shouldShow {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .padding(.horizontal, 16)
+                .listRowBackground(Color.clear)
         }
     }
     
