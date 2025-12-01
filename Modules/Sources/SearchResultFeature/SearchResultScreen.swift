@@ -117,7 +117,7 @@ public struct SearchResultScreen: View {
                 .highPriorityGesture(
                     TapGesture()
                         .onEnded {
-                            send(.topicTapped(post.topicId, post.topicName, false))
+                            send(.topicTapped(post.topicId, false))
                         }
                 )
             
@@ -129,7 +129,7 @@ public struct SearchResultScreen: View {
             .highPriorityGesture(
                 TapGesture()
                     .onEnded {
-                        send(.postTapped(post.topicId, post.topicName, post.id))
+                        send(.postTapped(post.topicId, post.id))
                     }
             )
         }
@@ -151,7 +151,7 @@ public struct SearchResultScreen: View {
                     isClosed: topic.isClosed,
                     isUnread: topic.isUnread,
                     onAction: { isUnreadTapped in
-                        send(.topicTapped(topic.id, topic.name, isUnreadTapped))
+                        send(.topicTapped(topic.id, isUnreadTapped))
                     }
                 )
                 .padding(.leading, 16)

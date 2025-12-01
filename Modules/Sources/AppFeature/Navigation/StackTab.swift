@@ -229,8 +229,8 @@ public struct StackTab: Reducer, Sendable {
             
             // Search
             
-        case let .search(.delegate(.openTopic(id, name, goTo))):
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+        case let .search(.delegate(.openTopic(id, goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: goTo))))
             
         default:
             break

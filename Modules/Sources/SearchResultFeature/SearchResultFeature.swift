@@ -55,8 +55,8 @@ public struct SearchResultFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             
-            case postTapped(Int, String, Int)
-            case topicTapped(Int, String, Bool)
+            case postTapped(Int, Int)
+            case topicTapped(Int, Bool)
             case articleTapped(ArticlePreview)
         }
         
@@ -70,7 +70,7 @@ public struct SearchResultFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case openArticle(ArticlePreview)
-            case openTopic(id: Int, name: String, goTo: GoTo)
+            case openTopic(id: Int, goTo: GoTo)
         }
     }
     
@@ -93,14 +93,14 @@ public struct SearchResultFeature: Reducer, Sendable {
             case .pageNavigation:
                 return .none
                 
-            case .view(.onAppear):
+            case .view(.onFirstAppear):
                 return .send(.internal(.loadContent(offset: 0)))
                 
-            case let .view(.postTapped(topicId, topicName, postId)):
-                return .send(.delegate(.openTopic(id: topicId, name: topicName, goTo: .post(id: postId))))
+            case let .view(.postTapped(topicId, postId)):
+                return .send(.delegate(.openTopic(id: topicId, goTo: .post(id: postId))))
                 
-            case let .view(.topicTapped(id, name, isUnreadTapped)):
-                return .send(.delegate(.openTopic(id: id, name: name, goTo: isUnreadTapped ? .unread : .first)))
+            case let .view(.topicTapped(id, isUnreadTapped)):
+                return .send(.delegate(.openTopic(id: id, goTo: isUnreadTapped ? .unread : .first)))
                 
             case let .view(.articleTapped(preview)):
                 return .send(.delegate(.openArticle(preview)))
