@@ -125,7 +125,7 @@ public struct TopicScreen: View {
                     OptionsMenu()
                 }
             }
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
@@ -331,7 +331,7 @@ public struct TopicScreen: View {
             }
         )
         .listRowBackground(Color.clear)
-        //.listRowSeparator(.hidden)
+        .listRowSeparator(Visibility.hidden)
         .scaleEffect(store.postId == post.id ? scrollScale : 1)
         .id(post.id)
     }
