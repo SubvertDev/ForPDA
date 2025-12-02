@@ -44,6 +44,9 @@ extension ProfileFeature {
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     
+                case .view(.searchTopicsButtonTapped):
+                    analyticsClient.log(ProfileEvent.searchTopicsTapped)
+                    
                 case .view(.searchRepliesButtonTapped):
                     analyticsClient.log(ProfileEvent.searchRepliesTapped)
                     
