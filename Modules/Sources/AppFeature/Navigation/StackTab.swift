@@ -20,6 +20,7 @@ import DeveloperFeature
 import ForumFeature
 import TopicFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import ProfileFeature
 import AnnouncementFeature
 import HistoryFeature
@@ -159,12 +160,12 @@ public struct StackTab: Reducer, Sendable {
     
     // MARK: - Favorites
     
-    private func handleFavoritesPathNavigation(action: FavoritesRootFeature.Action, state: inout State) -> Effect<Action> {
+    private func handleFavoritesPathNavigation(action: FavoritesFeature.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .favorites(.delegate(.openForum(id: id, name: name))):
+        case let .delegate(.openForum(id: id, name: name)):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
             
-        case let .favorites(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+        case let .delegate(.openTopic(id: id, name: name, goTo: goTo)):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         default:
@@ -302,7 +303,7 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleQMSPathNavigation(action: Path.QMS.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .qmsList(.chatRowTapped(id)):
+        case let .qmsList(.delegate(.openQMSChat(id))):
             state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
             
         case let .qms(.delegate(.handleUrl(url))):
@@ -319,7 +320,7 @@ public struct StackTab: Reducer, Sendable {
     private func handleAuthNavigation(action: AuthFeature.Action, state: inout State) -> Effect<Action> {
         // Also make necessary changes to delegate actions in AppFeature
         switch action {
-        case let .delegate(.loginSuccess(reason, userId)):
+        case .delegate(.loginSuccess(_, _)):
             fatalError("Auth navigation must be handled in ProfileFlow enum reducer")
             
         case .delegate(.showSettings):

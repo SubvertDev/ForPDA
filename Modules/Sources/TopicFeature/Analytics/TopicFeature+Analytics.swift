@@ -91,19 +91,14 @@ extension TopicFeature {
                 case .view(.editWarningSheetCloseButtonTapped):
                     analytics.log(TopicEvent.editWarningSheetClosed)
                     
-                case let .internal(.loadTopic(offset: offset)):
-                    analytics.log(TopicEvent.loadingStart(offset))
+                case .internal(.loadTopic):
+                    break
                     
-                case let .internal(.topicResponse(response)):
-                    switch response {
-                    case .success:
-                        analytics.log(TopicEvent.loadingSuccess)
-                    case let .failure(error):
-                        analytics.log(TopicEvent.loadingFailure(error))
-                    }
+                case .internal(.topicResponse):
+                    break
                     
-                case let .internal(.setFavoriteResponse(response)):
-                    analytics.log(TopicEvent.setFavoriteResponse(response))
+                case .internal(.setFavoriteResponse):
+                    break
                 }
                 
                 return .none

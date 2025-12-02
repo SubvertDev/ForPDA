@@ -35,13 +35,16 @@ public struct QMSScreen: View {
                 
                 if store.chat != nil {
                     ChatView(messages: store.messages) { message in
-                        send(.sendMessageButtonTapped(message.text))
+                        send(.sendMessageButtonTapped(message))
+                    } messageMenuAction: { (action: ChatAction, _, message) in
+                        if case .copy = action {
+                            UIPasteboard.general.string = message.text
+                        }
                     }
                     .messageUseStyler { string in
                         return QMSBuilder(text: string).build()
                     }
                     .setAvailableInputs([.text])
-                    .showMessageMenuOnLongPress(false)
                     .chatTheme(
                         ChatTheme(
                             colors: ChatTheme
@@ -76,10 +79,36 @@ public struct QMSScreen: View {
     }
 }
 
+// MARK: - Previews
+
 #Preview {
-    QMSScreen(store: Store(initialState: QMSFeature.State(chatId: 0)) {
-        QMSFeature()
-    })
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .init(userId: 1, token: "", isHidden: false) }
+    
+    return QMSScreen(
+        store: Store(
+            initialState: QMSFeature.State(chatId: 0)
+        ) {
+            QMSFeature()
+        } withDependencies: { _ in
+            
+        }
+    )
+    .environment(\.tintColor, Color(.Theme.primary))
+    .environment(\.locale, Locale(identifier: "en"))
+}
+
+#Preview("Error On Send") {
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .init(userId: 1, token: "", isHidden: false) }
+    
+    return QMSScreen(
+        store: Store(initialState: QMSFeature.State(chatId: 0)) {
+            QMSFeature()
+        } withDependencies: {
+            $0.qmsClient = .errorOnSend
+        }
+    )
     .environment(\.tintColor, Color(.Theme.primary))
     .environment(\.locale, Locale(identifier: "en"))
 }

@@ -47,7 +47,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
@@ -269,3 +269,5 @@ public struct ArticlesListFeature: Reducer, Sendable {
         return .none
     }
 }
+
+extension ArticlesListFeature.Destination.State: Equatable {}

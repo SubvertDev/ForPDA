@@ -178,7 +178,7 @@ struct LiquidTabView: View {
     private func _Page(for store: Store<Path.State, Path.Action>) -> some View {
         switch store.case {
         case let .favorites(store):
-            PageNavigation(store: store.scope(state: \.favorites.pageNavigation, action: \.favorites.pageNavigation))
+            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
         case let .forum(path):
             switch path.case {
             case let .forum(store):

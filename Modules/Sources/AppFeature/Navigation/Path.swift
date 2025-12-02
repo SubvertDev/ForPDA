@@ -12,6 +12,7 @@ import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
@@ -25,31 +26,31 @@ import SettingsFeature
 import TopicFeature
 import AuthFeature
 
-@Reducer(state: .equatable)
+@Reducer
 public enum Path {
     case articles(Articles.Body = Articles.body)
-    case favorites(FavoritesRootFeature)
+    case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
     case profile(Profile.Body = Profile.body)
     case settings(Settings.Body = Settings.body)
     case qms(QMS.Body = QMS.body)
     case auth(AuthFeature)
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Articles {
         case articlesList(ArticlesListFeature)
         case article(ArticleFeature)
         case search(SearchResultFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
         case reputation(ReputationFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Forum {
         case forumList(ForumsListFeature)
         case forum(ForumFeature)
@@ -58,7 +59,7 @@ public enum Path {
         case search(SearchResultFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Settings {
         case settings(SettingsFeature)
         case navigation(NavigationSettingsFeature)
@@ -66,12 +67,19 @@ public enum Path {
         case developer(DeveloperFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum QMS {
         case qmsList(QMSListFeature)
         case qms(QMSFeature)
     }
 }
+
+extension Path.State: Equatable {}
+extension Path.Articles.State: Equatable {}
+extension Path.Profile.State: Equatable {}
+extension Path.Forum.State: Equatable {}
+extension Path.Settings.State: Equatable {}
+extension Path.QMS.State: Equatable {}
 
 extension Path {
     @MainActor @ViewBuilder
@@ -81,8 +89,8 @@ extension Path {
             ArticlesViews(path)
             
         case let .favorites(store):
-            FavoritesRootScreen(store: store)
-                .tracking(for: FavoritesRootScreen.self)
+            FavoritesScreen(store: store)
+                .tracking(for: FavoritesScreen.self)
             
         case let .profile(path):
             ProfileViews(path)

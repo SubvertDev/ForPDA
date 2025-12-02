@@ -294,7 +294,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func Post(_ post: UIPost) -> some View {
         PostRowView(
-            state: .init(
+            state: PostRowView.State(
                 post: post,
                 sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
                 canPostInTopic: store.topic?.canPost ?? false,
@@ -331,7 +331,7 @@ public struct TopicScreen: View {
             }
         )
         .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
+        //.listRowSeparator(.hidden)
         .scaleEffect(store.postId == post.id ? scrollScale : 1)
         .id(post.id)
     }

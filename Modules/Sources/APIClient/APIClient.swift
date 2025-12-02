@@ -79,11 +79,7 @@ public struct APIClient: Sendable {
     public var getAttachment: @Sendable (_ id: Int) async throws -> URL
     public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
-    // QMS
-    public var loadQMSList: @Sendable () async throws -> QMSList
-    public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
-    public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
-    public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
+    // QMS -> MOVED TO QMSCLIENT
 
     // Search
     public var search: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
@@ -101,7 +97,7 @@ public struct APIClient: Sendable {
 
 extension APIClient: DependencyKey {
     
-    private static let api = API()
+    public static let api = API()
     
     // MARK: - Live Value
     
@@ -490,30 +486,6 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return ReportResponseType(rawValue: status)
             },
-            
-            // MARK: - QMS
-            
-            loadQMSList: {
-                let response = try await api.send(QMSCommand.list)
-                return try await parser.parseQmsList(response)
-            },
-            
-            loadQMSUser: { id in
-                let response = try await api.send(QMSCommand.info(id: id))
-                return try await parser.parseQmsUser(response)
-            },
-            
-            loadQMSChat: { id in
-                let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
-                let response = try await api.send(QMSCommand.Dialog.view(data: request))
-                return try await parser.parseQmsChat(response)
-            },
-            
-            sendQMSMessage: { chatId, message in
-                let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
-                let _ = try await api.send(QMSCommand.Message.send(data: request))
-                // Returns chatId + new messageId
-			},
 
 			// MARK: - Search
 
@@ -680,18 +652,6 @@ extension APIClient: DependencyKey {
             },
             sendReport: { _ in
                 return .success
-            },
-            loadQMSList: {
-                return QMSList(users: [])
-            },
-            loadQMSUser: { _ in
-                return QMSUser(userId: 0, name: "", flag: 0, avatarUrl: nil, lastSeenOnline: .now, lastMessageDate: .now, unreadCount: 0, chats: [])
-            },
-            loadQMSChat: { _ in
-                return QMSChat(id: 0, creationDate: .now, lastMessageDate: .now, name: "", partnerId: 0, partnerName: "", flag: 0, avatarUrl: nil, unknownId1: 0, totalCount: 0, unknownId2: 0, lastMessageId: 0, unreadCount: 0, messages: [])
-            },
-            sendQMSMessage: { _, _ in
-                
             },
             search: { _ in
                 return .mock

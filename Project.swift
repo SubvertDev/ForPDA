@@ -320,8 +320,9 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
-                    .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.Models,
+                    .Internal.QMSClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,
@@ -331,14 +332,13 @@ let project = Project(
         
             .feature(
                 name: "QMSFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
-                    .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
+                    .Internal.QMSClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .SPM.ExyteChat,
@@ -529,6 +529,18 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.LoggerClient,
                     .Internal.ParsingClient,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
+                name: "QMSClient",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .Internal.NotificationsClient,
+                    .SPM.PDAPI,
                     .SPM.TCA
                 ]
             ),
@@ -834,9 +846,9 @@ extension Dictionary where Key == String, Value == SettingValue {
 extension Array where Element == String {
     static let longTypeCheckingFlags = [
         "-Xfrontend",
-        "-warn-long-function-bodies=600",
+        "-warn-long-function-bodies=700",
         "-Xfrontend",
-        "-warn-long-expression-type-checking=100"
+        "-warn-long-expression-type-checking=150"
     ]
 }
 
@@ -931,6 +943,7 @@ extension TargetDependency.Internal {
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
+    static let QMSClient =           TargetDependency.target(name: "QMSClient")
     static let ToastClient =         TargetDependency.target(name: "ToastClient")
     
     // Shared

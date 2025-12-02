@@ -17,7 +17,7 @@ public struct ReputationFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination: Hashable {
         case alert(AlertState<Alert>)
         
@@ -164,6 +164,7 @@ public struct ReputationFeature: Reducer, Sendable {
                 return .none
                 
             case let .internal(.historyResponse(.failure(error))):
+                print(error)
                 state.isLoading = false
                 state.destination = .alert(.error)
                 reportFullyDisplayed(&state)
@@ -181,6 +182,8 @@ public struct ReputationFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ReputationFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extension
 

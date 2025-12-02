@@ -27,7 +27,7 @@ public struct ProfileFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         case alert(AlertState<ProfileFeature.Action.Alert>)
         case editProfile(EditFeature)
@@ -197,6 +197,8 @@ public struct ProfileFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ProfileFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extension
 

@@ -30,11 +30,6 @@ public enum TopicEvent: Event {
     case menuChangeReputation(Int, Int)
     case menuPostCopyLink(Int)
     
-    case loadingStart(Int)
-    case loadingSuccess
-    case loadingFailure(any Error)
-    case setFavoriteResponse(Bool)
-    
     public var name: String {
         return "Topic " + eventName(for: self).inProperCase
     }
@@ -57,15 +52,6 @@ public enum TopicEvent: Event {
         case let .urlTapped(url),
              let .imageTapped(url):
             return ["url": url.absoluteString]
-            
-        case let .loadingStart(offset):
-            return ["offset": String(offset)]
-            
-        case let .loadingFailure(error):
-            return ["error": error.localizedDescription]
-            
-        case let .setFavoriteResponse(state):
-            return ["state": state.description]
             
         default:
             return nil
