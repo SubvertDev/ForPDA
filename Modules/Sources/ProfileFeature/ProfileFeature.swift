@@ -12,6 +12,7 @@ import PersistenceKeys
 import Models
 import AnalyticsClient
 import ToastClient
+import SearchResultFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -74,6 +75,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case logoutButtonTapped
             case historyButtonTapped
             case reputationButtonTapped
+            case searchRepliesButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
         }
         
@@ -93,6 +95,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openSettings
             case openHistory
             case openReputation(Int)
+            case openSearch(SearchResult)
             case handleUrl(URL)
         }
     }
@@ -130,6 +133,16 @@ public struct ProfileFeature: Reducer, Sendable {
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .send(.delegate(.openReputation(userId)))
+                
+            case .view(.searchRepliesButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openSearch(SearchResult(
+                    on: .forum(id: nil, sIn: .posts, asTopics: false),
+                    authorId: userId,
+                    text: "",
+                    sort: .dateDescSort
+                ))))
                 
             case .view(.editButtonTapped):
                 if let user = state.user {

@@ -44,6 +44,9 @@ extension ProfileFeature {
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     
+                case .view(.searchRepliesButtonTapped):
+                    analyticsClient.log(ProfileEvent.searchRepliesTapped)
+                    
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {
                     case .about:

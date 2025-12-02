@@ -47,6 +47,7 @@ public enum Path {
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
+        case search(SearchResultFeature)
         case reputation(ReputationFeature)
     }
     
@@ -133,6 +134,10 @@ extension Path {
         case let .profile(store):
             ProfileScreen(store: store)
                 .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])
+            
+        case let .search(store):
+            SearchResultScreen(store: store)
+                .tracking(for: SearchResultScreen.self)
 
         case let .history(store):
             HistoryScreen(store: store)

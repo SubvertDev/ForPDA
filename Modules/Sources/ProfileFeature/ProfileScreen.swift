@@ -406,7 +406,9 @@ public struct ProfileScreen: View {
                 send(.reputationButtonTapped)
             }
             Row(title: "Topics", type: .description(String(user.topics)))
-            Row(title: "Replies", type: .description(String(user.replies)))
+            Row(title: "Replies", type: .navigationDescription(String(user.replies))) {
+                send(.searchRepliesButtonTapped)
+            }
         } header: {
             SectionHeader(title: "Forum statistics")
         }

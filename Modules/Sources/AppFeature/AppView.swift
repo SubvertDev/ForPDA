@@ -201,6 +201,8 @@ struct LiquidTabView: View {
             switch path.case {
             case let .history(store):
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            case let .search(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             default:
                 EmptyView()
             }
