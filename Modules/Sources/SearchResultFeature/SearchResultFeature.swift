@@ -13,6 +13,7 @@ import PersistenceKeys
 import SharedUI
 import TopicBuilder
 import PageNavigationFeature
+import ToastClient
 
 @Reducer
 public struct SearchResultFeature: Reducer, Sendable {
@@ -24,13 +25,8 @@ public struct SearchResultFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
-        @Shared(.userSession) var userSession: UserSession?
         
         public let search: SearchResult
-        
-        public var isUserAuthorized: Bool {
-            return userSession != nil
-        }
         
         public var pageNavigation = PageNavigationFeature.State(type: .topic)
         
@@ -77,6 +73,7 @@ public struct SearchResultFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.toastClient) private var toastClient
     
     // MARK: - Body
     
@@ -116,7 +113,7 @@ public struct SearchResultFeature: Reducer, Sendable {
                         offset: offset,
                         amount: amount
                     )
-                    let respone = try await apiClient.search(request: request)
+                    let respone = try await apiClient.search(request)
                     await send(.internal(.searchResponse(.success(respone))))
                 } catch: { error, send in
                     await send(.internal(.searchResponse(.failure(error))))
@@ -146,8 +143,9 @@ public struct SearchResultFeature: Reducer, Sendable {
                 
             case let .internal(.searchResponse(.failure(error))):
                 print(error)
-                // TODO: Toast.
-                return .none
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case .delegate:
                 return .none

@@ -391,6 +391,7 @@ let project = Project(
                     .Internal.PageNavigationFeature,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
                     .Internal.TopicBuilder,
                     .SPM.TCA,
                 ]
