@@ -6,7 +6,12 @@
 //
 
 extension String {
-    func fixBBCode() -> String {
+    func fixBackgroundBBCode() -> String {
         return self.replacingOccurrences(of: "[backgroud", with: "[background")
+    }
+    
+    func removeSelectionBBCodes() -> String {
+        return self.replacingOccurrences(of: "[backgroud=yellow][color=red]", with: "")
+            .replacingOccurrences(of: "[/color][/background]", with: "")
     }
 }

@@ -116,7 +116,7 @@ public struct SearchResultScreen: View {
                 send(.topicTapped(post.topicId, false))
             } label: {
                 RichText(
-                    text: makeAttributed("[b]\(post.topicName.fixBBCode())[/b]", .subheadline)!,
+                    text: makeAttributed("[b]\(post.topicName.fixBackgroundBBCode())[/b]", .subheadline)!,
                     isSelectable: false
                 )
             }
@@ -148,7 +148,7 @@ public struct SearchResultScreen: View {
             VStack(spacing: 0) {
                 let radius: CGFloat = isLiquidGlass ? 24 : 10
                 SharedUI.TopicRow(
-                    title: .render(makeAttributed(topic.name.fixBBCode(), .body)!),
+                    title: .render(makeAttributed(topic.name.fixBackgroundBBCode(), .body)!),
                     date: topic.lastPost.date,
                     username: topic.lastPost.username,
                     isClosed: topic.isClosed,
@@ -186,7 +186,7 @@ public struct SearchResultScreen: View {
                 state: ArticleRowView.State(
                     id: article.id,
                     title: .render(makeAttributed(
-                        "[b]\(article.title.fixBBCode())[/b]",
+                        "[b]\(article.title.fixBackgroundBBCode())[/b]",
                         store.appSettings.articlesListRowType == .short ? .callout : .title3
                     )!),
                     authorName: article.authorName,

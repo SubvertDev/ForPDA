@@ -99,8 +99,10 @@ public struct SearchResultFeature: Reducer, Sendable {
             case let .view(.topicTapped(id, isUnreadTapped)):
                 return .send(.delegate(.openTopic(id: id, goTo: isUnreadTapped ? .unread : .first)))
                 
-            case let .view(.articleTapped(preview)):
-                return .send(.delegate(.openArticle(preview)))
+            case let .view(.articleTapped(article)):
+                var article = article
+                article.title = article.title.removeSelectionBBCodes()
+                return .send(.delegate(.openArticle(article)))
                 
             case let .internal(.loadContent(offset)):
                 state.isLoading = true
@@ -129,9 +131,9 @@ public struct SearchResultFeature: Reducer, Sendable {
                 for type in content {
                     switch type {
                     case .post(let post):
-                        let topicTypes = TopicNodeBuilder(text: post.post.content.fixBBCode(), attachments: post.post.attachments).build()
+                        let topicTypes = TopicNodeBuilder(text: post.post.content.fixBackgroundBBCode(), attachments: post.post.attachments).build()
                         let uiPost = UIPost(post: post.post, content: topicTypes.map { .init(value: $0) } )
-                        state.content.append(.post(.init(topicId: post.topicId, topicName: post.topicName.fixBBCode(), post: uiPost)))
+                        state.content.append(.post(.init(topicId: post.topicId, topicName: post.topicName.fixBackgroundBBCode(), post: uiPost)))
                     case .topic(let topic):
                         state.content.append(.topic(topic))
                     case .article(let article):
