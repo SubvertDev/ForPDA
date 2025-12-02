@@ -264,6 +264,9 @@ public struct StackTab: Reducer, Sendable {
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
+        case let .search(.delegate(.openTopic(id, goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: goTo))))
+            
         case let .reputation(.delegate(.openProfile(id))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
