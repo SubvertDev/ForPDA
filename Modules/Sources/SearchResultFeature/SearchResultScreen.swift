@@ -72,7 +72,7 @@ public struct SearchResultScreen: View {
             .navigationTitle(Text("Search", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
