@@ -87,6 +87,12 @@ public struct SearchFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .binding(\.authorName):
+                if !state.authorName.isEmpty, state.authorName.count >= 3 {
+                    return .send(.view(.searchAuthorName(state.authorName)))
+                }
+                return .none
+                
             case .view(.onAppear):
                 switch state.searchOn {
                 case .site:

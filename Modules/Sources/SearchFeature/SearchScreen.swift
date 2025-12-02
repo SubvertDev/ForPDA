@@ -195,7 +195,7 @@ public struct SearchScreen: View {
     private func AuthorSection() -> some View {
         Section {
             SharedUI.ForField(
-                content: $store.authorName,
+                content: $store.authorName.removeDuplicates(),
                 placeholder: LocalizedStringResource("Input...", bundle: .module),
                 focusEqual: SearchFeature.State.Field.authorName,
                 focus: $focus,
@@ -208,11 +208,6 @@ public struct SearchScreen: View {
                         .padding(.horizontal, 12)
                 } else if store.authorId != nil {
                     AuthorProfileLinkButton()
-                }
-            }
-            .onChange(of: store.authorName) { name in
-                if !name.isEmpty, name.count >= 3 {
-                    send(.searchAuthorName(name))
                 }
             }
         } header: {
