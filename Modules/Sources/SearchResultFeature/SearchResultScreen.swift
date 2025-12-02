@@ -195,10 +195,9 @@ public struct SearchResultScreen: View {
                     date: article.date
                 ),
                 rowType: settingsToRow(store.appSettings.articlesListRowType),
-                bundle: .module
-            ) { action in
-                // TODO: Actions.
-            }
+                bundle: .module,
+                isContextMenuSupported: false
+            ) { _ in }
         }
         .buttonStyle(.plain)
         .padding(.bottom, 14)

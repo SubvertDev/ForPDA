@@ -25,6 +25,7 @@ public struct ArticleRowView: View {
     public let state: State
     public let rowType: RowType
     public let bundle: Bundle
+    public let isContextMenuSupported: Bool
     public let action: (ContextAction) -> Void
     
     private var isShort: Bool {
@@ -41,11 +42,13 @@ public struct ArticleRowView: View {
         state: State,
         rowType: RowType,
         bundle: Bundle,
+        isContextMenuSupported: Bool = true,
         action: @escaping (ContextAction) -> Void
     ) {
         self.state = state
         self.rowType = rowType
         self.bundle = bundle
+        self.isContextMenuSupported = isContextMenuSupported
         self.action = action
     }
     
@@ -61,7 +64,9 @@ public struct ArticleRowView: View {
             }
         }
         .contextMenu {
-            ContextMenu()
+            if isContextMenuSupported {
+                ContextMenu()
+            }
         }
     }
     
@@ -191,7 +196,9 @@ public struct ArticleRowView: View {
             
             Spacer()
             
-            ContextMenuButton()
+            if isContextMenuSupported {
+                ContextMenuButton()
+            }
         }
     }
     
@@ -226,6 +233,8 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func ContextMenu() -> some View {
         VStack(spacing: 0) {
+            // In .render case title will be with BB-codes
+            // .render case is using for search.
             if case .plain(let title) = state.title {
                 Section {
                     Button {
