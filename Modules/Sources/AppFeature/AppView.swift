@@ -177,6 +177,13 @@ struct LiquidTabView: View {
     @ViewBuilder
     private func _Page(for store: Store<Path.State, Path.Action>) -> some View {
         switch store.case {
+        case let .articles(path):
+            switch path.case {
+            case let .search(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            default:
+                EmptyView()
+            }
         case let .favorites(store):
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
         case let .forum(path):
@@ -184,6 +191,8 @@ struct LiquidTabView: View {
             case let .forum(store):
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             case let .topic(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            case let .search(store):
                 PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
             default:
                 EmptyView()
