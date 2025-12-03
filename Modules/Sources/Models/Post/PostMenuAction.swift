@@ -12,6 +12,6 @@ public enum PostMenuAction {
     case karma(Int)
     case report(Int)
     case changeReputation(Int, Int, String)
-    case postMentions(Int)
+    case mentions(Int)
     case copyLink(Int)
 }

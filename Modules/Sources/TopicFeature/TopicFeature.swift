@@ -371,7 +371,7 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .changeReputation(feature)
                     return .none
                     
-                case .postMentions(let postId):
+                case .mentions(let postId):
                     return .send(.delegate(.openSearch(SearchResult(
                         on: .topic(id: state.topicId, noHighlight: true),
                         authorId: nil,

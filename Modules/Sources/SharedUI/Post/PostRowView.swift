@@ -186,7 +186,7 @@ public struct PostRowView: View {
                 }
                 
                 ContextButton(text: LocalizedStringResource("Post Mentions", bundle: .module), symbol: .arrowRightSquare) {
-                    menuAction(.postMentions(state.post.id))
+                    menuAction(.mentions(state.post.id))
                 }
             }
             
