@@ -52,10 +52,10 @@ extension Models.SearchOn {
         switch self {
         case .site:
             return .site
-        case let .forum(id: id, sIn: sIn, asTopics: asTopics):
+        case let .forum(id, sIn, asTopics):
             return .forum(id: id, sIn: sIn.toPDAPIForumSearchIn(), asTopics: asTopics)
-        case let .topic(id: id):
-            return .topic(id: id)
+        case let .topic(id, noHighlight):
+            return .topic(id: id, noHighlight: noHighlight)
         }
     }
 }
