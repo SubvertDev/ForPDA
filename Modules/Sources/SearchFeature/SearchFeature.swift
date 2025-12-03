@@ -40,7 +40,7 @@ public struct SearchFeature: Reducer, Sendable {
         
         public init(
             on: SearchOn = .site,
-            navigation: [ForumInfo] = [.mock]
+            navigation: [ForumInfo] = []
         ) {
             self.searchOn = on
             self.navigation = navigation
