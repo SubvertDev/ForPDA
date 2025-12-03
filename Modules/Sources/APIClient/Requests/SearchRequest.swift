@@ -34,9 +34,9 @@ public struct SearchRequest: Sendable, Equatable {
     }
 }
 
-extension Models.SearchSort {
-    func toPDAPISearchSort() -> SearchCommand.SearchSort {
-        switch self {
+extension SearchRequest {
+    var transferSort: SearchCommand.SearchSort {
+        switch sort {
         case .dateAscSort:
             return .dateAscSort
         case .dateDescSort:
@@ -45,30 +45,26 @@ extension Models.SearchSort {
             return .matchSort
         }
     }
-}
-
-extension Models.SearchOn {
-    func toPDAPISearchOn() -> SearchCommand.SearchOn {
-        switch self {
+    
+    var transferOn: SearchCommand.SearchOn {
+        switch on {
         case .site:
             return .site
         case let .forum(id, sIn, asTopics):
-            return .forum(id: id, sIn: sIn.toPDAPIForumSearchIn(), asTopics: asTopics)
+            let sIn: SearchCommand.ForumSearchIn = switch sIn {
+            case .all:    .all
+            case .posts:  .posts
+            case .titles: .titles
+            }
+            return .forum(id: id, sIn: sIn, asTopics: asTopics)
         case let .topic(id, noHighlight):
             return .topic(id: id, noHighlight: noHighlight)
-        }
-    }
-}
-
-fileprivate extension Models.ForumSearchIn {
-    func toPDAPIForumSearchIn() -> SearchCommand.ForumSearchIn {
-        switch self {
-        case .all:
-            return .all
-        case .posts:
-            return .posts
-        case .titles:
-            return .titles
+        case let .profile(sIn):
+            let sIn: SearchCommand.ProfileSearchIn = switch sIn {
+            case .posts:  .posts
+            case .topics: .topics
+            }
+            return .profile(sIn)
         }
     }
 }

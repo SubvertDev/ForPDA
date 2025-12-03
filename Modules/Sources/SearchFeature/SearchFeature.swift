@@ -103,6 +103,17 @@ public struct SearchFeature: Reducer, Sendable {
                     state.whereSearch = !state.navigation.isEmpty ? .forumById : .forum
                     state.forumSearchIn = sIn
                     state.searchResultsAsTopics = asTopics
+                case .profile(let sIn):
+                    state.whereSearch = .forum
+                    state.searchSort = .dateDescSort
+                    switch sIn {
+                    case .posts:
+                        state.forumSearchIn = .posts
+                        state.searchResultsAsTopics = false
+                    case .topics:
+                        state.forumSearchIn = .titles
+                        state.searchResultsAsTopics = true
+                    }
                 }
                 return .none
             

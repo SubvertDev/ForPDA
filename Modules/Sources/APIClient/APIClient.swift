@@ -491,10 +491,10 @@ extension APIClient: DependencyKey {
 
             search: { request in
                 let command = SearchCommand.content(
-                    on: request.on.toPDAPISearchOn(),
+                    on: request.transferOn,
                     authorId: request.authorId,
                     text: request.text,
-                    sort: request.sort.toPDAPISearchSort(),
+                    sort: request.transferSort,
                     offset: request.offset,
                     amount: request.amount
                 )
