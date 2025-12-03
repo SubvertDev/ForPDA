@@ -52,7 +52,7 @@ public struct ForumFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         case search(SearchFeature)
     }
@@ -336,3 +336,5 @@ public struct ForumFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ForumFeature.Destination.State: Equatable {}
