@@ -585,6 +585,7 @@ let project = Project(
             .feature(
                 name: "SharedUI",
                 dependencies: [
+                    .Internal.Models,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
