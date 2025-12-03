@@ -371,6 +371,14 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .changeReputation(feature)
                     return .none
                     
+                case .postMentions(let postId):
+                    return .send(.delegate(.openSearch(SearchResult(
+                        on: .topic(id: state.topicId, noHighlight: true),
+                        authorId: nil,
+                        text: "\(postId)",
+                        sort: .dateDescSort
+                    ))))
+                    
                 case .copyLink(let postId):
                     let link = "https://4pda.to/forum/index.php?showtopic=\(state.topicId)&view=findpost&p=\(postId)"
                     pasteboardClient.copy(link)

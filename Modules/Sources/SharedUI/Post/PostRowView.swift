@@ -178,11 +178,15 @@ public struct PostRowView: View {
                 }
             }
             
-            if state.isUserAuthorized, state.post.post.author.id != state.sessionUserId {
-                Section {
+            Section {
+                if state.isUserAuthorized, state.post.post.author.id != state.sessionUserId {
                     ContextButton(text: LocalizedStringResource("Reputation", bundle: .module), symbol: .plusminus) {
                         menuAction(.changeReputation(state.post.id, state.post.post.author.id, state.post.post.author.name))
                     }
+                }
+                
+                ContextButton(text: LocalizedStringResource("Post Mentions", bundle: .module), symbol: .arrowRightSquare) {
+                    menuAction(.postMentions(state.post.id))
                 }
             }
             

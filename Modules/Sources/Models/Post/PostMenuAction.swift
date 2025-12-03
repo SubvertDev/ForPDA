@@ -5,8 +5,6 @@
 //  Created by Xialtal on 19.03.25.
 //
 
-import Models
-
 public enum PostMenuAction {
     case reply(Int, String)
     case edit(Post)
@@ -14,5 +12,6 @@ public enum PostMenuAction {
     case karma(Int)
     case report(Int)
     case changeReputation(Int, Int, String)
+    case postMentions(Int)
     case copyLink(Int)
 }

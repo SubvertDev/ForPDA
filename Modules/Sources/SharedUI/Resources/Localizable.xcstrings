@@ -87,6 +87,16 @@
         }
       }
     },
+    "Post Mentions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упоминания поста"
+          }
+        }
+      }
+    },
     "Rate" : {
       "localizations" : {
         "ru" : {
