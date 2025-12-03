@@ -236,6 +236,7 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.ParsingClient,
+                    .Internal.SearchFeature,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.TCA

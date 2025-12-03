@@ -184,6 +184,9 @@ public struct StackTab: Reducer, Sendable {
         case let .forumList(.delegate(.openForum(id: id, name: name))):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
             
+        case let .forumList(.delegate(.openSearch(options))):
+            state.path.append(.forum(.search(SearchResultFeature.State(search: options))))
+            
         case let .forumList(.delegate(.handleForumRedirect(url))):
             return handleDeeplink(url: url, state: &state)
             

@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SFSafeSymbols
 import SharedUI
+import SearchFeature
 
 @ViewAction(for: ForumsListFeature.self)
 public struct ForumsListScreen: View {
@@ -68,6 +69,19 @@ public struct ForumsListScreen: View {
             .animation(.default, value: store.forums)
             .navigationTitle(Text("Forum", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
+                NavigationStack {
+                    SearchScreen(store: store)
+                }
+            }
+            .toolbar {
+                Button {
+                    send(.searchButtonTapped)
+                } label: {
+                    Image(systemSymbol: .magnifyingglass)
+                        .foregroundStyle(foregroundStyle())
+                }
+            }
             .onAppear {
                 send(.onAppear)
             }
@@ -96,6 +110,17 @@ public struct ForumsListScreen: View {
                     .rotationEffect(.degrees(store.isExpanded[forumRow.id]! ? 0 : -180))
                     .offset(x: 16)
             }
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    @available(iOS, deprecated: 26.0)
+    private func foregroundStyle() -> AnyShapeStyle {
+        if isLiquidGlass {
+            return AnyShapeStyle(.foreground)
+        } else {
+            return AnyShapeStyle(tintColor)
         }
     }
 }

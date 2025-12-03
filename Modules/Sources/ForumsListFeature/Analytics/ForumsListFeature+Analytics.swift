@@ -22,6 +22,9 @@ extension ForumsListFeature {
                 case .view(.onAppear):
                     break
                     
+                case .view(.searchButtonTapped):
+                    analytics.log(ForumsListEvent.forumSearchTapped)
+                    
                 case let .view(.forumRedirectTapped(url)):
                     analytics.log(ForumsListEvent.forumRedirectTapped(url))
                     
@@ -39,7 +42,7 @@ extension ForumsListFeature {
                         analytics.log(ForumsListEvent.forumListLoadFailure(error))
                     }
                     
-                case .delegate:
+                case .delegate, .destination:
                     break
                 }
                 
