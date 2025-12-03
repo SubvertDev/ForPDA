@@ -9,6 +9,6 @@ import SwiftUI
 
 public enum SearchOn: Sendable, Hashable, Equatable {
     case site
-    case topic(id: Int)
+    case topic(id: Int, noHighlight: Bool)
     case forum(id: Int?, sIn: ForumSearchIn, asTopics: Bool)
 }

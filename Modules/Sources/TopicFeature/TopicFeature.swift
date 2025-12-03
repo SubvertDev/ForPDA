@@ -243,7 +243,7 @@ public struct TopicFeature: Reducer, Sendable {
                     !topic.navigation.isEmpty ? [topic.navigation.first!] : []
                 } else { [] }
                 state.destination = .search(SearchFeature.State(
-                    on: .topic(id: state.topicId),
+                    on: .topic(id: state.topicId, noHighlight: false),
                     navigation: navigation
                 ))
                 return .none
