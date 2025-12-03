@@ -139,7 +139,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .send(.delegate(.openSearch(SearchResult(
-                    on: .forum(id: nil, sIn: .titles, asTopics: true),
+                    on: .profile(.topics),
                     authorId: userId,
                     text: "",
                     sort: .dateDescSort
@@ -149,7 +149,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .send(.delegate(.openSearch(SearchResult(
-                    on: .forum(id: nil, sIn: .posts, asTopics: false),
+                    on: .profile(.posts),
                     authorId: userId,
                     text: "",
                     sort: .dateDescSort
