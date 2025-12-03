@@ -31,6 +31,10 @@ public enum UIContent: Equatable, Hashable, Identifiable {
         
         public var id: Int { post.id }
         
+        public var isDeleted: Bool {
+            return post.post.isDeleted
+        }
+        
         public init(
             topicId: Int,
             topicName: String,

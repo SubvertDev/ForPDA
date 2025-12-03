@@ -145,8 +145,8 @@ public struct SearchResultScreen: View {
         }
         .padding(.vertical, 12)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(post.topicName.isEmpty ? Color(.Background.quaternary) : Color(.Background.primary))
-        .disabled(post.topicName.isEmpty)
+        .listRowBackground(post.isDeleted ? Color(.Background.quaternary) : Color(.Background.primary))
+        .disabled(post.topicName.isEmpty && post.isDeleted)
     }
     
     // MARK: - Topic Row
