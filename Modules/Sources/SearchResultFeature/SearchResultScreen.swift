@@ -115,10 +115,17 @@ public struct SearchResultScreen: View {
             Button {
                 send(.topicTapped(post.topicId, false))
             } label: {
-                RichText(
-                    text: makeAttributed("[b]\(post.topicName.fixBackgroundBBCode())[/b]", .subheadline)!,
-                    isSelectable: false
-                )
+                if !post.topicName.isEmpty {
+                    RichText(
+                        text: makeAttributed("[b]\(post.topicName.fixBackgroundBBCode())[/b]", .subheadline)!,
+                        isSelectable: false
+                    )
+                } else {
+                    Text("<Access denied>", bundle: .module)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(tintColor)
+                }
             }
             .buttonStyle(.plain)
             .padding(.bottom, 4)
@@ -138,7 +145,8 @@ public struct SearchResultScreen: View {
         }
         .padding(.vertical, 12)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(Color(.Background.primary))
+        .listRowBackground(post.topicName.isEmpty ? Color(.Background.quaternary) : Color(.Background.primary))
+        .disabled(post.topicName.isEmpty)
     }
     
     // MARK: - Topic Row

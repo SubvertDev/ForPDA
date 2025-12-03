@@ -1,9 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "<Access denied>" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "<Нет доступа>"
+          }
+        }
+      }
+    },
     "Nothing found" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ничего не нашли"
@@ -13,7 +23,7 @@
     },
     "Search" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Поиск"
@@ -23,7 +33,7 @@
     },
     "Try entering a different query or changing your search parameters" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Попробуйте ввести другой запрос или изменить параметры поиска"
