@@ -8,6 +8,7 @@
 import SwiftUI
 import NukeUI
 import Models
+import SFSafeSymbols
 
 public struct PostRowView: View {
     
@@ -185,6 +186,13 @@ public struct PostRowView: View {
                     }
                 }
                 
+                ContextButton(
+                    text: LocalizedStringResource("Search «\(state.post.post.author.name)» posts", bundle: .module),
+                    symbol: userPostsInTopicIcon
+                ) {
+                    menuAction(.userPostsInTopic(state.post.post.author.id))
+                }
+                
                 ContextButton(text: LocalizedStringResource("Post Mentions", bundle: .module), symbol: .arrowRightSquare) {
                     menuAction(.mentions(state.post.id))
                 }
@@ -205,6 +213,19 @@ public struct PostRowView: View {
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 8, height: 22)
+    }
+}
+
+// MARK: - User Posts In Topic Icon
+
+@available(iOS, deprecated: 18.0)
+fileprivate extension PostRowView {
+    private var userPostsInTopicIcon: SFSymbol {
+        if #available(iOS 18.0, *) {
+            return .textPageBadgeMagnifyingglass
+        } else {
+            return .docTextMagnifyingglass
+        }
     }
 }
 

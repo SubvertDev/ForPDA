@@ -28,6 +28,7 @@ public enum TopicEvent: Event {
     case menuPostDelete(Int)
     case menuPostReport(Int)
     case menuChangeReputation(Int, Int)
+    case menuUserPostsInTopic(Int)
     case menuPostMentions(Int)
     case menuPostCopyLink(Int)
     
@@ -38,7 +39,8 @@ public enum TopicEvent: Event {
     public var properties: [String: String]? {
         switch self {
         case let .userTapped(id),
-             let .menuPostReply(id):
+             let .menuPostReply(id),
+             let .menuUserPostsInTopic(id):
             return ["userId": String(id)]
             
         case let .menuPostDelete(postId),

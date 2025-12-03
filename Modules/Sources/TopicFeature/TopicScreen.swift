@@ -325,6 +325,8 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.report(postId)))
                 case .changeReputation(let postId, let userId, let username):
                     send(.contextPostMenu(.changeReputation(postId, userId, username)))
+                case .userPostsInTopic(let authorId):
+                    send(.contextPostMenu(.userPostsInTopic(authorId)))
                 case .mentions(let postId):
                     send(.contextPostMenu(.mentions(postId)))
                 case .copyLink(let postId):
