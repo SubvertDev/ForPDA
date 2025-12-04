@@ -18,6 +18,7 @@ public enum Deeplink {
     case forum(id: Int, page: Int)
     case user(id: Int)
     case qms(id: Int)
+    case search(SearchResult)
 }
 
 public struct DeeplinkHandler {
@@ -33,6 +34,7 @@ public struct DeeplinkHandler {
         case badImageUrl(in: URL)
         case noTitle(in: URL)
         case badTitle(in: URL)
+        case badSearchType(type: String, for: String)
         case unknownType(type: String, for: String)
         case noType(of: String, for: String)
         case noDeeplinkAvailable(for: URL)
@@ -177,6 +179,94 @@ public struct DeeplinkHandler {
                     return .topic(id: nil, goTo: .post(id: postId))
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "pid", for: url.absoluteString))
+                }
+                
+            case "search":
+                // https://4pda.to/forum/index.php?act=search&query=4pda&source=all&sort=dd&subforums=1&topics=673847&hl=0
+                // https://4pda.to/forum/index.php?act=search&query=Xiaomi+%25E0%25EA%25F1%25E5%25F1%25F1%25F3%25E0%25F0%25FB&username=AirFlare&forums%255B%255D=716&subforums=1&exclude_trash=1&source=top&sort=dd&result=topics
+                if let sourceItem = queryItems.first(where: { $0.name == "source" })?.value {
+                    let forumSearchIn = ForumSearchIn(rawValue: sourceItem)
+                    
+                    let searchText = if let searchTextItem = queryItems.first(where: { $0.name == "query" })?.value {
+                        if let decodedSearchText = searchTextItem.removingPercentEncoding {
+                            decodedSearchText
+                        } else if let decodedSearchText = searchTextItem.unEscape() {
+                            decodedSearchText
+                        } else {
+                            searchTextItem
+                        }
+                    } else {
+                        ""
+                    }
+                    
+                    let authorId: Int? = ["author_id", "username-id", "username"]
+                        .compactMap { name in queryItems.first(where: { $0.name == name })?.value }
+                        .compactMap(Int.init)
+                        .first
+
+                    let sort = if let sortItem = queryItems.first(where: { $0.name == "sort" })?.value {
+                        SearchSort(rawValue: sortItem)
+                    } else {
+                        SearchSort.relevance
+                    }
+                    
+                    let asTopics = if let asTopicsItem = queryItems.first(where: { $0.name == "result" })?.value {
+                        asTopicsItem == "topics"
+                    } else {
+                        false
+                    }
+                    
+                    let noHighlight = if let highlight = queryItems.first(where: { $0.name == "hl" })?.value {
+                        highlight == "0"
+                    } else {
+                        false
+                    }
+                    
+                    if let topicIdItem = queryItems.first(where: { $0.name == "topics" })?.value {
+                        if let topicId = Int(topicIdItem) {
+                            return .search(.init(
+                                on: .topic(id: topicId, noHighlight: noHighlight),
+                                authorId: authorId,
+                                text: searchText,
+                                sort: sort
+                            ))
+                        } else {
+                            analytics.capture(DeeplinkError.badSearchType(type: "topics", for: url.absoluteString))
+                        }
+                    } else if let topicsIdItem = queryItems.first(where: { $0.name.removingPercentEncoding == "topics[]" })?.value {
+                        // TODO: Implement more than one topic support...
+                        analytics.capture(DeeplinkError.unknownType(type: "topics[]", for: url.absoluteString))
+                        if let topicId = Int(topicsIdItem) {
+                            return .search(.init(
+                                on: .topic(id: topicId, noHighlight: noHighlight),
+                                authorId: authorId,
+                                text: searchText,
+                                sort: sort
+                            ))
+                        } else {
+                            analytics.capture(DeeplinkError.badSearchType(type: "topics[]", for: url.absoluteString))
+                        }
+                    }
+                    
+                    if let forumIdItem = queryItems.first(where: { $0.name == "forums" })?.value {
+                        return .search(.init(
+                            on: .forum(id: Int(forumIdItem), sIn: forumSearchIn, asTopics: asTopics),
+                            authorId: authorId,
+                            text: searchText,
+                            sort: sort
+                        ))
+                    } else if let forumsIdItem = queryItems.first(where: { $0.name.removingPercentEncoding == "forums[]" })?.value {
+                        // TODO: Implement more than one forum support...
+                        analytics.capture(DeeplinkError.unknownType(type: "forums[]", for: url.absoluteString))
+                        return .search(.init(
+                            on: .forum(id: Int(forumsIdItem), sIn: forumSearchIn, asTopics: asTopics),
+                            authorId: authorId,
+                            text: searchText,
+                            sort: sort
+                        ))
+                    }
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
                 }
                 
             default:
