@@ -15,7 +15,6 @@ import PasteboardClient
 import HapticClient
 import PersistenceKeys
 import ToastClient
-import SearchFeature
 
 @Reducer
 public struct ArticlesListFeature: Reducer, Sendable {
@@ -51,7 +50,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
     public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
-        case search(SearchFeature)
         case alert(AlertState<Never>)
     }
     
@@ -121,8 +119,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openSearch(SearchOn)
             case openUserProfile(Int)
-            case openSearch(SearchResult)
             case openArticle(ArticlePreview)
         }
     }
@@ -177,14 +175,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 }
                 
             case .searchButtonTapped:
-                state.destination = .search(SearchFeature.State(on: .site))
-                return .none
-                
-            case let .destination(.presented(.search(.delegate(.userProfileTapped(id))))):
-                return .send(.delegate(.openUserProfile(id)))
-                
-            case let .destination(.presented(.search(.delegate(.searchOptionsConstructed(options))))):
-                return .send(.delegate(.openSearch(options)))
+                return .send(.delegate(.openSearch(.site)))
                 
             case .listGridTypeButtonTapped:
                 state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)

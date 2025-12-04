@@ -419,11 +419,6 @@ struct NavigationModifier: ViewModifier {
                         let state = store.withState { $0 }
                         TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
-                        NavigationStack {
-                            SearchScreen(store: store)
-                        }
-                    }
             }
         }
     }

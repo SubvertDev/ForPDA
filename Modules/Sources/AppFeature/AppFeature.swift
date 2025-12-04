@@ -34,6 +34,7 @@ import LoggerClient
 import NotificationsClient
 import ToastClient
 import Combine
+import SearchResultFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -608,6 +609,8 @@ public struct AppFeature: Reducer, Sendable {
             screen = .profile(.profile(ProfileFeature.State(userId: id)))
         case let .qms(id: id):
             screen = .qms(.qms(QMSFeature.State(chatId: id)))
+        case let .search(options: options):
+            screen = .search(.searchResult(SearchResultFeature.State(search: options)))
         }
         
         openScreenOnCurrentStack(screen, state: &state)

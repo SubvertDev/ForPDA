@@ -21,6 +21,7 @@ import ProfileFeature
 import QMSFeature
 import QMSListFeature
 import ReputationFeature
+import SearchFeature
 import SearchResultFeature
 import SettingsFeature
 import TopicFeature
@@ -33,6 +34,7 @@ public enum Path {
     case forum(Forum.Body = Forum.body)
     case profile(Profile.Body = Profile.body)
     case settings(Settings.Body = Settings.body)
+    case search(Search.Body = Search.body)
     case qms(QMS.Body = QMS.body)
     case auth(AuthFeature)
     
@@ -40,14 +42,12 @@ public enum Path {
     public enum Articles {
         case articlesList(ArticlesListFeature)
         case article(ArticleFeature)
-        case search(SearchResultFeature)
     }
     
     @Reducer
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
-        case search(SearchResultFeature)
         case reputation(ReputationFeature)
     }
     
@@ -57,7 +57,6 @@ public enum Path {
         case forum(ForumFeature)
         case announcement(AnnouncementFeature)
         case topic(TopicFeature)
-        case search(SearchResultFeature)
     }
     
     @Reducer
@@ -66,6 +65,12 @@ public enum Path {
         case navigation(NavigationSettingsFeature)
         case notifications(NotificationsFeature)
         case developer(DeveloperFeature)
+    }
+    
+    @Reducer
+    public enum Search {
+        case search(SearchFeature)
+        case searchResult(SearchResultFeature)
     }
     
     @Reducer
@@ -80,6 +85,7 @@ extension Path.Articles.State: Equatable {}
 extension Path.Profile.State: Equatable {}
 extension Path.Forum.State: Equatable {}
 extension Path.Settings.State: Equatable {}
+extension Path.Search.State: Equatable {}
 extension Path.QMS.State: Equatable {}
 
 extension Path {
@@ -102,6 +108,9 @@ extension Path {
         case let .settings(path):
             SettingsViews(path)
             
+        case let .search(path):
+            SearchViews(path)
+            
         case let .qms(path):
             QMSViews(path)
             
@@ -118,10 +127,6 @@ extension Path {
             ArticlesListScreen(store: store)
                 .tracking(for: ArticlesListScreen.self)
             
-        case let .search(store):
-            SearchResultScreen(store: store)
-                .tracking(for: SearchResultScreen.self)
-            
         case let .article(store):
             ArticleScreen(store: store)
                 .tracking(for: ArticleScreen.self, ["id": store.articlePreview.id])
@@ -135,10 +140,6 @@ extension Path {
             ProfileScreen(store: store)
                 .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])
             
-        case let .search(store):
-            SearchResultScreen(store: store)
-                .tracking(for: SearchResultScreen.self)
-
         case let .history(store):
             HistoryScreen(store: store)
                 .tracking(for: HistoryScreen.self)
@@ -155,10 +156,6 @@ extension Path {
         case let .forumList(store):
             ForumsListScreen(store: store)
                 .tracking(for: ForumsListScreen.self)
-            
-        case let .search(store):
-            SearchResultScreen(store: store)
-                .tracking(for: SearchResultScreen.self)
             
         case let .forum(store):
             ForumScreen(store: store)
@@ -192,6 +189,19 @@ extension Path {
         case let .developer(store):
             DeveloperScreen(store: store)
                 .tracking(for: DeveloperScreen.self)
+        }
+    }
+    
+    @MainActor @ViewBuilder
+    private static func SearchViews(_ store: Store<Path.Search.State, Path.Search.Action>) -> some View {
+        switch store.case {
+        case let .search(store):
+            SearchScreen(store: store)
+                .tracking(for: SearchScreen.self)
+            
+        case let .searchResult(store):
+            SearchResultScreen(store: store)
+                .tracking(for: SearchResultScreen.self)
         }
     }
     

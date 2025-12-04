@@ -54,21 +54,6 @@ public struct SearchScreen: View {
             .onSubmit(of: .search) {
                 send(.startSearch)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        send(.cancelButtonTapped)
-                    } label: {
-                        if #available(iOS 26.0, *) {
-                            Image(systemSymbol: .xmark)
-                                .foregroundStyle(tintColor)
-                        } else {
-                            Text("Cancel", bundle: .module)
-                                .foregroundStyle(tintColor)
-                        }
-                    }
-                }
-            }
             .bind($store.focus, to: $focus)
             .onAppear {
                 send(.onAppear)

@@ -10,7 +10,6 @@ import ComposableArchitecture
 import SharedUI
 import Models
 import SFSafeSymbols
-import SearchFeature
 
 public struct ArticlesListScreen: View {
     
@@ -76,11 +75,6 @@ public struct ArticlesListScreen: View {
                         store.send(.linkShared(success, url))
                     }
                     .presentationDetents([.medium])
-                }
-            }
-            .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
-                NavigationStack {
-                    SearchScreen(store: store)
                 }
             }
             .onChange(of: store.shouldScrollToTop) { _ in

@@ -73,11 +73,6 @@ public struct ForumScreen: View {
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
-            .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
-                NavigationStack {
-                    SearchScreen(store: store)
-                }
-            }
             ._toolbarTitleDisplayMode(.large)
             .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,

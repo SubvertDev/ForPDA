@@ -39,7 +39,7 @@ public struct SearchFeature: Reducer, Sendable {
         var authors: [SearchUsersResponse.SimplifiedUser] = []
         
         public init(
-            on: SearchOn = .site,
+            on: SearchOn,
             navigation: [ForumInfo] = []
         ) {
             self.searchOn = on
@@ -59,7 +59,6 @@ public struct SearchFeature: Reducer, Sendable {
             case searchAuthorName(String)
             case selectUser(Int, String)
             
-            case cancelButtonTapped
             case authorProfileButtonTapped
         }
         
@@ -116,13 +115,6 @@ public struct SearchFeature: Reducer, Sendable {
                     }
                 }
                 return .none
-            
-            case .view(.cancelButtonTapped):
-                return .run { _ in await dismiss() }
-                
-            case .delegate(.userProfileTapped),
-                 .delegate(.searchOptionsConstructed):
-                return .run { _ in await dismiss() }
                 
             case .view(.authorProfileButtonTapped):
                 return .send(.delegate(.userProfileTapped(state.authorId!)))

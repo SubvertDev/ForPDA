@@ -42,7 +42,7 @@ extension ForumsListFeature {
                         analytics.log(ForumsListEvent.forumListLoadFailure(error))
                     }
                     
-                case .delegate, .destination:
+                case .delegate:
                     break
                 }
                 

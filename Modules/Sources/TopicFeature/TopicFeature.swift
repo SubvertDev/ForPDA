@@ -22,7 +22,6 @@ import AnalyticsClient
 import TopicBuilder
 import ToastClient
 import NotificationsClient
-import SearchFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -49,7 +48,6 @@ public struct TopicFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case karmaChange(Int)
         case editWarning
-        case search(SearchFeature)
         case writeForm(WriteFormFeature)
         case changeReputation(ReputationChangeFeature)
     }
@@ -153,7 +151,8 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
-            case openSearch(SearchResult)
+            case openSearch(SearchOn, [ForumInfo])
+            case openSearchResult(SearchResult)
             case openedLastPage
         }
     }
@@ -206,12 +205,6 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case let .destination(.presented(.search(.delegate(.userProfileTapped(id))))):
-                return .send(.delegate(.openUser(id: id)))
-                
-            case let .destination(.presented(.search(.delegate(.searchOptionsConstructed(options))))):
-                return .send(.delegate(.openSearch(options)))
-                
             case .destination, .pageNavigation, .binding:
                 return .none
                 
@@ -242,11 +235,7 @@ public struct TopicFeature: Reducer, Sendable {
                 let navigation: [ForumInfo] = if let topic = state.topic {
                     !topic.navigation.isEmpty ? [topic.navigation.first!] : []
                 } else { [] }
-                state.destination = .search(SearchFeature.State(
-                    on: .topic(id: state.topicId, noHighlight: false),
-                    navigation: navigation
-                ))
-                return .none
+                return .send(.delegate(.openSearch(.topic(id: state.topicId, noHighlight: false), navigation)))
                 
             case .view(.topicHatOpenButtonTapped):
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
@@ -372,7 +361,7 @@ public struct TopicFeature: Reducer, Sendable {
                     return .none
                     
                 case .userPostsInTopic(let authorId):
-                    return .send(.delegate(.openSearch(SearchResult(
+                    return .send(.delegate(.openSearchResult(SearchResult(
                         on: .topic(id: state.topicId, noHighlight: true),
                         authorId: authorId,
                         text: "",
@@ -380,7 +369,7 @@ public struct TopicFeature: Reducer, Sendable {
                     ))))
                     
                 case .mentions(let postId):
-                    return .send(.delegate(.openSearch(SearchResult(
+                    return .send(.delegate(.openSearchResult(SearchResult(
                         on: .topic(id: state.topicId, noHighlight: true),
                         authorId: nil,
                         text: "\(postId)",

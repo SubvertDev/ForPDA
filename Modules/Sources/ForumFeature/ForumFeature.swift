@@ -50,21 +50,12 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
-    // MARK: - Destinations
-    
-    @Reducer
-    public enum Destination {
-        case search(SearchFeature)
-    }
-    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
-        
-        @Presents public var destination: Destination.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -101,7 +92,6 @@ public struct ForumFeature: Reducer, Sendable {
     
     public enum Action: ViewAction {
         case pageNavigation(PageNavigationFeature.Action)
-        case destination(PresentationAction<Destination.Action>)
 
         case view(View)
         public enum View {
@@ -132,8 +122,7 @@ public struct ForumFeature: Reducer, Sendable {
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
-            case openUserProfile(id: Int)
-            case openSearch(SearchResult)
+            case openSearch(on: SearchOn, navigation: [ForumInfo])
             case handleRedirect(URL)
         }
     }
@@ -182,17 +171,10 @@ public struct ForumFeature: Reducer, Sendable {
                 let navigation: [ForumInfo] = if let forum = state.forum {
                     [ForumInfo(id: forum.id, name: forum.name, flag: forum.flag)]
                 } else { [] }
-                state.destination = .search(SearchFeature.State(
+                return .send(.delegate(.openSearch(
                     on: .forum(id: state.forumId, sIn: .all, asTopics: false),
                     navigation: navigation
-                ))
-                return .none
-                
-            case let .destination(.presented(.search(.delegate(.userProfileTapped(id))))):
-                return .send(.delegate(.openUserProfile(id: id)))
-                
-            case let .destination(.presented(.search(.delegate(.searchOptionsConstructed(options))))):
-                return .send(.delegate(.openSearch(options)))
+                )))
                 
             case let .view(.topicTapped(topic, showUnread)):
                 guard !showUnread else {
@@ -319,11 +301,10 @@ public struct ForumFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
-            case .delegate, .destination:
+            case .delegate:
                 return .none
             }
         }
-        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }
@@ -336,5 +317,3 @@ public struct ForumFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
-
-extension ForumFeature.Destination.State: Equatable {}

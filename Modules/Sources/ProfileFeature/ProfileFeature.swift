@@ -12,7 +12,6 @@ import PersistenceKeys
 import Models
 import AnalyticsClient
 import ToastClient
-import SearchResultFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {

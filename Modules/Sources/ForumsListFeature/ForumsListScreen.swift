@@ -9,7 +9,6 @@ import SwiftUI
 import ComposableArchitecture
 import SFSafeSymbols
 import SharedUI
-import SearchFeature
 
 @ViewAction(for: ForumsListFeature.self)
 public struct ForumsListScreen: View {
@@ -69,11 +68,6 @@ public struct ForumsListScreen: View {
             .animation(.default, value: store.forums)
             .navigationTitle(Text("Forum", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            .fullScreenCover(item: $store.scope(state: \.destination?.search, action: \.destination.search)) { store in
-                NavigationStack {
-                    SearchScreen(store: store)
-                }
-            }
             .toolbar {
                 Button {
                     send(.searchButtonTapped)
