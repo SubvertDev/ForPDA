@@ -10,7 +10,6 @@ import ComposableArchitecture
 import APIClient
 import Models
 import AnalyticsClient
-import SearchFeature
 
 @Reducer
 public struct ForumsListFeature: Reducer, Sendable {

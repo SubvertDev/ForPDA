@@ -11,7 +11,6 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
-import SearchFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {

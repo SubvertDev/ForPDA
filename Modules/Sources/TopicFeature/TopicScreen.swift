@@ -17,7 +17,6 @@ import ParsingClient
 import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
-import SearchFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {

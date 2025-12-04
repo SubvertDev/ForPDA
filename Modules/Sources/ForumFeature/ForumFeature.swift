@@ -15,7 +15,6 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
-import SearchFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
