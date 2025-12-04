@@ -93,7 +93,7 @@ public struct StackTab: Reducer, Sendable {
                 let hasArticle = path.contains(where: { $0.is(\.articles.article) })
                 let hasSettings = path.contains(where: { $0.is(\.settings) })
                 let hasQms = path.contains(where: { $0.is(\.qms) })
-                let hasSearch = path.contains(where: { $0.is(\.search.search) })
+                let hasSearch = path.last(is: \.search.search) != nil
                 let showTabBar = !hasArticle && !hasSettings && !hasQms && !hasSearch
                 if state.showTabBar != showTabBar {
                     state.showTabBar = showTabBar
