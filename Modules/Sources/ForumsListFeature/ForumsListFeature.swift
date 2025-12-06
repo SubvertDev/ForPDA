@@ -77,7 +77,7 @@ public struct ForumsListFeature: Reducer, Sendable {
                 }
                 
             case .view(.searchButtonTapped):
-                return .send(.delegate(.openSearch(.forum(id: nil, sIn: .all, asTopics: false))))
+                return .send(.delegate(.openSearch(.forum(ids: [], sIn: .all, asTopics: false))))
                 
             case let .view(.forumTapped(id: id, name: name)):
                 return .send(.delegate(.openForum(id: id, name: name)))

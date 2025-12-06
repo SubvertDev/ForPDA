@@ -235,7 +235,7 @@ public struct TopicFeature: Reducer, Sendable {
                 let navigation: [ForumInfo] = if let topic = state.topic {
                     !topic.navigation.isEmpty ? [topic.navigation.first!] : []
                 } else { [] }
-                return .send(.delegate(.openSearch(.topic(id: state.topicId, noHighlight: false), navigation)))
+                return .send(.delegate(.openSearch(.topic(ids: [state.topicId], noHighlight: false), navigation)))
                 
             case .view(.topicHatOpenButtonTapped):
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
@@ -362,7 +362,7 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .userPostsInTopic(let authorId):
                     return .send(.delegate(.openSearchResult(SearchResult(
-                        on: .topic(id: state.topicId, noHighlight: true),
+                        on: .topic(ids: [state.topicId], noHighlight: true),
                         authorId: authorId,
                         text: "",
                         sort: .dateDescSort
@@ -370,7 +370,7 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .mentions(let postId):
                     return .send(.delegate(.openSearchResult(SearchResult(
-                        on: .topic(id: state.topicId, noHighlight: true),
+                        on: .topic(ids: [state.topicId], noHighlight: true),
                         authorId: nil,
                         text: "\(postId)",
                         sort: .dateDescSort

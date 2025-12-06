@@ -140,14 +140,14 @@ public struct SearchFeature: Reducer, Sendable {
                 case .site:  .site
                 case .topic: state.searchOn
                 case .forum:
-                    if case .forum(let id, _, _) = state.searchOn {
-                        .forum(id: id, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                    if case .forum(let ids, _, _) = state.searchOn {
+                        .forum(ids: ids, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     } else {
-                        .forum(id: nil, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                        .forum(ids: [], sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     }
                 case .forumById:
                     if let forum = state.navigation.last, !forum.isCategory {
-                        .forum(id: forum.id, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
+                        .forum(ids: [forum.id], sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     } else {
                         fatalError("Unexpected case. Info: [\(state.navigation)]")
                     }

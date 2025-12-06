@@ -171,7 +171,7 @@ public struct ForumFeature: Reducer, Sendable {
                     [ForumInfo(id: forum.id, name: forum.name, flag: forum.flag)]
                 } else { [] }
                 return .send(.delegate(.openSearch(
-                    on: .forum(id: state.forumId, sIn: .all, asTopics: false),
+                    on: .forum(ids: [state.forumId], sIn: .all, asTopics: false),
                     navigation: navigation
                 )))
                 

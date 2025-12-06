@@ -7,8 +7,8 @@
 
 public enum SearchOn: Sendable, Hashable, Equatable {
     case site
-    case topic(id: Int, noHighlight: Bool)
-    case forum(id: Int?, sIn: ForumSearchIn, asTopics: Bool)
+    case topic(ids: [Int], noHighlight: Bool)
+    case forum(ids: [Int], sIn: ForumSearchIn, asTopics: Bool)
     case profile(ProfileSearchIn)
     
     public enum ProfileSearchIn: Sendable, Equatable {

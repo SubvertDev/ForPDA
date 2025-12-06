@@ -225,7 +225,7 @@ public struct DeeplinkHandler {
                     if let topicIdItem = queryItems.first(where: { $0.name == "topics" })?.value {
                         if let topicId = Int(topicIdItem) {
                             return .search(.init(
-                                on: .topic(id: topicId, noHighlight: noHighlight),
+                                on: .topic(ids: [topicId], noHighlight: noHighlight),
                                 authorId: authorId,
                                 text: searchText,
                                 sort: sort
@@ -238,7 +238,7 @@ public struct DeeplinkHandler {
                         analytics.capture(DeeplinkError.unknownType(type: "topics[]", for: url.absoluteString))
                         if let topicId = Int(topicsIdItem) {
                             return .search(.init(
-                                on: .topic(id: topicId, noHighlight: noHighlight),
+                                on: .topic(ids: [topicId], noHighlight: noHighlight),
                                 authorId: authorId,
                                 text: searchText,
                                 sort: sort
@@ -250,7 +250,7 @@ public struct DeeplinkHandler {
                     
                     if let forumIdItem = queryItems.first(where: { $0.name == "forums" })?.value {
                         return .search(.init(
-                            on: .forum(id: Int(forumIdItem), sIn: forumSearchIn, asTopics: asTopics),
+                            on: .forum(ids: [Int(forumIdItem) ?? 0], sIn: forumSearchIn, asTopics: asTopics),
                             authorId: authorId,
                             text: searchText,
                             sort: sort
@@ -259,7 +259,7 @@ public struct DeeplinkHandler {
                         // TODO: Implement more than one forum support...
                         analytics.capture(DeeplinkError.unknownType(type: "forums[]", for: url.absoluteString))
                         return .search(.init(
-                            on: .forum(id: Int(forumsIdItem), sIn: forumSearchIn, asTopics: asTopics),
+                            on: .forum(ids: [Int(forumsIdItem) ?? 0], sIn: forumSearchIn, asTopics: asTopics),
                             authorId: authorId,
                             text: searchText,
                             sort: sort

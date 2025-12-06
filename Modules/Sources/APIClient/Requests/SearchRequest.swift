@@ -50,15 +50,15 @@ extension SearchRequest {
         switch on {
         case .site:
             return .site
-        case let .forum(id, sIn, asTopics):
+        case let .forum(ids, sIn, asTopics):
             let sIn: SearchCommand.ForumSearchIn = switch sIn {
             case .all:    .all
             case .posts:  .posts
             case .titles: .titles
             }
-            return .forum(id: id, sIn: sIn, asTopics: asTopics)
-        case let .topic(id, noHighlight):
-            return .topic(id: id, noHighlight: noHighlight)
+            return .forum(ids: ids, sIn: sIn, asTopics: asTopics)
+        case let .topic(ids, noHighlight):
+            return .topic(ids: ids, noHighlight: noHighlight)
         case let .profile(sIn):
             let sIn: SearchCommand.ProfileSearchIn = switch sIn {
             case .posts:  .posts
