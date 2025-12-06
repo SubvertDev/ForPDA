@@ -265,6 +265,13 @@ public struct DeeplinkHandler {
                             sort: sort
                         ))
                     }
+                    
+                    return .search(.init(
+                        on: .forum(ids: [], sIn: forumSearchIn, asTopics: asTopics),
+                        authorId: authorId,
+                        text: searchText,
+                        sort: sort
+                    ))
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
                 }
