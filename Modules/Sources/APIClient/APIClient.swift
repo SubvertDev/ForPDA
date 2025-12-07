@@ -492,7 +492,7 @@ extension APIClient: DependencyKey {
             search: { request in
                 let command = SearchCommand.content(
                     on: request.transferOn,
-                    authorId: request.authorId,
+                    authors: request.transferAuthors,
                     text: request.text,
                     sort: request.transferSort,
                     offset: request.offset,

@@ -138,7 +138,7 @@ public struct DeeplinkHandler {
                 value
             }
             
-            return .search(.init(on: .site, authorId: nil, text: searchText, sort: .dateDescSort))
+            return .search(.init(on: .site, author: nil, text: searchText, sort: .dateDescSort))
         }
         
         // showtopic
@@ -246,7 +246,7 @@ public struct DeeplinkHandler {
                         .forum(ids: forumIds, sIn: forumSearchIn, asTopics: asTopics)
                     }
                     
-                    return .search(.init(on: searchOn, authorId: authorId, text: searchText, sort: sort))
+                    return .search(.init(on: searchOn, author: .id(authorId ?? 0), text: searchText, sort: sort))
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
                 }

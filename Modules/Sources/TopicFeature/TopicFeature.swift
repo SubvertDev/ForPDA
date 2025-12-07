@@ -363,7 +363,7 @@ public struct TopicFeature: Reducer, Sendable {
                 case .userPostsInTopic(let authorId):
                     return .send(.delegate(.openSearchResult(SearchResult(
                         on: .topic(ids: [state.topicId], noHighlight: true),
-                        authorId: authorId,
+                        author: .id(authorId),
                         text: "",
                         sort: .dateDescSort
                     ))))
@@ -371,7 +371,7 @@ public struct TopicFeature: Reducer, Sendable {
                 case .mentions(let postId):
                     return .send(.delegate(.openSearchResult(SearchResult(
                         on: .topic(ids: [state.topicId], noHighlight: true),
-                        authorId: nil,
+                        author: nil,
                         text: "\(postId)",
                         sort: .dateDescSort
                     ))))

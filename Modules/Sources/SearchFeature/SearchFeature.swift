@@ -154,7 +154,7 @@ public struct SearchFeature: Reducer, Sendable {
                 }
                 return .send(.delegate(.searchOptionsConstructed(SearchResult(
                     on: searchOn,
-                    authorId: state.authorId,
+                    author: .id(state.authorId ?? 0),
                     text: state.searchText,
                     sort: state.searchSort
                 ))))

@@ -109,7 +109,7 @@ public struct SearchResultFeature: Reducer, Sendable {
                 return .run { [request = state.search, amount = state.appSettings.topicPerPage] send in
                     let request = SearchRequest(
                         on: request.on,
-                        authorId: request.authorId,
+                        author: request.author,
                         text: request.text,
                         sort: request.sort,
                         offset: offset,

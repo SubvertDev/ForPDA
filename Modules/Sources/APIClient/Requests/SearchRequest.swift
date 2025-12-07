@@ -11,7 +11,7 @@ import Models
 public struct SearchRequest: Sendable, Equatable {
     
     public let on: SearchOn
-    public let authorId: Int?
+    public let author: SearchAuthorType?
     public let text: String
     public let sort: SearchSort
     public let offset: Int
@@ -19,14 +19,14 @@ public struct SearchRequest: Sendable, Equatable {
     
     public init(
         on: SearchOn,
-        authorId: Int?,
+        author: SearchAuthorType?,
         text: String,
         sort: SearchSort,
         offset: Int,
         amount: Int,
     ) {
         self.on = on
-        self.authorId = authorId
+        self.author = author
         self.text = text
         self.sort = sort
         self.offset = offset
@@ -43,6 +43,17 @@ extension SearchRequest {
             return .dateDescSort
         case .relevance:
             return .matchSort
+        }
+    }
+    
+    var transferAuthors: [SearchCommand.AuthorType] {
+        return if let author {
+            switch author {
+            case .id(let id):     [.id(id)]
+            case .name(let name): [.name(name)]
+            }
+        } else {
+            []
         }
     }
     

@@ -7,18 +7,18 @@
 
 public struct SearchResult: Sendable, Equatable {
     public let on: SearchOn
-    public let authorId: Int?
+    public let author: SearchAuthorType?
     public let text: String
     public let sort: SearchSort
     
     public init(
         on: SearchOn,
-        authorId: Int?,
+        author: SearchAuthorType?,
         text: String,
         sort: SearchSort
     ) {
         self.on = on
-        self.authorId = authorId
+        self.author = author
         self.text = text
         self.sort = sort
     }
@@ -27,7 +27,7 @@ public struct SearchResult: Sendable, Equatable {
 public extension SearchResult {
     static let mock = SearchResult(
         on: .site,
-        authorId: nil,
+        author: nil,
         text: "ForPDA",
         sort: .relevance
     )

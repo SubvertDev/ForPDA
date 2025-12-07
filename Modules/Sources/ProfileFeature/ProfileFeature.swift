@@ -139,7 +139,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 guard let userId else { return .none }
                 return .send(.delegate(.openSearch(SearchResult(
                     on: .profile(.topics),
-                    authorId: userId,
+                    author: .id(userId),
                     text: "",
                     sort: .dateDescSort
                 ))))
@@ -149,7 +149,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 guard let userId else { return .none }
                 return .send(.delegate(.openSearch(SearchResult(
                     on: .profile(.posts),
-                    authorId: userId,
+                    author: .id(userId),
                     text: "",
                     sort: .dateDescSort
                 ))))
