@@ -222,56 +222,16 @@ public struct DeeplinkHandler {
                         false
                     }
                     
-                    if let topicIdItem = queryItems.first(where: { $0.name == "topics" })?.value {
-                        if let topicId = Int(topicIdItem) {
-                            return .search(.init(
-                                on: .topic(ids: [topicId], noHighlight: noHighlight),
-                                authorId: authorId,
-                                text: searchText,
-                                sort: sort
-                            ))
-                        } else {
-                            analytics.capture(DeeplinkError.badSearchType(type: "topics", for: url.absoluteString))
-                        }
-                    } else if let topicsIdItem = queryItems.first(where: { $0.name.removingPercentEncoding == "topics[]" })?.value {
-                        // TODO: Implement more than one topic support...
-                        analytics.capture(DeeplinkError.unknownType(type: "topics[]", for: url.absoluteString))
-                        if let topicId = Int(topicsIdItem) {
-                            return .search(.init(
-                                on: .topic(ids: [topicId], noHighlight: noHighlight),
-                                authorId: authorId,
-                                text: searchText,
-                                sort: sort
-                            ))
-                        } else {
-                            analytics.capture(DeeplinkError.badSearchType(type: "topics[]", for: url.absoluteString))
-                        }
+                    let topicIds = queryItems.extractSearchIds(forItem: "topics")
+                    let forumIds = queryItems.extractSearchIds(forItem: "forums")
+                    
+                    let searchOn: SearchOn = if !topicIds.isEmpty {
+                        .topic(ids: topicIds, noHighlight: noHighlight)
+                    } else {
+                        .forum(ids: forumIds, sIn: forumSearchIn, asTopics: asTopics)
                     }
                     
-                    if let forumIdItem = queryItems.first(where: { $0.name == "forums" })?.value {
-                        return .search(.init(
-                            on: .forum(ids: [Int(forumIdItem) ?? 0], sIn: forumSearchIn, asTopics: asTopics),
-                            authorId: authorId,
-                            text: searchText,
-                            sort: sort
-                        ))
-                    } else if let forumsIdItem = queryItems.first(where: { $0.name.removingPercentEncoding == "forums[]" })?.value {
-                        // TODO: Implement more than one forum support...
-                        analytics.capture(DeeplinkError.unknownType(type: "forums[]", for: url.absoluteString))
-                        return .search(.init(
-                            on: .forum(ids: [Int(forumsIdItem) ?? 0], sIn: forumSearchIn, asTopics: asTopics),
-                            authorId: authorId,
-                            text: searchText,
-                            sort: sort
-                        ))
-                    }
-                    
-                    return .search(.init(
-                        on: .forum(ids: [], sIn: forumSearchIn, asTopics: asTopics),
-                        authorId: authorId,
-                        text: searchText,
-                        sort: sort
-                    ))
+                    return .search(.init(on: searchOn, authorId: authorId, text: searchText, sort: sort))
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
                 }
@@ -329,8 +289,26 @@ public struct DeeplinkHandler {
     }
 }
 
+// MARK: - Helpers
+
 extension Array {
     subscript(safe index: Int) -> Element? {
         return indices.contains(index) ? self[index] : nil
+    }
+}
+
+extension Array where Element == URLQueryItem {
+    func extractSearchIds(forItem name: String) -> [Int] {
+        return self.compactMap { item -> Int? in
+            let isSingleItem = item.name == name
+            let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
+            
+            guard (isSingleItem || isMultiItems),
+                  let value = item.value,
+                  let id = Int(value) else {
+                return nil
+            }
+            return id
+        }
     }
 }
