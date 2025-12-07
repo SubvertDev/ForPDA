@@ -217,6 +217,9 @@ public struct StackTab: Reducer, Sendable {
         case let .topic(.delegate(.openSearch(on, navigation))):
             state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))
             
+        case let .topic(.delegate(.openSearchResult(options))):
+            state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
+            
         case .topic(.delegate(.openedLastPage)):
             for (id, element) in zip(state.path.ids, state.path).reversed() where element.is(\.forum.forum) {
                 return reduce(into: &state, action: .path(.element(id: id, action: .forum(.forum(.internal(.refresh))))))
