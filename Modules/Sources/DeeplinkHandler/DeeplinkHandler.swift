@@ -126,6 +126,21 @@ public struct DeeplinkHandler {
         
         guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
         
+        // site search
+        
+        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value {
+            // https://4pda.to/?s=4pda
+            let searchText = if let decodedSearchText = value.removingPercentEncoding {
+                decodedSearchText
+            } else if let decodedSearchText = value.unEscape() {
+                decodedSearchText
+            } else {
+                value
+            }
+            
+            return .search(.init(on: .site, authorId: nil, text: searchText, sort: .dateDescSort))
+        }
+        
         // showtopic
         
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
