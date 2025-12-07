@@ -87,8 +87,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
       "state" : {
-        "revision" : "dab5df3dd9fe2db57d5a332c1ce95ef6a00fd31c",
-        "version" : "0.6.4"
+        "revision" : "8c9d5c5f3b2bb9a93e4b49075fb0430a7f2c3a26",
+        "version" : "0.6.5"
       }
     },
     {
