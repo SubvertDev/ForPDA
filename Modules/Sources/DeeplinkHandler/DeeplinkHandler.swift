@@ -214,11 +214,17 @@ public struct DeeplinkHandler {
                         ""
                     }
                     
-                    let authorId: Int? = ["author_id", "username-id", "username"]
-                        .compactMap { name in queryItems.first(where: { $0.name == name })?.value }
+                    let author: SearchAuthorType? = if let idItem = ["author_id", "username-id"]
+                        .compactMap({ name in queryItems.first(where: { $0.name == name })?.value })
                         .compactMap(Int.init)
-                        .first
-
+                        .first {
+                        .id(idItem)
+                    } else if let usernameItem = queryItems.first(where: { $0.name == "username" })?.value {
+                        .name(usernameItem)
+                    } else {
+                        nil
+                    }
+                    
                     let sort = if let sortItem = queryItems.first(where: { $0.name == "sort" })?.value {
                         SearchSort(rawValue: sortItem)
                     } else {
@@ -246,7 +252,7 @@ public struct DeeplinkHandler {
                         .forum(ids: forumIds, sIn: forumSearchIn, asTopics: asTopics)
                     }
                     
-                    return .search(.init(on: searchOn, author: .id(authorId ?? 0), text: searchText, sort: sort))
+                    return .search(SearchResult(on: searchOn, author: author, text: searchText, sort: sort))
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
                 }
