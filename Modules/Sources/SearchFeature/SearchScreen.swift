@@ -295,4 +295,5 @@ public struct SearchScreen: View {
             SearchFeature()
         }
     )
+    .environment(\.tintColor, Color(.Theme.primary))
 }

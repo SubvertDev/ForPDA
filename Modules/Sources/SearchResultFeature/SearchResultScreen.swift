@@ -274,4 +274,5 @@ extension SearchResultScreen {
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
 }
