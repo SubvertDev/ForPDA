@@ -21,17 +21,6 @@
         }
       }
     },
-    "Search" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поиск"
-          }
-        }
-      }
-    },
     "Unable to open link" : {
       "localizations" : {
         "ru" : {
