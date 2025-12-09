@@ -25,7 +25,7 @@ public struct ArticleRowView: View {
     public let state: State
     public let rowType: RowType
     public let bundle: Bundle
-    public let isContextMenuSupported: Bool
+    public let isContextMenuSupported: Bool // used for search
     public let action: (ContextAction) -> Void
     
     private var isShort: Bool {
@@ -233,8 +233,8 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func ContextMenu() -> some View {
         VStack(spacing: 0) {
-            // In .render case title will be with BB-codes
-            // .render case is using for search.
+            // In the .render case, the title will contain BB-codes
+            // This is used for searching
             if case .plain(let title) = state.title {
                 Section {
                     Button {
