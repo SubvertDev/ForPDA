@@ -64,10 +64,10 @@ public struct ForField<T: Hashable>: View {
         .overlay {
             if #available(iOS 26, *) {
                 ConcentricRectangle()
-                    .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
+                    .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 1)
             } else {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
+                    .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 1)
             }
         }
     }
