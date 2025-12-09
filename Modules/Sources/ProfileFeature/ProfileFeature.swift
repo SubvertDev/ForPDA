@@ -151,8 +151,11 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .none
                 
             case .internal(.userResponse(.success(let user))):
-                state.isLoading = false
+                var user = user
+                user.devDBdevices.sort(by: { $0.main && !$1.main })
+                
                 state.user = user
+                state.isLoading = false
                 reportFullyDisplayed(&state)
                 return .none
                 
