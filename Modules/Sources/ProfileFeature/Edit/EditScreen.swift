@@ -39,7 +39,8 @@ public struct EditScreen: View {
                         Field(
                             content: Binding(unwrapping: $store.draftUser.status, default: ""),
                             title: LocalizedStringKey("Status"),
-                            focusEqual: .status
+                            focusEqual: .status,
+                            characterLimit: 28
                         )
                     } else {
                         // TODO: Some notify about it?
@@ -48,13 +49,15 @@ public struct EditScreen: View {
                     Field(
                         content: Binding(unwrapping: $store.draftUser.signature, default: ""),
                         title: LocalizedStringKey("Signature"),
-                        focusEqual: .signature
+                        focusEqual: .signature,
+                        characterLimit: 300
                     )
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
                         title: LocalizedStringKey("About me"),
-                        focusEqual: .about
+                        focusEqual: .about,
+                        characterLimit: 500
                     )
                     
                     Section {
@@ -67,7 +70,8 @@ public struct EditScreen: View {
                     Field(
                         content: Binding(unwrapping: $store.draftUser.city, default: ""),
                         title: LocalizedStringKey("City"),
-                        focusEqual: .city
+                        focusEqual: .city,
+                        characterLimit: 50
                     )
                 }
                 .scrollContentBackground(.hidden)
@@ -322,42 +326,17 @@ public struct EditScreen: View {
     private func Field(
         content: Binding<String>,
         title: LocalizedStringKey,
-        focusEqual: EditFeature.State.Field
+        focusEqual: EditFeature.State.Field,
+        characterLimit: Int? = nil
     ) -> some View {
         Section {
-            Group {
-                TextField(text: content, axis: .vertical) {
-                    Text("Input...", bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.quaternary))
-                }
-                .focused($focus, equals: focusEqual)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primary))
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(minHeight: nil, alignment: .top)
-            }
-            .padding(.vertical, 15)
-            .padding(.horizontal, 12)
-            .background {
-                if #available(iOS 26, *) {
-                    ConcentricRectangle()
-                        .fill(Color(.Background.teritary))
-                } else {
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(Color(.Background.teritary))
-                }
-            }
-            .overlay {
-                if #available(iOS 26, *) {
-                    ConcentricRectangle()
-                        .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
-                } else {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
-                }
-            }
+            ForField(
+                content: content,
+                placeholder: LocalizedStringResource("Input...", bundle: .module),
+                focusEqual: focusEqual,
+                focus: $focus,
+                characterLimit: characterLimit
+            )
         } header: {
             Header(title: title)
         }
