@@ -13,12 +13,16 @@ import Models
 @ViewAction(for: SearchFeature.self)
 public struct SearchScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<SearchFeature>
     @Environment(\.tintColor) private var tintColor
     
     @FocusState public var focus: SearchFeature.State.Field?
     
     @State private var additionalHidden = true
+    
+    // MARK: - Init
     
     public init(store: StoreOf<SearchFeature>) {
         self.store = store
@@ -227,6 +231,8 @@ public struct SearchScreen: View {
         }
         .buttonStyle(.plain)
     }
+    
+    // MARK: - Authors List
     
     private func AuthorsList() -> some View {
         Section {
