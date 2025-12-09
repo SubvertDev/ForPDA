@@ -22,7 +22,7 @@ public struct SearchFeature: Reducer, Sendable {
         public enum Field { case authorName }
         
         let searchOn: SearchOn
-        let navigation: [ForumInfo]
+        let navigation: ForumInfo?
         
         var focus: Field?
         
@@ -40,7 +40,7 @@ public struct SearchFeature: Reducer, Sendable {
         
         public init(
             on: SearchOn,
-            navigation: [ForumInfo] = []
+            navigation: ForumInfo? = nil
         ) {
             self.searchOn = on
             self.navigation = navigation
@@ -99,7 +99,7 @@ public struct SearchFeature: Reducer, Sendable {
                 case .topic:
                     state.whereSearch = .topic
                 case .forum(_, let sIn, let asTopics):
-                    state.whereSearch = !state.navigation.isEmpty ? .forumById : .forum
+                    state.whereSearch = state.navigation != nil ? .forumById : .forum
                     state.forumSearchIn = sIn
                     state.searchResultsAsTopics = asTopics
                 case .profile(let sIn):
@@ -140,13 +140,9 @@ public struct SearchFeature: Reducer, Sendable {
                 case .site:  .site
                 case .topic: state.searchOn
                 case .forum:
-                    if case .forum(let ids, _, _) = state.searchOn {
-                        .forum(ids: ids, sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
-                    } else {
-                        .forum(ids: [], sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
-                    }
+                    .forum(ids: [], sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                 case .forumById:
-                    if let forum = state.navigation.last, !forum.isCategory {
+                    if let forum = state.navigation {
                         .forum(ids: [forum.id], sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     } else {
                         fatalError("Unexpected case. Info: [\(state.navigation)]")

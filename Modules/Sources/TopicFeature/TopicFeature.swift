@@ -151,7 +151,7 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
-            case openSearch(SearchOn, [ForumInfo])
+            case openSearch(SearchOn, ForumInfo?)
             case openSearchResult(SearchResult)
             case openedLastPage
         }
@@ -232,9 +232,7 @@ public struct TopicFeature: Reducer, Sendable {
                 return .send(.internal(.refresh))
                 
             case .view(.searchButtonTapped):
-                let navigation: [ForumInfo] = if let topic = state.topic {
-                    !topic.navigation.isEmpty ? [topic.navigation.first!] : []
-                } else { [] }
+                let navigation: ForumInfo? = state.topic?.navigation.first
                 return .send(.delegate(.openSearch(.topic(ids: [state.topicId], noHighlight: false), navigation)))
                 
             case .view(.topicHatOpenButtonTapped):

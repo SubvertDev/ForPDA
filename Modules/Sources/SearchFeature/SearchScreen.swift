@@ -102,7 +102,7 @@ public struct SearchScreen: View {
                         .tag(SearchWhere.topic)
                 }
                 
-                if let forum = store.navigation.last, !forum.isCategory {
+                if let forum = store.navigation, !forum.isCategory {
                     Text("On \(forum.name)", bundle: .module)
                         .tag(SearchWhere.forumById)
                 }
@@ -289,8 +289,7 @@ public struct SearchScreen: View {
     SearchScreen(
         store: Store(
             initialState: SearchFeature.State(
-                on: .site,
-                navigation: [.mock]
+                on: .site
             ),
         ) {
             SearchFeature()
