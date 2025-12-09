@@ -152,6 +152,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 
             case .internal(.userResponse(.success(let user))):
                 var user = user
+                user.devDBdevices.removeAll(where: { $0.name.isEmpty })
                 user.devDBdevices.sort(by: { $0.main && !$1.main })
                 
                 state.user = user
