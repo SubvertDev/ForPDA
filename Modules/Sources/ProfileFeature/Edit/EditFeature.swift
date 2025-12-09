@@ -63,7 +63,7 @@ public struct EditFeature: Reducer, Sendable {
         }
         
         var isUserCanEditStatus: Bool {
-            return user.posts >= 250
+            return user.replies >= 250
         }
         
         var isSavingDisabled: Bool {
