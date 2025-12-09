@@ -1,40 +1,7 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Code" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Код"
-          }
-        }
-      }
-    },
-    "Code: " : {
-      "comment" : "Has space after colon",
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Код: "
-          }
-        }
-      }
-    },
-    "Hidden text" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скрытый текст"
-          }
-        }
-      }
-    }
+
   },
   "version" : "1.0"
 }
