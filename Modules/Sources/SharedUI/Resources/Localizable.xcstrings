@@ -1,13 +1,22 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add To Bookmarks" : {
-      "extractionState" : "stale",
+    "Code" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавить в закладки"
+            "value" : "Код:"
+          }
+        }
+      }
+    },
+    "Code: " : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Код: "
           }
         }
       }
@@ -22,6 +31,52 @@
         }
       }
     },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактировать"
+          }
+        }
+      }
+    },
+    "Edited: %@ • %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Edited: %1$@ • %2$@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отредактировал: %1$@ • %2$@"
+          }
+        }
+      }
+    },
+    "Hidden text" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрытый текст"
+          }
+        }
+      }
+    },
     "Open In Browser" : {
       "localizations" : {
         "ru" : {
@@ -32,13 +87,72 @@
         }
       }
     },
-    "Problems with article?" : {
-      "extractionState" : "stale",
+    "Post Mentions" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Проблемы со статьей?"
+            "value" : "Упоминания поста"
+          }
+        }
+      }
+    },
+    "Rate" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Оценить пост"
+          }
+        }
+      }
+    },
+    "Reason: %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Причина: %@"
+          }
+        }
+      }
+    },
+    "Reply" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ответить"
+          }
+        }
+      }
+    },
+    "Report" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба"
+          }
+        }
+      }
+    },
+    "Reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация"
+          }
+        }
+      }
+    },
+    "Search «%@» posts" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поиск постов «%@»"
           }
         }
       }

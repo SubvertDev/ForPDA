@@ -57,6 +57,9 @@ extension ArticlesListFeature {
                 case .loadMoreArticles:
                     analyticsClient.log(ArticlesListEvent.loadMoreTriggered)
                     
+                case .searchButtonTapped:
+                    analyticsClient.log(ArticlesListEvent.searchButtonTapped)
+                    
                 case .tryAgainButtonTapped:
                     analyticsClient.log(ArticlesListEvent.tryAgainButtonTapped)
                     

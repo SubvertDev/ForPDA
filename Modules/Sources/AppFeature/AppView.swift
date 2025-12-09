@@ -195,6 +195,13 @@ struct LiquidTabView: View {
             default:
                 EmptyView()
             }
+        case let .search(path):
+            switch path.case {
+            case let .searchResult(store):
+                PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            default:
+                EmptyView()
+            }
         default:
             EmptyView()
         }

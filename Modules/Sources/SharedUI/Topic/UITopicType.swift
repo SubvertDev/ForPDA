@@ -6,21 +6,22 @@
 //
 
 import SwiftUI
+import Models
 
-public indirect enum TopicTypeUI: Hashable, Equatable, Codable, Sendable {
+public indirect enum UITopicType: Hashable, Equatable, Codable, Sendable {
     case text(AttributedString)
     case attachment(Attachment)
     case image(URL)
-    case left([TopicTypeUI])
-    case center([TopicTypeUI])
-    case right([TopicTypeUI])
-    case spoiler([TopicTypeUI], AttributedString?)
-    case quote([TopicTypeUI], QuoteType?)
-    case code(TopicTypeUI, CodeType)
-    case hide([TopicTypeUI], Int?)
-    case list([TopicTypeUI], ListType)
-    case notice([TopicTypeUI], NoticeType)
-    case bullet([TopicTypeUI])
+    case left([UITopicType])
+    case center([UITopicType])
+    case right([UITopicType])
+    case spoiler([UITopicType], AttributedString?)
+    case quote([UITopicType], QuoteType?)
+    case code(UITopicType, CodeType)
+    case hide([UITopicType], Int?)
+    case list([UITopicType], ListType)
+    case notice([UITopicType], NoticeType)
+    case bullet([UITopicType])
     
     // We need custom hasher due to AttributedString bug
     // where TCA doesn't respect custom hasher

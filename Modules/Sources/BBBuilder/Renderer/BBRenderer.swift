@@ -402,6 +402,7 @@ enum ForumColors: String, CaseIterable {
     case orchid
     case palegoldenrod
     case palegreen
+    case yellow
     
     public var hexColor: (String, String) {
         switch self {
@@ -534,6 +535,7 @@ enum ForumColors: String, CaseIterable {
         case .orchid: return ("DA70D6", "DA70D6")
         case .palegoldenrod: return ("EEE8AA", "EEE8AA")
         case .palegreen: return ("98FB98", "98FB98")
+        case .yellow: return ("FFFF00", "FFFF00")
         }
     }
 }

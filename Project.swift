@@ -49,6 +49,8 @@ let project = Project(
                     .Internal.QMSListFeature,
                     .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
+                    .Internal.SearchFeature,
+                    .Internal.SearchResultFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -368,6 +370,30 @@ let project = Project(
              ),
         
             .feature(
+                name: "SearchFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.TCA,
+                ]
+            ),
+            
+            .feature(
+                name: "SearchResultFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .Internal.TopicBuilder,
+                    .SPM.TCA,
+                ]
+            ),
+        
+            .feature(
                 name: "SettingsFeature",
                 dependencies: [
                     .Internal.AnalyticsClient,
@@ -554,6 +580,7 @@ let project = Project(
             .feature(
                 name: "SharedUI",
                 dependencies: [
+                    .Internal.Models,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
@@ -896,6 +923,8 @@ extension TargetDependency.Internal {
     static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
     static let ReputationChangeFeature = TargetDependency.target(name: "ReputationChangeFeature")
     static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
+    static let SearchFeature =          TargetDependency.target(name: "SearchFeature")
+    static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")

@@ -101,7 +101,7 @@ public struct ArticlesListScreen: View {
                         ArticleRowView(
                             state: ArticleRowView.State(
                                 id: article.id,
-                                title: article.title,
+                                title: .plain(article.title),
                                 authorName: article.authorName,
                                 imageUrl: article.imageUrl,
                                 commentsAmount: article.commentsAmount,
@@ -154,6 +154,18 @@ public struct ArticlesListScreen: View {
     
     @ToolbarContentBuilder
     private func Toolbar() -> some ToolbarContent {
+        ToolbarItem {
+            Button {
+                store.send(.searchButtonTapped)
+            } label: {
+                Image(systemSymbol: .magnifyingglass)
+            }
+        }
+        
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer()
+        }
+        
         ToolbarItem {
             Button {
                 store.send(.listGridTypeButtonTapped)

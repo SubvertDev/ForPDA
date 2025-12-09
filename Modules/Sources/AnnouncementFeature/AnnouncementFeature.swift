@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import ParsingClient
 import Models
+import SharedUI
 import PersistenceKeys
 import AnalyticsClient
 import TopicBuilder
@@ -29,7 +30,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
         
         public var announcement: Announcement?
         
-        var types: [[TopicTypeUI]] = []
+        var types: [[UITopicType]] = []
         
         var didLoadOnce = false
        
@@ -51,7 +52,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case loadAnnouncement
-            case loadTypes([[TopicTypeUI]])
+            case loadTypes([[UITopicType]])
             case announcementResponse(Result<Announcement, any Error>)
         }
         
@@ -91,7 +92,7 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 state.name = state.name ?? announcement.name
 
                 return .run { send in
-                    var topicTypes: [[TopicTypeUI]] = []
+                    var topicTypes: [[UITopicType]] = []
                     
                     let types = TopicNodeBuilder(text: announcement.content, attachments: []).build()
                     topicTypes.append(types)

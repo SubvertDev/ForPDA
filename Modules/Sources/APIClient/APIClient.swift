@@ -80,6 +80,10 @@ public struct APIClient: Sendable {
     public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
     // QMS -> MOVED TO QMSCLIENT
+
+    // Search
+    public var search: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
+    public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // STREAMS
     public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }
@@ -482,6 +486,30 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return ReportResponseType(rawValue: status)
             },
+
+			// MARK: - Search
+
+            search: { request in
+                let command = SearchCommand.content(
+                    on: request.transferOn,
+                    authors: request.transferAuthors,
+                    text: request.text,
+                    sort: request.transferSort,
+                    offset: request.offset,
+                    amount: request.amount
+                )
+                let response = try await api.send(command)
+                return try await parser.parseSearch(response)
+            },
+            searchUsers: { request in
+                let command = SearchCommand.members(
+                    term: request.term,
+                    offset: request.offset,
+                    number: request.number
+                )
+                let response = try await api.send(command)
+                return try await parser.parseSearchUsers(response)
+            },
             
             // MARK: - Streams
             
@@ -624,6 +652,12 @@ extension APIClient: DependencyKey {
             },
             sendReport: { _ in
                 return .success
+            },
+            search: { _ in
+                return .mock
+            },
+            searchUsers: { _ in
+                return .mock
             },
             connectionState: {
                 return .finished

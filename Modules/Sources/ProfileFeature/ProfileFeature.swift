@@ -74,6 +74,8 @@ public struct ProfileFeature: Reducer, Sendable {
             case logoutButtonTapped
             case historyButtonTapped
             case reputationButtonTapped
+            case searchTopicsButtonTapped
+            case searchRepliesButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
         }
         
@@ -93,6 +95,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openSettings
             case openHistory
             case openReputation(Int)
+            case openSearch(SearchResult)
             case handleUrl(URL)
         }
     }
@@ -130,6 +133,26 @@ public struct ProfileFeature: Reducer, Sendable {
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .send(.delegate(.openReputation(userId)))
+                
+            case .view(.searchTopicsButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openSearch(SearchResult(
+                    on: .profile(.topics),
+                    author: .id(userId),
+                    text: "",
+                    sort: .dateDescSort
+                ))))
+                
+            case .view(.searchRepliesButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openSearch(SearchResult(
+                    on: .profile(.posts),
+                    author: .id(userId),
+                    text: "",
+                    sort: .dateDescSort
+                ))))
                 
             case .view(.editButtonTapped):
                 if let user = state.user {

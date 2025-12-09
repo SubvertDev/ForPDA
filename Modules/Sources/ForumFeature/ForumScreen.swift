@@ -86,7 +86,22 @@ public struct ForumScreen: View {
                 }
             }
             .toolbar {
-                OptionsMenu()
+                ToolbarItem {
+                    Button {
+                        send(.searchButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .magnifyingglass)
+                            .foregroundStyle(foregroundStyle())
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
+                }
+                
+                ToolbarItem {
+                    OptionsMenu()
+                }
             }
             .onFirstAppear {
                 send(.onFirstAppear)
@@ -136,7 +151,7 @@ public struct ForumScreen: View {
                     WithPerceptionTracking {
                         let radius: CGFloat = isLiquidGlass ? 24 : 10
                         TopicRow(
-                            title: topic.name,
+                            title: .plain(topic.name),
                             date: topic.lastPost.date,
                             username: topic.lastPost.username,
                             isClosed: topic.isClosed,

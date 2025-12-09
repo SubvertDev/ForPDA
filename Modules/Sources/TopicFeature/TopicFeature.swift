@@ -11,6 +11,7 @@ import PageNavigationFeature
 import APIClient
 import DeeplinkHandler
 import Models
+import SharedUI
 import PersistenceKeys
 import ParsingClient
 import PasteboardClient
@@ -123,11 +124,12 @@ public struct TopicFeature: Reducer, Sendable {
             case topicPollOpenButtonTapped
             case topicPollVoteButtonTapped([Int: Set<Int>])
             case changeKarmaTapped(Int, Bool)
+            case searchButtonTapped
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
             case contextMenu(TopicContextMenuAction)
-            case contextPostMenu(TopicPostContextMenuAction)
+            case contextPostMenu(PostMenuAction)
             case editWarningSheetCloseButtonTapped
         }
         
@@ -139,7 +141,7 @@ public struct TopicFeature: Reducer, Sendable {
             case changeKarma(postId: Int, isUp: Bool)
             case voteInPoll(selections: [[Int]])
             case loadTopic(Int)
-            case loadTypes([[TopicTypeUI]])
+            case loadTypes([[UITopicType]])
             case topicResponse(Result<Topic, any Error>)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
@@ -149,6 +151,8 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
+            case openSearch(SearchOn, ForumInfo?)
+            case openSearchResult(SearchResult)
             case openedLastPage
         }
     }
@@ -227,10 +231,14 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
                 
+            case .view(.searchButtonTapped):
+                let navigation: ForumInfo? = state.topic?.navigation.first
+                return .send(.delegate(.openSearch(.topic(ids: [state.topicId], noHighlight: false), navigation)))
+                
             case .view(.topicHatOpenButtonTapped):
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
-                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
+                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) })
                 state.shouldShowTopicHatButton = false
                 return .none
                 
@@ -350,6 +358,22 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .changeReputation(feature)
                     return .none
                     
+                case .userPostsInTopic(let authorId):
+                    return .send(.delegate(.openSearchResult(SearchResult(
+                        on: .topic(ids: [state.topicId], noHighlight: true),
+                        author: .id(authorId),
+                        text: "",
+                        sort: .dateDescSort
+                    ))))
+                    
+                case .mentions(let postId):
+                    return .send(.delegate(.openSearchResult(SearchResult(
+                        on: .topic(ids: [state.topicId], noHighlight: true),
+                        author: nil,
+                        text: "\(postId)",
+                        sort: .dateDescSort
+                    ))))
+                    
                 case .copyLink(let postId):
                     let link = "https://4pda.to/forum/index.php?showtopic=\(state.topicId)&view=findpost&p=\(postId)"
                     pasteboardClient.copy(link)
@@ -454,9 +478,9 @@ public struct TopicFeature: Reducer, Sendable {
                         topicPerPage = state.appSettings.topicPerPage,
                         shouldShowTopicHatButton = state.shouldShowTopicHatButton
                     ] send in
-                        var topicTypes: [[TopicTypeUI]] = []
+                        var topicTypes: [[UITopicType]] = []
                         
-                        topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
+                        topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
                             for (index, post) in topic.posts.enumerated() {
                                 // guard index == 0 else { continue } // For test purposes
                                 var text = post.content
@@ -469,7 +493,7 @@ public struct TopicFeature: Reducer, Sendable {
                                 }
                             }
                             
-                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topicPerPage + 1)
+                            var types = Array<[UITopicType]?>(repeating: nil, count: topicPerPage + 1)
                             for await (index, result) in taskGroup {
                                 types[index] = result
                             }
@@ -547,7 +571,7 @@ public struct TopicFeature: Reducer, Sendable {
         )
     }
     
-    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[TopicTypeUI]]) -> [UIPost] {
+    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[UITopicType]]) -> [UIPost] {
         zip(newPosts, newTypes).map { newPost, newTypes in
             if let oldPost = old.first(where: { $0.id == newPost.id }) {
                 let mergedContent = mergePostContent(
@@ -561,7 +585,7 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    private func mergePostContent(old: [UIPost.Content], new: [TopicTypeUI]) -> [UIPost.Content] {
+    private func mergePostContent(old: [UIPost.Content], new: [UITopicType]) -> [UIPost.Content] {
         new.map { newType in
             if let match = old.first(where: { $0.value.hashValue == newType.hashValue }) {
                 return match

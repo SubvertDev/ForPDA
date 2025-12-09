@@ -18,6 +18,7 @@ public enum Deeplink {
     case forum(id: Int, page: Int)
     case user(id: Int)
     case qms(id: Int)
+    case search(SearchResult)
 }
 
 public struct DeeplinkHandler {
@@ -33,6 +34,7 @@ public struct DeeplinkHandler {
         case badImageUrl(in: URL)
         case noTitle(in: URL)
         case badTitle(in: URL)
+        case badSearchType(type: String, for: String)
         case unknownType(type: String, for: String)
         case noType(of: String, for: String)
         case noDeeplinkAvailable(for: URL)
@@ -124,6 +126,21 @@ public struct DeeplinkHandler {
         
         guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
         
+        // site search
+        
+        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value {
+            // https://4pda.to/?s=4pda
+            let searchText = if let decodedSearchText = value.removingPercentEncoding {
+                decodedSearchText
+            } else if let decodedSearchText = value.unEscape() {
+                decodedSearchText
+            } else {
+                value
+            }
+            
+            return .search(.init(on: .site, author: nil, text: searchText, sort: .dateDescSort))
+        }
+        
         // showtopic
         
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
@@ -179,6 +196,67 @@ public struct DeeplinkHandler {
                     analytics.capture(DeeplinkError.noType(of: "pid", for: url.absoluteString))
                 }
                 
+            case "search":
+                // https://4pda.to/forum/index.php?act=search&query=4pda&source=all&sort=dd&subforums=1&topics=673847&hl=0
+                // https://4pda.to/forum/index.php?act=search&query=Xiaomi+%25E0%25EA%25F1%25E5%25F1%25F1%25F3%25E0%25F0%25FB&username=AirFlare&forums%255B%255D=716&subforums=1&exclude_trash=1&source=top&sort=dd&result=topics
+                if let sourceItem = queryItems.first(where: { $0.name == "source" })?.value {
+                    let forumSearchIn = ForumSearchIn(rawValue: sourceItem)
+                    
+                    let searchText = if let searchTextItem = queryItems.first(where: { $0.name == "query" })?.value {
+                        if let decodedSearchText = searchTextItem.removingPercentEncoding {
+                            decodedSearchText
+                        } else if let decodedSearchText = searchTextItem.unEscape() {
+                            decodedSearchText
+                        } else {
+                            searchTextItem
+                        }
+                    } else {
+                        ""
+                    }
+                    
+                    let author: SearchAuthorType? = if let idItem = ["author_id", "username-id"]
+                        .compactMap({ name in queryItems.first(where: { $0.name == name })?.value })
+                        .compactMap(Int.init)
+                        .first {
+                        .id(idItem)
+                    } else if let usernameItem = queryItems.first(where: { $0.name == "username" })?.value {
+                        .name(usernameItem)
+                    } else {
+                        nil
+                    }
+                    
+                    let sort = if let sortItem = queryItems.first(where: { $0.name == "sort" })?.value {
+                        SearchSort(rawValue: sortItem)
+                    } else {
+                        SearchSort.relevance
+                    }
+                    
+                    let asTopics = if let asTopicsItem = queryItems.first(where: { $0.name == "result" })?.value {
+                        asTopicsItem == "topics"
+                    } else {
+                        false
+                    }
+                    
+                    let noHighlight = if let highlight = queryItems.first(where: { $0.name == "hl" })?.value {
+                        highlight == "0"
+                    } else {
+                        false
+                    }
+                    
+                    let topicIds = queryItems.extractSearchIds(forItem: "topics")
+                    let forumIds = queryItems.extractSearchIds(forItem: "forums")
+                    
+                    let searchOn: SearchOn = if !topicIds.isEmpty {
+                        .topic(ids: topicIds, noHighlight: noHighlight)
+                    } else {
+                        .forum(ids: forumIds, sIn: forumSearchIn, asTopics: asTopics)
+                    }
+                    
+                    return .search(SearchResult(on: searchOn, author: author, text: searchText, sort: sort))
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
+                }
+                
             default:
                 analytics.capture(DeeplinkError.unknownType(type: actType, for: url.absoluteString))
             }
@@ -232,8 +310,26 @@ public struct DeeplinkHandler {
     }
 }
 
+// MARK: - Helpers
+
 extension Array {
     subscript(safe index: Int) -> Element? {
         return indices.contains(index) ? self[index] : nil
+    }
+}
+
+extension Array where Element == URLQueryItem {
+    func extractSearchIds(forItem name: String) -> [Int] {
+        return self.compactMap { item -> Int? in
+            let isSingleItem = item.name == name
+            let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
+            
+            guard (isSingleItem || isMultiItems),
+                  let value = item.value,
+                  let id = Int(value) else {
+                return nil
+            }
+            return id
+        }
     }
 }

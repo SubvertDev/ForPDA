@@ -6,19 +6,15 @@
 //
 
 import SwiftUI
-import SharedUI
 import NukeUI
 import SFSafeSymbols
 import Models
-import Sharing
-import Dependencies
-import CacheClient
 
 public typealias ImageTapHandler = (URL) -> Void
 
 public struct TopicView: View {
     
-    let type: TopicTypeUI
+    let type: UITopicType
     let nestLevel: Int
     let attachments: [Attachment]
     let textAlignment: NSTextAlignment?
@@ -26,7 +22,7 @@ public struct TopicView: View {
     let onImageTap: ImageTapHandler?
     
     public init(
-        type: TopicTypeUI,
+        type: UITopicType,
         nestLevel: Int = 1,
         attachments: [Attachment] = [],
         alignment: NSTextAlignment? = nil,
@@ -55,7 +51,7 @@ public struct TopicView: View {
                 }
             )
             
-        case let .attachment(attachment):            
+        case let .attachment(attachment):
             let metadata = attachment.metadata!
             
             let padding: CGFloat = CGFloat(((nestLevel - 1) * 12) + 16) * 2
@@ -231,7 +227,7 @@ struct SpoilerView: View {
     
     @State private var isExpanded = false
     
-    let types: [TopicTypeUI]
+    let types: [UITopicType]
     let nestLevel: Int
     let info: AttributedString?
     let attachments: [Attachment]
@@ -247,7 +243,7 @@ struct SpoilerView: View {
     }
     
     init(
-        types: [TopicTypeUI],
+        types: [UITopicType],
         nestLevel: Int,
         info: AttributedString?,
         attachments: [Attachment],
@@ -324,7 +320,7 @@ struct SpoilerView: View {
 
 struct QuoteView: View {
     
-    let types: [TopicTypeUI]
+    let types: [UITopicType]
     let nestLevel: Int
     let info: QuoteType?
     let attachments: [Attachment]
@@ -341,7 +337,7 @@ struct QuoteView: View {
     }
     
     init(
-        types: [TopicTypeUI],
+        types: [UITopicType],
         nestLevel: Int,
         info: QuoteType?,
         attachments: [Attachment],
@@ -428,7 +424,7 @@ struct CodeView: View {
     
     @State private var isExpanded = false
     
-    let type: TopicTypeUI
+    let type: UITopicType
     let nestLevel: Int
     let info: CodeType
     let onUrlTap: URLTapHandler?
@@ -507,7 +503,7 @@ struct CodeView: View {
 
 struct HideView: View {
     
-    let types: [TopicTypeUI]
+    let types: [UITopicType]
     let nestLevel: Int
     let info: Int?
     let attachments: [Attachment]
@@ -518,7 +514,7 @@ struct HideView: View {
     @State private var shouldLoadUser: Int?
     
     init(
-        types: [TopicTypeUI],
+        types: [UITopicType],
         nestLevel: Int,
         info: Int?,
         attachments: [Attachment],
@@ -532,17 +528,19 @@ struct HideView: View {
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
         
-        @Shared(.userSession) var userSession: UserSession?
-        if let userSession = userSession.wrapped {
-            if info != nil {
-                self._isShown = State(initialValue: false)
-                self._shouldLoadUser = State(initialValue: userSession.userId)  //userSession.userId
-            } else {
-                self._isShown = State(initialValue: true)
-            }
-        } else {
-            self._isShown = State(initialValue: false)
-        }
+        self.isShown = false
+        
+//        @Shared(.userSession) var userSession: UserSession?
+//        if let userSession = userSession.wrapped {
+//            if info != nil {
+//                self._isShown = State(initialValue: false)
+//                self._shouldLoadUser = State(initialValue: userSession.userId)  //userSession.userId
+//            } else {
+//                self._isShown = State(initialValue: true)
+//            }
+//        } else {
+//            self._isShown = State(initialValue: false)
+//        }
     }
     
     var body: some View {
@@ -582,14 +580,15 @@ struct HideView: View {
         }
         .animation(.default, value: isShown)
         .task {
-            @Dependency(\.cacheClient) var cache
-            if let userId = shouldLoadUser, let info {
-                if let currentUser = cache.getUser(userId) {
-                    if currentUser.replies >= info {
-                        isShown = true
-                    }
-                }
-            }
+//            #warning("What is happening here?")
+//            @Dependency(\.cacheClient) var cache
+//            if let userId = shouldLoadUser, let info {
+//                if let currentUser = await cache.getUser(userId) {
+//                    if currentUser.replies >= info {
+//                        isShown = true
+//                    }
+//                }
+//            }
         }
     }
 }
@@ -598,7 +597,7 @@ struct HideView: View {
 
 struct NoticeView: View {
     
-    let types: [TopicTypeUI]
+    let types: [UITopicType]
     let nestLevel: Int
     let info: NoticeType
     let attachments: [Attachment]
@@ -621,7 +620,7 @@ struct NoticeView: View {
 //                    .frame(height: 1)
 //                    .padding(.horizontal, 12)
 //            }
-//            
+//
             VStack(spacing: 8) {
                 ForEach(types, id: \.self) { type in
                     TopicView(

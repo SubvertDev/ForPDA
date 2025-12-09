@@ -97,6 +97,7 @@ public struct ForumFeature: Reducer, Sendable {
             case onFirstAppear
             case onNextAppear
             case onRefresh
+            case searchButtonTapped
             case topicTapped(TopicInfo, showUnread: Bool)
             case subforumRedirectTapped(URL)
             case subforumTapped(ForumInfo)
@@ -120,6 +121,7 @@ public struct ForumFeature: Reducer, Sendable {
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
+            case openSearch(on: SearchOn, navigation: ForumInfo?)
             case handleRedirect(URL)
         }
     }
@@ -163,6 +165,15 @@ public struct ForumFeature: Reducer, Sendable {
             case let .view(.sectionExpandTapped(kind)):
                 state.sectionsExpandState.toggle(kind: kind)
                 return .none
+                
+            case .view(.searchButtonTapped):
+                let navigation: ForumInfo? = if let forum = state.forum {
+                    ForumInfo(id: forum.id, name: forum.name, flag: forum.flag)
+                } else { nil }
+                return .send(.delegate(.openSearch(
+                    on: .forum(ids: [state.forumId], sIn: .all, asTopics: false),
+                    navigation: navigation
+                )))
                 
             case let .view(.topicTapped(topic, showUnread)):
                 guard !showUnread else {

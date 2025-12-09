@@ -99,7 +99,7 @@ public struct HistoryScreen: View {
         Section {
             ForEach(history.topics, id: \.id) { topic in
                 TopicRow(
-                    title: topic.name,
+                    title: .plain(topic.name),
                     date: topic.lastPost.date,
                     username: topic.lastPost.username,
                     isClosed: topic.isClosed,

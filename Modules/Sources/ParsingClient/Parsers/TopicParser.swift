@@ -166,43 +166,48 @@ public struct TopicParser {
     private static func parsePosts(_ postsRaw: [[Any]]) throws(ParsingError) -> [Post] {
         var posts: [Post] = []
         for post in postsRaw {
-            guard let id = post[safe: 0] as? Int,
-                  let flag = post[safe: 1] as? Int,
-                  let authorId = post[safe: 2] as? Int,
-                  let authorName = post[safe: 3] as? String,
-                  let authorGroupId = post[safe: 4] as? Int,
-                  let authorLastSeenDate = post[safe: 5] as? TimeInterval,
-                  let authorReputationCount = post[safe: 6] as? Int,
-                  let createdAt = post[safe: 7] as? TimeInterval,
-                  let content = post[safe: 8] as? String,
-                  let authorAvatarUrl = post[safe: 9] as? String,
-                  let authorSignature = post[safe: 10] as? String,
-                  let attachments = post[safe: 11] as? [[Any]],
-                  let karma = post[safe: 12] as? Int else {
-                throw ParsingError.failedToCastFields
-            }
-            
-            let post = Post(
-                id: id,
-                flag: flag,
-                content: content,
-                author: Post.Author(
-                    id: authorId,
-                    name: authorName.convertCodes(),
-                    groupId: authorGroupId,
-                    avatarUrl: authorAvatarUrl,
-                    lastSeenDate: Date(timeIntervalSince1970: authorLastSeenDate),
-                    signature: authorSignature,
-                    reputationCount: authorReputationCount
-                ),
-                karma: karma,
-                attachments: try AttachmentParser.parseAttachment(attachments),
-                createdAt: Date(timeIntervalSince1970: createdAt),
-                lastEdit: try parseLastEdit(post)
-            )
-            posts.append(post)
+            try posts.append(parsePost(post))
         }
         return posts
+    }
+    
+    // MARK: - Post
+    
+    internal static func parsePost(_ post: [Any]) throws(ParsingError) -> Post {
+        guard let id = post[safe: 0] as? Int,
+              let flag = post[safe: 1] as? Int,
+              let authorId = post[safe: 2] as? Int,
+              let authorName = post[safe: 3] as? String,
+              let authorGroupId = post[safe: 4] as? Int,
+              let authorLastSeenDate = post[safe: 5] as? TimeInterval,
+              let authorReputationCount = post[safe: 6] as? Int,
+              let createdAt = post[safe: 7] as? TimeInterval,
+              let content = post[safe: 8] as? String,
+              let authorAvatarUrl = post[safe: 9] as? String,
+              let authorSignature = post[safe: 10] as? String,
+              let attachments = post[safe: 11] as? [[Any]],
+              let karma = post[safe: 12] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return Post(
+            id: id,
+            flag: flag,
+            content: content,
+            author: Post.Author(
+                id: authorId,
+                name: authorName.convertCodes(),
+                groupId: authorGroupId,
+                avatarUrl: authorAvatarUrl,
+                lastSeenDate: Date(timeIntervalSince1970: authorLastSeenDate),
+                signature: authorSignature,
+                reputationCount: authorReputationCount
+            ),
+            karma: karma,
+            attachments: try AttachmentParser.parseAttachment(attachments),
+            createdAt: Date(timeIntervalSince1970: createdAt),
+            lastEdit: try parseLastEdit(post)
+        )
     }
     
     // MARK: - Last Edit

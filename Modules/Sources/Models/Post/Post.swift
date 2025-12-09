@@ -20,6 +20,10 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let lastEdit: LastEdit?
     private let rawKarma: Int
     
+    public var isDeleted: Bool {
+        return flag & 4 > 0
+    }
+    
     public var canEdit: Bool {
         return flag & 128 > 0
     }

@@ -22,7 +22,7 @@ extension ForumFeature {
                 case .pageNavigation:
                     break
                     
-                case .view(.onFirstAppear), .view(.onNextAppear):
+                case .view(.onFirstAppear), .view(.onNextAppear), .view(.searchButtonTapped):
                     break
                     
                 case .view(.onRefresh):

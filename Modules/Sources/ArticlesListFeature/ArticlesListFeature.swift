@@ -47,7 +47,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
     // MARK: - Destinations
     
     @Reducer
-    public enum Destination: Hashable {
+    public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
         case alert(AlertState<Never>)
@@ -110,6 +110,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case linkShared(Bool, URL)
         case listGridTypeButtonTapped
         case tryAgainButtonTapped
+        case searchButtonTapped
         case onRefresh
         case loadMoreArticles
         case scrollToTop
@@ -118,6 +119,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openSearch(SearchOn)
+            case openUserProfile(Int)
             case openArticle(ArticlePreview)
         }
     }
@@ -170,6 +173,9 @@ public struct ArticlesListFeature: Reducer, Sendable {
                     try await clock.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
                     await send(._articlesResponse(result))
                 }
+                
+            case .searchButtonTapped:
+                return .send(.delegate(.openSearch(.site)))
                 
             case .listGridTypeButtonTapped:
                 state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
