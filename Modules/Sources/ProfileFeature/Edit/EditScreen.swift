@@ -265,8 +265,8 @@ public struct EditScreen: View {
                 return
             }
             
-            if data.count <= 32768 /* should be max 32kb size */ {
-                if image.size.width <= 100, image.size.height <= 100 {
+            if isInPreview || data.count <= 32768 /* should be max 32kb size */ {
+                if isInPreview || (image.size.width <= 100 && image.size.height <= 100) {
                     send(.avatarSelected(data))
                 } else {
                     send(.onAvatarBadWidthHeightProvided)
@@ -354,7 +354,17 @@ public struct EditScreen: View {
     }
 }
 
-#Preview("") {
+// MARK: - Helpers
+
+private extension EditScreen {
+    private var isInPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
+}
+
+// MARK: - Previews
+
+#Preview {
     NavigationStack {
         EditScreen(
             store: Store(
