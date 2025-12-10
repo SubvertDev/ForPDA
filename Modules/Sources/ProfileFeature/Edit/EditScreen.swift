@@ -174,6 +174,7 @@ public struct EditScreen: View {
                     Text("Set", bundle: .module)
                         .textCase(.uppercase)
                 }
+                .buttonStyle(.plain)
                 .cornerRadius(12)
                 .foregroundStyle(tintColor)
             }
