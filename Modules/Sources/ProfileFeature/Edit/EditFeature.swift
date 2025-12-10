@@ -16,15 +16,6 @@ public struct EditFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Localizations
-    
-    private enum Localization {
-        static let avatarUpdated = LocalizedStringResource("Avatar updated", bundle: .module)
-        static let avatarUpdateError = LocalizedStringResource("Avatar update error", bundle: .module)
-        static let avatarFileSizeError = LocalizedStringResource("Avatar size more than 32KB", bundle: .module)
-        static let avatarWidthHeightError = LocalizedStringResource("Avatar must be 100x100", bundle: .module)
-    }
-    
     // MARK: - Destinations
     
     @Reducer
@@ -44,6 +35,7 @@ public struct EditFeature: Reducer, Sendable {
         public enum Field: CaseIterable { case status, signature, about, city }
         
         @Presents public var destination: Destination.State?
+        @Presents public var alert: AlertState<Action.Alert>?
         
         let user: User
         var draftUser: User
@@ -109,6 +101,11 @@ public struct EditFeature: Reducer, Sendable {
             case addAvatarButtonTapped
         }
         
+        case alert(PresentationAction<Alert>)
+        public enum Alert {
+            case cancel
+        }
+        
         case `internal`(Internal)
         public enum Internal {
             case saveProfile
@@ -150,10 +147,12 @@ public struct EditFeature: Reducer, Sendable {
                 return .send(.internal(.updateAvatar(empty)))
             
             case .view(.onAvatarBadFileSizeProvided):
-                return showToast(ToastMessage(text: Localization.avatarFileSizeError, haptic: .error))
+                state.alert = .avatarFileSizeError
+                return .none
                 
             case .view(.onAvatarBadWidthHeightProvided):
-                return showToast(ToastMessage(text: Localization.avatarWidthHeightError, haptic: .error))
+                state.alert = .avatarWidthHeightError
+                return .none
                 
             case .view(.setBirthdayDate):
                 state.birthdayDate = state.draftUser.birthdayDate ?? Date()
@@ -175,6 +174,10 @@ public struct EditFeature: Reducer, Sendable {
                 
             case .view(.addAvatarButtonTapped):
                 state.destination = .avatarPicker
+                return .none
+                
+            case .alert:
+                state.alert = nil
                 return .none
                 
             case .destination, .delegate:
@@ -207,28 +210,52 @@ public struct EditFeature: Reducer, Sendable {
                 case .success(let url):
                     state.draftUser.imageUrl = url ?? Links.defaultAvatar
                     state.isAvatarUploading = false
-                    
-                    return showToast(ToastMessage(text: Localization.avatarUpdated, haptic: .success))
                 case .error:
-                    return showToast(ToastMessage(text: Localization.avatarUpdateError, haptic: .error))
+                    state.alert = .avatarUpdateError
                 }
+                return .none
                 
             case let .internal(.updateAvatarResponse(.failure(error))):
                 print("Error: \(error)")
                 return .none
             }
         }
+        .ifLet(\.alert, action: \.alert)
         .ifLet(\.$destination, action: \.destination)
-    }
-    
-    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
-        return .run { _ in
-            await toastClient.showToast(toast)
-        }
     }
 }
 
 extension EditFeature.Destination.State: Equatable {}
+
+// MARK: - Alert Extension
+
+private extension AlertState where Action == EditFeature.Action.Alert {
+    nonisolated(unsafe) static let avatarUpdateError = Self {
+        TextState("Avatar update error", bundle: .module)
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("Ok", bundle: .module)
+        }
+    }
+    
+    nonisolated(unsafe) static let avatarFileSizeError = Self {
+        TextState("Avatar size more than 32KB", bundle: .module)
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("Ok", bundle: .module)
+        }
+    }
+    
+    nonisolated(unsafe) static let avatarWidthHeightError = Self {
+        TextState("Avatar must be 100x100", bundle: .module)
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("Ok", bundle: .module)
+        }
+    }
+}
+
+// MARK: - Helpers
 
 private extension Date {
     func toProfileString() -> String {

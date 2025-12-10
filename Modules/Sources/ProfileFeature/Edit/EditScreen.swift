@@ -75,6 +75,7 @@ public struct EditScreen: View {
                 }
                 .scrollContentBackground(.hidden)
             }
+            .alert($store.scope(state: \.alert, action: \.alert))
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             ._safeAreaBar(edge: .bottom) {
