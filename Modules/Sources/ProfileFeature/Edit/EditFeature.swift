@@ -167,6 +167,7 @@ public struct EditFeature: Reducer, Sendable {
                 return .send(.internal(.saveProfile))
                 
             case .delegate(.profileUpdated):
+                state.isSending = false
                 return .run { _ in await dismiss() }
                 
             case .view(.cancelButtonTapped):
@@ -180,6 +181,7 @@ public struct EditFeature: Reducer, Sendable {
                 return .none
                 
             case .internal(.saveProfile):
+                state.isSending = true
                 return .run { [user = state.draftUser, birthdayDate = state.birthdayDate] send in
                     let status = try await apiClient.editUserProfile(UserProfileEditRequest(
                         userId: user.id,

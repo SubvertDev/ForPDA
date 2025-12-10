@@ -42,8 +42,6 @@ public struct EditScreen: View {
                             focusEqual: .status,
                             characterLimit: 28
                         )
-                    } else {
-                        // TODO: Some notify about it?
                     }
                     
                     Field(
@@ -375,9 +373,10 @@ private extension EditScreen {
             ) {
                 EditFeature()
             } withDependencies: {
-                $0.apiClient.updateUserAvatar = { @Sendable _, _ in
+                $0.apiClient.updateUserAvatar = { _, data in
                     try await Task.sleep(for: .seconds(3))
-                    return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
+                    let url = URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!
+                    return .success(data.isEmpty ? nil : url)
                 }
             }
         )
