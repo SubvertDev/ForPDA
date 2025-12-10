@@ -200,6 +200,8 @@ public struct EditScreen: View {
         .padding(12)
         .frame(height: 60)
         .cornerRadius(10)
+        .pickerStyle(.menu)
+        .tint(tintColor)
     }
     
     // MARK: - Avatar
