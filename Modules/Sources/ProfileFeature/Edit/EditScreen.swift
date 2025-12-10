@@ -11,6 +11,7 @@ import NukeUI
 import Models
 import SharedUI
 import PhotosUI
+import SFSafeSymbols
 
 @ViewAction(for: EditFeature.self)
 public struct EditScreen: View {
@@ -213,7 +214,11 @@ public struct EditScreen: View {
                     style: StrokeStyle(lineWidth: 1, dash: [8])
                 )
                 .overlay(alignment: .bottomTrailing) {
-                    AvatarContextMenu()
+                    if store.isUserSetAvatar {
+                        AvatarContextMenu()
+                    } else {
+                        AvatarUploadButton()
+                    }
                 }
                 .background {
                     if store.isAvatarUploading {
@@ -282,6 +287,18 @@ public struct EditScreen: View {
         }
     }
     
+    // MARK: - Avatar Upload Button
+    
+    @ViewBuilder
+    private func AvatarUploadButton() -> some View {
+        Button {
+            send(.addAvatarButtonTapped)
+        } label: {
+            AvatarActionLabel(symbol: .plus)
+        }
+        .buttonStyle(.plain)
+    }
+    
     // MARK: - Avatar Context Menu
     
     @ViewBuilder
@@ -291,34 +308,38 @@ public struct EditScreen: View {
                 send(.addAvatarButtonTapped)
             } label: {
                 HStack {
-                    Text("Add avatar", bundle: .module)
+                    Text("Update avatar", bundle: .module)
                     Image(systemSymbol: .plusCircle)
                 }
             }
-
-            if store.isUserSetAvatar {
-                Button(role: .destructive) {
-                    send(.deleteAvatar)
-                } label: {
-                    HStack {
-                        Text("Delete avatar", bundle: .module)
-                        Image(systemSymbol: .trash)
-                    }
+            
+            Button(role: .destructive) {
+                send(.deleteAvatar)
+            } label: {
+                HStack {
+                    Text("Delete avatar", bundle: .module)
+                    Image(systemSymbol: .trash)
                 }
-                .tint(.red)
             }
+            .tint(.red)
         } label: {
-            Image(systemSymbol: .ellipsis)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primaryInvariably))
-                .frame(width: 32, height: 32)
-                .background(
-                    Circle()
-                        .fill(tintColor)
-                        .clipShape(Circle())
-                )
+            AvatarActionLabel(symbol: .ellipsis)
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
+    }
+    
+    // MARK: - Avatar Action Label
+    
+    private func AvatarActionLabel(symbol: SFSymbol) -> some View {
+        Image(systemSymbol: symbol)
+            .font(.body)
+            .foregroundStyle(Color(.Labels.primaryInvariably))
+            .frame(width: 32, height: 32)
+            .background(
+                Circle()
+                    .fill(tintColor)
+                    .clipShape(Circle())
+            )
     }
     
     // MARK: - Helpers
