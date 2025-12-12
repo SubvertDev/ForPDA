@@ -50,11 +50,12 @@ public struct SearchScreen: View {
                     ShowParametersButton()
                 }
                 .scrollContentBackground(.hidden)
+                ._contentMargins(.top, 0)
             }
             .navigationTitle(Text("Search", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
-            .searchable(text: $store.searchText)
+            .searchable(text: $store.searchText, placement: .navigationBarDrawer(displayMode: .always))
             .onSubmit(of: .search) {
                 send(.startSearch)
             }
@@ -292,14 +293,16 @@ public struct SearchScreen: View {
 // MARK: - Preview
 
 #Preview {
-    SearchScreen(
-        store: Store(
-            initialState: SearchFeature.State(
-                on: .site
-            ),
-        ) {
-            SearchFeature()
-        }
-    )
+    NavigationStack {
+        SearchScreen(
+            store: Store(
+                initialState: SearchFeature.State(
+                    on: .site
+                ),
+            ) {
+                SearchFeature()
+            }
+        )
+    }
     .environment(\.tintColor, Color(.Theme.primary))
 }
