@@ -145,7 +145,7 @@ public struct SearchFeature: Reducer, Sendable {
                     if let forum = state.navigation {
                         .forum(ids: [forum.id], sIn: state.forumSearchIn, asTopics: state.searchResultsAsTopics)
                     } else {
-                        fatalError("Unexpected case. Info: [\(state.navigation)]")
+                        fatalError("Unexpected case. Info: [\(state.navigation as Any)]")
                     }
                 }
                 return .send(.delegate(.searchOptionsConstructed(SearchResult(
