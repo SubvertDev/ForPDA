@@ -21,16 +21,6 @@
         }
       }
     },
-    "Add avatar" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить аватар"
-          }
-        }
-      }
-    },
     "Are you sure you want to log out of your profile ?" : {
       "localizations" : {
         "ru" : {
@@ -67,16 +57,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка обновления аватара"
-          }
-        }
-      }
-    },
-    "Avatar updated" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Аватар обновлен"
           }
         }
       }
@@ -321,6 +301,16 @@
         }
       }
     },
+    "Ok" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ок"
+          }
+        }
+      }
+    },
     "Online" : {
       "localizations" : {
         "ru" : {
@@ -487,6 +477,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Тем"
+          }
+        }
+      }
+    },
+    "Update avatar" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновить аватар"
           }
         }
       }

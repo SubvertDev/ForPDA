@@ -11,6 +11,7 @@ import NukeUI
 import Models
 import SharedUI
 import PhotosUI
+import SFSafeSymbols
 
 @ViewAction(for: EditFeature.self)
 public struct EditScreen: View {
@@ -39,22 +40,23 @@ public struct EditScreen: View {
                         Field(
                             content: Binding(unwrapping: $store.draftUser.status, default: ""),
                             title: LocalizedStringKey("Status"),
-                            focusEqual: .status
+                            focusEqual: .status,
+                            characterLimit: 28
                         )
-                    } else {
-                        // TODO: Some notify about it?
                     }
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.signature, default: ""),
                         title: LocalizedStringKey("Signature"),
-                        focusEqual: .signature
+                        focusEqual: .signature,
+                        characterLimit: 300
                     )
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
                         title: LocalizedStringKey("About me"),
-                        focusEqual: .about
+                        focusEqual: .about,
+                        characterLimit: 500
                     )
                     
                     Section {
@@ -67,11 +69,13 @@ public struct EditScreen: View {
                     Field(
                         content: Binding(unwrapping: $store.draftUser.city, default: ""),
                         title: LocalizedStringKey("City"),
-                        focusEqual: .city
+                        focusEqual: .city,
+                        characterLimit: 50
                     )
                 }
                 .scrollContentBackground(.hidden)
             }
+            .alert($store.scope(state: \.alert, action: \.alert))
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             ._safeAreaBar(edge: .bottom) {
@@ -170,6 +174,7 @@ public struct EditScreen: View {
                     Text("Set", bundle: .module)
                         .textCase(.uppercase)
                 }
+                .buttonStyle(.plain)
                 .cornerRadius(12)
                 .foregroundStyle(tintColor)
             }
@@ -195,6 +200,8 @@ public struct EditScreen: View {
         .padding(12)
         .frame(height: 60)
         .cornerRadius(10)
+        .pickerStyle(.menu)
+        .tint(tintColor)
     }
     
     // MARK: - Avatar
@@ -208,7 +215,11 @@ public struct EditScreen: View {
                     style: StrokeStyle(lineWidth: 1, dash: [8])
                 )
                 .overlay(alignment: .bottomTrailing) {
-                    AvatarContextMenu()
+                    if store.isUserSetAvatar {
+                        AvatarContextMenu()
+                    } else {
+                        AvatarUploadButton()
+                    }
                 }
                 .background {
                     if store.isAvatarUploading {
@@ -261,8 +272,8 @@ public struct EditScreen: View {
                 return
             }
             
-            if data.count <= 32768 /* should be max 32kb size */ {
-                if image.size.width <= 100, image.size.height <= 100 {
+            if isInPreview || data.count <= 32768 /* should be max 32kb size */ {
+                if isInPreview || (image.size.width <= 100 && image.size.height <= 100) {
                     send(.avatarSelected(data))
                 } else {
                     send(.onAvatarBadWidthHeightProvided)
@@ -277,6 +288,18 @@ public struct EditScreen: View {
         }
     }
     
+    // MARK: - Avatar Upload Button
+    
+    @ViewBuilder
+    private func AvatarUploadButton() -> some View {
+        Button {
+            send(.addAvatarButtonTapped)
+        } label: {
+            AvatarActionLabel(symbol: .plus)
+        }
+        .buttonStyle(.plain)
+    }
+    
     // MARK: - Avatar Context Menu
     
     @ViewBuilder
@@ -286,34 +309,38 @@ public struct EditScreen: View {
                 send(.addAvatarButtonTapped)
             } label: {
                 HStack {
-                    Text("Add avatar", bundle: .module)
+                    Text("Update avatar", bundle: .module)
                     Image(systemSymbol: .plusCircle)
                 }
             }
-
-            if store.isUserSetAvatar {
-                Button(role: .destructive) {
-                    send(.deleteAvatar)
-                } label: {
-                    HStack {
-                        Text("Delete avatar", bundle: .module)
-                        Image(systemSymbol: .trash)
-                    }
+            
+            Button(role: .destructive) {
+                send(.deleteAvatar)
+            } label: {
+                HStack {
+                    Text("Delete avatar", bundle: .module)
+                    Image(systemSymbol: .trash)
                 }
-                .tint(.red)
             }
+            .tint(.red)
         } label: {
-            Image(systemSymbol: .ellipsis)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primaryInvariably))
-                .frame(width: 32, height: 32)
-                .background(
-                    Circle()
-                        .fill(tintColor)
-                        .clipShape(Circle())
-                )
+            AvatarActionLabel(symbol: .ellipsis)
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
+    }
+    
+    // MARK: - Avatar Action Label
+    
+    private func AvatarActionLabel(symbol: SFSymbol) -> some View {
+        Image(systemSymbol: symbol)
+            .font(.body)
+            .foregroundStyle(Color(.Labels.primaryInvariably))
+            .frame(width: 32, height: 32)
+            .background(
+                Circle()
+                    .fill(tintColor)
+                    .clipShape(Circle())
+            )
     }
     
     // MARK: - Helpers
@@ -322,42 +349,17 @@ public struct EditScreen: View {
     private func Field(
         content: Binding<String>,
         title: LocalizedStringKey,
-        focusEqual: EditFeature.State.Field
+        focusEqual: EditFeature.State.Field,
+        characterLimit: Int? = nil
     ) -> some View {
         Section {
-            Group {
-                TextField(text: content, axis: .vertical) {
-                    Text("Input...", bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.quaternary))
-                }
-                .focused($focus, equals: focusEqual)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primary))
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(minHeight: nil, alignment: .top)
-            }
-            .padding(.vertical, 15)
-            .padding(.horizontal, 12)
-            .background {
-                if #available(iOS 26, *) {
-                    ConcentricRectangle()
-                        .fill(Color(.Background.teritary))
-                } else {
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(Color(.Background.teritary))
-                }
-            }
-            .overlay {
-                if #available(iOS 26, *) {
-                    ConcentricRectangle()
-                        .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
-                } else {
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 0.67)
-                }
-            }
+            ForField(
+                content: content,
+                placeholder: LocalizedStringResource("Input...", bundle: .module),
+                focusEqual: focusEqual,
+                focus: $focus,
+                characterLimit: characterLimit
+            )
         } header: {
             Header(title: title)
         }
@@ -375,7 +377,17 @@ public struct EditScreen: View {
     }
 }
 
-#Preview("") {
+// MARK: - Helpers
+
+private extension EditScreen {
+    private var isInPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
+}
+
+// MARK: - Previews
+
+#Preview {
     NavigationStack {
         EditScreen(
             store: Store(
@@ -383,9 +395,10 @@ public struct EditScreen: View {
             ) {
                 EditFeature()
             } withDependencies: {
-                $0.apiClient.updateUserAvatar = { @Sendable _, _ in
+                $0.apiClient.updateUserAvatar = { _, data in
                     try await Task.sleep(for: .seconds(3))
-                    return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
+                    let url = URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!
+                    return .success(data.isEmpty ? nil : url)
                 }
             }
         )
