@@ -154,11 +154,13 @@ public struct ArticlesListScreen: View {
     
     @ToolbarContentBuilder
     private func Toolbar() -> some ToolbarContent {
-        ToolbarItem {
-            Button {
-                store.send(.searchButtonTapped)
-            } label: {
-                Image(systemSymbol: .magnifyingglass)
+        if store.isAuthorized {
+            ToolbarItem {
+                Button {
+                    store.send(.searchButtonTapped)
+                } label: {
+                    Image(systemSymbol: .magnifyingglass)
+                }
             }
         }
         
