@@ -420,6 +420,14 @@ extension LiquidTabView {
                 return nil
             }
             
+        case let .search(path):
+            switch path.case {
+            case let .searchResult(store):
+                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+            default:
+                return nil
+            }
+            
         default:
             return nil
         }
