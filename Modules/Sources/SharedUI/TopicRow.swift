@@ -13,7 +13,7 @@ public struct TopicRow: View {
     
     @Environment(\.tintColor) private var tintColor
     
-    public let title: String
+    public let title: UITitleType
     public let date: Date
     public let username: String
     public let isClosed: Bool
@@ -21,7 +21,7 @@ public struct TopicRow: View {
     public let onAction: (_ unreadTapped: Bool) -> Void
     
     public init(
-        title: String,
+        title: UITitleType,
         date: Date,
         username: String,
         isClosed: Bool,
@@ -46,12 +46,14 @@ public struct TopicRow: View {
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.teritary))
                     
-                    RichText(
-                        text: AttributedString(title),
-                        isSelectable: false,
-                        font: .body,
-                        foregroundStyle: Color(.Labels.primary)
-                    )
+                    switch title {
+                    case .plain(let title):
+                        Text(verbatim: title)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                    case .render(let attributedTitle):
+                        RichText(text: attributedTitle, isSelectable: false)
+                    }
                     
                     HStack(spacing: 4) {
                         Image(systemSymbol: .personCircle)
@@ -105,26 +107,10 @@ public struct TopicRow: View {
     }
 }
 
-private extension Date {
-    func formattedDate() -> LocalizedStringKey {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        
-        if Calendar.current.isDateInToday(self) {
-            return LocalizedStringKey("Today, \(formatter.string(from: self))")
-        } else if Calendar.current.isDateInYesterday(self) {
-            return LocalizedStringKey("Yesterday, \(formatter.string(from: self))")
-        } else {
-            formatter.dateFormat = "dd.MM.yy, HH:mm"
-            return LocalizedStringKey(formatter.string(from: self))
-        }
-    }
-}
-
 #Preview {
     List {
         TopicRow(
-            title: "Обсуждение клиента",
+            title: .plain("Обсуждение клиента"),
             date: .now,
             username: "qwerty",
             isClosed: false,
@@ -133,7 +119,7 @@ private extension Date {
         )
         
         TopicRow(
-            title: "ForPDA [iOS]",
+            title: .plain("ForPDA [iOS]"),
             date: .now,
             username: "subvertd",
             isClosed: false,
@@ -142,7 +128,7 @@ private extension Date {
         )
         
         TopicRow(
-            title: "За особые достижения отмечены",
+            title: .plain("За особые достижения отмечены"),
             date: .now,
             username: "asdf",
             isClosed: true,
@@ -151,7 +137,7 @@ private extension Date {
         )
         
         TopicRow(
-            title: "Что нового было, пока вас не было?",
+            title: .plain("Что нового было, пока вас не было?"),
             date: .now,
             username: "123456789",
             isClosed: true,

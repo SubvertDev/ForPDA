@@ -43,7 +43,8 @@ public struct QMSChatParser {
                 id: message[0] as! Int,
                 senderId: message[1] as! Int,
                 date: Date(timeIntervalSince1970: message[2] as! TimeInterval),
-                text: message[3] as! String
+                text: message[3] as! String,
+                attachments: try! AttachmentParser.parseAttachment(message[4] as! [[Any]])
             )
         }
     }

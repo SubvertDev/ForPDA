@@ -74,6 +74,8 @@ public struct TabViewGallery: View {
             }
             .ignoresSafeArea()
         }
+        .statusBarHidden(!isTouched)
+        .animation(.easeInOut, value: !isTouched)
         .onAppear {
             deleteTempFiles()
             preloadImage()
@@ -104,11 +106,11 @@ public struct TabViewGallery: View {
             Spacer()
             
             Menu {
-                ContextButton(text: "Save", symbol: .arrowDownToLine, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Save", bundle: .module), symbol: .arrowDownToLine) {
                     saveImage()
                 }
                 
-                ContextButton(text: "Share", symbol: .squareAndArrowUp, bundle: .module) {
+                ContextButton(text: LocalizedStringResource("Share", bundle: .module), symbol: .squareAndArrowUp) {
                     configureShareSheet()
                 }
                 

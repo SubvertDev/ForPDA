@@ -1,8 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "" : {
-
+    "%lld people voted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проголосовало %lld чел."
+          }
+        }
+      }
     },
     "Add to favorites" : {
       "localizations" : {
@@ -10,6 +17,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В избранное"
+          }
+        }
+      }
+    },
+    "Added to favorites" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавлено в избранное"
           }
         }
       }
@@ -24,48 +41,12 @@
         }
       }
     },
-    "Delete" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить"
-          }
-        }
-      }
-    },
     "Down" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Плохо"
-          }
-        }
-      }
-    },
-    "Edit" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Редактировать"
-          }
-        }
-      }
-    },
-    "Edited: %@ • %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Edited: %1$@ • %2$@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отредактировал: %1$@ • %2$@"
           }
         }
       }
@@ -100,6 +81,16 @@
         }
       }
     },
+    "Link copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
     "Loading..." : {
       "localizations" : {
         "ru" : {
@@ -120,22 +111,32 @@
         }
       }
     },
-    "Rate" : {
+    "Poll" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Оценить пост"
+            "value" : "Опрос"
           }
         }
       }
     },
-    "Reason: %@" : {
+    "Post deleted" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Причина: %@"
+            "value" : "Пост удален"
+          }
+        }
+      }
+    },
+    "Post karma changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос засчитан"
           }
         }
       }
@@ -150,32 +151,22 @@
         }
       }
     },
-    "Reply" : {
+    "Removed from favorites" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ответить"
+            "value" : "Удалено из избранного"
           }
         }
       }
     },
-    "Reputation" : {
+    "Show results" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Репутация"
-          }
-        }
-      }
-    },
-    "Report" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Жалоба"
+            "value" : "Результаты"
           }
         }
       }
@@ -216,6 +207,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Хорошо"
+          }
+        }
+      }
+    },
+    "Vote" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голосовать"
+          }
+        }
+      }
+    },
+    "Vote approved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Голос засчитан"
           }
         }
       }

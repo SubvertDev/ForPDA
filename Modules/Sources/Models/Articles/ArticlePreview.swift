@@ -15,7 +15,7 @@ public struct ArticlePreview: Sendable, Hashable, Identifiable {
     public let authorName: String
     public let commentsAmount: Int
     public let imageUrl: URL
-    public let title: String
+    public var title: String
     public var description: String
     public let tags: [Tag]
     

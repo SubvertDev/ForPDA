@@ -51,17 +51,6 @@
         }
       }
     },
-    "Background color" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цвет фона"
-          }
-        }
-      }
-    },
     "Basic" : {
       "localizations" : {
         "ru" : {
@@ -164,12 +153,42 @@
         }
       }
     },
+    "Experimental navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспериментальная навигация"
+          }
+        }
+      }
+    },
+    "Floating navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Плавающая навигация"
+          }
+        }
+      }
+    },
     "GitHub repository" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub репозиторий"
+          }
+        }
+      }
+    },
+    "Hide tabbar on scroll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрывать таббар при скролле"
           }
         }
       }
@@ -230,6 +249,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Список изменений в Telegram"
+          }
+        }
+      }
+    },
+    "Navigation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Навигация"
           }
         }
       }

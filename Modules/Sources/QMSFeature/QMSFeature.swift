@@ -7,11 +7,13 @@
 
 import Foundation
 import ComposableArchitecture
-import APIClient
+import QMSClient
 import PersistenceKeys
 import Models
-import ExyteChat
 import AnalyticsClient
+import NotificationsClient
+import TCAExtensions
+import ExyteChat
 
 @Reducer
 public struct QMSFeature: Reducer, Sendable {
@@ -22,10 +24,14 @@ public struct QMSFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Presents var alert: AlertState<Action.Alert>?
+        
         @Shared(.userSession) var userSession: UserSession?
+        
         public let chatId: Int
         public var chat: QMSChat?
         public var messages: [Message] = []
+        var idMap: [Int: String] = [:] // Remote -> Local
         
         var didLoadOnce = false
         
@@ -37,98 +43,164 @@ public struct QMSFeature: Reducer, Sendable {
             }
         }
         
-        public init(
-            chatId: Int
-        ) {
+        public init(chatId: Int) {
             self.chatId = chatId
         }
     }
     
     // MARK: - Action
     
-    public enum Action: BindableAction {
-        case onAppear
-        case onDisappear
+    public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
-        case sendMessageButtonTapped(String)
         
-        case _refreshChatPeriodically
-        case _loadChat
-        case _chatLoaded(Result<QMSChat, any Error>)
+        case alert(PresentationAction<Alert>)
+        public enum Alert {
+            case ok
+        }
+        
+        case view(View)
+        public enum View {
+            case onAppear
+            case sendMessageButtonTapped(DraftMessage)
+            case urlTapped(URL)
+        }
+        
+        case `internal`(Internal)
+        public enum Internal {
+            case loadChat
+            case chatLoaded(Result<QMSChat, any Error>)
+            case messageSendError(id: String, message: String)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case handleUrl(URL)
+        }
     }
     
     // MARK: - Dependencies
     
-    @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.qmsClient) private var qmsClient
     @Dependency(\.analyticsClient) private var analyticsClient
-    @Dependency(\.continuousClock) private var clock
-    
-    // MARK: - Cancellable
-    
-    private enum CancelID { case timer }
+    @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
+            case .alert, .delegate:
+                return .none
+                
+            case .view(.onAppear):
                 return .merge([
-                    .send(._loadChat),
-                    .send(._refreshChatPeriodically)
+                    .send(.internal(.loadChat)),
+                    .run { send in
+                        for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
+                            await send(.internal(.loadChat))
+                        }
+                    },
+                    .run { [chatId = state.chatId] send in
+                        for await notification in notificationsClient.eventPublisher().values {
+                            if case let .qms(id) = notification, chatId == id {
+                                await send(.internal(.loadChat))
+                            }
+                        }
+                    }
                 ])
                 
-            case .onDisappear:
-                return .cancel(id: CancelID.timer)
+            case let .view(.sendMessageButtonTapped(draftMessage)):
+                let id: String
                 
-            case let .sendMessageButtonTapped(message):
-                return .run { [chatId = state.chatId] send in
-                    try await apiClient.sendQMSMessage(chatId, message)
-                    await send(._loadChat)
+                if let index = state.messages.firstIndex(where: { $0.id == draftMessage.id }) {
+                    // If this message is already exists with same id it means that it's errored out and we're retrying
+                    state.messages[index].status = .sending
+                    id = draftMessage.id!
+                } else {
+                    // If the same id doesn't exists it's a new message
+                    id = UUID().uuidString
+                    let localMessage = Message(
+                        id: id,
+                        user: User(id: String(state.userSession!.userId), name: "You", avatarURL: nil, isCurrentUser: true),
+                        status: .sending,
+                        createdAt: .now,
+                        text: draftMessage.text
+                    )
+                    state.messages.append(localMessage)
+                }
+
+                return .run { [chatId = state.chatId, message = draftMessage.text] send in
+                    try await qmsClient.sendQMSMessage(chatId: chatId, message: message)
+                } catch: { [id, message = draftMessage.text] error, send in
+                    await send(.internal(.messageSendError(id: id, message: message)))
                 }
                 
-            case ._refreshChatPeriodically:
-                return .run { send in
-                    // TODO: Remove on socket connect
-                    for await _ in self.clock.timer(interval: .seconds(5)) {
-                        await send(._loadChat)
-                    }
-                }
-                .cancellable(id: CancelID.timer)
+            case let .internal(.messageSendError(id, message)):
+                let draft = DraftMessage(
+                    id: id, text: message, medias: [], giphyMedia: nil, recording: nil, replyMessage: nil, createdAt: .now
+                )
+                let index = state.messages.firstIndex(where: { $0.id == id })!
+                state.messages[index].status = .error(draft)
+                return .none
                 
-            case ._loadChat:
+            case let .view(.urlTapped(url)):
+                return .send(.delegate(.handleUrl(url)))
+                
+            case .internal(.loadChat):
                 return .run { [id = state.chatId] send in
-                    let result = await Result { try await apiClient.loadQMSChat(id) }
-                    await send(._chatLoaded(result))
+                    let result = await Result { try await qmsClient.loadQMSChat(id) }
+                    await send(.internal(.chatLoaded(result)))
                 }
                 
-            case let ._chatLoaded(result):
+            case let .internal(.chatLoaded(result)):
                 switch result {
                 case let .success(chat):
-                    // customDump(chat)
                     state.chat = chat
-                    
-                    for message in chat.messages {
-                        if state.messages.contains(where: { $0.id == String(message.id) }) { continue }
-                        let isCurrentUser = state.userSession!.userId == message.senderId
-                        let newMessage = Message(
-                            id: String(message.id),
-                            user: User(
-                                id: String(message.senderId),
-                                name: isCurrentUser ? "You" : chat.partnerName,
-                                avatarURL: isCurrentUser ? nil : chat.avatarUrl,
-                                isCurrentUser: isCurrentUser
-                            ),
-                            createdAt: message.date,
-                            text: message.text
+                                        
+                    for remoteMessage in chat.messages {
+                        // Skip if message is already mapped
+                        guard state.idMap[remoteMessage.id] == nil else { continue }
+                        
+                        // Matching with currently 'sending' statuses
+                        if let pending = state.messages.last(where: { $0.status == .sending }) {
+                            state.idMap[remoteMessage.id] = pending.id
+                            continue
+                        }
+                        
+                        // No 'sending' status, treating as remote-only message
+                        let isCurrentUser = state.userSession!.userId == remoteMessage.senderId
+                        let user = User(
+                            id: String(remoteMessage.senderId),
+                            name: isCurrentUser ? "You" : chat.partnerName,
+                            avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
+                            isCurrentUser: isCurrentUser
                         )
-                        state.messages.append(newMessage)
+                        
+                        let newLocalMessage = Message(
+                            id: UUID().uuidString,
+                            user: user,
+                            status: .none,
+                            createdAt: remoteMessage.date,
+                            text: remoteMessage.processedText
+                        )
+                        
+                        state.messages.append(newLocalMessage)
+                        state.idMap[remoteMessage.id] = newLocalMessage.id
+                    }
+                    
+                    let messages = state.messages.filter { $0.user.isCurrentUser }
+                    for (index, message) in messages.reversed().enumerated() {
+                        if let messageIndex = state.messages.firstIndex(of: message) {
+                            state.messages[messageIndex].status = index < chat.unreadCount ? .none : .sent
+                        }
                     }
                     
                 case let .failure(error):
-                    print(error)
-                    // TODO: Handle error
+                    analyticsClient.capture(error)
+                    state.alert = .somethingWentWrong
                 }
+                
                 reportFullyDisplayed(&state)
                 return .none
                 

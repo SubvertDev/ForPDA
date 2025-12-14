@@ -14,9 +14,11 @@ import Models
 public enum Deeplink {
     case article(id: Int, title: String, imageUrl: URL)
     case announcement(id: Int)
-    case topic(id: Int, goTo: GoTo)
-    case forum(id: Int)
+    case topic(id: Int?, goTo: GoTo)
+    case forum(id: Int, page: Int)
     case user(id: Int)
+    case qms(id: Int)
+    case search(SearchResult)
 }
 
 public struct DeeplinkHandler {
@@ -32,9 +34,11 @@ public struct DeeplinkHandler {
         case badImageUrl(in: URL)
         case noTitle(in: URL)
         case badTitle(in: URL)
+        case badSearchType(type: String, for: String)
         case unknownType(type: String, for: String)
         case noType(of: String, for: String)
         case noDeeplinkAvailable(for: URL)
+        case externalURL
     }
     
     @Dependency(\.logger[.deeplink]) private var logger
@@ -68,9 +72,42 @@ public struct DeeplinkHandler {
 
             return .article(id: id, title: title, imageUrl: imageUrl)
             
+        case "forum":
+            guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
+            if let offset = components.queryItems?.first?.value.flatMap({Int($0)}) {
+                @Shared(.appSettings) var appSettings: AppSettings
+                let page = getPage(forOffset: offset, userPerPage: appSettings.forumPerPage)
+                return .forum(id: id, page: page)
+            } else {
+                return .forum(id: id, page: 1)
+            }
+            
+        case "announce":
+            guard let _ = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) } // forumId
+            guard let announceId = components.queryItems?.first?.value.flatMap({Int($0)}) else { throw .badIdOnMatch(in: url) }
+            return .announcement(id: announceId)
+            
+        case "topic":
+            guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
+            if let offset = components.queryItems?.first?.value.flatMap({Int($0)}) {
+                @Shared(.appSettings) var appSettings: AppSettings
+                let page = getPage(forOffset: offset, userPerPage: appSettings.topicPerPage)
+                return .topic(id: id, goTo: .page(page))
+            } else {
+                return .topic(id: id, goTo: .first)
+            }
+            
+        case "user":
+            guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
+            return .user(id: id)
+            
         default:
             throw .noComponentsMatch(in: url)
         }
+    }
+    
+    private func getPage(forOffset offset: Int, userPerPage: Int) -> Int {
+        return Int(ceil(Double(offset + 1) / Double(userPerPage)))
     }
     
     // MARK: - Inner To Inner
@@ -83,11 +120,28 @@ public struct DeeplinkHandler {
             }
         }
         
-        guard let host = url.host, host == "4pda.to" else { throw .noDeeplinkAvailable(for: url) }
+        let url = URL(string: url.absoluteString.replacingOccurrences(of: "&amp;", with: "&"))!
+        
+        guard let host = url.host, host == "4pda.to" else { throw .externalURL }
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents(in: url) }
         
         guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
+        
+        // site search
+        
+        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value {
+            // https://4pda.to/?s=4pda
+            let searchText = if let decodedSearchText = value.removingPercentEncoding {
+                decodedSearchText
+            } else if let decodedSearchText = value.unEscape() {
+                decodedSearchText
+            } else {
+                value
+            }
+            
+            return .search(.init(on: .site, author: nil, text: searchText, sort: .dateDescSort))
+        }
         
         // showtopic
         
@@ -118,13 +172,14 @@ public struct DeeplinkHandler {
         // showforum
         
         if let forumItem = queryItems.first(where: { $0.name == "showforum" }), let value = forumItem.value, let forumId = Int(value) {
-            // https://4pda.to/forum/index.php?showforum=123
-            return .forum(id: forumId)
+            // https://4pda.to/forum/index.php?showtopic=1104159
+            return .forum(id: forumId, page: 1)
         }
         
         if let announcementItem = queryItems.first(where: { $0.name == "act" }), let actType = announcementItem.value {
-            switch actType {
+            switch actType.lowercased() {
             case "announce":
+                // https://4pda.to/forum/index.php?act=announce&f=140&st=238
                  if let announceItem = queryItems.first(where: { $0.name == "st" }), let value = announceItem.value, let announceId = Int(value) {
                      return .announcement(id: announceId)
                  } else {
@@ -134,6 +189,75 @@ public struct DeeplinkHandler {
             case "boardrules":
                 // https://4pda.to/forum/index.php?act=boardrules
                 return .announcement(id: 0)
+                
+            case "findpost":
+                // https://4pda.to/forum/index.php?act=findpost&pid=136063497
+                if let postItem = queryItems.first(where: { $0.name == "pid" }), let value = postItem.value, let postId = Int(value) {
+                    return .topic(id: nil, goTo: .post(id: postId))
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "pid", for: url.absoluteString))
+                }
+                
+            case "search":
+                // https://4pda.to/forum/index.php?act=search&query=4pda&source=all&sort=dd&subforums=1&topics=673847&hl=0
+                // https://4pda.to/forum/index.php?act=search&query=Xiaomi+%25E0%25EA%25F1%25E5%25F1%25F1%25F3%25E0%25F0%25FB&username=AirFlare&forums%255B%255D=716&subforums=1&exclude_trash=1&source=top&sort=dd&result=topics
+                if let sourceItem = queryItems.first(where: { $0.name == "source" })?.value {
+                    let forumSearchIn = ForumSearchIn(rawValue: sourceItem)
+                    
+                    let searchText = if let searchTextItem = queryItems.first(where: { $0.name == "query" })?.value {
+                        if let decodedSearchText = searchTextItem.removingPercentEncoding {
+                            decodedSearchText
+                        } else if let decodedSearchText = searchTextItem.unEscape() {
+                            decodedSearchText
+                        } else {
+                            searchTextItem
+                        }
+                    } else {
+                        ""
+                    }
+                    
+                    let author: SearchAuthorType? = if let idItem = ["author_id", "username-id"]
+                        .compactMap({ name in queryItems.first(where: { $0.name == name })?.value })
+                        .compactMap(Int.init)
+                        .first {
+                        .id(idItem)
+                    } else if let usernameItem = queryItems.first(where: { $0.name == "username" })?.value {
+                        .name(usernameItem)
+                    } else {
+                        nil
+                    }
+                    
+                    let sort = if let sortItem = queryItems.first(where: { $0.name == "sort" })?.value {
+                        SearchSort(rawValue: sortItem)
+                    } else {
+                        SearchSort.relevance
+                    }
+                    
+                    let asTopics = if let asTopicsItem = queryItems.first(where: { $0.name == "result" })?.value {
+                        asTopicsItem == "topics"
+                    } else {
+                        false
+                    }
+                    
+                    let noHighlight = if let highlight = queryItems.first(where: { $0.name == "hl" })?.value {
+                        highlight == "0"
+                    } else {
+                        false
+                    }
+                    
+                    let topicIds = queryItems.extractSearchIds(forItem: "topics")
+                    let forumIds = queryItems.extractSearchIds(forItem: "forums")
+                    
+                    let searchOn: SearchOn = if !topicIds.isEmpty {
+                        .topic(ids: topicIds, noHighlight: noHighlight)
+                    } else {
+                        .forum(ids: forumIds, sIn: forumSearchIn, asTopics: asTopics)
+                    }
+                    
+                    return .search(SearchResult(on: searchOn, author: author, text: searchText, sort: sort))
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "source", for: url.absoluteString))
+                }
                 
             default:
                 analytics.capture(DeeplinkError.unknownType(type: actType, for: url.absoluteString))
@@ -164,6 +288,7 @@ public struct DeeplinkHandler {
     public func handleNotification(_ identifier: String) throws(DeeplinkError) -> Deeplink {
         let split = identifier.split(separator: "-")
         let url = URL(string: "notification://\(identifier)")!
+        
         guard let typeString = split.first,     let typeInt = Int(typeString)        else { throw .noDeeplinkAvailable(for: url) }
         guard let idString = split[safe: 1],    let id = Int(idString)               else { throw .noDeeplinkAvailable(for: url) }
         guard let timestampString = split.last, let timestamp = Int(timestampString) else { throw .noDeeplinkAvailable(for: url) }
@@ -172,11 +297,11 @@ public struct DeeplinkHandler {
         
         switch type {
         case .qms:
-            // TODO: Add
-            break
+            return Deeplink.qms(id: id)
         case .forum:
-            return Deeplink.forum(id: id)
+            return Deeplink.forum(id: id, page: 1)
         case .topic:
+            // Currently we don't have id of a post to jump due to limited api
             return Deeplink.topic(id: id, goTo: .unread)
         case .forumMention:
             // Forum mention has topic id in timestamp place
@@ -184,13 +309,29 @@ public struct DeeplinkHandler {
         case .siteMention:
             return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
         }
-        
-        throw .noDeeplinkAvailable(for: url)
     }
 }
+
+// MARK: - Helpers
 
 extension Array {
     subscript(safe index: Int) -> Element? {
         return indices.contains(index) ? self[index] : nil
+    }
+}
+
+extension Array where Element == URLQueryItem {
+    func extractSearchIds(forItem name: String) -> [Int] {
+        return self.compactMap { item -> Int? in
+            let isSingleItem = item.name == name
+            let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
+            
+            guard (isSingleItem || isMultiItems),
+                  let value = item.value,
+                  let id = Int(value) else {
+                return nil
+            }
+            return id
+        }
     }
 }

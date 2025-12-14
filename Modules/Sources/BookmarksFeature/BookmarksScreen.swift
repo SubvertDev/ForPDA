@@ -40,7 +40,7 @@ public struct BookmarksScreen: View {
                 .frame(width: UIScreen.main.bounds.width)
             }
             .navigationTitle(Text("Bookmarks", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
             .toolbarBackground(Color(.Background.primary), for: .navigationBar)
             .onAppear {
                 store.send(.onAppear)

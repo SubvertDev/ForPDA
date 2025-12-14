@@ -71,16 +71,6 @@
         }
       }
     },
-    "Copied" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скопировано"
-          }
-        }
-      }
-    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
@@ -101,6 +91,16 @@
         }
       }
     },
+    "Error sending report" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка отправки жалобы"
+          }
+        }
+      }
+    },
     "Hide comment" : {
       "localizations" : {
         "ru" : {
@@ -117,6 +117,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "только что"
+          }
+        }
+      }
+    },
+    "Link Copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
           }
         }
       }
@@ -151,6 +161,26 @@
         }
       }
     },
+    "Report sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба отправлена"
+          }
+        }
+      }
+    },
+    "Report too short" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком короткая жалоба"
+          }
+        }
+      }
+    },
     "Reputation" : {
       "localizations" : {
         "ru" : {
@@ -162,16 +192,6 @@
       }
     },
     "Share Link" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поделиться ссылкой"
-          }
-        }
-      }
-    },
-    "shareLink" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -228,16 +248,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упс!"
-          }
-        }
-      }
-    },
-    "Will be fixed soon :)" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Скоро починим :)"
           }
         }
       }

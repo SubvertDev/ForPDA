@@ -32,7 +32,7 @@ struct FormPreviewView: View {
                                 // links will be opening in browser.
                             }
                         }
-                    } else {
+                    } else if !store.isPreviewLoading {
                         Text("Oops, error with loading preview :(", bundle: .module)
                             .font(.headline)
                             .foregroundStyle(tintColor)
@@ -40,7 +40,7 @@ struct FormPreviewView: View {
                     }
                 }
                 .padding(16)
-                .navigationBarTitleDisplayMode(.inline)
+                ._toolbarTitleDisplayMode(.inline)
                 .navigationTitle(Text("Preview", bundle: .module))
             }
             .background(Color(.Background.primary))

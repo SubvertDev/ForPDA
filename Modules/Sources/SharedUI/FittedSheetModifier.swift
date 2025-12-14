@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+// NOTE:
+// Fitted sheet may work unreliable inside #Preview macro
+// Use older preview provider or extract your view out of macro
+
 public extension View {
     func fittedSheet<Item: Identifiable, Content: View>(
         item binding: Binding<Item?>,

@@ -15,12 +15,24 @@ import Models
 @ViewAction(for: HistoryFeature.self)
 public struct HistoryScreen: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<HistoryFeature>
     @Environment(\.tintColor) private var tintColor
+    @State private var navigationMinimized = false
+    
+    private var shouldShowNavigation: Bool {
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    // MARK: - Init
     
     public init(store: StoreOf<HistoryFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -39,13 +51,26 @@ public struct HistoryScreen: View {
                         Navigation()
                     }
                     .scrollContentBackground(.hidden)
+                    ._inScrollContentDetector(state: $navigationMinimized)
                 } else if !store.isLoading {
                     EmptyHistory()
                 }
             }
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
+            .safeAreaInset(edge: .bottom) {
+                if isLiquidGlass,
+                   store.appSettings.floatingNavigation,
+                   !store.appSettings.experimentalFloatingNavigation {
+                    PageNavigation(
+                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        minimized: $navigationMinimized
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
+            }
             .overlay {
                 if store.isLoading {
                     PDALoader()
@@ -62,7 +87,7 @@ public struct HistoryScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        if store.pageNavigation.shouldShow {
+        if shouldShowNavigation {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color(.Background.primary))
         }
@@ -74,7 +99,7 @@ public struct HistoryScreen: View {
         Section {
             ForEach(history.topics, id: \.id) { topic in
                 TopicRow(
-                    title: topic.name,
+                    title: .plain(topic.name),
                     date: topic.lastPost.date,
                     username: topic.lastPost.username,
                     isClosed: topic.isClosed,

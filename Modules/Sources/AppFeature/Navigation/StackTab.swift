@@ -20,12 +20,16 @@ import DeveloperFeature
 import ForumFeature
 import TopicFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import ProfileFeature
 import AnnouncementFeature
 import HistoryFeature
 import QMSListFeature
 import QMSFeature
 import ReputationFeature
+import AuthFeature
+import SearchFeature
+import SearchResultFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -65,6 +69,7 @@ public struct StackTab: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.analyticsClient) private var analytics
+    @Dependency(\.notificationCenter) private var notificationCenter
     
     // MARK: - Body
     
@@ -88,8 +93,13 @@ public struct StackTab: Reducer, Sendable {
                 let hasArticle = path.contains(where: { $0.is(\.articles.article) })
                 let hasSettings = path.contains(where: { $0.is(\.settings) })
                 let hasQms = path.contains(where: { $0.is(\.qms) })
-                state.showTabBar = !hasArticle && !hasSettings && !hasQms
-                return .send(.delegate(.showTabBar(state.showTabBar)))
+                let hasSearch = path.last(is: \.search.search) != nil
+                let showTabBar = !hasArticle && !hasSettings && !hasQms && !hasSearch
+                if state.showTabBar != showTabBar {
+                    state.showTabBar = showTabBar
+                    return .send(.delegate(.showTabBar(state.showTabBar)))
+                }
+                return .none
             }
         }
     }
@@ -113,8 +123,14 @@ public struct StackTab: Reducer, Sendable {
         case let .settings(action):
             return handleSettingsPathNavigation(action: action, state: &state)
             
+        case let .search(action):
+            return handleSearchPathNavigation(action: action, state: &state)
+            
         case let .qms(action):
             return handleQMSPathNavigation(action: action, state: &state)
+            
+        case let .auth(action):
+            return handleAuthNavigation(action: action, state: &state)
         }
     }
     
@@ -125,14 +141,14 @@ public struct StackTab: Reducer, Sendable {
         case let .articlesList(.delegate(.openArticle(preview))):
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        case .articlesList(.delegate(.openSettings)):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
+        case let .articlesList(.delegate(.openSearch(on))):
+            state.path.append(.search(.search(SearchFeature.State(on: on))))
             
         case let .article(.delegate(.handleDeeplink(id))):
             let preview = ArticlePreview.innerDeeplink(id: id)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
-        case let .article(.comments(.element(id: _, action: .profileTapped(userId: id)))):
+        case let .article(.comments(.element(id: _, action: .profileTapped(id)))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
         default:
@@ -143,16 +159,13 @@ public struct StackTab: Reducer, Sendable {
     
     // MARK: - Favorites
     
-    private func handleFavoritesPathNavigation(action: FavoritesRootFeature.Action, state: inout State) -> Effect<Action> {
+    private func handleFavoritesPathNavigation(action: FavoritesFeature.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .favorites(.delegate(.openForum(id: id, name: name))):
+        case let .delegate(.openForum(id: id, name: name)):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
             
-        case let .favorites(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+        case let .delegate(.openTopic(id: id, name: name, goTo: goTo)):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
-            
-        case .delegate(.openSettings):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
             
         default:
             break
@@ -167,11 +180,11 @@ public struct StackTab: Reducer, Sendable {
             
             // Forum List
             
-        case .forumList(.delegate(.openSettings)):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
-            
         case let .forumList(.delegate(.openForum(id: id, name: name))):
             state.path.append(.forum(.forum(ForumFeature.State(forumId: id, forumName: name))))
+            
+        case let .forumList(.delegate(.openSearch(on))):
+            state.path.append(.search(.search(SearchFeature.State(on: on))))
             
         case let .forumList(.delegate(.handleForumRedirect(url))):
             return handleDeeplink(url: url, state: &state)
@@ -187,6 +200,9 @@ public struct StackTab: Reducer, Sendable {
         case let .forum(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
+        case let .forum(.delegate(.openSearch(on, navigation))):
+            state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))
+            
         case let .forum(.delegate(.handleRedirect(url))):
             return handleDeeplink(url: url, state: &state)
                         
@@ -197,6 +213,17 @@ public struct StackTab: Reducer, Sendable {
             
         case let .topic(.delegate(.openUser(id: id))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
+        case let .topic(.delegate(.openSearch(on, navigation))):
+            state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))
+            
+        case let .topic(.delegate(.openSearchResult(options))):
+            state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
+            
+        case .topic(.delegate(.openedLastPage)):
+            for (id, element) in zip(state.path.ids, state.path).reversed() where element.is(\.forum.forum) {
+                return reduce(into: &state, action: .path(.element(id: id, action: .forum(.forum(.internal(.refresh))))))
+            }
             
             // Announcement
             
@@ -213,11 +240,11 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleProfilePathNavigation(action: Path.Profile.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .profile(.delegate(.userLoggedOut)):
-            return .send(.delegate(.switchTab(to: .articles)))
-            
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
+            
+        case let .profile(.delegate(.openSearch(options))):
+            state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
             
         case let .profile(.delegate(.openReputation(id))):
             state.path.append(.profile(.reputation(ReputationFeature.State(userId: id))))
@@ -254,6 +281,9 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleSettingsPathNavigation(action: Path.Settings.Action, state: inout State) -> Effect<Action> {
         switch action {
+        case .settings(.delegate(.openNavigationSettings)):
+            state.path.append(.settings(.navigation(NavigationSettingsFeature.State())))
+            
         case .settings(.delegate(.openNotificationsSettings)):
             state.path.append(.settings(.notifications(NotificationsFeature.State())))
             
@@ -269,12 +299,54 @@ public struct StackTab: Reducer, Sendable {
         return .none
     }
     
+    // MARK: - Search
+    
+    private func handleSearchPathNavigation(action: Path.Search.Action, state: inout State) -> Effect<Action> {
+        switch action {
+        case let .search(.delegate(.searchOptionsConstructed(options))):
+            state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
+            
+        case let .search(.delegate(.userProfileTapped(userId))):
+            state.path.append(.profile(.profile(ProfileFeature.State(userId: userId))))
+            
+        case let .searchResult(.delegate(.openTopic(id, goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: goTo))))
+            
+        case let .searchResult(.delegate(.openArticle(preview))):
+            state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
+            
+        default:
+            break
+        }
+        return .none
+    }
+    
     // MARK: - QMS
     
     private func handleQMSPathNavigation(action: Path.QMS.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .qmsList(.chatRowTapped(id)):
+        case let .qmsList(.delegate(.openQMSChat(id))):
             state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
+            
+        case let .qms(.delegate(.handleUrl(url))):
+            return handleDeeplink(url: url, state: &state)
+            
+        default:
+            break
+        }
+        return .none
+    }
+    
+    // MARK: - Auth
+    
+    private func handleAuthNavigation(action: AuthFeature.Action, state: inout State) -> Effect<Action> {
+        // Also make necessary changes to delegate actions in AppFeature
+        switch action {
+        case .delegate(.loginSuccess(_, _)):
+            fatalError("Auth navigation must be handled in ProfileFlow enum reducer")
+            
+        case .delegate(.showSettings):
+            state.path.append(.settings(.settings(SettingsFeature.State())))
             
         default:
             break
@@ -309,39 +381,54 @@ public struct StackTab: Reducer, Sendable {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
             case let .topic(id: targetId, goTo: goTo):
-                if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
-                    if case let .post(goToId) = goTo {
-                        guard let hasPostOnTheSamePage = element.forum?.topic?.topic?.posts.map({ $0.id }).contains(goToId) else {
-                            analytics.capture(DeeplinkHandlingError.failedToParseSamePagePost)
-                            return .none
-                        }
-                        if hasPostOnTheSamePage {
-                            // Post is on the same page, scrolling to
-                            // TODO: send goTo via action or state?
-                            state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                            return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                if let targetId {
+                    // Deeplink in the same OR other topic
+                    if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
+                        if case let .post(goToId) = goTo {
+                            guard let hasPostOnTheSamePage = element.forum?.topic?.topic?.posts.map({ $0.id }).contains(goToId) else {
+                                analytics.capture(DeeplinkHandlingError.failedToParseSamePagePost)
+                                return .none
+                            }
+                            if hasPostOnTheSamePage {
+                                // Post is on the same page, scrolling to
+                                // TODO: send goTo via action or state?
+                                state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                                return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                            } else {
+                                // Post is NOT on the same page, opening new screen
+                                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                                return .none
+                            }
                         } else {
-                            // Post is NOT on the same page, opening new screen
-                            state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                            analytics.capture(DeeplinkHandlingError.unknownGoToType(goTo))
                             return .none
                         }
-                    } else {
-                        analytics.capture(DeeplinkHandlingError.unknownGoToType(goTo))
-                        return .none
+                    }
+                    
+                    // Different topic or announcement, using app navigation
+                    state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                } else {
+                    // Deeplink in the same topic ONLY (inner-inner deeplink case)
+                    if let (id, _) = state.path.last(is: \.forum.topic) {
+                        state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                        return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                     }
                 }
                 
-                // Different topic or announcement, using app navigation
-                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
-                
-            case let .forum(id: id):
-                state.path.append(.forum(.forum(ForumFeature.State(forumId: id))))
+            case let .forum(id: id, page: page):
+                state.path.append(.forum(.forum(ForumFeature.State(forumId: id, initialPage: page))))
                 
             case let .announcement(id: id):
                 state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id))))
                 
             case let .user(id: id):
                 state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+                
+            case let .qms(id: id):
+                state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
+                
+            case let .search(options: options):
+                state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 
             case let .article(id: id, title: title, imageUrl: imageUrl):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
@@ -350,7 +437,11 @@ public struct StackTab: Reducer, Sendable {
             
             return .none
         } catch {
-            analytics.capture(error)
+            if case .externalURL = error {
+                // Skipping externalURL case since it's not error per-se
+            } else {
+                analytics.capture(error)
+            }
         }
         
         return .run { [url] _ in await open(url: url) }

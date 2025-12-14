@@ -11,6 +11,12 @@ import NukeUI
 
 public struct ArticleRowView: View {
     
+    // MARK: - Enums
+    
+    public enum ContextAction {
+        case shareLink, copyLink, openInBrowser
+    }
+    
     // MARK: - Properties
     
     @Namespace private var namespace
@@ -18,8 +24,9 @@ public struct ArticleRowView: View {
     
     public let state: State
     public let rowType: RowType
-    public let contextMenuActions: ContextMenuActions
     public let bundle: Bundle
+    public let isContextMenuSupported: Bool // used for search
+    public let action: (ContextAction) -> Void
     
     private var isShort: Bool {
         return rowType == .short
@@ -34,13 +41,15 @@ public struct ArticleRowView: View {
     public init(
         state: State,
         rowType: RowType,
-        contextMenuActions: ContextMenuActions,
-        bundle: Bundle
+        bundle: Bundle,
+        isContextMenuSupported: Bool = true,
+        action: @escaping (ContextAction) -> Void
     ) {
         self.state = state
         self.rowType = rowType
-        self.contextMenuActions = contextMenuActions
         self.bundle = bundle
+        self.isContextMenuSupported = isContextMenuSupported
+        self.action = action
     }
     
     // MARK: - Body
@@ -54,14 +63,11 @@ public struct ArticleRowView: View {
                 ShortRow()
             }
         }
-//        .transition(.opacity)
-//        .animation(.smooth, value: isShort)
-        .pdaContextMenu(
-            title: state.title,
-            authorName: state.authorName,
-            contextMenuActions: contextMenuActions,
-            bundle: bundle
-        )
+        .contextMenu {
+            if isContextMenuSupported {
+                ContextMenu()
+            }
+        }
     }
     
     // MARK: - Normal Row
@@ -119,7 +125,6 @@ public struct ArticleRowView: View {
         }
         .background(
             Color(.Background.primary)
-//                .matchedGeometryEffect(id: "background\(id)", in: namespace)
         )
     }
     
@@ -134,11 +139,9 @@ public struct ArticleRowView: View {
                         .overlay { image.resizable().scaledToFill() }
                         .clipped()
                         .contentShape(Rectangle())
-//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 } else {
                     Color(.Background.teritary)
                         .frame(maxHeight: .infinity)
-//                        .matchedGeometryEffect(id: "image\(id)", in: namespace)
                 }
             }
             .skeleton(with: state.isLoading, shape: .rectangle)
@@ -154,22 +157,19 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func Description() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Text(state.authorName)
-            //     .font(isShort ? .caption : .footnote)
-            //     .fontWeight(.regular)
-            //     .foregroundStyle(Color(.Labels.secondary))
-            //     .frame(maxWidth: .infinity, alignment: .leading)
-            //     .padding(.bottom, 4)
-            
-            Text(state.title)
-                .font(isShort ? .callout : .title3)
-                .fontWeight(.semibold)
-                .lineLimit(nil)
-                .foregroundStyle(Color(.Labels.primary))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, isShort ? 8 : 12)
+            switch state.title {
+            case .plain(let title):
+                Text(title)
+                    .font(isShort ? .callout : .title3)
+                    .fontWeight(.semibold)
+                    .lineLimit(nil)
+                    .foregroundStyle(Color(.Labels.primary))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, isShort ? 8 : 12)
+            case .render(let attributedTitle):
+                RichText(text: attributedTitle, isSelectable: false)
+            }
         }
-//        .matchedGeometryEffect(id: "description\(id)", in: namespace)
     }
     
     // MARK: - Footer
@@ -196,9 +196,10 @@ public struct ArticleRowView: View {
             
             Spacer()
             
-            ContextMenu()
+            if isContextMenuSupported {
+                ContextMenuButton()
+            }
         }
-//        .matchedGeometryEffect(id: "footer\(id)", in: namespace)
     }
     
     // MARK: - Separator
@@ -208,20 +209,14 @@ public struct ArticleRowView: View {
         Rectangle()
             .foregroundStyle(Color(.Separator.primary))
             .frame(height: 0.33)
-//            .matchedGeometryEffect(id: "separator\(id)", in: namespace)
     }
     
     // MARK: - Context Menu
         
     @ViewBuilder
-    private func ContextMenu() -> some View {
+    private func ContextMenuButton() -> some View {
         Menu {
-            MenuButtons(
-                title: state.title,
-                authorName: state.authorName,
-                contextMenuActions: contextMenuActions,
-                bundle: bundle
-            )
+            ContextMenu()
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)
@@ -232,6 +227,36 @@ public struct ArticleRowView: View {
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 19, height: 22)
     }
+    
+    // MARK: - Row Context Menu
+    
+    @ViewBuilder
+    private func ContextMenu() -> some View {
+        VStack(spacing: 0) {
+            // In the .render case, the title will contain BB-codes
+            // This is used for searching
+            if case .plain(let title) = state.title {
+                Section {
+                    Button {
+                        action(.shareLink)
+                    } label: {
+                        Text(title)
+                        Text(state.authorName)
+                        Image(systemSymbol: .squareAndArrowUp)
+                    }
+                }
+            }
+            
+            Section {
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                    action(.copyLink)
+                }
+                ContextButton(text: LocalizedStringResource("Open In Browser", bundle: .module), symbol: .safari) {
+                    action(.openInBrowser)
+                }
+            }
+        }
+    }
 }
 
 // MARK: - State Model
@@ -239,13 +264,13 @@ public struct ArticleRowView: View {
 public extension ArticleRowView {
     struct State {
         public let id: Int
-        public let title: String
+        public let title: UITitleType
         public let authorName: String
         public let imageUrl: URL
         public let commentsAmount: Int
         public let date: Date
         
-        public init(id: Int, title: String, authorName: String, imageUrl: URL, commentsAmount: Int, date: Date) {
+        public init(id: Int, title: UITitleType, authorName: String, imageUrl: URL, commentsAmount: Int, date: Date) {
             self.id = id
             self.title = title
             self.authorName = authorName

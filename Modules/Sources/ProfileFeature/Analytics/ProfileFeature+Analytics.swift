@@ -20,30 +20,35 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate, .binding, .destination:
+                case .view(.onAppear), .delegate, .binding:
                     break
                     
-                case .view(.sheetContinueButtonTapped):
-                    analyticsClient.log(ProfileEvent.sheetContinueButtonTapped)
-                    
-                case .view(.sheetCloseButtonTapped):
-                    analyticsClient.log(ProfileEvent.sheetCloseButtonTapped)
+                case .destination(.presented(.alert(.logout))):
+                    analyticsClient.logout()
                     
                 case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)
                     
+                case .view(.editButtonTapped):
+                    analyticsClient.log(ProfileEvent.editTapped)
+                
                 case .view(.settingsButtonTapped):
                     analyticsClient.log(ProfileEvent.settingsTapped)
                     
                 case .view(.logoutButtonTapped):
                     analyticsClient.log(ProfileEvent.logoutTapped)
-                    analyticsClient.logout()
                     
                 case .view(.historyButtonTapped):
                     analyticsClient.log(ProfileEvent.historyTapped)
                     
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
+                    
+                case .view(.searchTopicsButtonTapped):
+                    analyticsClient.log(ProfileEvent.searchTopicsTapped)
+                    
+                case .view(.searchRepliesButtonTapped):
+                    analyticsClient.log(ProfileEvent.searchRepliesTapped)
                     
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {
@@ -60,6 +65,9 @@ extension ProfileFeature {
                     
                 case .internal(.userResponse(.failure)):
                     analyticsClient.log(ProfileEvent.userLoadingFailed)
+                    
+                case .destination:
+                    break
                 }
                 return .none
             }

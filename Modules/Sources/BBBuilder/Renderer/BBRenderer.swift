@@ -16,7 +16,16 @@ public final class BBRenderer {
     private let baseAttributes: [NSAttributedString.Key: Any]
     
     public init(baseAttributes: [NSAttributedString.Key: Any]? = nil) {
-        self.baseAttributes = baseAttributes ?? BBRenderer.defaultAttributes
+        var attributes = baseAttributes ?? BBRenderer.defaultAttributes
+        
+        // Setting custom font disables dynamic foregroundColor
+        if attributes.count == 1,
+           attributes[.font] != nil,
+           attributes[.foregroundColor] == nil {
+            attributes[.foregroundColor] = UIColor(resource: .Labels.primary)
+        }
+        
+        self.baseAttributes = attributes
     }
     
     public func render(text: String) -> NSAttributedString {
@@ -393,6 +402,7 @@ enum ForumColors: String, CaseIterable {
     case orchid
     case palegoldenrod
     case palegreen
+    case yellow
     
     public var hexColor: (String, String) {
         switch self {
@@ -525,6 +535,7 @@ enum ForumColors: String, CaseIterable {
         case .orchid: return ("DA70D6", "DA70D6")
         case .palegoldenrod: return ("EEE8AA", "EEE8AA")
         case .palegreen: return ("98FB98", "98FB98")
+        case .yellow: return ("FFFF00", "FFFF00")
         }
     }
 }

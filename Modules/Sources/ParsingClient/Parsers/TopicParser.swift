@@ -131,7 +131,7 @@ public struct TopicParser {
     
     private static func parsePollOptions(_ optionsRaw: [[Any]]) throws(ParsingError) -> [Topic.Poll.Option] {
         var options: [Topic.Poll.Option] = []
-        for option in optionsRaw {
+        for (optionId, option) in optionsRaw.enumerated() {
             guard let name = option[safe: 0] as? String,
                   let several = option[safe: 1] as? Int,
                   let names = option[safe: 2] as? [String],
@@ -151,6 +151,7 @@ public struct TopicParser {
             }
             
             let option = Topic.Poll.Option(
+                id: optionId,
                 name: name,
                 several: several == 1 ? true : false,
                 choices: choices
@@ -165,97 +166,47 @@ public struct TopicParser {
     private static func parsePosts(_ postsRaw: [[Any]]) throws(ParsingError) -> [Post] {
         var posts: [Post] = []
         for post in postsRaw {
-            guard let id = post[safe: 0] as? Int,
-                  let flag = post[safe: 1] as? Int,
-                  let authorId = post[safe: 2] as? Int,
-                  let authorName = post[safe: 3] as? String,
-                  let authorGroupId = post[safe: 4] as? Int,
-                  let authorLastSeenDate = post[safe: 5] as? TimeInterval,
-                  let authorReputationCount = post[safe: 6] as? Int,
-                  let createdAt = post[safe: 7] as? TimeInterval,
-                  let content = post[safe: 8] as? String,
-                  let authorAvatarUrl = post[safe: 9] as? String,
-                  let authorSignature = post[safe: 10] as? String,
-                  let attachments = post[safe: 11] as? [[Any]],
-                  let karma = post[safe: 12] as? Int else {
-                throw ParsingError.failedToCastFields
-            }
-            
-            let post = Post(
-                id: id,
-                flag: flag,
-                content: content,
-                author: Post.Author(
-                    id: authorId,
-                    name: authorName.convertCodes(),
-                    groupId: authorGroupId,
-                    avatarUrl: authorAvatarUrl,
-                    lastSeenDate: Date(timeIntervalSince1970: authorLastSeenDate),
-                    signature: authorSignature,
-                    reputationCount: authorReputationCount
-                ),
-                karma: karma,
-                attachments: try parseAttachment(attachments),
-                createdAt: Date(timeIntervalSince1970: createdAt),
-                lastEdit: try parseLastEdit(post)
-            )
-            posts.append(post)
+            try posts.append(parsePost(post))
         }
         return posts
     }
     
-    // MARK: - Attachment
+    // MARK: - Post
     
-    private static func parseAttachment(_ attachmentsRaw: [[Any]]) throws(ParsingError) -> [Post.Attachment] {
-        var attachments: [Post.Attachment] = []
-        for attachment in attachmentsRaw {
-            guard let id = attachment[safe: 0] as? Int,
-                  let type = attachment[safe: 1] as? Int,
-                  let name = attachment[safe: 2] as? String,
-                  let size = attachment[safe: 3] as? Int else {
-                throw ParsingError.failedToCastFields
-            }
-            
-            guard let type = Post.Attachment.AttachmentType(rawValue: type) else {
-                throw ParsingError.unknownAttachmentType(type)
-            }
-            
-            let downloadCount = (attachment[safe: 7] as? Int) ?? (attachment[safe: 4] as? Int)
-            
-            let attachment = Post.Attachment(
-                id: id,
-                type: type,
-                name: name,
-                size: size,
-                metadata: try parseAttachmentMetadata(attachment),
-                downloadCount: downloadCount // Only if attachment.count > 7
-            )
-            attachments.append(attachment)
-        }
-        return attachments
-    }
-    
-    // MARK: - Attachment Metadata
-     
-    private static func parseAttachmentMetadata(_ attachment: [Any]) throws(ParsingError) -> Post.Attachment.Metadata? {
-        if attachment.count <= 5 {
-            return nil
-        }
-        
-        guard let url = attachment[safe: 4] as? String,
-              let width = attachment[safe: 5] as? Int,
-              let height = attachment[safe: 6] as? Int else {
+    internal static func parsePost(_ post: [Any]) throws(ParsingError) -> Post {
+        guard let id = post[safe: 0] as? Int,
+              let flag = post[safe: 1] as? Int,
+              let authorId = post[safe: 2] as? Int,
+              let authorName = post[safe: 3] as? String,
+              let authorGroupId = post[safe: 4] as? Int,
+              let authorLastSeenDate = post[safe: 5] as? TimeInterval,
+              let authorReputationCount = post[safe: 6] as? Int,
+              let createdAt = post[safe: 7] as? TimeInterval,
+              let content = post[safe: 8] as? String,
+              let authorAvatarUrl = post[safe: 9] as? String,
+              let authorSignature = post[safe: 10] as? String,
+              let attachments = post[safe: 11] as? [[Any]],
+              let karma = post[safe: 12] as? Int else {
             throw ParsingError.failedToCastFields
         }
         
-        guard let url = URL(string: url) else {
-            throw ParsingError.failedToCreateAttachmentMetadataUrl
-        }
-        
-        return Post.Attachment.Metadata(
-            width: width,
-            height: height,
-            url: url
+        return Post(
+            id: id,
+            flag: flag,
+            content: content,
+            author: Post.Author(
+                id: authorId,
+                name: authorName.convertCodes(),
+                groupId: authorGroupId,
+                avatarUrl: authorAvatarUrl,
+                lastSeenDate: Date(timeIntervalSince1970: authorLastSeenDate),
+                signature: authorSignature,
+                reputationCount: authorReputationCount
+            ),
+            karma: karma,
+            attachments: try AttachmentParser.parseAttachment(attachments),
+            createdAt: Date(timeIntervalSince1970: createdAt),
+            lastEdit: try parseLastEdit(post)
         )
     }
     

@@ -32,25 +32,39 @@ public struct ArticlesListScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                ScrollViewReader { proxy in
-                    WithPerceptionTracking {
-                        ArticlesList()
-                            .refreshable {
-                                await store.send(.onRefresh).finish()
-                            }
-                            .onAppear {
-                                scrollProxy = proxy
-                            }
-                    }
-                }
-                
-                if store.isLoading && store.articles.isEmpty {
+                switch store.viewState {
+                case .loading:
                     PDALoader()
                         .frame(width: 24, height: 24)
+                    
+                case let .loaded(articles):
+                    ScrollViewReader { proxy in
+                        WithPerceptionTracking {
+                            ArticlesList(articles: articles)
+                                .refreshable {
+                                    await store.send(.onRefresh).finish()
+                                }
+                                .onAppear {
+                                    scrollProxy = proxy
+                                }
+                        }
+                    }
+                    
+                case .networkError:
+                    UnavailableView(
+                        symbol: .exclamationmarkTriangleFill,
+                        title: "Failed to load",
+                        description: "Try again later",
+                        actionTitle: "Try again",
+                        action: {
+                            store.send(.tryAgainButtonTapped)
+                        },
+                        bundle: .module
+                    )
                 }
             }
             .navigationTitle(Text("Articles", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
             .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
             .toolbar { Toolbar() }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
@@ -77,9 +91,9 @@ public struct ArticlesListScreen: View {
     // MARK: - Articles List
         
     @ViewBuilder
-    private func ArticlesList() -> some View {
+    private func ArticlesList(articles: [ArticlePreview]) -> some View {
         List {
-            ForEach(store.articles) { article in
+            ForEach(articles) { article in
                 WithPerceptionTracking {
                     Button {
                         store.send(.articleTapped(article))
@@ -87,26 +101,26 @@ public struct ArticlesListScreen: View {
                         ArticleRowView(
                             state: ArticleRowView.State(
                                 id: article.id,
-                                title: article.title,
+                                title: .plain(article.title),
                                 authorName: article.authorName,
                                 imageUrl: article.imageUrl,
                                 commentsAmount: article.commentsAmount,
                                 date: article.date
                             ),
                             rowType: settingsToRow(store.listRowType),
-                            contextMenuActions: ContextMenuActions(
-                                shareAction:          { store.send(.cellMenuOpened(article, .shareLink)) },
-                                copyAction:           { store.send(.cellMenuOpened(article, .copyLink)) },
-                                openInBrowserAction:  { store.send(.cellMenuOpened(article, .openInBrowser)) },
-                                reportAction:         { store.send(.cellMenuOpened(article, .report)) },
-                                addToBookmarksAction: { store.send(.cellMenuOpened(article, .addToBookmarks)) }
-                            ),
                             bundle: .module
-                        )
+                        ) { action in
+                            switch action {
+                            case .shareLink:     store.send(.cellMenuOpened(article, .shareLink))
+                            case .copyLink:      store.send(.cellMenuOpened(article, .copyLink))
+                            case .openInBrowser: store.send(.cellMenuOpened(article, .openInBrowser))
+                            }
+                        }
                     }
                     .id(article.id)
                     .buttonStyle(.plain)
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 14)
                     .listRowSeparator(.hidden)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .listRowBackground(Color(.Background.primary))
@@ -126,9 +140,9 @@ public struct ArticlesListScreen: View {
                     .padding(.bottom, 20)
                     .frame(maxWidth: .infinity)
                     .listRowSeparator(.hidden)
+                    .listRowBackground(Color(.Background.primary))
             }
         }
-        .listRowSpacing(14)
         .listStyle(.plain)
     }
     
@@ -140,24 +154,26 @@ public struct ArticlesListScreen: View {
     
     @ToolbarContentBuilder
     private func Toolbar() -> some ToolbarContent {
+        if store.isAuthorized {
+            ToolbarItem {
+                Button {
+                    store.send(.searchButtonTapped)
+                } label: {
+                    Image(systemSymbol: .magnifyingglass)
+                }
+            }
+        }
+        
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer()
+        }
+        
         ToolbarItem {
             Button {
                 store.send(.listGridTypeButtonTapped)
             } label: {
                 Image(systemSymbol: store.listRowType == .normal ? .rectangleGrid1x2 : .squareFillTextGrid1x2)
                     .replaceDownUpByLayerEffect(value: true)
-            }
-        }
-        
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.fixed)
-        }
-        
-        ToolbarItem {
-            Button {
-                store.send(.settingsButtonTapped)
-            } label: {
-                Image(systemSymbol: .gearshape)
             }
         }
     }

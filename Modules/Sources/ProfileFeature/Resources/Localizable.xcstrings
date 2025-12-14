@@ -31,7 +31,47 @@
         }
       }
     },
+    "Avatar must be 100x100" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Аватар должен быть 100х100"
+          }
+        }
+      }
+    },
+    "Avatar size more than 32KB" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер аватара превышает 32КБ"
+          }
+        }
+      }
+    },
+    "Avatar update error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка обновления аватара"
+          }
+        }
+      }
+    },
     "Birthdate" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дата рождения"
+          }
+        }
+      }
+    },
+    "Birthday date" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -47,16 +87,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
-          }
-        }
-      }
-    },
-    "Chats do not (yet) support: BB-codes, attachments, caching, push-notifications and some other functionality" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Чаты (ещё) не поддерживают: ББ-коды, вложения, кеширование, пуш-уведомления и некоторый другой функционал"
           }
         }
       }
@@ -81,12 +111,12 @@
         }
       }
     },
-    "Continue in (%lld)" : {
+    "Delete avatar" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Продолжить через (%lld)"
+            "value" : "Удалить аватар"
           }
         }
       }
@@ -101,12 +131,42 @@
         }
       }
     },
+    "Edit profile" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить профиль"
+          }
+        }
+      }
+    },
     "Email" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Email"
+          }
+        }
+      }
+    },
+    "Female" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Женский"
+          }
+        }
+      }
+    },
+    "File size should not be more that 32 kb and max 100x100 pixels" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер файла до 32 кб и максимум 100х100 пикселей"
           }
         }
       }
@@ -161,12 +221,12 @@
         }
       }
     },
-    "IN DEVELOPMENT" : {
+    "Input..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "В РАЗРАБОТКЕ"
+            "value" : "Введите…"
           }
         }
       }
@@ -221,6 +281,36 @@
         }
       }
     },
+    "Male" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мужской"
+          }
+        }
+      }
+    },
+    "Not set" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не указан"
+          }
+        }
+      }
+    },
+    "Ok" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ок"
+          }
+        }
+      }
+    },
     "Online" : {
       "localizations" : {
         "ru" : {
@@ -257,6 +347,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль"
+          }
+        }
+      }
+    },
+    "Profile update error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка редактирования профиля"
+          }
+        }
+      }
+    },
+    "Profile updated" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль обновлен"
           }
         }
       }
@@ -301,6 +411,36 @@
         }
       }
     },
+    "Send" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Set" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указать"
+          }
+        }
+      }
+    },
+    "Signature" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подпись"
+          }
+        }
+      }
+    },
     "Site statistics" : {
       "localizations" : {
         "ru" : {
@@ -331,16 +471,6 @@
         }
       }
     },
-    "This functionality is presented as-is" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Функционал предоставлен как есть"
-          }
-        }
-      }
-    },
     "Topics" : {
       "localizations" : {
         "ru" : {
@@ -351,12 +481,12 @@
         }
       }
     },
-    "Understood, continue" : {
+    "Update avatar" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Понятно, продолжить"
+            "value" : "Обновить аватар"
           }
         }
       }

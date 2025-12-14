@@ -17,6 +17,29 @@ public struct ReputationChangeFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let reputationChanged = LocalizedStringResource("Reputation changed", bundle: .module)
+        static let reputationChangeError = LocalizedStringResource("Reputation change error", bundle: .module)
+        static let reputationChangeBlocked = LocalizedStringResource("Reputation change blocked", bundle: .module)
+        static let reputationSelfChangeError = LocalizedStringResource("Cannot change self reputation", bundle: .module)
+        static let reputationChangeNotEnoughPosts = LocalizedStringResource("Not enough posts for reputation change", bundle: .module)
+        static let reputationChangeTooLowReputation = LocalizedStringResource("Your reputation is too low", bundle: .module)
+        static let reputationChangeCannotChangeToday = LocalizedStringResource(
+            "You can no longer change reputation today", bundle: .module)
+        static let reputationChangeCannotChangeForThisPost = LocalizedStringResource(
+            "You can not change reputation for this post", bundle: .module)
+        static let reputationChangeCannotChangeForThisUserNow = LocalizedStringResource(
+            "You can not change reputation for this user now", bundle: .module)
+        static let reputationChangeCannotChangeTodayForThisUser = LocalizedStringResource(
+            "You can not change reputation for this user today", bundle: .module)
+        static let reputationChangeThisPersonYouRecentlyDownvoted = LocalizedStringResource(
+            "Change denied, this person you recently downvoted", bundle: .module)
+        static let reputationChangeThisPersonRecentlyDownvotedYou = LocalizedStringResource(
+            "Change denied, this person recently downvoted you", bundle: .module)
+    }
+    
     // MARK: - State
     
     @ObservableState
@@ -98,32 +121,12 @@ public struct ReputationChangeFeature: Reducer, Sendable {
                 return .merge([
                     .run { _ in await dismiss() },
                     .run { _ in
-                        switch status {
-                        case .error:
-                            await toastClient.showToast(.reputationChangeError)
-                        case .success:
-                            await toastClient.showToast(.reputationChanged)
-                        case .blocked:
-                            await toastClient.showToast(.reputationChangeBlocked)
-                        case .selfChangeError:
-                            await toastClient.showToast(.reputationSelfChangeError)
-                        case .notEnoughtPosts:
-                            await toastClient.showToast(.reputationChangeNotEnoughPosts)
-                        case .tooLowReputation:
-                            await toastClient.showToast(.reputationChangeTooLowReputation)
-                        case .cannotChangeToday:
-                            await toastClient.showToast(.reputationChangeCannotChangeToday)
-                        case .cannotChangeForThisPost:
-                            await toastClient.showToast(.reputationChangeCannotChangeForThisPost)
-                        case .cannotChangeForThisUserNow:
-                            await toastClient.showToast(.reputationChangeCannotChangeForThisUserNow)
-                        case .cannotChangeTodayToThisUser:
-                            await toastClient.showToast(.reputationChangeCannotChangeTodayForThisUser)
-                        case .thisPersonYouRecentlyDownvoted:
-                            await toastClient.showToast(.reputationChangeThisPersonYouRecentlyDownvoted)
-                        case .thisPersonRecentlyDownvotedYou:
-                            await toastClient.showToast(.reputationChangeThisPersonRecentlyDownvotedYou)
-                        }
+                        let toast = ToastMessage(
+                            text: reputationStatusToText(status),
+                            isError: status == .success ? false : true,
+                            haptic: status == .success ? .success : .error
+                        )
+                        await toastClient.showToast(toast)
                     }
                 ])
                 
@@ -132,6 +135,37 @@ public struct ReputationChangeFeature: Reducer, Sendable {
                 print("\(error)")
                 return .none
             }
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private func reputationStatusToText(_ status: ReputationChangeResponseType) -> LocalizedStringResource {
+        switch status {
+        case .error:
+            return Localization.reputationChangeError
+        case .success:
+            return Localization.reputationChanged
+        case .blocked:
+            return Localization.reputationChangeBlocked
+        case .selfChangeError:
+            return Localization.reputationSelfChangeError
+        case .notEnoughtPosts:
+            return Localization.reputationChangeNotEnoughPosts
+        case .tooLowReputation:
+            return Localization.reputationChangeTooLowReputation
+        case .cannotChangeToday:
+            return Localization.reputationChangeCannotChangeToday
+        case .cannotChangeForThisPost:
+            return Localization.reputationChangeCannotChangeForThisPost
+        case .cannotChangeForThisUserNow:
+            return Localization.reputationChangeCannotChangeForThisUserNow
+        case .cannotChangeTodayToThisUser:
+            return Localization.reputationChangeCannotChangeTodayForThisUser
+        case .thisPersonYouRecentlyDownvoted:
+            return Localization.reputationChangeThisPersonYouRecentlyDownvoted
+        case .thisPersonRecentlyDownvotedYou:
+            return Localization.reputationChangeThisPersonRecentlyDownvotedYou
         }
     }
 }

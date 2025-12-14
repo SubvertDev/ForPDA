@@ -31,7 +31,7 @@ public struct WriteFormScreen: View {
                     .navigationTitle(Text(formTitle(), bundle: .module))
                     .padding(.horizontal, 16)
                     .background(Color(.Background.primary))
-                    .navigationBarTitleDisplayMode(.inline)
+                    ._toolbarTitleDisplayMode(.inline)
                     .onTapGesture {
                         isFocused = false
                     }

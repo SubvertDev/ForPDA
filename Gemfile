@@ -1,10 +1,12 @@
 source "https://rubygems.org"
 
-gem "fastlane"
+gem "fastlane", "2.229.1"
 
-# bundle exec fix for ruby 3.4
-gem "abbrev"
-gem "csv"
+# warnings fix
+gem "ostruct"
+
+# telegram notify fix
+gem "openssl"
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')
 eval_gemfile(plugins_path) if File.exist?(plugins_path)

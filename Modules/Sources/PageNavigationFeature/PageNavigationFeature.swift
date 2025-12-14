@@ -44,8 +44,12 @@ public struct PageNavigationFeature: Reducer, Sendable {
             return Int(ceil(Double(offset) / Double(perPage))) + 1
         }
         
-        var totalPages: Int {
+        public var totalPages: Int {
             return Int(ceil(Double(count) / Double(perPage)))
+        }
+        
+        public var isFirstPage: Bool {
+            return currentPage == 1
         }
         
         public var isLastPage: Bool {
@@ -108,6 +112,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
                 
             case .goToPage(let newPage):
                 state.offset = (newPage - 1) * state.perPage
+                state.page = String(state.currentPage)
                 
             case .onViewTapped:
                 state.focus = state.focus == nil ? .page : nil

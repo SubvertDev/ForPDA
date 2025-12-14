@@ -14,6 +14,7 @@ import SFSafeSymbols
 import Models
 import RichTextKit
 import ParsingClient
+import BBBuilder
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -27,14 +28,6 @@ public struct ProfileScreen: View {
         case general, statistics, achievements
     }
     @State private var pickerSelection: PickerSelection = .general
-    
-    // MARK: - Timer properties
-    
-    @State private var timeRemaining = 5
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    var isSheetTimerFinished: Bool {
-        return timeRemaining <= 0
-    }
     
     // MARK: - Init
     
@@ -76,14 +69,14 @@ public struct ProfileScreen: View {
             }
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
-            .navigationBarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.editProfile, action: \.destination.editProfile)) { store in
+                NavigationStack {
+                    EditScreen(store: store)
+                }
+            }
             .toolbar {
                 ToolbarButtons()
-            }
-            .sheet(isPresented: $store.showQMSWarningSheet) {
-                WarningSheet()
-                    .presentationDetents([.medium])
-                    .presentationDragIndicator(.visible)
             }
             .onAppear {
                 send(.onAppear)
@@ -110,6 +103,14 @@ public struct ProfileScreen: View {
             
             ToolbarItem {
                 Button {
+                    send(.editButtonTapped)
+                } label: {
+                    Image(systemSymbol: .pencil)
+                }
+            }
+            
+            ToolbarItem {
+                Button {
                     send(.settingsButtonTapped)
                 } label: {
                     Image(systemSymbol: .gearshape)
@@ -123,40 +124,39 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func Header(user: User) -> some View {
         VStack(alignment: .center, spacing: 0) {
-            LazyImage(url: user.imageUrl) { state in
-                Group {
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Color(.systemBackground)
+            HStack {
+                LazyImage(url: user.imageUrl) { state in
+                    Group {
+                        if let image = state.image {
+                            image.resizable().scaledToFill()
+                        } else {
+                            Color(.systemBackground)
+                        }
+                    }
+                    .skeleton(with: state.isLoading, shape: .circle)
+                }
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+                
+                VStack(alignment: .leading) {
+                    Text(user.nickname)
+                        .font(.headline)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    if !user.lastSeenDate.isOnlineHidden() {
+                        Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
+                            .font(.footnote)
+                            .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
                     }
                 }
-                .skeleton(with: state.isLoading, shape: .circle)
             }
-            .frame(width: 128, height: 128)
-            .clipShape(Circle())
             .padding(.bottom, 10)
-            
-            Text(user.nickname)
-                .font(.headline)
-                .foregroundStyle(Color(.Labels.primary))
-                .padding(.bottom, 4)
-            
-            if !user.lastSeenDate.isOnlineHidden() {
-                Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
-                    .padding(.bottom, 8)
-            }
             
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
                     send(.deeplinkTapped(url, .signature))
                 }) {
-                    ($0 as? UITextView)?.backgroundColor = .clear
                     ($0 as? UITextView)?.textAlignment = .center
-                    ($0 as? UITextView)?.isEditable = false
-                    ($0 as? UITextView)?.isScrollEnabled = false
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
@@ -306,7 +306,7 @@ public struct ProfileScreen: View {
                 Row(title: "Birthdate", type: .description(birthdate))
             }
             if let gender = user.gender, gender != .unknown {
-                Row(title: "Gender", type: .description(gender.title))
+                Row(title: "Gender", type: .localizedDescription(gender.title))
             }
             if let city = user.city {
                 Row(title: "City", type: .description(city))
@@ -331,8 +331,6 @@ public struct ProfileScreen: View {
                 RichText(text: aboutMe, onUrlTap: { url in
                     send(.deeplinkTapped(url, .about))
                 })
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primary))
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -407,8 +405,12 @@ public struct ProfileScreen: View {
             Row(title: "Reputation", type: .navigationDescription(String(user.reputation))) {
                 send(.reputationButtonTapped)
             }
-            Row(title: "Topics", type: .description(String(user.topics)))
-            Row(title: "Replies", type: .description(String(user.replies)))
+            Row(title: "Topics", type: .navigationDescription(String(user.topics))) {
+                send(.searchTopicsButtonTapped)
+            }
+            Row(title: "Replies", type: .navigationDescription(String(user.replies))) {
+                send(.searchRepliesButtonTapped)
+            }
         } header: {
             SectionHeader(title: "Forum statistics")
         }
@@ -507,6 +509,7 @@ public struct ProfileScreen: View {
         case description(String)
         case navigation
         case navigationDescription(String)
+        case localizedDescription(LocalizedStringKey)
     }
     
     @ViewBuilder
@@ -539,6 +542,11 @@ public struct ProfileScreen: View {
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
+                    case let .localizedDescription(text):
+                        Text(text, bundle: .module)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                        
                     case .navigation:
                         Image(systemSymbol: .chevronRight)
                             .font(.system(size: 17, weight: .semibold))
@@ -564,7 +572,7 @@ public struct ProfileScreen: View {
     }
     
     @ViewBuilder
-    private func informationRow(title: LocalizedStringKey, description: String) -> some View {
+    private func InformationRow(title: LocalizedStringKey, description: String) -> some View {
         HStack {
             Text(title, bundle: .module)
             
@@ -576,7 +584,7 @@ public struct ProfileScreen: View {
     }
     
     @ViewBuilder
-    private func informationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
+    private func InformationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
         HStack {
             Text(title, bundle: .module)
             
@@ -585,101 +593,6 @@ public struct ProfileScreen: View {
             Text(description, bundle: .module)
                 .foregroundStyle(.secondary)
         }
-    }
-    
-    // MARK: - Warning Sheet
-    
-    @ViewBuilder
-    private func WarningSheet() -> some View {
-        VStack(spacing: 0) {
-            Spacer()
-            
-            Image(systemSymbol: .hammer)
-                .font(.title)
-                .foregroundStyle(tintColor)
-                .padding(.bottom, 8)
-            
-            Text("This functionality is presented as-is", bundle: .module)
-                .font(.title3)
-                .bold()
-                .foregroundStyle(Color(.Labels.primary))
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 6)
-            
-            Text("Chats do not (yet) support: BB-codes, attachments, caching, push-notifications and some other functionality", bundle: .module)
-                .font(.footnote)
-                .foregroundStyle(Color(.Labels.teritary))
-                .multilineTextAlignment(.center)
-            
-            Spacer()
-            
-            Button {
-                send(.sheetContinueButtonTapped)
-            } label: {
-                Text(isSheetTimerFinished ? "Understood, continue" : "Continue in (\(timeRemaining))", bundle: .module)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(tintColor)
-            .frame(height: 48)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(ignoresSafeAreaEdges: .bottom)
-            .disabled(!isSheetTimerFinished)
-        }
-        .background {
-            VStack(spacing: 0) {
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: 12))
-                    .padding(.top, 32)
-                
-                Spacer()
-                
-                ComingSoonTape()
-                    .rotationEffect(Angle(degrees: -12))
-                    .padding(.bottom, 96)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .overlay(alignment: .topTrailing) {
-            Button {
-                send(.sheetCloseButtonTapped)
-            } label: {
-                ZStack {
-                    Circle()
-                        .fill(Color(.Background.quaternary))
-                        .frame(width: 30, height: 30)
-                    
-                    Image(systemSymbol: .xmark)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.top, 14)
-                .padding(.trailing, 16)
-            }
-        }
-        .onReceive(timer) { input in
-            if timeRemaining > 0 {
-                timeRemaining -= 1
-            }
-        }
-    }
-    
-    // MARK: - Coming Soon Tape
-    
-    @ViewBuilder
-    private func ComingSoonTape() -> some View {
-        HStack(spacing: 8) {
-            ForEach(0..<6, id: \.self) { index in
-                Text("IN DEVELOPMENT", bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(Color(.Labels.primaryInvariably))
-                    .fixedSize(horizontal: true, vertical: false)
-                    .lineLimit(1)
-            }
-        }
-        .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-        .background(tintColor)
     }
 }
 
@@ -735,19 +648,20 @@ private struct ListSectionSpacing: ViewModifier {
 
 extension User {
     var signatureAttributed: NSAttributedString? {
-        return BBCodeParser.parse(signature, fontStyle: .footnote)
+        guard let signature, !signature.isEmpty else { return nil }
+        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .footnote)])
+            .render(text: signature)
     }
     
     var statusAttributed: NSAttributedString? {
-        if let status {
-            let trimmed = status.trimmingCharacters(in: .whitespacesAndNewlines)
-            return !trimmed.isEmpty ? BBCodeParser.parse(status) : nil
-        }
-        return nil
+        guard let status, !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer().render(text: status)
     }
     
     var aboutMeAttributed: NSAttributedString? {
-        return BBCodeParser.parse(aboutMe, fontStyle: .body)
+        guard let aboutMe, !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .body)])
+            .render(text: aboutMe)
     }
 }
 

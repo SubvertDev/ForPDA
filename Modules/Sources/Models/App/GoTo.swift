@@ -10,4 +10,5 @@ public enum GoTo: Sendable, Equatable {
     case unread
     case post(id: Int)
     case last
+    case page(Int)
 }

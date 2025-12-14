@@ -10,16 +10,16 @@ import Models
 
 public struct BBAttributedParser {
     
-    public static func parse(text: AttributedString, attachments: [Post.Attachment]) -> [BBContainerNode] {
+    public static func parse(text: AttributedString, attachments: [Attachment]) -> [BBContainerNode] {
         var parser = BBAttributedParser(text: text, attachments: attachments)
         return parser.parse()
     }
     
     private var attributedTokenizer: BBAttributedTokenizer
-    private var attachments: [Post.Attachment]
+    private var attachments: [Attachment]
     private var openingTags: [(tag: BBTag, attribute: NSAttributedString?)] = []
     
-    private init(text: AttributedString, attachments: [Post.Attachment]) {
+    private init(text: AttributedString, attachments: [Attachment]) {
         attributedTokenizer = BBAttributedTokenizer(string: text)
         self.attachments = attachments
     }

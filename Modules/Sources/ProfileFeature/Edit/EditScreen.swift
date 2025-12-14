@@ -1,0 +1,407 @@
+//
+//  EditScreen.swift
+//  ForPDA
+//
+//  Created by Xialtal on 28.08.25.
+//
+
+import SwiftUI
+import ComposableArchitecture
+import NukeUI
+import Models
+import SharedUI
+import PhotosUI
+import SFSafeSymbols
+
+@ViewAction(for: EditFeature.self)
+public struct EditScreen: View {
+    
+    @Perception.Bindable public var store: StoreOf<EditFeature>
+    @Environment(\.tintColor) private var tintColor
+    
+    @State private var pickerItem: PhotosPickerItem?
+    
+    @FocusState var focus: EditFeature.State.Field?
+    
+    public init(store: StoreOf<EditFeature>) {
+        self.store = store
+    }
+    
+    public var body: some View {
+        WithPerceptionTracking {
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                List {
+                    AvatarRow()
+                    
+                    if store.isUserCanEditStatus {
+                        Field(
+                            content: Binding(unwrapping: $store.draftUser.status, default: ""),
+                            title: LocalizedStringKey("Status"),
+                            focusEqual: .status,
+                            characterLimit: 28
+                        )
+                    }
+                    
+                    Field(
+                        content: Binding(unwrapping: $store.draftUser.signature, default: ""),
+                        title: LocalizedStringKey("Signature"),
+                        focusEqual: .signature,
+                        characterLimit: 300
+                    )
+                    
+                    Field(
+                        content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
+                        title: LocalizedStringKey("About me"),
+                        focusEqual: .about,
+                        characterLimit: 500
+                    )
+                    
+                    Section {
+                        UserBirthday()
+                        UserGender()
+                    }
+                    .listRowBackground(Color(.Background.teritary))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    
+                    Field(
+                        content: Binding(unwrapping: $store.draftUser.city, default: ""),
+                        title: LocalizedStringKey("City"),
+                        focusEqual: .city,
+                        characterLimit: 50
+                    )
+                }
+                .scrollContentBackground(.hidden)
+            }
+            .alert($store.scope(state: \.alert, action: \.alert))
+            .navigationTitle(Text("Edit profile", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
+            ._safeAreaBar(edge: .bottom) {
+                SendButton()
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        send(.cancelButtonTapped)
+                    } label: {
+                        Text("Cancel", bundle: .module)
+                            .foregroundStyle(tintColor)
+                    }
+                    .disabled(store.isSending)
+                }
+            }
+            .bind($store.focus, to: $focus)
+            .onTapGesture {
+                focus = nil
+            }
+            .onAppear {
+                send(.onAppear)
+            }
+        }
+    }
+    
+    // MARK: - Send Button
+    
+    @ViewBuilder
+    private func SendButton() -> some View {
+        Button {
+            send(.saveButtonTapped)
+        } label: {
+            if store.isSending {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            } else {
+                Text("Send", bundle: .module)
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            }
+        }
+        .disabled(store.isSending)
+        .disabled(store.isSavingDisabled)
+        .buttonStyle(.borderedProminent)
+        .tint(tintColor)
+        .frame(height: 48)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background {
+            if #available(iOS 26, *) {
+                // No background
+            } else {
+                Color(.Background.primary)
+            }
+        }
+    }
+    
+    // MARK: - User Birthday Picker
+    
+    @ViewBuilder
+    private func UserBirthday() -> some View {
+        if let date = store.birthdayDate {
+            DatePicker(
+                selection: Binding(unwrapping: $store.birthdayDate, default: date),
+                displayedComponents: .date
+            ) {
+                Text("Birthday date", bundle: .module)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
+            }
+            .padding(12)
+            .frame(height: 60)
+            .cornerRadius(10)
+            .swipeActions(edge: .trailing) {
+                Button {
+                    send(.wipeBirthdayDate)
+                } label: {
+                    Image(systemSymbol: .trash)
+                }
+                .tint(.red)
+            }
+        } else {
+            HStack {
+                Text("Birthday date", bundle: .module)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
+                
+                Spacer()
+                
+                Button {
+                    send(.setBirthdayDate)
+                } label: {
+                    Text("Set", bundle: .module)
+                        .textCase(.uppercase)
+                }
+                .buttonStyle(.plain)
+                .cornerRadius(12)
+                .foregroundStyle(tintColor)
+            }
+            .padding(12)
+            .frame(height: 60)
+            .cornerRadius(10)
+        }
+    }
+    
+    // MARK: - User Gender Picker
+    
+    @ViewBuilder
+    private func UserGender() -> some View {
+        Picker(
+            LocalizedStringResource("Gender", bundle: .module),
+            selection: Binding(unwrapping: $store.draftUser.gender, default: .unknown)
+        ) {
+            ForEach(User.Gender.allCases) { gender in
+                Text(gender.title, bundle: .module)
+                    .tag(gender)
+            }
+        }
+        .padding(12)
+        .frame(height: 60)
+        .cornerRadius(10)
+        .pickerStyle(.menu)
+        .tint(tintColor)
+    }
+    
+    // MARK: - Avatar
+    
+    @ViewBuilder
+    private func AvatarRow() -> some View {
+        VStack {
+            Circle()
+                .stroke(
+                    store.isUserSetAvatar ? Color.clear : tintColor,
+                    style: StrokeStyle(lineWidth: 1, dash: [8])
+                )
+                .overlay(alignment: .bottomTrailing) {
+                    if store.isUserSetAvatar {
+                        AvatarContextMenu()
+                    } else {
+                        AvatarUploadButton()
+                    }
+                }
+                .background {
+                    if store.isAvatarUploading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .foregroundStyle(Color(.Labels.quintuple))
+                    } else {
+                        if store.isUserSetAvatar {
+                            LazyImage(url: store.draftUser.imageUrl) { state in
+                                Group {
+                                    if let image = state.image {
+                                        image.resizable().scaledToFill()
+                                    } else {
+                                        Image(systemSymbol: .personCropCircle)
+                                            .font(.title)
+                                            .foregroundStyle(Color(.Labels.quintuple))
+                                    }
+                                }
+                                .skeleton(with: state.isLoading, shape: .circle)
+                            }
+                            .clipShape(Circle())
+                        } else {
+                            Image(systemSymbol: .personCropCircle)
+                                .font(.title)
+                                .foregroundStyle(Color(.Labels.quintuple))
+                        }
+                    }
+                }
+                .frame(width: 100, height: 100)
+                .background(Circle().foregroundColor(Color(.Background.teritary)))
+                .padding(.bottom, 8)
+            
+            Text("File size should not be more that 32 kb and max 100x100 pixels", bundle: .module)
+                .font(.caption)
+                .foregroundStyle(Color(.Labels.teritary))
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .photosPicker(
+            isPresented: Binding($store.destination.avatarPicker),
+            selection: $pickerItem,
+            matching: .any(of: [.images, .screenshots])
+        )
+        .task(id: pickerItem) {
+            guard let data = try? await pickerItem?.loadTransferable(type: Data.self) else {
+                return
+            }
+            guard let image = UIImage(data: data) else {
+                return
+            }
+            
+            if isInPreview || data.count <= 32768 /* should be max 32kb size */ {
+                if isInPreview || (image.size.width <= 100 && image.size.height <= 100) {
+                    send(.avatarSelected(data))
+                } else {
+                    send(.onAvatarBadWidthHeightProvided)
+                }
+            } else {
+                send(.onAvatarBadFileSizeProvided)
+            }
+
+            // Drop last selected avatar.
+            // Need, because photosPicker remember last choice.
+            pickerItem = nil
+        }
+    }
+    
+    // MARK: - Avatar Upload Button
+    
+    @ViewBuilder
+    private func AvatarUploadButton() -> some View {
+        Button {
+            send(.addAvatarButtonTapped)
+        } label: {
+            AvatarActionLabel(symbol: .plus)
+        }
+        .buttonStyle(.plain)
+    }
+    
+    // MARK: - Avatar Context Menu
+    
+    @ViewBuilder
+    private func AvatarContextMenu() -> some View {
+        Menu {
+            Button {
+                send(.addAvatarButtonTapped)
+            } label: {
+                HStack {
+                    Text("Update avatar", bundle: .module)
+                    Image(systemSymbol: .plusCircle)
+                }
+            }
+            
+            Button(role: .destructive) {
+                send(.deleteAvatar)
+            } label: {
+                HStack {
+                    Text("Delete avatar", bundle: .module)
+                    Image(systemSymbol: .trash)
+                }
+            }
+            .tint(.red)
+        } label: {
+            AvatarActionLabel(symbol: .ellipsis)
+        }
+        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
+    }
+    
+    // MARK: - Avatar Action Label
+    
+    private func AvatarActionLabel(symbol: SFSymbol) -> some View {
+        Image(systemSymbol: symbol)
+            .font(.body)
+            .foregroundStyle(Color(.Labels.primaryInvariably))
+            .frame(width: 32, height: 32)
+            .background(
+                Circle()
+                    .fill(tintColor)
+                    .clipShape(Circle())
+            )
+    }
+    
+    // MARK: - Helpers
+    
+    @ViewBuilder
+    private func Field(
+        content: Binding<String>,
+        title: LocalizedStringKey,
+        focusEqual: EditFeature.State.Field,
+        characterLimit: Int? = nil
+    ) -> some View {
+        Section {
+            ForField(
+                content: content,
+                placeholder: LocalizedStringResource("Input...", bundle: .module),
+                focusEqual: focusEqual,
+                focus: $focus,
+                characterLimit: characterLimit
+            )
+        } header: {
+            Header(title: title)
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    private func Header(title: LocalizedStringKey) -> some View {
+        Text(title, bundle: .module)
+            .font(.footnote)
+            .fontWeight(.semibold)
+            .foregroundStyle(Color(.Labels.teritary))
+            .textCase(nil)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Helpers
+
+private extension EditScreen {
+    private var isInPreview: Bool {
+        ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+    }
+}
+
+// MARK: - Previews
+
+#Preview {
+    NavigationStack {
+        EditScreen(
+            store: Store(
+                initialState: EditFeature.State(user: .mock)
+            ) {
+                EditFeature()
+            } withDependencies: {
+                $0.apiClient.updateUserAvatar = { _, data in
+                    try await Task.sleep(for: .seconds(3))
+                    let url = URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!
+                    return .success(data.isEmpty ? nil : url)
+                }
+            }
+        )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+}

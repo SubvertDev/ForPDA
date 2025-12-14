@@ -49,14 +49,14 @@ public struct Field: View {
             .padding(.vertical, 15)
             .padding(.horizontal, 12)
             .background {
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                     .fill(Color(.Background.teritary))
                     .onTapGesture {
                         isFocused = true
                     }
             }
             .overlay {
-                RoundedRectangle(cornerRadius: 14)
+                RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                     .strokeBorder(Color(.Separator.primary))
             }
             

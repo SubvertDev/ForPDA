@@ -12,6 +12,7 @@ import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
@@ -20,32 +21,37 @@ import ProfileFeature
 import QMSFeature
 import QMSListFeature
 import ReputationFeature
+import SearchFeature
+import SearchResultFeature
 import SettingsFeature
 import TopicFeature
+import AuthFeature
 
-@Reducer(state: .equatable)
+@Reducer
 public enum Path {
     case articles(Articles.Body = Articles.body)
-    case favorites(FavoritesRootFeature)
+    case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
     case profile(Profile.Body = Profile.body)
     case settings(Settings.Body = Settings.body)
+    case search(Search.Body = Search.body)
     case qms(QMS.Body = QMS.body)
+    case auth(AuthFeature)
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Articles {
         case articlesList(ArticlesListFeature)
         case article(ArticleFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
         case reputation(ReputationFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Forum {
         case forumList(ForumsListFeature)
         case forum(ForumFeature)
@@ -53,19 +59,34 @@ public enum Path {
         case topic(TopicFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Settings {
         case settings(SettingsFeature)
+        case navigation(NavigationSettingsFeature)
         case notifications(NotificationsFeature)
         case developer(DeveloperFeature)
     }
     
-    @Reducer(state: .equatable)
+    @Reducer
+    public enum Search {
+        case search(SearchFeature)
+        case searchResult(SearchResultFeature)
+    }
+    
+    @Reducer
     public enum QMS {
         case qmsList(QMSListFeature)
         case qms(QMSFeature)
     }
 }
+
+extension Path.State: Equatable {}
+extension Path.Articles.State: Equatable {}
+extension Path.Profile.State: Equatable {}
+extension Path.Forum.State: Equatable {}
+extension Path.Settings.State: Equatable {}
+extension Path.Search.State: Equatable {}
+extension Path.QMS.State: Equatable {}
 
 extension Path {
     @MainActor @ViewBuilder
@@ -75,8 +96,8 @@ extension Path {
             ArticlesViews(path)
             
         case let .favorites(store):
-            FavoritesRootScreen(store: store)
-                .tracking(for: FavoritesRootScreen.self)
+            FavoritesScreen(store: store)
+                .tracking(for: FavoritesScreen.self)
             
         case let .profile(path):
             ProfileViews(path)
@@ -87,8 +108,15 @@ extension Path {
         case let .settings(path):
             SettingsViews(path)
             
+        case let .search(path):
+            SearchViews(path)
+            
         case let .qms(path):
             QMSViews(path)
+            
+        case let .auth(store):
+            AuthScreen(store: store)
+                .tracking(for: AuthScreen.self)
         }
     }
     
@@ -111,7 +139,7 @@ extension Path {
         case let .profile(store):
             ProfileScreen(store: store)
                 .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])
-
+            
         case let .history(store):
             HistoryScreen(store: store)
                 .tracking(for: HistoryScreen.self)
@@ -150,6 +178,10 @@ extension Path {
             SettingsScreen(store: store)
                 .tracking(for: SettingsScreen.self)
             
+        case let .navigation(store):
+            NavigationSettingsScreen(store: store)
+                .tracking(for: NavigationSettingsScreen.self)
+            
         case let .notifications(store):
             NotificationsScreen(store: store)
                 .tracking(for: NotificationsScreen.self)
@@ -157,6 +189,19 @@ extension Path {
         case let .developer(store):
             DeveloperScreen(store: store)
                 .tracking(for: DeveloperScreen.self)
+        }
+    }
+    
+    @MainActor @ViewBuilder
+    private static func SearchViews(_ store: Store<Path.Search.State, Path.Search.Action>) -> some View {
+        switch store.case {
+        case let .search(store):
+            SearchScreen(store: store)
+                .tracking(for: SearchScreen.self)
+            
+        case let .searchResult(store):
+            SearchResultScreen(store: store)
+                .tracking(for: SearchResultScreen.self)
         }
     }
     

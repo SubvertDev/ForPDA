@@ -25,7 +25,7 @@ public struct ReputationVotesRequest: Sendable {
         self.amount = amount
     }
     
-    nonisolated(unsafe) var transferType: MemberReputationVotesRequest.ReputationList {
+    nonisolated public var transferType: MemberReputationVotesRequest.ReputationList {
         switch type {
         case .to: return .to
         case .from: return .from

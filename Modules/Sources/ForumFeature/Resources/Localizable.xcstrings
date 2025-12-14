@@ -41,12 +41,32 @@
         }
       }
     },
+    "Link copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
     "Mark Read" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Прочитано"
+          }
+        }
+      }
+    },
+    "Marked as read" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмечено прочитанным"
           }
         }
       }

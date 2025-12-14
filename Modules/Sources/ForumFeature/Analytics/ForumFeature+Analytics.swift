@@ -19,42 +19,47 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .onAppear, .pageNavigation, .delegate:
+                case .pageNavigation:
                     break
                     
-                case .onRefresh:
+                case .view(.onFirstAppear), .view(.onNextAppear), .view(.searchButtonTapped):
+                    break
+                    
+                case .view(.onRefresh):
                     analytics.log(ForumEvent.onRefresh)
                     
-                case let .topicTapped(topic, showUnread):
+                case let .view(.topicTapped(topic, showUnread)):
                     analytics.log(ForumEvent.topicTapped(topic.id, showUnread))
                     
-                case let .subforumRedirectTapped(url):
+                case let .view(.subforumRedirectTapped(url)):
                     analytics.log(ForumEvent.subforumRedirectTapped(url))
                     
-                case let .subforumTapped(forum):
+                case let .view(.subforumTapped(forum)):
                     analytics.log(ForumEvent.subforumTapped(forum.id, forum.name))
                     
-                case let .announcementTapped(id: id, name: name):
+                case let .view(.announcementTapped(id: id, name: name)):
                     analytics.log(ForumEvent.announcementTapped(id, name))
                     
-                case let .sectionExpandTapped(kind):
+                case let .view(.sectionExpandTapped(kind)):
                     analytics.log(ForumEvent.sectionExpandTapped(kind.rawValue))
                     
-                case let .contextOptionMenu(option):
+                case let .view(.contextOptionMenu(option)):
                     switch option {
                     case .sort:
                         break // TODO: Add
                     case .toBookmarks:
                         break // TODO: Add
                     }
-                case let .contextTopicMenu(option, topic):
+                    
+                case let .view(.contextTopicMenu(option, topic)):
                     switch option {
                     case .open:
                         analytics.log(ForumEvent.menuOpen(topic.id))
                     case .goToEnd:
                         analytics.log(ForumEvent.menuGoToEnd(topic.id))
                     }
-                case let .contextCommonMenu(option, id, isForum):
+                    
+                case let .view(.contextCommonMenu(option, id, isForum)):
                     switch option {
                     case .markRead:
                         analytics.log(ForumEvent.menuMarkRead(id, isForum))
@@ -66,16 +71,22 @@ extension ForumFeature {
                         analytics.log(ForumEvent.menuSetFavorite(id, isForum, state))
                     }
                     
-                case let ._loadForum(offset: offset):
+                case .internal(.refresh):
+                    break
+                    
+                case let .internal(.loadForum(offset: offset)):
                     analytics.log(ForumEvent.loadingStart(offset))
                     
-                case let ._forumResponse(response):
+                case let .internal(.forumResponse(response)):
                     switch response {
                     case .success:
                         analytics.log(ForumEvent.loadingSuccess)
                     case let .failure(error):
                         analytics.log(ForumEvent.loadingFailure(error))
                     }
+                    
+                case .delegate:
+                    break
                 }
                 
                 return .none

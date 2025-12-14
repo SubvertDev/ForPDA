@@ -12,17 +12,50 @@ public struct QMSMessage: Sendable, Codable, Hashable, Identifiable {
     public let senderId: Int
     public let date: Date
     public let text: String
-    // public let attachments: [QMSAttachment]
+    public let attachments: [Attachment]
+    
+    public var processedText: String {
+        if attachments.isEmpty {
+            return text
+        } else {
+            var attachmentsText = ""
+            for (index, attachment) in attachments.enumerated() {
+                attachmentsText.append("[attachment=\(attachment.name),\(attachment.id)]")
+                if index != attachments.count - 1 {
+                    attachmentsText.append("\n\n")
+                }
+            }
+            return attachmentsText + (text.isEmpty ? "" : "\n\n\(text)")
+        }
+    }
     
     public init(
         id: Int,
         senderId: Int,
         date: Date,
-        text: String
+        text: String,
+        attachments: [Attachment]
     ) {
         self.id = id
         self.senderId = senderId
         self.date = date
         self.text = text
+        self.attachments = attachments
+    }
+}
+
+// MARK: - Mock
+
+public extension QMSMessage {
+    
+    static func mock() -> QMSMessage {
+        let id = Int.random(in: 0...100000)
+        return QMSMessage(
+            id: id,
+            senderId: 1,
+            date: .now,
+            text: "test \(id)",
+            attachments: []
+        )
     }
 }

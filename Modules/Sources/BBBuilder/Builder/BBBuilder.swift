@@ -20,7 +20,7 @@ public struct BBBuilder {
     
     // MARK: - Build Interface
     
-    public static func build(text: String, attachments: [Post.Attachment] = []) -> [BBContainerNode] {
+    public static func build(text: String, attachments: [Attachment] = []) -> [BBContainerNode] {
         let renderedText = AttributedString(BBRenderer().render(text: text))
         let builder = BBBuilder(attachments: attachments)
         let nodes = BBAttributedParser.parse(text: renderedText, attachments: attachments)
@@ -29,7 +29,7 @@ public struct BBBuilder {
     
     // MARK: - Properties
     
-    private var attachments: [Post.Attachment]
+    private var attachments: [Attachment]
     
     // MARK: - Dependencies
     
@@ -37,7 +37,7 @@ public struct BBBuilder {
     
     // MARK: - Init
     
-    private init(attachments: [Post.Attachment]) {
+    private init(attachments: [Attachment]) {
         self.attachments = attachments
     }
     
@@ -161,8 +161,8 @@ public struct BBBuilder {
                 }
                 
             case .img:
+                // TODO: Finish image case
                 logger.info("Image case")
-                #warning("todo")
                 mergedNodes.lastOrAppend = unwrap(node: node, with: mutableText)
                 
             case let .attachment(attribute):

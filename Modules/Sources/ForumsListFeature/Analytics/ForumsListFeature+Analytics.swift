@@ -22,8 +22,8 @@ extension ForumsListFeature {
                 case .view(.onAppear):
                     break
                     
-                case .view(.settingsButtonTapped):
-                    analytics.log(ForumsListEvent.settingsButtonTapped)
+                case .view(.searchButtonTapped):
+                    analytics.log(ForumsListEvent.forumSearchTapped)
                     
                 case let .view(.forumRedirectTapped(url)):
                     analytics.log(ForumsListEvent.forumRedirectTapped(url))

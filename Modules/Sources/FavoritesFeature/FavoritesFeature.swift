@@ -12,14 +12,23 @@ import APIClient
 import Models
 import TCAExtensions
 import PasteboardClient
-import NotificationCenterClient
 import AnalyticsClient
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct FavoritesFeature: Reducer, Sendable {
     
     public init() {}
+    
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
+        static let notifyTypeChanged = LocalizedStringResource("Notify type changed", bundle: .module)
+        static let sortFiltersChanged = LocalizedStringResource("Sort filters are changed", bundle: .module)
+    }
     
     // MARK: - State
     
@@ -96,6 +105,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.continuousClock) private var clock
     
     // MARK: - Body
@@ -111,10 +121,14 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.loadFavorites(offset: newOffset)))
                 
             case .sort(.presented(.saveButtonTapped)):
-                return .run { send in
-                    await send(.internal(.refresh))
-                    await send(.sort(.presented(.cancelButtonTapped)))
-                }
+                return .concatenate(
+                    .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
+                    },
+                    
+                    .send(.internal(.refresh)),
+                    .send(.sort(.presented(.cancelButtonTapped)))
+                )
                 
             case .sort(.presented(.cancelButtonTapped)):
                 state.sort = nil
@@ -128,7 +142,18 @@ public struct FavoritesFeature: Reducer, Sendable {
                     updatePageNavigation(&state, offset: 0),
                     .send(.internal(.loadFavorites(offset: 0))),
                     .run { send in
-                        for await _ in notificationCenter.observe(.favoritesUpdated) {
+                        for await _ in notificationCenter.notifications(named: .favoritesUpdated) {
+                            await send(.internal(.refresh))
+                        }
+                    },
+                    .run { send in
+                        for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
+                            await send(.view(.onSceneBecomeActive))
+                        }
+                    },
+                    .run { send in
+                        for await notification in notificationsClient.eventPublisher().values {
+                            guard notification.isTopic else { continue }
                             await send(.internal(.refresh))
                         }
                     }
@@ -142,11 +167,10 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.refresh))
                 
             case .view(.onSceneBecomeActive):
-                if state.isLoading {
-                    return .none
-                } else {
+                if !state.isLoading {
                     return .send(.internal(.refresh))
                 }
+                return .none
                 
             case let .view(.favoriteTapped(favorite, showUnread)):
                 guard !showUnread else {
@@ -168,9 +192,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                     
                 case .markAllAsRead:
                     return .run { send in
-                        _ = try await apiClient.readAllFavorites()
-                        // TODO: Display toast on success/error.
-                        
+                        let status = try await apiClient.readAllFavorites()
+                        let success = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                        await toastClient.showToast(status ? success : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
                 }
@@ -180,23 +204,30 @@ public struct FavoritesFeature: Reducer, Sendable {
                 case .copyLink(let id):
                     let show = isForum ? "showforum" : "showtopic"
                     pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .delete(let id):
                     return .run { send in
                         let request = SetFavoriteRequest(id: id, action: .delete, type: isForum ? .forum : .topic)
-                        _ = try await apiClient.setFavorite(request)
-                        // TODO: Display toast on success/error.
-                        
+                        let status = try await apiClient.setFavorite(request)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
                     
                 case .setImportant(let id, let pin):
                     return .run { send in
                         let request = SetFavoriteRequest(id: id, action: pin ? .pin : .unpin, type: isForum ? .forum : .topic)
-                        _ = try await apiClient.setFavorite(request)
-                        // TODO: Display toast on success/error.
-                        
+                        let status = try await apiClient.setFavorite(request)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
+                    }
+                    
+                case .markRead(let id):
+                    return .run { [id, isForum] send in
+                        let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
                 }
@@ -214,9 +245,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                 case .notify(let flag, let notify):
                     return .run { send in
                         let request = NotifyFavoriteRequest(id: favorite.topic.id, flag: flag, type: notify)
-                        _ = try await apiClient.notifyFavorite(request)
-                        // TODO: Display toast on success/error.
-                        
+                        let status = try await apiClient.notifyFavorite(request)
+                        let notifyTypeChangedToast = ToastMessage(text: Localization.notifyTypeChanged, haptic: .success)
+                        await toastClient.showToast(status ? notifyTypeChangedToast : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
                 }
@@ -279,7 +310,9 @@ public struct FavoritesFeature: Reducer, Sendable {
             case let .internal(.favoritesResponse(.failure(error))):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
                 reportFullyDisplayed(&state)
-                return showToast(.whoopsSomethingWentWrong)
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case .delegate:
                 return .none
@@ -310,11 +343,5 @@ public struct FavoritesFeature: Reducer, Sendable {
                 )
             )
             .map(Action.pageNavigation)
-    }
-    
-    private func showToast(_ toast: ToastMessage) -> Effect<Action> {
-        return .run { _ in
-            await toastClient.showToast(toast)
-        }
     }
 }

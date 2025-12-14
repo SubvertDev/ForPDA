@@ -9,17 +9,18 @@ import Foundation
 
 public enum ProfileEvent: Event {
     case qmsTapped
+    case editTapped
     case settingsTapped
     case logoutTapped
     case historyTapped
     case reputationTapped
+    case searchTopicsTapped
+    case searchRepliesTapped
     case userLoaded(Int)
     case userLoadingFailed
     case achievementTapped
     case linkInAboutTapped
     case linkInSignatureTapped
-    case sheetContinueButtonTapped
-    case sheetCloseButtonTapped
     
     public var name: String {
         return "Profile " + eventName(for: self).inProperCase

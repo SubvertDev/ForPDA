@@ -114,17 +114,18 @@ public struct ReputationChangeView: View {
     // MARK: - Bottom Buttons
         
     private func ActionButtons() -> some View {
-        HStack {
-            BottomButton(title: "Down", image: .arrowshapeDown) {
-                store.send(.downButtonTapped)
-            }
-            
-            BottomButton(title: "Up", image: .arrowshapeUp) {
-                store.send(.upButtonTapped)
+        _GlassEffectContainer(spacing: 8) {
+            HStack(spacing: 8) {
+                BottomButton(title: "Down", image: .arrowshapeDown) {
+                    store.send(.downButtonTapped)
+                }
+                
+                BottomButton(title: "Up", image: .arrowshapeUp) {
+                    store.send(.upButtonTapped)
+                }
             }
         }
         .padding(.vertical, 8)
-        .opacity(store.changeReason.isEmpty ? 0.3 : 1)
         .disabled(store.changeReason.isEmpty)
         .animation(.default, value: store.changeReason.isEmpty)
     }
@@ -140,26 +141,34 @@ public struct ReputationChangeView: View {
         Button {
             action()
         } label: {
-            Label {
-                Text(title, bundle: .module)
-            } icon: {
-                Image(image)
-            }
-            .foregroundStyle(tintColor)
-            .frame(maxWidth: .infinity)
-            .frame(height: 32)
-            .padding(8)
-        }
-        .background {
-            if isLiquidGlass {
-                Capsule()
-                    .fill(tintColor.opacity(0.12))
-            } else {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(tintColor.opacity(0.12))
+            WithPerceptionTracking {
+                Label {
+                    Text(title, bundle: .module)
+                } icon: {
+                    Image(image)
+                }
+                .foregroundStyle(store.changeReason.isEmpty ? .secondary : tintColor)
+                .frame(maxWidth: .infinity)
+                .padding(8)
+                .if(!isLiquidGlass) { content in
+                    content
+                        .animation(.default, value: store.changeReason.isEmpty)
+                }
             }
         }
-        .liquidIfAvailable(glass: .identity, isInteractive: !store.changeReason.isEmpty)
+        .ifElse(
+            isLiquidGlass,
+            trueCondition: { content in
+                content
+                    ._buttonStyleGlass(isProminent: true)
+            },
+            falseCondition: { content in
+                content
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.roundedRectangle)
+            }
+        )
+        .tint(tintColor.opacity(0.12))
     }
 }
 
@@ -167,27 +176,44 @@ public struct ReputationChangeView: View {
 
 @available(iOS 17, *)
 #Preview {
-    @Previewable @State var showSheet = true
+    // Fitted sheet doesn't work reliably in preview macro
+    PreviewView()
+}
+
+struct PreviewView: View {
+    @State var store: StoreOf<ReputationChangeFeature>? = Store(
+        initialState: ReputationChangeFeature.State(
+            userId: 6176341,
+            username: "AirFlare",
+            content: .post(id: 0)
+        ), reducer: {
+            ReputationChangeFeature()
+        }
+    )
     
-    return Rectangle()
-        .fill(.white)
-        .ignoresSafeArea()
-        .sheet(isPresented: $showSheet) {
-            NavigationStack {
-                ReputationChangeView(
-                    store: Store(
-                        initialState: ReputationChangeFeature.State(
-                            userId: 6176341,
-                            username: "AirFlare",
-                            content: .post(id: 0)
-                        )
-                    ) {
+    var body: some View {
+        VStack {
+            Button(String("Open Sheet")) {
+                store = Store(
+                    initialState: ReputationChangeFeature.State(
+                        userId: 6176341,
+                        username: "AirFlare",
+                        content: .post(id: 0)
+                    ), reducer: {
                         ReputationChangeFeature()
                     }
                 )
             }
-            .presentationDetents([.height(360)])
         }
+        .fittedSheet(
+            item: $store,
+            embedIntoNavStack: true,
+            onDismiss: {},
+            content: { store in
+                ReputationChangeView(store: store)
+            }
+        )
         .environment(\.tintColor, Color(.Theme.primary))
         .tint(Color(.Theme.primary))
+    }
 }

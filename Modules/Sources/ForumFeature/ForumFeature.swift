@@ -21,6 +21,13 @@ public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
+    }
+    
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -51,6 +58,7 @@ public struct ForumFeature: Reducer, Sendable {
 
         public var forumId: Int
         public var forumName: String?
+        public let initialPage: Int?
         
         public var forum: Forum?
         public var topics: [TopicInfo] = []
@@ -70,38 +78,50 @@ public struct ForumFeature: Reducer, Sendable {
         
         public init(
             forumId: Int,
-            forumName: String? = nil
+            forumName: String? = nil,
+            initialPage: Int? = nil
         ) {
             self.forumId = forumId
             self.forumName = forumName
+            self.initialPage = initialPage
         }
     }
     
     // MARK: - Action
     
-    public enum Action {
-        case onAppear
-        case onRefresh
-        case topicTapped(TopicInfo, showUnread: Bool)
-        case subforumRedirectTapped(URL)
-        case subforumTapped(ForumInfo)
-        case announcementTapped(id: Int, name: String)
-        case sectionExpandTapped(SectionExpand.Kind)
-        
-        case contextOptionMenu(ForumOptionContextMenuAction)
-        case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
-        case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
-        
+    public enum Action: ViewAction {
         case pageNavigation(PageNavigationFeature.Action)
-        
-        case _loadForum(offset: Int)
-        case _forumResponse(Result<Forum, any Error>)
+
+        case view(View)
+        public enum View {
+            case onFirstAppear
+            case onNextAppear
+            case onRefresh
+            case searchButtonTapped
+            case topicTapped(TopicInfo, showUnread: Bool)
+            case subforumRedirectTapped(URL)
+            case subforumTapped(ForumInfo)
+            case announcementTapped(id: Int, name: String)
+            case sectionExpandTapped(SectionExpand.Kind)
+            
+            case contextOptionMenu(ForumOptionContextMenuAction)
+            case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
+            case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
+        }
+                
+        case `internal`(Internal)
+        public enum Internal {
+            case refresh
+            case loadForum(offset: Int)
+            case forumResponse(Result<Forum, any Error>)
+        }
         
         case delegate(Delegate)
         public enum Delegate {
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
+            case openSearch(on: SearchOn, navigation: ForumInfo?)
             case handleRedirect(URL)
         }
     }
@@ -112,6 +132,7 @@ public struct ForumFeature: Reducer, Sendable {
     @Dependency(\.toastClient) private var toastClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
+    @Dependency(\.notificationCenter) private var notificationCenter
     
     // MARK: - Body
     
@@ -122,48 +143,62 @@ public struct ForumFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
-                guard state.forum == nil else { return .none }
-                return .send(._loadForum(offset: 0))
-                
-            case .onRefresh:
-                state.isRefreshing = true
-                return .run { [offset = state.pageNavigation.offset] send in
-                    await send(._loadForum(offset: offset))
-                }
-                
-            case let .sectionExpandTapped(kind):
-                state.sectionsExpandState.toggle(kind: kind)
-                return .none
-                
             case let .pageNavigation(.offsetChanged(to: newOffset)):
-                return .send(._loadForum(offset: newOffset))
+                return .send(.internal(.loadForum(offset: newOffset)))
                 
             case .pageNavigation:
                 return .none
                 
-            case let ._loadForum(offset):
-                if !state.isRefreshing {
-                    state.isLoadingTopics = true
-                }
-                return .run { [id = state.forumId, perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
-                    let startTime = Date()
-                    for try await forum in try await apiClient.getForum(id, offset, perPage, isRefreshing ? .skipCache : .cacheAndLoad) {
-                        if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
-                        await send(._forumResponse(.success(forum)))
-                    }
-                } catch: { error, send in
-                    await send(._forumResponse(.failure(error)))
+            case .view(.onFirstAppear):
+                if let page = state.initialPage {
+                    return .send(.pageNavigation(.goToPage(newPage: page)))
+                } else {
+                    return .send(.internal(.loadForum(offset: 0)))
                 }
                 
-            case .contextOptionMenu(let action):
+            case .view(.onNextAppear):
+                return .send(.internal(.refresh))
+                
+            case .view(.onRefresh):
+                return .send(.internal(.refresh))
+                
+            case let .view(.sectionExpandTapped(kind)):
+                state.sectionsExpandState.toggle(kind: kind)
+                return .none
+                
+            case .view(.searchButtonTapped):
+                let navigation: ForumInfo? = if let forum = state.forum {
+                    ForumInfo(id: forum.id, name: forum.name, flag: forum.flag)
+                } else { nil }
+                return .send(.delegate(.openSearch(
+                    on: .forum(ids: [state.forumId], sIn: .all, asTopics: false),
+                    navigation: navigation
+                )))
+                
+            case let .view(.topicTapped(topic, showUnread)):
+                guard !showUnread else {
+                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                }
+                let goTo = state.appSettings.topicOpeningStrategy.asGoTo
+                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
+                
+            case let .view(.subforumTapped(forum)):
+                return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
+                
+            case let .view(.announcementTapped(id: id, name: name)):
+                return .send(.delegate(.openAnnouncement(id: id, name: name)))
+                
+            case let .view(.subforumRedirectTapped(url)):
+                return .send(.delegate(.handleRedirect(url)))
+                
+            case .view(.contextOptionMenu(let action)):
                 switch action {
                     // TODO: sort, to bookmarks
                     // TODO: Add analytics
                 default: return .none
                 }
                 
-            case let .contextTopicMenu(action, topic):
+            case let .view(.contextTopicMenu(action, topic)):
                 switch action {
                 case .open:
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
@@ -171,16 +206,18 @@ public struct ForumFeature: Reducer, Sendable {
                 case .goToEnd:
                     return .concatenate(
                         .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
-                        .send(.onRefresh)
+                        .send(.internal(.refresh))
                     )
                 }
                 
-            case .contextCommonMenu(let action, let id, let isForum):
+            case .view(.contextCommonMenu(let action, let id, let isForum)):
                 switch action {
                 case .copyLink:
                     let show = isForum ? "showforum" : "showtopic"
                     pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .openInBrowser:
                     let show = isForum ? "showforum" : "showtopic"
@@ -188,10 +225,11 @@ public struct ForumFeature: Reducer, Sendable {
                     return .run { _ in await open(url: url) }
                     
                 case .markRead:
-                    return .run { [id = id, isForum = isForum] send in
-                        let response = try await apiClient.markReadForum(id, !isForum)
-                        await send(.onRefresh)
-                        #warning("add toast")
+                    return .run { [id, isForum] send in
+                        let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        let markedAsRead = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                        await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
+                        await send(.internal(.refresh))
                     }
                     
                 case .setFavorite(let isFavorite):
@@ -201,15 +239,36 @@ public struct ForumFeature: Reducer, Sendable {
                             action: isFavorite ? .delete : .add,
                             type: isForum ? .forum : .topic
                         )
-                        let response = try await apiClient.setFavorite(request)
-                        await send(.onRefresh)
-                        #warning("add toast")
+                        let status = try await apiClient.setFavorite(request)
+                        notificationCenter.post(name: .favoritesUpdated, object: nil)
+                        await send(.internal(.refresh))
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                     } catch: { _, _ in
                         await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
                 }
                 
-            case let ._forumResponse(.success(forum)):
+            case .internal(.refresh):
+                state.isRefreshing = true
+                return .run { [offset = state.pageNavigation.offset] send in
+                    await send(.internal(.loadForum(offset: offset)))
+                }
+                
+            case let .internal(.loadForum(offset)):
+                if !state.isRefreshing {
+                    state.isLoadingTopics = true
+                }
+                return .run { [id = state.forumId, perPage = state.appSettings.forumPerPage, isRefreshing = state.isRefreshing] send in
+                    let startTime = Date()
+                    for try await forum in try await apiClient.getForum(id, offset, perPage, isRefreshing ? .skipCache : .cacheAndLoad) {
+                        if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
+                        await send(.internal(.forumResponse(.success(forum))))
+                    }
+                } catch: { error, send in
+                    await send(.internal(.forumResponse(.failure(error))))
+                }
+                
+            case let .internal(.forumResponse(.success(forum))):
                 var topics: [TopicInfo] = []
                 var pinnedTopics: [TopicInfo] = []
                 
@@ -237,25 +296,9 @@ public struct ForumFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case let ._forumResponse(.failure(error)):
+            case .internal(.forumResponse(.failure)):
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
-                
-            case let .topicTapped(topic, showUnread):
-                guard !showUnread else {
-                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
-                }
-                let goTo = state.appSettings.topicOpeningStrategy.asGoTo
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
-                
-            case let .subforumTapped(forum):
-                return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
-                
-            case let .announcementTapped(id: id, name: name):
-                return .send(.delegate(.openAnnouncement(id: id, name: name)))
-                
-            case let .subforumRedirectTapped(url):
-                return .send(.delegate(.handleRedirect(url)))
                 
             case .delegate:
                 return .none

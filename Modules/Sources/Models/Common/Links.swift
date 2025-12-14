@@ -20,6 +20,7 @@ public enum Links {
     public static let github = URL(string: "https://github.com/SubvertDev/ForPDA/")!
     public static let githubReleases = URL(string: "https://github.com/SubvertDev/ForPDA/releases/")!
     public static let defaultAvatar = URL(string: "https://4pda.to/s/PXtijiHlTQLQuS20Pw2juZgaB7jch8eE.jpg")!
+    public static let defaultQMSAvatar = URL(string: "https://4pda.to/s/mQ6021gSPEDDSilvNhU5Lz0aSLgvyaaxu.png")!
     
     // TODO: Check if needed
     

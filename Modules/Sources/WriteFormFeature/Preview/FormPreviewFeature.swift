@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import Models
 import TopicBuilder
+import SharedUI
 
 @Reducer
 public struct FormPreviewFeature: Reducer, Sendable {
@@ -22,7 +23,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
     public struct State: Equatable {
         public let formType: WriteFormForType
         
-        var contentTypes: [TopicTypeUI] = []
+        var contentTypes: [UITopicType] = []
         
         var isPreviewLoading = false
         

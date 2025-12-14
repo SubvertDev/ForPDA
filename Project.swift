@@ -15,7 +15,8 @@ let project = Project(
             resources: ["Modules/Resources/**"],
             dependencies: [
                 .target(name: "AppFeature"),
-                .target(name: "SafariExtension")
+                .target(name: "SafariExtension"),
+                .SPM.TCA
             ],
             settings: .settings(base: .appSettings, defaultSettings: .recommended)
         ),
@@ -48,6 +49,8 @@ let project = Project(
                     .Internal.QMSListFeature,
                     .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
+                    .Internal.SearchFeature,
+                    .Internal.SearchResultFeature,
                     .Internal.SettingsFeature,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -87,6 +90,7 @@ let project = Project(
                     .Internal.GalleryFeature,
                     .Internal.HapticClient,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.ReputationChangeFeature,
@@ -182,8 +186,9 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.Models,
-                    .Internal.NotificationCenterClient,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
+                    .Internal.PasteboardClient,
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
@@ -211,6 +216,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -280,9 +286,12 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.BBBuilder,
+                    .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
@@ -307,8 +316,9 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
-                    .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.Models,
+                    .Internal.QMSClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,
@@ -318,13 +328,15 @@ let project = Project(
         
             .feature(
                 name: "QMSFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
-                    .Internal.APIClient,
+                    .Internal.BBBuilder,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
+                    .Internal.QMSClient,
                     .Internal.SharedUI,
+                    .Internal.TCAExtensions,
                     .SPM.ExyteChat,
                     .SPM.NukeUI,
                     .SPM.SkeletonUI,
@@ -340,6 +352,8 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .Internal.TCAExtensions,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -354,6 +368,30 @@ let project = Project(
                     .SPM.TCA,
                 ]
              ),
+        
+            .feature(
+                name: "SearchFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.TCA,
+                ]
+            ),
+            
+            .feature(
+                name: "SearchResultFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .Internal.TopicBuilder,
+                    .SPM.TCA,
+                ]
+            ),
         
             .feature(
                 name: "SettingsFeature",
@@ -390,9 +428,10 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
+                    .Internal.GalleryFeature,
                     .Internal.LoggerClient,
                     .Internal.Models,
-                    .Internal.NotificationCenterClient,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
                     .Internal.PasteboardClient,
@@ -455,6 +494,7 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.Models,
+                    .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
                 ]
@@ -489,10 +529,13 @@ let project = Project(
             ),
         
             .feature(
-                name: "NotificationCenterClient",
-                hasResources: false,
+                name: "QMSClient",
                 dependencies: [
-                    .Internal.LoggerClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .Internal.NotificationsClient,
+                    .SPM.PDAPI,
                     .SPM.TCA
                 ]
             ),
@@ -537,6 +580,7 @@ let project = Project(
             .feature(
                 name: "SharedUI",
                 dependencies: [
+                    .Internal.Models,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
@@ -583,7 +627,14 @@ let project = Project(
                 infoPlist: .default,
                 sources: ["Modules/Tests/**"],
                 resources: [],
-                dependencies: [.target(name: "ForPDA")]
+                dependencies: [
+                    .target(name: "ForPDA"),
+                    .Internal.ArticlesListFeature,
+                    .Internal.BBBuilder,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.TCA
+                ]
             ),
         
         .tests(
@@ -729,7 +780,6 @@ extension SettingsDictionary {
         .setDevelopmentTeam("7353CQCGQC")
     
         .includeAppIcon()
-        .enableBackwardCompatibleAppIcons()
         .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
@@ -787,21 +837,14 @@ extension Dictionary where Key == String, Value == SettingValue {
     func enableDsym() -> SettingsDictionary {
         return merging(["DEBUG_INFORMATION_FORMAT": "dwarf-with-dsym"])
     }
-    
-    func enableBackwardCompatibleAppIcons() -> SettingsDictionary {
-        return merging([
-            "ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS": true,
-            "ASSETCATALOG_OTHER_FLAGS": "--enable-icon-stack-fallback-generation=disabled"
-        ])
-    }
 }
 
 extension Array where Element == String {
     static let longTypeCheckingFlags = [
         "-Xfrontend",
-        "-warn-long-function-bodies=600",
+        "-warn-long-function-bodies=700",
         "-Xfrontend",
-        "-warn-long-expression-type-checking=100"
+        "-warn-long-expression-type-checking=150"
     ]
 }
 
@@ -880,6 +923,8 @@ extension TargetDependency.Internal {
     static let QMSListFeature =         TargetDependency.target(name: "QMSListFeature")
     static let ReputationChangeFeature = TargetDependency.target(name: "ReputationChangeFeature")
     static let ReputationFeature =      TargetDependency.target(name: "ReputationFeature")
+    static let SearchFeature =          TargetDependency.target(name: "SearchFeature")
+    static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
@@ -891,10 +936,10 @@ extension TargetDependency.Internal {
     static let CacheClient =         TargetDependency.target(name: "CacheClient")
     static let HapticClient =        TargetDependency.target(name: "HapticClient")
     static let LoggerClient =        TargetDependency.target(name: "LoggerClient")
-    static let NotificationCenterClient = TargetDependency.target(name: "NotificationCenterClient")
     static let NotificationsClient = TargetDependency.target(name: "NotificationsClient")
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
+    static let QMSClient =           TargetDependency.target(name: "QMSClient")
     static let ToastClient =         TargetDependency.target(name: "ToastClient")
     
     // Shared
