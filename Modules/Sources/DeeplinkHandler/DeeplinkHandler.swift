@@ -175,7 +175,7 @@ public struct DeeplinkHandler {
         }
         
         if let announcementItem = queryItems.first(where: { $0.name == "act" }), let actType = announcementItem.value {
-            switch actType {
+            switch actType.lowercased() {
             case "announce":
                 // https://4pda.to/forum/index.php?act=announce&f=140&st=238
                  if let announceItem = queryItems.first(where: { $0.name == "st" }), let value = announceItem.value, let announceId = Int(value) {
