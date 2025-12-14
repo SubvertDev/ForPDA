@@ -139,7 +139,7 @@ struct LiquidTabView: View {
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
             .if(store.appSettings.experimentalFloatingNavigation) { content in
                 if #available(iOS 26.1, *) {
-                    let isEnabled = getNavigation()?.state.count ?? 0 > 1
+                    let isEnabled = getNavigation()?.state.totalPages ?? 0 > 1
                     content
                         .tabViewBottomAccessory(isEnabled: isEnabled) {
                             if let navigationStore = getNavigation() {

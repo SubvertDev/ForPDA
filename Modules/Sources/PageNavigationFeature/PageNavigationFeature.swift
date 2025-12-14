@@ -44,7 +44,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
             return Int(ceil(Double(offset) / Double(perPage))) + 1
         }
         
-        var totalPages: Int {
+        public var totalPages: Int {
             return Int(ceil(Double(count) / Double(perPage)))
         }
         
