@@ -120,6 +120,8 @@ public struct DeeplinkHandler {
             }
         }
         
+        let url = URL(string: url.absoluteString.replacingOccurrences(of: "&amp;", with: "&"))!
+        
         guard let host = url.host, host == "4pda.to" else { throw .externalURL }
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents(in: url) }
