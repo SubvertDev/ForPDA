@@ -37,6 +37,7 @@ public struct TopicFeature: Reducer, Sendable {
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
+        static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
     }
     
     // MARK: - Destinations
@@ -605,6 +606,10 @@ public struct TopicFeature: Reducer, Sendable {
             let response = try await apiClient.jumpForum(request)
             let offset = response.offset - (response.offset % topicPerPage)
             await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
+            
+            if jump.type == .post && jump.postId != response.postId {
+                await toastClient.showToast(ToastMessage(text: Localization.showingNearestPost))
+            }
         } catch: { error, send in
             await send(.internal(.jumpRequestFailed))
         }

@@ -171,6 +171,16 @@
         }
       }
     },
+    "The post has been deleted, showing the nearest one" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост был удален, показываю ближайший"
+          }
+        }
+      }
+    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {
