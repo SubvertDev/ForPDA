@@ -160,6 +160,10 @@ public struct DeeplinkHandler {
                     // https://4pda.to/forum/index.php?showtopic=123456&view=getnewpost
                     return .topic(id: topicId, goTo: .unread)
                     
+                case "getlastpost":
+                    // https://4pda.to/forum/index.php?showtopic=673755&view=getlastpost
+                    return .topic(id: topicId, goTo: .last)
+                    
                 default:
                     analytics.capture(DeeplinkError.unknownType(type: viewType, for: url.absoluteString))
                 }
