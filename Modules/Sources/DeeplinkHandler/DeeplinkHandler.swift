@@ -158,7 +158,7 @@ public struct DeeplinkHandler {
                     
                 case "getnewpost":
                     // https://4pda.to/forum/index.php?showtopic=123456&view=getnewpost
-                    return .topic(id: topicId, goTo: .last)
+                    return .topic(id: topicId, goTo: .unread)
                     
                 default:
                     analytics.capture(DeeplinkError.unknownType(type: viewType, for: url.absoluteString))
