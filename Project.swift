@@ -365,6 +365,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .Internal.WriteFormFeature,
                     .SPM.TCA,
                 ]
              ),
