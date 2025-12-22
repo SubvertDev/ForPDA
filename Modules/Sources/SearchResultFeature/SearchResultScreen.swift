@@ -171,8 +171,8 @@ public struct SearchResultScreen: View {
                         .clipShape(
                             .rect(
                                 topLeadingRadius: index == 0 ? radius : 0,
-                                bottomLeadingRadius: index == store.contentCount - 1 ? radius : 0,
-                                bottomTrailingRadius: index == store.contentCount - 1 ? radius : 0,
+                                bottomLeadingRadius: index == store.content.count - 1 ? radius : 0,
+                                bottomTrailingRadius: index == store.content.count - 1 ? radius : 0,
                                 topTrailingRadius: index == 0 ? radius : 0
                             )
                         )
