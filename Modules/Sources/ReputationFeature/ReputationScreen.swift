@@ -113,10 +113,11 @@ public struct ReputationScreen: View {
     
     @ViewBuilder
     private func ReputationRow(vote: ReputationVote) -> some View {
+        let authorId = store.pickerSection == .history ? vote.authorId : vote.toId
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Button {
-                    send(.profileTapped(store.pickerSection == .history ? vote.authorId : vote.toId))
+                    send(.profileTapped(authorId))
                 } label: {
                     Text(store.pickerSection == .history ? vote.authorName : vote.toName)
                         .foregroundStyle(Color(.Labels.primary))
@@ -172,10 +173,7 @@ public struct ReputationScreen: View {
                 Spacer()
                 
                 Menu {
-                    MenuButtons(
-                        voteId: vote.id,
-                        authorId: store.pickerSection == .history ? vote.authorId : vote.toId
-                    )
+                    MenuButtons(voteId: vote.id, authorId: authorId)
                 } label: {
                     Image(systemSymbol: .ellipsis)
                         .foregroundStyle(Color(.Labels.teritary))
@@ -190,7 +188,7 @@ public struct ReputationScreen: View {
         .contentShape(Rectangle())
         .background(Color(.Background.primary))
         .contextMenu {
-            MenuButtons(voteId: vote.id, authorId: vote.authorId)
+            MenuButtons(voteId: vote.id, authorId: authorId)
         }
     }
     // MARK: - Empty Reputation
