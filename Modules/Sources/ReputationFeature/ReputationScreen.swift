@@ -68,14 +68,16 @@ public struct ReputationScreen: View {
                 Spacer()
             } else {
                 List(store.historyData, id: \.self) { vote in
-                    ReputationRow(vote: vote)
-                        .listRowBackground(Color(.Background.primary))
-                        .onAppear {
-                            if let index = store.historyData.firstIndex(of: vote),
-                               index == store.historyData.count - 5 {
-                                send(.loadMore)
+                    WithPerceptionTracking {
+                        ReputationRow(vote: vote)
+                            .listRowBackground(Color(.Background.primary))
+                            .onAppear {
+                                if let index = store.historyData.firstIndex(of: vote),
+                                   index == store.historyData.count - 5 {
+                                    send(.loadMore)
+                                }
                             }
-                        }
+                    }
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
