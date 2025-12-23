@@ -61,6 +61,16 @@
         }
       }
     },
+    "From profile" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Из профиля"
+          }
+        }
+      }
+    },
     "Last page" : {
       "localizations" : {
         "ru" : {

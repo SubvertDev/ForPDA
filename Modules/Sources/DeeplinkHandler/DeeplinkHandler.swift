@@ -158,6 +158,10 @@ public struct DeeplinkHandler {
                     
                 case "getnewpost":
                     // https://4pda.to/forum/index.php?showtopic=123456&view=getnewpost
+                    return .topic(id: topicId, goTo: .unread)
+                    
+                case "getlastpost":
+                    // https://4pda.to/forum/index.php?showtopic=673755&view=getlastpost
                     return .topic(id: topicId, goTo: .last)
                     
                 default:
@@ -322,16 +326,22 @@ extension Array {
 
 extension Array where Element == URLQueryItem {
     func extractSearchIds(forItem name: String) -> [Int] {
-        return self.compactMap { item -> Int? in
-            let isSingleItem = item.name == name
-            let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
-            
-            guard (isSingleItem || isMultiItems),
-                  let value = item.value,
-                  let id = Int(value) else {
-                return nil
+        return self
+            .filter { item -> Bool in
+                let isSingleItem = item.name == name
+                let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
+                return isSingleItem || isMultiItems
             }
-            return id
-        }
+            .compactMap { item -> [Int]? in
+                guard let value = item.value else { return nil }
+                if value.contains(",") {
+                    return value
+                        .split(separator: ",")
+                        .compactMap { Int(String($0).trimmingCharacters(in: .whitespaces)) }
+                } else {
+                    return [Int(value) ?? 0]
+                }
+            }
+            .flatMap { $0 }
     }
 }

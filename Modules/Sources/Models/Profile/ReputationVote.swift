@@ -7,6 +7,7 @@
 
 import Foundation
 import SFSafeSymbols
+import SwiftUI
 
 public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     public let id: Int
@@ -24,7 +25,7 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     private var createdInDetails: (title: String, titleId: Int, createdInType: String, goToId: Int?) {
         switch createdIn {
         case .profile:
-            return ("From profile", id, "Profile", nil)
+            return (String(localized: "From profile", bundle: .module), id, "Profile", nil)
             
         case let .topic(id: id, topicName: topicName, postId: postId):
             return (topicName, id, "Topic", postId)

@@ -20,12 +20,7 @@ public struct EditFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination: Hashable, Equatable {
-        case alert(AlertState<Alert>)
         case avatarPicker
-        
-        public enum Alert {
-            case yes, no
-        }
     }
     
     // MARK: - State
@@ -104,6 +99,7 @@ public struct EditFeature: Reducer, Sendable {
         case alert(PresentationAction<Alert>)
         public enum Alert {
             case cancel
+            case deleteAvatar
         }
         
         case `internal`(Internal)
@@ -135,6 +131,10 @@ public struct EditFeature: Reducer, Sendable {
             case .binding:
                 return .none
                 
+            case .alert(.presented(.deleteAvatar)):
+                let empty = Data()
+                return .send(.internal(.updateAvatar(empty)))
+                
             case .view(.onAppear):
                 state.birthdayDate = state.draftUser.birthdayDate ?? nil
                 return .none
@@ -143,8 +143,8 @@ public struct EditFeature: Reducer, Sendable {
                 return .send(.internal(.updateAvatar(data)))
                 
             case .view(.deleteAvatar):
-                let empty = Data()
-                return .send(.internal(.updateAvatar(empty)))
+                state.alert = .deleteAvatarConfirmation
+                return .none
             
             case .view(.onAvatarBadFileSizeProvided):
                 state.alert = .avatarFileSizeError
@@ -251,6 +251,18 @@ private extension AlertState where Action == EditFeature.Action.Alert {
     } actions: {
         ButtonState(role: .cancel) {
             TextState("Ok", bundle: .module)
+        }
+    }
+    
+    nonisolated(unsafe) static let deleteAvatarConfirmation = Self {
+        TextState("Are you sure, that you want to delete an avatar?", bundle: .module)
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("Cancel", bundle: .module)
+        }
+        
+        ButtonState(role: .destructive, action: .deleteAvatar) {
+            TextState("Delete", bundle: .module)
         }
     }
 }

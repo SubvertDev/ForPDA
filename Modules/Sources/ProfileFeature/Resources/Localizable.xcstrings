@@ -31,6 +31,16 @@
         }
       }
     },
+    "Are you sure, that you want to delete an avatar?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить аватар?"
+          }
+        }
+      }
+    },
     "Avatar must be 100x100" : {
       "localizations" : {
         "ru" : {
@@ -107,6 +117,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментариев"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
           }
         }
       }
