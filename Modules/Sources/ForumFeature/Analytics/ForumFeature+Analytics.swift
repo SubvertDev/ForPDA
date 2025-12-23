@@ -34,6 +34,9 @@ extension ForumFeature {
                 case let .view(.subforumRedirectTapped(url)):
                     analytics.log(ForumEvent.subforumRedirectTapped(url))
                     
+                case let .view(.globalAnnouncementUrlTapped(url)):
+                    analytics.log(ForumEvent.globalAnnouncementUrlTapped(url))
+                    
                 case let .view(.subforumTapped(forum)):
                     analytics.log(ForumEvent.subforumTapped(forum.id, forum.name))
                     

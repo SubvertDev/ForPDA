@@ -17,7 +17,7 @@ public struct ForumParser {
                     id: array[3] as! Int,
                     name: array[4] as! String,
                     flag: array[5] as! Int,
-                    description: array[6] as! String,
+                    globalAnnouncement: array[6] as! String,
                     announcements: parseAnnouncementInfo(array[7] as! [[Any]]),
                     subforums: parseForumInfo(array[8] as! [[Any]]),
                     topicsCount: array[9] as! Int,

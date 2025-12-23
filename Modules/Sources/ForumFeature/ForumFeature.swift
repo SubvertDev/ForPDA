@@ -102,6 +102,7 @@ public struct ForumFeature: Reducer, Sendable {
             case subforumRedirectTapped(URL)
             case subforumTapped(ForumInfo)
             case announcementTapped(id: Int, name: String)
+            case globalAnnouncementUrlTapped(URL)
             case sectionExpandTapped(SectionExpand.Kind)
             
             case contextOptionMenu(ForumOptionContextMenuAction)
@@ -174,6 +175,9 @@ public struct ForumFeature: Reducer, Sendable {
                     on: .forum(ids: [state.forumId], sIn: .all, asTopics: false),
                     navigation: navigation
                 )))
+                
+            case let .view(.globalAnnouncementUrlTapped(url)):
+                return .send(.delegate(.handleRedirect(url)))
                 
             case let .view(.topicTapped(topic, showUnread)):
                 guard !showUnread else {

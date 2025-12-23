@@ -11,6 +11,7 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
+import BBBuilder
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -42,6 +43,10 @@ public struct ForumScreen: View {
                 
                 if let forum = store.forum, !store.isLoadingTopics {
                     List {
+                        if let globalAnnouncement = forum.globalAnnouncementAttributed {
+                            GlobalAnnouncementRow(announce: globalAnnouncement)
+                        }
+                        
                         if !forum.subforums.isEmpty {
                             SubforumsSection(subforums: forum.subforums)
                         }
@@ -137,6 +142,29 @@ public struct ForumScreen: View {
         } else {
             return AnyShapeStyle(tintColor)
         }
+    }
+    
+    // MARK: - Global Announcement Row
+    
+    @ViewBuilder
+    private func GlobalAnnouncementRow(announce: NSAttributedString) -> some View {
+        RichText(text: announce, onUrlTap: { url in
+            send(.globalAnnouncementUrlTapped(url))
+        })
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background {
+            if #available(iOS 26, *) {
+                ConcentricRectangle()
+                    .fill(Color(.Background.teritary))
+            } else {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(.Background.teritary))
+            }
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Topics
@@ -333,6 +361,13 @@ public struct ForumScreen: View {
 extension Bundle {
     static var models: Bundle? {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+    }
+}
+
+extension Forum {
+    var globalAnnouncementAttributed: NSAttributedString? {
+        guard !globalAnnouncement.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer().render(text: globalAnnouncement)
     }
 }
 

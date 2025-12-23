@@ -212,6 +212,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.BBBuilder,
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PageNavigationFeature,

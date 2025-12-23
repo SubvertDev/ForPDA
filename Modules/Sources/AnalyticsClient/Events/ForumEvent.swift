@@ -11,6 +11,7 @@ public enum ForumEvent: Event {
     case onRefresh
     case topicTapped(Int, Bool)
     case subforumRedirectTapped(URL)
+    case globalAnnouncementUrlTapped(URL)
     case subforumTapped(Int, String)
     case announcementTapped(Int, String)
     case sectionExpandTapped(String)
@@ -39,7 +40,8 @@ public enum ForumEvent: Event {
         case let .topicTapped(id, showUnread):
             return ["id": String(id), "showUnread": showUnread.description]
             
-        case let .subforumRedirectTapped(url):
+        case let .subforumRedirectTapped(url),
+             let .globalAnnouncementUrlTapped(url):
             return ["url": url.absoluteString]
             
         case let .subforumTapped(id, name):
