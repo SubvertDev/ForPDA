@@ -29,7 +29,8 @@ public struct DevDBParser {
               let editionName = array[safe: 7] as? String,
               let editionsRaw = array[safe: 8] as? [[Any]],
               let imagesRaw = array[safe: 9] as? [[Any]],
-              let specsRaw = array[safe: 10] as? [[Any]] else {
+              let specsRaw = array[safe: 10] as? [[Any]],
+              let isMyDevice = array[safe: 11] as? Int else {
             throw ParsingError.failedToCastFields
         }
         
@@ -42,7 +43,8 @@ public struct DevDBParser {
             categoryName: categoryName,
             images: try parseDeviceImages(imagesRaw),
             editions: try parseDeviceEditions(editionsRaw),
-            specifications: try parseDeviceSpecifications(specsRaw)
+            specifications: try parseDeviceSpecifications(specsRaw),
+            isMyDevice: isMyDevice == 1
         )
     }
     

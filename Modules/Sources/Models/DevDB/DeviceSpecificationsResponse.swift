@@ -17,6 +17,7 @@ public struct DeviceSpecificationsResponse: Sendable {
     public let images: [DeviceImage]
     public let editions: [Edition]
     public let specifications: [Specification]
+    public let isMyDevice: Bool
     
     public struct DeviceImage: Sendable {
         public let url: URL
@@ -61,7 +62,8 @@ public struct DeviceSpecificationsResponse: Sendable {
         categoryName: String,
         images: [DeviceImage],
         editions: [Edition],
-        specifications: [Specification]
+        specifications: [Specification],
+        isMyDevice: Bool
     ) {
         self.tag = tag
         self.type = type
@@ -72,6 +74,7 @@ public struct DeviceSpecificationsResponse: Sendable {
         self.images = images
         self.editions = editions
         self.specifications = specifications
+        self.isMyDevice = isMyDevice
     }
 }
 
@@ -122,6 +125,7 @@ public extension DeviceSpecificationsResponse {
                     )
                 ]
             )
-        ]
+        ],
+        isMyDevice: true
     )
 }
