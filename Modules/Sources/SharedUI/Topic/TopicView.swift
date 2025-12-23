@@ -328,6 +328,7 @@ struct QuoteView: View {
     let onImageTap: ImageTapHandler?
     private let text: AttributedString
     private var date: String?
+    private var postId: Int?
     
     private static var defaultAttributes: AttributeContainer {
         var container = AttributeContainer()
@@ -367,6 +368,7 @@ struct QuoteView: View {
                 infoText.setAttributes(QuoteView.defaultAttributes)
                 text.append(infoText)
                 self.date = metadata.date
+                self.postId = metadata.postId
             }
         } else {
             text.setAttributes(QuoteView.defaultAttributes)
@@ -377,6 +379,16 @@ struct QuoteView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
+                if let postId {
+                    Button {
+                        onUrlTap?(URL(string: "snapback://\(postId)")!)
+                    } label: {
+                        Image(systemSymbol: .arrowLeftSquare)
+                            .frame(width: 16, height: 16)
+                    }
+                    .padding(.trailing, 8)
+                }
+                
                 Text(text)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
