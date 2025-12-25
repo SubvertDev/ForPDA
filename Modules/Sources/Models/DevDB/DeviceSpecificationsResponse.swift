@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DeviceSpecificationsResponse: Sendable {
+public struct DeviceSpecificationsResponse: Sendable, Equatable {
     public let tag: String
     public let type: DeviceType
     public let vendorName: String
@@ -19,7 +19,7 @@ public struct DeviceSpecificationsResponse: Sendable {
     public let specifications: [Specification]
     public let isMyDevice: Bool
     
-    public struct DeviceImage: Sendable {
+    public struct DeviceImage: Sendable, Equatable {
         public let url: URL
         public let fullUrl: URL
         public let isFront: Bool
@@ -31,7 +31,7 @@ public struct DeviceSpecificationsResponse: Sendable {
         }
     }
     
-    public struct Edition: Sendable {
+    public struct Edition: Sendable, Equatable {
         public let name: String
         public let subTag: String
         
@@ -41,12 +41,22 @@ public struct DeviceSpecificationsResponse: Sendable {
         }
     }
     
-    public struct Specification: Sendable {
+    public struct Specification: Sendable, Equatable {
         public let id: Int
         public let title: String
-        public var entries: [(name: String, value: String)]
+        public var entries: [SpecificationEntry]
         
-        public init(id: Int, title: String, entries: [(String, String)]) {
+        public struct SpecificationEntry: Sendable, Equatable {
+            public let name: String
+            public let value: String
+            
+            public init(name: String, value: String) {
+                self.name = name
+                self.value = value
+            }
+        }
+        
+        public init(id: Int, title: String, entries: [SpecificationEntry]) {
             self.id = id
             self.title = title
             self.entries = entries
@@ -109,17 +119,17 @@ public extension DeviceSpecificationsResponse {
                 id: 0,
                 title: "Общее",
                 entries: [
-                    (name: "Производитель:", value: "Apple"),
-                    (name: "Модель:", value: "iPhone 13"),
-                    (name: "Операционная система:", value: "iOS 15, iOS 16, iOS 17, iOS 18")
+                    .init(name: "Производитель:", value: "Apple"),
+                    .init(name: "Модель:", value: "iPhone 13"),
+                    .init(name: "Операционная система:", value: "iOS 15, iOS 16, iOS 17, iOS 18")
                 ]
             ),
             .init(
                 id: 17,
                 title: "Коммуникации",
                 entries: [
-                    (name: "Bluetooth:", value: "5.0"),
-                    (
+                    .init(name: "Bluetooth:", value: "5.0"),
+                    .init(
                         name: "Телефон:",
                         value: "5G , GSM (850, 900, 1800, 1900), LTE (700 (12/17/28), 800 (20), 850 (5/26), 900 (8)..."
                     )

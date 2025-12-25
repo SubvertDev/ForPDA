@@ -99,7 +99,7 @@ public struct DevDBParser {
                 guard let value = spec[safe: 4] as? String else {
                     throw ParsingError.failedToCastFields
                 }
-                specs[specs.count - 1].entries.append((title, value))
+                specs[specs.count - 1].entries.append(.init(name: title, value: value))
             }
         }
         return specs

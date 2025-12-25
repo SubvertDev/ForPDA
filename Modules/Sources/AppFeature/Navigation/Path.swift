@@ -11,6 +11,7 @@ import AnnouncementFeature
 import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
+import DeviceSpecificationsFeature
 import FavoritesRootFeature
 import FavoritesFeature
 import ForumFeature
@@ -30,6 +31,7 @@ import AuthFeature
 @Reducer
 public enum Path {
     case articles(Articles.Body = Articles.body)
+    case devDB(DevDB.Body = DevDB.body)
     case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
     case profile(Profile.Body = Profile.body)
@@ -42,6 +44,11 @@ public enum Path {
     public enum Articles {
         case articlesList(ArticlesListFeature)
         case article(ArticleFeature)
+    }
+    
+    @Reducer
+    public enum DevDB {
+        case specifications(DeviceSpecificationsFeature)
     }
     
     @Reducer
@@ -82,6 +89,7 @@ public enum Path {
 
 extension Path.State: Equatable {}
 extension Path.Articles.State: Equatable {}
+extension Path.DevDB.State: Equatable {}
 extension Path.Profile.State: Equatable {}
 extension Path.Forum.State: Equatable {}
 extension Path.Settings.State: Equatable {}
@@ -94,6 +102,9 @@ extension Path {
         switch store.case {
         case let .articles(path):
             ArticlesViews(path)
+            
+        case let .devDB(path):
+            DevDBViews(path)
             
         case let .favorites(store):
             FavoritesScreen(store: store)
@@ -130,6 +141,15 @@ extension Path {
         case let .article(store):
             ArticleScreen(store: store)
                 .tracking(for: ArticleScreen.self, ["id": store.articlePreview.id])
+        }
+    }
+    
+    @MainActor @ViewBuilder
+    private static func DevDBViews(_ store: Store<Path.DevDB.State, Path.DevDB.Action>) -> some View {
+        switch store.case {
+        case let .specifications(store):
+            DeviceSpecificationsScreen(store: store)
+                .tracking(for: DeviceSpecificationsScreen.self)
         }
     }
     
