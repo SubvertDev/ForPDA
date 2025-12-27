@@ -50,6 +50,9 @@ extension ProfileFeature {
                 case .view(.searchRepliesButtonTapped):
                     analyticsClient.log(ProfileEvent.searchRepliesTapped)
                     
+                case .view(.deviceButtonTapped(let tag)):
+                    analyticsClient.log(ProfileEvent.deviceButtonTapped(tag))
+                    
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {
                     case .about:

@@ -16,6 +16,7 @@ public enum ProfileEvent: Event {
     case reputationTapped
     case searchTopicsTapped
     case searchRepliesTapped
+    case deviceButtonTapped(String)
     case userLoaded(Int)
     case userLoadingFailed
     case achievementTapped
@@ -30,6 +31,8 @@ public enum ProfileEvent: Event {
         switch self {
         case let .userLoaded(userId):
             return ["userId": String(userId)]
+        case let .deviceButtonTapped(tag):
+            return ["deviceTag": tag]
         default:
             return nil
         }

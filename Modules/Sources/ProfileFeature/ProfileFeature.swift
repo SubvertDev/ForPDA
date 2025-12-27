@@ -76,6 +76,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
+            case deviceButtonTapped(String)
             case deeplinkTapped(URL, ProfileDeeplinkType)
         }
         
@@ -94,6 +95,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openQms
             case openSettings
             case openHistory
+            case openDevice(String)
             case openReputation(Int)
             case openSearch(SearchResult)
             case handleUrl(URL)
@@ -125,6 +127,9 @@ public struct ProfileFeature: Reducer, Sendable {
                 } catch: { error, send in
                     await send(.internal(.userResponse(.failure(error))))
                 }
+                
+            case let .view(.deviceButtonTapped(tag)):
+                return .send(.delegate(.openDevice(tag)))
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))

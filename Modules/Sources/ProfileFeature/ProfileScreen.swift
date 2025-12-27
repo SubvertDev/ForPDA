@@ -348,19 +348,23 @@ public struct ProfileScreen: View {
     private func DevicesSection(devices: [User.Device]) -> some View {
         Section {
             ForEach(devices) { device in
-                HStack(spacing: 0) {
-                    Text(device.name)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                    
-                    Spacer(minLength: 8)
-                    
-                    if device.main {
-                        Circle()
-                            .font(.title2)
-                            .foregroundStyle(tintColor)
-                            .frame(width: 8)
-                            .padding(.trailing, 12)
+                Button {
+                    send(.deviceButtonTapped(device.id))
+                } label: {
+                    HStack(spacing: 0) {
+                        Text(device.name)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                        
+                        Spacer(minLength: 8)
+                        
+                        if device.main {
+                            Circle()
+                                .font(.title2)
+                                .foregroundStyle(tintColor)
+                                .frame(width: 8)
+                                .padding(.trailing, 12)
+                        }
                     }
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
