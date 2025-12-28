@@ -380,6 +380,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
                 ._toolbarTitleDisplayMode(.inline)
+                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
