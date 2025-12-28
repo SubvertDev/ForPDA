@@ -77,6 +77,7 @@ public struct TopicFeature: Reducer, Sendable {
         public var goTo: GoTo
         
         var posts: [UIPost] = []
+        var postsFilter: TopicPostsFilter = .exceptDeleted
         
         var isLoadingTopic = true
         var isRefreshing = false
@@ -220,6 +221,9 @@ public struct TopicFeature: Reducer, Sendable {
                     await send(.internal(.refresh))
                 }
                 .cancellable(id: CancelID.loading)
+                
+            case .binding(\.postsFilter):
+                return .send(.internal(.load))
                 
             case .destination, .pageNavigation, .binding:
                 return .none
@@ -465,9 +469,14 @@ public struct TopicFeature: Reducer, Sendable {
                 if !state.isRefreshing {
                     state.isLoadingTopic = true
                 }
-                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage, isRefreshing = state.isRefreshing] send in
+                return .run { [
+                    id = state.topicId,
+                    perPage = state.appSettings.topicPerPage,
+                    isRefreshing = state.isRefreshing,
+                    postsFilter = state.postsFilter
+                ] send in
                     let startTime = Date()
-                    let topic = try await apiClient.getTopic(id, offset, perPage)
+                    let topic = try await apiClient.getTopic(id, offset, perPage, postsFilter)
                     if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
                     await send(.internal(.topicResponse(.success(topic))))
                 } catch: { error, send in

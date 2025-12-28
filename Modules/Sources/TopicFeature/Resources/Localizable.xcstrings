@@ -81,6 +81,16 @@
         }
       }
     },
+    "Except deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кроме удаленных"
+          }
+        }
+      }
+    },
     "Go To End" : {
       "localizations" : {
         "ru" : {
@@ -121,6 +131,46 @@
         }
       }
     },
+    "No" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
+    "Only default" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только обычные"
+          }
+        }
+      }
+    },
+    "Only deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только удаленные"
+          }
+        }
+      }
+    },
+    "Only hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только скрытые"
+          }
+        }
+      }
+    },
     "Open In Browser" : {
       "localizations" : {
         "ru" : {
@@ -157,6 +207,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Голос засчитан"
+          }
+        }
+      }
+    },
+    "Posts Filter" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтр постов"
           }
         }
       }
@@ -267,6 +327,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Написать пост"
+          }
+        }
+      }
+    },
+    "Yes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
           }
         }
       }
