@@ -51,7 +51,9 @@ public struct BBPanelView: View {
                 }
                 .sheet(isPresented: Binding($store.destination.colorTag)) {
                     ColorPickerView(onColorSelected: { color in
-                        send(.colorSelected(color.description))
+                        if let color = color.hexColor {
+                            send(.colorSelected(color))
+                        }
                     })
                     .presentationDetents([.medium])
                 }
@@ -146,6 +148,18 @@ public struct BBPanelView: View {
         .presentationDetents([.height(337)])
         .presentationDragIndicator(.visible)
         
+    }
+}
+
+// MARK: - Helpers
+
+extension Color {
+    var hexColor: String? {
+        let components = self.cgColor?.components
+        guard let r = components?[0], let g = components?[1], let b = components?[2] else {
+            return nil
+        }
+        return String(format: "#%02x%02x%02x", Int(r * 255), Int(g * 255), Int(b * 255))
     }
 }
 
