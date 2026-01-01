@@ -251,6 +251,8 @@ struct CheckBox: ToggleStyle {
     }
 }
 
+#warning("Uncomment previews")
+/*
 // MARK: - Field View Preview
 
 @available(iOS 17, *)
@@ -381,3 +383,4 @@ struct CheckBox: ToggleStyle {
     }
     .padding(.horizontal, 16)
 }
+*/
