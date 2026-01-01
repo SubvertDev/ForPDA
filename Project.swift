@@ -139,6 +139,16 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+            
+            .feature(
+                name: "BBPanelFeature",
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+             ),
         
             .feature(
                 name: "BookmarksFeature",
@@ -909,6 +919,7 @@ extension TargetDependency.Internal {
     static let ArticleFeature =         TargetDependency.target(name: "ArticleFeature")
     static let ArticlesListFeature =    TargetDependency.target(name: "ArticlesListFeature")
     static let AuthFeature =            TargetDependency.target(name: "AuthFeature")
+    static let BBPanelFeature =         TargetDependency.target(name: "BBPanelFeature")
     static let BookmarksFeature =       TargetDependency.target(name: "BookmarksFeature")
     static let DeeplinkHandler =        TargetDependency.target(name: "DeeplinkHandler")
     static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
