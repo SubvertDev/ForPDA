@@ -100,7 +100,7 @@ public struct BBPanelView: View {
     
     @ViewBuilder
     private func AlertInput(_ action: @escaping () -> Void) -> some View {
-        TextField(LocalizedStringKey("Input..."), text: $store.alertInput)
+        TextField(String(), text: $store.alertInput)
         
         Button(LocalizedStringResource("Cancel", bundle: .module)) { }
         
