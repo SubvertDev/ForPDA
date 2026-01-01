@@ -353,7 +353,7 @@ public struct EditScreen: View {
         characterLimit: Int? = nil
     ) -> some View {
         Section {
-            ForField(
+            SharedUI.Field(
                 content: content,
                 placeholder: LocalizedStringResource("Input...", bundle: .module),
                 focusEqual: focusEqual,

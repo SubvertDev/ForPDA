@@ -40,7 +40,7 @@ struct WriteFormView: View {
         switch type {
         case .text(let content):
             Section {
-                ForField(
+                Field(
                     content: Binding(
                         get: { onUpdateContent(nil) },
                         set: { _ = onUpdateContent($0) }
@@ -74,7 +74,7 @@ struct WriteFormView: View {
             
         case .editor(let content):
             Section {
-                ForField(
+                Field(
                     content: Binding(
                         get: { onUpdateContent(nil) },
                         set: { _ = onUpdateContent($0) }

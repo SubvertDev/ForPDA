@@ -38,7 +38,7 @@ public struct ReputationChangeView: View {
                     .offset(y: isLiquidGlass ? -6 : 0)
                 
                 Section {
-                    ForField(
+                    Field(
                         content: $store.changeReason.sending(\.reasonChanged),
                         placeholder: LocalizedStringResource("Input", bundle: .module),
                         focusEqual: ReputationChangeFeature.State.Field.reason,

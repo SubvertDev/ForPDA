@@ -163,7 +163,7 @@ public struct WriteFormScreen: View {
             .padding(.horizontal, 2)
             
             if store.isEditReasonToggleSelected {
-                ForField(
+                Field(
                     content: $store.editReasonContent,
                     placeholder: LocalizedStringResource("Input...", bundle: .module),
                     focusEqual: WriteFormFeature.State.Field.reason,
