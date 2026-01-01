@@ -19,7 +19,7 @@ extension WriteFormFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .binding, .destination, .internal:
+                case .binding, .destination, .bbPanel, .internal:
                     break
                     
                 case .delegate(.writeFormSent):

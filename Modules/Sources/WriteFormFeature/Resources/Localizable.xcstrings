@@ -47,6 +47,16 @@
         }
       }
     },
+    "Input..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите…"
+          }
+        }
+      }
+    },
     "It will be attached as a dialog to your last post" : {
       "localizations" : {
         "ru" : {

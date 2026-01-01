@@ -465,6 +465,7 @@ let project = Project(
                 name: "WriteFormFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.BBPanelFeature,
                     .Internal.Models,
                     .Internal.ParsingClient,
                     .Internal.SharedUI,

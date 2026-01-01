@@ -10,6 +10,7 @@ import ComposableArchitecture
 import SwiftUI
 import Models
 import SharedUI
+import BBPanelFeature
 
 @ViewAction(for: WriteFormFeature.self)
 public struct WriteFormScreen: View {
@@ -18,7 +19,7 @@ public struct WriteFormScreen: View {
     @Environment(\.tintColor) private var tintColor
     
     @State private var isPreviewPresented: Bool = false
-    @FocusState private var isFocused: Bool
+    @FocusState public var focus: WriteFormFeature.State.Field?
     
     public init(store: StoreOf<WriteFormFeature>) {
         self.store = store
@@ -33,7 +34,7 @@ public struct WriteFormScreen: View {
                     .background(Color(.Background.primary))
                     ._toolbarTitleDisplayMode(.inline)
                     .onTapGesture {
-                        isFocused = false
+                        focus = nil
                     }
                     .overlay {
                         if store.formFields.isEmpty || store.isFormLoading {
@@ -52,6 +53,7 @@ public struct WriteFormScreen: View {
                     FormPreviewView(store: store)
                 }
             }
+            .bind($store.focus, to: $focus)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -73,6 +75,17 @@ public struct WriteFormScreen: View {
                     .disabled(store.textContent.isEmptyAfterTrimming())
                     .disabled(store.isPublishing)
                 }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .bottomBar) {
+                        BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                    }
+                    .sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .keyboard) {
+                        BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                    }
+                }
             }
             .onAppear {
                 send(.onAppear)
@@ -88,7 +101,9 @@ public struct WriteFormScreen: View {
                     VStack {
                         WriteFormView(
                             type: store.formFields[index],
-                            isFocused: $isFocused,
+                            range: $store.editorRange,
+                            focus: $focus,
+                            focusEqual: WriteFormFeature.State.Field.field(index),
                             onUpdateContent: { content in
                                 if content != nil {
                                     send(.updateFieldContent(index, content!))
@@ -102,6 +117,8 @@ public struct WriteFormScreen: View {
                 
                 if store.inPostEditingMode {
                     EditReason()
+                } else {
+                    Text("textContent: \(store.textContent)")
                 }
             }
         }
@@ -127,8 +144,7 @@ public struct WriteFormScreen: View {
         .frame(height: 48)
         .disabled(store.textContent.isEmptyAfterTrimming())
         .disabled(store.isPublishing)
-        
-        Spacer()
+        .disabled(true)
     }
     
     @ViewBuilder
@@ -147,8 +163,12 @@ public struct WriteFormScreen: View {
             .padding(.horizontal, 2)
             
             if store.isEditReasonToggleSelected {
-                Field(text: $store.editReasonContent, description: "", guideText: "", isFocused: $isFocused)
-                    .disabled(store.isPublishing || !store.isEditReasonToggleSelected)
+                ForField(
+                    content: $store.editReasonContent,
+                    placeholder: LocalizedStringResource("Input...", bundle: .module),
+                    focusEqual: WriteFormFeature.State.Field.reason,
+                    focus: $focus
+                )
                 
                 if store.canShowShowMark {
                     Toggle(isOn: $store.isShowMarkToggleSelected) {

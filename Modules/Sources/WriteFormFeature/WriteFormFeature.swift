@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import APIClient
 import Models
+import BBPanelFeature
 
 @Reducer
 public struct WriteFormFeature: Reducer, Sendable {
@@ -29,6 +30,7 @@ public struct WriteFormFeature: Reducer, Sendable {
     public enum Destination {
         case preview(FormPreviewFeature)
         case alert(AlertState<Alert>)
+        case bbPanel(BBPanelFeature)
         
         @CasePathable
         public enum Alert {
@@ -42,11 +44,19 @@ public struct WriteFormFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        public enum Field: Equatable, Hashable { case reason, field(Int) }
+        
         @Presents public var destination: Destination.State?
         
         @Shared(.userSession) var userSession
         
         public let formFor: WriteFormForType
+        
+        public var bbPanel = BBPanelFeature.State(with: .post(isCurator: true, canModerate: true))
+        
+        var editorRange: NSRange?
+        
+        var focus: Field?
         
         var textContent = ""
         var isEditReasonToggleSelected = false
@@ -77,6 +87,7 @@ public struct WriteFormFeature: Reducer, Sendable {
     public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
+        case bbPanel(BBPanelFeature.Action)
         
         case view(View)
         public enum View {
@@ -111,8 +122,36 @@ public struct WriteFormFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
+        Scope(state: \.bbPanel, action: \.bbPanel) {
+            BBPanelFeature()
+        }
+        
         Reduce<State, Action> { state, action in
             switch action {
+            case let .bbPanel(.delegate(.tagTapped(tag))):
+                if let range = state.editorRange {
+                    if !state.textContent.isEmpty {
+                        if range.lowerBound == range.upperBound {
+                            let index = state.textContent.index(state.textContent.startIndex, offsetBy: range.lowerBound)
+                            state.textContent.insert(contentsOf: "\(tag.0)\(tag.1)", at: index)
+                            state.editorRange = NSMakeRange(range.lowerBound + tag.0.count, 0)
+                        } else {
+                            let ubIndex = state.textContent.index(state.textContent.startIndex, offsetBy: range.upperBound)
+                            let lbIndex = state.textContent.index(state.textContent.startIndex, offsetBy: range.lowerBound)
+                            state.textContent.insert(contentsOf: tag.1, at: ubIndex)
+                            state.textContent.insert(contentsOf: tag.0, at: lbIndex)
+                            state.editorRange = NSMakeRange(range.lowerBound + tag.0.count, range.upperBound - range.lowerBound)
+                        }
+                    } else {
+                        state.textContent = "\(tag.0)\(tag.1)"
+                        state.editorRange = NSMakeRange(tag.0.count, 0)
+                    }
+                } else {
+                    print(".bbPanel(.delegate(.tagTapped(tag))): [\(tag), \"\(state.textContent)\", \(state.editorRange)]")
+                    //fatalError("How tag can tapped without tap to editor field? [\(tag), \(state.textContent)]")
+                }
+                return .none
+            
             case .view(.onAppear):
                 switch state.formFor {
                 case .topic(let forumId, _):
@@ -308,7 +347,7 @@ public struct WriteFormFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .binding, .destination:
+            case .binding, .destination, .bbPanel:
                 return .none
             }
         }

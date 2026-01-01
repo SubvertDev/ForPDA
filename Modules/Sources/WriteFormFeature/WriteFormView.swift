@@ -14,23 +14,40 @@ import BBBuilder
 struct WriteFormView: View {
     
     let type: WriteFormFieldType
-    @FocusState.Binding var isFocused: Bool
+    let focusEqual: WriteFormFeature.State.Field
+    let onUpdateContent: (String?) -> String
     
-    let onUpdateContent: (String?) -> String // (String) -> Void?,
-    var onUpdateSelection: ((Int, String, Bool) -> Void)?
-
+    @FocusState.Binding var focus: WriteFormFeature.State.Field?
+    
+    @Binding var range: NSRange?
+    
+    public init(
+        type: WriteFormFieldType,
+        range: Binding<NSRange?>,
+        focus: FocusState<WriteFormFeature.State.Field?>.Binding,
+        focusEqual: WriteFormFeature.State.Field,
+        onUpdateContent: @escaping (String?) -> String,
+    ) {
+        self.type = type
+        self._range = range
+        self.focusEqual = focusEqual
+        self.onUpdateContent = onUpdateContent
+        
+        self._focus = focus
+    }
+    
     var body: some View {
         switch type {
         case .text(let content):
             Section {
-                Field(
-                    text: Binding(
+                ForField(
+                    content: Binding(
                         get: { onUpdateContent(nil) },
                         set: { _ = onUpdateContent($0) }
                     ),
-                    description: content.description,
-                    guideText: content.example,
-                    isFocused: $isFocused
+                    placeholder: LocalizedStringResource("Input...", bundle: .module),
+                    focusEqual: focusEqual,
+                    focus: $focus
                 )
             } header: {
                 Header(title: content.name, required: content.isRequired)
@@ -57,15 +74,16 @@ struct WriteFormView: View {
             
         case .editor(let content):
             Section {
-                Field(
-                    text: Binding(
+                ForField(
+                    content: Binding(
                         get: { onUpdateContent(nil) },
                         set: { _ = onUpdateContent($0) }
                     ),
-                    description: content.description,
-                    guideText: content.example,
-                    isEditor: true,
-                    isFocused: $isFocused
+                    placeholder: LocalizedStringResource("Input...", bundle: .module),
+                    focusEqual: focusEqual,
+                    focus: $focus,
+                    minHeight: 144,
+                    selection: $range
                 )
             } header: {
                 if !content.name.isEmpty {
@@ -123,7 +141,7 @@ struct WriteFormView: View {
                             // FIXME: Now all checkboxes always false. Find the solution with getter.
                             get: { false },
                             set: { isSelected in
-                                onUpdateSelection?(index, options[index], isSelected)
+                                //onUpdateSelection?(index, options[index], isSelected)
                             }
                         )) {
                             Text(options[index])
