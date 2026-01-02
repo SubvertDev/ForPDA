@@ -25,11 +25,12 @@ public struct BBPanelFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case sizeTag
-        case listTag
         case colorTag
         
         case urlTag
         case spoilerWithTitleTag
+        
+        case listTag(ListTagBuilderFeature)
     }
     
     // MARK: - State
@@ -105,9 +106,9 @@ public struct BBPanelFeature: Reducer, Sendable {
                 case .url:
                     state.destination = .urlTag
                 case .listNumber:
-                    return .none
+                    state.destination = .listTag(ListTagBuilderFeature.State(isBullet: false))
                 case .listBullet:
-                    return .none
+                    state.destination = .listTag(ListTagBuilderFeature.State(isBullet: true))
                 case .upload:
                     // TODO: Attachments...
                     return .none
@@ -124,6 +125,9 @@ public struct BBPanelFeature: Reducer, Sendable {
                 let input = state.alertInput
                 state.alertInput = ""
                 return .send(.delegate(.tagTapped(("[\(tag.code)=\(input)]", "[/\(tag.code)]"))))
+                
+            case let .destination(.presented(.listTag(.delegate(.listTagBuilded(tag))))):
+                return .send(.delegate(.tagTapped(tag)))
                 
             case .delegate, .destination, .binding:
                 return .none

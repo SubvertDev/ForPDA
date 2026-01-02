@@ -1,9 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add item" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить пункт"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
@@ -13,7 +23,7 @@
     },
     "Colors" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Цвета"
@@ -21,9 +31,19 @@
         }
       }
     },
+    "Create" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать"
+          }
+        }
+      }
+    },
     "Input full URL-address" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите полный URL-адрес"
@@ -33,7 +53,7 @@
     },
     "Input spoiler title" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Введите заголовок спойлера"
@@ -41,9 +61,39 @@
         }
       }
     },
+    "Item %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пункт %lld"
+          }
+        }
+      }
+    },
+    "New list" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новый список"
+          }
+        }
+      }
+    },
+    "New list items are created automatically" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новые пункты создаются автоматически"
+          }
+        }
+      }
+    },
     "OK" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ОК"
@@ -51,12 +101,12 @@
         }
       }
     },
-    "Sheet" : {
+    "Select text size" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Шит"
+            "value" : "Select text size"
           }
         }
       }

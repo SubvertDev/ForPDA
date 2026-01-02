@@ -46,6 +46,11 @@ public struct BBPanelView: View {
                     .padding(.bottom, 8)
                     .padding(.horizontal, 12)
                 }
+                .sheet(item: $store.scope(state: \.destination?.listTag, action: \.destination.listTag)) { store in
+                    NavigationStack {
+                        ListTagBuilderView(store: store)
+                    }
+                }
                 .sheet(isPresented: Binding($store.destination.colorTag)) {
                     ColorPickerView(onColorSelected: { color in
                         if let color = color.hexColor {
