@@ -5,7 +5,6 @@
 //  Created by Xialtal on 28.12.25.
 //
 
-import SwiftUI
 import Foundation
 import ComposableArchitecture
 
