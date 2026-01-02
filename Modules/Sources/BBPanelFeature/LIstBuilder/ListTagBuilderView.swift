@@ -38,13 +38,13 @@ public struct ListTagBuilderView: View {
                     }
                     
                     AddItemButton()
+                } footer: {
+                    Text("New list items are created automatically", bundle: .module)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.Labels.teritary))
                 }
                 .listRowBackground(Color(.Background.teritary))
                 .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                
-                Text("New list items are created automatically", bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(Color(.Labels.secondary))
             }
             .scrollContentBackground(.hidden)
         }
