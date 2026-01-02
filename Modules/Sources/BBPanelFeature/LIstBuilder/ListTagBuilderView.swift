@@ -39,9 +39,8 @@ public struct ListTagBuilderView: View {
                     
                     AddItemButton()
                 }
-                .fixedSize(horizontal: false, vertical: true)
                 .listRowBackground(Color(.Background.teritary))
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0))
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 
                 Text("New list items are created automatically", bundle: .module)
                     .font(.footnote)
@@ -100,10 +99,11 @@ public struct ListTagBuilderView: View {
                 .font(.body)
                 .foregroundStyle(Color(.Labels.quaternary))
         }
+        .padding(.vertical, 11)
         .focused($focus, equals: .item(id))
         .multilineTextAlignment(.leading)
         .fixedSize(horizontal: false, vertical: true)
-        .frame(height: 44)
+        .frame(minHeight: 44)
         .cornerRadius(10)
     }
 }
