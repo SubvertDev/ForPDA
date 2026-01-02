@@ -46,9 +46,6 @@ public struct BBPanelView: View {
                     .padding(.bottom, 8)
                     .padding(.horizontal, 12)
                 }
-                .sheet(isPresented: Binding($store.destination.smileTag)) {
-                    SmilesList()
-                }
                 .sheet(isPresented: Binding($store.destination.colorTag)) {
                     ColorPickerView(onColorSelected: { color in
                         if let color = color.hexColor {
@@ -110,44 +107,6 @@ public struct BBPanelView: View {
             action()
         }
         .disabled(store.alertInput.isEmpty)
-    }
-    
-    @ViewBuilder
-    private func SmilesList() -> some View {
-        Grid {
-            GridRow {
-                Text("Sheet")
-                Text("Sheet")
-                Text("Sheet")
-            }
-            
-            GridRow {
-                Text("Sheet")
-                Text("Sheet")
-                Text("Sheet")
-            }
-            
-            GridRow {
-                Text("Sheet")
-                Text("Sheet")
-                Text("Sheet")
-            }
-            
-            GridRow {
-                Text("Sheet")
-                Text("Sheet")
-                Text("Sheet")
-            }
-            
-            GridRow {
-                Text("Sheet")
-                Text("Sheet")
-                Text("Sheet")
-            }
-        }
-        .presentationDetents([.height(337)])
-        .presentationDragIndicator(.visible)
-        
     }
 }
 

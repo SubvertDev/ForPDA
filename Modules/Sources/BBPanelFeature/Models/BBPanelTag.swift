@@ -32,7 +32,6 @@ public enum BBPanelTag {
     case mod
     case ex
     
-    case smile
     case upload
 }
 
@@ -101,9 +100,6 @@ extension BBPanelTag {
             return .exclamationmarkSquare
         case .upload:
             return .paperclip
-        case .smile:
-            return .faceSmiling
-            
         }
     }
 }

@@ -18,10 +18,10 @@ extension BBPanelType {
     var kit: [BBPanelTag] {
         switch self {
         case .qms:
-            return [.smile, .b, .i, .u, .s, .quote, .code]
+            return [.b, .i, .u, .s, .quote, .code]
         case .post:
             return [
-                .smile, .b, .i, .u, .s, .size, .color, .url, .listBullet, .listNumber, .quote,
+                .b, .i, .u, .s, .size, .color, .url, .listBullet, .listNumber, .quote,
                 .spoiler, .spoilerWithTitle, .code, .left, .center, .right, .sub, .sup, .offtop, .hide
             ]
         case .profile:

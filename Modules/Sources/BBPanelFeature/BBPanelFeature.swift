@@ -28,7 +28,6 @@ public struct BBPanelFeature: Reducer, Sendable {
         case sizeTag
         case listTag
         case colorTag
-        case smileTag
         
         case urlTag
         case spoilerWithTitleTag
@@ -72,7 +71,6 @@ public struct BBPanelFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case tagTapped((String, String))
-            case smileTapped(String)
         }
     }
     
@@ -116,8 +114,6 @@ public struct BBPanelFeature: Reducer, Sendable {
                     return .none
                 case .spoilerWithTitle:
                     state.destination = .spoilerWithTitleTag
-                case .smile:
-                    state.destination = .smileTag
                 }
                 return .none
                 
