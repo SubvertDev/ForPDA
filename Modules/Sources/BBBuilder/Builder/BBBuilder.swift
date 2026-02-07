@@ -540,7 +540,7 @@ extension NSMutableAttributedString {
             return "• "
         case .numeric:
             return "\(index). "
-        case .alphabet:
+        case .alphabet, .alphabetSmall:
             return "\(Character(UnicodeScalar(96 + index)!)). "
         case .romanBig:
             return "\(toRoman(index).uppercased()). "
