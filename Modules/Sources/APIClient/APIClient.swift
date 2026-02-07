@@ -58,7 +58,7 @@ public struct APIClient: Sendable {
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
-    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
+    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
@@ -324,8 +324,13 @@ extension APIClient: DependencyKey {
                 return try await parser.parseAnnouncement(response)
             },
             
-            getTopic: { id, offset, perPage in
-                let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
+            getTopic: { id, offset, perPage, postsFilter in
+                let request = TopicRequest(
+                    id: id,
+                    offset: offset,
+                    itemsPerPage: perPage,
+                    showPostMode: postsFilter.rawValue
+                )
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
@@ -600,7 +605,7 @@ extension APIClient: DependencyKey {
             getAnnouncement: { _ in
                 return .mock
             },
-            getTopic: { _, _, _ in
+            getTopic: { _, _, _, _ in
                 return .mock
             },
             getTemplate: { _, _ in
