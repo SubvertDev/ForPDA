@@ -189,10 +189,10 @@ public struct EditFeature: Reducer, Sendable {
                     let status = try await apiClient.editUserProfile(UserProfileEditRequest(
                         userId: user.id,
                         city: user.city ?? "",
-                        about: user.aboutMe?.simplify() ?? "",
+                        about: user.aboutMe ?? "",
                         gender: user.gender ?? .unknown,
                         status: user.status ?? "",
-                        signature: user.signature?.simplify() ?? "",
+                        signature: user.signature ?? "",
                         birthdayDate: birthdayDate
                     ))
                     await send(.delegate(.profileUpdated(status)))
@@ -274,11 +274,5 @@ private extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd-MM-yyyy"
         return dateFormatter.string(from: self)
-    }
-}
-
-private extension String {
-    func simplify() -> String {
-        return String(self.debugDescription.dropFirst().dropLast())
     }
 }
