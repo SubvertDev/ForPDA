@@ -308,6 +308,8 @@ public struct TopicScreen: View {
                     send(.urlTapped(url))
                 case .imageTapped(let url):
                     send(.imageTapped(url))
+                case .textQuoted(let text):
+                    send(.textQuoted(post, text))
                 }
             },
             menuAction: { action in

@@ -129,6 +129,7 @@ public struct TopicFeature: Reducer, Sendable {
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
+            case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
             case contextPostMenu(PostMenuAction)
             case editWarningSheetCloseButtonTapped
@@ -403,6 +404,21 @@ public struct TopicFeature: Reducer, Sendable {
                         }
                     }
                 }
+                return .none
+                
+            case let .view(.textQuoted(post, quotedText)):
+                guard state.topic != nil else { return .none }
+                
+                let currentDate = Date().formatted(date: .numeric, time: .shortened)
+                let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\n\(quotedText)\n[/quote]\n"
+                let feature = WriteFormFeature.State(
+                    formFor: .post(
+                        type: .new,
+                        topicId: state.topicId,
+                        content: .simple(formattedQuote, [])
+                    )
+                )
+                state.destination = .writeForm(feature)
                 return .none
                 
             case .view(.finishedPostAnimation):

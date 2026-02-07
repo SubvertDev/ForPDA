@@ -85,19 +85,21 @@ public struct WriteFormScreen: View {
         ScrollView {
             VStack {
                 ForEach(store.formFields.indices, id: \.self) { index in
-                    VStack {
-                        WriteFormView(
-                            type: store.formFields[index],
-                            isFocused: $isFocused,
-                            onUpdateContent: { content in
-                                if content != nil {
-                                    send(.updateFieldContent(index, content!))
+                    WithPerceptionTracking {
+                        VStack {
+                            WriteFormView(
+                                type: store.formFields[index],
+                                isFocused: $isFocused,
+                                onUpdateContent: { content in
+                                    if content != nil {
+                                        send(.updateFieldContent(index, content!))
+                                    }
+                                    return store.textContent
                                 }
-                                return store.textContent
-                            }
-                        )
+                            )
+                        }
+                        .padding(.top, 16)
                     }
-                    .padding(.top, 16)
                 }
                 
                 if store.inPostEditingMode {
