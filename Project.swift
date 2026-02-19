@@ -673,7 +673,7 @@ let project = Project(
                     base: SettingsDictionary()
                         .manualCodeSigning(
                             identity: "iPhone Developer",
-                            provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension"
+                            provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension 1771522328"
                         )
                         .setDevelopmentTeam("7353CQCGQC")
                         .merging([
@@ -785,7 +785,7 @@ extension SettingsDictionary {
         .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
-            provisioningProfileSpecifier: "match Development com.subvert.forpda"
+            provisioningProfileSpecifier: "match Development com.subvert.forpda 1771522323"
         )
     
     static let targetSettings = SettingsDictionary()
