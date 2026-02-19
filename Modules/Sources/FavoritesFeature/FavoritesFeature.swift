@@ -286,6 +286,10 @@ public struct FavoritesFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.favoritesResponse(.success(response))):
+                if response.favorites.isEmpty && !state.pageNavigation.isFirstPage {
+                    return .send(.pageNavigation(.firstPageTapped))
+                }
+
                 var favsImportant: [FavoriteInfo] = []
                 var favorites: [FavoriteInfo] = []
 
