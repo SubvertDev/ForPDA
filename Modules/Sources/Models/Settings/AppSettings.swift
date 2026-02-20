@@ -30,6 +30,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var forumPerPage: Int
     public var topicPerPage: Int
     public var historyPerPage: Int
+    public var mentionsPerPage: Int
     public var hideTabBarOnScroll: Bool
     public var floatingNavigation: Bool
     public var experimentalFloatingNavigation: Bool
@@ -50,6 +51,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         forumPerPage: Int,
         topicPerPage: Int,
         historyPerPage: Int,
+        mentionsPerPage: Int,
         hideTabBarOnScroll: Bool,
         floatingNavigation: Bool,
         experimentalFloatingNavigation: Bool,
@@ -69,6 +71,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.forumPerPage = forumPerPage
         self.topicPerPage = topicPerPage
         self.historyPerPage = historyPerPage
+        self.mentionsPerPage = mentionsPerPage
         self.hideTabBarOnScroll = hideTabBarOnScroll
         self.floatingNavigation = floatingNavigation
         self.experimentalFloatingNavigation = experimentalFloatingNavigation
@@ -91,6 +94,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
         self.historyPerPage = try container.decodeIfPresent(Int.self, forKey: .historyPerPage) ?? AppSettings.default.historyPerPage
+        self.mentionsPerPage = try container.decodeIfPresent(Int.self, forKey: .mentionsPerPage) ?? AppSettings.default.mentionsPerPage
         self.hideTabBarOnScroll = try container.decodeIfPresent(Bool.self, forKey: .hideTabBarOnScroll) ?? AppSettings.default.hideTabBarOnScroll
         self.floatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .floatingNavigation) ?? AppSettings.default.floatingNavigation
         self.experimentalFloatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .experimentalFloatingNavigation) ?? AppSettings.default.experimentalFloatingNavigation
@@ -114,6 +118,7 @@ public extension AppSettings {
         forumPerPage: 30,
         topicPerPage: 20,
         historyPerPage: 20,
+        mentionsPerPage: 20,
         hideTabBarOnScroll: true,
         floatingNavigation: true,
         experimentalFloatingNavigation: false,

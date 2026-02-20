@@ -61,6 +61,7 @@ public struct APIClient: Sendable {
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
+    public var getMentions: @Sendable (_ showPosts: Bool, _ offset: Int, _ perPage: Int) async throws -> Mentions
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
@@ -347,6 +348,11 @@ extension APIClient: DependencyKey {
 			getHistory: { offset, perPage in
                 let response = try await api.send(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
+			},
+            
+            getMentions: { showPosts, offset, perPage in
+                let response = try await api.send(MemberCommand.mention(showPosts: showPosts, offset: offset, itemsPerPage: perPage))
+                return try await parser.parseMentions(response)
             },
             
             previewPost: { request in
@@ -614,6 +620,9 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
+            getMentions: { _, _, _ in
+                return .mock
+            },
             previewPost: { request in
                 return PostPreview(
                     content: request.post.content,

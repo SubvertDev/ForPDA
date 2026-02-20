@@ -24,6 +24,7 @@ import FavoritesFeature
 import ProfileFeature
 import AnnouncementFeature
 import HistoryFeature
+import MentionsFeature
 import QMSListFeature
 import QMSFeature
 import ReputationFeature
@@ -243,6 +244,9 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
+        case .profile(.delegate(.openMentions)):
+            state.path.append(.profile(.mentions(MentionsFeature.State())))
+            
         case let .profile(.delegate(.openSearch(options))):
             state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
             
@@ -259,6 +263,13 @@ public struct StackTab: Reducer, Sendable {
             return handleDeeplink(url: url, state: &state)
             
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
+        case let .mentions(.delegate(.openArticle(sourceId: sourceId, targetId: targetId))):
+            let articlePreview = ArticlePreview.innerDeeplink(id: sourceId)
+            state.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: articlePreview))))
+            
+        case let .mentions(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         case let .reputation(.delegate(.openProfile(id))):

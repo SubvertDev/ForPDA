@@ -73,6 +73,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
+            case mentionsButtonTapped
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
@@ -94,6 +95,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openQms
             case openSettings
             case openHistory
+            case openMentions
             case openReputation(Int)
             case openSearch(SearchResult)
             case handleUrl(URL)
@@ -128,6 +130,9 @@ public struct ProfileFeature: Reducer, Sendable {
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
+                
+            case .view(.mentionsButtonTapped):
+                return .send(.delegate(.openMentions))
                 
             case .view(.reputationButtonTapped):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId

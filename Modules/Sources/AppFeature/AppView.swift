@@ -18,6 +18,7 @@ import FavoritesRootFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
+import MentionsFeature
 import Models
 import NotificationsFeature
 import ProfileFeature
@@ -415,6 +416,8 @@ extension LiquidTabView {
         case let .profile(path):
             switch path.case {
             case let .history(store):
+                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+            case let .mentions(store):
                 return store.scope(state: \.pageNavigation, action: \.pageNavigation)
             default:
                 return nil

@@ -185,6 +185,10 @@ public struct ProfileScreen: View {
                     Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
                         send(.historyButtonTapped)
                     }
+                    
+                    Row(symbol: .at, title: "Mentions", type: .navigation) {
+                        send(.mentionsButtonTapped)
+                    }
                 }
             }
             .listRowBackground(Color(.Background.teritary))

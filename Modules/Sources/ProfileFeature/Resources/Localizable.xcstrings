@@ -241,6 +241,16 @@
         }
       }
     },
+    "Mentions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упоминания"
+          }
+        }
+      }
+    },
     "Input..." : {
       "localizations" : {
         "ru" : {
