@@ -71,6 +71,9 @@ public struct AppFeature: Reducer, Sendable {
         public var showTabBar: Bool
         public var toastMessage: ToastMessage?
         
+        public var favoritesBadges = 0
+        public var profileBadges = 0
+        
         public var isAuthorized: Bool {
             return userSession != nil
         }
@@ -145,6 +148,7 @@ public struct AppFeature: Reducer, Sendable {
         case registerBackgroundTask
         case backgroundTaskInvoked
         case didFinishToastAnimation
+        case updateBadges(Unread)
         
         case connectionStateChanged(ConnectionState)
         case networkStateChanged(Bool)
@@ -259,6 +263,12 @@ public struct AppFeature: Reducer, Sendable {
                     },
                     
                     .run { send in
+                        for await unread in notificationsClient.unreadPublisher().values {
+                            await send(.updateBadges(unread))
+                        }
+                    },
+                    
+                    .run { send in
                         for await toast in toastClient.queue() {
                             await send(._showToast(toast))
                         }
@@ -331,6 +341,11 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .didFinishToastAnimation:
                 state.toastMessage = nil
+                return .none
+                
+            case let .updateBadges(unread):
+                state.favoritesBadges = unread.favoritesUnreadCount
+                state.profileBadges = unread.qmsUnreadCount + unread.mentionsUnreadCount
                 return .none
                 
             case ._failedToConnect:

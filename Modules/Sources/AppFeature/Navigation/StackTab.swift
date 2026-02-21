@@ -11,6 +11,7 @@ import AnalyticsClient
 import DeeplinkHandler
 import Models
 import TCAExtensions
+import NotificationsClient
 
 import ComposableArchitecture
 import ArticleFeature
@@ -43,6 +44,23 @@ public struct StackTab: Reducer, Sendable {
         public var path: StackState<Path.State>
         public var showTabBar: Bool
         
+        public var notificationsContext: NotificationContext? {
+            if path.isEmpty, case .favorites = root {
+                return .favorites
+            }
+            
+            switch path.last {
+            case .profile(.mentions):
+                return .mentions
+            case let .qms(.qms(state)):
+                return .chat(id: state.chatId)
+            case let .forum(.topic(state)):
+                return .topic(id: state.topicId)
+            default:
+                return nil
+            }
+        }
+        
         public init(
             root: Path.State,
             path: StackState<Path.State> = .init(),
@@ -57,6 +75,7 @@ public struct StackTab: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
+        case onAppear
         case root(Path.Action)
         case path(StackActionOf<Path>)
         
@@ -71,6 +90,7 @@ public struct StackTab: Reducer, Sendable {
     
     @Dependency(\.analyticsClient) private var analytics
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
@@ -81,6 +101,10 @@ public struct StackTab: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .onAppear:
+                notificationsClient.setNotificationContext(context: state.notificationsContext)
+                return .none
+                
             case let .root(pathAction), let .path(.element(id: _, action: pathAction)):
                 return handleNavigation(action: pathAction, state: &state)
                 
@@ -91,6 +115,8 @@ public struct StackTab: Reducer, Sendable {
         .forEach(\.path, action: \.path)
         .onChange(of: \.path) { _, path in
             Reduce<State, Action> { state, action in
+                notificationsClient.setNotificationContext(context: state.notificationsContext)
+                
                 let hasArticle = path.contains(where: { $0.is(\.articles.article) })
                 let hasSettings = path.contains(where: { $0.is(\.settings) })
                 let hasQms = path.contains(where: { $0.is(\.qms) })
@@ -265,7 +291,7 @@ public struct StackTab: Reducer, Sendable {
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
-        case let .mentions(.delegate(.openArticle(sourceId: sourceId, targetId: targetId))):
+        case let .mentions(.delegate(.openArticle(sourceId: sourceId, targetId: targetId))): // TODO: Scroll to comment via targetId
             let articlePreview = ArticlePreview.innerDeeplink(id: sourceId)
             state.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: articlePreview))))
             

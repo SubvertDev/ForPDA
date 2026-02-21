@@ -85,15 +85,17 @@ public struct QMSScreen: View {
     @Shared(.userSession) var userSession
     $userSession.withLock { $0 = .init(userId: 1, token: "", isHidden: false) }
     
-    return QMSScreen(
-        store: Store(
-            initialState: QMSFeature.State(chatId: 0)
-        ) {
-            QMSFeature()
-        } withDependencies: { _ in
-            
-        }
-    )
+    return NavigationStack {
+        QMSScreen(
+            store: Store(
+                initialState: QMSFeature.State(chatId: 0)
+            ) {
+                QMSFeature()
+            } withDependencies: { _ in
+                
+            }
+        )
+    }
     .environment(\.tintColor, Color(.Theme.primary))
     .environment(\.locale, Locale(identifier: "en"))
 }

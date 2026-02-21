@@ -11,6 +11,7 @@ import PageNavigationFeature
 import APIClient
 import Models
 import AnalyticsClient
+import NotificationsClient
 
 @Reducer
 public struct MentionsFeature: Reducer, Sendable {
@@ -66,6 +67,7 @@ public struct MentionsFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
@@ -108,7 +110,11 @@ public struct MentionsFeature: Reducer, Sendable {
                 state.pageNavigation.count = response.mentionsCount
                 state.isLoading = false
                 reportFullyDisplayed(&state)
-                return .none
+                return .run { _ in
+                    await notificationsClient.removeNotifications(categories: [.forumMention, .siteMention])
+                    let unread = try await apiClient.getUnread(type: 0, value: 0)
+                    await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                }
                 
             case let .internal(.mentionsResponse(.failure(error))):
                 print(error)

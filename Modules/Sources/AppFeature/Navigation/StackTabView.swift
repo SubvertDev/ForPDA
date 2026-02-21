@@ -23,6 +23,7 @@ public struct StackTabView: View {
             }
             .toolbar(store.showTabBar ? .visible : .hidden, for: .tabBar)
             .animation(.default, value: store.root) // Animation for root change
+            .onAppear { store.send(.onAppear) }
         }
     }
 }

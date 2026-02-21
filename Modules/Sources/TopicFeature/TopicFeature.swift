@@ -539,6 +539,8 @@ public struct TopicFeature: Reducer, Sendable {
                     .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
+                            let unread = try await apiClient.getUnread(type: 0, value: 0)
+                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                         }
                     }
                 )

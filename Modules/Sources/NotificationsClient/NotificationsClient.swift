@@ -26,6 +26,22 @@ public enum NotificationEvent: Equatable {
     }
 }
 
+public enum NotificationContext: Sendable, CustomStringConvertible {
+    case chat(id: Int)
+    case favorites
+    case mentions
+    case topic(id: Int)
+    
+    public var description: String {
+        switch self {
+        case .chat(let id):  return "Chat (\(id))"
+        case .favorites:     return "Favorites"
+        case .mentions:      return "Mentions"
+        case .topic(let id): return "Topic (\(id))"
+        }
+    }
+}
+
 @DependencyClient
 public struct NotificationsClient: Sendable {
     public var hasPermission: @Sendable () async throws -> Bool
@@ -36,7 +52,9 @@ public struct NotificationsClient: Sendable {
     public var processNotification: @Sendable (String) async -> Bool = { _ in false }
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
     public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
+    public var setNotificationContext: @Sendable (_ context: NotificationContext?) -> Void
     public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
+    public var unreadPublisher: @Sendable () -> AnyPublisher<Unread, Never> = { Just(.mock).eraseToAnyPublisher() }
 }
 
 extension DependencyValues {
@@ -52,15 +70,21 @@ extension NotificationsClient: DependencyKey {
         @Dependency(\.analyticsClient) var analyticsClient
         @Dependency(\.logger[.notifications]) var logger
         
-        let subject = PassthroughSubject<NotificationEvent, Never>()
-
+        let eventSubject = PassthroughSubject<NotificationEvent, Never>()
+        // TODO: Make proper previewValue
+        let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+        let unreadSubject = CurrentValueSubject<Unread, Never>(isPreview ? .mockBadges : .mockEmpty)
+        
+        let center = UNUserNotificationCenter.current()
+        let context: LockIsolated<NotificationContext?> = .init(nil)
+        
         return NotificationsClient(
             hasPermission: {
-                return await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .authorized
+                return await center.notificationSettings().authorizationStatus == .authorized
             },
             
             requestPermission: {
-                return try await UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound])
+                return try await center.requestAuthorization(options: [.badge, .alert, .sound])
             },
             
             registerForRemoteNotifications: {
@@ -75,7 +99,7 @@ extension NotificationsClient: DependencyKey {
             delegate: {
                 AsyncStream { continuation in
                     let delegate = Delegate(continuation: continuation)
-                    UNUserNotificationCenter.current().delegate = delegate
+                    center.delegate = delegate
                     continuation.onTermination = { _ in
                         _ = delegate
                     }
@@ -97,7 +121,7 @@ extension NotificationsClient: DependencyKey {
                         switch notification.flag {
                         case 1:
                             // Last api request was NOT the chat of this message
-                            subject.send(.qms(notification.id))
+                            eventSubject.send(.qms(notification.id))
                             
                         case 2:
                             // Last api request was the chat of this message
@@ -112,7 +136,7 @@ extension NotificationsClient: DependencyKey {
                             
                         case 102:
                             // User did read chat fully (not sure)
-                            subject.send(.qms(notification.id))
+                            eventSubject.send(.qms(notification.id))
                             // No need to update unread for that
                             return false
                             
@@ -124,7 +148,7 @@ extension NotificationsClient: DependencyKey {
                     case .topic:
                         switch notification.flag {
                         case 1:
-                            subject.send(.topic(notification.id))
+                            eventSubject.send(.topic(notification.id))
                         case 2:
                             // Last message, unused
                             return false
@@ -133,7 +157,7 @@ extension NotificationsClient: DependencyKey {
                             return false
                         case 4:
                             // Hat update
-                            subject.send(.topic(notification.id))
+                            eventSubject.send(.topic(notification.id))
                         default:
                             analyticsClient.capture(EventError.unknownFlag(notificationRaw))
                             return false
@@ -142,7 +166,7 @@ extension NotificationsClient: DependencyKey {
                     case .forum:
                         switch notification.flag {
                         case 1:
-                            subject.send(.forum(notification.id))
+                            eventSubject.send(.forum(notification.id))
                         case 2:
                             // Silent update, unused
                             return false
@@ -154,7 +178,7 @@ extension NotificationsClient: DependencyKey {
                     case .site:
                         if notification.flag == 3 {
                             // Article comment mention
-                            subject.send(.site(notification.id))
+                            eventSubject.send(.site(notification.id))
                         } else if notification.flag == 2 {
                             // Last article comment timestamp, unused
                             return false
@@ -173,55 +197,79 @@ extension NotificationsClient: DependencyKey {
             },
             
             showUnreadNotifications: { unread, skipCategories in
+                @Dependency(\.analyticsClient) var analyticsClient
                 @Dependency(\.cacheClient) var cacheClient
-                @Shared(.appSettings) var appSettings: AppSettings
+                @Shared(.appSettings) var appSettings
                 
-                logger.info("Going to show \(unread.items.count) notifications.\nSkip categories: \(skipCategories)")
+                unreadSubject.send(unread)
+                
+                do {
+                    let badgeCount = unread.favoritesUnreadCount + unread.mentionsUnreadCount + unread.qmsUnreadCount
+                    logger.info("Setting app notifications badge to \(badgeCount)")
+                    try await center.setBadgeCount(badgeCount)
+                } catch {
+                    analyticsClient.capture(error)
+                }
+                
+                logger.info("Going to show \(unread.items.count) notifications. Skip categories: \(skipCategories)")
                 
                 for item in unread.items {
                     // customDump(item)
                     
-                    switch item.category {
-                    case .qms where !appSettings.notifications.isQmsEnabled:
+                    // Checking if category of this notification is disabled in settings
+                    guard item.isNotificationEnabled(using: appSettings) else {
+                        logger.info("Skipping \(item.id) because it's category \(item.category.rawValue) is disabled in settings")
                         continue
-                    case .forum where !appSettings.notifications.isForumEnabled:
-                        continue
-                    case .topic where !appSettings.notifications.isTopicsEnabled:
-                        continue
-                    case .forumMention where !appSettings.notifications.isForumMentionsEnabled:
-                        continue
-                    case .siteMention where !appSettings.notifications.isSiteMentionsEnabled:
-                        continue
-                    default:
-                        break
                     }
 
+                    // Checking if we're already processed this notification before
                     switch item.notificationType {
                     case .always:
                         if let timestamp = await cacheClient.getLastTimestampOfUnreadItem(item.id), timestamp == item.timestamp {
-                            // logger.info("Skipping notification at \(timestamp) of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                            logger.info("Skipping \(item.id) at \(timestamp) (\(item.category.rawValue)) because it's already processed")
                             continue
                         }
                         await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
                     case .once:
                         if let topicId = await cacheClient.getTopicIdOfUnreadItem(item.id), topicId == item.id {
-                            // logger.info("Skipping notification of item \(item.id) with category \(item.category.rawValue) because it's already processed")
+                            logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's already processed")
                             continue
                         }
                         await cacheClient.setTopicIdOfUnreadItem(item.id)
                     case .doNot:
+                        logger.info("Skipping \(item.id) because it's set to not to notify")
                         continue
                     case .unknown:
+                        logger.warning("Unknown notification skipping condition")
                         continue
                     }
                     
+                    // Checking if notification category should be skipped based on provided values
                     if skipCategories.contains(item.category) {
-                        // logger.info("Skipping notfication of item \(item.id) with category \(item.category.rawValue) because it's marked to skip")
+                        logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's marked to skip")
                         continue
                     }
                     
-                    // logger.info("Processing notification at \(item.timestamp) of \(item.id) with type \(item.category.rawValue)")
-                    
+                    // Checking for current notification context
+                    // If we have a match, skip showing a notification
+                    if let currentContext = context.value {
+                        switch currentContext {
+                        case let .chat(id: id) where item.category == .qms && item.id == id:
+                            logger.info("Skipping on context: \(currentContext)")
+                            continue
+                        case .favorites:
+                            break
+                        case .mentions where item.category == .forumMention || item.category == .siteMention:
+                            logger.info("Skipping on context: \(currentContext)")
+                            continue
+                        case let .topic(id: id) where item.category == .topic && item.id == id:
+                            logger.info("Skipping on context: \(currentContext)")
+                            continue
+                        default:
+                            break
+                        }
+                    }
+                                        
                     let content = UNMutableNotificationContent()
                     content.sound = .default
                     
@@ -233,7 +281,9 @@ extension NotificationsClient: DependencyKey {
                         content.title = "Новое на форуме"
                         content.body = item.name
                     case .topic:
-                        content.title = item.unreadCount & 4 != 0 ? "Обновилась шапка" : "\(item.authorName.convertCodes()) в теме"
+                        content.title = item.unreadCount & 4 != 0
+                        ? "Обновилась шапка"
+                        : "\(item.authorName.convertCodes()) в теме"
                         content.body = item.name
                     case .forumMention:
                         content.title = "Упоминание в теме \(item.name)"
@@ -246,9 +296,23 @@ extension NotificationsClient: DependencyKey {
                     let request = UNNotificationRequest(identifier: "\(item.category.rawValue)-\(item.id)-\(item.timestamp)", content: content, trigger: nil)
                     
                     do {
-                        try await UNUserNotificationCenter.current().add(request)
+                        // Deleting notification with same id due to update of last message in topic
+                        let identifiers = await center.deliveredNotifications()
+                            .compactMap { notification -> String? in
+                                guard let raw = notification.request.identifier.split(separator: "-")[safe: 1],
+                                      let id = Int(raw),
+                                      id == item.id
+                                else { return nil }
+                                return notification.request.identifier
+                            }
+                        if !identifiers.isEmpty {
+                            logger.info("Removing delivered notifications: \(identifiers)")
+                            center.removeDeliveredNotifications(withIdentifiers: identifiers)
+                        }
+                        
+                        logger.info("Showing notification: \"\(content.title) \\n \(content.body)\"")
+                        try await center.add(request)
                     } catch {
-                        @Dependency(\.analyticsClient) var analyticsClient
                         analyticsClient.capture(error)
                     }
                 }
@@ -257,7 +321,8 @@ extension NotificationsClient: DependencyKey {
             },
             
             removeNotifications: { categories in
-                let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
+                logger.info("Removing ")
+                let pending = await center.pendingNotificationRequests()
                 let filteredPending = pending.filter { notification in
                     if let prefix = notification.identifier.split(separator: "-").first {
                         return categories
@@ -266,9 +331,9 @@ extension NotificationsClient: DependencyKey {
                     }
                     return false
                 }
-                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
+                center.removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
                 
-                let delivered = await UNUserNotificationCenter.current().deliveredNotifications()
+                let delivered = await center.deliveredNotifications()
                 let filteredDelivered = delivered.filter { notification in
                     if let prefix = notification.request.identifier.split(separator: "-").first {
                         return categories
@@ -277,11 +342,20 @@ extension NotificationsClient: DependencyKey {
                     }
                     return false
                 }
-                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: filteredDelivered.map(\.request.identifier))
+                center.removeDeliveredNotifications(withIdentifiers: filteredDelivered.map(\.request.identifier))
+            },
+            
+            setNotificationContext: { c in
+                // logger.info("Setting notification context to: \(String(describing: c))")
+                context.withValue { $0 = c }
             },
             
             eventPublisher: {
-                return subject.eraseToAnyPublisher()
+                return eventSubject.eraseToAnyPublisher()
+            },
+            
+            unreadPublisher: {
+                return unreadSubject.eraseToAnyPublisher()
             }
         )
     }
@@ -317,3 +391,27 @@ extension NotificationsClient {
 // https://stackoverflow.com/questions/73750724/how-can-usernotificationcenter-didreceive-cause-a-crash-even-with-nothing-in
 extension UNUserNotificationCenter: @retroactive @unchecked Sendable {}
 extension UNNotificationResponse: @retroactive @unchecked Sendable {}
+
+// TODO: Move to shared module
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}
+
+extension Unread.Item {
+    func isNotificationEnabled(using settings: AppSettings) -> Bool {
+        switch category {
+        case .qms:
+            return settings.notifications.isQmsEnabled
+        case .forum:
+            return settings.notifications.isForumEnabled
+        case .topic:
+            return settings.notifications.isTopicsEnabled
+        case .forumMention:
+            return settings.notifications.isForumMentionsEnabled
+        case .siteMention:
+            return settings.notifications.isSiteMentionsEnabled
+        }
+    }
+}

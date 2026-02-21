@@ -120,6 +120,7 @@ struct LiquidTabView: View {
                 ) {
                     StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
                 }
+                .badge(store.favoritesBadges)
                 
                 Tab(
                     AppTab.forum.title,
@@ -136,6 +137,7 @@ struct LiquidTabView: View {
                 ) {
                     ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                 }
+                .badge(store.profileBadges)
             }
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
             .if(store.appSettings.experimentalFloatingNavigation) { content in
