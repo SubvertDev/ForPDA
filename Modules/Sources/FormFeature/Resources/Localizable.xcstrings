@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Add more" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -33,26 +34,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
-          }
-        }
-      }
-    },
-    "Choose from Files" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбрать из файлов"
-          }
-        }
-      }
-    },
-    "Choose from Gallery" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выбрать из галереи"
           }
         }
       }
@@ -223,22 +204,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Опубликовать"
-          }
-        }
-      }
-    },
-    "Select files..." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select files..."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выберите файлы…"
           }
         }
       }
