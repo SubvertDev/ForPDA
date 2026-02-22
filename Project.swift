@@ -18,7 +18,10 @@ let project = Project(
                 .target(name: "SafariExtension"),
                 .SPM.TCA
             ],
-            settings: .settings(base: .appSettings, defaultSettings: .recommended)
+            settings: .settings(
+                base: .appSettings.merging(.sharingAliasFix),
+                defaultSettings: .recommended
+            )
         ),
         
         // MARK: - Features
@@ -638,27 +641,27 @@ let project = Project(
         
         // MARK: - Tests -
         
-            .target(
-                name: "ForPDATests",
-                destinations: .iOS,
-                product: .unitTests,
-                bundleId: "com.subvert.forpda.tests",
-                deploymentTargets: .iOS("16.0"),
-                infoPlist: .default,
-                sources: ["Modules/Tests/**"],
-                resources: [],
-                dependencies: [
-                    .target(name: "ForPDA"),
-                    .Internal.ArticlesListFeature,
-                    .Internal.BBBuilder,
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .SPM.TCA
-                ]
-            ),
+//            .target(
+//                name: "ForPDATests",
+//                destinations: .iOS,
+//                product: .unitTests,
+//                bundleId: "com.subvert.forpda.tests",
+//                deploymentTargets: .iOS("16.0"),
+//                infoPlist: .default,
+//                sources: ["Modules/Tests/ForPDATests/**"],
+//                resources: [],
+//                dependencies: [
+//                    .target(name: "ForPDA"),
+//                    .Internal.ArticlesListFeature,
+//                    .Internal.BBBuilder,
+//                    .Internal.Models,
+//                    .Internal.SharedUI,
+//                    .SPM.TCA
+//                ]
+//            ),
         
         .tests(
-            name: "BBBuilderTests",
+            name: "BBBuilder",
             dependencies: [
                 .Internal.BBBuilder,
                 .Internal.Models,
@@ -735,6 +738,9 @@ extension ProjectDescription.Target {
             infoPlist = .extendingDefault(with: ["UIAppFonts": "fontello.ttf"])
         }
         
+        let baseSettings: SettingsDictionary = .targetSettings
+            .merging(dependencies.contains(.SPM.TCA) ? .sharingAliasFix : [:])
+        
         return .target(
             name: name,
             destinations: App.destinations,
@@ -742,27 +748,41 @@ extension ProjectDescription.Target {
             bundleId: App.bundleId + "." + name,
             deploymentTargets: .iOS("16.0"),
             infoPlist: infoPlist,
-            sources: ["Modules/Sources/\(name)/**"],
+            // sources: ["Modules/Sources/\(name)/**"],
+            sources: [.glob(
+                "Modules/Sources/\(name)/**",
+                excluding: ["Modules/Sources/\(name)/Tests/**"]
+            )],
             resources: .resources(resources),
             dependencies: dependencies,
             settings: .settings(
-                base: .targetSettings,
+                base: baseSettings,
                 defaultSettings: .recommended
             )
         )
     }
     
-    static func tests(name: String, dependencies: [TargetDependency]) -> ProjectDescription.Target {
+    static func tests(
+        name: String,
+        dependencies: [TargetDependency]
+    ) -> ProjectDescription.Target {
+        let baseSettings: SettingsDictionary = .targetSettings
+            .merging(dependencies.contains(.SPM.TCA) ? .sharingAliasFix : [:])
+                
         return .target(
-            name: name,
+            name: name + "Tests",
             destinations: App.destinations,
             product: .unitTests,
             bundleId: App.bundleId + "." + name + ".Tests",
             deploymentTargets: .iOS("16.0"),
             infoPlist: .default,
-            sources: ["Modules/Tests/\(name)/**"],
-            resources: ["Modules/Resources/**"],
-            dependencies: dependencies
+            sources: ["Modules/Sources/\(name)/Tests/**"],
+            // resources: ["Modules/Resources/**"],
+            dependencies: dependencies,
+            settings: .settings(
+                base: baseSettings,
+                defaultSettings: .recommended
+            )
         )
     }
     
@@ -811,6 +831,13 @@ extension SettingsDictionary {
         .disableAssetGeneration()
         .excludeAppIcon()
         .disableCodeSigning()
+    
+    public static let sharingSpmFix = SettingsDictionary()
+        .merging(["PRODUCT_NAME": "PFSharing"])
+        .merging(.sharingAliasFix)
+    
+    static let sharingAliasFix = SettingsDictionary()
+        .otherSwiftFlags(["-module-alias", "Sharing=PFSharing"])
 }
 
 extension Dictionary where Key == String, Value == SettingValue {

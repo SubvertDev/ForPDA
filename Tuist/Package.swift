@@ -2,7 +2,7 @@
 import PackageDescription
 
 #if TUIST
-    import struct ProjectDescription.PackageSettings
+    import ProjectDescription
 
     let packageSettings = PackageSettings(
         productTypes: [
@@ -36,8 +36,25 @@ import PackageDescription
             "SFSafeSymbols": .framework,
             
             "YouTubePlayerKit": .framework
+        ],
+        targetSettings: [
+            "ComposableArchitecture": .settings(
+                base: .moduleAliasForSharing,
+                defaultSettings: .recommended
+            ),
+            "Sharing": .settings(
+                base: .moduleAliasForSharing.merging(.productNameForSharing),
+                defaultSettings: .recommended
+            )
         ]
     )
+extension SettingsDictionary {
+    static let moduleAliasForSharing = SettingsDictionary()
+        .otherSwiftFlags(["-module-alias", "Sharing=PFSharing"])
+    
+    static let productNameForSharing = SettingsDictionary()
+        .merging(["PRODUCT_NAME": "PFSharing"])
+}
 #endif
 
 let package = Package(
