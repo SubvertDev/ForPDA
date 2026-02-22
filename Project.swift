@@ -143,6 +143,7 @@ let project = Project(
             .feature(
                 name: "BBPanelFeature",
                 dependencies: [
+                    .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .SPM.SFSafeSymbols,
@@ -298,6 +299,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBBuilder,
+                    .Internal.BBPanelFeature,
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.PersistenceKeys,

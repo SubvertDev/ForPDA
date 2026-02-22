@@ -15,6 +15,7 @@ import ComposableArchitecture
 import PersistenceKeys
 
 public typealias ConnectionState = API.ConnectionState
+public typealias UploadRequest = PDAPI.UploadRequest
 public typealias UploadProgressStatus = PDAPI.UploadProgressStatus
 public typealias PDAPIError = APIError
 

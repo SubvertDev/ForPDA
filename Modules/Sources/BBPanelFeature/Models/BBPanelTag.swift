@@ -35,6 +35,19 @@ public enum BBPanelTag {
     case upload
 }
 
+public enum ColorTagColors {
+    case teal
+}
+
+public enum FontTagSize {
+    case two
+    case three
+    case four
+    case five
+    case six
+    case seven
+    case eight
+}
 extension BBPanelTag {
     
     var code: String {

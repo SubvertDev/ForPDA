@@ -33,22 +33,44 @@ public struct BBPanelFeature: Reducer, Sendable {
         case listTag(ListTagBuilderFeature)
     }
     
+    // MARK: - View State
+    
+    public enum BBPanelViewState {
+        case tags
+        case colorPicker
+        case fontSizePicker
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Presents var destination: Destination.State?
         
+        var upload = UploadBoxFeature.State(
+            type: .bbPanel,
+            allowedExtensions: []
+        )
+        
         let panelWith: BBPanelType
+        let supportsUpload: Bool
         
         var tags: [BBPanelTag] = []
+        var viewState: BBPanelViewState = .tags
         
         var alertInput = ""
+        var textSize = 1
+        
+        var isUploading = false
+        var uploadedFiles = 0
+        var showUploadBox = false
         
         public init(
-            with: BBPanelType
+            for panelType: BBPanelType,
+            supportsUpload: Bool = false
         ) {
-            self.panelWith = with
+            self.panelWith = panelType
+            self.supportsUpload = supportsUpload
         }
     }
     
@@ -57,13 +79,15 @@ public struct BBPanelFeature: Reducer, Sendable {
     public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
+        case upload(UploadBoxFeature.Action)
         
         case view(View)
         public enum View {
             case onAppear
             case tagButtonTapped(BBPanelTag)
-            
             case alertTagButtonTapped(BBPanelTag)
+            case hideUploadBoxButtonTapped
+            case returnTagsButtonTapped
             
             case colorSelected(String)
         }
@@ -79,10 +103,17 @@ public struct BBPanelFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
+        Scope(state: \.upload, action: \.upload) {
+            UploadBoxFeature()
+        }
+        
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
                 var tags = state.panelWith.kit
+                if state.supportsUpload {
+                    tags.insert(.upload, at: 0)
+                }
                 if case let .post(isCurator, canModerate) = state.panelWith {
                     if canModerate {
                         tags.append(.cur)
@@ -98,23 +129,29 @@ public struct BBPanelFeature: Reducer, Sendable {
             case let .view(.tagButtonTapped(tag)):
                 switch tag {
                 case .b, .i, .s, .u, .sup, .sub, .offtop, .center, .left, .right, .hide, .code, .cur, .mod, .ex, .quote, .spoiler:
+                    print("SIMPLE Tag tapped: \(tag)")
                     return .send(.delegate(.tagTapped(("[\(tag.code)]", "[/\(tag.code)]"))))
                 case .size:
-                    return .none
+                    //state.destination = .sizeTag
+                    state.viewState = .fontSizePicker
                 case .color:
-                    state.destination = .colorTag
+                    //state.destination = .colorTag
+                    state.viewState = .colorPicker
                 case .url:
                     state.destination = .urlTag
+                case .spoilerWithTitle:
+                    state.destination = .spoilerWithTitleTag
                 case .listNumber:
                     state.destination = .listTag(ListTagBuilderFeature.State(isBullet: false))
                 case .listBullet:
                     state.destination = .listTag(ListTagBuilderFeature.State(isBullet: true))
                 case .upload:
-                    // TODO: Attachments...
-                    return .none
-                case .spoilerWithTitle:
-                    state.destination = .spoilerWithTitleTag
+                    state.showUploadBox.toggle()
                 }
+                return .none
+                
+            case .view(.returnTagsButtonTapped):
+                state.viewState = .tags
                 return .none
                 
             case let .view(.colorSelected(color)):
@@ -126,10 +163,22 @@ public struct BBPanelFeature: Reducer, Sendable {
                 state.alertInput = ""
                 return .send(.delegate(.tagTapped(("[\(tag.code)=\(input)]", "[/\(tag.code)]"))))
                 
+            case .view(.hideUploadBoxButtonTapped):
+                state.showUploadBox = false
+                return .none
+                
             case let .destination(.presented(.listTag(.delegate(.listTagBuilded(tag))))):
                 return .send(.delegate(.tagTapped(tag)))
                 
-            case .delegate, .destination, .binding:
+            case .upload(.delegate(.someFileUploading)):
+                state.isUploading = true
+                return .none
+                
+            case .upload(.delegate(.allFilesAreUploaded)):
+                state.isUploading = false
+                return .none
+                
+            case .delegate, .destination, .binding, .upload:
                 return .none
             }
         }

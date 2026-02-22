@@ -75,16 +75,11 @@ public struct WriteFormScreen: View {
                     .disabled(store.textContent.isEmptyAfterTrimming())
                     .disabled(store.isPublishing)
                 }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarItem(placement: .bottomBar) {
-                        BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
-                    }
-                    .sharedBackgroundVisibility(.hidden)
-                } else {
-                    ToolbarItem(placement: .keyboard) {
-                        BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
-                    }
+            }
+            ._safeAreaBar(edge: .bottom) {
+                if focus != nil {
+                    BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                        .padding(isLiquidGlass ? 8 : 0)
                 }
             }
             .onAppear {
@@ -118,7 +113,7 @@ public struct WriteFormScreen: View {
                 if store.inPostEditingMode {
                     EditReason()
                 } else {
-                    Text("textContent: \(store.textContent)")
+                    Text(verbatim: "textContent: \(store.textContent)")
                 }
             }
         }

@@ -27,52 +27,54 @@ public struct ListTagBuilderView: View {
     // MARK: - Body
     
     public var body: some View {
-        ZStack {
-            Color(.Background.primary)
-                .ignoresSafeArea()
-            
-            List {
-                Section {
-                    ForEach(store.listItems) { item in
-                        ItemField(id: item.id)
+        WithPerceptionTracking {
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                List {
+                    Section {
+                        ForEach(store.listItems) { item in
+                            ItemField(id: item.id)
+                        }
+                        
+                        AddItemButton()
+                    } footer: {
+                        Text("New list items are created automatically", bundle: .module)
+                            .font(.footnote)
+                            .foregroundStyle(Color(.Labels.teritary))
                     }
-                    
-                    AddItemButton()
-                } footer: {
-                    Text("New list items are created automatically", bundle: .module)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.Labels.teritary))
+                    .listRowBackground(Color(.Background.teritary))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
-                .listRowBackground(Color(.Background.teritary))
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                .scrollContentBackground(.hidden)
             }
-            .scrollContentBackground(.hidden)
-        }
-        .navigationTitle(Text("New list", bundle: .module))
-        .navigationBarTitleDisplayMode(.inline)
-        .bind($store.focus, to: $focus)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    send(.cancelButtonTapped)
-                } label: {
-                    Text("Cancel", bundle: .module)
-                        .foregroundStyle(tintColor)
+            .navigationTitle(Text("New list", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
+            .bind($store.focus, to: $focus)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        send(.cancelButtonTapped)
+                    } label: {
+                        Text("Cancel", bundle: .module)
+                            .foregroundStyle(tintColor)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        send(.createButtonTapped)
+                    } label: {
+                        Text("Create", bundle: .module)
+                            .foregroundStyle(tintColor)
+                    }
+                    .disabled(store.isAddItemButtonDisabled)
                 }
             }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    send(.createButtonTapped)
-                } label: {
-                    Text("Create", bundle: .module)
-                        .foregroundStyle(tintColor)
-                }
-                .disabled(store.isAddItemButtonDisabled)
+            .onAppear {
+                send(.onAppear)
             }
-        }
-        .onAppear {
-            send(.onAppear)
         }
     }
     

@@ -12,6 +12,7 @@ import Models
 import SharedUI
 import PhotosUI
 import SFSafeSymbols
+import BBPanelFeature
 
 @ViewAction(for: EditFeature.self)
 public struct EditScreen: View {
@@ -79,7 +80,10 @@ public struct EditScreen: View {
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             ._safeAreaBar(edge: .bottom) {
-                SendButton()
+                if focus == .about || focus == .signature {
+                    BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                        .padding(isLiquidGlass ? 8 : 0)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -353,13 +357,15 @@ public struct EditScreen: View {
         characterLimit: Int? = nil
     ) -> some View {
         Section {
-            SharedUI.Field(
-                content: content,
-                placeholder: LocalizedStringResource("Input...", bundle: .module),
-                focusEqual: focusEqual,
-                focus: $focus,
-                characterLimit: characterLimit
-            )
+            WithPerceptionTracking {
+                SharedUI.Field(
+                    content: content,
+                    placeholder: LocalizedStringResource("Input...", bundle: .module),
+                    focusEqual: focusEqual,
+                    focus: $focus,
+                    characterLimit: characterLimit
+                )
+            }
         } header: {
             Header(title: title)
         }

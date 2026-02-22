@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import Models
 import ToastClient
+import BBPanelFeature
 
 @Reducer
 public struct EditFeature: Reducer, Sendable {
@@ -32,9 +33,15 @@ public struct EditFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         @Presents public var alert: AlertState<Action.Alert>?
         
+        public var bbPanel = BBPanelFeature.State(
+            with: .post(isCurator: true, canModerate: true),
+            supportsUpload: true
+        )
+        
         let user: User
         var draftUser: User
         var focus: Field?
+        var editorRange: NSRange?
         
         var isSending = false
         var isAvatarUploading = false
@@ -78,6 +85,7 @@ public struct EditFeature: Reducer, Sendable {
     public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
+        case bbPanel(BBPanelFeature.Action)
         
         case view(View)
         public enum View {
@@ -126,9 +134,13 @@ public struct EditFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
+        Scope(state: \.bbPanel, action: \.bbPanel) {
+            BBPanelFeature()
+        }
+        
         Reduce<State, Action> { state, action in
             switch action {
-            case .binding:
+            case .binding, .bbPanel:
                 return .none
                 
             case .alert(.presented(.deleteAvatar)):
