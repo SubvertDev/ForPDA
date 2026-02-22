@@ -10,18 +10,24 @@ import ComposableArchitecture
 import PhotosUI
 
 @ViewAction(for: UploadBoxFeature.self)
-struct UploadBoxView: View {
+public struct UploadBoxView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable var store: StoreOf<UploadBoxFeature>
+    @Perception.Bindable public var store: StoreOf<UploadBoxFeature>
     @Environment(\.tintColor) private var tintColor
     
     @State private var pickerItem: PhotosPickerItem?
     
+    // MARK: - Init
+    
+    public init(store: StoreOf<UploadBoxFeature>) {
+        self.store = store
+    }
+    
     // MARK: - Body
     
-    var body: some View {
+    public var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 6) {
                 WithPerceptionTracking {

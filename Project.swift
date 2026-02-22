@@ -146,6 +146,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .Internal.UploadBoxFeature,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -463,6 +464,15 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+            
+            .feature(
+                name: "UploadBoxFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .SPM.TCA,
+                ]
+            ),
         
             .feature(
                 name: "FormFeature",
@@ -473,6 +483,7 @@ let project = Project(
                     .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TopicBuilder,
+                    .Internal.UploadBoxFeature,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.TCA,
@@ -956,6 +967,7 @@ extension TargetDependency.Internal {
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
+    static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
     
     // Clients
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")

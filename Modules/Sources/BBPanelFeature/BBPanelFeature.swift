@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import UploadBoxFeature
 
 @Reducer
 public struct BBPanelFeature: Reducer, Sendable {

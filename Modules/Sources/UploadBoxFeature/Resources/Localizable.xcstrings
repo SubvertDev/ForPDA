@@ -1,0 +1,18 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Choose from Files" : {
+
+    },
+    "Choose from Gallery" : {
+
+    },
+    "Select files..." : {
+
+    },
+    "The selected file will be inserted into the text as code wherever your cursor is located. Or it will also be automatically added to the end of the post." : {
+
+    }
+  },
+  "version" : "1.1"
+}

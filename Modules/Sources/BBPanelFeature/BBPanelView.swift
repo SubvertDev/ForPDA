@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import UploadBoxFeature
 
 @ViewAction(for: BBPanelFeature.self)
 public struct BBPanelView: View {

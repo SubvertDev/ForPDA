@@ -13,6 +13,8 @@ import CryptoKit
 @Reducer
 public struct UploadBoxFeature: Reducer, Sendable {
     
+    public init() {}
+    
     // MARK: - Helpers
     
     var isPreview: Bool {
