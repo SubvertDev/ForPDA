@@ -431,14 +431,14 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 let currentDate = Date().formatted(date: .numeric, time: .shortened)
                 let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\n\(quotedText)\n[/quote]\n"
-                let feature = WriteFormFeature.State(
-                    formFor: .post(
+                let feature = FormFeature.State(
+                    type: .post(
                         type: .new,
                         topicId: state.topicId,
                         content: .simple(formattedQuote, [])
                     )
                 )
-                state.destination = .writeForm(feature)
+                state.destination = .form(feature)
                 return .none
                 
             case .view(.finishedPostAnimation):
