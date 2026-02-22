@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SharedUI
 
 struct EditReasonView: View {
     
@@ -39,11 +40,10 @@ struct EditReasonView: View {
             
             if isEditingReasonEnabled {
                 Field(
-                    id: id,
-                    text: $text,
-                    placeholder: "Введите причину",
-                    isEditor: true,
-                    focusedField: $focusedField
+                    content: $text,
+                    placeholder: LocalizedStringResource("Input reason"),
+                    focusEqual: id,
+                    focus: $focusedField
                 )
                 
                 if canShowShowMark {

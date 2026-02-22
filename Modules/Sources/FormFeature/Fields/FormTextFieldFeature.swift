@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SharedUI
 
 // MARK: - Feature
 
@@ -82,11 +83,10 @@ struct FormTextFieldRow: View {
             ) {
                 WithPerceptionTracking {
                     Field(
-                        id: store.id,
-                        text: $store.text,
-                        placeholder: store.placeholder,
-                        isEditor: false,
-                        focusedField: $focusedField
+                        content: $store.text,
+                        placeholder: LocalizedStringResource(stringLiteral: store.placeholder),
+                        focusEqual: store.id,
+                        focus: $focusedField
                     )
                 }
             }

@@ -77,12 +77,12 @@
         }
       }
     },
-    "Input..." : {
+    "Input reason" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Введите…"
+            "value" : "Введите причину"
           }
         }
       }
@@ -212,7 +212,6 @@
       }
     },
     "Publish" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
