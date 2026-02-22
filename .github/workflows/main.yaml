@@ -58,7 +58,7 @@ jobs:
     
   on_developer_push:
     if: github.event_name == 'push'
-    name: Cache warmup
+    name: Cache warmup & tests
     runs-on: macos-26
     steps:
       - name: Checkout

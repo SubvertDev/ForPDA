@@ -92,6 +92,7 @@ platform :ios do
         upload_dsym_to_sentry
         upload_bundle_to_tuist
         upload_app_to_testflight
+        notify_all
         unless ENV['CI']
             run_tuist(testflight: false)
         end
