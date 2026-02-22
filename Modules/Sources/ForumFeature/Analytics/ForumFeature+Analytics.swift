@@ -19,7 +19,7 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .pageNavigation:
+                case .destination, .pageNavigation:
                     break
                     
                 case .view(.onFirstAppear), .view(.onNextAppear), .view(.searchButtonTapped):
