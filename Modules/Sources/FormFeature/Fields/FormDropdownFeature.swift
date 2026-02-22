@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SharedUI
 
 // MARK: - Feature
 
@@ -114,11 +115,11 @@ struct FormDropdownRow: View {
                         }
                         .padding()
                         .background(
-                            RoundedRectangle(cornerRadius: 14)
+                            RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                                 .fill(Color(.Background.teritary))
                         )
                         .overlay {
-                            RoundedRectangle(cornerRadius: 14)
+                            RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                                 .strokeBorder(Color(.Separator.primary))
                         }
                     }
