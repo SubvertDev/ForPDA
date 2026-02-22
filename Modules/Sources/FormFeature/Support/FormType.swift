@@ -1,16 +1,16 @@
 //
-//  WriteFormForType.swift
-//  ForPDA
+//  FormType.swift
+//  FormFeature
 //
-//  Created by Xialtal on 14.03.25.
+//  Created by Ilia Lubianoi on 20.07.2025.
 //
 
-import Foundation
+import Models
 
-public enum WriteFormForType: Sendable, Equatable {
+public enum FormType: Sendable, Equatable {
+    case post(type: PostType, topicId: Int, content: PostContentType)
     case report(id: Int, type: ReportType)
     case topic(forumId: Int, content: String)
-    case post(type: PostType, topicId: Int, content: PostContentType)
     
     public enum PostType: Sendable, Equatable {
         case new
@@ -18,8 +18,8 @@ public enum WriteFormForType: Sendable, Equatable {
     }
     
     public enum PostContentType: Sendable, Equatable {
-        case template(String)
         case simple(String, [Int])
+        case template(String)
     }
     
     public var isTopic: Bool {

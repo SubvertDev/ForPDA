@@ -26,7 +26,7 @@ public struct FormFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         case preview(FormPreviewFeature)
         case alert(AlertState<Alert>)
@@ -46,14 +46,16 @@ public struct FormFeature: Reducer, Sendable {
         @Shared(.userSession) var userSession
         
         let type: FormType
+        
         public var rows: IdentifiedArrayOf<FormFieldFeature.State> = []
         public var focusedField: Int?
         public var isFormLoading = false
         public var isPublishing = false
-        var canShowShowMark = false
         public var isEditingReasonEnabled = false
-        var isShowMarkEnabled = false
         public var editReasonText = ""
+        
+        var canShowShowMark = false
+        var isShowMarkEnabled = false
         
         public var inPostEditingMode: Bool {
             if case let .post(type, _, _) = type, case .edit = type {
@@ -129,9 +131,7 @@ public struct FormFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Reduce<State, Action> {
-            state,
-            action in
+        Reduce<State, Action> { state, action in
             switch action {
             case .binding(\.isEditingReasonEnabled):
                 if !state.isEditingReasonEnabled {
@@ -237,7 +237,7 @@ public struct FormFeature: Reducer, Sendable {
                     }
                     
                     previewState = FormPreviewFeature.State(
-                        formType: .post(type: type.convert(), topicId: topicId, content: content.convert())
+                        formType: .post(type: type, topicId: topicId, content: content)
                     )
                     
                 case .report:
@@ -380,7 +380,7 @@ public struct FormFeature: Reducer, Sendable {
                     
                 case let .report(id: id, type: type):
                     return .run { [content = state.content] send in
-                        let request = ReportRequest(id: id, type: type.convert(), message: content)
+                        let request = ReportRequest(id: id, type: type, message: content)
                         let result = await Result { try await apiClient.sendReport(request) }
                         await send(.internal(.reportResponse(result)))
                     }
@@ -436,6 +436,8 @@ public struct FormFeature: Reducer, Sendable {
         }
     }
 }
+
+extension FormFeature.Destination.State: Equatable {}
 
 // MARK: - Alerts
 

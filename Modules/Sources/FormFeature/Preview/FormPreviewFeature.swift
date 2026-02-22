@@ -21,14 +21,14 @@ public struct FormPreviewFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable, Sendable {
-        public let formType: WriteFormForType
+        public let formType: FormType
         
         var contentTypes: [UITopicType] = []
         
         var isPreviewLoading = false
         
         public init(
-            formType: WriteFormForType
+            formType: FormType
         ) {
             self.formType = formType
         }
