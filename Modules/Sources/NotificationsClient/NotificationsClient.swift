@@ -26,7 +26,7 @@ public enum NotificationEvent: Equatable {
     }
 }
 
-public enum NotificationContext: Sendable, CustomStringConvertible {
+public enum NotificationContext: Equatable, Sendable, CustomStringConvertible {
     case chat(id: Int)
     case favorites
     case mentions
@@ -51,7 +51,7 @@ public struct NotificationsClient: Sendable {
     public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
     public var processNotification: @Sendable (String) async -> Bool = { _ in false }
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
-    public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category]) async -> Void
+    public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category], _ timestamps: [TimeInterval]) async -> Void
     public var setNotificationContext: @Sendable (_ context: NotificationContext?) -> Void
     public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
     public var unreadPublisher: @Sendable () -> AnyPublisher<Unread, Never> = { Just(.mock).eraseToAnyPublisher() }
@@ -293,7 +293,8 @@ extension NotificationsClient: DependencyKey {
                         content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     }
                     
-                    let request = UNNotificationRequest(identifier: "\(item.category.rawValue)-\(item.id)-\(item.timestamp)", content: content, trigger: nil)
+                    let identifier = "\(item.category.rawValue)-\(item.id)-\(item.timestamp)"
+                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
                     
                     do {
                         // Deleting notification with same id due to update of last message in topic
@@ -306,11 +307,11 @@ extension NotificationsClient: DependencyKey {
                                 return notification.request.identifier
                             }
                         if !identifiers.isEmpty {
-                            logger.info("Removing delivered notifications: \(identifiers)")
+                            logger.info("Removing delivered notifications (sun): \(identifiers)")
                             center.removeDeliveredNotifications(withIdentifiers: identifiers)
                         }
                         
-                        logger.info("Showing notification: \"\(content.title) \\n \(content.body)\"")
+                        logger.info("Showing notification: \"\(content.title) \\n \(content.body)\" (\(identifier))")
                         try await center.add(request)
                     } catch {
                         analyticsClient.capture(error)
@@ -320,8 +321,10 @@ extension NotificationsClient: DependencyKey {
                 logger.info("Successfully processed notifications")
             },
             
-            removeNotifications: { categories in
-                logger.info("Removing ")
+            removeNotifications: { categories, timestamps in
+                logger.info("Removing notifications with categories: \(categories)")
+                
+                // Do we even have pending ones?
                 let pending = await center.pendingNotificationRequests()
                 let filteredPending = pending.filter { notification in
                     if let prefix = notification.identifier.split(separator: "-").first {
@@ -331,10 +334,13 @@ extension NotificationsClient: DependencyKey {
                     }
                     return false
                 }
+                if !filteredPending.isEmpty {
+                    logger.warning("Removing pending requests: \(filteredPending.map(\.identifier))")
+                }
                 center.removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
                 
                 let delivered = await center.deliveredNotifications()
-                let filteredDelivered = delivered.filter { notification in
+                let filteredCategoriesDelivered = delivered.filter { notification in
                     if let prefix = notification.request.identifier.split(separator: "-").first {
                         return categories
                             .map { String($0.rawValue) }
@@ -342,12 +348,26 @@ extension NotificationsClient: DependencyKey {
                     }
                     return false
                 }
-                center.removeDeliveredNotifications(withIdentifiers: filteredDelivered.map(\.request.identifier))
+                center.removeDeliveredNotifications(withIdentifiers: filteredCategoriesDelivered.map(\.request.identifier))
+                
+                // let filteredTimestampsDelivered = delivered
+                //     .compactMap { notification -> String? in
+                //         guard let raw = notification.request.identifier.split(separator: "-")[safe: 2],
+                //               let timestamp = TimeInterval(raw),
+                //               timestamps.contains(timestamp) else {
+                //             return nil
+                //         }
+                //         return notification.request.identifier
+                //     }
+                // center.removeDeliveredNotifications(withIdentifiers: filteredTimestampsDelivered)
+                // logger.info("Removing delivered notifications (rn): \(filteredTimestampsDelivered)")
             },
             
             setNotificationContext: { c in
-                // logger.info("Setting notification context to: \(String(describing: c))")
-                context.withValue { $0 = c }
+                if context.value != c {
+                    logger.info("Setting notification context to: \(String(describing: c))")
+                    context.withValue { $0 = c }
+                }
             },
             
             eventPublisher: {

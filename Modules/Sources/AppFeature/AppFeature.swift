@@ -599,7 +599,8 @@ public struct AppFeature: Reducer, Sendable {
             case .articles, .forum, .profile:
                 break
             case .favorites:
-                await notificationsClient.removeNotifications(categories: [.forum, .topic])
+                break
+                // await notificationsClient.removeNotifications(categories: [.forum, .topic])
             }
         }
     }
