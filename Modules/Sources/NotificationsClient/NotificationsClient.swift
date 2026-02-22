@@ -350,17 +350,17 @@ extension NotificationsClient: DependencyKey {
                 }
                 center.removeDeliveredNotifications(withIdentifiers: filteredCategoriesDelivered.map(\.request.identifier))
                 
-                // let filteredTimestampsDelivered = delivered
-                //     .compactMap { notification -> String? in
-                //         guard let raw = notification.request.identifier.split(separator: "-")[safe: 2],
-                //               let timestamp = TimeInterval(raw),
-                //               timestamps.contains(timestamp) else {
-                //             return nil
-                //         }
-                //         return notification.request.identifier
-                //     }
-                // center.removeDeliveredNotifications(withIdentifiers: filteredTimestampsDelivered)
-                // logger.info("Removing delivered notifications (rn): \(filteredTimestampsDelivered)")
+                let filteredTimestampsDelivered = delivered
+                    .compactMap { notification -> String? in
+                        guard let raw = notification.request.identifier.split(separator: "-")[safe: 2],
+                              let timestamp = TimeInterval(raw),
+                              timestamps.contains(timestamp) else {
+                            return nil
+                        }
+                        return notification.request.identifier
+                    }
+                center.removeDeliveredNotifications(withIdentifiers: filteredTimestampsDelivered)
+                logger.info("Removing delivered notifications (rn): \(filteredTimestampsDelivered)")
             },
             
             setNotificationContext: { c in

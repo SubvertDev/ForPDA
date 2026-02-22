@@ -539,9 +539,14 @@ public struct TopicFeature: Reducer, Sendable {
                     .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
+                            
+                            // Syncing notifications and badges when reading last page
                             let unread = try await apiClient.getUnread(type: 0, value: 0)
                             await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                         }
+                        // Deleting notifications related to posts on the current page
+                        let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970)
+                        await notificationsClient.removeNotifications(categories: [], timestamps: timestamps)
                     }
                 )
                 
