@@ -695,7 +695,7 @@ let project = Project(
         ),
         
         .tests(
-            name: "FormFeatureTests",
+            name: "FormFeature",
             dependencies: [
                 .Internal.APIClient,
                 .Internal.Models,
