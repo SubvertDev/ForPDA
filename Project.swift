@@ -1012,7 +1012,7 @@ extension TargetDependency.SPM {
     static let PDAPI =          TargetDependency.external(name: "PDAPI_SPM")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let RichTextKit =    TargetDependency.external(name: "RichTextKit")
-    static let Sentry =         TargetDependency.external(name: "SentrySwiftUI")
+    static let Sentry =         TargetDependency.external(name: "Sentry")
     static let SFSafeSymbols =  TargetDependency.external(name: "SFSafeSymbols")
     static let SkeletonUI =     TargetDependency.external(name: "SkeletonUI")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")

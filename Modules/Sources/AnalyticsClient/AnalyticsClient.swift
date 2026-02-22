@@ -162,10 +162,8 @@ extension AnalyticsClient {
                 $0.sessionSampleRate = 1
                 $0.profileAppStarts = true
             }
-            options.enableAppHangTracking = false // Not working properly
-            options.enableAppHangTrackingV2 = false // Not working properly
+            options.enableAppHangTracking = true
             options.enableReportNonFullyBlockingAppHangs = false // False positives
-            options.enablePerformanceV2 = true
             options.enablePreWarmedAppStartTracing = true
             options.enableCoreDataTracing = false // I don't have CoreData
             options.enableUserInteractionTracing = false // Doesn't work with SwiftUI
