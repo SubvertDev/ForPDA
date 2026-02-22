@@ -95,4 +95,20 @@ public extension Unread {
             )
         ]
     )
+    
+    static let mockEmpty = Unread(
+        date: .now,
+        qmsUnreadCount: 0,
+        favoritesUnreadCount: 0,
+        mentionsUnreadCount: 0,
+        items: []
+    )
+    
+    static let mockBadges = Unread(
+        date: .now,
+        qmsUnreadCount: 15,
+        favoritesUnreadCount: 20,
+        mentionsUnreadCount: 3,
+        items: []
+    )
 }

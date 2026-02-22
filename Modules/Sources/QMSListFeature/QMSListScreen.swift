@@ -39,6 +39,7 @@ public struct QMSListScreen: View {
                             WithPerceptionTracking {
                                 if user.chats.isEmpty {
                                     UserRow(user)
+                                        .listRowBackground(Color(.Background.teritary))
                                 } else {
                                     DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
                                         ChatList(user.chats)
@@ -87,20 +88,12 @@ public struct QMSListScreen: View {
                 .frame(width: 50, height: 50)
                 
                 Text(user.name)
-                
-                Spacer()
-                
-                if user.unreadCount > 0 {
-                    Circle()
-                        .font(.title2)
-                        .foregroundStyle(tintColor)
-                        .frame(width: 8)
-                }
             }
-            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .listRowBackground(Color(.Background.teritary))
+        .badge(user.unreadCount)
+        ._badgeProminence(.increased)
     }
     
     // MARK: - Chat Row
@@ -111,26 +104,18 @@ public struct QMSListScreen: View {
             Button {
                 send(.chatRowTapped(chat.id))
             } label: {
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(chat.name)
-                        Text(chat.lastMessageDate.formatted())
-                    }
-                    
-                    Spacer()
-                    
-                    if chat.unreadCount > 0 {
-                        Circle()
-                            .font(.title2)
-                            .foregroundStyle(tintColor)
-                            .frame(width: 8)
-                    }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(chat.name)
+                    Text(chat.lastMessageDate.formatted())
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
         }
         .buttonStyle(.plain)
         .listRowBackground(Color(.Background.teritary))
+        .badge(chat.unreadCount)
+        ._badgeProminence(.increased)
     }
     
     // MARK: - Chat List
@@ -146,7 +131,9 @@ public struct QMSListScreen: View {
 // MARK: - Previews
 
 #Preview {
-    QMSListScreen(store: Store(initialState: QMSListFeature.State()) {
-        QMSListFeature()
-    })
+    NavigationStack {
+        QMSListScreen(store: Store(initialState: QMSListFeature.State()) {
+            QMSListFeature()
+        })
+    }
 }

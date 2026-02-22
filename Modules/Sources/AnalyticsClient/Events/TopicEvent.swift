@@ -15,6 +15,7 @@ public enum TopicEvent: Event {
     case urlTapped(URL)
     case imageTapped(URL)
     case editWarningSheetClosed
+    case textQuoted(Int)
     
     case menuCopyLink
     case menuOpenInBrowser
@@ -44,7 +45,8 @@ public enum TopicEvent: Event {
              let .menuUserPostsInTopic(id):
             return ["userId": String(id)]
             
-        case let .menuPostDelete(postId),
+        case let .textQuoted(postId),
+             let .menuPostDelete(postId),
              let .menuPostKarma(postId),
              let .menuPostReport(postId),
              let .menuPostMentions(postId),

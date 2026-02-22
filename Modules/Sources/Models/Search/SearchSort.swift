@@ -5,7 +5,7 @@
 //  Created by Xialtal on 25.11.25.
 //
 
-public enum SearchSort: Sendable {
+public enum SearchSort: Sendable, Equatable, Codable {
     case dateDescSort
     case dateAscSort
     case relevance

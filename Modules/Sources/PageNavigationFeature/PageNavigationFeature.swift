@@ -15,6 +15,7 @@ public enum PageNavigationType {
     case forum
     case topic
     case history
+    case mentions
 }
 
 @Reducer
@@ -65,6 +66,7 @@ public struct PageNavigationFeature: Reducer, Sendable {
             case .forum: self.perPage = _appSettings.forumPerPage.wrappedValue
             case .topic: self.perPage = _appSettings.topicPerPage.wrappedValue
             case .history: self.perPage = _appSettings.historyPerPage.wrappedValue
+            case .mentions: self.perPage = _appSettings.mentionsPerPage.wrappedValue
             }
         }
     }

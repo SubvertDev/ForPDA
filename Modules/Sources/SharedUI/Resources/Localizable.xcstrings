@@ -97,6 +97,16 @@
         }
       }
     },
+    "Quote" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цитировать"
+          }
+        }
+      }
+    },
     "Rate" : {
       "localizations" : {
         "ru" : {

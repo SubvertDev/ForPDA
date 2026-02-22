@@ -63,10 +63,10 @@ extension QMSClient: DependencyKey {
         
         return QMSClient(
             loadQMSList: {
-                return QMSList(users: [])
+                return .mock
             },
             loadQMSUser: { _ in
-                return QMSUser(userId: 0, name: "", flag: 0, avatarUrl: nil, lastSeenOnline: .now, lastMessageDate: .now, unreadCount: 0, chats: [])
+                return .mock
             },
             loadQMSChat: { id in
                 return await mock.loadQMSChat()

@@ -202,7 +202,10 @@ public struct QMSFeature: Reducer, Sendable {
                 }
                 
                 reportFullyDisplayed(&state)
-                return .none
+                return .run { _ in
+                    let ids = (try? result.get().id).map { [$0] } ?? []
+                    await notificationsClient.removeNotifications(ids: ids)
+                }
                 
             case .binding:
                 return .none

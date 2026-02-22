@@ -29,9 +29,9 @@ jobs:
         run: |
           bundle cache
           
-      - name: Set Xcode 26.1
+      - name: Set Xcode 26.3
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.1.app
+          sudo xcode-select -s /Applications/Xcode_26.3.app
           
       - name: Cache Tuist .build
         uses: actions/cache@v4
@@ -50,7 +50,7 @@ jobs:
           FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          TUIST_CONFIG_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
+          TUIST_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
           SENTRY_DSYM_TOKEN: ${{ secrets.SENTRY_DSYM_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
@@ -58,7 +58,7 @@ jobs:
     
   on_developer_push:
     if: github.event_name == 'push'
-    name: Cache warmup
+    name: Cache warmup & tests
     runs-on: macos-26
     steps:
       - name: Checkout
@@ -79,9 +79,9 @@ jobs:
         run: |
           bundle cache
           
-      - name: Set Xcode 26.1
+      - name: Set Xcode 26.3
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.1.app
+          sudo xcode-select -s /Applications/Xcode_26.3.app
           
       - name: Cache Tuist .build
         uses: actions/cache@v4
@@ -93,14 +93,14 @@ jobs:
 
       - name: Run cache warmup
         run: |
-          bundle exec fastlane ci_cache_warmup
+          bundle exec fastlane ci_push
         env:
           CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
           FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
           FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          TUIST_CONFIG_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
+          TUIST_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
           SENTRY_DSYM_TOKEN: ${{ secrets.SENTRY_DSYM_TOKEN }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}

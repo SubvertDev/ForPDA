@@ -18,7 +18,10 @@ let project = Project(
                 .target(name: "SafariExtension"),
                 .SPM.TCA
             ],
-            settings: .settings(base: .appSettings, defaultSettings: .recommended)
+            settings: .settings(
+                base: .appSettings.merging(.sharingAliasFix),
+                defaultSettings: .recommended
+            )
         ),
         
         // MARK: - Features
@@ -41,6 +44,7 @@ let project = Project(
                     .Internal.ForumsListFeature,
                     .Internal.HistoryFeature,
                     .Internal.LoggerClient,
+                    .Internal.MentionsFeature,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.NotificationsFeature,
@@ -282,6 +286,22 @@ let project = Project(
             ),
         
             .feature(
+                name: "MentionsFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                    .Internal.PageNavigationFeature,
+                    .Internal.ParsingClient,
+                    .Internal.SharedUI,
+                    .SPM.NukeUI,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
                 name: "NotificationsFeature",
                 dependencies: [
                     .Internal.AnalyticsClient,
@@ -304,6 +324,7 @@ let project = Project(
                     .Internal.BBPanelFeature,
                     .Internal.HapticClient,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
@@ -645,27 +666,27 @@ let project = Project(
         
         // MARK: - Tests -
         
-            .target(
-                name: "ForPDATests",
-                destinations: .iOS,
-                product: .unitTests,
-                bundleId: "com.subvert.forpda.tests",
-                deploymentTargets: .iOS("16.0"),
-                infoPlist: .default,
-                sources: ["Modules/Tests/**"],
-                resources: [],
-                dependencies: [
-                    .target(name: "ForPDA"),
-                    .Internal.ArticlesListFeature,
-                    .Internal.BBBuilder,
-                    .Internal.Models,
-                    .Internal.SharedUI,
-                    .SPM.TCA
-                ]
-            ),
+//            .target(
+//                name: "ForPDATests",
+//                destinations: .iOS,
+//                product: .unitTests,
+//                bundleId: "com.subvert.forpda.tests",
+//                deploymentTargets: .iOS("16.0"),
+//                infoPlist: .default,
+//                sources: ["Modules/Tests/ForPDATests/**"],
+//                resources: [],
+//                dependencies: [
+//                    .target(name: "ForPDA"),
+//                    .Internal.ArticlesListFeature,
+//                    .Internal.BBBuilder,
+//                    .Internal.Models,
+//                    .Internal.SharedUI,
+//                    .SPM.TCA
+//                ]
+//            ),
         
         .tests(
-            name: "BBBuilderTests",
+            name: "BBBuilder",
             dependencies: [
                 .Internal.BBBuilder,
                 .Internal.Models,
@@ -708,7 +729,7 @@ let project = Project(
                     base: SettingsDictionary()
                         .manualCodeSigning(
                             identity: "iPhone Developer",
-                            provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension"
+                            provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension 1771522328"
                         )
                         .setDevelopmentTeam("7353CQCGQC")
                         .merging([
@@ -752,6 +773,9 @@ extension ProjectDescription.Target {
             infoPlist = .extendingDefault(with: ["UIAppFonts": "fontello.ttf"])
         }
         
+        let baseSettings: SettingsDictionary = .targetSettings
+            .merging(dependencies.contains(.SPM.TCA) ? .sharingAliasFix : [:])
+        
         return .target(
             name: name,
             destinations: App.destinations,
@@ -759,27 +783,41 @@ extension ProjectDescription.Target {
             bundleId: App.bundleId + "." + name,
             deploymentTargets: .iOS("16.0"),
             infoPlist: infoPlist,
-            sources: ["Modules/Sources/\(name)/**"],
+            // sources: ["Modules/Sources/\(name)/**"],
+            sources: [.glob(
+                "Modules/Sources/\(name)/**",
+                excluding: ["Modules/Sources/\(name)/Tests/**"]
+            )],
             resources: .resources(resources),
             dependencies: dependencies,
             settings: .settings(
-                base: .targetSettings,
+                base: baseSettings,
                 defaultSettings: .recommended
             )
         )
     }
     
-    static func tests(name: String, dependencies: [TargetDependency]) -> ProjectDescription.Target {
+    static func tests(
+        name: String,
+        dependencies: [TargetDependency]
+    ) -> ProjectDescription.Target {
+        let baseSettings: SettingsDictionary = .targetSettings
+            .merging(dependencies.contains(.SPM.TCA) ? .sharingAliasFix : [:])
+                
         return .target(
-            name: name,
+            name: name + "Tests",
             destinations: App.destinations,
             product: .unitTests,
             bundleId: App.bundleId + "." + name + ".Tests",
             deploymentTargets: .iOS("16.0"),
             infoPlist: .default,
-            sources: ["Modules/Tests/\(name)/**"],
-            resources: ["Modules/Resources/**"],
-            dependencies: dependencies
+            sources: ["Modules/Sources/\(name)/Tests/**"],
+            // resources: ["Modules/Resources/**"],
+            dependencies: dependencies,
+            settings: .settings(
+                base: baseSettings,
+                defaultSettings: .recommended
+            )
         )
     }
     
@@ -820,7 +858,7 @@ extension SettingsDictionary {
         .merging(["CODE_SIGNING_ALLOWED": .string("YES")])
         .manualCodeSigning(
             identity: "Apple Development",
-            provisioningProfileSpecifier: "match Development com.subvert.forpda"
+            provisioningProfileSpecifier: "match Development com.subvert.forpda 1771522323"
         )
     
     static let targetSettings = SettingsDictionary()
@@ -828,6 +866,13 @@ extension SettingsDictionary {
         .disableAssetGeneration()
         .excludeAppIcon()
         .disableCodeSigning()
+    
+    public static let sharingSpmFix = SettingsDictionary()
+        .merging(["PRODUCT_NAME": "PFSharing"])
+        .merging(.sharingAliasFix)
+    
+    static let sharingAliasFix = SettingsDictionary()
+        .otherSwiftFlags(["-module-alias", "Sharing=PFSharing"])
 }
 
 extension Dictionary where Key == String, Value == SettingValue {
@@ -955,6 +1000,7 @@ extension TargetDependency.Internal {
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
+    static let MentionsFeature =        TargetDependency.target(name: "MentionsFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")
     static let PageNavigationFeature =  TargetDependency.target(name: "PageNavigationFeature")
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
@@ -1003,7 +1049,7 @@ extension TargetDependency.SPM {
     static let PDAPI =          TargetDependency.external(name: "PDAPI_SPM")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let RichTextKit =    TargetDependency.external(name: "RichTextKit")
-    static let Sentry =         TargetDependency.external(name: "SentrySwiftUI")
+    static let Sentry =         TargetDependency.external(name: "Sentry")
     static let SFSafeSymbols =  TargetDependency.external(name: "SFSafeSymbols")
     static let SkeletonUI =     TargetDependency.external(name: "SkeletonUI")
     static let SmoothGradient = TargetDependency.external(name: "SmoothGradient")

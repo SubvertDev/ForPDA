@@ -27,6 +27,10 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         return (flag & 64) != 0 && (flag & 16) == 0
     }
     
+    public var canModerate: Bool {
+        return (flag & 512) != 0
+    }
+    
     public var isFavorite: Bool
     
     public struct Poll: Sendable, Codable, Hashable {

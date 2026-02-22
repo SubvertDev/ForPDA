@@ -26,9 +26,11 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var appTintColor: AppTintColor
     public var notifications: NotificationsSettings
     public var favorites: FavoritesSettings
+    public var searchSort: SearchSort
     public var forumPerPage: Int
     public var topicPerPage: Int
     public var historyPerPage: Int
+    public var mentionsPerPage: Int
     public var hideTabBarOnScroll: Bool
     public var floatingNavigation: Bool
     public var experimentalFloatingNavigation: Bool
@@ -45,9 +47,11 @@ public struct AppSettings: Sendable, Equatable, Codable {
         appTintColor: AppTintColor,
         notifications: NotificationsSettings,
         favorites: FavoritesSettings,
+        searchSort: SearchSort,
         forumPerPage: Int,
         topicPerPage: Int,
         historyPerPage: Int,
+        mentionsPerPage: Int,
         hideTabBarOnScroll: Bool,
         floatingNavigation: Bool,
         experimentalFloatingNavigation: Bool,
@@ -63,9 +67,11 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appTintColor = appTintColor
         self.notifications = notifications
         self.favorites = favorites
+        self.searchSort = searchSort
         self.forumPerPage = forumPerPage
         self.topicPerPage = topicPerPage
         self.historyPerPage = historyPerPage
+        self.mentionsPerPage = mentionsPerPage
         self.hideTabBarOnScroll = hideTabBarOnScroll
         self.floatingNavigation = floatingNavigation
         self.experimentalFloatingNavigation = experimentalFloatingNavigation
@@ -84,9 +90,11 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
         self.notifications = try container.decodeIfPresent(NotificationsSettings.self, forKey: .notifications) ?? AppSettings.default.notifications
         self.favorites = try container.decodeIfPresent(FavoritesSettings.self, forKey: .favorites) ?? AppSettings.default.favorites
+        self.searchSort = try container.decodeIfPresent(SearchSort.self, forKey: .searchSort) ?? AppSettings.default.searchSort
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
         self.historyPerPage = try container.decodeIfPresent(Int.self, forKey: .historyPerPage) ?? AppSettings.default.historyPerPage
+        self.mentionsPerPage = try container.decodeIfPresent(Int.self, forKey: .mentionsPerPage) ?? AppSettings.default.mentionsPerPage
         self.hideTabBarOnScroll = try container.decodeIfPresent(Bool.self, forKey: .hideTabBarOnScroll) ?? AppSettings.default.hideTabBarOnScroll
         self.floatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .floatingNavigation) ?? AppSettings.default.floatingNavigation
         self.experimentalFloatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .experimentalFloatingNavigation) ?? AppSettings.default.experimentalFloatingNavigation
@@ -106,9 +114,11 @@ public extension AppSettings {
         appTintColor: .primary,
         notifications: .default,
         favorites: .default,
+        searchSort: .relevance,
         forumPerPage: 30,
         topicPerPage: 20,
         historyPerPage: 20,
+        mentionsPerPage: 20,
         hideTabBarOnScroll: true,
         floatingNavigation: true,
         experimentalFloatingNavigation: false,

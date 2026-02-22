@@ -41,6 +41,9 @@ extension ProfileFeature {
                 case .view(.historyButtonTapped):
                     analyticsClient.log(ProfileEvent.historyTapped)
                     
+                case .view(.mentionsButtonTapped):
+                    analyticsClient.log(ProfileEvent.mentionsTapped)
+                    
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     
@@ -66,7 +69,7 @@ extension ProfileFeature {
                 case .internal(.userResponse(.failure)):
                     analyticsClient.log(ProfileEvent.userLoadingFailed)
                     
-                case .destination:
+                case .internal, .destination:
                     break
                 }
                 return .none

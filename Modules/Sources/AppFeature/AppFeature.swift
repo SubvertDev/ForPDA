@@ -71,6 +71,9 @@ public struct AppFeature: Reducer, Sendable {
         public var showTabBar: Bool
         public var toastMessage: ToastMessage?
         
+        public var favoritesBadges = 0
+        public var profileBadges = 0
+        
         public var isAuthorized: Bool {
             return userSession != nil
         }
@@ -140,11 +143,11 @@ public struct AppFeature: Reducer, Sendable {
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppTab)
         case deeplink(URL)
-        case notificationDeeplink(String)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
         case backgroundTaskInvoked
         case didFinishToastAnimation
+        case updateBadges(Unread)
         
         case connectionStateChanged(ConnectionState)
         case networkStateChanged(Bool)
@@ -253,8 +256,8 @@ public struct AppFeature: Reducer, Sendable {
                     },
                     
                     .run { send in
-                        for await identifier in notificationsClient.delegate() {
-                            await send(.notificationDeeplink(identifier))
+                        for await unread in notificationsClient.unreadPublisher().values {
+                            await send(.updateBadges(unread))
                         }
                     },
                     
@@ -304,8 +307,8 @@ public struct AppFeature: Reducer, Sendable {
                     let isProcessed = await notificationsClient.processNotification(notification)
                     if isProcessed {
                         let unread = try await apiClient.getUnread(type: 0, value: 0)
-                        let skipCategories: [Unread.Item.Category] = [.topic, .forum]
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: skipCategories)
+                        // let skipCategories: [Unread.Item.Category] = [.topic, .forum]
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                 }
                 
@@ -331,6 +334,11 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .didFinishToastAnimation:
                 state.toastMessage = nil
+                return .none
+                
+            case let .updateBadges(unread):
+                state.favoritesBadges = unread.favoritesUnreadCount
+                state.profileBadges = unread.qmsUnreadCount + unread.mentionsUnreadCount
                 return .none
                 
             case ._failedToConnect:
@@ -359,7 +367,7 @@ public struct AppFeature: Reducer, Sendable {
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
-            case .appDelegate, .binding, .alert:
+            case .binding, .alert:
                 return .none
                 
             case let .didSelectTab(tab):
@@ -415,7 +423,7 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case let .notificationDeeplink(identifier):
+            case let .appDelegate(.userNotification(identifier)):
                 do {
                     let deeplink = try DeeplinkHandler().handleNotification(identifier)
                     return showScreenForDeeplink(deeplink, &state)
@@ -434,6 +442,8 @@ public struct AppFeature: Reducer, Sendable {
                     if newPhase == .active {
                         try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
+                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                     
                     if isLoggedIn, newPhase == .background {
@@ -511,6 +521,9 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
                 return .none
+                
+            case .appDelegate:
+                return .none
             }
         }
         .ifLet(\.$alert, action: \.alert)
@@ -582,7 +595,8 @@ public struct AppFeature: Reducer, Sendable {
             case .articles, .forum, .profile:
                 break
             case .favorites:
-                await notificationsClient.removeNotifications(categories: [.forum, .topic])
+                break
+                // await notificationsClient.removeNotifications(categories: [.forum, .topic])
             }
         }
     }
