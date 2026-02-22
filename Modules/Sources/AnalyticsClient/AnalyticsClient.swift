@@ -162,7 +162,6 @@ extension AnalyticsClient {
                 $0.sessionSampleRate = 1
                 $0.profileAppStarts = true
             }
-            options.enableMetricKit = true
             options.enableAppHangTracking = false // Not working properly
             options.enableAppHangTrackingV2 = false // Not working properly
             options.enableReportNonFullyBlockingAppHangs = false // False positives
