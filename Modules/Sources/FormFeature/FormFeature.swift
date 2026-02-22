@@ -183,13 +183,6 @@ public struct FormFeature: Reducer, Sendable {
                 break
                 
             case let .rows(action):
-                if case let .element(id: id, action: .uploadBox(.delegate(.filesHasBeenUploaded))) = action {
-                    if case let .uploadBox(uploadBoxState) = state.rows[id: id] {
-                        print("Files: \(uploadBoxState)")
-                    } else {
-                        fatalError("Non UploadBox state casted by action id")
-                    }
-                }
                 break
                 
             case .view(.onAppear):

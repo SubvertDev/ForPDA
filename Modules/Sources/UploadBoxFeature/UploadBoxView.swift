@@ -17,7 +17,7 @@ public struct UploadBoxView: View {
     @Perception.Bindable public var store: StoreOf<UploadBoxFeature>
     @Environment(\.tintColor) private var tintColor
     
-    @State private var pickerItem: PhotosPickerItem?
+    @State private var pickerItems: [PhotosPickerItem] = []
     
     // MARK: - Init
     
@@ -65,13 +65,18 @@ public struct UploadBoxView: View {
             )
             .photosPicker(
                 isPresented: Binding($store.destination.photosPicker),
-                selection: $pickerItem
+                selection: $pickerItems,
+                maxSelectionCount: 10
             )
-            .task(id: pickerItem) {
-                guard let data = try? await pickerItem?.loadTransferable(type: Data.self) else {
-                    return
+            .task(id: pickerItems) {
+                var photos: [UploadBoxFeature.FileType] = []
+                for item in pickerItems {
+                    if let url = try? await item.loadTransferable(type: URL.self) {
+                        let type = item.supportedContentTypes.first
+                        photos.append(.image(url: url, ext: type?.preferredFilenameExtension))
+                    }
                 }
-                send(.photosPickerPhotoSelected(data))
+                send(.photosPickerPhotosSelected(photos))
             }
             .tint(tintColor)
         }

@@ -15,7 +15,9 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
     public var isUploading: Bool
     public var isUploadError: Bool
     
-    public enum FileType: Sendable {
+    public var serverId: Int? = nil
+    
+    public enum FileType: Sendable, Equatable {
         case file, image
     }
     

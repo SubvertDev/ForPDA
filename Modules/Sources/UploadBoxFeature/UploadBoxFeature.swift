@@ -21,6 +21,13 @@ public struct UploadBoxFeature: Reducer, Sendable {
         return ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
     }
     
+    // MARK: - File Type
+    
+    public enum FileType: Equatable, Sendable {
+        case file(url: URL)
+        case image(url: URL, ext: String?)
+    }
+    
     // MARK: - Destination
     
     @Reducer
@@ -42,10 +49,10 @@ public struct UploadBoxFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         
         let type: UploadBoxType
-        let allowedExtensions: [String]
-        
+        public var allowedExtensions: [String]
         var files: [UploadBoxFile]
-        //var uploadQueue: [UUID] = []
+        
+        var uploadQueue: [FileType] = []
         var isAnyFileUploading = false
         
         public var filesCount: Int {
@@ -54,7 +61,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
         
         public init(
             type: UploadBoxType,
-            allowedExtensions: [String],
+            allowedExtensions: [String] = [],
             files: [UploadBoxFile] = []
         ) {
             self.type = type
@@ -73,13 +80,15 @@ public struct UploadBoxFeature: Reducer, Sendable {
         public enum View {
             case selectFilesButtonTapped
             case removeFileButtonTapped(UploadBoxFile)
-            case photosPickerPhotoSelected(Data)
+            case photosPickerPhotosSelected([FileType])
             case fileImporterURLsRecieved([URL])
         }
         
         case `internal`(Internal)
         public enum Internal {
+            case startNextUpload
             case uploadFile(UploadBoxFile)
+            case uploadFileFinished(index: Int, Int)
             case updateFileUploadStatus(UUID, UploadProgressStatus)
         }
         
@@ -87,7 +96,11 @@ public struct UploadBoxFeature: Reducer, Sendable {
         public enum Delegate {
             case someFileUploading
             case allFilesAreUploaded
-            case filesHasBeenTapped(String)
+            case fileHasBeenRemoved(Int)
+            case fileHasBeenUploaded(Int)
+            
+            // TODO: Implement
+            case fileHasBeenTapped(Int)
         }
     }
     
@@ -121,7 +134,9 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 
             case .destination(.presented(.confirmationDialog(.gallery))):
                 if isPreview {
-                    return .send(.view(.photosPickerPhotoSelected(Data())))
+                    return .send(.view(.photosPickerPhotosSelected(
+                        [.image(url: URL(fileURLWithPath: ""), ext: nil)]
+                    )))
                 } else {
                     state.destination = .photosPicker
                 }
@@ -148,57 +163,63 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 if file.isUploading {
                     return .cancel(id: CancelID.uploading(file.id))
                 }
-                
-            case let .view(.photosPickerPhotoSelected(data)):
-                if !isPreview {
-                    if let imageExtension = data.imageExtension {
-                        let file = UploadBoxFile(
-                            name: "\(UUID().uuidString).\(imageExtension)",
-                            type: .image,
-                            data: data
-                        )
-                        return .send(.internal(.uploadFile(file)))
-                    } else {
-                        // TODO: send error alert
-                    }
-                } else {
-                    state.files.append(.mockImage)
+                if let serverId = file.serverId {
+                    return .send(.delegate(.fileHasBeenRemoved(serverId)))
                 }
                 
+            case let .view(.photosPickerPhotosSelected(images)):
+                if isPreview {
+                    state.files.append(.mockImage)
+                    return .none
+                }
+                state.uploadQueue = images
+                return .send(.internal(.startNextUpload))
+                
             case let .view(.fileImporterURLsRecieved(urls)):
-                //var urls = urls
-#warning("Fix preview")
                 if isPreview {
                     let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
                     let fileURL = documentsURL.appending(path: "data.dat")
                     try! Data().write(to: fileURL)
-                    //urls.append(fileURL)
                     state.files.append(.mockFile)
                     return .none
                 }
-                return .run { [urls = urls] send in
-                    for url in urls {
-                        if url.startAccessingSecurityScopedResource() {
-                            guard let data = try? Data(contentsOf: url) else {
-                                // TODO: Add alert
-                                print("Couldn't extract data from url: \(url)")
-                                continue
-                            }
-                            url.stopAccessingSecurityScopedResource()
-                            
-                            let file = UploadBoxFile(
-                                name: url.lastPathComponent,
-                                type: .file,
-                                data: data,
-                                isUploading: true
-                            )
-                            await send(.internal(.uploadFile(file)))
-                            
-                            while file.isUploading { /* waiting... */ }
-                        } else {
-                            print("=============== NO ACCESS ================")
-                        }
+                state.uploadQueue = urls.map { .file(url: $0) }
+                return .send(.internal(.startNextUpload))
+            
+            case .internal(.startNextUpload):
+                guard let item = state.uploadQueue.first else {
+                    state.isAnyFileUploading = false
+                    return .send(.delegate(.allFilesAreUploaded))
+                }
+                state.isAnyFileUploading = true
+                state.uploadQueue.removeFirst()
+                
+                return .run { send in
+                    let (url, uploadType): (URL, UploadBoxFile.FileType)
+                    switch item {
+                    case .file(let u):
+                        url = u
+                        uploadType = .file
+                    case .image(let u, _):
+                        url = u
+                        uploadType = .image
                     }
+                    
+                    guard url.startAccessingSecurityScopedResource() else { return }
+                    defer { url.stopAccessingSecurityScopedResource() }
+
+                    guard let data = try? Data(contentsOf: url) else {
+                        await send(.internal(.startNextUpload))
+                        return
+                    }
+                    
+                    let file = UploadBoxFile(
+                        name: data.imageExtension ?? url.lastPathComponent,
+                        type: uploadType,
+                        data: data,
+                        isUploading: true
+                    )
+                    await send(.internal(.uploadFile(file)))
                 }
                 
             case let .internal(.uploadFile(file)):
@@ -212,6 +233,8 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         md5: calculateFileHash(data: file.data),
                         isQms: false
                     )
+                    await send(.delegate(.someFileUploading))
+                    
                     for await status in apiClient.upload(request) {
                         await send(.internal(.updateFileUploadStatus(file.id, status)))
                     }
@@ -222,20 +245,29 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 if let index = state.files.firstIndex(where: { $0.id == id }) {
                     switch status {
                     case .done(let response):
-                        print("YEY<<<<<<< \(response)")
-                        state.files[index].isUploading = false
-                        state.isAnyFileUploading = false
+                        guard let fileId = Int(response.replacingOccurrences(of: "[", with: "")
+                            .replacingOccurrences(of: "]", with: "")
+                            .components(separatedBy: ",")[2]) else {
+                            state.files[index].isUploading = false
+                            state.files[index].isUploadError = true
+                            return .none
+                        }
+                        return .send(.internal(.uploadFileFinished(index: index, fileId)))
+                        
                     case .uploading(let value):
                         print("Reducer UPLAODING: \(value)")
                         state.files[index].isUploading = true
+                        
                     case .initialized:
                         print("FILE UPLOADING INITIALIZED")
                         state.files[index].isUploading = true
+                        
                     case .error(let err):
                         // TODO: Alert?
                         print("ERROR ON FILE UPLOADING: \(err)")
                         state.files[index].isUploading = false
                         state.files[index].isUploadError = true
+                        
                     @unknown default:
                         print("UNKNOWN DEFAULT ERROR! \(id), \(status)")
                         state.files[index].isUploading = false
@@ -245,6 +277,14 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     // TODO: Handle error.
                 }
                 return .none
+                
+            case let .internal(.uploadFileFinished(index, responseFileId)):
+                state.files[index].serverId = responseFileId
+                state.files[index].isUploading = false
+                return .concatenate(
+                    .send(.delegate(.fileHasBeenUploaded(responseFileId))),
+                    .send(.internal(.startNextUpload))
+                )
             }
             
             return .none

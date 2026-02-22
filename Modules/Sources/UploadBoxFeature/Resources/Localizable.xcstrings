@@ -2,13 +2,34 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Choose from Files" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из файлов"
+          }
+        }
+      }
     },
     "Choose from Gallery" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из галереи"
+          }
+        }
+      }
     },
     "Select files..." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите файлы…"
+          }
+        }
+      }
     },
     "The selected file will be inserted into the text as code wherever your cursor is located. Or it will also be automatically added to the end of the post." : {
 
