@@ -31,6 +31,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     public enum Action {
         case didFinishLaunching(UIApplication)
         case didRegisterForRemoteNotifications(Data)
+        case userNotification(String)
     }
     
     // MARK: - Dependencies
@@ -63,13 +64,16 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
                 cacheClient.configure()
                 
+                // Stream should be created before .run so we don't miss any delegate calls
+                let userNotificationsStream = notificationsClient.delegate()
+                
                 return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
-//                        group.addTask {
-//                            for await _ in notificationsClient.delegate() {
-//                                print("test")
-//                            }
-//                        }
+                        group.addTask {
+                            for await identifier in userNotificationsStream {
+                                await send(.userNotification(identifier))
+                            }
+                        }
                         
                         group.addTask {
                             let granted = try await notificationsClient.requestPermission()
@@ -85,6 +89,10 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
+                return .none
+                
+            case .userNotification:
+                // Handled in AppFeature instead
                 return .none
             }
         }

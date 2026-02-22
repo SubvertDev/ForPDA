@@ -143,7 +143,6 @@ public struct AppFeature: Reducer, Sendable {
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppTab)
         case deeplink(URL)
-        case notificationDeeplink(String)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
         case backgroundTaskInvoked
@@ -253,12 +252,6 @@ public struct AppFeature: Reducer, Sendable {
                     .run { send in
                         for await notification in apiClient.notificationStream() {
                             await send(.receivedNotification(notification))
-                        }
-                    },
-                    
-                    .run { send in
-                        for await identifier in notificationsClient.delegate() {
-                            await send(.notificationDeeplink(identifier))
                         }
                     },
                     
@@ -374,7 +367,7 @@ public struct AppFeature: Reducer, Sendable {
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
-            case .appDelegate, .binding, .alert:
+            case .binding, .alert:
                 return .none
                 
             case let .didSelectTab(tab):
@@ -430,7 +423,7 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case let .notificationDeeplink(identifier):
+            case let .appDelegate(.userNotification(identifier)):
                 do {
                     let deeplink = try DeeplinkHandler().handleNotification(identifier)
                     return showScreenForDeeplink(deeplink, &state)
@@ -527,6 +520,9 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
+                return .none
+                
+            case .appDelegate:
                 return .none
             }
         }
