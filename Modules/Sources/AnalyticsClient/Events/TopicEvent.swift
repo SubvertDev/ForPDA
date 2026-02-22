@@ -21,6 +21,7 @@ public enum TopicEvent: Event {
     case menuGoToEnd
     case menuSetFavorite
     case menuWritePost
+    case menuWritePostWithTemplate
     
     case menuPostReply(Int)
     case menuPostKarma(Int)

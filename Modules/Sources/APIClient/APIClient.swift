@@ -61,8 +61,10 @@ public struct APIClient: Sendable {
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
+    public var sendTemplate: @Sendable (_ id: Int, _ content: String, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
+    public var previewTemplate: @Sendable (_ id: Int, _ content: String, _ isTopic: Bool) async throws -> PostPreview
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
@@ -339,6 +341,14 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 return try await parser.parseWriteForm(response)
             },
+            sendTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .send(content)
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTemplateSend(response: response)
+            },
             
 			getHistory: { offset, perPage in
                 let response = try await api.send(MemberCommand.history(page: offset, perPage: perPage))
@@ -354,6 +364,14 @@ extension APIClient: DependencyKey {
                 ), postId: request.id)
                 let response = try await api.send(command)
                 return try await parser.parsePostPreview(response)
+            },
+            previewTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .preview(content)
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTemplatePreview(response: response)
             },
             
             sendPost: { request in
@@ -607,6 +625,9 @@ extension APIClient: DependencyKey {
             getTemplate: { _, _ in
                 return [.mockTitle, .mockText, .mockEditor]
             },
+            sendTemplate: { _, _, isTopic in
+                return .success(isTopic ? .topic(id: 0) : .post(PostSend(id: 0, topicId: 1, offset: 2)))
+            },
 			getHistory: { _, _ in
                 return .mock
 			},
@@ -615,6 +636,9 @@ extension APIClient: DependencyKey {
                     content: request.post.content,
                     attachmentIds: request.post.attachments
                 )
+            },
+            previewTemplate: { _, _, _ in
+                return PostPreview(content: "Builded", attachmentIds: [])
             },
             sendPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))

@@ -9,7 +9,7 @@ import AnalyticsClient
 import ComposableArchitecture
 import APIClient
 import Models
-import WriteFormFeature
+import FormFeature
 
 @Reducer
 public struct ReputationFeature: Reducer, Sendable {
@@ -21,7 +21,7 @@ public struct ReputationFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case alert(AlertState<Alert>)
-        case report(WriteFormFeature)
+        case report(FormFeature)
         
         public enum Alert { case ok }
     }
@@ -129,8 +129,8 @@ public struct ReputationFeature: Reducer, Sendable {
                 return .send(.delegate(.openProfile(profileId: profileId)))
                 
             case let .view(.complainButtonTapped(voteId)):
-                let feature = WriteFormFeature.State(
-                    formFor: .report(id: voteId, type: .reputation)
+                let feature = FormFeature.State(
+                    type: .report(id: voteId, type: .reputation)
                 )
                 state.destination = .report(feature)
                 return .none

@@ -1,7 +1,7 @@
 import ProjectDescription
 
 let tuist = Tuist(
-    fullHandle: "forpda/forpda",
+    //fullHandle: "forpda/forpda",
     project: .tuist(
         compatibleXcodeVersions: .upToNextMajor("26.2"),
         swiftVersion: "6.2.3",

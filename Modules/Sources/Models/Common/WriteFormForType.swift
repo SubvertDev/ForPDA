@@ -9,7 +9,7 @@ import Foundation
 
 public enum WriteFormForType: Sendable, Equatable {
     case report(id: Int, type: ReportType)
-    case topic(forumId: Int, content: [String])
+    case topic(forumId: Int, content: String)
     case post(type: PostType, topicId: Int, content: PostContentType)
     
     public enum PostType: Sendable, Equatable {
@@ -18,7 +18,11 @@ public enum WriteFormForType: Sendable, Equatable {
     }
     
     public enum PostContentType: Sendable, Equatable {
-        case template([String])
+        case template(String)
         case simple(String, [Int])
+    }
+    
+    public var isTopic: Bool {
+        if case .topic = self { true } else { false }
     }
 }

@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add more" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить еще"
+          }
+        }
+      }
+    },
     "Attach this post to previous one?" : {
       "localizations" : {
         "ru" : {
@@ -23,6 +33,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Choose from Files" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из файлов"
+          }
+        }
+      }
+    },
+    "Choose from Gallery" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из галереи"
           }
         }
       }
@@ -135,22 +165,6 @@
         }
       }
     },
-    "Oops, error with loading title :(" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Oops, error with loading title :("
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ой, ошибка при загрузке заголовка :("
-          }
-        }
-      }
-    },
     "Post is already sent" : {
       "localizations" : {
         "ru" : {
@@ -198,6 +212,7 @@
       }
     },
     "Publish" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

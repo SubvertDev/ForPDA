@@ -34,7 +34,7 @@ public struct EditFeature: Reducer, Sendable {
         @Presents public var alert: AlertState<Action.Alert>?
         
         public var bbPanel = BBPanelFeature.State(
-            with: .post(isCurator: true, canModerate: true),
+            for: .post(isCurator: true, canModerate: true),
             supportsUpload: true
         )
         

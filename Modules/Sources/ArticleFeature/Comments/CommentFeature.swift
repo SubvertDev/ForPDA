@@ -12,8 +12,8 @@ import PersistenceKeys
 import APIClient
 import Models
 import ToastClient
-import WriteFormFeature
 import ReputationChangeFeature
+import FormFeature
 
 public enum CommentContextMenuOptions {
     case report
@@ -38,8 +38,8 @@ public struct CommentFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
-        @Presents var writeForm: WriteFormFeature.State?
         @Presents var changeReputation: ReputationChangeFeature.State?
+        @Presents var writeForm: FormFeature.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
@@ -88,8 +88,8 @@ public struct CommentFeature: Reducer, Sendable {
         case likeButtonTapped
         case changeReputationButtonTapped
         
-        case writeForm(PresentationAction<WriteFormFeature.Action>)
         case changeReputation(PresentationAction<ReputationChangeFeature.Action>)
+        case writeForm(PresentationAction<FormFeature.Action>)
         
         case _likeResult(Bool)
         case _timerTicked
@@ -130,7 +130,7 @@ public struct CommentFeature: Reducer, Sendable {
             case let .profileTapped(id):
                 return .send(.delegate(.commentHeaderTapped(id)))
 
-            case .writeForm(.presented(.delegate(.writeFormSent(let response)))):
+            case .writeForm(.presented(.delegate(.formSent(let response)))):
                 if case let .report(result) = response {
                     let toast: ToastMessage
                     switch result {
@@ -158,10 +158,12 @@ public struct CommentFeature: Reducer, Sendable {
                 guard state.isAuthorized else {
                     return .send(.delegate(.unauthorizedAction))
                 }
-                state.writeForm = WriteFormFeature.State(formFor: .report(
-                    id: state.comment.id,
-                    type: .comment
-                ))
+                state.writeForm = FormFeature.State(
+                    type: .report(
+                        id: state.comment.id,
+                        type: .comment
+                    )
+                )
                 return .none
                 
             case .changeReputationButtonTapped:
@@ -217,7 +219,7 @@ public struct CommentFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$writeForm, action: \.writeForm) {
-            WriteFormFeature()
+            FormFeature()
         }
         .ifLet(\.$changeReputation, action: \.changeReputation) {
             ReputationChangeFeature()

@@ -1,5 +1,5 @@
 {
-  "originHash" : "ee0e3f856a054524d5bd9e93a6fcbc05691c9c5dccea70c43fe82afab082d916",
+  "originHash" : "d4b9f9dec604960c5f9151a320f6801e5abfed10d76c1beedc2092c9d5f8e3cb",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -87,14 +87,14 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
       "state" : {
-        "revision" : "8c9d5c5f3b2bb9a93e4b49075fb0430a7f2c3a26",
-        "version" : "0.6.5"
+        "revision" : "4f8bd050475e13d7841db57d3ba0057003b0b204",
+        "version" : "0.7.0"
       }
     },
     {
       "identity" : "posthog-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/PostHog/posthog-ios",
+      "location" : "https://github.com/PostHog/posthog-ios.git",
       "state" : {
         "revision" : "ba5dd65d2341ab8ea1949f072594ef67c490af3a",
         "version" : "3.34.0"
@@ -184,7 +184,7 @@
     {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-composable-architecture",
+      "location" : "https://github.com/pointfreeco/swift-composable-architecture.git",
       "state" : {
         "revision" : "5b0890fabfd68a2d375d68502bc3f54a8548c494",
         "version" : "1.23.1"
@@ -229,7 +229,7 @@
     {
       "identity" : "swift-memberwise-init-macro",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gohanlon/swift-memberwise-init-macro",
+      "location" : "https://github.com/gohanlon/swift-memberwise-init-macro.git",
       "state" : {
         "revision" : "47a2bdf45f1567e7324438f8482e362ee1c3fb44",
         "version" : "0.5.2"

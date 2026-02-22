@@ -52,6 +52,8 @@ extension ForumFeature {
                         break // TODO: Add
                     case .toBookmarks:
                         break // TODO: Add
+                    case .createTopic:
+                        break // TODO: Add
                     }
                     
                 case let .view(.contextTopicMenu(option, topic)):

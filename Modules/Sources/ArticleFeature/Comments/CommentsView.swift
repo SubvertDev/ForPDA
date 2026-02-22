@@ -12,8 +12,8 @@ import NukeUI
 import SharedUI
 import SkeletonUI
 import SFSafeSymbols
-import WriteFormFeature
 import ReputationChangeFeature
+import FormFeature
 
 // MARK: - Comments View
 
@@ -120,7 +120,7 @@ struct CommentView: View {
             }
             .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
                 NavigationStack {
-                    WriteFormScreen(store: store)
+                    FormScreen(store: store)
                 }
             }
             .fittedSheet(
