@@ -421,7 +421,8 @@ public struct FormFeature: Reducer, Sendable {
                 
             case let .internal(.templateResponse(.failure(error))):
                 state.isPublishing = false
-                #warning("add error")
+                state.destination = .alert(.unknownError)
+                analyticsClient.capture(error)
             }
             
             return .none
@@ -430,6 +431,8 @@ public struct FormFeature: Reducer, Sendable {
         .forEach(\.rows, action: \.rows) {
             FormFieldFeature()
         }
+        
+        Analytics()
     }
 }
 
