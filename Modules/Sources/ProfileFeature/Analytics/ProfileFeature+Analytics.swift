@@ -20,7 +20,7 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate, .binding, .internal:
+                case .view(.onAppear), .delegate, .binding:
                     break
                     
                 case .destination(.presented(.alert(.logout))):
@@ -69,7 +69,7 @@ extension ProfileFeature {
                 case .internal(.userResponse(.failure)):
                     analyticsClient.log(ProfileEvent.userLoadingFailed)
                     
-                case .destination:
+                case .internal, .destination:
                     break
                 }
                 return .none
