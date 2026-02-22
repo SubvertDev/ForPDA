@@ -546,7 +546,7 @@ public struct TopicFeature: Reducer, Sendable {
                         }
                         // Deleting notifications related to posts on the current page
                         let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970)
-                        await notificationsClient.removeNotifications(categories: [], timestamps: timestamps)
+                        await notificationsClient.removeNotifications(timestamps: timestamps)
                     }
                 )
                 

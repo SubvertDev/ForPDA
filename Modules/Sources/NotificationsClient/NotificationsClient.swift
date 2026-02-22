@@ -51,10 +51,14 @@ public struct NotificationsClient: Sendable {
     public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
     public var processNotification: @Sendable (String) async -> Bool = { _ in false }
     public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
-    public var removeNotifications: @Sendable (_ categories: [Unread.Item.Category], _ timestamps: [TimeInterval]) async -> Void
+    public var removeNotifications: @Sendable ([Unread.Item.Category], [Int], [TimeInterval]) async -> Void
     public var setNotificationContext: @Sendable (_ context: NotificationContext?) -> Void
     public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
     public var unreadPublisher: @Sendable () -> AnyPublisher<Unread, Never> = { Just(.mock).eraseToAnyPublisher() }
+    
+    public func removeNotifications(categories: [Unread.Item.Category] = [], ids: [Int] = [], timestamps: [TimeInterval] = []) async {
+        await removeNotifications(categories, ids, timestamps)
+    }
 }
 
 extension DependencyValues {
@@ -321,9 +325,10 @@ extension NotificationsClient: DependencyKey {
                 logger.info("Successfully processed notifications")
             },
             
-            removeNotifications: { categories, timestamps in
+            removeNotifications: { categories, ids, timestamps in
                 logger.info("Removing notifications with categories: \(categories)")
                 
+                // Removing via categories
                 // Do we even have pending ones?
                 let pending = await center.pendingNotificationRequests()
                 let filteredPending = pending.filter { notification in
@@ -335,10 +340,11 @@ extension NotificationsClient: DependencyKey {
                     return false
                 }
                 if !filteredPending.isEmpty {
-                    logger.warning("Removing pending requests: \(filteredPending.map(\.identifier))")
+                    center.removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
+                    logger.warning("Removing PENDING notifications (rn-categories): \(filteredPending.map(\.identifier))")
                 }
-                center.removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
                 
+                // Removing via categories
                 let delivered = await center.deliveredNotifications()
                 let filteredCategoriesDelivered = delivered.filter { notification in
                     if let prefix = notification.request.identifier.split(separator: "-").first {
@@ -348,8 +354,27 @@ extension NotificationsClient: DependencyKey {
                     }
                     return false
                 }
-                center.removeDeliveredNotifications(withIdentifiers: filteredCategoriesDelivered.map(\.request.identifier))
+                if !filteredCategoriesDelivered.isEmpty {
+                    center.removeDeliveredNotifications(withIdentifiers: filteredCategoriesDelivered.map(\.request.identifier))
+                    logger.info("Removing delivered notifications (rn-categories): \(filteredCategoriesDelivered)")
+                }
                 
+                // Removing via ids
+                let filteredIdsDelivered = delivered
+                    .compactMap { notification -> String? in
+                        guard let raw = notification.request.identifier.split(separator: "-")[safe: 1],
+                              let id = Int(raw),
+                              ids.contains(id) else {
+                            return nil
+                        }
+                        return notification.request.identifier
+                    }
+                if !filteredIdsDelivered.isEmpty {
+                    center.removeDeliveredNotifications(withIdentifiers: filteredIdsDelivered)
+                    logger.info("Removing delivered notifications (rn-ids): \(filteredIdsDelivered)")
+                }
+                
+                // Removing via timestamps
                 let filteredTimestampsDelivered = delivered
                     .compactMap { notification -> String? in
                         guard let raw = notification.request.identifier.split(separator: "-")[safe: 2],
@@ -359,8 +384,10 @@ extension NotificationsClient: DependencyKey {
                         }
                         return notification.request.identifier
                     }
-                center.removeDeliveredNotifications(withIdentifiers: filteredTimestampsDelivered)
-                logger.info("Removing delivered notifications (rn): \(filteredTimestampsDelivered)")
+                if !filteredTimestampsDelivered.isEmpty {
+                    center.removeDeliveredNotifications(withIdentifiers: filteredTimestampsDelivered)
+                    logger.info("Removing delivered notifications (rn-timestamps): \(filteredTimestampsDelivered)")
+                }
             },
             
             setNotificationContext: { c in
