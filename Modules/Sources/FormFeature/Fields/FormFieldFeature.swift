@@ -17,7 +17,7 @@ public struct FormFieldFeature: Reducer {
     public enum State: Equatable, Identifiable, FormFieldConformable {
         var flag: Int { return -1 }
         
-        case checkBox(FormCheckBoxFeature.State)
+        case checkBoxList(FormCheckBoxListFeature.State)
         case dropdown(FormDropdownFeature.State)
         case editor(FormEditorFeature.State)
         case textField(FormTextFieldFeature.State)
@@ -26,7 +26,7 @@ public struct FormFieldFeature: Reducer {
         
         public var id: Int {
             switch self {
-            case .checkBox(let state): return state.id
+            case .checkBoxList(let state): return state.id
             case .dropdown(let state): return state.id
             case .editor(let state): return state.id
             case .textField(let state): return state.id
@@ -35,9 +35,9 @@ public struct FormFieldFeature: Reducer {
             }
         }
         
-        func getValue() -> String {
+        func getValue() -> FormValue {
             switch self {
-            case .checkBox(let state): state.getValue()
+            case .checkBoxList(let state): state.getValue()
             case .dropdown(let state): state.getValue()
             case .editor(let state): state.getValue()
             case .textField(let state): state.getValue()
@@ -48,7 +48,7 @@ public struct FormFieldFeature: Reducer {
         
         func isValid() -> Bool {
             switch self {
-            case .checkBox(let state): state.isValid()
+            case .checkBoxList(let state): state.isValid()
             case .dropdown(let state): state.isValid()
             case .editor(let state): state.isValid()
             case .textField(let state): state.isValid()
@@ -59,7 +59,7 @@ public struct FormFieldFeature: Reducer {
         
         func isRequired() -> Bool {
             switch self {
-            case .checkBox(let state): state.isRequired
+            case .checkBoxList(let state): state.isRequired
             case .dropdown(let state): state.isRequired
             case .editor(let state): state.isRequired
             case .textField(let state): state.isRequired
@@ -72,7 +72,7 @@ public struct FormFieldFeature: Reducer {
     // MARK: - Actions
     
     public enum Action {
-        case checkBox(FormCheckBoxFeature.Action)
+        case checkBoxList(FormCheckBoxListFeature.Action)
         case dropdown(FormDropdownFeature.Action)
         case editor(FormEditorFeature.Action)
         case textField(FormTextFieldFeature.Action)
@@ -83,8 +83,8 @@ public struct FormFieldFeature: Reducer {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.checkBox, action: \.checkBox) {
-            FormCheckBoxFeature()
+        Scope(state: \.checkBoxList, action: \.checkBoxList) {
+            FormCheckBoxListFeature()
         }
         Scope(state: \.dropdown, action: \.dropdown) {
             FormDropdownFeature()
@@ -116,9 +116,9 @@ struct FormFieldRow: View {
     
     var body: some View {
         switch store.state {
-        case .checkBox:
-            if let store = store.scope(state: \.checkBox, action: \.checkBox) {
-                FormCheckBoxRow(store: store)
+        case .checkBoxList:
+            if let store = store.scope(state: \.checkBoxList, action: \.checkBoxList) {
+                FormCheckBoxListRow(store: store)
             }
             
         case .dropdown:

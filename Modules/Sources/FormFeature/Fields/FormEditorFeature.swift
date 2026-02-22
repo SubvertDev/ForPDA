@@ -41,12 +41,12 @@ public struct FormEditorFeature: Reducer {
             self.text = defaultText
         }
         
-        func getValue() -> String {
-            return text
+        func getValue() -> FormValue {
+            return .string(text)
         }
         
         func isValid() -> Bool {
-            return !text.isEmpty
+            return isRequired ? !text.isEmpty : true
         }
     }
     

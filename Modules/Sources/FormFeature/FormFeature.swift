@@ -77,7 +77,7 @@ public struct FormFeature: Reducer, Sendable {
                 return editorState.text
             } else {
                 let values = rows.map { $0.getValue() }
-                return "[" + values.joined(separator: ",") + "]"
+                return "[" + values.description + "]"
             }
         }
         
@@ -185,7 +185,7 @@ public struct FormFeature: Reducer, Sendable {
             case let .rows(action):
                 if case let .element(id: id, action: .uploadBox(.delegate(.filesHasBeenUploaded))) = action {
                     if case let .uploadBox(uploadBoxState) = state.rows[id: id] {
-                        print("Files: \(uploadBoxState.files)")
+                        print("Files: \(uploadBoxState)")
                     } else {
                         fatalError("Non UploadBox state casted by action id")
                     }
@@ -300,12 +300,15 @@ public struct FormFeature: Reducer, Sendable {
                         )
                         state.rows.append(.editor(editorState))
                         
-                    case let .checkboxList(content, _):
-                        let checkboxState = FormCheckBoxFeature.State(
+                    case let .checkboxList(content, options):
+                        let checkboxListState = FormCheckBoxListFeature.State(
                             id: index,
-                            flag: content.flag
+                            title: content.name,
+                            description: content.description,
+                            flag: content.flag,
+                            options: options
                         )
-                        state.rows.append(.checkBox(checkboxState))
+                        state.rows.append(.checkBoxList(checkboxListState))
                         
                     case let .dropdown(content, options):
                         let dropdownState = FormDropdownFeature.State(

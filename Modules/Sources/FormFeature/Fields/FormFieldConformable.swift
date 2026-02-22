@@ -10,7 +10,7 @@ protocol FormFieldConformable: Identifiable {
     var isRequired: Bool { get }
     
     func isValid() -> Bool
-    func getValue() -> String
+    func getValue() -> FormValue
 }
 
 extension FormFieldConformable {

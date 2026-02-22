@@ -39,8 +39,8 @@ public struct FormDropdownFeature: Reducer {
             self.selectedOption = options.first ?? ""
         }
         
-        func getValue() -> String {
-            return selectedOption
+        func getValue() -> FormValue {
+            return .string(selectedOption)
         }
         
         func isValid() -> Bool {

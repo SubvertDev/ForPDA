@@ -85,15 +85,16 @@ public struct FormUploadBoxFeature: Reducer {
             self.flag = flag
             self.allowedExtensions = allowedExtensions
             self.isLoading = isLoading
-            self.files = files
+            //self.files = files
         }
         
-        func getValue() -> String {
-            return files.map { "[\($0.id),\($0.name)]" }.joined(separator: ",")
+        func getValue() -> FormValue {
+            return .array([])
+            //return Array<Int>().map { "[\($0.id),\($0.name)]" }.joined(separator: ",")
         }
         
         func isValid() -> Bool {
-            return !files.isEmpty
+            return false
         }
     }
     
