@@ -29,7 +29,7 @@ public struct FormTitleFeature: Reducer {
         var nodes: [FormNode] = []
         
         func getValue() -> FormValue {
-            return .string("\"\"")
+            return .integer(0)//.string("")
         }
         
         func isValid() -> Bool {
@@ -75,20 +75,24 @@ struct FormTitleRow: View {
     
     var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 6) {
-                ForEach(store.nodes, id: \.self) { node in
-                    FormNodeView(node: node)
+            if !store.text.isEmpty {
+                VStack(spacing: 6) {
+                    ForEach(store.nodes, id: \.self) { node in
+                        FormNodeView(node: node)
+                    }
                 }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .padding(.horizontal, 12)
-            .background {
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(Color(.Background.teritary))
-            }
-            .onAppear {
-                send(.onAppear)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .background {
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color(.Background.teritary))
+                }
+                .onAppear {
+                    send(.onAppear)
+                }
+            } else {
+                EmptyView()
             }
         }
     }

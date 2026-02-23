@@ -41,9 +41,10 @@ public struct FormPreviewFeature: Reducer, Sendable {
         
         case cancelButtonTapped
         
-        case _loadPreview(id: Int, content: String)
+        case _loadPreview(id: Int, content: [FormValue])
         case _loadSimplePreview(id: Int, content: String, attIds: [Int])
-        case _previewResponse(Result<PostPreview, any Error>)
+        case _previewResponse(Result<TemplatePreview, any Error>)
+        case _simplePreviewResponse(Result<PostPreview, any Error>)
     }
     
     // MARK: - Dependencies
@@ -84,14 +85,14 @@ public struct FormPreviewFeature: Reducer, Sendable {
                 return .run { [isTopic = state.formType.isTopic] send in
                     let result = await Result { try await apiClient.previewTemplate(
                         id: id,
-                        content: content,
+                        content: try! FormValue.toDocument(content),
                         isTopic: isTopic
                     )}
                     await send(._previewResponse(result))
                 } catch: { error, send in
                     await send(._previewResponse(.failure(error)))
                 }
-            
+                
             case let ._loadSimplePreview(id, content, attachments):
                 state.isPreviewLoading = true
                 return .run { send in
@@ -106,17 +107,31 @@ public struct FormPreviewFeature: Reducer, Sendable {
                             )
                         )
                     )}
-                    await send(._previewResponse(result))
+                    await send(._simplePreviewResponse(result))
                 } catch: { error, send in
-                    await send(._previewResponse(.failure(error)))
+                    await send(._simplePreviewResponse(.failure(error)))
                 }
                 
-            case let ._previewResponse(.success(preview)):
+            case let ._simplePreviewResponse(.success(preview)):
                 state.contentTypes = TopicNodeBuilder(
                     text: preview.content, attachments: []
                 ).build()
                 
                 // TODO: Attachments.
+                
+                state.isPreviewLoading = false
+                
+                return .none
+                
+            case let ._simplePreviewResponse(.failure(error)):
+                // TODO: Toast?
+                print(error)
+                return .send(.cancelButtonTapped)
+                
+            case let ._previewResponse(.success(preview)):
+                state.contentTypes = TopicNodeBuilder(
+                    text: preview.content, attachments: preview.attachments
+                ).build()
                 
                 state.isPreviewLoading = false
                 

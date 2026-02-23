@@ -297,7 +297,7 @@ public struct TopicFeature: Reducer, Sendable {
                         type: .post(
                             type: .new,
                             topicId: topic.id,
-                            content: .template("")
+                            content: .template([])
                         )
                     )
                     state.destination = .form(formState)

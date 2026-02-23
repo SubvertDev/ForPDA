@@ -54,6 +54,12 @@ public struct FormScreen: View {
             .scrollIndicators(.hidden)
             .navigationTitle(Text(navigationTitleText(), bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
+            //.alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .sheet(item: $store.scope(state: \.destination?.preview, action: \.destination.preview)) { store in
+                NavigationStack {
+                    FormPreviewView(store: store)
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 PublishButton()
             }
@@ -191,7 +197,7 @@ public struct FormScreen: View {
         FormScreen(
             store: Store(
                 initialState: FormFeature.State(
-                    type: .post(type: .new, topicId: 0, content: .template(""))
+                    type: .post(type: .new, topicId: 0, content: .template([]))
                 )
             ) {
                 FormFeature()

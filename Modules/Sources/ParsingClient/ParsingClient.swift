@@ -41,7 +41,7 @@ public struct ParsingClient: Sendable {
     public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
     public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
-    public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parseTemplatePreview: @Sendable (_ response: String) async throws -> TemplatePreview
     public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
     
     // Search

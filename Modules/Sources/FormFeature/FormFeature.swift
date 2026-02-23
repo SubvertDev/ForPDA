@@ -72,12 +72,11 @@ public struct FormFeature: Reducer, Sendable {
             return !rows.allSatisfy { $0.isValid() } || isPublishing
         }
         
-        var content: String {
+        var content: [FormValue] {
             if rows.count == 1, case let .editor(editorState) = rows.first {
-                return editorState.text
+                return [.string(editorState.text)]
             } else {
-                let values = rows.map { $0.getValue() }
-                return "[" + values.description + "]"
+                return rows.map { $0.getValue() }
             }
         }
         
@@ -179,10 +178,7 @@ public struct FormFeature: Reducer, Sendable {
                 }
                 return .run { _ in await dismiss() }
                 
-            case .delegate:
-                break
-                
-            case let .rows(action):
+            case .delegate, .rows:
                 break
                 
             case .view(.onAppear):
@@ -224,7 +220,11 @@ public struct FormFeature: Reducer, Sendable {
                 switch state.type {
                 case let .post(type: type, topicId: topicId, content: content):
                     let content = if case .simple(_, let attachments) = content {
-                        FormType.PostContentType.simple(state.content, attachments)
+                        if case let .string(text) = state.content.first {
+                            FormType.PostContentType.simple(text, attachments)
+                        } else {
+                            fatalError("Simple content SHOULD be .string()!")
+                        }
                     } else {
                         FormType.PostContentType.template(state.content)
                     }
@@ -234,8 +234,11 @@ public struct FormFeature: Reducer, Sendable {
                     )
                     
                 case .report:
+                    let content = if case let .string(text) = state.content.first { text } else {
+                        fatalError("Simple content SHOULD be .string()!")
+                    }
                     previewState = FormPreviewFeature.State(
-                        formType: .post(type: .new, topicId: 0, content: .simple(state.content, []))
+                        formType: .post(type: .new, topicId: 0, content: .simple(content, []))
                     )
                     
                 case let .topic(forumId: forumId, content: _):
@@ -267,7 +270,6 @@ public struct FormFeature: Reducer, Sendable {
                 for (index, field) in fields.enumerated() {
                     switch field {
                     case let .title(content):
-                        guard !content.isEmpty else { continue }
                         let titleState = FormTitleFeature.State(id: index, text: content)
                         state.rows.append(.title(titleState))
                         
@@ -336,14 +338,18 @@ public struct FormFeature: Reducer, Sendable {
                 switch state.type {
                 case .topic(forumId: let id, content: _), .post(type: .new, topicId: let id, content: .template):
                     return .run { [isTopic = state.type.isTopic, content = state.content] send in
+                        let content = try! FormValue.toDocument(content)
                         let result = await Result { try await apiClient.sendTemplate(id: id, content: content, isTopic: isTopic) }
                         await send(.internal(.templateResponse(result)))
                     }
                     
                 case let .post(type: type, topicId: topicId, content: .simple(_, attachments)):
                     let editPostFlag = state.isShowMarkEnabled ? 4 : 0
+                    let content = if case let .string(text) = state.content.first { text } else {
+                        fatalError("Simple content SHOULD be .string()!")
+                    }
                     return .run { [
-                        content = state.content,
+                        content = content,
                         reason = state.editReasonText
                     ] send in
                         switch type {
@@ -376,7 +382,10 @@ public struct FormFeature: Reducer, Sendable {
                     }
                     
                 case let .report(id: id, type: type):
-                    return .run { [content = state.content] send in
+                    let content = if case let .string(text) = state.content.first { text } else {
+                        fatalError("Simple content SHOULD be .string()!")
+                    }
+                    return .run { [content = content] send in
                         let request = ReportRequest(id: id, type: type, message: content)
                         let result = await Result { try await apiClient.sendReport(request) }
                         await send(.internal(.reportResponse(result)))

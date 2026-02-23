@@ -10,7 +10,7 @@ import Models
 public enum FormType: Sendable, Equatable {
     case post(type: PostType, topicId: Int, content: PostContentType)
     case report(id: Int, type: ReportType)
-    case topic(forumId: Int, content: String)
+    case topic(forumId: Int, content: [FormValue])
     
     public enum PostType: Sendable, Equatable {
         case new
@@ -19,7 +19,7 @@ public enum FormType: Sendable, Equatable {
     
     public enum PostContentType: Sendable, Equatable {
         case simple(String, [Int])
-        case template(String)
+        case template([FormValue])
     }
     
     public var isTopic: Bool {

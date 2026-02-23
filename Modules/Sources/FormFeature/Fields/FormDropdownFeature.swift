@@ -41,7 +41,7 @@ public struct FormDropdownFeature: Reducer {
         }
         
         func getValue() -> FormValue {
-            return .string(selectedOption)
+            return .integer(options.firstIndex(of: selectedOption)! + 1)
         }
         
         func isValid() -> Bool {

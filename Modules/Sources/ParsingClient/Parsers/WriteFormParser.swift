@@ -26,7 +26,7 @@ public struct WriteFormParser {
         return try parseFormFields(fields)
     }
     
-    public static func parseTemplatePreview(from string: String) throws(ParsingError) -> PostPreview {
+    public static func parseTemplatePreview(from string: String) throws(ParsingError) -> TemplatePreview {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -37,11 +37,12 @@ public struct WriteFormParser {
         
         guard let template = array[safe: 2] as? [Any],
               let content = template[safe: 2] as? String,
-              let attachmentIds = template[safe: 3] as? [Int] else {
+              let attachmentsRaw = template[safe: 3] as? [[Any]],
+              let attachments = try? AttachmentParser.parseAttachment(attachmentsRaw) else {
             throw ParsingError.failedToCastFields
         }
         
-        return PostPreview(content: content, attachmentIds: attachmentIds)
+        return TemplatePreview(content: content, attachments: attachments)
     }
     
     public static func parseTemplateSend(from string: String) throws(ParsingError) -> TemplateSend {

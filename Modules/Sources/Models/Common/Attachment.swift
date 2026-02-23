@@ -76,3 +76,14 @@ public struct Attachment: Sendable, Hashable, Codable {
         self.downloadCount = downloadCount
     }
 }
+
+public extension Attachment {
+    static let mock = Attachment(
+        id: 0,
+        type: .file,
+        name: "FileName.dat",
+        size: 1709,
+        metadata: nil,
+        downloadCount: 2
+    )
+}

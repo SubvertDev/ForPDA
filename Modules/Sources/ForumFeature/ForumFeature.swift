@@ -212,7 +212,7 @@ public struct ForumFeature: Reducer, Sendable {
                     let formState = FormFeature.State(
                         type: .topic(
                             forumId: state.forumId,
-                            content: ""
+                            content: []
                         )
                     )
                     state.destination = .form(formState)

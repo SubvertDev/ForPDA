@@ -17,6 +17,7 @@ import PersistenceKeys
 public typealias ConnectionState = API.ConnectionState
 public typealias UploadRequest = PDAPI.UploadRequest
 public typealias UploadProgressStatus = PDAPI.UploadProgressStatus
+public typealias PDAPIDocument = PDAPI.Document
 public typealias PDAPIError = APIError
 
 // MARK: - Client
@@ -61,11 +62,11 @@ public struct APIClient: Sendable {
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
-    public var sendTemplate: @Sendable (_ id: Int, _ content: String, _ isTopic: Bool) async throws -> TemplateSend
+    public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var getMentions: @Sendable (_ showPosts: Bool, _ offset: Int, _ perPage: Int) async throws -> Mentions
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
-    public var previewTemplate: @Sendable (_ id: Int, _ content: String, _ isTopic: Bool) async throws -> PostPreview
+    public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplatePreview
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
@@ -652,7 +653,7 @@ extension APIClient: DependencyKey {
                 )
             },
             previewTemplate: { _, _, _ in
-                return PostPreview(content: "Builded", attachmentIds: [])
+                return TemplatePreview(content: "content", attachments: [.mock])
             },
             sendPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
