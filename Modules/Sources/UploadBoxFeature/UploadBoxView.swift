@@ -71,11 +71,12 @@ public struct UploadBoxView: View {
             .task(id: pickerItems) {
                 var photos: [UploadBoxFeature.FileType] = []
                 for item in pickerItems {
-                    if let url = try? await item.loadTransferable(type: URL.self) {
+                    if let data = try? await item.loadTransferable(type: Data.self) {
                         let type = item.supportedContentTypes.first
-                        photos.append(.image(url: url, ext: type?.preferredFilenameExtension))
+                        photos.append(.image(data: data, ext: type?.preferredFilenameExtension))
                     }
                 }
+                print("PHOTOSL \(photos)")
                 send(.photosPickerPhotosSelected(photos))
             }
             .tint(tintColor)
@@ -161,8 +162,8 @@ public struct UploadBoxView: View {
             if file.isUploading {
                 ProgressView()
                     .frame(width: 28, height: 28)
-            } else if file.isUploadError {
-                Text(verbatim: "File upload ERROR")
+            } else if file.uploadingError != nil {
+                Text(verbatim: "File upload ERROR \(file.uploadingError)")
                     .font(.title)
                     .foregroundColor(tintColor)
             } else {

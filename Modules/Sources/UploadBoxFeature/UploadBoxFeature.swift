@@ -23,9 +23,9 @@ public struct UploadBoxFeature: Reducer, Sendable {
     
     // MARK: - File Type
     
-    public enum FileType: Equatable, Sendable {
+    public enum FileType: Equatable, Hashable, Sendable {
         case file(url: URL)
-        case image(url: URL, ext: String?)
+        case image(data: Data, ext: String?)
     }
     
     // MARK: - Destination
@@ -35,6 +35,16 @@ public struct UploadBoxFeature: Reducer, Sendable {
         case confirmationDialog(ConfirmationDialogState<Dialog>)
         case fileImporter
         case photosPicker
+        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Alert: Equatable {
+            case removeFile(UUID)
+            case reuploadFile(UUID)
+            
+            case selectFileFromFiles(oldFile: UUID?)
+            case selectFileFromGallery(oldFile: UUID?)
+        }
         
         @CasePathable
         public enum Dialog {
@@ -78,6 +88,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
 
         case view(View)
         public enum View {
+            case fileWithErrorTapped(UUID)
             case selectFilesButtonTapped
             case removeFileButtonTapped(UploadBoxFile)
             case photosPickerPhotosSelected([FileType])
@@ -90,6 +101,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case uploadFile(UploadBoxFile)
             case uploadFileFinished(index: Int, Int)
             case updateFileUploadStatus(UUID, UploadProgressStatus)
+            case uploadFileCanceledByValidation(UUID?, UploadBoxFile.UploadErrorType)
         }
         
         case delegate(Delegate)
@@ -135,14 +147,63 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case .destination(.presented(.confirmationDialog(.gallery))):
                 if isPreview {
                     return .send(.view(.photosPickerPhotosSelected(
-                        [.image(url: URL(fileURLWithPath: ""), ext: nil)]
+                        [.image(data: Data(), ext: nil)]
                     )))
                 } else {
                     state.destination = .photosPicker
                 }
                 
+            case let .destination(.presented(.alert(.selectFileFromFiles(oldFileId)))):
+                if let oldFileId = oldFileId,
+                   let oldIndex = state.files.firstIndex(where: { $0.id == oldFileId }) {
+                    return .concatenate(
+                        .send(.view(.removeFileButtonTapped(state.files[oldIndex]))),
+                        .send(.destination(.presented(.confirmationDialog(.files))))
+                    )
+                }
+                return .send(.destination(.presented(.confirmationDialog(.files))))
+                
+            case let .destination(.presented(.alert(.selectFileFromGallery(oldFileId)))):
+                if let oldFileId = oldFileId,
+                   let oldIndex = state.files.firstIndex(where: { $0.id == oldFileId }) {
+                    return .concatenate(
+                        .send(.view(.removeFileButtonTapped(state.files[oldIndex]))),
+                        .send(.destination(.presented(.confirmationDialog(.gallery))))
+                    )
+                }
+                return .send(.destination(.presented(.confirmationDialog(.gallery))))
+                
+            case let .destination(.presented(.alert(.removeFile(id)))):
+                if let index = state.files.firstIndex(where: { $0.id == id }) {
+                    return .send(.view(.removeFileButtonTapped(state.files[index])))
+                }
+                
+            case let .destination(.presented(.alert(.reuploadFile(id)))):
+                break // TODO: Implement
+                
             case .destination:
                 break
+                
+            case let .view(.fileWithErrorTapped(id)):
+                if let index = state.files.firstIndex(where: { $0.id == id }),
+                   let error = state.files[index].uploadingError {
+                    switch error {
+                    case .sizeTooBig:
+                        state.destination = .alert(.criticalFileConfirmation(
+                            fileId: id,
+                            title: TextState("File size too big", bundle: .module),
+                            message: TextState("Select another file. If there are already files in the queue, it will be uploaded last", bundle: .module)
+                        ))
+                    case .badExtension:
+                        state.destination = .alert(.criticalFileConfirmation(
+                            fileId: id,
+                            title: TextState("Sorry, this format is not supported", bundle: .module),
+                            message: TextState("Select another file. If there are already files in the queue, it will be uploaded last", bundle: .module)
+                        ))
+                    case .uploadFailure:
+                        state.destination = .alert(.reuploadFileConfirmation(id: id))
+                    }
+                }
                 
             case .view(.selectFilesButtonTapped):
                 let dialogState = ConfirmationDialogState<Destination.Dialog>(
@@ -172,7 +233,8 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     state.files.append(.mockImage)
                     return .none
                 }
-                state.uploadQueue = images
+                let filtered = Array(Set(state.uploadQueue + images))
+                state.uploadQueue.append(contentsOf: filtered)
                 return .send(.internal(.startNextUpload))
                 
             case let .view(.fileImporterURLsRecieved(urls)):
@@ -183,44 +245,82 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     state.files.append(.mockFile)
                     return .none
                 }
-                state.uploadQueue = urls.map { .file(url: $0) }
+                let filtered = Array(Set(state.uploadQueue + urls.map { .file(url: $0) }))
+                state.uploadQueue.append(contentsOf: filtered)
                 return .send(.internal(.startNextUpload))
-            
+                
+            case let .internal(.uploadFileCanceledByValidation(id, status)):
+                switch status {
+                case .sizeTooBig:
+                    state.destination = .alert(.criticalFileConfirmation(
+                        fileId: id,
+                        title: TextState("File size too big", bundle: .module),
+                        message: TextState("Select another file. If there are already files in the queue, it will be uploaded last", bundle: .module)
+                    ))
+                case .badExtension:
+                    state.destination = .alert(.criticalFileConfirmation(
+                        fileId: id,
+                        title: TextState("Sorry, this format is not supported", bundle: .module),
+                        message: TextState("Select another file. If there are already files in the queue, it will be uploaded last", bundle: .module)
+                    ))
+                case .uploadFailure:
+                    if let id {
+                        state.destination = .alert(.reuploadFileConfirmation(id: id))
+                    }
+                }
+                
             case .internal(.startNextUpload):
                 guard let item = state.uploadQueue.first else {
                     state.isAnyFileUploading = false
                     return .send(.delegate(.allFilesAreUploaded))
                 }
+                
                 state.isAnyFileUploading = true
                 state.uploadQueue.removeFirst()
                 
-                return .run { send in
-                    let (url, uploadType): (URL, UploadBoxFile.FileType)
-                    switch item {
-                    case .file(let u):
-                        url = u
-                        uploadType = .file
-                    case .image(let u, _):
-                        url = u
-                        uploadType = .image
+                let data: Data?
+                let name: String
+                let uploadType: UploadBoxFile.FileType
+                let fileExtension: String?
+                
+                switch item {
+                case .file(let url):
+                    guard url.startAccessingSecurityScopedResource() else {
+                        return .send(.internal(.startNextUpload))
                     }
-                    
-                    guard url.startAccessingSecurityScopedResource() else { return }
                     defer { url.stopAccessingSecurityScopedResource() }
-
-                    guard let data = try? Data(contentsOf: url) else {
-                        await send(.internal(.startNextUpload))
-                        return
-                    }
                     
-                    let file = UploadBoxFile(
-                        name: data.imageExtension ?? url.lastPathComponent,
-                        type: uploadType,
-                        data: data,
-                        isUploading: true
-                    )
-                    await send(.internal(.uploadFile(file)))
+                    data = try? Data(contentsOf: url)
+                    name = url.lastPathComponent
+                    uploadType = .file
+                    fileExtension = url.pathExtension
+                case .image(let d, let ext):
+                    data = d
+                    uploadType = .image
+                    fileExtension = if let ext = ext { ext } else { d.imageExtension }
+                    name = "\(UUID().uuidString).\(fileExtension ?? "bin")"
                 }
+                
+                guard let ext = fileExtension, fileExtensionAllowed(ext: ext, allowed: state.allowedExtensions) else {
+                    return .concatenate(
+                        .send(.internal(.uploadFileCanceledByValidation(nil, .badExtension))),
+                        .send(.internal(.startNextUpload))
+                    )
+                }
+                guard let data else {
+                    return .concatenate(
+                        .send(.internal(.uploadFileCanceledByValidation(nil, .sizeTooBig))),
+                        .send(.internal(.startNextUpload))
+                    )
+                }
+                
+                let file = UploadBoxFile(
+                    name: name,
+                    type: uploadType,
+                    data: data,
+                    isUploading: true
+                )
+                return .send(.internal(.uploadFile(file)))
                 
             case let .internal(.uploadFile(file)):
                 state.files.append(file)
@@ -249,8 +349,8 @@ public struct UploadBoxFeature: Reducer, Sendable {
                             .replacingOccurrences(of: "]", with: "")
                             .components(separatedBy: ",")[2]) else {
                             state.files[index].isUploading = false
-                            state.files[index].isUploadError = true
-                            return .none
+                            state.files[index].uploadingError = .uploadFailure
+                            return .send(.internal(.startNextUpload))
                         }
                         return .send(.internal(.uploadFileFinished(index: index, fileId)))
                         
@@ -262,19 +362,27 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         print("FILE UPLOADING INITIALIZED")
                         state.files[index].isUploading = true
                         
-                    case .error(let err):
-                        // TODO: Alert?
-                        print("ERROR ON FILE UPLOADING: \(err)")
+                    case .error(let error):
+                        state.files[index].uploadingError = switch error {
+                        case .serverDenied: .uploadFailure
+                        case .fileSizeTooBig: .sizeTooBig
+                        case .fileNotAllowed, .fileTypeNotAllowed: .badExtension
+                        case .responseStatus, .other: .uploadFailure
+                        @unknown default: .uploadFailure
+                        }
                         state.files[index].isUploading = false
-                        state.files[index].isUploadError = true
+                        // TODO: capture?
+                        print("ERROR ON FILE UPLOADING: \(error)")
+                        return .send(.internal(.startNextUpload))
                         
                     @unknown default:
                         print("UNKNOWN DEFAULT ERROR! \(id), \(status)")
                         state.files[index].isUploading = false
-                        state.files[index].isUploadError = true
+                        state.files[index].uploadingError = .uploadFailure
+                        return .send(.internal(.startNextUpload))
                     }
                 } else {
-                    // TODO: Handle error.
+                    // Do nothing... File removed by user.
                 }
                 return .none
                 
@@ -295,9 +403,63 @@ public struct UploadBoxFeature: Reducer, Sendable {
 
 extension UploadBoxFeature.Destination.State: Equatable {}
 
+// MARK: - Alert Extension
+
+extension AlertState where Action == UploadBoxFeature.Destination.Alert {
+    
+    nonisolated static func reuploadFileConfirmation(id: UUID) -> AlertState {
+        return AlertState(
+            title: { TextState("An error occurred while uploading the file", bundle: .module) },
+            actions: {
+                ButtonState(action: .reuploadFile(id)) {
+                    TextState("Try Again", bundle: .module)
+                }
+                ButtonState(role: .destructive, action: .removeFile(id)) {
+                    TextState("Delete", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("Cancel", bundle: .module)
+                }
+            },
+            message: {
+                TextState("You can try uploading it again. If there are already files in the queue, it will be uploaded last")
+            }
+        )
+    }
+    
+    nonisolated static func criticalFileConfirmation(fileId: UUID?, title: TextState, message: TextState) -> AlertState {
+        return AlertState(
+            title: { title },
+            actions: {
+                ButtonState(action: .selectFileFromGallery(oldFile: fileId)) {
+                    TextState("Choose from Gallery", bundle: .module)
+                }
+                ButtonState(action: .selectFileFromFiles(oldFile: fileId)) {
+                    TextState("Choose from Files", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("Cancel", bundle: .module)
+                }
+            },
+            message: { message }
+        )
+    }
+}
+
 // MARK: - Helpers
 
 private extension UploadBoxFeature {
+    func fileExtensionAllowed(ext: String?, allowed: [String]) -> Bool {
+        guard let fileExtension = ext else { return false }
+        guard !allowed.isEmpty else { return true }
+        for allowedExtension in allowed {
+            if fileExtension.lowercased() == allowedExtension.lowercased() {
+                return true
+            }
+        }
+        return false
+    }
+    
     func calculateFileHash(data: Data) -> String {
         return Insecure.MD5.hash(data: data)
             .map { byte in String(format: "%02X", byte) }
@@ -314,6 +476,8 @@ private extension Data {
             return "png"
         case 0x47:
             return "gif"
+        case 0x52:
+            return "webp"
         case 0x49, 0x4D:
             return "tiff"
         default:

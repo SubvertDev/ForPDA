@@ -13,7 +13,7 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
     public let type: FileType
     public let data: Data
     public var isUploading: Bool
-    public var isUploadError: Bool
+    public var uploadingError: UploadErrorType?
     
     public var serverId: Int? = nil
     
@@ -21,18 +21,24 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
         case file, image
     }
     
+    public enum UploadErrorType: Sendable {
+        case sizeTooBig
+        case badExtension
+        case uploadFailure
+    }
+    
     public init(
         name: String,
         type: FileType,
         data: Data,
         isUploading: Bool = false,
-        isUploadError: Bool = false
+        uploadingError: UploadErrorType? = nil
     ) {
         self.name = name
         self.type = type
         self.data = data
         self.isUploading = isUploading
-        self.isUploadError = isUploadError
+        self.uploadingError = uploadingError
     }
 }
 
