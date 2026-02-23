@@ -54,6 +54,8 @@ public struct FormFeature: Reducer, Sendable {
         public var isEditingReasonEnabled = false
         public var editReasonText = ""
         
+        var isFormLocked = false
+        
         var canShowShowMark = false
         var isShowMarkEnabled = false
         
@@ -178,8 +180,20 @@ public struct FormFeature: Reducer, Sendable {
                 }
                 return .run { _ in await dismiss() }
                 
-            case .delegate, .rows:
+            case .delegate:
                 break
+                
+            case let .rows(action):
+                if case let .element(id: id, action: .uploadBox(.delegate(.anyFileUploading(status)))) = action {
+                    state.isFormLocked = status
+                    
+                    // Lock all uploadboxes, exclude one that uploading.
+                    for index in state.rows.indices {
+                        if index != id, case var .uploadBox(uploadBoxState) = state.rows[id: index] {
+                            uploadBoxState.isLocked = status
+                        }
+                    }
+                }
                 
             case .view(.onAppear):
                 switch state.type {

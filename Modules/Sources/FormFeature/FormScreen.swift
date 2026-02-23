@@ -106,7 +106,7 @@ public struct FormScreen: View {
         }
         .buttonStyle(.borderedProminent)
         .tint(tintColor)
-        .disabled(store.isPublishButtonDisabled)
+        .disabled(store.isPublishButtonDisabled || store.isFormLocked)
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
@@ -124,6 +124,7 @@ public struct FormScreen: View {
                 Text("Cancel", bundle: .module)
             }
             .tint(tintColor)
+            .disabled(store.isFormLocked)
         }
         
         ToolbarItem(placement: .navigationBarTrailing) {
@@ -135,7 +136,7 @@ public struct FormScreen: View {
                     .frame(width: 34, height: 22)
             }
             .tint(tintColor)
-            .disabled(store.isPreviewButtonDisabled)
+            .disabled(store.isPreviewButtonDisabled || store.isFormLocked)
         }
     }
     

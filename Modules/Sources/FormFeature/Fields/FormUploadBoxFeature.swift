@@ -25,8 +25,8 @@ public struct FormUploadBoxFeature: Reducer {
         let description: String
         let flag: Int
         let allowedExtensions: [String]
+        public var isLocked: Bool
         
-        var isLoading: Bool
         var uploadedFilesIds: [Int] = []
         
         public init(
@@ -35,14 +35,14 @@ public struct FormUploadBoxFeature: Reducer {
             description: String,
             flag: Int,
             allowedExtensions: [String],
-            isLoading: Bool = false
+            isLocked: Bool = false
         ) {
             self.id = id
             self.title = title
             self.description = description
             self.flag = flag
             self.allowedExtensions = allowedExtensions
-            self.isLoading = isLoading
+            self.isLocked = isLocked
         }
         
         func getValue() -> FormValue {
@@ -50,7 +50,7 @@ public struct FormUploadBoxFeature: Reducer {
         }
         
         func isValid() -> Bool {
-            if isLoading { return false }
+            if isLocked { return false }
             return isRequired ? !uploadedFilesIds.isEmpty : true
         }
     }
@@ -64,6 +64,11 @@ public struct FormUploadBoxFeature: Reducer {
         case view(View)
         public enum View {
             case onAppear
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case anyFileUploading(Bool)
         }
     }
     
@@ -79,10 +84,10 @@ public struct FormUploadBoxFeature: Reducer {
         Reduce<State, Action> { state, action in
             switch action {
             case .upload(.delegate(.someFileUploading)):
-                state.isLoading = true
+                return .send(.delegate(.anyFileUploading(true)))
                 
             case .upload(.delegate(.allFilesAreUploaded)):
-                state.isLoading = false
+                return .send(.delegate(.anyFileUploading(false)))
                 
             case let .upload(.delegate(.fileHasBeenUploaded(id))):
                 state.uploadedFilesIds.append(id)
@@ -93,7 +98,7 @@ public struct FormUploadBoxFeature: Reducer {
             case .view(.onAppear):
                 state.upload.allowedExtensions = state.allowedExtensions
                 
-            case .binding, .upload:
+            case .binding, .upload, .delegate:
                 break
             }
             return .none
@@ -127,6 +132,7 @@ struct FormUploadBoxRow: View {
                 }
             }
             .tint(tintColor)
+            .disabled(store.isLocked)
             .onAppear {
                 send(.onAppear)
             }
