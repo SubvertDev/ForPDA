@@ -43,6 +43,7 @@ public struct UploadBoxView: View {
                     }
                 }
             }
+            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .confirmationDialog(
                 $store.scope(
                     state: \.destination?.confirmationDialog,
