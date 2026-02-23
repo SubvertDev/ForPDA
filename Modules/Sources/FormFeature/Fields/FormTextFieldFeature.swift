@@ -23,6 +23,7 @@ public struct FormTextFieldFeature: Reducer {
         let description: String
         let placeholder: String
         let flag: Int
+        let maxLength: Int?
         public var text = ""
         
         public init(
@@ -31,7 +32,8 @@ public struct FormTextFieldFeature: Reducer {
             description: String = "",
             placeholder: String = "",
             flag: Int,
-            defaultText: String = ""
+            defaultText: String = "",
+            maxLength: Int? = nil
         ) {
             self.id = id
             self.title = title
@@ -39,6 +41,7 @@ public struct FormTextFieldFeature: Reducer {
             self.placeholder = placeholder
             self.flag = flag
             self.text = defaultText
+            self.maxLength = maxLength
         }
         
         func getValue() -> FormValue {
@@ -86,7 +89,8 @@ struct FormTextFieldRow: View {
                         content: $store.text,
                         placeholder: LocalizedStringResource(stringLiteral: store.placeholder),
                         focusEqual: store.id,
-                        focus: $focusedField
+                        focus: $focusedField,
+                        characterLimit: store.maxLength
                     )
                 }
             }

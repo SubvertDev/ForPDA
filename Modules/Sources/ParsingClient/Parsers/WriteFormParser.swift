@@ -112,7 +112,12 @@ public struct WriteFormParser {
             
             switch type {
             case "text", "editor":
-                formFields.append(type == "text" ? .text(content) : .editor(content))
+                let maxLenght: Int? = field[safe: 7] as? Int
+                formFields.append(
+                    type == "text"
+                    ? .text(content, maxLenght: maxLenght == 0 ? nil : maxLenght)
+                    : .editor(content)
+                )
                 
             case "dropdown", "checkbox_list":
                 guard let options = field[6] as? [String] else {

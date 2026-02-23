@@ -271,14 +271,15 @@ public struct FormFeature: Reducer, Sendable {
                         let titleState = FormTitleFeature.State(id: index, text: content)
                         state.rows.append(.title(titleState))
                         
-                    case let .text(content):
+                    case let .text(content, maxLength):
                         let textFieldState = FormTextFieldFeature.State(
                             id: index,
                             title: content.name,
                             description: content.description,
                             placeholder: content.example,
                             flag: content.flag,
-                            defaultText: content.defaultValue
+                            defaultText: content.defaultValue,
+                            maxLength: maxLength
                         )
                         state.rows.append(.textField(textFieldState))
                         

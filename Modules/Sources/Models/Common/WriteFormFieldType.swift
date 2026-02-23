@@ -7,7 +7,7 @@
 
 public enum WriteFormFieldType: Sendable, Equatable, Hashable {
     case title(String)
-    case text(FormField)
+    case text(FormField, maxLenght: Int?)
     case editor(FormField)
     case dropdown(FormField, _ options: [String])
     case uploadbox(FormField, _ extensions: [String])
@@ -62,7 +62,8 @@ public extension WriteFormFieldType {
             example: "Starting from For, ends with PDA",
             flag: 1,
             defaultValue: ""
-        )
+        ),
+        maxLenght: 255
     )
     
     static let mockEditor: WriteFormFieldType = .editor(
@@ -128,7 +129,8 @@ extension Array where Element == WriteFormFieldType {
                 example: "",
                 flag: 1,
                 defaultValue: ""
-            )
+            ),
+            maxLenght: 255
         ),
         .text(
             .init(
@@ -138,7 +140,8 @@ extension Array where Element == WriteFormFieldType {
                 example: "",
                 flag: 1,
                 defaultValue: ""
-            )
+            ),
+            maxLenght: nil
         ),
         .editor(
             .init(
