@@ -72,12 +72,14 @@ extension NotificationsClient: DependencyKey {
     
     public static var liveValue: Self {
         @Dependency(\.analyticsClient) var analyticsClient
+        @Dependency(\.cacheClient) var cacheClient
         @Dependency(\.logger[.notifications]) var logger
         
         let eventSubject = PassthroughSubject<NotificationEvent, Never>()
         // TODO: Make proper previewValue
         let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-        let unreadSubject = CurrentValueSubject<Unread, Never>(isPreview ? .mockBadges : .mockEmpty)
+        let startValue = cacheClient.getUnread() ?? .mockEmpty
+        let unreadSubject = CurrentValueSubject<Unread, Never>(isPreview ? .mockBadges : startValue)
         
         let center = UNUserNotificationCenter.current()
         let context: LockIsolated<NotificationContext?> = .init(nil)

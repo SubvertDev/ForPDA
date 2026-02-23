@@ -339,6 +339,7 @@ public struct AppFeature: Reducer, Sendable {
             case let .updateBadges(unread):
                 state.favoritesBadges = unread.favoritesUnreadCount
                 state.profileBadges = unread.qmsUnreadCount + unread.mentionsUnreadCount
+                cacheClient.setUnread(unread)
                 return .none
                 
             case ._failedToConnect:

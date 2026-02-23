@@ -58,6 +58,8 @@ public struct CacheClient: Sendable {
     public var setTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
     public var deleteTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
     public var getTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Int?
+    public var getUnread: @Sendable () -> Unread?
+    public var setUnread: @Sendable (_ unread: Unread) -> Void
 }
 
 // MARK: - Dependency Key
@@ -181,6 +183,12 @@ extension CacheClient: DependencyKey {
             },
             getTopicIdOfUnreadItem: { topicId in
                 return try? await notificationsStorage.async.object(forKey: topicId)
+            },
+            getUnread: {
+                return try? unreadStorage.object(forKey: unreadKey)
+            },
+            setUnread: { unread in
+                try? unreadStorage.setObject(unread, forKey: unreadKey)
             }
         )
     }
@@ -271,6 +279,16 @@ private extension CacheClient {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Int.self)
+        )
+    }
+    
+    private static var unreadKey: String { "unreadKey" }
+    private static var unreadStorage: Storage<String, Unread> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "Unread", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: Unread.self)
         )
     }
 }
