@@ -64,8 +64,12 @@ public struct TopicView: View {
             let scaleFactor = availableWidth / CGFloat(metadata.width)
             let isWidthMoreThanAvailable = scaleFactor < 1
 
-            let width = isWidthMoreThanAvailable ? availableWidth : CGFloat(metadata.width)
-            let height = width / ratioWH
+            let width: CGFloat? = if metadata.width != 0 {
+                isWidthMoreThanAvailable ? availableWidth : CGFloat(metadata.width)
+            } else {
+                nil
+            }
+            let height: CGFloat? = if let width = width { (width / ratioWH) } else { nil }
             
             LazyImage(url: metadata.url) { state in
                 if let container = state.imageContainer {

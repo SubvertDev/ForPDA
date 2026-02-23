@@ -24,6 +24,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
         public let formType: FormType
         
         var contentTypes: [UITopicType] = []
+        var attachments: [Attachment] = []
         
         var isPreviewLoading = false
         
@@ -85,7 +86,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
                 return .run { [isTopic = state.formType.isTopic] send in
                     let result = await Result { try await apiClient.previewTemplate(
                         id: id,
-                        content: try! FormValue.toDocument(content),
+                        content: try FormValue.toDocument(content),
                         isTopic: isTopic
                     )}
                     await send(._previewResponse(result))
@@ -132,6 +133,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
                 state.contentTypes = TopicNodeBuilder(
                     text: preview.content, attachments: preview.attachments
                 ).build()
+                state.attachments = preview.attachments
                 
                 state.isPreviewLoading = false
                 

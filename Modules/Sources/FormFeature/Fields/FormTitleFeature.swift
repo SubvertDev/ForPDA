@@ -29,7 +29,7 @@ public struct FormTitleFeature: Reducer {
         var nodes: [FormNode] = []
         
         func getValue() -> FormValue {
-            return .integer(0)//.string("")
+            return .integer(0)
         }
         
         func isValid() -> Bool {
