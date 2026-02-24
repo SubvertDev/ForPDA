@@ -169,11 +169,8 @@ public struct FormFeature: Reducer, Sendable {
                         return .none
                     }
                     
-                case let .topic(id):
-                    break
-                    
-                case let .post(status):
-                    #warning("handle")
+                case .topic, .post:
+                    // .formSent not called when an error occurs
                     break
                 }
                 return .run { _ in await dismiss() }
