@@ -7,7 +7,7 @@
 
 public enum TemplateSend: Sendable {
     case success(TemplateSendType)
-    case error(TemplateSendError)
+    case failure(TemplateSendError)
     
     public enum TemplateSendType: Sendable {
         case topic(id: Int)
@@ -22,7 +22,7 @@ public enum TemplateSend: Sendable {
     }
     
     public var isError: Bool {
-        return if case .error = self {
+        return if case .failure = self {
             true
         } else { false }
     }

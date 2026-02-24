@@ -77,16 +77,16 @@ public struct WriteFormParser {
             guard let errors = array[safe: 2] as? [Any] else {
                 throw ParsingError.failedToCastFields
             }
-            return .error(.fieldsError(errors.description))
+            return .failure(.fieldsError(errors.description))
             
         case 3:
-            return .error(.badParam)
+            return .failure(.badParam)
             
         case 4:
-            return .error(.sentToPremod)
+            return .failure(.sentToPremod)
             
         default:
-            return .error(.status(status))
+            return .failure(.status(status))
         }
     }
     

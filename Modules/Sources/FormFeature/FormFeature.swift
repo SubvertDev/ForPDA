@@ -169,10 +169,8 @@ public struct FormFeature: Reducer, Sendable {
                         return .none
                     }
                     
-                case let .template(status):
-                    if status.isError {
-                        return .none
-                    }
+                case let .topic(id):
+                    break
                     
                 case let .post(status):
                     #warning("handle")
@@ -419,7 +417,7 @@ public struct FormFeature: Reducer, Sendable {
                 analyticsClient.capture(error)
                 
             case let .internal(.simplePostResponse(.success(.success(post)))):
-                return .send(.delegate(.formSent(.post(.success(post)))))
+                return .send(.delegate(.formSent(.post(post))))
                 
             case let .internal(.simplePostResponse(.success(.failure(errorStatus)))):
                 state.isPublishing = false
@@ -441,8 +439,26 @@ public struct FormFeature: Reducer, Sendable {
                 state.destination = .alert(.unknownError)
                 analyticsClient.capture(error)
                 
-            case let .internal(.templateResponse(.success(result))):
-                return .send(.delegate(.formSent(.template(result))))
+            case let .internal(.templateResponse(.success(.success(result)))):
+                switch result {
+                case .post(let post):
+                    return .send(.delegate(.formSent(.post(post))))
+                case .topic(let id):
+                    return .send(.delegate(.formSent(.topic(id))))
+                }
+                
+            case let .internal(.templateResponse(.success(.failure(errorStatus)))):
+                state.isPublishing = false
+                switch errorStatus {
+                case .badParam:
+                    state.destination = .alert(.templateRequestHasBadParam)
+                case .sentToPremod:
+                    state.destination = .alert(.topicIsSentToPremoderation)
+                case .fieldsError:
+                    state.destination = .alert(.notAllFieldsAreFilledInTemplate)
+                case .status(let status):
+                    state.destination = .alert(.serverReturnStatusForTopic(status))
+                }
                 
             case let .internal(.templateResponse(.failure(error))):
                 state.isPublishing = false
@@ -466,6 +482,45 @@ extension FormFeature.Destination.State: Equatable {}
 // MARK: - Alerts
 
 public extension AlertState where Action == FormFeature.Destination.Alert {
+    
+    // Topic & Template
+    
+    nonisolated(unsafe) static let topicIsSentToPremoderation = AlertState {
+        TextState("Topic is sent to premoderation")
+    } actions: {
+        ButtonState(action: .dismiss) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let templateRequestHasBadParam = AlertState {
+        TextState("The server refused to create the topic (invalid parameter)")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let notAllFieldsAreFilledInTemplate = AlertState {
+        TextState("Not all required fields are filled in")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
+    }
+    
+    static func serverReturnStatusForTopic(_ status: Int) -> AlertState {
+        return AlertState(
+            title: { TextState("The server refused to create the topic (status \(status))") },
+            actions: {
+                ButtonState {
+                    TextState("OK")
+                }
+            }
+        )
+    }
+    
+    // Post
     
     nonisolated(unsafe) static let postIsSentToPremoderation = AlertState {
         TextState("Post is sent to premoderation")

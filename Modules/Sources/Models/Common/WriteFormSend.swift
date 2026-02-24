@@ -6,7 +6,7 @@
 //
 
 public enum WriteFormSend: Sendable {
-    case post(PostSendResponse)
+    case post(PostSend)
     case report(ReportResponseType)
-    case template(TemplateSend)
+    case topic(Int)
 }

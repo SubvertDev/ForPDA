@@ -208,7 +208,7 @@ public struct TopicFeature: Reducer, Sendable {
                 ])
                 
             case let .destination(.presented(.form(.delegate(.formSent(response))))):
-                if case let .post(data) = response, case let .success(post) = data {
+                if case let .post(post) = response {
                     return jumpTo(.post(id: post.id), true, &state)
                 }
                 return .none
