@@ -284,6 +284,7 @@ public struct FormFeature: Reducer, Sendable {
                 for (index, field) in fields.enumerated() {
                     switch field {
                     case let .title(content):
+                        // do not skip empty titles, cause they are needed for future request building
                         let titleState = FormTitleFeature.State(id: index, text: content)
                         state.rows.append(.title(titleState))
                         
