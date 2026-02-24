@@ -171,6 +171,9 @@ public struct BBPanelFeature: Reducer, Sendable {
             case let .destination(.presented(.listTag(.delegate(.listTagBuilded(tag))))):
                 return .send(.delegate(.tagTapped(tag)))
                 
+            case let .upload(.delegate(.fileHasBeenTapped(id, name))):
+                return .send(.delegate(.tagTapped(("[attachment=\"\(id):\(name)\"]", ""))))
+                
             case .upload(.delegate(.someFileUploading)):
                 state.isUploading = true
                 return .none

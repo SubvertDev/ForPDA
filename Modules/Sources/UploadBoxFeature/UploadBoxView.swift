@@ -186,7 +186,7 @@ public struct UploadBoxView: View {
         }
         .onTapGesture {
             if let serverId = file.serverId, file.uploadingError == nil {
-                send(.fileButtonTapped(serverId))
+                send(.fileButtonTapped(serverId, file.name))
             } else {
                 send(.fileWithErrorButtonTapped(file.id))
             }
