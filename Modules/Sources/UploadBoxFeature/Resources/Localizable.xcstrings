@@ -3,7 +3,7 @@
   "strings" : {
     "An error occurred while uploading the file" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Во время загрузки файла произошла ошибка"
@@ -13,7 +13,7 @@
     },
     "Cancel" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
@@ -23,7 +23,7 @@
     },
     "Choose from Files" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбрать из файлов"
@@ -33,7 +33,7 @@
     },
     "Choose from Gallery" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбрать из галереи"
@@ -43,7 +43,7 @@
     },
     "Delete" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить"
@@ -53,7 +53,7 @@
     },
     "File size too big" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Слишком большой размер"
@@ -63,7 +63,7 @@
     },
     "Select another file. If there are already files in the queue, it will be uploaded last" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите другой файл. Если в очереди уже есть файлы, то он будет загружен последним"
@@ -73,7 +73,7 @@
     },
     "Select files..." : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выберите файлы…"
@@ -83,7 +83,7 @@
     },
     "Sorry, this format is not supported" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Извините, данный формат не поддерживается"
@@ -93,7 +93,7 @@
     },
     "The selected file will be inserted into the text as code wherever your cursor is located. Or it will also be automatically added to the end of the post." : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Выбранный файл будет вставлен в текст, в виде кода, где у вас находится курсор. Или добавится автоматически в конец поста."
@@ -103,7 +103,7 @@
     },
     "Try Again" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Попробовать еще раз"
@@ -113,7 +113,7 @@
     },
     "You can try uploading it again. If there are already files in the queue, it will be uploaded last" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Вы можете попробовать загрузить его еще раз. Если в очереди уже есть файлы, то он будет загружен последним"

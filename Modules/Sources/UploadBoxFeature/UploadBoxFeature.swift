@@ -410,7 +410,7 @@ extension AlertState where Action == UploadBoxFeature.Destination.Alert {
                 }
             },
             message: {
-                TextState("You can try uploading it again. If there are already files in the queue, it will be uploaded last")
+                TextState("You can try uploading it again. If there are already files in the queue, it will be uploaded last", bundle: .module)
             }
         )
     }
