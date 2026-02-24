@@ -25,7 +25,7 @@ public struct NotificationsScreen: View {
                     .ignoresSafeArea()
                 
                 List {
-                    Group {
+                    Section {
                         if !store.areNotificationsEnabled {
                             VStack(spacing: 8) {
                                 Text("Notifications are disabled")
@@ -47,17 +47,44 @@ public struct NotificationsScreen: View {
                         Row("Topics", value: $store.isTopicsEnabled)
                         Row("Forum mentions", value: $store.isForumMentionsEnabled)
                         Row("Site mentions", value: $store.isSiteMentionsEnabled)
+                    } header: {
+                        Text("General", bundle: .module)
                     }
                     .tint(tintColor)
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                    .frame(minHeight: 60)
+                    
+                    Section {
+                        Row("Background notifications", value: $store.isBackgroundNotificationsEnabled)
+                        if store.isBackgroundNotificationsEnabled {
+                            Button {
+                                store.send(.sendLogButtonTapped)
+                            } label: {
+                                HStack {
+                                    Text("Send log", bundle: .module)
+                                    Spacer()
+                                    Image(systemSymbol: .squareAndArrowUp)
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Experimental", bundle: .module)
+                    }
+                    .tint(tintColor)
+                    .listRowBackground(Color(.Background.teritary))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
+                .animation(.default, value: store.isBackgroundNotificationsEnabled)
                 .scrollContentBackground(.hidden)
-                ._contentMargins(.top, 16)
             }
             .navigationTitle(Text("Notifications", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
+            .sheet(item: $store.logURL, id: \.self) { url in
+                WithPerceptionTracking {
+                    ShareActivityView(url: url, onDismiss: { _ in })
+                        .presentationDetents([.medium])
+                }
+            }
             .onAppear {
                 store.send(.onAppear)
             }
@@ -76,6 +103,7 @@ public struct NotificationsScreen: View {
             Toggle(String(""), isOn: value)
         }
         .disabled(!store.areNotificationsEnabled)
+        .frame(minHeight: 60)
     }
 }
 

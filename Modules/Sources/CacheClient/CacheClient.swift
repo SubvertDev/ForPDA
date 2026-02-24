@@ -49,8 +49,8 @@ public struct CacheClient: Sendable {
     public var getQMSChats: @Sendable (_ id: Int) -> [QMSChatInfo]?
     
     // Background Tasks
-    public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
-    public var getLastBackgroundTaskInvokeTime: @Sendable () async -> [TimeInterval]
+    public var setBackgroundTaskEntry: @Sendable (BackgroundTaskEntry) -> Void
+    public var getBackgroundTaskEntries: @Sendable () -> [BackgroundTaskEntry]
     
     // Notifications
     public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
@@ -158,13 +158,13 @@ extension CacheClient: DependencyKey {
             
             // MARK: - Background Tasks
             
-            setLastBackgroundTaskInvokeTime: { date in
-                var invokes = (try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
+            setBackgroundTaskEntry: { date in
+                var invokes = (try? lastBackgroundTaskInvokeTimeStorage.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
                 invokes.append(date)
-                try? await lastBackgroundTaskInvokeTimeStorage.async.setObject(invokes, forKey: lastBackgroundTaskInvokeTimeKey)
+                try? lastBackgroundTaskInvokeTimeStorage.setObject(invokes, forKey: lastBackgroundTaskInvokeTimeKey)
             },
-            getLastBackgroundTaskInvokeTime: {
-                return (try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
+            getBackgroundTaskEntries: {
+                return (try? lastBackgroundTaskInvokeTimeStorage.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
             },
             
             // MARK: - Notifications
@@ -264,12 +264,12 @@ private extension CacheClient {
     }
     
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
-    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [TimeInterval]> {
+    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [BackgroundTaskEntry]> {
         return try! Storage(
             diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30))),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: [TimeInterval].self)
+            transformer: TransformerFactory.forCodable(ofType: [BackgroundTaskEntry].self)
         )
     }
     

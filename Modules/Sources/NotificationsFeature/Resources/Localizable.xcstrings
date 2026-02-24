@@ -1,6 +1,26 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Background notifications" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уведомления в фоне"
+          }
+        }
+      }
+    },
+    "Experimental" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспериментальные"
+          }
+        }
+      }
+    },
     "Forum" : {
       "localizations" : {
         "ru" : {
@@ -17,6 +37,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упоминания на форуме"
+          }
+        }
+      }
+    },
+    "General" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Основные"
           }
         }
       }
@@ -57,6 +87,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QMS"
+          }
+        }
+      }
+    },
+    "Send log" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить лог"
           }
         }
       }
