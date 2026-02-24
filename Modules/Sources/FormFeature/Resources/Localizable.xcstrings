@@ -1,17 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add more" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить еще"
-          }
-        }
-      }
-    },
     "Attach this post to previous one?" : {
       "localizations" : {
         "ru" : {
@@ -116,6 +105,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет, не нужно"
+          }
+        }
+      }
+    },
+    "Not all required fields are filled in" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заполните все обязательные поля"
           }
         }
       }
@@ -230,6 +229,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать отметку"
+          }
+        }
+      }
+    },
+    "The server refused to create the topic (invalid parameter)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер отказал в создании темы (неверный параметр)"
+          }
+        }
+      }
+    },
+    "The server refused to create the topic (status %lld)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сервер отказал в создании темы (статус %lld)"
+          }
+        }
+      }
+    },
+    "Topic is sent to premoderation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема отправлена на премодерацию"
           }
         }
       }
