@@ -14,8 +14,7 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
     public let data: Data
     public var isUploading: Bool
     public var uploadingError: UploadErrorType?
-    
-    public var serverId: Int? = nil
+    public var serverId: Int?
     
     public enum FileType: Sendable, Equatable {
         case file, image
@@ -32,13 +31,15 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
         type: FileType,
         data: Data,
         isUploading: Bool = false,
-        uploadingError: UploadErrorType? = nil
+        uploadingError: UploadErrorType? = nil,
+        serverId: Int? = nil
     ) {
         self.name = name
         self.type = type
         self.data = data
         self.isUploading = isUploading
         self.uploadingError = uploadingError
+        self.serverId = serverId
     }
 }
 
@@ -46,12 +47,14 @@ extension UploadBoxFile {
     static let mockImage = UploadBoxFile(
         name: UUID().uuidString,
         type: .image,
-        data: Data()
+        data: Data(),
+        serverId: 0
     )
     
     static let mockFile = UploadBoxFile(
         name: UUID().uuidString,
         type: .file,
-        data: Data()
+        data: Data(),
+        serverId: 1
     )
 }

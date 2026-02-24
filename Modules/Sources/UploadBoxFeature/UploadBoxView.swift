@@ -180,6 +180,11 @@ public struct UploadBoxView: View {
                     .multilineTextAlignment(.center)
             }
         }
+        .onTapGesture {
+            if let serverId = file.serverId, file.uploadingError == nil {
+                send(.onFileButtonTapped(serverId))
+            }
+        }
         .padding(.horizontal, 12)
         .frame(minWidth: 144, maxWidth: 144, minHeight: 144)
         .background(

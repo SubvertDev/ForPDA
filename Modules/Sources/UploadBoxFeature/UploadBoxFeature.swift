@@ -88,6 +88,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
 
         case view(View)
         public enum View {
+            case onFileButtonTapped(Int)
             case fileWithErrorTapped(UUID)
             case selectFilesButtonTapped
             case removeFileButtonTapped(UploadBoxFile)
@@ -111,7 +112,6 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case fileHasBeenRemoved(Int)
             case fileHasBeenUploaded(Int)
             
-            // TODO: Implement
             case fileHasBeenTapped(Int)
         }
     }
@@ -184,25 +184,13 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case .destination:
                 break
                 
+            case let .view(.onFileButtonTapped(id)):
+                return .send(.delegate(.fileHasBeenTapped(id)))
+                
             case let .view(.fileWithErrorTapped(id)):
                 if let index = state.files.firstIndex(where: { $0.id == id }),
                    let error = state.files[index].uploadingError {
-                    switch error {
-                    case .sizeTooBig:
-                        state.destination = .alert(.criticalFileConfirmation(
-                            fileId: id,
-                            title: TextState("File size too big", bundle: .module),
-                            message: TextState("Select another file. If there are already files in the queue, it will be uploaded last", bundle: .module)
-                        ))
-                    case .badExtension:
-                        state.destination = .alert(.criticalFileConfirmation(
-                            fileId: id,
-                            title: TextState("Sorry, this format is not supported", bundle: .module),
-                            message: TextState("Select another file. If there are already files in the queue, it will be uploaded last", bundle: .module)
-                        ))
-                    case .uploadFailure:
-                        state.destination = .alert(.reuploadFileConfirmation(id: id))
-                    }
+                    return .send(.internal(.uploadFileCanceledByValidation(id, error)))
                 }
                 
             case .view(.selectFilesButtonTapped):
