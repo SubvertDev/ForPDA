@@ -21,13 +21,6 @@ public struct UploadBoxFeature: Reducer, Sendable {
         return ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
     }
     
-    // MARK: - File Type
-    
-    public enum FileType: Equatable, Hashable, Sendable {
-        case file(url: URL)
-        case image(data: Data, ext: String?)
-    }
-    
     // MARK: - Destination
     
     @Reducer
@@ -62,7 +55,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
         public var allowedExtensions: [String]
         var files: [UploadBoxFile]
         
-        var uploadQueue: [FileType] = []
+        var uploadQueue: [UploadBoxFile.FileSource] = []
         var isAnyFileUploading = false
         
         public var filesCount: Int {
@@ -92,7 +85,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case fileWithErrorButtonTapped(_ id: UUID)
             case selectFilesButtonTapped
             case removeFileButtonTapped(UploadBoxFile)
-            case photosPickerPhotosSelected([FileType])
+            case photosPickerPhotosSelected([UploadBoxFile.FileSource])
             case fileImporterURLsRecieved([URL])
         }
         
@@ -122,7 +115,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
     
     // MARK: - Cancellable
     
-    private enum CancelID: Hashable { case uploading(UUID) }
+    private enum CancelID: Hashable { case uploading }
     
     // MARK: - Body
     
@@ -179,7 +172,10 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 }
                 
             case let .destination(.presented(.alert(.reuploadFile(id)))):
-                break // TODO: Implement
+                if let index = state.files.firstIndex(where: { $0.id == id }),
+                   let fileSource = state.files[index].fileSource {
+                    state.uploadQueue.append(fileSource)
+                }
                 
             case .destination:
                 break
@@ -210,9 +206,14 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case let .view(.removeFileButtonTapped(file)):
                 state.files.removeAll(where: { $0.id == file.id })
                 if file.isUploading {
-                    return .cancel(id: CancelID.uploading(file.id))
+                    return .concatenate(
+                        .cancel(id: CancelID.uploading),
+                        .send(.internal(.startNextUpload))
+                        // no need to send delegate .fileHasBeenRemoved,
+                        // cause file at level upper not exists (cause not uploaded)
+                    )
                 }
-                if let serverId = file.serverId {
+                if let serverId = file.serverId { // file already uploaded
                     return .send(.delegate(.fileHasBeenRemoved(serverId)))
                 }
                 
@@ -221,8 +222,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     state.files.append(.mockImage)
                     return .send(.delegate(.fileHasBeenUploaded(0)))
                 }
-                let filtered = Array(Set(state.uploadQueue + images))
-                state.uploadQueue.append(contentsOf: filtered)
+                state.uploadQueue.append(contentsOf: images)
                 return .send(.internal(.startNextUpload))
                 
             case let .view(.fileImporterURLsRecieved(urls)):
@@ -233,8 +233,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     state.files.append(.mockFile)
                     return .send(.delegate(.fileHasBeenUploaded(0)))
                 }
-                let filtered = Array(Set(state.uploadQueue + urls.map { .file(url: $0) }))
-                state.uploadQueue.append(contentsOf: filtered)
+                state.uploadQueue.append(contentsOf: urls.map { .file(url: $0) })
                 return .send(.internal(.startNextUpload))
                 
             case let .internal(.uploadFileCanceledByValidation(id, status)):
@@ -302,13 +301,23 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     )
                 }
                 
-                let file = UploadBoxFile(
-                    name: name,
-                    type: uploadType,
-                    data: data,
-                    isUploading: true
-                )
-                return .send(.internal(.uploadFile(file)))
+                return .run { [files = state.files] send in
+                    let fileHash = await calculateFileHash(data: data)
+                    guard !files.contains(where: { $0.md5 == fileHash }) else {
+                        await send(.internal(.startNextUpload))
+                        return
+                    }
+                    
+                    let file = UploadBoxFile(
+                        name: name,
+                        type: uploadType,
+                        data: data,
+                        md5: fileHash,
+                        isUploading: true,
+                        fileSource: item
+                    )
+                    await send(.internal(.uploadFile(file)))
+                }
                 
             case let .internal(.uploadFile(file)):
                 state.files.append(file)
@@ -318,7 +327,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         fileName: file.name,
                         fileSize: file.data.count,
                         fileData: file.data,
-                        md5: calculateFileHash(data: file.data),
+                        md5: file.md5,
                         isQms: false
                     )
                     await send(.delegate(.someFileUploading))
@@ -327,7 +336,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         await send(.internal(.updateFileUploadStatus(file.id, status)))
                     }
                 }
-                .cancellable(id: CancelID.uploading(file.id), cancelInFlight: true)
+                .cancellable(id: CancelID.uploading)
                 
             case let .internal(.updateFileUploadStatus(id, status)):
                 if let index = state.files.firstIndex(where: { $0.id == id }) {
@@ -344,11 +353,9 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         
                     case .uploading(let value):
                         print("Reducer UPLAODING: \(value)")
-                        state.files[index].isUploading = true
                         
                     case .initialized:
                         print("FILE UPLOADING INITIALIZED")
-                        state.files[index].isUploading = true
                         
                     case .error(let error):
                         state.files[index].uploadingError = switch error {
@@ -376,6 +383,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 
             case let .internal(.uploadFileFinished(index, responseFileId)):
                 state.files[index].serverId = responseFileId
+                state.files[index].fileSource = nil
                 state.files[index].isUploading = false
                 return .concatenate(
                     .send(.delegate(.fileHasBeenUploaded(responseFileId))),
@@ -448,10 +456,15 @@ private extension UploadBoxFeature {
         return false
     }
     
-    func calculateFileHash(data: Data) -> String {
-        return Insecure.MD5.hash(data: data)
-            .map { byte in String(format: "%02X", byte) }
-            .joined()
+    func calculateFileHash(data: Data) async -> String {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .userInitiated).async {
+                let hash = Insecure.MD5.hash(data: data)
+                    .map { byte in String(format: "%02X", byte) }
+                    .joined()
+                continuation.resume(returning: hash)
+            }
+        }
     }
 }
 

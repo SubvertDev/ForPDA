@@ -70,7 +70,7 @@ public struct UploadBoxView: View {
                 maxSelectionCount: 10
             )
             .task(id: pickerItems) {
-                var photos: [UploadBoxFeature.FileType] = []
+                var photos: [UploadBoxFile.FileSource] = []
                 for item in pickerItems {
                     if let data = try? await item.loadTransferable(type: Data.self) {
                         let type = item.supportedContentTypes.first
@@ -239,11 +239,7 @@ public struct UploadBoxView: View {
             initialState: UploadBoxFeature.State(
                 type: .form,
                 allowedExtensions: ["jpg", "jpeg", "gif", "png"],
-                files: [
-                    .init(name: "File 1", type: .file, data: Data()),
-                    .init(name: "Image 1", type: .image, data: Data()),
-                    .init(name: "File 2", type: .file, data: Data()),
-                ]
+                files: [.mockFile, .mockImage, .mockFile]
             )
         ) {
             UploadBoxFeature()
@@ -274,11 +270,7 @@ public struct UploadBoxView: View {
             initialState: UploadBoxFeature.State(
                 type: .bbPanel,
                 allowedExtensions: ["jpg", "jpeg", "gif", "png"],
-                files: [
-                    .init(name: "File 1", type: .file, data: Data()),
-                    .init(name: "Image 1", type: .image, data: Data()),
-                    .init(name: "File 2", type: .file, data: Data()),
-                ]
+                files: [.mockFile, .mockImage, .mockFile]
             )
         ) {
             UploadBoxFeature()
