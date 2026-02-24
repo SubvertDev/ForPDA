@@ -123,6 +123,10 @@ public struct NotificationsFeature: Reducer, Sendable {
                 state.$appSettings.notifications.isSiteMentionsEnabled.withLock { $0 = state.isSiteMentionsEnabled }
                 return .none
                 
+            case .binding(\.isBackgroundNotificationsEnabled):
+                state.$appSettings.backgroundNotifications.withLock { $0 = state.isBackgroundNotificationsEnabled }
+                return .none
+                
             case .binding:
                 return .none
             }
