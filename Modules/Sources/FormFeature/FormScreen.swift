@@ -54,12 +54,7 @@ public struct FormScreen: View {
             .scrollIndicators(.hidden)
             .navigationTitle(Text(navigationTitleText(), bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            //.alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
-            .sheet(item: $store.scope(state: \.destination?.preview, action: \.destination.preview)) { store in
-                NavigationStack {
-                    FormPreviewView(store: store)
-                }
-            }
+            .modifier(DestinationModifier(store: store)) // extracted to modifier, due to .alert() compilation error
             .safeAreaInset(edge: .bottom) {
                 PublishButton()
             }
@@ -151,6 +146,28 @@ public struct FormScreen: View {
             }
         case .topic:  "New topic"
         case .report: "Send report"
+        }
+    }
+}
+
+// MARK: - Destination Modifier
+
+struct DestinationModifier: ViewModifier {
+    @Perception.Bindable private var store: StoreOf<FormFeature>
+    
+    init(store: StoreOf<FormFeature>) {
+        self.store = store
+    }
+    
+    func body(content: Content) -> some View {
+        WithPerceptionTracking {
+            content
+                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .sheet(item: $store.scope(state: \.destination?.preview, action: \.destination.preview)) { store in
+                    NavigationStack {
+                        FormPreviewView(store: store)
+                    }
+                }
         }
     }
 }
