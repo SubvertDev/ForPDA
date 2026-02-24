@@ -231,7 +231,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case let .view(.photosPickerPhotosSelected(images)):
                 if isPreview {
                     state.files.append(.mockImage)
-                    return .none
+                    return .send(.delegate(.fileHasBeenUploaded(0)))
                 }
                 let filtered = Array(Set(state.uploadQueue + images))
                 state.uploadQueue.append(contentsOf: filtered)
@@ -243,7 +243,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     let fileURL = documentsURL.appending(path: "data.dat")
                     try! Data().write(to: fileURL)
                     state.files.append(.mockFile)
-                    return .none
+                    return .send(.delegate(.fileHasBeenUploaded(0)))
                 }
                 let filtered = Array(Set(state.uploadQueue + urls.map { .file(url: $0) }))
                 state.uploadQueue.append(contentsOf: filtered)

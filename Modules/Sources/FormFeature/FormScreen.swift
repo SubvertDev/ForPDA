@@ -223,7 +223,7 @@ struct DestinationModifier: ViewModifier {
                 $0.apiClient.getTemplate = { _, _ in
                     return [
                         .mockTitle,
-                        .mockText,
+                        .mockRequiredText,
                         .mockEditor,
                         .mockUploadBox,
                     ]

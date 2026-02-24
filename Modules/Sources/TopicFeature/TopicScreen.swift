@@ -688,3 +688,63 @@ private extension TopicPostsFilter {
     )
     .tint(Color(.Theme.primary))
 }
+
+#Preview("New template post requests") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    templatePostSendingPreview
+}
+
+@MainActor private var templatePostSendingPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
+                            type: .new, topicId: 0, content: .template([])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .success(.post(.init(id: 1, topicId: 0, offset: 0)))
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Post Template sending returns error status") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postTemplateErrorStatusPreview
+}
+
+@MainActor private var postTemplateErrorStatusPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(type: .new, topicId: 0, content: .template([]))
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .failure(.badParam) // <----------
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}

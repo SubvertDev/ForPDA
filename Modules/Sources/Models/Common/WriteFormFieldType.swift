@@ -54,7 +54,7 @@ public extension WriteFormFieldType {
     static let mockTitle: WriteFormFieldType =
         .title("This is an absolute [b]simple[/b] [i]title[/i]")
     
-    static let mockText: WriteFormFieldType = .text(
+    static let mockRequiredText: WriteFormFieldType = .text(
         FormField(
             id: 0,
             name: "Topic name",
@@ -66,7 +66,7 @@ public extension WriteFormFieldType {
         maxLenght: 255
     )
     
-    static let mockEditor: WriteFormFieldType = .editor(
+    static let mockRequiredEditor: WriteFormFieldType = .editor(
         FormField(
             id: 0,
             name: "Topic content",
@@ -77,7 +77,7 @@ public extension WriteFormFieldType {
         )
     )
     
-    static let mockEditorSimple: WriteFormFieldType = .editor(
+    static let mockEditor: WriteFormFieldType = .editor(
         FormField(
             id: 0,
             name: "",

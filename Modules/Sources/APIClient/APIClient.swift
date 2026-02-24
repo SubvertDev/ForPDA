@@ -635,7 +635,7 @@ extension APIClient: DependencyKey {
                 return .mock
             },
             getTemplate: { _, _ in
-                return [.mockTitle, .mockText, .mockEditor]
+                return [.mockTitle, .mockRequiredText, .mockRequiredEditor, .mockEditor, .mockUploadBox]
             },
             sendTemplate: { _, _, isTopic in
                 return .success(isTopic ? .topic(id: 0) : .post(PostSend(id: 0, topicId: 1, offset: 2)))
