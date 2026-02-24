@@ -163,15 +163,19 @@ public struct UploadBoxView: View {
             if file.isUploading {
                 ProgressView()
                     .frame(width: 28, height: 28)
-            } else if file.uploadingError != nil {
-                Text(verbatim: "File upload ERROR \(file.uploadingError)")
-                    .font(.title)
-                    .foregroundColor(tintColor)
             } else {
-                Image(systemSymbol: file.type == .file ? .doc : .photo)
-                    .font(.title)
-                    .foregroundColor(tintColor)
-                    .frame(width: 48, height: 48)
+                if file.uploadingError == nil {
+                    Image(systemSymbol: file.type == .file ? .doc : .photo)
+                        .font(.title)
+                        .foregroundColor(tintColor)
+                        .frame(width: 48, height: 48)
+                    
+                } else {
+                    Image(systemSymbol: .xmark)
+                        .font(.title)
+                        .foregroundColor(.red)
+                        .frame(width: 48, height: 48)
+                }
                 
                 Text(file.name)
                     .font(.footnote)
@@ -182,7 +186,9 @@ public struct UploadBoxView: View {
         }
         .onTapGesture {
             if let serverId = file.serverId, file.uploadingError == nil {
-                send(.onFileButtonTapped(serverId))
+                send(.fileButtonTapped(serverId))
+            } else {
+                send(.fileWithErrorButtonTapped(file.id))
             }
         }
         .padding(.horizontal, 12)

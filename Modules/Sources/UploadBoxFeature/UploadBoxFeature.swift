@@ -88,8 +88,8 @@ public struct UploadBoxFeature: Reducer, Sendable {
 
         case view(View)
         public enum View {
-            case onFileButtonTapped(Int)
-            case fileWithErrorTapped(UUID)
+            case fileButtonTapped(_ serverId: Int)
+            case fileWithErrorButtonTapped(_ id: UUID)
             case selectFilesButtonTapped
             case removeFileButtonTapped(UploadBoxFile)
             case photosPickerPhotosSelected([FileType])
@@ -184,10 +184,10 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case .destination:
                 break
                 
-            case let .view(.onFileButtonTapped(id)):
+            case let .view(.fileButtonTapped(id)):
                 return .send(.delegate(.fileHasBeenTapped(id)))
                 
-            case let .view(.fileWithErrorTapped(id)):
+            case let .view(.fileWithErrorButtonTapped(id)):
                 if let index = state.files.firstIndex(where: { $0.id == id }),
                    let error = state.files[index].uploadingError {
                     return .send(.internal(.uploadFileCanceledByValidation(id, error)))
