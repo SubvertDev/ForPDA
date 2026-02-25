@@ -177,6 +177,9 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 if let index = state.files.firstIndex(where: { $0.id == id }),
                    let fileSource = state.files[index].fileSource {
                     state.uploadQueue.append(fileSource)
+                    if !state.isAnyFileUploading && state.uploadQueue.count == 1 {
+                        return .send(.internal(.startNextUpload))
+                    }
                 }
                 
             case .destination:
