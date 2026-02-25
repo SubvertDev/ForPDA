@@ -48,13 +48,11 @@ public struct BBPanelFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents var destination: Destination.State?
         
-        var upload = UploadBoxFeature.State(
-            type: .bbPanel,
-            allowedExtensions: []
-        )
+        var upload = UploadBoxFeature.State(type: .bbPanel)
         
         let panelWith: BBPanelType
-        let supportsUpload: Bool
+        public var supportsUpload: Bool
+        public var allowedExtensions: [String]
         
         var tags: [BBPanelTag] = []
         var viewState: BBPanelViewState = .tags
@@ -68,10 +66,12 @@ public struct BBPanelFeature: Reducer, Sendable {
         
         public init(
             for panelType: BBPanelType,
-            supportsUpload: Bool = false
+            supportsUpload: Bool = false,
+            allowedExtensions: [String] = []
         ) {
             self.panelWith = panelType
             self.supportsUpload = supportsUpload
+            self.allowedExtensions = allowedExtensions
         }
     }
     
@@ -114,6 +114,7 @@ public struct BBPanelFeature: Reducer, Sendable {
                 var tags = state.panelWith.kit
                 if state.supportsUpload {
                     tags.insert(.upload, at: 0)
+                    state.upload.allowedExtensions = state.allowedExtensions
                 }
                 if case let .post(isCurator, canModerate) = state.panelWith {
                     if canModerate {
@@ -130,7 +131,6 @@ public struct BBPanelFeature: Reducer, Sendable {
             case let .view(.tagButtonTapped(tag)):
                 switch tag {
                 case .b, .i, .s, .u, .sup, .sub, .offtop, .center, .left, .right, .hide, .code, .cur, .mod, .ex, .quote, .spoiler:
-                    print("SIMPLE Tag tapped: \(tag)")
                     return .send(.delegate(.tagTapped(("[\(tag.code)]", "[/\(tag.code)]"))))
                 case .size:
                     //state.destination = .sizeTag
@@ -176,6 +176,16 @@ public struct BBPanelFeature: Reducer, Sendable {
                 
             case .upload(.delegate(.someFileUploading)):
                 state.isUploading = true
+                return .none
+                
+            case .upload(.delegate(.fileHasBeenUploaded)):
+                state.uploadedFiles += 1
+                return .none
+                
+            case .upload(.delegate(.fileHasBeenRemoved)):
+                if state.uploadedFiles != 0 {
+                    state.uploadedFiles -= 1
+                }
                 return .none
                 
             case .upload(.delegate(.allFilesAreUploaded)):
