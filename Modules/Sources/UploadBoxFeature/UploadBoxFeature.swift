@@ -87,6 +87,9 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case removeFileButtonTapped(UploadBoxFile)
             case photosPickerPhotosSelected([UploadBoxFile.FileSource])
             case fileImporterURLsRecieved([URL])
+            case fileImporterURLsRecievingFailure
+            
+            case fileUploadCanceled(UUID?, UploadBoxFile.UploadErrorType)
         }
         
         case `internal`(Internal)
@@ -95,7 +98,6 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case uploadFile(UploadBoxFile)
             case uploadFileFinished(index: Int, Int)
             case updateFileUploadStatus(UUID, UploadProgressStatus)
-            case uploadFileCanceledByValidation(UUID?, UploadBoxFile.UploadErrorType)
         }
         
         case delegate(Delegate)
@@ -186,7 +188,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case let .view(.fileWithErrorButtonTapped(id)):
                 if let index = state.files.firstIndex(where: { $0.id == id }),
                    let error = state.files[index].uploadingError {
-                    return .send(.internal(.uploadFileCanceledByValidation(id, error)))
+                    return .send(.view(.fileUploadCanceled(id, error)))
                 }
                 
             case .view(.selectFilesButtonTapped):
@@ -227,17 +229,17 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 
             case let .view(.fileImporterURLsRecieved(urls)):
                 if isPreview {
-                    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-                    let fileURL = documentsURL.appending(path: "data.dat")
-                    try! Data().write(to: fileURL)
                     state.files.append(.mockFile)
                     return .send(.delegate(.fileHasBeenUploaded(0)))
                 }
                 state.uploadQueue.append(contentsOf: urls.map { .file(url: $0) })
                 return .send(.internal(.startNextUpload))
                 
-            case let .internal(.uploadFileCanceledByValidation(id, status)):
-                switch status {
+            case .view(.fileImporterURLsRecievingFailure):
+                state.destination = .alert(.fileImportFailed)
+                
+            case let .view(.fileUploadCanceled(id, reason)):
+                switch reason {
                 case .sizeTooBig:
                     state.destination = .alert(.criticalFileConfirmation(
                         fileId: id,
@@ -290,13 +292,13 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 
                 guard let ext = fileExtension, fileExtensionAllowed(ext: ext, allowed: state.allowedExtensions) else {
                     return .concatenate(
-                        .send(.internal(.uploadFileCanceledByValidation(nil, .badExtension))),
+                        .send(.view(.fileUploadCanceled(nil, .badExtension))),
                         .send(.internal(.startNextUpload))
                     )
                 }
                 guard let data else {
                     return .concatenate(
-                        .send(.internal(.uploadFileCanceledByValidation(nil, .sizeTooBig))),
+                        .send(.view(.fileUploadCanceled(nil, .sizeTooBig))),
                         .send(.internal(.startNextUpload))
                     )
                 }
@@ -439,6 +441,14 @@ extension AlertState where Action == UploadBoxFeature.Destination.Alert {
             },
             message: { message }
         )
+    }
+    
+    nonisolated(unsafe) static let fileImportFailed = AlertState {
+        TextState("File import failed. Please, try again")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
     }
 }
 

@@ -52,15 +52,18 @@ public struct UploadBoxView: View {
             )
             .fileImporter(
                 isPresented: Binding($store.destination.fileImporter),
-                allowedContentTypes: [.item], // server will decide
+                allowedContentTypes: [.item],
                 allowsMultipleSelection: true,
                 onCompletion: { result in
                     switch result {
                     case let .success(urls):
                         send(.fileImporterURLsRecieved(urls))
                     case let .failure(error):
-                        print("File importer error: \(error)")
-#warning("Handle error")
+                        if let error = error as? CocoaError, error.code == .userCancelled {
+                            // canceled by user
+                        } else {
+                            send(.fileImporterURLsRecievingFailure)
+                        }
                     }
                 }
             )
@@ -77,7 +80,6 @@ public struct UploadBoxView: View {
                         photos.append(.image(data: data, ext: type?.preferredFilenameExtension))
                     }
                 }
-                print("PHOTOSL \(photos)")
                 send(.photosPickerPhotosSelected(photos))
             }
             .tint(tintColor)
