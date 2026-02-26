@@ -75,11 +75,12 @@ public struct UploadBoxView: View {
             .task(id: pickerItems) {
                 var photos: [UploadBoxFile.FileSource] = []
                 for item in pickerItems {
-                    if let data = try? await item.loadTransferable(type: Data.self) {
+                    if let media = try? await item.loadTransferable(type: PhotosPickerMedia.self) {
                         let type = item.supportedContentTypes.first
-                        photos.append(.image(data: data, ext: type?.preferredFilenameExtension))
+                        photos.append(.image(url: media.url, ext: type?.preferredFilenameExtension))
                     }
                 }
+                pickerItems = []
                 send(.photosPickerPhotosSelected(photos))
             }
             .tint(tintColor)
