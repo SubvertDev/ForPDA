@@ -23,16 +23,16 @@ extension FormFeature {
                     break
                     
                 case .delegate(.formSent):
-                    analytics.log(WriteFormEvent.writeFormSent)
+                    analytics.log(FormEvent.formSent)
                     
                 case .view(.publishButtonTapped):
-                    analytics.log(WriteFormEvent.publishTapped)
+                    analytics.log(FormEvent.publishTapped)
                     
                 case .view(.cancelButtonTapped):
-                    analytics.log(WriteFormEvent.dismissTapped)
+                    analytics.log(FormEvent.dismissTapped)
                     
                 case .view(.previewButtonTapped):
-                    analytics.log(WriteFormEvent.previewTapped)
+                    analytics.log(FormEvent.previewTapped)
                     
                 case .view:
                     break
