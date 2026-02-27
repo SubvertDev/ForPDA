@@ -18,7 +18,7 @@ public enum FormType: Sendable, Equatable {
     }
     
     public enum PostContentType: Sendable, Equatable {
-        case simple(String, [Int])
+        case simple(String, [FormAttachment])
         case template([FormValue])
     }
     

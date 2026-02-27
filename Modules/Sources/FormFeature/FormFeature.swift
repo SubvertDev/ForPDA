@@ -273,7 +273,7 @@ public struct FormFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.formResponse(.success(fields))):
-                print(fields)
+                //print(fields)
                 state.isFormLoading = false
                 for (index, field) in fields.enumerated() {
                     switch field {
@@ -357,6 +357,7 @@ public struct FormFeature: Reducer, Sendable {
                     let content = if case let .string(text) = state.content.first { text } else {
                         fatalError("Simple content SHOULD be .string()!")
                     }
+                    let attachments = attachments.map { $0.id }
                     return .run { [
                         content = content,
                         reason = state.editReasonText

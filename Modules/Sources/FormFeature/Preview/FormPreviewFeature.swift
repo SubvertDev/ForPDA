@@ -66,6 +66,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
                     switch contentType {
                     case .simple(let content, let attachments):
                         let postId = if case let .edit(id) = type { id } else { 0 }
+                        let attachments = attachments.map { $0.id }
                         return .send(._loadSimplePreview(
                             postId: postId,
                             topicId: topicId,
