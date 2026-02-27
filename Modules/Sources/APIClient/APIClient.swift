@@ -65,8 +65,8 @@ public struct APIClient: Sendable {
     public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
     public var getMentions: @Sendable (_ showPosts: Bool, _ offset: Int, _ perPage: Int) async throws -> Mentions
-    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
-    public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplatePreview
+    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PreviewResponse
+    public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> PreviewResponse
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
@@ -647,13 +647,10 @@ extension APIClient: DependencyKey {
                 return .mock
             },
             previewPost: { request in
-                return PostPreview(
-                    content: request.post.content,
-                    attachmentIds: request.post.attachments
-                )
+                return PreviewResponse(content: request.post.content, attachments: [.mock])
             },
             previewTemplate: { _, _, _ in
-                return TemplatePreview(content: "content", attachments: [.mock])
+                return PreviewResponse(content: "content", attachments: [.mock])
             },
             sendPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
