@@ -504,28 +504,3 @@ private extension UploadBoxFeature {
         return false
     }
 }
-
-private extension Data {
-    var imageExtension: String? {
-        switch mimeType {
-        case 0xFF:
-            return "jpeg"
-        case 0x89:
-            return "png"
-        case 0x47:
-            return "gif"
-        case 0x52:
-            return "webp"
-        case 0x49, 0x4D:
-            return "tiff"
-        default:
-            return nil
-        }
-    }
-    
-    private var mimeType: UInt8 {
-        var mt: UInt8 = 0
-        copyBytes(to: &mt, count: 1)
-        return mt
-    }
-}
