@@ -43,9 +43,8 @@ public struct FormPreviewFeature: Reducer, Sendable {
         case cancelButtonTapped
         
         case _loadPreview(id: Int, content: [FormValue])
-        case _loadSimplePreview(id: Int, content: String, attIds: [Int])
-        case _previewResponse(Result<TemplatePreview, any Error>)
-        case _simplePreviewResponse(Result<PostPreview, any Error>)
+        case _loadSimplePreview(postId: Int, topicId: Int, content: String, attIds: [Int])
+        case _previewResponse(Result<PreviewResponse, any Error>)
     }
     
     // MARK: - Dependencies
@@ -63,10 +62,16 @@ public struct FormPreviewFeature: Reducer, Sendable {
                 case .topic(let forumId, let content):
                     return .send(._loadPreview(id: forumId, content: content))
                     
-                case .post(_, let topicId, let contentType):
+                case .post(let type, let topicId, let contentType):
                     switch contentType {
                     case .simple(let content, let attachments):
-                        return .send(._loadSimplePreview(id: topicId, content: content, attIds: attachments))
+                        let postId = if case let .edit(id) = type { id } else { 0 }
+                        return .send(._loadSimplePreview(
+                            postId: postId,
+                            topicId: topicId,
+                            content: content,
+                            attIds: attachments
+                        ))
                         
                     case .template(let content):
                         return .send(._loadPreview(id: topicId, content: content))
@@ -94,40 +99,24 @@ public struct FormPreviewFeature: Reducer, Sendable {
                     await send(._previewResponse(.failure(error)))
                 }
                 
-            case let ._loadSimplePreview(id, content, attachments):
+            case let ._loadSimplePreview(postId, topicId, content, attachments):
                 state.isPreviewLoading = true
                 return .run { send in
                     let result = await Result { try await apiClient.previewPost(
                         request: PostPreviewRequest(
-                            id: 0, // TODO: until we not adding support to edit post.
+                            id: postId,
                             post: PostRequest(
-                                topicId: id,
+                                topicId: topicId,
                                 content: content,
                                 flag: 0,
                                 attachments: attachments
                             )
                         )
                     )}
-                    await send(._simplePreviewResponse(result))
+                    await send(._previewResponse(result))
                 } catch: { error, send in
-                    await send(._simplePreviewResponse(.failure(error)))
+                    await send(._previewResponse(.failure(error)))
                 }
-                
-            case let ._simplePreviewResponse(.success(preview)):
-                state.contentTypes = TopicNodeBuilder(
-                    text: preview.content, attachments: []
-                ).build()
-                
-                // TODO: Attachments.
-                
-                state.isPreviewLoading = false
-                
-                return .none
-                
-            case let ._simplePreviewResponse(.failure(error)):
-                // TODO: Toast?
-                print(error)
-                return .send(.cancelButtonTapped)
                 
             case let ._previewResponse(.success(preview)):
                 state.contentTypes = TopicNodeBuilder(

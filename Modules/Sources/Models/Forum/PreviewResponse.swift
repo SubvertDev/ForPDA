@@ -1,11 +1,11 @@
 //
-//  TemplatePreview.swift
+//  PreviewResponse.swift
 //  ForPDA
 //
-//  Created by Xialtal on 23.02.26.
+//  Created by Xialtal on 27.02.26.
 //
 
-public struct TemplatePreview: Sendable {
+public struct PreviewResponse: Sendable {
     public let content: String
     public let attachments: [Attachment]
     

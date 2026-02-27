@@ -11,7 +11,6 @@ import Foundation
 import Models
 import Testing
 import FormFeature
-import UploadBoxFeature
 
 @MainActor
 struct FormFeatureTests {

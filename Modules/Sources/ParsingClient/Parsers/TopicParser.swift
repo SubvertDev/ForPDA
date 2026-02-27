@@ -57,7 +57,7 @@ public struct TopicParser {
         )
     }
     
-    public static func parsePostPreview(from string: String) throws(ParsingError) -> PostPreview {
+    public static func parsePostPreview(from string: String) throws(ParsingError) -> PreviewResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -67,11 +67,12 @@ public struct TopicParser {
         }
         
         guard let content = array[safe: 2] as? String,
-              let attachmentIds = array[safe: 3] as? [Int] else {
+              let attachmentsRaw = array[safe: 3] as? [[Any]],
+              let attachments = try? AttachmentParser.parseAttachment(attachmentsRaw) else {
             throw ParsingError.failedToCastFields
         }
         
-        return PostPreview(content: content, attachmentIds: attachmentIds)
+        return PreviewResponse(content: content, attachments: attachments)
     }
     
     public static func parsePostSendResponse(from string: String) throws(ParsingError) -> PostSendResponse {

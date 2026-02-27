@@ -26,7 +26,7 @@ public struct FormParser {
         return try parseFormFields(fields)
     }
     
-    public static func parseTemplatePreview(from string: String) throws(ParsingError) -> TemplatePreview {
+    public static func parseTemplatePreview(from string: String) throws(ParsingError) -> PreviewResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -42,7 +42,7 @@ public struct FormParser {
             throw ParsingError.failedToCastFields
         }
         
-        return TemplatePreview(content: content, attachments: attachments)
+        return PreviewResponse(content: content, attachments: attachments)
     }
     
     public static func parseTemplateSend(from string: String) throws(ParsingError) -> TemplateSend {
