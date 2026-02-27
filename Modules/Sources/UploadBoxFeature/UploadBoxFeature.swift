@@ -242,8 +242,10 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     state.files.append(.mockImage)
                     return .send(.delegate(.fileHasBeenUploaded(0)))
                 }
-                state.uploadQueue.append(contentsOf: images)
-                return .send(.internal(.startNextUpload))
+                if !images.isEmpty {
+                    state.uploadQueue.append(contentsOf: images)
+                    return .send(.internal(.startNextUpload))
+                }
                 
             case let .view(.fileImporterURLsRecieved(urls)):
                 if isPreview {
@@ -380,7 +382,9 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     guard let fileId = Int(response.replacingOccurrences(of: "[", with: "")
                         .replacingOccurrences(of: "]", with: "")
                         .components(separatedBy: ",")[2]) else {
-                        break
+                        state.files[index].isUploading = false
+                        state.files[index].uploadingError = .other(NSError(domain: response, code: 0))
+                        return .send(.internal(.startNextUpload))
                     }
                     return .send(.internal(.uploadFileFinished(index: index, fileId)))
                     
@@ -393,7 +397,6 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         return .send(.view(.removeFileButtonTapped(state.files[index])))
                     }
                     state.files[index].md5 = md5
-                    return .none
                     
                 case let .error(error):
                     state.files[index].uploadingError = switch error {
@@ -405,13 +408,14 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     @unknown default: .uploadFailure
                     }
                     state.files[index].isUploading = false
+                    return .send(.internal(.startNextUpload))
                     
                 @unknown default:
                     print("UNKNOWN DEFAULT ERROR! \(id), \(status)")
                     state.files[index].isUploading = false
                     state.files[index].uploadingError = .uploadFailure
+                    return .send(.internal(.startNextUpload))
                 }
-                return .send(.internal(.startNextUpload))
                 
             case let .internal(.uploadFileFinished(index, responseFileId)):
                 state.files[index].serverId = responseFileId
