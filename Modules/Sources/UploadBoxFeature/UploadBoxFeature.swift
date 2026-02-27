@@ -105,7 +105,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case startNextUpload
-            case uploadFile(UploadBoxFile)
+            case uploadFile(UploadBoxFile, URL)
             case uploadFileFinished(index: Int, Int)
             case updateFileUploadStatus(UUID, UploadProgressStatus)
         }
@@ -329,30 +329,29 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 let file = UploadBoxFile(
                     name: name,
                     type: uploadType,
-                    url: url,
                     isUploading: true,
                     fileSource: item
                 )
                 state.files.append(file)
                 
-                return .send(.internal(.uploadFile(file)))
+                return .send(.internal(.uploadFile(file, url)))
                 
-            case let .internal(.uploadFile(file)):
+            case let .internal(.uploadFile(file, url)):
                 state.isAnyFileUploading = true
                 
                 return .run(priority: .userInitiated, name: file.name) { send in
                     if file.type == .file {
-                        guard file.url.startAccessingSecurityScopedResource() else {
+                        guard url.startAccessingSecurityScopedResource() else {
                             await send(.view(.fileUploadCanceled(file.id, .noAccessToSSR)))
                             await send(.internal(.startNextUpload))
                             return
                         }
                     }
                     
-                    let data = try? Data(contentsOf: file.url)
+                    let data = try? Data(contentsOf: url)
                     
                     if file.type == .file {
-                        file.url.stopAccessingSecurityScopedResource()
+                        url.stopAccessingSecurityScopedResource()
                     }
                     
                     guard let data else {

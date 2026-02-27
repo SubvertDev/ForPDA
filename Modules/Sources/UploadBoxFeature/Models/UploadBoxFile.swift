@@ -11,7 +11,6 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
     public let id = UUID()
     public let name: String
     public let type: FileType
-    public let url: URL
     public var md5: String?
     public var isUploading: Bool
     public var uploadingError: UploadErrorType?
@@ -41,7 +40,6 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
     public init(
         name: String,
         type: FileType,
-        url: URL,
         md5: String? = nil,
         isUploading: Bool = false,
         uploadingError: UploadErrorType? = nil,
@@ -50,7 +48,6 @@ public struct UploadBoxFile: Sendable, Identifiable, Equatable {
     ) {
         self.name = name
         self.type = type
-        self.url = url
         self.md5 = md5
         self.isUploading = isUploading
         self.uploadingError = uploadingError
@@ -63,7 +60,6 @@ extension UploadBoxFile {
     static let mockImage = UploadBoxFile(
         name: UUID().uuidString,
         type: .image,
-        url: URL(string: "")!,
         md5: UUID().uuidString,
         serverId: 0
     )
@@ -71,7 +67,6 @@ extension UploadBoxFile {
     static let mockFile = UploadBoxFile(
         name: UUID().uuidString,
         type: .file,
-        url: URL(string: "")!,
         md5: UUID().uuidString,
         serverId: 1
     )
