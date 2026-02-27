@@ -110,7 +110,7 @@ public struct FormFeature: Reducer, Sendable {
             case reportResponse(Result<ReportResponseType, any Error>)
             case simplePostResponse(Result<PostSendResponse, any Error>)
             case templateResponse(Result<TemplateSend, any Error>)
-            case publishPost(flag: PostSendFlag)
+            case publishForm(flag: PostSendFlag)
         }
         
         case delegate(Delegate)
@@ -154,7 +154,7 @@ public struct FormFeature: Reducer, Sendable {
                     return .run { _ in await dismiss() }
                 }
                 
-                return .send(.internal(.publishPost(flag: PostSendFlag(rawValue: editorFlag)!)))
+                return .send(.internal(.publishForm(flag: PostSendFlag(rawValue: editorFlag)!)))
                 
             case .destination(.dismiss):
                 state.isPublishing = false
@@ -259,10 +259,7 @@ public struct FormFeature: Reducer, Sendable {
                 state.destination = .preview(previewState)
                 
             case .view(.publishButtonTapped):
-                return .send(.internal(.publishPost(flag: .default)))
-//                return .run { send in
-//                    await send(.internal(.publishPost(flag: .default)))
-//                }
+                return .send(.internal(.publishForm(flag: .default)))
                 
             case let .internal(.loadForm(id: id, isTopic: isTopic)):
                 return .run { send in
@@ -343,7 +340,7 @@ public struct FormFeature: Reducer, Sendable {
                 state.isFormLoading = false
                 state.destination = .alert(.unknownError)
                 
-            case let .internal(.publishPost(flag: flag)):
+            case let .internal(.publishForm(flag: flag)):
                 state.isPublishing = true
                 switch state.type {
                 case .topic(forumId: let id, content: _), .post(type: .new, topicId: let id, content: .template):
