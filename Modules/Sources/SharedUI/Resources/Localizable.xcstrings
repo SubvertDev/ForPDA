@@ -77,6 +77,16 @@
         }
       }
     },
+    "IN DEVELOPMENT" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В РАЗРАБОТКЕ"
+          }
+        }
+      }
+    },
     "Open In Browser" : {
       "localizations" : {
         "ru" : {
@@ -173,6 +183,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
+    "Understood" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понятно"
           }
         }
       }
