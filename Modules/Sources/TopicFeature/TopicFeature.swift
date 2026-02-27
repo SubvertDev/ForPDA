@@ -48,7 +48,6 @@ public struct TopicFeature: Reducer, Sendable {
         case gallery([URL], [Int], Int)
         @ReducerCaseIgnored
         case karmaChange(Int)
-        case editWarning
         case form(FormFeature)
         case changeReputation(ReputationChangeFeature)
         case alert(AlertState<Alert>)
@@ -139,7 +138,6 @@ public struct TopicFeature: Reducer, Sendable {
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
             case contextPostMenu(PostMenuAction)
-            case editWarningSheetCloseButtonTapped
         }
         
         case `internal`(Internal)
@@ -344,18 +342,16 @@ public struct TopicFeature: Reducer, Sendable {
                     return .none
                     
                 case let .edit(post):
-                    if post.attachments.isEmpty {
-                        let formState = FormFeature.State(
-                            type: .post(
-                                type: .edit(postId: post.id),
-                                topicId: state.topicId,
-                                content: .simple(post.content, post.attachments.map { $0.id })
-                            )
+                    let formState = FormFeature.State(
+                        type: .post(
+                            type: .edit(postId: post.id),
+                            topicId: state.topicId,
+                            content: .simple(post.content, post.attachments.map {
+                                .init(id: $0.id, name: $0.name, type: $0.type)
+                            })
                         )
-                        state.destination = .form(formState)
-                    } else {
-                        state.destination = .editWarning
-                    }
+                    )
+                    state.destination = .form(formState)
                     return .none
                     
                 case let .report(id):
@@ -444,10 +440,6 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.finishedPostAnimation):
                 state.postId = nil
                 return .none.animation()
-                
-            case .view(.editWarningSheetCloseButtonTapped):
-                state.destination = nil
-                return .none
                 
             case .internal(.load):
                 switch state.goTo {
