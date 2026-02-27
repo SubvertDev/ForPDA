@@ -11,6 +11,7 @@ import SharedUI
 import Models
 import TopicBuilder
 
+@ViewAction(for: FormPreviewFeature.self)
 struct FormPreviewView: View {
     
     @Perception.Bindable var store: StoreOf<FormPreviewFeature>
@@ -23,31 +24,35 @@ struct FormPreviewView: View {
     
     var body: some View {
         WithPerceptionTracking {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    if !store.contentTypes.isEmpty {
-                        ForEach(store.contentTypes, id: \.self) { type in
-                            TopicView(type: type, attachments: store.attachments) { _ in
-                                // Not handling URLs. Do not remove, cause else
-                                // links will be opening in browser.
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        if !store.contentTypes.isEmpty {
+                            ForEach(store.contentTypes, id: \.self) { type in
+                                TopicView(type: type, attachments: store.attachments) { _ in
+                                    // Not handling URLs. Do not remove, cause else
+                                    // links will be opening in browser.
+                                }
                             }
+                        } else if !store.isPreviewLoading {
+                            Text("Oops, error with loading preview :(", bundle: .module)
+                                .font(.headline)
+                                .foregroundStyle(tintColor)
+                                .frame(maxWidth: .infinity, alignment: .center)
                         }
-                    } else if !store.isPreviewLoading {
-                        Text("Oops, error with loading preview :(", bundle: .module)
-                            .font(.headline)
-                            .foregroundStyle(tintColor)
-                            .frame(maxWidth: .infinity, alignment: .center)
                     }
+                    .padding(16)
+                    ._toolbarTitleDisplayMode(.inline)
+                    .navigationTitle(Text("Preview", bundle: .module))
                 }
-                .padding(16)
-                ._toolbarTitleDisplayMode(.inline)
-                .navigationTitle(Text("Preview", bundle: .module))
             }
-            .background(Color(.Background.primary))
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        store.send(.cancelButtonTapped)
+                        send(.cancelButtonTapped)
                     } label: {
                         Text("Cancel", bundle: .module)
                     }
@@ -60,8 +65,29 @@ struct FormPreviewView: View {
                 }
             }
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
+}
+
+// MARK: - Preview
+
+#Preview("Preview") {
+    NavigationStack {
+        FormPreviewView(
+            store: Store(
+                initialState: FormPreviewFeature.State(
+                    formType: .post(
+                        type: .new,
+                        topicId: 0,
+                        content: .simple("Content", [])
+                    )
+                )
+            ) {
+                FormPreviewFeature()
+            }
+        )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
 }
