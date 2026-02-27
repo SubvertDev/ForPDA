@@ -49,7 +49,7 @@ public struct ParsingClient: Sendable {
     public var parseSearchUsers: @Sendable (_ response: String) async throws -> SearchUsersResponse
     
     // Write Form
-    public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
+    public var parseWriteForm: @Sendable (_ response: String) async throws -> [FormFieldType]
     
     // Extra
     public var parseUnread: @Sendable (_ response: String) async throws -> Unread
@@ -125,10 +125,10 @@ extension ParsingClient: DependencyKey {
             return try TopicParser.parsePostSendResponse(from: response)
 		},
         parseTemplatePreview: { response in
-            return try WriteFormParser.parseTemplatePreview(from: response)
+            return try FormParser.parseTemplatePreview(from: response)
         },
         parseTemplateSend: { response in
-            return try WriteFormParser.parseTemplateSend(from: response)
+            return try FormParser.parseTemplateSend(from: response)
         },
         parseSearch: { response in
             return try SearchParser.parse(from: response)
@@ -137,7 +137,7 @@ extension ParsingClient: DependencyKey {
             return try SearchUsersParser.parse(from: response)
         },
         parseWriteForm: { response in
-            return try WriteFormParser.parse(from: response)
+            return try FormParser.parse(from: response)
         },
         parseUnread: { response in
             return try UnreadParser.parse(from: response)

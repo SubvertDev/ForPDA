@@ -1,5 +1,5 @@
 //
-//  WriteFormParser.swift
+//  FormParser.swift
 //  ForPDA
 //
 //  Created by Xialtal on 14.03.25.
@@ -8,9 +8,9 @@
 import Foundation
 import Models
 
-public struct WriteFormParser {
+public struct FormParser {
 
-    public static func parse(from string: String) throws(ParsingError) -> [WriteFormFieldType] {
+    public static func parse(from string: String) throws(ParsingError) -> [FormFieldType] {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -90,8 +90,8 @@ public struct WriteFormParser {
         }
     }
     
-    private static func parseFormFields(_ fieldsRaw: [[Any]]) throws(ParsingError)-> [WriteFormFieldType] {
-        var formFields: [WriteFormFieldType] = []
+    private static func parseFormFields(_ fieldsRaw: [[Any]]) throws(ParsingError)-> [FormFieldType] {
+        var formFields: [FormFieldType] = []
         for (index, field) in fieldsRaw.enumerated() {
             guard let type = field[safe: 0] as? String,
                   let name = field[safe: 1] as? String,
@@ -102,7 +102,7 @@ public struct WriteFormParser {
                 throw ParsingError.failedToCastFields
             }
             
-            let content = WriteFormFieldType.FormField(
+            let content = FormFieldType.FormField(
                 id: index,
                 name: name,
                 description: description,

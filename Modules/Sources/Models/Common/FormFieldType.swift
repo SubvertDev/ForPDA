@@ -1,11 +1,11 @@
 //
-//  WriteFormFieldType.swift
+//  FormFieldType.swift
 //  ForPDA
 //
 //  Created by Xialtal on 14.03.25.
 //
 
-public enum WriteFormFieldType: Sendable, Equatable, Hashable {
+public enum FormFieldType: Sendable, Equatable, Hashable {
     case title(String)
     case text(FormField, maxLenght: Int?)
     case editor(FormField)
@@ -49,12 +49,12 @@ public enum WriteFormFieldType: Sendable, Equatable, Hashable {
 
 // MARK: - Mocks
 
-public extension WriteFormFieldType {
+public extension FormFieldType {
     
-    static let mockTitle: WriteFormFieldType =
+    static let mockTitle: FormFieldType =
         .title("This is an absolute [b]simple[/b] [i]title[/i]")
     
-    static let mockRequiredText: WriteFormFieldType = .text(
+    static let mockRequiredText: FormFieldType = .text(
         FormField(
             id: 0,
             name: "Topic name",
@@ -66,7 +66,7 @@ public extension WriteFormFieldType {
         maxLenght: 255
     )
     
-    static let mockRequiredEditor: WriteFormFieldType = .editor(
+    static let mockRequiredEditor: FormFieldType = .editor(
         FormField(
             id: 0,
             name: "Topic content",
@@ -77,7 +77,7 @@ public extension WriteFormFieldType {
         )
     )
     
-    static let mockEditor: WriteFormFieldType = .editor(
+    static let mockEditor: FormFieldType = .editor(
         FormField(
             id: 0,
             name: "",
@@ -88,7 +88,7 @@ public extension WriteFormFieldType {
         )
     )
     
-    static let mockUploadBox: WriteFormFieldType = .uploadbox(
+    static let mockUploadBox: FormFieldType = .uploadbox(
         .init(
             id: 0,
             name: "Device photos",
@@ -101,8 +101,8 @@ public extension WriteFormFieldType {
     )
 }
 
-extension Array where Element == WriteFormFieldType {
-    public static let releaser: [WriteFormFieldType] = [
+extension Array where Element == FormFieldType {
+    public static let releaser: [FormFieldType] = [
         .title("[size=2][center][b][color=royalblue]Важно![/color][/b]\r\n[SIZE=1] [/SIZE]\r\nЕсли Вы используете инструмент впервые,  просьба ознакомиться с темой [url=\"https://4pda.to/forum/index.php?showtopic=950823\"][b]Релизер[/b][/url], а также [url=\"https://4pda.to/forum/index.php?act=announce&f=212&st=250\"][b]Правилами раздела и FAQ по созданию и обновлению тем[/b][/url][/center][/size]\r\n"),
         .title(""),
         .dropdown(

@@ -108,7 +108,7 @@ public struct FormFeature: Reducer, Sendable {
         @CasePathable
         public enum Internal {
             case loadForm(id: Int, isTopic: Bool)
-            case formResponse(Result<[WriteFormFieldType], any Error>)
+            case formResponse(Result<[FormFieldType], any Error>)
             case reportResponse(Result<ReportResponseType, any Error>)
             case simplePostResponse(Result<PostSendResponse, any Error>)
             case templateResponse(Result<TemplateSend, any Error>)
@@ -118,7 +118,7 @@ public struct FormFeature: Reducer, Sendable {
         case delegate(Delegate)
         @CasePathable
         public enum Delegate {
-            case formSent(WriteFormSend)
+            case formSent(FormSend)
         }
     }
     
@@ -348,7 +348,7 @@ public struct FormFeature: Reducer, Sendable {
                 case .topic(forumId: let id, content: _), .post(type: .new, topicId: let id, content: .template):
                     return .run { [isTopic = state.type.isTopic, content = state.content] send in
                         let content = try! FormValue.toDocument(content)
-                        let result = await Result { try await apiClient.sendTemplate(id: id, content: content, isTopic: isTopic) }
+                        let result = await Result { try await apiClient.sendTemplate(id, content, isTopic) }
                         await send(.internal(.templateResponse(result)))
                     }
                     

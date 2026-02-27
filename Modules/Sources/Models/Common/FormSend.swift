@@ -1,11 +1,11 @@
 //
-//  WriteFormSend.swift
+//  FormSend.swift
 //  ForPDA
 //
 //  Created by Xialtal on 18.03.25.
 //
 
-public enum WriteFormSend: Sendable {
+public enum FormSend: Sendable {
     case post(PostSend)
     case report(ReportResponseType)
     case topic(Int)
