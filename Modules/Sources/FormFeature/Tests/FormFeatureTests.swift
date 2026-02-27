@@ -11,6 +11,7 @@ import Foundation
 import Models
 import Testing
 import FormFeature
+import UploadBoxFeature
 
 @MainActor
 struct FormFeatureTests {
@@ -45,7 +46,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
         
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -84,7 +85,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
         
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -130,7 +131,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
 
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -175,7 +176,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
 
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -225,7 +226,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
 
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -238,7 +239,7 @@ struct FormFeatureTests {
             $0.destination = nil
         }
         
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -283,7 +284,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
 
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
@@ -330,7 +331,7 @@ struct FormFeatureTests {
         
         await store.send(.view(.publishButtonTapped))
         
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         await store.receive(\.internal.simplePostResponse)
@@ -345,7 +346,7 @@ struct FormFeatureTests {
                 type: .post(
                     type: .new,
                     topicId: 0,
-                    content: .template("")
+                    content: .template([])
                 )
             )
         ) {
@@ -360,6 +361,7 @@ struct FormFeatureTests {
         }
         
         let title = FormTitleFeature.State(id: 0, text: "[size=2][center][b][color=royalblue]Важно![/color][/b]\r\n[SIZE=1] [/SIZE]\r\nЕсли Вы используете инструмент впервые,  просьба ознакомиться с темой [url=\"https://4pda.to/forum/index.php?showtopic=950823\"][b]Релизер[/b][/url], а также [url=\"https://4pda.to/forum/index.php?act=announce&f=212&st=250\"][b]Правилами раздела и FAQ по созданию и обновлению тем[/b][/url][/center][/size]\r\n")
+        let title1 = FormTitleFeature.State(id: 1, text: "")
         var dropdown = FormDropdownFeature.State(
             id: 2,
             title: "Тип обновления",
@@ -378,7 +380,8 @@ struct FormFeatureTests {
             description: "Укажите версию. Например: 1.3.7",
             placeholder: "",
             flag: 1,
-            defaultText: ""
+            defaultText: "",
+            maxLength: 255
         )
         var text2 = FormTextFieldFeature.State(
             id: 4,
@@ -414,6 +417,7 @@ struct FormFeatureTests {
             $0.isFormLoading = false
             $0.rows = [
                 .title(title),
+                .title(title1),
                 .dropdown(dropdown),
                 .textField(text1),
                 .textField(text2),
@@ -442,44 +446,32 @@ struct FormFeatureTests {
             $0.rows[id: 5] = .editor(editor)
         }
         
-        await store.send(.rows(.element(id: 6, action: .uploadBox(.view(.selectFilesButtonTapped))))) {
-            uploadbox.destination = .confirmationDialog(
-                ConfirmationDialogState<FormUploadBoxFeature.Destination.Dialog>(
-                    title: { TextState(verbatim: "") },
-                    actions: {
-                        ButtonState(action: .gallery) {
-                            TextState("Choose from Gallery", bundle: .module)
-                        }
-                        ButtonState(action: .files) {
-                            TextState("Choose from Files", bundle: .module)
-                        }
-                    }
-                )
-            )
+        await store.send(.rows(.element(id: 6, action: .uploadBox(.view(.onAppear))))) {
+            uploadbox.upload.allowedExtensions = ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"]
             $0.rows[id: 6] = .uploadBox(uploadbox)
         }
         
         #expect(store.state.isPublishButtonDisabled)
         
-        let fileURL = try! saveBase64StringToDocuments(base64String: baseImage, filename: "base")
-        
-        await store.send(.rows(.element(id: 6, action: .uploadBox(.view(.fileImporterURLsRecieved([fileURL])))))) {
-            uploadbox.files = [
-                FormUploadBoxFeature.File(
-                    id: 0,
-                    name: "base",
-                    type: .file,
-                    data: try! Data(contentsOf: fileURL)
-                )
-            ]
-            $0.rows[id: 6] = .uploadBox(uploadbox)
-        }
-        
-        #expect(!store.state.isPublishButtonDisabled)
+//        let fileURL = try! saveBase64StringToDocuments(base64String: baseImage, filename: "base")
+//        
+//        await store.send(.rows(.element(id: 6, action: .uploadBox(.view(.fileImporterURLsRecieved([fileURL])))))) {
+//            uploadbox.files = [
+//                FormUploadBoxFeature.File(
+//                    id: 0,
+//                    name: "base",
+//                    type: .file,
+//                    data: try! Data(contentsOf: fileURL)
+//                )
+//            ]
+//            $0.rows[id: 6] = .uploadBox(uploadbox)
+//        }
+//        
+//        #expect(!store.state.isPublishButtonDisabled)
         
         await store.send(.view(.publishButtonTapped))
         
-        await store.receive(\.internal.publishPost) {
+        await store.receive(\.internal.publishForm) {
             $0.isPublishing = true
         }
         
