@@ -67,10 +67,12 @@ public struct FormFeature: Reducer, Sendable {
         }
         
         var isPreviewButtonDisabled: Bool {
+            if isFormLoading { return true }
             return !rows.filter { $0.isRequired() }.allSatisfy { $0.isValid() }
         }
         
         public var isPublishButtonDisabled: Bool {
+            if isFormLoading { return true }
             return !rows.allSatisfy { $0.isValid() } || isPublishing
         }
         
