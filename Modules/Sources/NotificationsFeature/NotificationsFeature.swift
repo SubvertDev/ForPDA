@@ -27,21 +27,7 @@ public struct NotificationsFeature: Reducer, Sendable {
         
         public var areNotificationsEnabled = false
         
-        public var isQmsEnabled: Bool
-        public var isForumEnabled: Bool
-        public var isTopicsEnabled: Bool
-        public var isForumMentionsEnabled: Bool
-        public var isSiteMentionsEnabled: Bool
-        public var isBackgroundNotificationsEnabled: Bool
-        
-        public init() {
-            self.isQmsEnabled = _appSettings.notifications.isQmsEnabled.wrappedValue
-            self.isForumEnabled = _appSettings.notifications.isForumEnabled.wrappedValue
-            self.isTopicsEnabled = _appSettings.notifications.isTopicsEnabled.wrappedValue
-            self.isForumMentionsEnabled = _appSettings.notifications.isForumMentionsEnabled.wrappedValue
-            self.isSiteMentionsEnabled = _appSettings.notifications.isSiteMentionsEnabled.wrappedValue
-            self.isBackgroundNotificationsEnabled = _appSettings.backgroundNotifications.wrappedValue
-        }
+        public init() {}
     }
     
     // MARK: - Action
@@ -103,32 +89,12 @@ public struct NotificationsFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .binding(\.isQmsEnabled):
-                state.$appSettings.notifications.isQmsEnabled.withLock { $0 = state.isQmsEnabled }
-                return .none
-                
-            case .binding(\.isForumEnabled):
-                state.$appSettings.notifications.isForumEnabled.withLock { $0 = state.isForumEnabled }
-                return .none
-                
-            case .binding(\.isTopicsEnabled):
-                state.$appSettings.notifications.isTopicsEnabled.withLock { $0 = state.isTopicsEnabled }
-                return .none
-                
-            case .binding(\.isForumMentionsEnabled):
-                state.$appSettings.notifications.isForumMentionsEnabled.withLock { $0 = state.isForumMentionsEnabled }
-                return .none
-                
-            case .binding(\.isSiteMentionsEnabled):
-                state.$appSettings.notifications.isSiteMentionsEnabled.withLock { $0 = state.isSiteMentionsEnabled }
-                return .none
-                
-            case .binding(\.isBackgroundNotificationsEnabled):
-                state.$appSettings.backgroundNotifications.withLock { $0 = state.isBackgroundNotificationsEnabled }
-                return .none
-                
             case .binding:
-                return .none
+                return .run { _ in
+                    if let unread = cacheClient.getUnread() {
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    }
+                }
             }
         }
     }

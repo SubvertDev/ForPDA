@@ -338,8 +338,17 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case let .updateBadges(unread):
-                state.favoritesBadges = unread.favoritesUnreadCount
-                state.profileBadges = unread.qmsUnreadCount + unread.mentionsUnreadCount
+                let favoritesBadges =
+                (state.appSettings.notifications.isForumEnabled ? unread.forumCount : 0) +
+                (state.appSettings.notifications.isTopicsEnabled ? unread.topicCount : 0)
+                state.favoritesBadges = favoritesBadges
+                
+                let profileBadges =
+                (state.appSettings.notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
+                (state.appSettings.notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
+                (state.appSettings.notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+                state.profileBadges = profileBadges
+                
                 cacheClient.setUnread(unread)
                 return .none
                 

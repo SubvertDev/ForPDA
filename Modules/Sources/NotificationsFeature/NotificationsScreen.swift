@@ -28,25 +28,26 @@ public struct NotificationsScreen: View {
                     Section {
                         if !store.areNotificationsEnabled {
                             VStack(spacing: 8) {
-                                Text("Notifications are disabled")
+                                Text("Notifications are disabled", bundle: .module)
                                     .multilineTextAlignment(.center)
                                     .listRowBackground(Color(.Background.teritary))
                                     .frame(maxWidth: .infinity)
                                 
                                 Button {
-                                    
+                                    let url = URL(string: UIApplication.openSettingsURLString)!
+                                    UIApplication.shared.open(url)
                                 } label: {
-                                    Text("Open Settings")
+                                    Text("Open Settings", bundle: .module)
                                 }
                             }
                             .padding(16)
                         }
                         
-                        Row("QMS", value: $store.isQmsEnabled)
-                        Row("Forum", value: $store.isForumEnabled)
-                        Row("Topics", value: $store.isTopicsEnabled)
-                        Row("Forum mentions", value: $store.isForumMentionsEnabled)
-                        Row("Site mentions", value: $store.isSiteMentionsEnabled)
+                        Row("QMS", value: $store.appSettings.notifications.isQmsEnabled)
+                        Row("Forum", value: $store.appSettings.notifications.isForumEnabled)
+                        Row("Topics", value: $store.appSettings.notifications.isTopicsEnabled)
+                        Row("Forum mentions", value: $store.appSettings.notifications.isForumMentionsEnabled)
+                        Row("Site mentions", value: $store.appSettings.notifications.isSiteMentionsEnabled)
                     } header: {
                         Text("General", bundle: .module)
                     }
@@ -55,8 +56,9 @@ public struct NotificationsScreen: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
                     Section {
-                        Row("Background notifications", value: $store.isBackgroundNotificationsEnabled)
-                        if store.isBackgroundNotificationsEnabled {
+                        Row("Background notifications", value: $store.appSettings.backgroundNotifications)
+                        
+                        if store.appSettings.backgroundNotifications {
                             Button {
                                 store.send(.sendLogButtonTapped)
                             } label: {
@@ -74,7 +76,7 @@ public struct NotificationsScreen: View {
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
-                .animation(.default, value: store.isBackgroundNotificationsEnabled)
+                .animation(.default, value: store.appSettings.backgroundNotifications)
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Notifications", bundle: .module))
