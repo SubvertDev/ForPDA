@@ -32,9 +32,11 @@ struct FormPreviewView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         if !store.contentTypes.isEmpty {
                             ForEach(store.contentTypes, id: \.self) { type in
-                                TopicView(type: type, attachments: store.attachments) { _ in
-                                    // Not handling URLs. Do not remove, cause else
-                                    // links will be opening in browser.
+                                WithPerceptionTracking {
+                                    TopicView(type: type, attachments: store.attachments) { _ in
+                                        // Not handling URLs. Do not remove, cause else
+                                        // links will be opening in browser.
+                                    }
                                 }
                             }
                         } else if !store.isPreviewLoading {
