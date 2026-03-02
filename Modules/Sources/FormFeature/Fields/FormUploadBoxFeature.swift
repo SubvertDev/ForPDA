@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import UploadBoxFeature
+import Models
 
 // MARK: - Feature
 

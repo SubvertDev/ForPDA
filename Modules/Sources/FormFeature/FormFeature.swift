@@ -292,7 +292,7 @@ public struct FormFeature: Reducer, Sendable {
                             title: content.name,
                             description: content.description,
                             placeholder: content.example,
-                            flag: FormFlag(rawValue: content.flag),
+                            flag: content.flag,
                             defaultText: content.defaultValue,
                             maxLength: maxLength
                         )
@@ -304,7 +304,7 @@ public struct FormFeature: Reducer, Sendable {
                             title: content.name,
                             description: content.description,
                             placeholder: content.example,
-                            flag: FormFlag(rawValue: content.flag),
+                            flag: content.flag,
                             defaultText: content.defaultValue
                         )
                         state.rows.append(.editor(editorState))
@@ -314,7 +314,7 @@ public struct FormFeature: Reducer, Sendable {
                             id: index,
                             title: content.name,
                             description: content.description,
-                            flag: FormFlag(rawValue: content.flag),
+                            flag: content.flag,
                             options: options
                         )
                         state.rows.append(.checkBoxList(checkboxListState))
@@ -324,7 +324,7 @@ public struct FormFeature: Reducer, Sendable {
                             id: index,
                             title: content.name,
                             description: content.description,
-                            flag: FormFlag(rawValue: content.flag),
+                            flag: content.flag,
                             options: options
                         )
                         state.rows.append(.dropdown(dropdownState))
@@ -334,12 +334,13 @@ public struct FormFeature: Reducer, Sendable {
                             id: index,
                             title: content.name,
                             description: content.description,
-                            flag: FormFlag(rawValue: content.flag),
+                            flag: content.flag,
                             allowedExtensions: extensions
                         )
                         state.rows.append(.uploadBox(uploadboxState))
                     }
                 }
+                state.isFormLoading = false
                 
             case let .internal(.formResponse(.failure(error))):
                 print(error)

@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import Models
 
 // MARK: - Feature
 

@@ -5,6 +5,8 @@
 //  Created by Ilia Lubianoi on 20.07.2025.
 //
 
+import Models
+
 protocol FormFieldConformable: Identifiable {
     var flag: FormFlag { get }
     var isRequired: Bool { get }

@@ -107,7 +107,7 @@ public struct FormParser {
                 name: name,
                 description: description,
                 example: example,
-                flag: flag,
+                flag: FormFlag(rawValue: flag),
                 defaultValue: defaultValue
             )
             

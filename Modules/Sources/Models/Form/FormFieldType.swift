@@ -18,23 +18,15 @@ public enum FormFieldType: Sendable, Equatable, Hashable {
         public let name: String
         public let description: String
         public let example: String
-        public let flag: Int
+        public let flag: FormFlag
         public let defaultValue: String
-        
-        public var isRequired: Bool {
-            return flag & 1 != 0
-        }
-        
-        public var isVisible: Bool {
-            return flag & 2 != 0
-        }
         
         public init(
             id: Int,
             name: String,
             description: String,
             example: String,
-            flag: Int,
+            flag: FormFlag,
             defaultValue: String
         ) {
             self.id = id
@@ -60,7 +52,7 @@ public extension FormFieldType {
             name: "Topic name",
             description: "Enter topic name",
             example: "Starting from For, ends with PDA",
-            flag: 1,
+            flag: .required,
             defaultValue: ""
         ),
         maxLenght: 255
@@ -72,7 +64,7 @@ public extension FormFieldType {
             name: "Topic content",
             description: "This [B]field[/B] contains topic [color=red]hat[/color] content",
             example: "ForPDA Forever!",
-            flag: 1,
+            flag: .required,
             defaultValue: ""
         )
     )
@@ -83,7 +75,7 @@ public extension FormFieldType {
             name: "",
             description: "",
             example: "Post text...",
-            flag: 0,
+            flag: [],
             defaultValue: ""
         )
     )
@@ -94,7 +86,7 @@ public extension FormFieldType {
             name: "Device photos",
             description: "Upload device photos. Allowed formats JPG, GIF, PNG",
             example: "",
-            flag: 1,
+            flag: .required,
             defaultValue: ""
         ),
         ["jpg", "gif", "png"]
@@ -111,7 +103,7 @@ extension Array where Element == FormFieldType {
                 name: "Тип обновления",
                 description: "Что публикуем?",
                 example: "",
-                flag: 1,
+                flag: .required,
                 defaultValue: ""
             ),
             [
@@ -127,7 +119,7 @@ extension Array where Element == FormFieldType {
                 name: "Версия",
                 description: "Укажите версию. Например: 1.3.7",
                 example: "",
-                flag: 1,
+                flag: .required,
                 defaultValue: ""
             ),
             maxLenght: 255
@@ -138,7 +130,7 @@ extension Array where Element == FormFieldType {
                 name: "Краткое описание",
                 description: "Здесь можно указать: [I][U]источник, дату публикации, архитектуру, авторство, номер сборки, тип модификации[/U][/I] и так далее.\r\n[COLOR=red][I]Не повторяйте тут версию или название программы! Здесь запрещены ВВ-коды и ссылки.[/I][/COLOR]\r\nПример 1: Для ARM64 от 01/02/2022 из F-Droid\r\nПример 2: AdFree от ModMaker",
                 example: "",
-                flag: 1,
+                flag: .required,
                 defaultValue: ""
             ),
             maxLenght: nil
@@ -149,7 +141,7 @@ extension Array where Element == FormFieldType {
                 name: "Описание",
                 description: "Введите дополнительную полезную информацию, например для:\r\n[b]\"Новая версия\"[/b] - список \"что нового\".\r\n[b]\"Модификация\"[/b] - \"на чем основано\", \"особенности\", \"обновлено\". ",
                 example: "",
-                flag: 3,
+                flag: [.required, .uploadable],
                 defaultValue: ""
             )
         ),
@@ -159,7 +151,7 @@ extension Array where Element == FormFieldType {
                 name: "Файлы",
                 description: "",
                 example: "",
-                flag: 3,
+                flag: [.required, .uploadable],
                 defaultValue: ""
             ),
             [

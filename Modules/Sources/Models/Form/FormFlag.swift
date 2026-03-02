@@ -5,7 +5,7 @@
 //  Created by Xialtal on 28.02.26.
 //
 
-public struct FormFlag: OptionSet, Sendable {
+public struct FormFlag: OptionSet, Sendable, Equatable, Hashable {
     public var rawValue: Int
     
     public init(rawValue: Int) {
