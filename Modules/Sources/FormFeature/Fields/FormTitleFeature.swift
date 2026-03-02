@@ -19,7 +19,7 @@ public struct FormTitleFeature: Reducer {
     public struct State: Equatable, FormFieldConformable {
         public let id: Int
         let text: String
-        let flag = 0
+        let flag: FormFlag = []
         
         public init(id: Int, text: String) {
             self.id = id

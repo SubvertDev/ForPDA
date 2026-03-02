@@ -204,7 +204,11 @@ public struct FormFeature: Reducer, Sendable {
                     
                     switch content {
                     case let .simple(content, _):
-                        let editorState = FormEditorFeature.State(id: 0, flag: 1, defaultText: content)
+                        let editorState = FormEditorFeature.State(
+                            id: 0,
+                            flag: [.required, .uploadable],
+                            defaultText: content
+                        )
                         state.rows.append(.editor(editorState))
                         state.focusedField = 0
                         
@@ -218,7 +222,7 @@ public struct FormFeature: Reducer, Sendable {
                     return .send(.internal(.loadForm(id: forumId, isTopic: true)))
                     
                 case .report:
-                    let editorState = FormEditorFeature.State(id: 0, flag: 1)
+                    let editorState = FormEditorFeature.State(id: 0, flag: .required)
                     state.rows.append(.editor(editorState))
                     state.focusedField = 0
                 }
@@ -288,7 +292,7 @@ public struct FormFeature: Reducer, Sendable {
                             title: content.name,
                             description: content.description,
                             placeholder: content.example,
-                            flag: content.flag,
+                            flag: FormFlag(rawValue: content.flag),
                             defaultText: content.defaultValue,
                             maxLength: maxLength
                         )
@@ -300,7 +304,7 @@ public struct FormFeature: Reducer, Sendable {
                             title: content.name,
                             description: content.description,
                             placeholder: content.example,
-                            flag: content.flag,
+                            flag: FormFlag(rawValue: content.flag),
                             defaultText: content.defaultValue
                         )
                         state.rows.append(.editor(editorState))
@@ -310,7 +314,7 @@ public struct FormFeature: Reducer, Sendable {
                             id: index,
                             title: content.name,
                             description: content.description,
-                            flag: content.flag,
+                            flag: FormFlag(rawValue: content.flag),
                             options: options
                         )
                         state.rows.append(.checkBoxList(checkboxListState))
@@ -320,7 +324,7 @@ public struct FormFeature: Reducer, Sendable {
                             id: index,
                             title: content.name,
                             description: content.description,
-                            flag: content.flag,
+                            flag: FormFlag(rawValue: content.flag),
                             options: options
                         )
                         state.rows.append(.dropdown(dropdownState))
@@ -330,7 +334,7 @@ public struct FormFeature: Reducer, Sendable {
                             id: index,
                             title: content.name,
                             description: content.description,
-                            flag: content.flag,
+                            flag: FormFlag(rawValue: content.flag),
                             allowedExtensions: extensions
                         )
                         state.rows.append(.uploadBox(uploadboxState))

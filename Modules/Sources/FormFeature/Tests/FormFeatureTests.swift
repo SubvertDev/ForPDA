@@ -28,7 +28,7 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: 1)
+        var editorState = FormEditorFeature.State(id: 0, flag: .required)
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -67,7 +67,7 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: 1)
+        var editorState = FormEditorFeature.State(id: 0, flag: .required)
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -113,7 +113,7 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: 1, defaultText: "")
+        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -158,7 +158,7 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: 1, defaultText: "")
+        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -208,7 +208,7 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: 1, defaultText: "")
+        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -266,7 +266,7 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: 1, defaultText: "")
+        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -312,7 +312,7 @@ struct FormFeatureTests {
             }
         }
         
-        let editorState = FormEditorFeature.State(id: 0, flag: 1, defaultText: "some text")
+        let editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "some text")
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -365,7 +365,7 @@ struct FormFeatureTests {
             id: 2,
             title: "Тип обновления",
             description: "Что публикуем?",
-            flag: 1,
+            flag: .required,
             options: [
                 "Новая версия",
                 "Beta",
@@ -378,7 +378,7 @@ struct FormFeatureTests {
             title: "Версия",
             description: "Укажите версию. Например: 1.3.7",
             placeholder: "",
-            flag: 1,
+            flag: .required,
             defaultText: "",
             maxLength: 255
         )
@@ -387,7 +387,7 @@ struct FormFeatureTests {
             title: "Краткое описание",
             description: "Здесь можно указать: [I][U]источник, дату публикации, архитектуру, авторство, номер сборки, тип модификации[/U][/I] и так далее.\r\n[COLOR=red][I]Не повторяйте тут версию или название программы! Здесь запрещены ВВ-коды и ссылки.[/I][/COLOR]\r\nПример 1: Для ARM64 от 01/02/2022 из F-Droid\r\nПример 2: AdFree от ModMaker",
             placeholder: "",
-            flag: 1,
+            flag: .required,
             defaultText: ""
         )
         var editor = FormEditorFeature.State(
@@ -395,14 +395,14 @@ struct FormFeatureTests {
             title: "Описание",
             description: "Введите дополнительную полезную информацию, например для:\r\n[b]\"Новая версия\"[/b] - список \"что нового\".\r\n[b]\"Модификация\"[/b] - \"на чем основано\", \"особенности\", \"обновлено\". ",
             placeholder: "",
-            flag: 3,
+            flag: [.required, .uploadable],
             defaultText: ""
         )
         var uploadbox = FormUploadBoxFeature.State(
             id: 6,
             title: "Файлы",
             description: "",
-            flag: 3,
+            flag: [.required, .uploadable],
             allowedExtensions: ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"]
         )
         

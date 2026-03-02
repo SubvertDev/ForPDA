@@ -6,7 +6,7 @@
 //
 
 protocol FormFieldConformable: Identifiable {
-    var flag: Int { get }
+    var flag: FormFlag { get }
     var isRequired: Bool { get }
     
     func isValid() -> Bool
@@ -15,6 +15,6 @@ protocol FormFieldConformable: Identifiable {
 
 extension FormFieldConformable {
     var isRequired: Bool {
-        return flag & 1 != 0
+        return flag == .required
     }
 }

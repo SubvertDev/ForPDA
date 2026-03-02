@@ -22,7 +22,7 @@ public struct FormTextFieldFeature: Reducer {
         let title: String
         let description: String
         let placeholder: String
-        let flag: Int
+        let flag: FormFlag
         let maxLength: Int?
         public var text = ""
         
@@ -31,7 +31,7 @@ public struct FormTextFieldFeature: Reducer {
             title: String = "",
             description: String = "",
             placeholder: String = "",
-            flag: Int,
+            flag: FormFlag,
             defaultText: String = "",
             maxLength: Int? = nil
         ) {
@@ -111,7 +111,7 @@ struct FormTextFieldRow: View {
                 title: "TextField Title",
                 description: "TextField Description",
                 placeholder: "TextField Placeholder",
-                flag: 1,
+                flag: .required,
                 defaultText: "TextField Default Text"
             )
         ) {

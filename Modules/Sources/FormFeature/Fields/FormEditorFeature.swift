@@ -22,7 +22,7 @@ public struct FormEditorFeature: Reducer {
         let title: String
         let description: String
         let placeholder: String
-        let flag: Int
+        let flag: FormFlag
         public var text = ""
         
         public init(
@@ -30,7 +30,7 @@ public struct FormEditorFeature: Reducer {
             title: String = "",
             description: String = "",
             placeholder: String = "",
-            flag: Int,
+            flag: FormFlag,
             defaultText: String = ""
         ) {
             self.id = id
@@ -108,7 +108,7 @@ struct FormEditorRow: View {
                 title: "Editor Title",
                 description: "Editor Description",
                 placeholder: "Editor Placeholder",
-                flag: 1,
+                flag: .required,
                 defaultText: "Editor Default Text"
             )
         ) {

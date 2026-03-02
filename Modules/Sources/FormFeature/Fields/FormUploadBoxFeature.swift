@@ -23,7 +23,7 @@ public struct FormUploadBoxFeature: Reducer {
         public let id: Int
         let title: String
         let description: String
-        let flag: Int
+        let flag: FormFlag
         let allowedExtensions: [String]
         public var isLocked: Bool
         
@@ -33,7 +33,7 @@ public struct FormUploadBoxFeature: Reducer {
             id: Int,
             title: String,
             description: String,
-            flag: Int,
+            flag: FormFlag,
             allowedExtensions: [String],
             isLocked: Bool = false
         ) {
@@ -149,7 +149,7 @@ struct FormUploadBoxRow: View {
                 id: 0,
                 title: "File skin",
                 description: "Supported formats: jpg, jpeg, gif, png",
-                flag: 1,
+                flag: .required,
                 allowedExtensions: ["jpg", "jpeg", "gif", "png"]
             )
         ) {
