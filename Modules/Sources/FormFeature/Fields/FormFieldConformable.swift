@@ -15,6 +15,6 @@ protocol FormFieldConformable: Identifiable {
 
 extension FormFieldConformable {
     var isRequired: Bool {
-        return flag == .required
+        return flag.contains(.required)
     }
 }
