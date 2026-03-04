@@ -1,13 +1,13 @@
 {
-  "originHash" : "51e9626775d37c8c25b08a6a558fd4692eb36a4241c656f0f04a9bbd72c3f84c",
+  "originHash" : "624758e3f2c2ca0871e73dcb9971b38858a1e31e06e634f8f0442ce10c0548cf",
   "pins" : [
     {
       "identity" : "activityindicatorview",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/ActivityIndicatorView",
       "state" : {
-        "revision" : "9970fd0bb7a05dad0b6566ae1f56937716686b24",
-        "version" : "1.1.1"
+        "revision" : "36140867802ae4a1d2b11490bcbbefe058001d14",
+        "version" : "1.2.1"
       }
     },
     {
@@ -17,6 +17,15 @@
       "state" : {
         "branch" : "d0f7d6b",
         "revision" : "d0f7d6bafd3e8ffe99afba4995822d24aee044fb"
+      }
+    },
+    {
+      "identity" : "anchoredpopup",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SubvertDev/AnchoredPopup.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c409740455e14866a223715ed285da33cfd0f044"
       }
     },
     {
@@ -31,10 +40,10 @@
     {
       "identity" : "chat",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/Chat.git",
+      "location" : "https://github.com/SubvertDev/Chat",
       "state" : {
-        "revision" : "b86c12a57f64b72bae1d81d3310146ebbe29c073",
-        "version" : "2.4.2"
+        "branch" : "44a08c5",
+        "revision" : "44a08c5141ac32dde14e5707ad25d8bbed5be0e9"
       }
     },
     {
@@ -51,8 +60,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Giphy/giphy-ios-sdk",
       "state" : {
-        "revision" : "37f5b1ff6cf8bc4a78c0bc5eb1b814381bac9580",
-        "version" : "2.2.16"
+        "revision" : "f7a8edf513ab14147ef33c942b10b45cdac1e765",
+        "version" : "2.3.0"
+      }
+    },
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "e227df15448d2ad1a5d4e4c49722a71c68f9058a",
+        "version" : "8.7.0"
       }
     },
     {
@@ -67,10 +85,10 @@
     {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
+      "location" : "https://github.com/SubvertDev/MediaPicker.git",
       "state" : {
-        "revision" : "6f8745755530209462b60445ec4ba332c3058474",
-        "version" : "2.2.4"
+        "branch" : "main",
+        "revision" : "199f445c1efa65291160d9589ad8509848130783"
       }
     },
     {
