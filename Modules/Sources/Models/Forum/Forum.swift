@@ -62,7 +62,7 @@ public extension Forum {
         topics: [
             [.mockPinned],
             [.mockLong],
-            [.mockToday],
+            [.mockToday()],
             [.mockYesterday],
             Array(repeating: .mockWeekAgo, count: 26)
         ].flatMap { $0

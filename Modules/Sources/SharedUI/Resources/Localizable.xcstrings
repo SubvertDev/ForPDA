@@ -127,6 +127,16 @@
         }
       }
     },
+    "Refreshing..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обновляем..."
+          }
+        }
+      }
+    },
     "Reply" : {
       "localizations" : {
         "ru" : {

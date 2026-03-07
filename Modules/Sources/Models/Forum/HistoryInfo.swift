@@ -20,7 +20,7 @@ public struct HistoryInfo: Codable, Sendable, Hashable {
 public extension HistoryInfo {
     static let mockToday = HistoryInfo(
         seenDate: Date.now,
-        topic: .mockToday
+        topic: .mockToday()
     )
     
     static let mockYesterday = HistoryInfo(

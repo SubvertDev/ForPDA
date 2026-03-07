@@ -47,11 +47,13 @@ public struct FavoriteInfo: Codable, Identifiable, Hashable, Sendable {
 }
 
 public extension FavoriteInfo {
-    static let mock = FavoriteInfo(
-        flag: 0,
-        topic: .mockToday,
-        isForum: false
-    )
+    static func mock() -> FavoriteInfo {
+        return FavoriteInfo(
+            flag: 0,
+            topic: .mockToday(),
+            isForum: false
+        )
+    }
     
     static let mockUnread = FavoriteInfo(
         flag: 0,

@@ -13,6 +13,8 @@ public typealias QuoteHandler = (String) -> Void
 
 public struct RichText: View {
     
+    @Environment(\.redactionReasons) private var redactionReasons
+    
     @State public var text: NSAttributedString
     public let isSelectable: Bool
     public let font: Font?
@@ -109,6 +111,21 @@ public struct RichText: View {
             configuration($0)
         }
         .id(refreshId)
+        
+        // Redacted modifier hotfix
+        .onAppear {
+            if redactionReasons == .placeholder {
+                text = NSAttributedString(string: "")
+                refreshId = UUID()
+            }
+        }
+        .overlay {
+            if redactionReasons == .placeholder {
+                Text(verbatim: "placeholder")
+                    .font(.caption)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
     }
 }
 

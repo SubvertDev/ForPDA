@@ -608,7 +608,8 @@ let project = Project(
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
                     .SPM.SkeletonUI,
-                    .SPM.SwiftyGif
+                    .SPM.SwiftyGif,
+                    .SPM.SmoothGradient,
                 ]
             ),
         

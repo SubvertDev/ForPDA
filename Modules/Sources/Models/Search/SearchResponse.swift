@@ -20,7 +20,7 @@ public struct SearchResponse: Sendable, Equatable {
 
 public extension SearchResponse {
     static let mock = SearchResponse(
-        content: [.article(.mock), .topic(.mockToday), .post(.mock)],
+        content: [.article(.mock), .topic(.mockToday()), .post(.mock)],
         contentCount: 3
     )
 }

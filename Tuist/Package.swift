@@ -32,8 +32,9 @@ import PackageDescription
             "Nuke": .framework,
             "NukeUI": .framework,
             "RichTextKit": .framework,
-            "SkeletonUI": .framework,
             "SFSafeSymbols": .framework,
+            "SkeletonUI": .framework,
+            "SmoothGradient": .framework,
             
             "YouTubePlayerKit": .framework
         ],

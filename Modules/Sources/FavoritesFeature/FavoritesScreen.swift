@@ -26,6 +26,12 @@ public struct FavoritesScreen: View {
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
+    private var isLegacyFloatingNavigationEnabled: Bool {
+        return isLiquidGlass
+        && store.appSettings.floatingNavigation
+        && !store.appSettings.experimentalFloatingNavigation
+    }
+    
     // MARK: - Init
 
     public init(store: StoreOf<FavoritesFeature>) {
@@ -36,36 +42,31 @@ public struct FavoritesScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-
-                if store.shouldShowEmptyState {
-                    EmptyFavorites()
-                } else if !store.isLoading {
-                    List {
+            SlackList(LocalizedStringResource("Favorites", bundle: .module)) {
+                WithPerceptionTracking {
+                    if store.isLoading {
+                        FavoritesSection(favorites: Favorite.mockLoading.favorites, important: false)
+                            .redacted(reason: .placeholder)
+                            .disabled(true)
+                    } else {
                         if !store.favoritesImportant.isEmpty {
                             FavoritesSection(favorites: store.favoritesImportant, important: true)
                         }
-                        
                         FavoritesSection(favorites: store.favorites, important: false)
                     }
-                    .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                    .refreshable {
-                        await send(.onRefresh).finish()
-                    }
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text("Favorites", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
+            .onRefresh {
+                await send(.onRefresh).finish()
+            }
+            ._inScrollContentDetector(isEnabled: isLegacyFloatingNavigationEnabled, state: $navigationMinimized)
+            .overlay {
+                if store.shouldShowEmptyState {
+                    EmptyFavorites()
+                }
+            }
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if isLegacyFloatingNavigationEnabled {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
@@ -74,11 +75,14 @@ public struct FavoritesScreen: View {
                     .padding(.bottom, 8)
                 }
             }
+            .animation(.default, value: store.isLoading)
+            .animation(.default, value: store.shouldShowEmptyState)
             .animation(.default, value: store.favoritesImportant)
             .animation(.default, value: store.favorites)
+            .disabled(store.shouldShowEmptyState)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    if store.isUserAuthorized {
+                    if !store.isLoading, !store.shouldShowEmptyState, store.isUserAuthorized {
                         Menu {
                             ContextButton(
                                 text: LocalizedStringResource("Sort", bundle: .module),
@@ -236,12 +240,16 @@ public struct FavoritesScreen: View {
                     }
                 }
                 .contextMenu {
-                    if !favorite.isForum {
-                        TopicContextMenu(favorite: favorite)
-                    }
-                    
-                    Section {
-                        CommonContextMenu(favorite: favorite)
+                    WithPerceptionTracking {
+                        if !store.isLoading {
+                            if !favorite.isForum {
+                                TopicContextMenu(favorite: favorite)
+                            }
+                            
+                            Section {
+                                CommonContextMenu(favorite: favorite)
+                            }
+                        }
                     }
                 }
                 .listRowBackground(
@@ -336,18 +344,67 @@ public struct FavoritesScreen: View {
 
 // MARK: - Previews
 
-#Preview {
+#Preview("Favorites") {
     @Shared(.userSession) var userSession
     $userSession.withLock { $0 = .mock }
     
     return NavigationStack {
         FavoritesScreen(
             store: Store(
-                initialState: FavoritesFeature.State(
-                    favorites: [.mock, .mockUnread]
-                )
+                initialState: FavoritesFeature.State()
             ) {
                 FavoritesFeature()
+            } withDependencies: {
+                $0.apiClient.getFavorites = { @Sendable _, _ in
+                    return AsyncThrowingStream { continuation in
+                        Task {
+                            try? await Task.sleep(for: .seconds(1))
+                            continuation.yield(with: .success(.mockTwoPages))
+                            continuation.finish()
+                        }
+                    }
+                }
+            }
+        )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Favorites Loading") {
+    @Shared(.userSession) var userSession
+    $userSession.withLock { $0 = .mock }
+    
+    return NavigationStack {
+        FavoritesScreen(
+            store: Store(
+                initialState: FavoritesFeature.State()
+            ) {
+                FavoritesFeature()
+            } withDependencies: {
+                $0.apiClient.getFavorites = { @Sendable _, _ in
+                    return AsyncThrowingStream { _ in }
+                }
+            }
+        )
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Favorites Empty") {
+    NavigationStack {
+        FavoritesScreen(
+            store: Store(
+                initialState: FavoritesFeature.State()
+            ) {
+                FavoritesFeature()
+            } withDependencies: {
+                $0.apiClient.getFavorites = { @Sendable _, _ in
+                    return AsyncThrowingStream { continuation in
+                        continuation.yield(with: .success(.mockEmpty))
+                    }
+                }
             }
         )
     }

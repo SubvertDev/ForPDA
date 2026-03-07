@@ -20,7 +20,22 @@ public struct Favorite: Codable, Hashable, Sendable {
 
 public extension Favorite {
     static let mock = Favorite(
-        favorites: [.mock],
+        favorites: [.mock()],
         favoritesCount: 1
+    )
+    
+    static let mockTwoPages = Favorite(
+        favorites: (1..<35).map { _ in .mock() },
+        favoritesCount: 35
+    )
+    
+    static let mockLoading = Favorite(
+        favorites: (1..<20).map { _ in .mock() },
+        favoritesCount: 20
+    )
+    
+    static let mockEmpty = Favorite(
+        favorites: [],
+        favoritesCount: 0
     )
 }
