@@ -313,6 +313,8 @@ public struct WriteFormFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$destination, action: \.destination)
+        
+        Analytics()
     }
 }
 
