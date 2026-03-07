@@ -8,7 +8,6 @@
 import SwiftUI
 import ComposableArchitecture
 import APIClient
-import CryptoKit
 
 @Reducer
 public struct UploadBoxFeature: Reducer, Sendable {
@@ -63,7 +62,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
         
         let type: UploadBoxType
         public var allowedExtensions: [String]
-        var files: [UploadBoxFile]
+        public var files: [UploadBoxFile]
         
         var uploadQueue: [UploadBoxFile.FileSource] = []
         var isAnyFileUploading = false
@@ -360,11 +359,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                         return
                     }
                     
-                    let request = UploadRequest(
-                        fileName: file.name,
-                        fileData: data,
-                        isQms: false
-                    )
+                    let request = UploadRequest(fileName: file.name, fileData: data, isQms: false)
                     
                     await send(.delegate(.someFileUploading))
                     
