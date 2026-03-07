@@ -77,12 +77,12 @@ let package = Package(
 
         // Other
         .package(url: "https://github.com/CSolanaM/SkeletonUI", exact: "2.0.2"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa", exact: "9.5.0"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", exact: "9.6.0"),
         .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", exact: "0.5.2"),
         .package(url: "https://github.com/hyperoslo/Cache", exact: "7.4.0"),
         .package(url: "https://github.com/kean/Nuke", exact: "12.8.0"),
         .package(url: "https://github.com/kirualex/SwiftyGif", exact: "5.4.5"),
-        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.41.2"),
+        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.45.1"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", exact: "1.0.1"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", exact: "7.0.0"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", exact: "2.0.5"),

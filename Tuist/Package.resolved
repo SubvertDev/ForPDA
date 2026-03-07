@@ -1,5 +1,5 @@
 {
-  "originHash" : "624758e3f2c2ca0871e73dcb9971b38858a1e31e06e634f8f0442ce10c0548cf",
+  "originHash" : "183145e4c9a75328b5a25869e9dacde50b9d9e0e3010e75bcd09dbd3e988e3ee",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -42,7 +42,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/Chat",
       "state" : {
-        "branch" : "44a08c5",
+        "branch" : "main",
         "revision" : "44a08c5141ac32dde14e5707ad25d8bbed5be0e9"
       }
     },
@@ -110,12 +110,21 @@
       }
     },
     {
+      "identity" : "plcrashreporter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/microsoft/plcrashreporter.git",
+      "state" : {
+        "revision" : "0254f941c646b1ed17b243654723d0f071e990d0",
+        "version" : "1.12.2"
+      }
+    },
+    {
       "identity" : "posthog-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "38dc32a8b80da53ed6736a7ea696b324881c3d40",
-        "version" : "3.41.2"
+        "revision" : "759a19e1e824bc80dde9cd4ff9a8204a4f50752e",
+        "version" : "3.45.1"
       }
     },
     {
@@ -132,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "c97459fd75243c620a09a1e6219e63aaec37555e",
-        "version" : "9.5.0"
+        "revision" : "990135f0881e56ac6b39404de0f5b0cd0dcf2131",
+        "version" : "9.6.0"
       }
     },
     {
