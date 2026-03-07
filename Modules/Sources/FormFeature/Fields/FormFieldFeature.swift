@@ -16,7 +16,7 @@ public struct FormFieldFeature: Reducer {
     
     @ObservableState
     public enum State: Equatable, Identifiable, FormFieldConformable {
-        var flag: FormFlag { return [] }
+        var flag: FormFieldFlag { return [] }
         
         case checkBoxList(FormCheckBoxListFeature.State)
         case dropdown(FormDropdownFeature.State)

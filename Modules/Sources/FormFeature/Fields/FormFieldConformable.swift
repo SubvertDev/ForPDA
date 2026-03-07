@@ -8,7 +8,7 @@
 import Models
 
 protocol FormFieldConformable: Identifiable {
-    var flag: FormFlag { get }
+    var flag: FormFieldFlag { get }
     var isRequired: Bool { get }
     
     func isValid() -> Bool

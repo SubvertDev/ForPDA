@@ -18,7 +18,7 @@ public enum FormFieldType: Sendable, Equatable, Hashable {
         public let name: String
         public let description: String
         public let example: String
-        public let flag: FormFlag
+        public let flag: FormFieldFlag
         public let defaultValue: String
         
         public init(
@@ -26,7 +26,7 @@ public enum FormFieldType: Sendable, Equatable, Hashable {
             name: String,
             description: String,
             example: String,
-            flag: FormFlag,
+            flag: FormFieldFlag,
             defaultValue: String
         ) {
             self.id = id

@@ -20,7 +20,7 @@ public struct FormTitleFeature: Reducer {
     public struct State: Equatable, FormFieldConformable {
         public let id: Int
         let text: String
-        let flag: FormFlag = []
+        let flag: FormFieldFlag = []
         
         public init(id: Int, text: String) {
             self.id = id

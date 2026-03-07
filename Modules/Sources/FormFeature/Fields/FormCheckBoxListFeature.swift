@@ -21,7 +21,7 @@ public struct FormCheckBoxListFeature: Reducer {
         public let id: Int
         let title: String
         let description: String
-        let flag: FormFlag
+        let flag: FormFieldFlag
         let options: [String]
         
         var selectedOptions: [Int: Bool]
@@ -30,7 +30,7 @@ public struct FormCheckBoxListFeature: Reducer {
             id: Int,
             title: String,
             description: String,
-            flag: FormFlag,
+            flag: FormFieldFlag,
             options: [String]
         ) {
             self.id = id

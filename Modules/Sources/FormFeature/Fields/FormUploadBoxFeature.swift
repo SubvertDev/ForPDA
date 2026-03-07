@@ -24,7 +24,7 @@ public struct FormUploadBoxFeature: Reducer {
         public let id: Int
         let title: String
         let description: String
-        let flag: FormFlag
+        let flag: FormFieldFlag
         let allowedExtensions: [String]
         let isHidden: Bool
         public var isLocked: Bool
@@ -35,7 +35,7 @@ public struct FormUploadBoxFeature: Reducer {
             id: Int,
             title: String,
             description: String,
-            flag: FormFlag,
+            flag: FormFieldFlag,
             allowedExtensions: [String],
             isHidden: Bool,
             isLocked: Bool = false

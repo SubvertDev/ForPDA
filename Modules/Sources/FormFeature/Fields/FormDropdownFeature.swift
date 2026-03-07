@@ -22,7 +22,7 @@ public struct FormDropdownFeature: Reducer {
         public let id: Int
         let title: String
         let description: String
-        let flag: FormFlag
+        let flag: FormFieldFlag
         let options: [String]
         public var selectedOption: String
         
@@ -30,7 +30,7 @@ public struct FormDropdownFeature: Reducer {
             id: Int,
             title: String,
             description: String,
-            flag: FormFlag,
+            flag: FormFieldFlag,
             options: [String]
         ) {
             self.id = id

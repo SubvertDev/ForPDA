@@ -23,7 +23,7 @@ public struct FormEditorFeature: Reducer {
         let title: String
         let description: String
         let placeholder: String
-        let flag: FormFlag
+        let flag: FormFieldFlag
         let uploadBox: FormStickedUploadBox?
         public var text = ""
         
@@ -32,7 +32,7 @@ public struct FormEditorFeature: Reducer {
             title: String = "",
             description: String = "",
             placeholder: String = "",
-            flag: FormFlag,
+            flag: FormFieldFlag,
             defaultText: String = "",
             uploadBox: FormStickedUploadBox? = nil
         ) {
