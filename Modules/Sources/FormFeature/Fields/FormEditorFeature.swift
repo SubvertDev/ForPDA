@@ -24,6 +24,7 @@ public struct FormEditorFeature: Reducer {
         let description: String
         let placeholder: String
         let flag: FormFlag
+        let uploadBox: FormStickedUploadBox?
         public var text = ""
         
         public init(
@@ -32,7 +33,8 @@ public struct FormEditorFeature: Reducer {
             description: String = "",
             placeholder: String = "",
             flag: FormFlag,
-            defaultText: String = ""
+            defaultText: String = "",
+            uploadBox: FormStickedUploadBox? = nil
         ) {
             self.id = id
             self.title = title
@@ -40,10 +42,21 @@ public struct FormEditorFeature: Reducer {
             self.placeholder = placeholder
             self.flag = flag
             self.text = defaultText
+            self.uploadBox = uploadBox
         }
         
         func getValue() -> FormValue {
             return .string(text)
+        }
+        
+        func getAttachments() -> [Int] {
+            var attachments: [Int] = []
+            for file in bbPanel.existsFiles {
+                if let serverId = file.serverId {
+                    attachments.append(serverId)
+                }
+            }
+            return attachments
         }
         
         func isValid() -> Bool {

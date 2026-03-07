@@ -403,7 +403,8 @@ struct FormFeatureTests {
             title: "Файлы",
             description: "",
             flag: [.required, .uploadable],
-            allowedExtensions: ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"]
+            allowedExtensions: ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"],
+            isHidden: true
         )
         
         await store.send(.view(.onAppear)) {

@@ -22,6 +22,16 @@ extension FormValue {
         }
         return document
     }
+    
+    static func getIntArray(_ values: [FormValue]) -> [Int] {
+        var array: [Int] = []
+        for value in values {
+            if case let .integer(int) = value {
+                array.append(int)
+            }
+        }
+        return array
+    }
 }
 
 private extension PDAPIDocument {

@@ -26,6 +26,7 @@ public struct FormUploadBoxFeature: Reducer {
         let description: String
         let flag: FormFlag
         let allowedExtensions: [String]
+        let isHidden: Bool
         public var isLocked: Bool
         
         var uploadedFilesIds: [Int] = []
@@ -36,6 +37,7 @@ public struct FormUploadBoxFeature: Reducer {
             description: String,
             flag: FormFlag,
             allowedExtensions: [String],
+            isHidden: Bool,
             isLocked: Bool = false
         ) {
             self.id = id
@@ -43,6 +45,7 @@ public struct FormUploadBoxFeature: Reducer {
             self.description = description
             self.flag = flag
             self.allowedExtensions = allowedExtensions
+            self.isHidden = isHidden
             self.isLocked = isLocked
         }
         
@@ -121,21 +124,23 @@ struct FormUploadBoxRow: View {
     
     var body: some View {
         WithPerceptionTracking {
-            VStack(spacing: 6) {
-                FieldSection(
-                    title: store.title,
-                    description: store.description,
-                    required: store.isRequired
-                ) {
-                    WithPerceptionTracking {
-                        UploadBoxView(store: store.scope(state: \.upload, action: \.upload))
+            if !store.isHidden {
+                VStack(spacing: 6) {
+                    FieldSection(
+                        title: store.title,
+                        description: store.description,
+                        required: store.isRequired
+                    ) {
+                        WithPerceptionTracking {
+                            UploadBoxView(store: store.scope(state: \.upload, action: \.upload))
+                        }
                     }
                 }
-            }
-            .tint(tintColor)
-            .disabled(store.isLocked)
-            .onAppear {
-                send(.onAppear)
+                .tint(tintColor)
+                .disabled(store.isLocked)
+                .onAppear {
+                    send(.onAppear)
+                }
             }
         }
     }
@@ -151,7 +156,8 @@ struct FormUploadBoxRow: View {
                 title: "File skin",
                 description: "Supported formats: jpg, jpeg, gif, png",
                 flag: .required,
-                allowedExtensions: ["jpg", "jpeg", "gif", "png"]
+                allowedExtensions: ["jpg", "jpeg", "gif", "png"],
+                isHidden: false
             )
         ) {
             FormUploadBoxFeature()

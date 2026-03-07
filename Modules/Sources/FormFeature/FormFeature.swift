@@ -77,10 +77,28 @@ public struct FormFeature: Reducer, Sendable {
         }
         
         var content: [FormValue] {
-            if rows.count == 1, case let .editor(editorState) = rows.first {
-                return [.string(editorState.text)]
+            if case let .editor(editorState) = rows.first {
+                if rows.count == 1 { // report
+                    return [.string(editorState.text)]
+                } else if rows.count == 2 { // simple post
+                    let attachments = editorState.getAttachments()
+                    return [.string(editorState.text), .array(attachments.map { .integer($0) })]
+                } else {
+                    fatalError("Incorrect data? \(rows)")
+                }
             } else {
-                return rows.map { $0.getValue() }
+                var content: [FormValue] = []
+                var combinedAttachments: [Int] = []
+                for row in rows {
+                    if case let .editor(state) = row, state.uploadBox != nil {
+                        combinedAttachments = state.getAttachments()
+                    } else if case let .uploadBox(state) = row, state.isHidden {
+                        content.append(.array(combinedAttachments.map { .integer($0) }))
+                    } else {
+                        content.append(row.getValue())
+                    }
+                }
+                return content
             }
         }
         
@@ -207,9 +225,19 @@ public struct FormFeature: Reducer, Sendable {
                         let editorState = FormEditorFeature.State(
                             id: 0,
                             flag: [.required, .uploadable],
-                            defaultText: content
+                            defaultText: content,
+                            uploadBox: .init(id: 1, allowedExtensions: [])
+                        )
+                        let uploadBoxState = FormUploadBoxFeature.State(
+                            id: 1,
+                            title: "",
+                            description: "",
+                            flag: [.uploadable],
+                            allowedExtensions: [],
+                            isHidden: true
                         )
                         state.rows.append(.editor(editorState))
+                        state.rows.append(.uploadBox(uploadBoxState))
                         state.focusedField = 0
                         
                     case .template:
@@ -222,7 +250,7 @@ public struct FormFeature: Reducer, Sendable {
                     return .send(.internal(.loadForm(id: forumId, isTopic: true)))
                     
                 case .report:
-                    let editorState = FormEditorFeature.State(id: 0, flag: .required)
+                    let editorState = FormEditorFeature.State(id: 0, flag: .required, uploadBox: nil)
                     state.rows.append(.editor(editorState))
                     state.focusedField = 0
                 }
@@ -234,11 +262,15 @@ public struct FormFeature: Reducer, Sendable {
                 let previewState: FormPreviewFeature.State
                 switch state.type {
                 case let .post(type: type, topicId: topicId, content: content):
-                    let content = if case .simple(_, let attachments) = content {
-                        if case let .string(text) = state.content.first {
-                            FormType.PostContentType.simple(text, attachments)
+                    let content = if case .simple = content {
+                        if case let .string(text) = state.content.first,
+                           case let .array(attachments) = state.content.last {
+                            FormType.PostContentType.simple(
+                                text,
+                                FormValue.getIntArray(attachments).map { .init(id: $0, name: "", type: .file)}
+                            )
                         } else {
-                            fatalError("Simple content SHOULD be .string()!")
+                            fatalError("Bad simple post content! \(state.content)")
                         }
                     } else {
                         FormType.PostContentType.template(state.content)
@@ -250,7 +282,7 @@ public struct FormFeature: Reducer, Sendable {
                     
                 case .report:
                     let content = if case let .string(text) = state.content.first { text } else {
-                        fatalError("Simple content SHOULD be .string()!")
+                        fatalError("Report content field should contains only one .string()!")
                     }
                     previewState = FormPreviewFeature.State(
                         formType: .post(type: .new, topicId: 0, content: .simple(content, []))
@@ -277,8 +309,20 @@ public struct FormFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.formResponse(.success(fields))):
-                //print(fields)
-                state.isFormLoading = false
+                var combined: (editorId: Int, uploadBox: FormStickedUploadBox?)? = nil
+                for (index, field) in fields.enumerated() {
+                    if case let .editor(content) = field, content.flag == [.required, .uploadable] {
+                        combined = (index, nil)
+                    } else if case let .uploadbox(content, extensions) = field {
+                        if content.flag == [.required, .uploadable] {
+                            combined = (combined!.editorId, .init(id: index, allowedExtensions: extensions))
+                        } else if let editorId = combined?.editorId, index - 1 == editorId {
+                            // if previous field is editor, that means editor supports upload
+                            combined = (combined!.editorId, .init(id: index, allowedExtensions: extensions))
+                        }
+                    }
+                }
+                
                 for (index, field) in fields.enumerated() {
                     switch field {
                     case let .title(content):
@@ -305,7 +349,8 @@ public struct FormFeature: Reducer, Sendable {
                             description: content.description,
                             placeholder: content.example,
                             flag: content.flag,
-                            defaultText: content.defaultValue
+                            defaultText: content.defaultValue,
+                            uploadBox: index == combined?.editorId ? combined?.uploadBox : nil
                         )
                         state.rows.append(.editor(editorState))
                         
@@ -335,7 +380,8 @@ public struct FormFeature: Reducer, Sendable {
                             title: content.name,
                             description: content.description,
                             flag: content.flag,
-                            allowedExtensions: extensions
+                            allowedExtensions: extensions,
+                            isHidden: index == combined?.uploadBox?.id
                         )
                         state.rows.append(.uploadBox(uploadboxState))
                     }
@@ -357,12 +403,16 @@ public struct FormFeature: Reducer, Sendable {
                         await send(.internal(.templateResponse(result)))
                     }
                     
-                case let .post(type: type, topicId: topicId, content: .simple(_, attachments)):
+                case let .post(type: type, topicId: topicId, content: .simple):
                     let editPostFlag = state.isShowMarkEnabled ? 4 : 0
                     let content = if case let .string(text) = state.content.first { text } else {
-                        fatalError("Simple content SHOULD be .string()!")
+                        fatalError("Bad simple post content: \(state.content)")
                     }
-                    let attachments = attachments.map { $0.id }
+                    let attachments = if case let .array(attachments) = state.content.last {
+                        FormValue.getIntArray(attachments)
+                    } else {
+                        fatalError("Bad simple post attachments: \(state.content)")
+                    }
                     return .run { [
                         content = content,
                         reason = state.editReasonText
