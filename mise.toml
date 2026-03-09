@@ -2,3 +2,5 @@
 ruby = "3.4.8"
 tuist = "4.155.4"
 swiftlint = "0.63.2"
+[settings]
+ruby.compile = false
