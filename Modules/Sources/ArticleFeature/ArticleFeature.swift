@@ -67,6 +67,9 @@ public struct ArticleFeature: Reducer, Sendable {
         public var isShowingVoteResults: Bool
         public var focus: Field?
         
+        var pendingScrollToId: Int?
+        var scrollToId: Int?
+        
         public var canComment: Bool {
             return article?.canComment ?? false
         }
@@ -89,6 +92,7 @@ public struct ArticleFeature: Reducer, Sendable {
             isLoading: Bool = false,
             isRefreshing: Bool = false,
             comments: IdentifiedArrayOf<CommentFeature.State> = [],
+            scrollToId: Int? = nil,
             replyComment: Comment? = nil,
             commentText: String = "",
             isUploadingComment: Bool = false,
@@ -102,6 +106,7 @@ public struct ArticleFeature: Reducer, Sendable {
             self.isLoading = isLoading
             self.isRefreshing = isRefreshing
             self.comments = comments
+            self.pendingScrollToId = scrollToId
             self.replyComment = replyComment
             self.commentText = commentText
             self.isUploadingComment = isUploadingComment
@@ -370,6 +375,10 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._parseArticleElements(.success(let elements)):
                 state.elements = elements
                 state.isLoading = false
+                if let pendingScrollToId = state.pendingScrollToId {
+                    state.scrollToId = pendingScrollToId
+                    state.pendingScrollToId = nil
+                }
                 reportFullyDisplayed(&state)
                 return .run { _ in
                     var urls: [URL] = []
