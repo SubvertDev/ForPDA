@@ -147,7 +147,13 @@ public struct PostRowView: View {
     @ViewBuilder
     private func Footer(_ lastEdit: Post.LastEdit) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Edited: \(lastEdit.username) • \(lastEdit.date.formatted())", bundle: .module)
+            let link = "https://4pda.to/forum/index.php?showuser=\(lastEdit.userId)"
+            Text(LocalizedStringResource("Edited: [\(lastEdit.username)](\(link)) • \(lastEdit.date.formatted())", bundle: .module))
+                .environment(\.openURL, OpenURLAction(handler: { url in
+                    action(.urlTapped(url))
+                    return .handled
+                }))
+            
             if !lastEdit.reason.isEmpty {
                 Text("Reason: \(lastEdit.reason)", bundle: .module)
             }
