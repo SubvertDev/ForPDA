@@ -141,6 +141,7 @@ platform :ios do
         update_build_number(build_number: "1")
         Dir.chdir("..") do
             sh("tuist install")
+            sh("tuist generate --no-open")
             sh("tuist cache --external-only")
             sh("tuist test")
 	    commit_sha = sh("git rev-parse --short=7 HEAD").strip
