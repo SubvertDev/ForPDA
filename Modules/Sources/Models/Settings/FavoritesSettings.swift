@@ -19,6 +19,14 @@ public struct FavoritesSettings: Sendable, Codable, Hashable {
         self.isReverseOrder = isReverseOrder
         self.isUnreadFirst = isUnreadFirst
     }
+    
+    public func asDictionary() -> [String: Any] {
+        return [
+            "isSortByName": isSortByName,
+            "isReverseOrder": isReverseOrder,
+            "isUnreadFirst": isUnreadFirst,
+        ]
+    }
 }
 
 extension FavoritesSettings {

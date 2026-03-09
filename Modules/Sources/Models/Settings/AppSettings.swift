@@ -105,6 +105,26 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.analyticsConfigurationDebug = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationDebug) ?? AppSettings.default.analyticsConfigurationDebug
         self.analyticsConfigurationRelease = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationRelease) ?? AppSettings.default.analyticsConfigurationRelease
     }
+    
+    public func asDictionary() -> [String: Any] {
+        let dictionary: [String: Any] = [
+            "articlesListRowType": articlesListRowType,
+            "bookmarksListRowType": bookmarksListRowType,
+            "startPage": startPage,
+            "topicOpeningStrategy": topicOpeningStrategy,
+            "appColorScheme": appColorScheme,
+            "backgroundTheme": backgroundTheme,
+            "appTintColor": appTintColor,
+            "notifications": notifications.asDictionary(),
+            "backgroundNotifications": backgroundNotifications,
+            "favorites": favorites.asDictionary(),
+            "searchSort": searchSort,
+            "hideTabBarOnScroll": hideTabBarOnScroll,
+            "floatingNavigation": floatingNavigation,
+            "experimentalFloatingNavigation": experimentalFloatingNavigation,
+        ]
+        return ["settings": dictionary]
+    }
 }
 
 public extension AppSettings {
