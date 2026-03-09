@@ -155,8 +155,8 @@ public struct ProfileScreen: View {
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
                     send(.deeplinkTapped(url, .signature))
-                }) {
-                    ($0 as? UITextView)?.textAlignment = .center
+                }) { _ in
+                    // ($0 as? UITextView)?.textAlignment = .center
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
