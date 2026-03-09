@@ -7,6 +7,7 @@
 
 import Foundation
 import ComposableArchitecture
+import APIClient
 import QMSClient
 import PersistenceKeys
 import Models
@@ -166,7 +167,16 @@ public struct QMSFeature: Reducer, Sendable {
                 return .none
                 
             case let .view(.urlTapped(url)):
-                return .send(.delegate(.handleUrl(url)))
+                guard url.absoluteString.contains("act=findpost") else {
+                    return .send(.delegate(.handleUrl(url)))
+                }
+                return .run { send in
+                    @Dependency(\.apiClient) var api
+                    let request = JumpForumRequest(postId: 85632963, topicId: 0, allPosts: true, type: .post)
+                    let response = try await api.jumpForum(request: request)
+                    let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
+                    await send(.delegate(.handleUrl(url)))
+                }
                 
             case .internal(.loadChat):
                 return .run { [id = state.chatId] send in

@@ -164,8 +164,7 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     }
     
     func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if let postIdString = (textAttachment as? AsyncTextAttachment)?.postId, let postId = Int(postIdString) {
-            let url = URL(string: "snapback://\(postId)")!
+        if let url = (textAttachment as? AsyncTextAttachment)?.link {
             onUrlTap?(url)
         } else {
             print("[ERROR] Couldn't extract postId from SnapbackImage")
