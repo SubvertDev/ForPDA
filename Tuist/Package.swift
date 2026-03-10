@@ -34,6 +34,7 @@ import PackageDescription
             "RichTextKit": .framework,
             "SkeletonUI": .framework,
             "SFSafeSymbols": .framework,
+            "SwiftyGif": .framework,
             
             "YouTubePlayerKit": .framework
         ],
