@@ -13,6 +13,14 @@ public enum TopicOpeningStrategy: CaseIterable, Codable, Sendable {
     case unread
     case last
     
+    public var _rawValue: String {
+        switch self {
+        case .first:  return "first"
+        case .unread: return "unread"
+        case .last:   return "last"
+        }
+    }
+    
     public var text: LocalizedStringResource {
         switch self {
         case .first:  return .init("First page", bundle: .module)
