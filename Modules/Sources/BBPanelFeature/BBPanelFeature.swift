@@ -25,7 +25,6 @@ public struct BBPanelFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
-        case sizeTag
         case colorTag
         
         case urlTag
@@ -38,8 +37,7 @@ public struct BBPanelFeature: Reducer, Sendable {
     
     public enum BBPanelViewState {
         case tags
-        case colorPicker
-        case fontSizePicker
+        case fontSizes
     }
     
     // MARK: - State
@@ -54,6 +52,17 @@ public struct BBPanelFeature: Reducer, Sendable {
         public var supportsUpload: Bool
         public var allowedExtensions: [String]
         
+        public var existsFiles: [UploadBoxFile] {
+            get { upload.files }
+            set(files) {
+                if !isUploading {
+                    upload.files = files
+                } else {
+                    fatalError("Could not update files, cause some is uploading (\(upload.files))")
+                }
+            }
+        }
+        
         var tags: [BBPanelTag] = []
         var viewState: BBPanelViewState = .tags
         
@@ -67,11 +76,13 @@ public struct BBPanelFeature: Reducer, Sendable {
         public init(
             for panelType: BBPanelType,
             supportsUpload: Bool = false,
-            allowedExtensions: [String] = []
+            allowedExtensions: [String] = [],
+            existsFiles: [UploadBoxFile] = []
         ) {
             self.panelWith = panelType
             self.supportsUpload = supportsUpload
             self.allowedExtensions = allowedExtensions
+            self.existsFiles = existsFiles
         }
     }
     
@@ -86,11 +97,12 @@ public struct BBPanelFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case tagButtonTapped(BBPanelTag)
+            case fontSizeButtonTapped(Int)
+            case colorButtonTapped(String)
+            case colorCancelButtonTapped
             case alertTagButtonTapped(BBPanelTag)
             case hideUploadBoxButtonTapped
             case returnTagsButtonTapped
-            
-            case colorSelected(String)
         }
         
         case delegate(Delegate)
@@ -114,6 +126,9 @@ public struct BBPanelFeature: Reducer, Sendable {
                 var tags = state.panelWith.kit
                 if state.supportsUpload {
                     tags.insert(.upload, at: 0)
+                    
+                    state.upload.files = state.existsFiles
+                    state.uploadedFiles = state.existsFiles.count
                     state.upload.allowedExtensions = state.allowedExtensions
                 }
                 if case let .post(isCurator, canModerate) = state.panelWith {
@@ -133,11 +148,9 @@ public struct BBPanelFeature: Reducer, Sendable {
                 case .b, .i, .s, .u, .sup, .sub, .offtop, .center, .left, .right, .hide, .code, .cur, .mod, .ex, .quote, .spoiler:
                     return .send(.delegate(.tagTapped(("[\(tag.code)]", "[/\(tag.code)]"))))
                 case .size:
-                    //state.destination = .sizeTag
-                    state.viewState = .fontSizePicker
+                    state.viewState = .fontSizes
                 case .color:
-                    //state.destination = .colorTag
-                    state.viewState = .colorPicker
+                    state.destination = .colorTag
                 case .url:
                     state.destination = .urlTag
                 case .spoilerWithTitle:
@@ -151,13 +164,20 @@ public struct BBPanelFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case let .view(.fontSizeButtonTapped(size)):
+                return .send(.delegate(.tagTapped(("[SIZE=\(size)]", "[/SIZE]"))))
+                
             case .view(.returnTagsButtonTapped):
                 state.viewState = .tags
                 return .none
                 
-            case let .view(.colorSelected(color)):
+            case let .view(.colorButtonTapped(name)):
                 state.destination = nil
-                return .send(.delegate(.tagTapped(("[COLOR=\(color)]", "[/COLOR]"))))
+                return .send(.delegate(.tagTapped(("[COLOR=\(name)]", "[/COLOR]"))))
+                
+            case .view(.colorCancelButtonTapped):
+                state.destination = nil
+                return .none
                 
             case let .view(.alertTagButtonTapped(tag)):
                 let input = state.alertInput

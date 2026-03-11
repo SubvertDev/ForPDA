@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct Field<T: Hashable>: View {
+public struct Field<T: Hashable, BBPanel: View>: View {
     
     // MARK: - Properties
     
@@ -20,6 +20,7 @@ public struct Field<T: Hashable>: View {
     let characterLimit: Int?
     let minHeight: CGFloat?
     var selection: Binding<NSRange?>
+    let bbPanel: () -> BBPanel
     
     // MARK: - Init
     
@@ -30,7 +31,8 @@ public struct Field<T: Hashable>: View {
         focus: FocusState<T?>.Binding,
         characterLimit: Int? = nil,
         minHeight: CGFloat? = nil,
-        selection: Binding<NSRange?> = .constant(nil)
+        selection: Binding<NSRange?> = .constant(nil),
+        @ViewBuilder bbPanel: @escaping () -> BBPanel = { EmptyView() }
     ) {
         self.content = content
         self.placeholder = placeholder
@@ -38,6 +40,7 @@ public struct Field<T: Hashable>: View {
         self.characterLimit = characterLimit
         self.minHeight = minHeight
         self.selection = selection
+        self.bbPanel = bbPanel
         
         self._focus = focus
     }
@@ -45,13 +48,19 @@ public struct Field<T: Hashable>: View {
     // MARK: - Body
     
     public var body: some View {
-        Group {
+        VStack {
             SelectableTextView(
                 content: content,
                 selection: selection,
                 placeholder: placeholder,
                 characterLimit: characterLimit
             )
+            
+            if BBPanel.self != EmptyView.self {
+                Spacer()
+            }
+            
+            bbPanel()
         }
         .padding(.vertical, 15)
         .padding(.horizontal, 12)

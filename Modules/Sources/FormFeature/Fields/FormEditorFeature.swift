@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SharedUI
 import Models
+import BBPanelFeature
 
 // MARK: - Feature
 
@@ -19,6 +20,9 @@ public struct FormEditorFeature: Reducer {
     
     @ObservableState
     public struct State: Equatable, FormFieldConformable {
+        
+        var bbPanel: BBPanelFeature.State
+        
         public let id: Int
         let title: String
         let description: String
@@ -26,6 +30,9 @@ public struct FormEditorFeature: Reducer {
         let flag: FormFieldFlag
         let uploadBox: FormStickedUploadBox?
         public var text = ""
+        public var textRange: NSRange? = nil
+        
+        var focus: Int? = nil
         
         public init(
             id: Int,
@@ -43,6 +50,11 @@ public struct FormEditorFeature: Reducer {
             self.flag = flag
             self.text = defaultText
             self.uploadBox = uploadBox
+            
+            self.bbPanel = BBPanelFeature.State(
+                for: .post(isCurator: false, canModerate: false),
+                supportsUpload: flag.contains(.uploadable)
+            )
         }
         
         func getValue() -> FormValue {
@@ -66,8 +78,14 @@ public struct FormEditorFeature: Reducer {
     
     // MARK: - Action
     
-    public enum Action: BindableAction {
+    public enum Action: ViewAction, BindableAction {
         case binding(BindingAction<State>)
+        case bbPanel(BBPanelFeature.Action)
+        
+        case view(View)
+        public enum View {
+            case onAppear
+        }
     }
     
     // MARK: - Body
@@ -75,7 +93,49 @@ public struct FormEditorFeature: Reducer {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
+        Scope(state: \.bbPanel, action: \.bbPanel) {
+            BBPanelFeature()
+        }
+        
         Reduce<State, Action> { state, action in
+            switch action {
+            case .view(.onAppear):
+                if let uploadBox = state.uploadBox {
+                    return .concatenate(
+                        .send(.binding(.set(\.bbPanel.allowedExtensions, uploadBox.allowedExtensions))),
+                        .send(.binding(.set(\.bbPanel.existsFiles, uploadBox.existsAttachments.map {
+                            .init(
+                                name: $0.name,
+                                type: $0.type == .image ? .image : .file,
+                                serverId: $0.id
+                            )
+                        })))
+                    )
+                }
+                
+            case let .bbPanel(.delegate(.tagTapped(tag))):
+                if let range = state.textRange, !state.text.isEmpty {
+                    // если мы вставляем бб код в текст БЕЗ выделенной области
+                    if range.lowerBound == range.upperBound {
+                        let index = state.text.index(state.text.startIndex, offsetBy: range.lowerBound)
+                        state.text.insert(contentsOf: "\(tag.0)\(tag.1)", at: index)
+                        state.textRange = NSMakeRange(range.lowerBound + tag.0.count, 0)
+                    } else {
+                        let ubIndex = state.text.index(state.text.startIndex, offsetBy: range.upperBound)
+                        let lbIndex = state.text.index(state.text.startIndex, offsetBy: range.lowerBound)
+                        state.text.insert(contentsOf: tag.1, at: ubIndex)
+                        state.text.insert(contentsOf: tag.0, at: lbIndex)
+                        state.textRange = NSMakeRange(range.lowerBound + tag.0.count, range.upperBound - range.lowerBound)
+                    }
+                } else {
+                    state.text = "\(tag.0)\(tag.1)"
+                    state.textRange = NSMakeRange(tag.0.count, 0)
+                }
+                state.focus = state.id
+                
+            case .binding, .bbPanel:
+                break
+            }
             return .none
         }
     }
@@ -83,6 +143,7 @@ public struct FormEditorFeature: Reducer {
 
 // MARK: - View
 
+@ViewAction(for: FormEditorFeature.self)
 struct FormEditorRow: View {
     
     @Perception.Bindable var store: StoreOf<FormEditorFeature>
@@ -101,9 +162,20 @@ struct FormEditorRow: View {
                         placeholder: LocalizedStringResource(stringLiteral: store.placeholder),
                         focusEqual: store.id,
                         focus: $focusedField,
-                        minHeight: 144
+                        minHeight: 144,
+                        selection: $store.textRange,
+                        bbPanel: {
+                            BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                                .onTapGesture {
+                                    focusedField = store.id
+                                }
+                        }
                     )
                 }
+            }
+            .bind($focusedField, to: $store.focus)
+            .onAppear {
+                send(.onAppear)
             }
         }
     }

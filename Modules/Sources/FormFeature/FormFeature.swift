@@ -77,15 +77,9 @@ public struct FormFeature: Reducer, Sendable {
         }
         
         var content: [FormValue] {
-            if case let .editor(editorState) = rows.first {
-                if rows.count == 1 { // report
-                    return [.string(editorState.text)]
-                } else if rows.count == 2 { // simple post
-                    let attachments = editorState.getAttachments()
-                    return [.string(editorState.text), .array(attachments.map { .integer($0) })]
-                } else {
-                    fatalError("Incorrect data? \(rows)")
-                }
+            if rows.count == 1, case let .editor(editorState) = rows.first {
+                let attachments = editorState.getAttachments()
+                return [.string(editorState.text), .array(attachments.map { .integer($0) })]
             } else {
                 var content: [FormValue] = []
                 var combinedAttachments: [Int] = []
@@ -221,23 +215,14 @@ public struct FormFeature: Reducer, Sendable {
                     }
                     
                     switch content {
-                    case let .simple(content, _):
+                    case let .simple(content, attachments):
                         let editorState = FormEditorFeature.State(
                             id: 0,
                             flag: [.required, .uploadable],
                             defaultText: content,
-                            uploadBox: .init(id: 1, allowedExtensions: [])
-                        )
-                        let uploadBoxState = FormUploadBoxFeature.State(
-                            id: 1,
-                            title: "",
-                            description: "",
-                            flag: .uploadable,
-                            allowedExtensions: [], // server will decide
-                            isHidden: true
+                            uploadBox: .init(id: 1, existsAttachments: attachments, allowedExtensions: [])
                         )
                         state.rows.append(.editor(editorState))
-                        state.rows.append(.uploadBox(uploadBoxState))
                         state.focusedField = 0
                         
                     case .template:

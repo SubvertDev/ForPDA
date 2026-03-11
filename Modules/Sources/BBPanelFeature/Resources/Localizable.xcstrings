@@ -12,7 +12,14 @@
       }
     },
     "Attachments" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вложения"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -20,19 +27,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
-          }
-        }
-      }
-    },
-    "ColorPicker" : {
-
-    },
-    "Colors" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цвета"
           }
         }
       }
@@ -107,12 +101,12 @@
         }
       }
     },
-    "Select text size" : {
+    "Select color" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select text size"
+            "value" : "Выберите цвет"
           }
         }
       }
