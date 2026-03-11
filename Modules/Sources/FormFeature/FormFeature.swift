@@ -79,13 +79,14 @@ public struct FormFeature: Reducer, Sendable {
         var content: [FormValue] {
             if rows.count == 1, case let .editor(editorState) = rows.first {
                 let attachments = editorState.getAttachments()
-                return [.string(editorState.text), .array(attachments.map { .integer($0) })]
+                return [editorState.getValue(), .array(attachments.map { .integer($0) })]
             } else {
                 var content: [FormValue] = []
                 var combinedAttachments: [Int] = []
                 for row in rows {
                     if case let .editor(state) = row, state.uploadBox != nil {
                         combinedAttachments = state.getAttachments()
+                        content.append(row.getValue())
                     } else if case let .uploadBox(state) = row, state.isHidden {
                         content.append(.array(combinedAttachments.map { .integer($0) }))
                     } else {
