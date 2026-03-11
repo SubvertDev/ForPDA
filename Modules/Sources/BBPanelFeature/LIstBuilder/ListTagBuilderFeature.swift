@@ -22,15 +22,10 @@ public struct ListTagBuilderFeature: Reducer, Sendable {
         
         var focus: Field?
         
-        var listItems: [ListItemField] = []
+        var listItems: [String] = [""]
         
         var isAddItemButtonDisabled: Bool {
-            for item in listItems {
-                if item.content.isEmpty {
-                    return true
-                }
-            }
-            return false
+            return listItems.contains(where: { $0.isEmpty })
         }
         
         public init(
@@ -72,13 +67,12 @@ public struct ListTagBuilderFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                state.listItems.append(.init(id: 0, content: ""))
                 state.focus = .item(0)
                 return .none
                 
             case .view(.addListItemButtonTapped):
                 let newId = state.listItems.count
-                state.listItems.append(.init(id: newId, content: ""))
+                state.listItems.append("")
                 state.focus = .item(newId)
                 return .none
                 
@@ -88,7 +82,7 @@ public struct ListTagBuilderFeature: Reducer, Sendable {
                     if item != state.listItems.first {
                         leftTag.append("\n")
                     }
-                    leftTag.append("[*]\(item.content)")
+                    leftTag.append("[*]\(item)")
                 }
                 return .send(.delegate(.listTagBuilded((leftTag, "[/LIST]"))))
                 

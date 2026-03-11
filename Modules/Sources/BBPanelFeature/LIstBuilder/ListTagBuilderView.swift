@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SharedUI
 
 @ViewAction(for: ListTagBuilderFeature.self)
 public struct ListTagBuilderView: View {
@@ -34,8 +35,8 @@ public struct ListTagBuilderView: View {
                 
                 List {
                     Section {
-                        ForEach(store.listItems) { item in
-                            ItemField(id: item.id)
+                        ForEach(0..<store.listItems.count, id: \.self) { index in
+                            ItemField(id: index)
                         }
                         
                         AddItemButton()
@@ -53,24 +54,7 @@ public struct ListTagBuilderView: View {
             .navigationBarTitleDisplayMode(.inline)
             .bind($store.focus, to: $focus)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        send(.cancelButtonTapped)
-                    } label: {
-                        Text("Cancel", bundle: .module)
-                            .foregroundStyle(tintColor)
-                    }
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        send(.createButtonTapped)
-                    } label: {
-                        Text("Create", bundle: .module)
-                            .foregroundStyle(tintColor)
-                    }
-                    .disabled(store.isAddItemButtonDisabled)
-                }
+                Toolbar()
             }
             .onAppear {
                 send(.onAppear)
@@ -95,18 +79,52 @@ public struct ListTagBuilderView: View {
     // MARK: - Item Field
     
     @ViewBuilder
-    public func ItemField(id: Int) -> some View {
-        TextField(text: $store.listItems[id].content, axis: .vertical) {
-            Text("Item \(id + 1)", bundle: .module)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.quaternary))
+    private func ItemField(id: Int) -> some View {
+        WithPerceptionTracking {
+            TextField(text: $store.listItems[id], axis: .vertical) {
+                Text("Item \(id + 1)", bundle: .module)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.quaternary))
+            }
+            .padding(.vertical, 11)
+            .focused($focus, equals: .item(id))
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minHeight: 44)
+            .cornerRadius(10)
         }
-        .padding(.vertical, 11)
-        .focused($focus, equals: .item(id))
-        .multilineTextAlignment(.leading)
-        .fixedSize(horizontal: false, vertical: true)
-        .frame(minHeight: 44)
-        .cornerRadius(10)
+    }
+    
+    // MARK: - Toolbar
+    
+    @ToolbarContentBuilder
+    private func Toolbar() -> some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button {
+                send(.cancelButtonTapped)
+            } label: {
+                if isLiquidGlass {
+                    Image(systemSymbol: .xmark)
+                } else {
+                    Text("Cancel", bundle: .module)
+                }
+            }
+            .tint(tintColor)
+        }
+        
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                send(.createButtonTapped)
+            } label: {
+                if isLiquidGlass {
+                    Image(systemSymbol: .checkmark)
+                } else {
+                    Text("Create", bundle: .module)
+                }
+            }
+            .tint(tintColor)
+            .disabled(store.isAddItemButtonDisabled)
+        }
     }
 }
 
@@ -124,4 +142,5 @@ public struct ListTagBuilderView: View {
             }
         )
     }
+    .environment(\.tintColor, Color(.Theme.primary))
 }
