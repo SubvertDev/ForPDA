@@ -232,8 +232,8 @@ public struct FormFeature: Reducer, Sendable {
                             id: 1,
                             title: "",
                             description: "",
-                            flag: [.uploadable],
-                            allowedExtensions: [],
+                            flag: .uploadable,
+                            allowedExtensions: [], // server will decide
                             isHidden: true
                         )
                         state.rows.append(.editor(editorState))

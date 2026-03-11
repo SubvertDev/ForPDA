@@ -41,7 +41,7 @@ struct EditReasonView: View {
             if isEditingReasonEnabled {
                 Field(
                     content: $text,
-                    placeholder: LocalizedStringResource("Input reason"),
+                    placeholder: LocalizedStringResource("Input reason", bundle: .module),
                     focusEqual: id,
                     focus: $focusedField
                 )

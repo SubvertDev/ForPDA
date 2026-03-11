@@ -37,7 +37,7 @@ public struct FormScreen: View {
                         FormFieldRow(store: fieldStore, focusedField: $focusedField)
                     }
                     
-                    if store.rows.count == 1 && store.inPostEditingMode {
+                    if store.inPostEditingMode {
                         EditReasonView(
                             id: 1,
                             text: $store.editReasonText,
