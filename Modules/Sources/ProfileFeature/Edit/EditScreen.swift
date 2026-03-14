@@ -80,10 +80,7 @@ public struct EditScreen: View {
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             ._safeAreaBar(edge: .bottom) {
-                if focus == .about || focus == .signature {
-                    BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
-                        .padding(isLiquidGlass ? 8 : 0)
-                }
+                SendButton()
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
