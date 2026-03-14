@@ -41,6 +41,10 @@ public struct QMSScreen: View {
                             UIPasteboard.general.string = message.text
                         }
                     }
+                    .enableLoadMore { _ in
+                        await send(.loadMoreTriggered)
+                    }
+                    .linkPreviewsDisabled()
                     .messageUseStyler { string in
                         return QMSBuilder(text: string).build()
                     }

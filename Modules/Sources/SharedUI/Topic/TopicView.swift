@@ -406,7 +406,7 @@ struct QuoteView: View {
             HStack(spacing: 0) {
                 if let postId {
                     Button {
-                        onUrlTap?(URL(string: "snapback://\(postId)")!)
+                        onUrlTap?(URL(string: "https://4pda.to/forum/index.php?act=findpost&pid=\(postId)")!)
                     } label: {
                         Image(systemSymbol: .arrowLeftSquare)
                             .frame(width: 16, height: 16)

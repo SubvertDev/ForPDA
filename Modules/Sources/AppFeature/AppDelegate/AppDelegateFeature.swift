@@ -84,6 +84,19 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             }
                             //if granted { await application.registerForRemoteNotifications() }
                         }
+                        
+                        group.addTask {
+                            var properties: [String: Any] = [:]
+                            
+                            @Shared(.appSettings) var appSettings
+                            let settingsProperties = appSettings.asDictionary()
+                            let a11yProperties = await AccessibilityAnalytics.current(for: .current).asDictionary()
+                            
+                            properties.merge(settingsProperties) { old, new in new }
+                            properties.merge(a11yProperties) { old, new in new }
+                            
+                            analyticsClient.setUserProperties(properties: properties)
+                        }
                     }
                 }
                 

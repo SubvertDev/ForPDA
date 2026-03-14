@@ -72,12 +72,14 @@ extension NotificationsClient: DependencyKey {
     
     public static var liveValue: Self {
         @Dependency(\.analyticsClient) var analyticsClient
+        @Dependency(\.cacheClient) var cacheClient
         @Dependency(\.logger[.notifications]) var logger
         
         let eventSubject = PassthroughSubject<NotificationEvent, Never>()
         // TODO: Make proper previewValue
         let isPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
-        let unreadSubject = CurrentValueSubject<Unread, Never>(isPreview ? .mockBadges : .mockEmpty)
+        let startValue = cacheClient.getUnread() ?? .mockEmpty
+        let unreadSubject = CurrentValueSubject<Unread, Never>(isPreview ? .mockBadges : startValue)
         
         let center = UNUserNotificationCenter.current()
         let context: LockIsolated<NotificationContext?> = .init(nil)
@@ -208,7 +210,16 @@ extension NotificationsClient: DependencyKey {
                 unreadSubject.send(unread)
                 
                 do {
-                    let badgeCount = unread.favoritesUnreadCount + unread.mentionsUnreadCount + unread.qmsUnreadCount
+                    @Shared(.appSettings) var appSettings
+                    let notifications = appSettings.notifications
+
+                    let badgeCount =
+                    (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
+                    (notifications.isForumEnabled ? unread.forumCount : 0) +
+                    (notifications.isTopicsEnabled ? unread.topicCount : 0) +
+                    (notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
+                    (notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+                    
                     logger.info("Setting app notifications badge to \(badgeCount)")
                     try await center.setBadgeCount(badgeCount)
                 } catch {

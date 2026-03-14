@@ -35,6 +35,7 @@ import NotificationsClient
 import ToastClient
 import Combine
 import SearchResultFeature
+import CacheClient
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -337,8 +338,18 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case let .updateBadges(unread):
-                state.favoritesBadges = unread.favoritesUnreadCount
-                state.profileBadges = unread.qmsUnreadCount + unread.mentionsUnreadCount
+                let favoritesBadges =
+                (state.appSettings.notifications.isForumEnabled ? unread.forumCount : 0) +
+                (state.appSettings.notifications.isTopicsEnabled ? unread.topicCount : 0)
+                state.favoritesBadges = favoritesBadges
+                
+                let profileBadges =
+                (state.appSettings.notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
+                (state.appSettings.notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
+                (state.appSettings.notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+                state.profileBadges = profileBadges
+                
+                cacheClient.setUnread(unread)
                 return .none
                 
             case ._failedToConnect:
@@ -447,7 +458,7 @@ public struct AppFeature: Reducer, Sendable {
                     }
                     
                     if isLoggedIn, newPhase == .background {
-                        // await send(.registerBackgroundTask)
+                        await send(.registerBackgroundTask)
                     }
                     
                     if newPhase == .background {
@@ -457,50 +468,55 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .registerBackgroundTask:
                 // return .send(.syncUnreadTaskInvoked) // For test purposes
+                guard state.appSettings.backgroundNotifications else { return .none }
+                
                 let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
+                request.earliestBeginDate = .now.addingTimeInterval(15 * 60) // 15 minutes by default
                 do {
+                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationBegin))
                     try BGTaskScheduler.shared.submit(request)
-                    logger.info("Successfully scheduled BGAppRefreshTaskRequest")
+                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationSuccess))
+                    logger.info("[AppRefresh] Successfully scheduled BGAppRefreshTaskRequest")
                     // Set breakpoint here and run:
                     // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
                 } catch {
+                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationFailed(error.localizedDescription)))
                     analyticsClient.capture(error)
                 }
                 return .none
                 
             case .backgroundTaskInvoked:
-                return .none
-                
-                // TEMPORARY DISABLED DUE TO BACKGROUND PAUSE BUG
-                
-                // return .run { [appSettings = state.appSettings] send in
-                //     do {
-                //         // Refresh task might pause in background and resume in foreground
-                //         // hence we need to always check current application state
-                //         let appState = await UIApplication.shared.applicationState
-                //         logger.warning("Background task invoked on '\(appState.description, privacy: .public)' state")
-                //
-                //         guard await UIApplication.shared.applicationState == .background else { return }
-                //         guard try await notificationsClient.hasPermission() else { return }
-                //         guard appSettings.notifications.isAnyEnabled else { return }
-                //
-                //         try await apiClient.connect(inBackground: true)
-                //         let unread = try await apiClient.getUnread()
-                //
-                //         guard await UIApplication.shared.applicationState == .background else { return }
-                //         logger.warning("Preparing to show unread notifications")
-                //         await notificationsClient.showUnreadNotifications(unread, [])
-                //         logger.warning("Did show unread notifications")
-                //
-                //         guard await UIApplication.shared.applicationState == .background else { return }
-                //         logger.warning("STOPPING CONNECTION ON BG TASK REQUEST")
-                //         try await apiClient.disconnect()
-                //     } catch {
-                //         analyticsClient.capture(error)
-                //     }
-                //
-                //     await send(.registerBackgroundTask)
-                // }
+                cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .startedSync))
+                return .run { [appSettings = state.appSettings] send in
+                    do {
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .startedAsync))
+                        
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .checkingForPermission))
+                        guard try await notificationsClient.hasPermission() else { return }
+                        logger.info("[AppRefresh] Notifications permission is granted")
+                        
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .checkingForSettings))
+                        guard appSettings.notifications.isAnyEnabled else { return }
+                        logger.info("[AppRefresh] Notifications enabled in settings")
+                        
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .connecting))
+                        try await apiClient.connect(inBackground: true)
+                        logger.info("[AppRefresh] Successfully connected. Fetching notifications...")
+                        
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .gettingNotifications))
+                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        logger.info("[AppRefresh] Successfully fetched. Preparing to show notifications..")
+                        
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .showingNotifications))
+                        await notificationsClient.showUnreadNotifications(unread, [])
+                        logger.info("[AppRefresh] Successfully shown notifications")
+                        
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .success))
+                    } catch {
+                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .failure(error.localizedDescription)))
+                        analyticsClient.capture(error)
+                    }
+                }
                 
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),

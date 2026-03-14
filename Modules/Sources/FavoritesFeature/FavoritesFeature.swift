@@ -196,6 +196,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                         let success = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
                         await toastClient.showToast(status ? success : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
+                        
+                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                 }
                 

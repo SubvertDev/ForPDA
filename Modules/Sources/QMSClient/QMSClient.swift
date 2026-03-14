@@ -17,7 +17,7 @@ import ParsingClient
 public struct QMSClient: Sendable {
     public var loadQMSList: @Sendable () async throws -> QMSList
     public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
-    public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
+    public var loadQMSChat: @Sendable (_ id: Int, _ lastMessageId: Int, _ offset: Int) async throws -> QMSChat
     public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
 }
 
@@ -43,8 +43,8 @@ extension QMSClient: DependencyKey {
                 return try await parser.parseQmsUser(response)
             },
             
-            loadQMSChat: { id in
-                let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
+            loadQMSChat: { id, lastMessageId, offset in
+                let request = QMSViewDialogRequest(dialogId: id, messageId: lastMessageId, limit: offset)
                 let response = try await api.send(QMSCommand.Dialog.view(data: request))
                 return try await parser.parseQmsChat(response)
             },
@@ -68,7 +68,7 @@ extension QMSClient: DependencyKey {
             loadQMSUser: { _ in
                 return .mock
             },
-            loadQMSChat: { id in
+            loadQMSChat: { id, lastMessageId, offset in
                 return await mock.loadQMSChat()
             },
             sendQMSMessage: { chatId, message in
@@ -85,7 +85,7 @@ extension QMSClient: DependencyKey {
         return QMSClient(
             loadQMSList: unimplemented(),
             loadQMSUser: unimplemented(),
-            loadQMSChat: { id in
+            loadQMSChat: { id, lastMessageId, offset in
                 return await mock.loadQMSChat()
             },
             sendQMSMessage: { chatId, message in

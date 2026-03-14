@@ -14,6 +14,22 @@ public struct Unread: Codable, Sendable, Hashable {
     public let mentionsUnreadCount: Int
     public let items: [Item]
     
+    public var forumCount: Int {
+        return items.filter { $0.category == .forum }.count
+    }
+    
+    public var topicCount: Int {
+        return items.filter { $0.category == .topic }.count
+    }
+    
+    public var siteMentionsCount: Int {
+        return items.filter { $0.category == .siteMention }.count
+    }
+    
+    public var forumMentionsCount: Int {
+        return items.filter { $0.category == .forumMention }.count
+    }
+    
     public init(
         date: Date,
         qmsUnreadCount: Int,

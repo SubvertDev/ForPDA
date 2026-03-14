@@ -396,24 +396,10 @@ public struct StackTab: Reducer, Sendable {
     enum DeeplinkHandlingError: Error {
         case failedToParseSamePagePost
         case unknownGoToType(GoTo)
+        case unknownTopicCase(URL)
     }
     
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
-        var url = url
-        
-        if url.absoluteString.prefix(7) == "link://" {
-            return .run { [url] _ in
-                let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
-                await open(url: resultUrl)
-            }
-        }
-        
-        if url.scheme == "snapback" {
-            if case let .forum(.topic(topic)) = state.path.last {
-                url = URL(string: url.absoluteString + "/\(topic.topicId)")!
-            }
-        }
-        
         do {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
@@ -442,14 +428,16 @@ public struct StackTab: Reducer, Sendable {
                         }
                     }
                     
-                    // Different topic or announcement, using app navigation
+                    // Different topic id or non-topic screen, pushing new screen instead
                     state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
-                } else {
+                } else if let (id, _) = state.path.last(is: \.forum.topic) {
                     // Deeplink in the same topic ONLY (inner-inner deeplink case)
-                    if let (id, _) = state.path.last(is: \.forum.topic) {
-                        state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                        return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
-                    }
+                    state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                } else {
+                    // Deeplink from non-topic screen (e.g. QMS) with no targetId
+                    analytics.capture(DeeplinkHandlingError.unknownTopicCase(url))
+                    return .run { [url] _ in await open(url: url) }
                 }
                 
             case let .forum(id: id, page: page):
@@ -476,12 +464,17 @@ public struct StackTab: Reducer, Sendable {
         } catch {
             if case .externalURL = error {
                 // Skipping externalURL case since it's not error per-se
+            } else if case let .fileDownload(url: url) = error {
+                return .run { [url] _ in
+                    let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
+                    await open(url: resultUrl)
+                }
             } else {
                 analytics.capture(error)
             }
+            
+            return .run { [url] _ in await open(url: url) }
         }
-        
-        return .run { [url] _ in await open(url: url) }
     }
 }
 

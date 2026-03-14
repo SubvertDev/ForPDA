@@ -355,7 +355,10 @@ public struct BBBuilder {
         case .snapback(let postId):
             let image = UIImage(resource: .snapback)
             let attachment = AsyncTextAttachment(image: image, displaySize: CGSize(width: 16, height: 16))
-            attachment.postId = postId.string
+            
+            let postId = Int(postId.string)!
+            attachment.link = URL(string: "https://4pda.to/forum/index.php?act=findpost&pid=\(postId)")!
+            
             let textWithAttachment = NSMutableAttributedString(attachment: attachment)
             textWithAttachment.addAttributes([.baselineOffset: -2.5], range: NSRange(location: 0, length: textWithAttachment.length))
             if isFirst {
@@ -388,7 +391,9 @@ public struct BBBuilder {
             }
             
         case .attachment(let attachmentId):
-            let id = Int(attachmentId.string.prefix(upTo: attachmentId.string.firstIndex(of: ":")!).dropFirst())!
+            let split = attachmentId.string.dropFirst().dropLast().split(separator: ":")
+            let id = Int(split.first!)!
+            let name = String(split.last!)
             
             let attachment = attachments.first(where: { $0.id == id })!
             let attachmentString: NSAttributedString
@@ -398,16 +403,17 @@ public struct BBBuilder {
                 asyncAttachment.image = UIImage.placeholder(color: .gray, size: CGSize(width: 32, height: 32)) // TODO: Skeleton loader
                 attachmentString = NSAttributedString(attachment: asyncAttachment)
             } else {
+                let downloadUrl = URL(string: "https://4pda.to/forum/dl/post/\(id)/\(name)")!
                 let image = UIImage(systemSymbol: .arrowDownDoc).withTintColor(.tintColor)//, withConfiguration: config)
                 let textAttachment = AsyncTextAttachment(image: image)//, displaySize: CGSize(width: 16, height: 16))
-                textAttachment.postId = String(id)
+                textAttachment.link = downloadUrl
                 
                 let mutableString = NSMutableAttributedString(attachment: textAttachment)
                 mutableString.addAttribute(.baselineOffset, value: -3, range: .fullRange(of: mutableString))
                 
                 let attachmentName = NSAttributedString(string: attachment.name)
                 mutableString.append(attachmentName)
-                mutableString.addAttribute(.link, value: URL(string: "link://\(id)")!, range: .fullRange(of: mutableString))
+                mutableString.addAttribute(.link, value: downloadUrl, range: .fullRange(of: mutableString))
                 
                 mutableString.append(NSAttributedString(string: " (\(attachment.sizeString))", attributes: [.foregroundColor: UIColor(resource: .Labels.primary)]))
                 mutableString.addAttribute(.font, value: UIFont.defaultBBFont, range: .fullRange(of: mutableString))

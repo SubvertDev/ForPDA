@@ -644,6 +644,11 @@ public struct TopicFeature: Reducer, Sendable {
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
             let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
+            if response.id != topicId {
+                // Handling case where post is in another topic
+                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
+                return await send(.delegate(.handleUrl(url)))
+            }
             let offset = response.offset - (response.offset % topicPerPage)
             await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
             
