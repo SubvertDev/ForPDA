@@ -34,6 +34,7 @@ import PackageDescription
             "RichTextKit": .framework,
             "SkeletonUI": .framework,
             "SFSafeSymbols": .framework,
+            "SwiftyGif": .framework,
             
             "YouTubePlayerKit": .framework
         ],
@@ -61,7 +62,7 @@ let package = Package(
     name: "ForPDA",
     dependencies: [
         // TCA
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.23.2"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.24.1"),
                 
         // TCA Dependencies
         .package(url: "https://github.com/apple/swift-async-algorithms", exact: "1.1.2"),
@@ -69,7 +70,7 @@ let package = Package(
         .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", exact: "1.3.2"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", exact: "1.4.1"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies", exact: "1.11.0"),
-        .package(url: "https://github.com/pointfreeco/swift-navigation", exact: "2.6.0"),
+        .package(url: "https://github.com/pointfreeco/swift-navigation", exact: "2.7.0"),
         .package(url: "https://github.com/pointfreeco/swift-perception", exact: "2.0.9"),
         .package(url: "https://github.com/pointfreeco/swift-sharing", exact: "2.7.4"),
         .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.18.9"),

@@ -626,9 +626,9 @@ public struct AppFeature: Reducer, Sendable {
     private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
         let screen: Path.State
         switch deeplink {
-        case let .article(id, _, _):
+        case let .article(id, _, _, scrollToId):
             let preview = ArticlePreview.innerDeeplink(id: id)
-            screen = .articles(.article(ArticleFeature.State(articlePreview: preview)))
+            screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
         case let .topic(id, goTo):

@@ -55,6 +55,8 @@ extension AnalyticsClient: DependencyKey {
                 PostHogSDK.shared.identify(id, userProperties: userProperties)
             },
             setUserProperties: { properties in
+                // Always make sure that properties are serializable
+                // PostHog will show an error in console when used in debug mode
                 PostHogSDK.shared.setPersonProperties(userPropertiesToSet: properties)
             },
             logout: {

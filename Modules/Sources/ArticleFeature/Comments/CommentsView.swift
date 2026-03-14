@@ -134,6 +134,7 @@ struct CommentView: View {
             .task {
                 await store.send(.onTask).finish()
             }
+            .id(store.comment.id)
         }
     }
     

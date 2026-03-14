@@ -12,7 +12,7 @@ import APIClient
 import Models
 
 public enum Deeplink {
-    case article(id: Int, title: String, imageUrl: URL)
+    case article(id: Int, title: String, imageUrl: URL, scrollToId: Int?)
     case announcement(id: Int)
     case topic(id: Int?, goTo: GoTo)
     case forum(id: Int, page: Int)
@@ -71,7 +71,7 @@ public struct DeeplinkHandler {
             guard let titleEncoded = queryItems.first(where: { $0.name == "title"} )?.value else { throw .noTitle(in: url) }
             guard let title = titleEncoded.removingPercentEncoding else { throw .badTitle(in: url) }
 
-            return .article(id: id, title: title, imageUrl: imageUrl)
+            return .article(id: id, title: title, imageUrl: imageUrl, scrollToId: nil)
             
         case "forum":
             guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
@@ -312,7 +312,7 @@ public struct DeeplinkHandler {
             // Forum mention has topic id in timestamp place
             return Deeplink.topic(id: timestamp, goTo: .post(id: id))
         case .siteMention:
-            return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
+            return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!, scrollToId: timestamp)
         }
     }
 }

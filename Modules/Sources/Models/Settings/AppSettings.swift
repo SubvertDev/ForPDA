@@ -106,19 +106,21 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.analyticsConfigurationRelease = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationRelease) ?? AppSettings.default.analyticsConfigurationRelease
     }
     
+    // _rawValue is a temporary hotfix because conforming to String breaks backward-compatibility
+    // Those who conformed before this dictionary, can use vanilla rawValue
     public func asDictionary() -> [String: Any] {
         let dictionary: [String: Any] = [
-            "articlesListRowType": articlesListRowType,
-            "bookmarksListRowType": bookmarksListRowType,
-            "startPage": startPage,
-            "topicOpeningStrategy": topicOpeningStrategy,
-            "appColorScheme": appColorScheme,
-            "backgroundTheme": backgroundTheme,
-            "appTintColor": appTintColor,
+            "articlesListRowType": articlesListRowType.rawValue,
+            "bookmarksListRowType": bookmarksListRowType.rawValue,
+            "startPage": startPage.rawValue,
+            "topicOpeningStrategy": topicOpeningStrategy._rawValue,
+            "appColorScheme": appColorScheme._rawValue,
+            "backgroundTheme": backgroundTheme._rawValue,
+            "appTintColor": appTintColor._rawValue,
             "notifications": notifications.asDictionary(),
             "backgroundNotifications": backgroundNotifications,
             "favorites": favorites.asDictionary(),
-            "searchSort": searchSort,
+            "searchSort": searchSort._rawValue,
             "hideTabBarOnScroll": hideTabBarOnScroll,
             "floatingNavigation": floatingNavigation,
             "experimentalFloatingNavigation": experimentalFloatingNavigation,

@@ -68,6 +68,10 @@ public struct ArticleScreen: View {
                 .overlay { RefreshIndicator() }
                 .background(Color(.Background.primary))
                 .onAppear { store.send(.onAppear) }
+                .onChange(of: store.scrollToId) { _ in
+                    guard let scrollId = store.scrollToId, !store.isLoading else { return }
+                    withAnimation { scrollProxy?.scrollTo(scrollId, anchor: .center) }
+                }
         }
     }
     
@@ -84,7 +88,7 @@ public struct ArticleScreen: View {
                         isExpanded: $isCommentViewExpanded,
                         isScrollDownVisible: $isCommentsViewVisible.inverted
                     ) {
-                        withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
+                        withAnimation { scrollProxy?.scrollTo(-1, anchor: .top) }
                     }
                 } else {
                     KeyboardView(
@@ -92,7 +96,7 @@ public struct ArticleScreen: View {
                         focus: $focus,
                         isScrollDownVisible: $isCommentsViewVisible.inverted
                     ) {
-                        withAnimation { scrollProxy?.scrollTo(69, anchor: .top) }
+                        withAnimation { scrollProxy?.scrollTo(-1, anchor: .top) }
                     }
                     .transition(.push(from: .bottom))
                 }
@@ -228,7 +232,9 @@ public struct ArticleScreen: View {
                     HStack {
                         Text(store.articlePreview.authorName)
                         Spacer()
-                        Text(store.articlePreview.formattedDate, bundle: .module)
+                        if store.articlePreview.date != .unknown {
+                            Text(store.articlePreview.formattedDate, bundle: .module)
+                        }
                     }
                     .font(.caption)
                     .foregroundStyle(Color(.Labels.secondaryInvariably))
@@ -282,7 +288,7 @@ public struct ArticleScreen: View {
             
             CommentsView(store: store)
                 .modifier(ScrollVisibility(threshold: 0.01, isVisible: $isCommentsViewVisible))
-                .id(69)
+                .id(-1)
         }
     }
     

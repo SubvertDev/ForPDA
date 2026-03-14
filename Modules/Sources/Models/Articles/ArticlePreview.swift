@@ -78,18 +78,48 @@ public extension ArticlePreview {
     )
     
     static func outerDeeplink(id: Int, imageUrl: URL, title: String) -> ArticlePreview {
-        return ArticlePreview(id: id, date: .default, authorId: 0, authorName: "", commentsAmount: 0, imageUrl: imageUrl, title: title, description: "", tags: [])
+        return ArticlePreview(
+            id: id,
+            date: .unknown,
+            authorId: 0,
+            authorName: "",
+            commentsAmount: 0,
+            imageUrl: imageUrl,
+            title: title,
+            description: "",
+            tags: []
+        )
     }
     
     static func innerDeeplink(id: Int) -> ArticlePreview {
-        return ArticlePreview(id: id, date: .default, authorId: 0, authorName: "", commentsAmount: 0, imageUrl: URL(string: "/")!, title: "", description: "", tags: [])
+        return ArticlePreview(
+            id: id,
+            date: .unknown,
+            authorId: 0,
+            authorName: "",
+            commentsAmount: 0,
+            imageUrl: URL(string: "/")!,
+            title: "",
+            description: "",
+            tags: []
+        )
     }
     
     static func makeFromArticle(_ article: Article) -> ArticlePreview {
-        return ArticlePreview(id: article.id, date: article.date, authorId: article.authorId, authorName: article.authorName, commentsAmount: article.commentsAmount, imageUrl: article.imageUrl, title: article.title, description: article.description, tags: article.tags)
+        return ArticlePreview(
+            id: article.id,
+            date: article.date,
+            authorId: article.authorId,
+            authorName: article.authorName,
+            commentsAmount: article.commentsAmount,
+            imageUrl: article.imageUrl,
+            title: article.title,
+            description: article.description,
+            tags: article.tags
+        )
     }
 }
 
 public extension Date {
-    static let `default` = Date(timeIntervalSince1970: 1720343745)
+    static let unknown = Date(timeIntervalSince1970: 0)
 }

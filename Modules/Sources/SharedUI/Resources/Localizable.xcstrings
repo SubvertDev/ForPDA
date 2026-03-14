@@ -51,18 +51,18 @@
         }
       }
     },
-    "Edited: %@ • %@" : {
+    "Edited: [%@](%@) • %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Edited: %1$@ • %2$@"
+            "value" : "Edited: [%1$@](%2$@) • %3$@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отредактировал: %1$@ • %2$@"
+            "value" : "Отредактировал: [%1$@](%2$@) • %3$@"
           }
         }
       }

@@ -656,12 +656,14 @@ let project = Project(
         
             .feature(
                 name: "BBBuilder",
+                hasTests: true,
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.LoggerClient,
                     .Internal.Models,
                     .Internal.SharedUI,
-                    .SPM.TCA
+                    .SPM.TCA,
+                    .SPM.SwiftyGif
                 ]
             ),
         
@@ -760,6 +762,7 @@ extension ProjectDescription.Target {
     static func feature(
         name: String,
         productType: Product = defaultProductType(),
+        hasTests: Bool = false,
         hasResources: Bool = true,
         dependencies: [TargetDependency]
     ) -> ProjectDescription.Target {
@@ -774,6 +777,13 @@ extension ProjectDescription.Target {
             infoPlist = .extendingDefault(with: ["UIAppFonts": "fontello.ttf"])
         }
         
+        let sources: SourceFilesList
+        if hasTests {
+            sources = [.glob("Modules/Sources/\(name)/Sources/**")]
+        } else {
+            sources = [.glob("Modules/Sources/\(name)/**")]
+        }
+        
         let baseSettings: SettingsDictionary = .targetSettings
             .merging(dependencies.contains(.SPM.TCA) ? .sharingAliasFix : [:])
         
@@ -784,11 +794,7 @@ extension ProjectDescription.Target {
             bundleId: App.bundleId + "." + name,
             deploymentTargets: .iOS("16.0"),
             infoPlist: infoPlist,
-            // sources: ["Modules/Sources/\(name)/**"],
-            sources: [.glob(
-                "Modules/Sources/\(name)/**",
-                excluding: ["Modules/Sources/\(name)/Tests/**"]
-            )],
+            sources: sources,
             resources: .resources(resources),
             dependencies: dependencies,
             settings: .settings(

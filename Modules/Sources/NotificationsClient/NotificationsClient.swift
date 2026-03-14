@@ -241,18 +241,18 @@ extension NotificationsClient: DependencyKey {
                     switch item.notificationType {
                     case .always:
                         if let timestamp = await cacheClient.getLastTimestampOfUnreadItem(item.id), timestamp == item.timestamp {
-                            logger.info("Skipping \(item.id) at \(timestamp) (\(item.category.rawValue)) because it's already processed")
+                            // logger.info("Skipping \(item.id) at \(timestamp) (\(item.category.rawValue)) because it's already processed")
                             continue
                         }
                         await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
                     case .once:
                         if let topicId = await cacheClient.getTopicIdOfUnreadItem(item.id), topicId == item.id {
-                            logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's already processed")
+                            // logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's already processed")
                             continue
                         }
                         await cacheClient.setTopicIdOfUnreadItem(item.id)
                     case .doNot:
-                        logger.info("Skipping \(item.id) because it's set to not to notify")
+                        // logger.info("Skipping \(item.id) because it's set to not to notify")
                         continue
                     case .unknown:
                         logger.warning("Unknown notification skipping condition")
@@ -261,7 +261,7 @@ extension NotificationsClient: DependencyKey {
                     
                     // Checking if notification category should be skipped based on provided values
                     if skipCategories.contains(item.category) {
-                        logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's marked to skip")
+                        // logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's marked to skip")
                         continue
                     }
                     

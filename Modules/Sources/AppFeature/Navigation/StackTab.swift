@@ -291,9 +291,9 @@ public struct StackTab: Reducer, Sendable {
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
-        case let .mentions(.delegate(.openArticle(sourceId: sourceId, targetId: targetId))): // TODO: Scroll to comment via targetId
+        case let .mentions(.delegate(.openArticle(sourceId: sourceId, targetId: targetId))):
             let articlePreview = ArticlePreview.innerDeeplink(id: sourceId)
-            state.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: articlePreview))))
+            state.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: articlePreview, scrollToId: targetId))))
             
         case let .mentions(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
@@ -455,9 +455,9 @@ public struct StackTab: Reducer, Sendable {
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 
-            case let .article(id: id, title: title, imageUrl: imageUrl):
+            case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId: scrollToId):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
+                state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId))))
             }
             
             return .none
