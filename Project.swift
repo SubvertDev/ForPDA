@@ -51,7 +51,6 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
-                    .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
                     .Internal.SearchFeature,
                     .Internal.SearchResultFeature,
@@ -59,9 +58,9 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.TopicFeature,
-                    .Internal.WriteFormFeature,
                     .SPM.AlertToast,
-                    .SPM.TCA
+                    .SPM.TCA,
+                    .SPM.SFSafeSymbols
                 ]
             ),
         
@@ -71,7 +70,6 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.ParsingClient,
@@ -95,7 +93,6 @@ let project = Project(
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
-                    .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
@@ -147,9 +144,7 @@ let project = Project(
             .feature(
                 name: "BookmarksFeature",
                 dependencies: [
-                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
@@ -167,7 +162,6 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.LoggerClient,
                     .SPM.TCA
                 ]
             ),
@@ -188,12 +182,10 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.PasteboardClient,
-                    .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
@@ -217,10 +209,8 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBBuilder,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
-                    .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
@@ -235,9 +225,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.Models,
-                    .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -262,10 +250,8 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
-                    .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -277,11 +263,9 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
-                    .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.TCA
@@ -308,7 +292,6 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBBuilder,
-                    .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.PersistenceKeys,
@@ -337,7 +320,6 @@ let project = Project(
                 name: "QMSListFeature",
                 hasResources: false,
                 dependencies: [
-                    .Internal.AnalyticsClient,
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.QMSClient,
@@ -370,10 +352,8 @@ let project = Project(
             .feature(
                 name: "ReputationChangeFeature",
                 dependencies: [
-                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.Models,
-                    .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.TCAExtensions,
@@ -436,7 +416,6 @@ let project = Project(
                 name: "TopicBuilder",
                 dependencies: [
                     .Internal.BBBuilder,
-                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
@@ -450,10 +429,8 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
                     .Internal.GalleryFeature,
-                    .Internal.LoggerClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
@@ -478,7 +455,6 @@ let project = Project(
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.Models,
-                    .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TopicBuilder,
                     .SPM.NukeUI,
