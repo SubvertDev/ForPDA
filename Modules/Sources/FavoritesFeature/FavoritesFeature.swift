@@ -121,14 +121,11 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.loadFavorites(offset: newOffset)))
                 
             case .sort(.presented(.saveButtonTapped)):
-                return .concatenate(
-                    .run { _ in
-                        await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
-                    },
-                    
-                    .send(.internal(.refresh)),
-                    .send(.sort(.presented(.cancelButtonTapped)))
-                )
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
+                    await send(.internal(.refresh))
+                    await send(.sort(.presented(.cancelButtonTapped)))
+                }
                 
             case .sort(.presented(.cancelButtonTapped)):
                 state.sort = nil
@@ -340,15 +337,9 @@ public struct FavoritesFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
     
-    private func updatePageNavigation(_ state: inout State, count: Int = 0, offset: Int? = nil) -> Effect<Action> {
-        return PageNavigationFeature()
-            .reduce(
-                into: &state.pageNavigation,
-                action: .update(
-                    count: count,
-                    offset: offset
-                )
-            )
-            .map(Action.pageNavigation)
+    private func updatePageNavigation(_ state: inout State, count: Int = 0, offset: Int? = nil) -> EffectOf<FavoritesFeature> {
+        return .run { send in
+            await send(.pageNavigation(.update(count: count, offset: offset)))
+        }
     }
 }

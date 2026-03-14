@@ -38,7 +38,7 @@ public struct SettingsScreen: View {
             }
             .navigationTitle(Text("Settings", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
             .animation(.default, value: colorScheme)
             .onAppear {
                 store.send(.onAppear)

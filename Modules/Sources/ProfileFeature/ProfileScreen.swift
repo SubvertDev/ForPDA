@@ -67,10 +67,10 @@ public struct ProfileScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
             .navigationTitle(Text("Profile", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            .fullScreenCover(item: $store.scope(state: \.destination?.editProfile, action: \.destination.editProfile)) { store in
+            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).editProfile) { store in
                 NavigationStack {
                     EditScreen(store: store)
                 }

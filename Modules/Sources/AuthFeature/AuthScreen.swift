@@ -188,7 +188,7 @@ public struct AuthScreen: View {
                     }
                 }
             }
-            .alert($store.scope(state: \.alert, action: \.alert))
+            .alert($store.scope(state: \.$alert, action: \.alert))
             .bind($store.focus, to: $focus)
             .onChange(of: focus) { _ in
                 // TODO: Redo

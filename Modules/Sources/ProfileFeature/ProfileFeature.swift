@@ -212,15 +212,13 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .none
                 
             case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):
-                return .concatenate(
-                    .run { _ in
-                        await toastClient.showToast(ToastMessage(
-                            text: status ? Localization.profileUpdated : Localization.profileUpdateError,
-                            haptic: status ? .success : .error
-                        ))
-                    },
-                    .send(.view(.onAppear))
-                )
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(
+                        text: status ? Localization.profileUpdated : Localization.profileUpdateError,
+                        haptic: status ? .success : .error
+                    ))
+                    await send(.view(.onAppear))
+                }
             
             case .destination(.presented(.alert(.logout))):
                 state.$userSession.withLock { $0 = nil }

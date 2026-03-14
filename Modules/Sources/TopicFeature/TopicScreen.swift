@@ -400,7 +400,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
                 ._toolbarTitleDisplayMode(.inline)
-                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .alert($store.scope(state: \.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
@@ -430,7 +430,7 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).writeForm) { store in
                         NavigationStack {
                             WriteFormScreen(store: store)
                         }
@@ -455,7 +455,7 @@ struct NavigationModifier: ViewModifier {
             WithPerceptionTracking {
                 content
                     .fittedSheet(
-                        item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                        item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
                         embedIntoNavStack: true
                     ) { store in
                         ReputationChangeView(store: store)

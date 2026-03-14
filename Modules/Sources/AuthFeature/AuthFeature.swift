@@ -172,9 +172,8 @@ public struct AuthFeature: Reducer, Sendable {
             case .view(.onAppear):
                 return .run { send in
                     let result = await Result { try await apiClient.getCaptcha() }
-                    await send(.internal(.captchaResponse(result)))
+                    await send(.internal(.captchaResponse(result)), animation: .default)
                 }
-                .animation()
                 
                 // MARK: - Internal
                 

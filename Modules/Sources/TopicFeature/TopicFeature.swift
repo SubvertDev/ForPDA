@@ -604,7 +604,7 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Shared Logic
     
     /// If offset is set to nil, then initialOffset property will be used
-    private func loadPage(offset: Int? = nil, _ state: inout State) -> Effect<Action> {
+    private func loadPage(offset: Int? = nil, _ state: inout State) -> EffectOf<TopicFeature> {
         return .concatenate(
             updatePageNavigation(&state, offset: offset ?? state.initialOffset),
             .cancel(id: CancelID.loading),
@@ -636,9 +636,11 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    public func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
+    public func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> EffectOf<TopicFeature> {
         if case let .page(page) = jump {
-            return reduce(into: &state, action: .pageNavigation(.goToPage(newPage: page)))
+            return .run { send in
+                await send(.pageNavigation(.goToPage(newPage: page)))
+            }
         }
         
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
@@ -660,16 +662,10 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
-        return PageNavigationFeature()
-            .reduce(
-                into: &state.pageNavigation,
-                action: .update(
-                    count: state.topic?.postsCount ?? 0,
-                    offset: offset
-                )
-            )
-            .map(Action.pageNavigation)
+    private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> EffectOf<TopicFeature> {
+        return .run { [count = state.topic?.postsCount ?? 0] send in
+            await send(.pageNavigation(.update(count: count, offset: offset)))
+        }
     }
     
     private func reportFullyDisplayed(_ state: inout State) {

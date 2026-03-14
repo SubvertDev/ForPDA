@@ -228,12 +228,12 @@ public struct AppFeature: Reducer, Sendable {
                         for await session in userSession.publisher.values.dropFirst() {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
                             if let session {
-                                await send(.userDidLogin(userId: session.userId))
+                                await send(.userDidLogin(userId: session.userId), animation: .default)
                             } else {
-                                await send(.userDidLogout)
+                                await send(.userDidLogout, animation: .default)
                             }
                         }
-                    }.animation(),
+                    },
                     
                     .run { send in
                         do {
@@ -554,21 +554,21 @@ public struct AppFeature: Reducer, Sendable {
     // MARK: - Private Functions
     
     @available(iOS, deprecated: 26, message: "System tabbar handles scrolls/pops by itself")
-    private func handleSameTabSelection(_ state: inout State) -> Effect<Action> {
+    private func handleSameTabSelection(_ state: inout State) -> EffectOf<AppFeature> {
         if state.selectedTab == .articles, state.articlesTab.path.isEmpty {
             // Scroll to top of articles
-            return StackTab()
-                .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                .map(Action.articlesTab)
+            return .run { send in
+                await send(.articlesTab(.root(.articles(.articlesList(.scrollToTop)))))
+            }
         }
         
         switch state.selectedTab {
         case .articles:
             //
             if state.articlesTab.path.isEmpty {
-                return StackTab()
-                    .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                    .map(Action.articlesTab)
+                return .run { send in
+                    await send(.articlesTab(.root(.articles(.articlesList(.scrollToTop)))))
+                }
             } else {
                 // TODO: enum
                 let error = NSError(domain: "Impossible articles tab action", code: 0)
@@ -599,13 +599,13 @@ public struct AppFeature: Reducer, Sendable {
         return removeNotifications(&state)
     }
     
-    private func handleOtherTabSelection(newTab: AppTab, _ state: inout State) -> Effect<Action> {
+    private func handleOtherTabSelection(newTab: AppTab, _ state: inout State) -> EffectOf<AppFeature> {
         state.previousTab = state.selectedTab
         state.selectedTab = newTab
         return removeNotifications(&state)
     }
     
-    private func removeNotifications(_ state: inout State) -> Effect<Action> {
+    private func removeNotifications(_ state: inout State) -> EffectOf<AppFeature> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
             case .articles, .forum, .profile:
@@ -617,13 +617,13 @@ public struct AppFeature: Reducer, Sendable {
         }
     }
     
-    private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
-        return StackTab()
-            .reduce(into: &state.favoritesTab, action: .root(.favorites(.internal(.refresh))))
-            .map(Action.favoritesTab)
+    private func refreshFavoritesTab(_ state: inout State) -> EffectOf<AppFeature> {
+        return .run { send in
+            await send(.favoritesTab(.root(.favorites(.internal(.refresh)))))
+        }
     }
     
-    private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
+    private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> EffectOf<AppFeature> {
         let screen: Path.State
         switch deeplink {
         case let .article(id, _, _, scrollToId):

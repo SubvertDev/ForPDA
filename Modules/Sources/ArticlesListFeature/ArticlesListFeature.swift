@@ -243,7 +243,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
     
-    private func handleMenuOptions(article: ArticlePreview, action: ContextMenuOptions, state: inout State) -> Effect<Action> {
+    private func handleMenuOptions(article: ArticlePreview, action: ContextMenuOptions, state: inout State) -> EffectOf<ArticlesListFeature> {
         switch action {
         case .shareLink:
             state.destination = .share(article.url)

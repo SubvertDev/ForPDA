@@ -46,8 +46,8 @@ public struct WriteFormScreen: View {
             .animation(.default, value: store.isPublishing)
             .animation(.default, value: store.isEditReasonToggleSelected)
             .animation(.default, value: store.isShowMarkToggleSelected)
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
-            .sheet(item: $store.scope(state: \.destination?.preview, action: \.destination.preview)) { store in
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
+            .sheet(item: $store.scope(state: \.$destination, action: \.destination).preview) { store in
                 NavigationStack {
                     FormPreviewView(store: store)
                 }

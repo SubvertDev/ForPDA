@@ -431,7 +431,7 @@ public struct ArticleFeature: Reducer, Sendable {
         .cancellable(id: CancelID.loading)
     }
     
-    private func getArticle(id: Int, useCache: Bool = true) -> EffectOf<Self> {
+    private func getArticle(id: Int, useCache: Bool = true) -> EffectOf<ArticleFeature> {
         return .concatenate([
             .run { send in
                 do {
@@ -446,7 +446,7 @@ public struct ArticleFeature: Reducer, Sendable {
         ])
     }
     
-    private func handleMenuOptions(action: ArticleMenuAction, state: inout State) -> Effect<Action> {
+    private func handleMenuOptions(action: ArticleMenuAction, state: inout State) -> EffectOf<ArticleFeature> {
         switch action {
         case .copyLink:
             pasteboardClient.copy(state.articlePreview.url.absoluteString)
@@ -462,7 +462,7 @@ public struct ArticleFeature: Reducer, Sendable {
         return .none
     }
     
-    private func showToast(type: CommentResponseType) -> Effect<Action> {
+    private func showToast(type: CommentResponseType) -> EffectOf<ArticleFeature> {
         return .run { _ in
             let toast = ToastMessage(
                 text: type.description,
