@@ -41,7 +41,10 @@ struct FormNodeView: View {
             type: node,
             attachments: [],
             onUrlTap: { _ in
-                #warning("Обработать тапы на ссылки")
+                // We don't process taps on links.
+                // If you open them, the form's sheet will close.
+                // It works in the official client for topics, because the form opens as a page
+                // and links open in new tabs. But it doesn't work properly for posts at all - it breaks the UI.
             }
         )
     }
