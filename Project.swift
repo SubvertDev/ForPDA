@@ -498,6 +498,7 @@ let project = Project(
         
             .feature(
                 name: "FormFeature",
+                hasTests: true,
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.BBPanelFeature,
