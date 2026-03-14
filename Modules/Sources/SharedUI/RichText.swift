@@ -138,6 +138,7 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     private let onQuote: QuoteHandler?
 //    @Binding var text: NSAttributedString?
     weak var textView: UITextView?
+    var lastActionTime: Date?
     
     init(
         refreshId: Binding<UUID> = .constant(UUID()),
@@ -153,23 +154,36 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
         self._refreshId = refreshId
     }
     
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        print("Intercepted URL tap: \(URL)") // TODO: Remove after tests
-        if let onUrlTap {
-            onUrlTap(URL)
-            return false
-        } else {
-            return true
+    func textView(_ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction) -> UIAction? {
+        guard let onUrlTap else { return nil }
+        
+        // For some reason this delegate is called twice
+        // so we need to guard from last action with some delay
+        guard lastActionTime?.timeIntervalSince(.now) ?? -1 < -0.1 else { return nil }
+        
+        switch textItem.content {
+        case let .link(url):
+            onUrlTap(url)
+            
+        case let .textAttachment(attachment):
+            if let url = (attachment as? AsyncTextAttachment)?.link {
+                onUrlTap(url)
+            }
+            
+        case .tag:
+            break
+            
+        @unknown default:
+            break
         }
+        
+        lastActionTime = .now
+        
+        return nil
     }
     
-    func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if let url = (textAttachment as? AsyncTextAttachment)?.link {
-            onUrlTap?(url)
-        } else {
-            print("[ERROR] Couldn't extract postId from SnapbackImage")
-        }
-        return false
+    func textView(_ textView: UITextView, menuConfigurationFor textItem: UITextItem, defaultMenu: UIMenu) -> UITextItem.MenuConfiguration? {
+        return .init(menu: .init())
     }
     
     func textAttachmentDidLoadImage(textAttachment: AsyncTextAttachment, displaySizeChanged: Bool) {
