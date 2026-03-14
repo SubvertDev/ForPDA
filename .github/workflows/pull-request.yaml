@@ -1,0 +1,28 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ develop ]
+  workflow_dispatch:
+
+jobs:
+  pull_request_checks:
+    name: Pull request checks
+    runs-on: macos-26
+    steps:
+      - name: Common setup
+        uses: ./.github/actions/setup
+
+      - name: Run pull request checks
+        run: |
+          bundle exec fastlane ci_pull_request
+        env:
+          CONNECT_API_KEY: ${{ secrets.CONNECT_API_KEY }}
+          FASTLANE_USER: ${{ secrets.FASTLANE_USER }}
+          FASTLANE_TEAM_ID: ${{ secrets.FASTLANE_TEAM_ID }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          TUIST_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
+          SENTRY_DSYM_TOKEN: ${{ secrets.SENTRY_DSYM_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
