@@ -21,7 +21,7 @@ public struct ProfileScreen: View {
     
     // MARK: - Profile properties
     
-    @Perception.Bindable public var store: StoreOf<ProfileFeature>
+    @Bindable public var store: StoreOf<ProfileFeature>
     @Environment(\.tintColor) private var tintColor
     
     public enum PickerSelection {
@@ -38,50 +38,49 @@ public struct ProfileScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if let user = store.user {
-                    List {
-                        Header(user: user)
-                        NavigationSection()
-                        SegmentPicker()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if let user = store.user {
+                List {
+                    Header(user: user)
+                    NavigationSection()
+                    SegmentPicker()
+                    
+                    switch pickerSelection {
+                    case .general:
+                        GeneralSegment(user: user)
                         
-                        switch pickerSelection {
-                        case .general:
-                            GeneralSegment(user: user)
-                            
-                        case .statistics:
-                            StatisticsSegment(user: user)
-                            
-                        case .achievements:
-                            AchievementsSegment(user: user)
-                        }
+                    case .statistics:
+                        StatisticsSegment(user: user)
+                        
+                    case .achievements:
+                        AchievementsSegment(user: user)
                     }
-                    .listSectionSpacingBackport(28)
-                    .scrollContentBackground(.hidden)
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
                 }
-            }
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
-            .navigationTitle(Text("Profile", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).editProfile) { store in
-                NavigationStack {
-                    EditScreen(store: store)
-                }
-            }
-            .toolbar {
-                ToolbarButtons()
-            }
-            .onAppear {
-                send(.onAppear)
+                .listSectionSpacingBackport(28)
+                .scrollContentBackground(.hidden)
+            } else {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .alert($store.scope(state: \.$destination, action: \.destination).alert)
+        .navigationTitle(Text("Profile", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).editProfile) { store in
+            NavigationStack {
+                EditScreen(store: store)
+            }
+        }
+        .toolbar {
+            ToolbarButtons()
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Toolbar Items

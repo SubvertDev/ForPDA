@@ -17,7 +17,7 @@ public struct SearchResultScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<SearchResultFeature>
+    @Bindable public var store: StoreOf<SearchResultFeature>
     
     @Environment(\.tintColor) private var tintColor
     
@@ -37,57 +37,56 @@ public struct SearchResultScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if !store.isLoading {
-                    if !store.content.isEmpty {
-                        List {
-                            if shouldShowNavigation {
-                                Navigation()
-                            }
-                            
-                            ContentSection()
-                            
-                            if shouldShowNavigation {
-                                Navigation()
-                            }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if !store.isLoading {
+                if !store.content.isEmpty {
+                    List {
+                        if shouldShowNavigation {
+                            Navigation()
                         }
-                        .listStyle(.plain)
-                        .scrollContentBackground(.hidden)
-                        ._inScrollContentDetector(state: $navigationMinimized)
-                    } else {
-                        NothingFound()
+                        
+                        ContentSection()
+                        
+                        if shouldShowNavigation {
+                            Navigation()
+                        }
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    ._inScrollContentDetector(state: $navigationMinimized)
+                } else {
+                    NothingFound()
                 }
-            }
-            .overlay {
-                if store.isLoading {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
-            }
-            .navigationTitle(Text("Search", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color(.Background.primary))
-            .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
-                    PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
-                        minimized: $navigationMinimized
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
-                }
-            }
-            .onFirstAppear {
-                send(.onFirstAppear)
             }
         }
+        .overlay {
+            if store.isLoading {
+                PDALoader()
+                    .frame(width: 24, height: 24)
+            }
+        }
+        .navigationTitle(Text("Search", bundle: .module))
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color(.Background.primary))
+        .safeAreaInset(edge: .bottom) {
+            if isLiquidGlass,
+               store.appSettings.floatingNavigation,
+               !store.appSettings.experimentalFloatingNavigation {
+                PageNavigation(
+                    store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                    minimized: $navigationMinimized
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+        }
+        .onFirstAppear {
+            send(.onFirstAppear)
+        }
+                
     }
     
     // MARK: - Search Content Section
@@ -152,36 +151,35 @@ public struct SearchResultScreen: View {
     // MARK: - Topic Row
     
     private func TopicRow(_ index: Int, _ topic: TopicInfo) -> some View {
-        WithPerceptionTracking {
-            VStack(spacing: 0) {
-                let radius: CGFloat = isLiquidGlass ? 24 : 10
-                SharedUI.TopicRow(
-                    title: .render(makeAttributed(topic.name.fixBackgroundBBCode(), .body)!),
-                    date: topic.lastPost.date,
-                    username: topic.lastPost.username,
-                    isClosed: topic.isClosed,
-                    isUnread: topic.isUnread,
-                    onAction: { isUnreadTapped in
-                        send(.topicTapped(topic.id, isUnreadTapped))
-                    }
-                )
-                .padding(.leading, 16)
-                .background(
-                    Color(.Background.teritary)
-                        .clipShape(
-                            .rect(
-                                topLeadingRadius: index == 0 ? radius : 0,
-                                bottomLeadingRadius: index == store.content.count - 1 ? radius : 0,
-                                bottomTrailingRadius: index == store.content.count - 1 ? radius : 0,
-                                topTrailingRadius: index == 0 ? radius : 0
-                            )
+        VStack(spacing: 0) {
+            let radius: CGFloat = isLiquidGlass ? 24 : 10
+            SharedUI.TopicRow(
+                title: .render(makeAttributed(topic.name.fixBackgroundBBCode(), .body)!),
+                date: topic.lastPost.date,
+                username: topic.lastPost.username,
+                isClosed: topic.isClosed,
+                isUnread: topic.isUnread,
+                onAction: { isUnreadTapped in
+                    send(.topicTapped(topic.id, isUnreadTapped))
+                }
+            )
+            .padding(.leading, 16)
+            .background(
+                Color(.Background.teritary)
+                    .clipShape(
+                        .rect(
+                            topLeadingRadius: index == 0 ? radius : 0,
+                            bottomLeadingRadius: index == store.content.count - 1 ? radius : 0,
+                            bottomTrailingRadius: index == store.content.count - 1 ? radius : 0,
+                            topTrailingRadius: index == 0 ? radius : 0
                         )
-                )
-            }
-            .listSectionSeparator(.hidden)
-            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color(.Background.primary))
+                    )
+            )
         }
+        .listSectionSeparator(.hidden)
+        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color(.Background.primary))
+                
     }
     
     // MARK: - Article Row

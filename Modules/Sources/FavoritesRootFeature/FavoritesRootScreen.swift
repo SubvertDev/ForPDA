@@ -19,7 +19,7 @@ public struct FavoritesRootScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<FavoritesRootFeature>
+    @Bindable public var store: StoreOf<FavoritesRootFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
@@ -31,26 +31,25 @@ public struct FavoritesRootScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            VStack {
+                // For the Good Times
+                //SegmentPicker()
                 
-                VStack {
-                    // For the Good Times
-                    //SegmentPicker()
+                switch store.pickerSelection {
+                case .favorites:
+                    FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
                     
-                    switch store.pickerSelection {
-                    case .favorites:
-                        FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
-                        
-                    case .bookmarks:
-                        BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-                    }
+                case .bookmarks:
+                    BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
                 }
             }
-            .animation(.default, value: store.pickerSelection)
         }
+        .animation(.default, value: store.pickerSelection)
+                
     }
     
     // MARK: - Segment Picker

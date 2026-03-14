@@ -16,7 +16,7 @@ public struct QMSListScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<QMSListFeature>
+    @Bindable public var store: StoreOf<QMSListFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
@@ -28,43 +28,40 @@ public struct QMSListScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if let qms = store.qms {
-                    List {
-                        ForEach(Array(qms.users.enumerated()), id: \.0) { index, user in
-                            WithPerceptionTracking {
-                                if user.chats.isEmpty {
-                                    UserRow(user)
-                                        .listRowBackground(Color(.Background.teritary))
-                                } else {
-                                    DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
-                                        ChatList(user.chats)
-                                    } label: {
-                                        UserRow(user)
-                                    }
-                                    .listRowBackground(Color(.Background.teritary))
-                                }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if let qms = store.qms {
+                List {
+                    ForEach(Array(qms.users.enumerated()), id: \.0) { index, user in
+                        if user.chats.isEmpty {
+                            UserRow(user)
+                                .listRowBackground(Color(.Background.teritary))
+                        } else {
+                            DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
+                                ChatList(user.chats)
+                            } label: {
+                                UserRow(user)
                             }
+                            .listRowBackground(Color(.Background.teritary))
                         }
                     }
-                    .scrollContentBackground(.hidden)
-                    ._contentMargins(.top, 16)
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
                 }
-            }
-            .navigationTitle("QMS")
-            ._toolbarTitleDisplayMode(.inline)
-            .animation(.default, value: store.expandedGroups)
-            .onAppear {
-                send(.onAppear)
+                .scrollContentBackground(.hidden)
+                .contentMargins(.top, 16)
+            } else {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .navigationTitle("QMS")
+        ._toolbarTitleDisplayMode(.inline)
+        .animation(.default, value: store.expandedGroups)
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - User Row

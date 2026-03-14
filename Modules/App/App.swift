@@ -24,7 +24,7 @@ struct ForPDAApp: App {
         WindowGroup {
             if TestContext.current == nil {
                 AppView(store: appDelegate.store)
-                    .onChange(of: scenePhase) { newScenePhase in
+                    .onChange(of: scenePhase) { _, newScenePhase in
                         appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
                     }
                     .onOpenURL { url in

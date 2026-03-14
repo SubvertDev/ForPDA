@@ -15,7 +15,7 @@ public struct ArticlesListScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<ArticlesListFeature>
+    @Bindable public var store: StoreOf<ArticlesListFeature>
     @State private var scrollProxy: ScrollViewProxy?
     
     // MARK: - Init
@@ -27,65 +27,59 @@ public struct ArticlesListScreen: View {
     // MARK: - Body
         
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            switch store.viewState {
+            case .loading:
+                PDALoader()
+                    .frame(width: 24, height: 24)
                 
-                switch store.viewState {
-                case .loading:
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                    
-                case let .loaded(articles):
-                    ScrollViewReader { proxy in
-                        WithPerceptionTracking {
-                            ArticlesList(articles: articles)
-                                .refreshable {
-                                    await store.send(.onRefresh).finish()
-                                }
-                                .onAppear {
-                                    scrollProxy = proxy
-                                }
+            case let .loaded(articles):
+                ScrollViewReader { proxy in
+                    ArticlesList(articles: articles)
+                        .refreshable {
+                            await store.send(.onRefresh).finish()
                         }
-                    }
-                    
-                case .networkError:
-                    UnavailableView(
-                        symbol: .exclamationmarkTriangleFill,
-                        title: "Failed to load",
-                        description: "Try again later",
-                        actionTitle: "Try again",
-                        action: {
-                            store.send(.tryAgainButtonTapped)
-                        },
-                        bundle: .module
-                    )
+                        .onAppear {
+                            scrollProxy = proxy
+                        }
                 }
-            }
-            .navigationTitle(Text("Articles", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
-            .toolbar { Toolbar() }
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
-            .sheet(item: $store.destination.share, id: \.self) { url in
-                // FIXME: Perceptible warning despite tracking closure
-                WithPerceptionTracking {
-                    ShareActivityView(url: url) { success in
-                        store.send(.linkShared(success, url))
-                    }
-                    .presentationDetents([.medium])
-                }
-            }
-            .onChange(of: store.shouldScrollToTop) { _ in
-                withAnimation {
-                    scrollProxy?.scrollTo(store.articles.first?.id)
-                }
-            }
-            .onAppear {
-                store.send(.onAppear)
+                
+            case .networkError:
+                UnavailableView(
+                    symbol: .exclamationmarkTriangleFill,
+                    title: "Failed to load",
+                    description: "Try again later",
+                    actionTitle: "Try again",
+                    action: {
+                        store.send(.tryAgainButtonTapped)
+                    },
+                    bundle: .module
+                )
             }
         }
+        .navigationTitle(Text("Articles", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
+        .toolbar { Toolbar() }
+        .alert($store.scope(state: \.$destination, action: \.destination).alert)
+        .sheet(item: $store.destination.share, id: \.self) { url in
+            ShareActivityView(url: url) { success in
+                store.send(.linkShared(success, url))
+            }
+            .presentationDetents([.medium])
+        }
+        .onChange(of: store.shouldScrollToTop) {
+            withAnimation {
+                scrollProxy?.scrollTo(store.articles.first?.id)
+            }
+        }
+        .onAppear {
+            store.send(.onAppear)
+        }
+                
     }
     
     // MARK: - Articles List
@@ -94,43 +88,42 @@ public struct ArticlesListScreen: View {
     private func ArticlesList(articles: [ArticlePreview]) -> some View {
         List {
             ForEach(articles) { article in
-                WithPerceptionTracking {
-                    Button {
-                        store.send(.articleTapped(article))
-                    } label: {
-                        ArticleRowView(
-                            state: ArticleRowView.State(
-                                id: article.id,
-                                title: .plain(article.title),
-                                authorName: article.authorName,
-                                imageUrl: article.imageUrl,
-                                commentsAmount: article.commentsAmount,
-                                date: article.date
-                            ),
-                            rowType: settingsToRow(store.listRowType),
-                            bundle: .module
-                        ) { action in
-                            switch action {
-                            case .shareLink:     store.send(.cellMenuOpened(article, .shareLink))
-                            case .copyLink:      store.send(.cellMenuOpened(article, .copyLink))
-                            case .openInBrowser: store.send(.cellMenuOpened(article, .openInBrowser))
-                            }
-                        }
-                    }
-                    .id(article.id)
-                    .buttonStyle(.plain)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 14)
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowBackground(Color(.Background.primary))
-                    .onAppear {
-                        guard let index = store.articles.firstIndex(of: article) else { return }
-                        if store.articles.count - 5 == index {
-                            store.send(.loadMoreArticles)
+                Button {
+                    store.send(.articleTapped(article))
+                } label: {
+                    ArticleRowView(
+                        state: ArticleRowView.State(
+                            id: article.id,
+                            title: .plain(article.title),
+                            authorName: article.authorName,
+                            imageUrl: article.imageUrl,
+                            commentsAmount: article.commentsAmount,
+                            date: article.date
+                        ),
+                        rowType: settingsToRow(store.listRowType),
+                        bundle: .module
+                    ) { action in
+                        switch action {
+                        case .shareLink:     store.send(.cellMenuOpened(article, .shareLink))
+                        case .copyLink:      store.send(.cellMenuOpened(article, .copyLink))
+                        case .openInBrowser: store.send(.cellMenuOpened(article, .openInBrowser))
                         }
                     }
                 }
+                .id(article.id)
+                .buttonStyle(.plain)
+                .padding(.horizontal, 16)
+                .padding(.bottom, 14)
+                .listRowSeparator(.hidden)
+                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .listRowBackground(Color(.Background.primary))
+                .onAppear {
+                    guard let index = store.articles.firstIndex(of: article) else { return }
+                    if store.articles.count - 5 == index {
+                        store.send(.loadMoreArticles)
+                    }
+                }
+                                
             }
             
             if !store.articles.isEmpty {

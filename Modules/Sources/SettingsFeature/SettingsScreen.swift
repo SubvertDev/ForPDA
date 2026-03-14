@@ -13,7 +13,7 @@ import Models
 
 public struct SettingsScreen: View {
         
-    @Perception.Bindable public var store: StoreOf<SettingsFeature>
+    @Bindable public var store: StoreOf<SettingsFeature>
     @Environment(\.tintColor) private var tintColor
     @Environment(\.colorScheme) private var colorScheme
     
@@ -22,28 +22,27 @@ public struct SettingsScreen: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                List {
-                    ThemeSection()
-                    BasicSection()
-                    LinksSection()
-                    AdvancedSection()
-                    AboutAppSection()
-                }
-                .scrollContentBackground(.hidden)
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            List {
+                ThemeSection()
+                BasicSection()
+                LinksSection()
+                AdvancedSection()
+                AboutAppSection()
             }
-            .navigationTitle(Text("Settings", bundle: .module))
-            ._toolbarTitleDisplayMode(.inline)
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
-            .animation(.default, value: colorScheme)
-            .onAppear {
-                store.send(.onAppear)
-            }
+            .scrollContentBackground(.hidden)
         }
+        .navigationTitle(Text("Settings", bundle: .module))
+        ._toolbarTitleDisplayMode(.inline)
+        .alert($store.scope(state: \.$destination, action: \.destination).alert)
+        .animation(.default, value: colorScheme)
+        .onAppear {
+            store.send(.onAppear)
+        }
+                
     }
     
     // MARK: - Header
@@ -169,9 +168,8 @@ public struct SettingsScreen: View {
         Section {
             HStack(spacing: 29) {
                 ForEach(AppColorScheme.allCases, id: \.self) { scheme in
-                    WithPerceptionTracking {
-                        SchemeButton(scheme: scheme)
-                    }
+                    SchemeButton(scheme: scheme)
+                                        
                 }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

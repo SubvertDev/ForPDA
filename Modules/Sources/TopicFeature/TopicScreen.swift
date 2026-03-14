@@ -23,7 +23,7 @@ public struct TopicScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<TopicFeature>
+    @Bindable public var store: StoreOf<TopicFeature>
     
     @Environment(\.tintColor) private var tintColor
     @State private var scrollProxy: ScrollViewProxy?
@@ -59,91 +59,88 @@ public struct TopicScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                ScrollViewReader { proxy in
-                    WithPerceptionTracking {
-                        ScrollView {
-                            LazyVStack(spacing: 16) {
-                                if shouldShowTopNavigation {
-                                    Navigation()
-                                }
-                                
-                                if !store.isLoadingTopic {
-                                    Header()
-                                    
-                                    if let poll = store.topic?.poll {
-                                        Poll(poll)
-                                    }
-                                    
-                                    PostList()
-                                }
-                                
-                                if shouldShowBottomNavigation {
-                                    Navigation()
-                                }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        if shouldShowTopNavigation {
+                            Navigation()
+                        }
+                        
+                        if !store.isLoadingTopic {
+                            Header()
+                            
+                            if let poll = store.topic?.poll {
+                                Poll(poll)
                             }
-                            .padding(.bottom, 16)
+                            
+                            PostList()
                         }
-                        ._inScrollContentDetector(state: $navigationMinimized)
-                        .onAppear {
-                            scrollProxy = proxy
+                        
+                        if shouldShowBottomNavigation {
+                            Navigation()
                         }
                     }
+                    .padding(.bottom, 16)
                 }
-                .scrollDismissesKeyboard(.immediately)
-            }
-            .refreshable {
-                // Wrapper around finish() due to SwiftUI bug
-                await Task { await send(.onRefresh).finish() }.value
-            }
-            .overlay {
-                if store.topic == nil {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
+                ._inScrollContentDetector(state: $navigationMinimized)
+                .onAppear {
+                    scrollProxy = proxy
                 }
             }
-            .navigations(store: store)
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        send(.searchButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .magnifyingglass)
-                            .foregroundStyle(foregroundStyle())
-                    }
-                }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer()
-                }
-                ToolbarItem {
-                    OptionsMenu()
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
-                    PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
-                        minimized: $navigationMinimized
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
-                }
-            }
-            .onChange(of: store.postId)         { _ in Task { await scrollAndAnimate() } }
-            .onChange(of: store.isLoadingTopic) { _ in Task { await scrollAndAnimate() } }
-            .onFirstAppear {
-                send(.onFirstAppear)
-            } onNextAppear: {
-                send(.onNextAppear)
+            .scrollDismissesKeyboard(.immediately)
+        }
+        .refreshable {
+            // Wrapper around finish() due to SwiftUI bug
+            await Task { await send(.onRefresh).finish() }.value
+        }
+        .overlay {
+            if store.topic == nil {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .navigations(store: store)
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    send(.searchButtonTapped)
+                } label: {
+                    Image(systemSymbol: .magnifyingglass)
+                        .foregroundStyle(foregroundStyle())
+                }
+            }
+            
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer()
+            }
+            ToolbarItem {
+                OptionsMenu()
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if isLiquidGlass,
+               store.appSettings.floatingNavigation,
+               !store.appSettings.experimentalFloatingNavigation {
+                PageNavigation(
+                    store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                    minimized: $navigationMinimized
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+        }
+        .onChange(of: store.postId)         { Task { await scrollAndAnimate() } }
+        .onChange(of: store.isLoadingTopic) { Task { await scrollAndAnimate() } }
+        .onFirstAppear {
+            send(.onFirstAppear)
+        } onNextAppear: {
+            send(.onNextAppear)
+        }
+                
     }
     
     // MARK: - Options Menu
@@ -281,21 +278,20 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func PostList() -> some View {
         ForEach(store.posts) { post in
-            WithPerceptionTracking {
-                if store.shouldShowTopicHatButton && store.posts.first == post {
-                    if !isPollAvailable {
-                        PostSeparator()
-                    }
-                } else {
-                    VStack(spacing: 0) {
-                        Post(post)
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 16)
-                        
-                        PostSeparator()
-                    }
+            if store.shouldShowTopicHatButton && store.posts.first == post {
+                if !isPollAvailable {
+                    PostSeparator()
+                }
+            } else {
+                VStack(spacing: 0) {
+                    Post(post)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
+                    
+                    PostSeparator()
                 }
             }
+                        
         }
     }
     
@@ -388,7 +384,7 @@ public struct TopicScreen: View {
 
 struct NavigationModifier: ViewModifier {
     
-    @Perception.Bindable private var store: StoreOf<TopicFeature>
+    @Bindable private var store: StoreOf<TopicFeature>
     @Environment(\.tintColor) private var tintColor
     
     init(store: StoreOf<TopicFeature>) {
@@ -396,31 +392,30 @@ struct NavigationModifier: ViewModifier {
     }
     
     func body(content: Content) -> some View {
-        WithPerceptionTracking {
-            content
-                .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
-                ._toolbarTitleDisplayMode(.inline)
-                .alert($store.scope(state: \.$destination, action: \.destination).alert)
-                .modifier(FullScreenCoverModifier(store: store))
-                .modifier(SheetModifier(store: store))
-                .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
-                    Button {
-                        store.send(.view(.changeKarmaTapped(postId, true)))
-                    } label: {
-                        Text("Up", bundle: .module)
-                    }
-                    
-                    Button {
-                        store.send(.view(.changeKarmaTapped(postId, false)))
-                    } label: {
-                        Text("Down", bundle: .module)
-                    }
+        content
+            .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+            ._toolbarTitleDisplayMode(.inline)
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
+            .modifier(FullScreenCoverModifier(store: store))
+            .modifier(SheetModifier(store: store))
+            .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
+                Button {
+                    store.send(.view(.changeKarmaTapped(postId, true)))
+                } label: {
+                    Text("Up", bundle: .module)
                 }
-        }
+                
+                Button {
+                    store.send(.view(.changeKarmaTapped(postId, false)))
+                } label: {
+                    Text("Down", bundle: .module)
+                }
+            }
+                
     }
     
     struct FullScreenCoverModifier: ViewModifier {
-        @Perception.Bindable private var store: StoreOf<TopicFeature>
+        @Bindable private var store: StoreOf<TopicFeature>
         @Environment(\.tintColor) private var tintColor
         
         init(store: StoreOf<TopicFeature>) {
@@ -428,23 +423,22 @@ struct NavigationModifier: ViewModifier {
         }
         
         func body(content: Content) -> some View {
-            WithPerceptionTracking {
-                content
-                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).writeForm) { store in
-                        NavigationStack {
-                            WriteFormScreen(store: store)
-                        }
+            content
+                .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).writeForm) { store in
+                    NavigationStack {
+                        WriteFormScreen(store: store)
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                        let state = store.withState { $0 }
-                        TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
-                    }
-            }
+                }
+                .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
+                    let state = store.withState { $0 }
+                    TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+                }
+                        
         }
     }
     
     struct SheetModifier: ViewModifier {
-        @Perception.Bindable private var store: StoreOf<TopicFeature>
+        @Bindable private var store: StoreOf<TopicFeature>
         @Environment(\.tintColor) private var tintColor
         
         init(store: StoreOf<TopicFeature>) {
@@ -452,20 +446,19 @@ struct NavigationModifier: ViewModifier {
         }
         
         func body(content: Content) -> some View {
-            WithPerceptionTracking {
-                content
-                    .fittedSheet(
-                        item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
-                        embedIntoNavStack: true
-                    ) { store in
-                        ReputationChangeView(store: store)
-                    }
-                    .sheet(isPresented: Binding($store.destination.editWarning)) {
-                        EditWarningSheet()
-                            .presentationDetents([.medium])
-                            .presentationDragIndicator(.visible)
-                    }
-            }
+            content
+                .fittedSheet(
+                    item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
+                    embedIntoNavStack: true
+                ) { store in
+                    ReputationChangeView(store: store)
+                }
+                .sheet(isPresented: Binding($store.destination.editWarning)) {
+                    EditWarningSheet()
+                        .presentationDetents([.medium])
+                        .presentationDragIndicator(.visible)
+                }
+                        
         }
         
         // TODO: Move to SharedUI?

@@ -14,7 +14,7 @@ import SharedUI
 @ViewAction(for: WriteFormFeature.self)
 public struct WriteFormScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<WriteFormFeature>
+    @Bindable public var store: StoreOf<WriteFormFeature>
     @Environment(\.tintColor) private var tintColor
     
     @State private var isPreviewPresented: Bool = false
@@ -25,59 +25,58 @@ public struct WriteFormScreen: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
+        NavigationStack {
+            WriteForm()
+                .navigationTitle(Text(formTitle(), bundle: .module))
+                .padding(.horizontal, 16)
+                .background(Color(.Background.primary))
+                ._toolbarTitleDisplayMode(.inline)
+                .onTapGesture {
+                    isFocused = false
+                }
+                .overlay {
+                    if store.formFields.isEmpty || store.isFormLoading {
+                        PDALoader()
+                            .frame(width: 24, height: 24)
+                    }
+                }
+        }
+        .disabled(store.isPublishing)
+        .animation(.default, value: store.isPublishing)
+        .animation(.default, value: store.isEditReasonToggleSelected)
+        .animation(.default, value: store.isShowMarkToggleSelected)
+        .alert($store.scope(state: \.$destination, action: \.destination).alert)
+        .sheet(item: $store.scope(state: \.$destination, action: \.destination).preview) { store in
             NavigationStack {
-                WriteForm()
-                    .navigationTitle(Text(formTitle(), bundle: .module))
-                    .padding(.horizontal, 16)
-                    .background(Color(.Background.primary))
-                    ._toolbarTitleDisplayMode(.inline)
-                    .onTapGesture {
-                        isFocused = false
-                    }
-                    .overlay {
-                        if store.formFields.isEmpty || store.isFormLoading {
-                            PDALoader()
-                                .frame(width: 24, height: 24)
-                        }
-                    }
-            }
-            .disabled(store.isPublishing)
-            .animation(.default, value: store.isPublishing)
-            .animation(.default, value: store.isEditReasonToggleSelected)
-            .animation(.default, value: store.isShowMarkToggleSelected)
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
-            .sheet(item: $store.scope(state: \.$destination, action: \.destination).preview) { store in
-                NavigationStack {
-                    FormPreviewView(store: store)
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        send(.dismissButtonTapped)
-                    } label: {
-                        Text("Cancel", bundle: .module)
-                    }
-                    .disabled(store.isPublishing)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        send(.previewButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .eye)
-                            .font(.body)
-                            .frame(width: 34, height: 22)
-                    }
-                    .disabled(store.textContent.isEmptyAfterTrimming())
-                    .disabled(store.isPublishing)
-                }
-            }
-            .onAppear {
-                send(.onAppear)
+                FormPreviewView(store: store)
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    send(.dismissButtonTapped)
+                } label: {
+                    Text("Cancel", bundle: .module)
+                }
+                .disabled(store.isPublishing)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    send(.previewButtonTapped)
+                } label: {
+                    Image(systemSymbol: .eye)
+                        .font(.body)
+                        .frame(width: 34, height: 22)
+                }
+                .disabled(store.textContent.isEmptyAfterTrimming())
+                .disabled(store.isPublishing)
+            }
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     @ViewBuilder
@@ -85,21 +84,20 @@ public struct WriteFormScreen: View {
         ScrollView {
             VStack {
                 ForEach(store.formFields.indices, id: \.self) { index in
-                    WithPerceptionTracking {
-                        VStack {
-                            WriteFormView(
-                                type: store.formFields[index],
-                                isFocused: $isFocused,
-                                onUpdateContent: { content in
-                                    if content != nil {
-                                        send(.updateFieldContent(index, content!))
-                                    }
-                                    return store.textContent
+                    VStack {
+                        WriteFormView(
+                            type: store.formFields[index],
+                            isFocused: $isFocused,
+                            onUpdateContent: { content in
+                                if content != nil {
+                                    send(.updateFieldContent(index, content!))
                                 }
-                            )
-                        }
-                        .padding(.top, 16)
+                                return store.textContent
+                            }
+                        )
                     }
+                    .padding(.top, 16)
+                                        
                 }
                 
                 if store.inPostEditingMode {

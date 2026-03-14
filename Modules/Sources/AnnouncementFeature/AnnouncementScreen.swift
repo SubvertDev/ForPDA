@@ -18,7 +18,7 @@ public struct AnnouncementScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<AnnouncementFeature>
+    @Bindable public var store: StoreOf<AnnouncementFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
@@ -30,32 +30,30 @@ public struct AnnouncementScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if let announcement = store.announcement {
-                    ScrollView {
-                        AnnouncementBody(announcement)
-                            .padding(.horizontal, 16)
-                    }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if let announcement = store.announcement {
+                ScrollView {
+                    AnnouncementBody(announcement)
+                        .padding(.horizontal, 16)
                 }
             }
-            .overlay {
-                if store.announcement == nil {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
+        }
+        .overlay {
+            if store.announcement == nil {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
-            .navigationTitle(Text(store.name ?? "Загружаем..."))
-            ._toolbarTitleDisplayMode(.inline)
-            .toolbar {
-                // TODO: Announcement Info?
-            }
-            .onAppear {
-                send(.onAppear)
-            }
+        }
+        .navigationTitle(Text(store.name ?? "Загружаем..."))
+        ._toolbarTitleDisplayMode(.inline)
+        .toolbar {
+            // TODO: Announcement Info?
+        }
+        .onAppear {
+            send(.onAppear)
         }
     }
     

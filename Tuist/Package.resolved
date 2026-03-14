@@ -1,5 +1,5 @@
 {
-  "originHash" : "2d554b5f4bcd67fd68337f24c281f6148286471e095228834074e212a04788cf",
+  "originHash" : "a362578a99e707c0426e1213ee7f021ad247ed57c2587aebc6447a4893e73755",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -22,10 +22,10 @@
     {
       "identity" : "anchoredpopup",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/AnchoredPopup.git",
+      "location" : "https://github.com/exyte/AnchoredPopup.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "c409740455e14866a223715ed285da33cfd0f044"
+        "revision" : "dfcd04d7a265808333674a7ccf001838102a391e",
+        "version" : "1.1.0"
       }
     },
     {
@@ -40,10 +40,10 @@
     {
       "identity" : "chat",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/Chat",
+      "location" : "https://github.com/exyte/Chat",
       "state" : {
-        "branch" : "main",
-        "revision" : "44a08c5141ac32dde14e5707ad25d8bbed5be0e9"
+        "revision" : "ecf7edb1ba6d4406543af3796c512005dc013802",
+        "version" : "2.7.6"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Giphy/giphy-ios-sdk",
       "state" : {
-        "revision" : "f7a8edf513ab14147ef33c942b10b45cdac1e765",
-        "version" : "2.3.0"
+        "revision" : "ed91784fe854a8204a9f994282d87f9c18df5fac",
+        "version" : "2.3.1"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
       "state" : {
-        "revision" : "e227df15448d2ad1a5d4e4c49722a71c68f9058a",
-        "version" : "8.7.0"
+        "revision" : "c92b84898e34ab46ff0dad86c02a0acbe2d87008",
+        "version" : "8.8.0"
       }
     },
     {
@@ -85,10 +85,10 @@
     {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SubvertDev/MediaPicker.git",
+      "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "199f445c1efa65291160d9589ad8509848130783"
+        "revision" : "fd71c0b560aa79eee1b87f73ce93fac5576a01df",
+        "version" : "3.2.4"
       }
     },
     {

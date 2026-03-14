@@ -108,52 +108,51 @@ public struct DeveloperFeature: Reducer, Sendable {
 
 public struct DeveloperScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<DeveloperFeature>
+    @Bindable public var store: StoreOf<DeveloperFeature>
     
     public init(store: StoreOf<DeveloperFeature>) {
         self.store = store
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("ID: \(store.analyticsId)")
-                        
-                        HStack(spacing: 8) {
-                            Text("Is analytics enabled: ")
-                            Toggle("", isOn: $store.isAnalyticsEnabled)
-                        }
-                        
-                        HStack(spacing: 8) {
-                            Text("Is Sentry enabled: ")
-                            Toggle("", isOn: $store.isCrashlyticsEnabled)
-                        }
-                        
-                        Button("Send test crash to Sentry") {
-                            store.send(.sendCrashButtonTapped)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            ForEach(store.backgroundTaskEntries, id: \.self) { entry in
-                                Text(verbatim: "[\(entry.date.formatted(date: .numeric, time: .standard))] \(entry.stage)")
-                                    .font(.caption)
-                            }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("ID: \(store.analyticsId)")
+                    
+                    HStack(spacing: 8) {
+                        Text("Is analytics enabled: ")
+                        Toggle("", isOn: $store.isAnalyticsEnabled)
+                    }
+                    
+                    HStack(spacing: 8) {
+                        Text("Is Sentry enabled: ")
+                        Toggle("", isOn: $store.isCrashlyticsEnabled)
+                    }
+                    
+                    Button("Send test crash to Sentry") {
+                        store.send(.sendCrashButtonTapped)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(store.backgroundTaskEntries, id: \.self) { entry in
+                            Text(verbatim: "[\(entry.date.formatted(date: .numeric, time: .standard))] \(entry.stage)")
+                                .font(.caption)
                         }
                     }
-                    .padding(16)
                 }
-            }
-            .navigationTitle("Developer menu")
-            ._toolbarTitleDisplayMode(.inline)
-            .onAppear {
-                store.send(.onAppear)
+                .padding(16)
             }
         }
+        .navigationTitle("Developer menu")
+        ._toolbarTitleDisplayMode(.inline)
+        .onAppear {
+            store.send(.onAppear)
+        }
+                
     }
     
 }

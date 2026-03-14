@@ -22,24 +22,21 @@ struct CommentsView: View {
     let store: StoreOf<ArticleFeature>
     
     var body: some View {
-        WithPerceptionTracking {
-            VStack(spacing: 0) {
-                Text("Comments (\(store.comments.count.description)):", bundle: .module)
-                    .font(.title3)
-                    .bold()
-                    .padding(.vertical, 24)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                LazyVStack(spacing: 0) {
-                    ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
-                        WithPerceptionTracking {
-                            CommentView(store: store)
-                        }
-                    }
+        VStack(spacing: 0) {
+            Text("Comments (\(store.comments.count.description)):", bundle: .module)
+                .font(.title3)
+                .bold()
+                .padding(.vertical, 24)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            LazyVStack(spacing: 0) {
+                ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
+                    CommentView(store: store)
                 }
             }
-            .padding(.horizontal, 16)
         }
+        .padding(.horizontal, 16)
+                
     }
 }
 
@@ -51,7 +48,7 @@ struct CommentView: View {
     
     @Environment(\.tintColor) private var tintColor
     
-    @Perception.Bindable public var store: StoreOf<CommentFeature>
+    @Bindable public var store: StoreOf<CommentFeature>
     
     public init(store: StoreOf<CommentFeature>) {
         self.store = store
@@ -60,82 +57,81 @@ struct CommentView: View {
     // MARK: - Body
     
     var body: some View {
-        WithPerceptionTracking {
-            VStack(spacing: 0) {
-                ZStack {
-                    if store.comment.isDeleted {
-                        Text("Comment has been deleted", bundle: .module)
-                            .font(.subheadline)
-                            .foregroundStyle(Color(.Labels.quaternary))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 16)
-                    } else {
-                        VStack(spacing: 6) {
-                            Header()
-                            
-                            if store.comment.isHidden {
-                                Button {
-                                    store.send(.hiddenLabelTapped)
-                                } label: {
-                                    Text("Comment is hidden", bundle: .module)
-                                        .font(.subheadline)
-                                        .foregroundStyle(Color(.Labels.quaternary))
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                                .buttonStyle(.plain)
-                            } else {
-                                Text(store.comment.text)
-                                    .font(.subheadline)
-                                    .foregroundStyle(Color(.Labels.primary))
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .textSelection(.enabled)
-                            }
-                            
-                            Footer()
-                        }
-                        // TODO: Jumps when used in LazyVStack
-                        .animation(.default, value: store.comment.isHidden)
+        VStack(spacing: 0) {
+            ZStack {
+                if store.comment.isDeleted {
+                    Text("Comment has been deleted", bundle: .module)
+                        .font(.subheadline)
+                        .foregroundStyle(Color(.Labels.quaternary))
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, 16)
-                        .overlay(alignment: .topLeading) {
-                            Rectangle()
-                                .foregroundStyle(Color(.Background.primary))
-                                .frame(width: 128, height: 16)
-                                .offset(x: -1, y: -16)
-                        }
-                    }
-                }
-                .overlay(alignment: .leading) {
-                    if store.comment.nestLevel > 0 {
-                        HStack(spacing: 0) {
-                            ForEach(1...store.comment.nestLevel, id: \.self) { index in
-                                Rectangle()
-                                    .frame(width: 1)
-                                    .foregroundStyle(Color(.Separator.secondary))
-                                    .offset(x: CGFloat(-17 * index))
+                } else {
+                    VStack(spacing: 6) {
+                        Header()
+                        
+                        if store.comment.isHidden {
+                            Button {
+                                store.send(.hiddenLabelTapped)
+                            } label: {
+                                Text("Comment is hidden", bundle: .module)
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color(.Labels.quaternary))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
+                            .buttonStyle(.plain)
+                        } else {
+                            Text(store.comment.text)
+                                .font(.subheadline)
+                                .foregroundStyle(Color(.Labels.primary))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                        }
+                        
+                        Footer()
+                    }
+                    // TODO: Jumps when used in LazyVStack
+                    .animation(.default, value: store.comment.isHidden)
+                    .padding(.bottom, 16)
+                    .overlay(alignment: .topLeading) {
+                        Rectangle()
+                            .foregroundStyle(Color(.Background.primary))
+                            .frame(width: 128, height: 16)
+                            .offset(x: -1, y: -16)
+                    }
+                }
+            }
+            .overlay(alignment: .leading) {
+                if store.comment.nestLevel > 0 {
+                    HStack(spacing: 0) {
+                        ForEach(1...store.comment.nestLevel, id: \.self) { index in
+                            Rectangle()
+                                .frame(width: 1)
+                                .foregroundStyle(Color(.Separator.secondary))
+                                .offset(x: CGFloat(-17 * index))
                         }
                     }
                 }
-                .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
-            .fullScreenCover(item: $store.scope(state: \.$writeForm, action: \.writeForm)) { store in
-                NavigationStack {
-                    WriteFormScreen(store: store)
-                }
-            }
-            .fittedSheet(
-                item: $store.scope(state: \.$changeReputation, action: \.changeReputation),
-                embedIntoNavStack: true
-            ) { store in
-                ReputationChangeView(store: store)
-            }
-            .background(Color(.Background.primary))
-            .alert($store.scope(state: \.$alert, action: \.alert))
-            .task {
-                await store.send(.onTask).finish()
-            }
-            .id(store.comment.id)
+            .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
         }
+        .fullScreenCover(item: $store.scope(state: \.$writeForm, action: \.writeForm)) { store in
+            NavigationStack {
+                WriteFormScreen(store: store)
+            }
+        }
+        .fittedSheet(
+            item: $store.scope(state: \.$changeReputation, action: \.changeReputation),
+            embedIntoNavStack: true
+        ) { store in
+            ReputationChangeView(store: store)
+        }
+        .background(Color(.Background.primary))
+        .alert($store.scope(state: \.$alert, action: \.alert))
+        .task {
+            await store.send(.onTask).finish()
+        }
+        .id(store.comment.id)
+                
     }
     
     // MARK: - Header

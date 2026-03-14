@@ -15,7 +15,7 @@ struct SortView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable var store: StoreOf<SortFeature>
+    @Bindable var store: StoreOf<SortFeature>
     @Environment(\.tintColor) private var tintColor
     @State private var sortSelection: FavoriteSortType?
     @State private var sortSelections: Set<FavoriteSortType> = .init()
@@ -29,103 +29,102 @@ struct SortView: View {
     // MARK: - Body
     
     var body: some View {
-        WithPerceptionTracking {
-            VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Menu {
-                        Button {
-                            store.send(.didSelectSortType(.byDate))
-                        } label: {
-                            Text(SortType.byDate.titleLocalized, bundle: .module)
-                            Image(systemSymbol: .calendar)
-                        }
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Menu {
+                    Button {
+                        store.send(.didSelectSortType(.byDate))
+                    } label: {
+                        Text(SortType.byDate.titleLocalized, bundle: .module)
+                        Image(systemSymbol: .calendar)
+                    }
+                    
+                    Button {
+                        store.send(.didSelectSortType(.byName))
+                    } label: {
+                        Text(SortType.byName.titleLocalized, bundle: .module)
+                        Image(systemSymbol: .person)
+                    }
+                } label: {
+                    HStack {
+                        Text(store.sortType.titleLocalized, bundle: .module)
+                            .foregroundStyle(Color(.Labels.primary))
+                            .padding(.leading, 16)
                         
-                        Button {
-                            store.send(.didSelectSortType(.byName))
-                        } label: {
-                            Text(SortType.byName.titleLocalized, bundle: .module)
-                            Image(systemSymbol: .person)
-                        }
-                    } label: {
-                        HStack {
-                            Text(store.sortType.titleLocalized, bundle: .module)
-                                .foregroundStyle(Color(.Labels.primary))
-                                .padding(.leading, 16)
-                            
-                            Spacer()
-                            
-                            Image(systemSymbol: .chevronUpChevronDown)
-                                .foregroundStyle(Color(.Labels.teritary))
-                                .padding(.trailing, 11)
-                        }
-                        .frame(height: 60)
-                        .background(Color(.Background.teritary))
-                        .cornerRadius(10)
+                        Spacer()
+                        
+                        Image(systemSymbol: .chevronUpChevronDown)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .padding(.trailing, 11)
                     }
-                }
-                .listRowBackground(Color(.Background.teritary))
-                .padding(.bottom, 28)
-                
-                Row("In reverse order", value: $store.isReverseOrder)
-                    .padding(.bottom, 24)
-                
-                Row("Unread first", value: $store.isUnreadFirst)
-                    .padding(.bottom, 64)
-                
-                HStack {
-                    Button {
-                        store.send(.cancelButtonTapped)
-                    } label: {
-                        Text("Cancel", bundle: .module)
-                            .frame(maxWidth: .infinity)
-                            .padding(8)
-                    }
-                    .buttonStyle(.bordered)
-                    .frame(height: 48)
-
-                    Button {
-                        store.send(.saveButtonTapped)
-                    } label: {
-                        Text("Apply", bundle: .module)
-                            .frame(maxWidth: .infinity)
-                            .padding(8)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .frame(height: 48)
-                }
-                .padding(.vertical, 8)
-            }
-            .padding(.horizontal, 16)
-            .background {
-                if !isLiquidGlass {
-                    Color(.Background.primary)
+                    .frame(height: 60)
+                    .background(Color(.Background.teritary))
+                    .cornerRadius(10)
                 }
             }
-            ._toolbarTitleDisplayMode(.inline)
-            .modifier(NavigationTitle())
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        store.send(.cancelButtonTapped)
-                    } label: {
-                        if isLiquidGlass {
-                            Image(systemSymbol: .xmark)
-                        } else {
-                            Image(systemSymbol: .xmark)
-                                .font(.caption2)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color(.Labels.teritary))
-                                .frame(width: 30, height: 30)
-                                .background(
-                                    Circle()
-                                        .fill(Color(.Background.quaternary))
-                                        .clipShape(Circle())
-                                )
-                        }
+            .listRowBackground(Color(.Background.teritary))
+            .padding(.bottom, 28)
+            
+            Row("In reverse order", value: $store.isReverseOrder)
+                .padding(.bottom, 24)
+            
+            Row("Unread first", value: $store.isUnreadFirst)
+                .padding(.bottom, 64)
+            
+            HStack {
+                Button {
+                    store.send(.cancelButtonTapped)
+                } label: {
+                    Text("Cancel", bundle: .module)
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
+                }
+                .buttonStyle(.bordered)
+                .frame(height: 48)
+        
+                Button {
+                    store.send(.saveButtonTapped)
+                } label: {
+                    Text("Apply", bundle: .module)
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
+                }
+                .buttonStyle(.borderedProminent)
+                .frame(height: 48)
+            }
+            .padding(.vertical, 8)
+        }
+        .padding(.horizontal, 16)
+        .background {
+            if !isLiquidGlass {
+                Color(.Background.primary)
+            }
+        }
+        ._toolbarTitleDisplayMode(.inline)
+        .modifier(NavigationTitle())
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    store.send(.cancelButtonTapped)
+                } label: {
+                    if isLiquidGlass {
+                        Image(systemSymbol: .xmark)
+                    } else {
+                        Image(systemSymbol: .xmark)
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                Circle()
+                                    .fill(Color(.Background.quaternary))
+                                    .clipShape(Circle())
+                            )
                     }
                 }
             }
         }
+                
     }
     
     @available(iOS, deprecated: 26.0)

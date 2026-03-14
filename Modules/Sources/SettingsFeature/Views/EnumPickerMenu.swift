@@ -22,9 +22,8 @@ struct EnumPickerMenu<Selection: Hashable & CaseIterable, Content: View, Label: 
             }
             .pickerStyle(.inline)
         } label: {
-            WithPerceptionTracking {
-                label()
-            }
+            label()
+                        
         }
     }
 }

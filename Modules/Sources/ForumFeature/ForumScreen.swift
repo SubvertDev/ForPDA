@@ -18,7 +18,7 @@ public struct ForumScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<ForumFeature>
+    @Bindable public var store: StoreOf<ForumFeature>
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
@@ -36,84 +36,83 @@ public struct ForumScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if let forum = store.forum, !store.isLoadingTopics {
-                    List {
-                        if let globalAnnouncement = forum.globalAnnouncementAttributed {
-                            GlobalAnnouncementRow(announce: globalAnnouncement)
-                        }
-                        
-                        if !forum.subforums.isEmpty {
-                            SubforumsSection(subforums: forum.subforums)
-                        }
-                        
-                        if !forum.announcements.isEmpty {
-                            AnnouncmentsSection(announcements: forum.announcements)
-                        }
-
-                        if !store.topicsPinned.isEmpty {
-                            TopicsSection(topics: store.topicsPinned, pinned: true)
-                        }
-                        
-                        if !store.topics.isEmpty {
-                            TopicsSection(topics: store.topics, pinned: false)
-                        }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if let forum = store.forum, !store.isLoadingTopics {
+                List {
+                    if let globalAnnouncement = forum.globalAnnouncementAttributed {
+                        GlobalAnnouncementRow(announce: globalAnnouncement)
                     }
-                    .scrollContentBackground(.hidden)
-                    .scrollDismissesKeyboard(.immediately)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                    .refreshable {
-                        await send(.onRefresh).finish()
+                    
+                    if !forum.subforums.isEmpty {
+                        SubforumsSection(subforums: forum.subforums)
                     }
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
-            }
-            .animation(.default, value: store.forum)
-            .animation(.default, value: store.sectionsExpandState)
-            .navigationTitle(Text(store.forumName ?? "Загрузка..."))
-            ._toolbarTitleDisplayMode(.large)
-            .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
-                    PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
-                        minimized: $navigationMinimized
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
-                }
-            }
-            .toolbar {
-                ToolbarItem {
-                    Button {
-                        send(.searchButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .magnifyingglass)
-                            .foregroundStyle(foregroundStyle())
+                    
+                    if !forum.announcements.isEmpty {
+                        AnnouncmentsSection(announcements: forum.announcements)
+                    }
+        
+                    if !store.topicsPinned.isEmpty {
+                        TopicsSection(topics: store.topicsPinned, pinned: true)
+                    }
+                    
+                    if !store.topics.isEmpty {
+                        TopicsSection(topics: store.topics, pinned: false)
                     }
                 }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer()
+                .scrollContentBackground(.hidden)
+                .scrollDismissesKeyboard(.immediately)
+                ._inScrollContentDetector(state: $navigationMinimized)
+                .refreshable {
+                    await send(.onRefresh).finish()
                 }
-                
-                ToolbarItem {
-                    OptionsMenu()
-                }
-            }
-            .onFirstAppear {
-                send(.onFirstAppear)
-            } onNextAppear: {
-                send(.onNextAppear)
+            } else {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .animation(.default, value: store.forum)
+        .animation(.default, value: store.sectionsExpandState)
+        .navigationTitle(Text(store.forumName ?? "Загрузка..."))
+        ._toolbarTitleDisplayMode(.large)
+        .safeAreaInset(edge: .bottom) {
+            if isLiquidGlass,
+               store.appSettings.floatingNavigation,
+               !store.appSettings.experimentalFloatingNavigation {
+                PageNavigation(
+                    store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                    minimized: $navigationMinimized
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+        }
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    send(.searchButtonTapped)
+                } label: {
+                    Image(systemSymbol: .magnifyingglass)
+                        .foregroundStyle(foregroundStyle())
+                }
+            }
+            
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer()
+            }
+            
+            ToolbarItem {
+                OptionsMenu()
+            }
+        }
+        .onFirstAppear {
+            send(.onFirstAppear)
+        } onNextAppear: {
+            send(.onNextAppear)
+        }
+                
     }
     
     // MARK: - Options Menu
@@ -176,32 +175,31 @@ public struct ForumScreen: View {
                 Navigation(pinned: pinned)
                 
                 ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
-                    WithPerceptionTracking {
-                        let radius: CGFloat = isLiquidGlass ? 24 : 10
-                        TopicRow(
-                            title: .plain(topic.name),
-                            date: topic.lastPost.date,
-                            username: topic.lastPost.username,
-                            isClosed: topic.isClosed,
-                            isUnread: topic.isUnread
-                        ) { unreadTapped in
-                            send(.topicTapped(topic, showUnread: unreadTapped))
-                        }
-                        .contextMenu {
-                            TopicContextMenu(topic: topic)
-                            
-                            Section {
-                                CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
-                            }
-                        }
-                        .listRowBackground(
-                            Color(.Background.teritary)
-                                .clipShape(.rect(
-                                    topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
-                                    bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
-                                ))
-                        )
+                    let radius: CGFloat = isLiquidGlass ? 24 : 10
+                    TopicRow(
+                        title: .plain(topic.name),
+                        date: topic.lastPost.date,
+                        username: topic.lastPost.username,
+                        isClosed: topic.isClosed,
+                        isUnread: topic.isUnread
+                    ) { unreadTapped in
+                        send(.topicTapped(topic, showUnread: unreadTapped))
                     }
+                    .contextMenu {
+                        TopicContextMenu(topic: topic)
+                        
+                        Section {
+                            CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                        }
+                    }
+                    .listRowBackground(
+                        Color(.Background.teritary)
+                            .clipShape(.rect(
+                                topLeadingRadius: index == 0 ? radius : 0, bottomLeadingRadius: index == topics.count - 1 ? radius : 0,
+                                bottomTrailingRadius: index == topics.count - 1 ? radius : 0, topTrailingRadius: index == 0 ? radius : 0
+                            ))
+                    )
+                                        
                 }
                 .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -252,25 +250,24 @@ public struct ForumScreen: View {
         Section {
             if store.sectionsExpandState.value(for: .subforums) {
                 ForEach(subforums) { forum in
-                    WithPerceptionTracking {
-                        ForumRow(title: forum.name, isUnread: forum.isUnread) {
-                            if let redirectUrl = forum.redirectUrl {
-                                send(.subforumRedirectTapped(redirectUrl))
-                            } else {
-                                send(.subforumTapped(forum))
-                            }
-                        }
-                        .contextMenu {
-                            Section {
-                                CommonContextMenu(
-                                    id: forum.id,
-                                    isFavorite: forum.isFavorite,
-                                    isUnread: forum.isUnread,
-                                    isForum: true
-                                )
-                            }
+                    ForumRow(title: forum.name, isUnread: forum.isUnread) {
+                        if let redirectUrl = forum.redirectUrl {
+                            send(.subforumRedirectTapped(redirectUrl))
+                        } else {
+                            send(.subforumTapped(forum))
                         }
                     }
+                    .contextMenu {
+                        Section {
+                            CommonContextMenu(
+                                id: forum.id,
+                                isFavorite: forum.isFavorite,
+                                isUnread: forum.isUnread,
+                                isForum: true
+                            )
+                        }
+                    }
+                                        
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }

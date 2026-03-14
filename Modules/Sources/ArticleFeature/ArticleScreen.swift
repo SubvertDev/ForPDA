@@ -19,7 +19,7 @@ public struct ArticleScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<ArticleFeature>
+    @Bindable public var store: StoreOf<ArticleFeature>
     @FocusState public var focus: ArticleFeature.State.Field?
     @Environment(\.tintColor) private var tintColor
     
@@ -42,67 +42,62 @@ public struct ArticleScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ArticleScrollView()
-                .bind($store.focus, to: $focus)
-                .alert($store.scope(state: \.$destination, action: \.destination).alert)
-                .sheet(item: $store.destination.share, id: \.self) { url in
-                    // FIXME: Perceptible warning despite tracking closure
-                    WithPerceptionTracking {
-                        ShareActivityView(url: url) { success in
-                            store.send(.linkShared(success, url))
-                        }
-                        .presentationDetents([.medium])
-                    }
+        ArticleScrollView()
+            .bind($store.focus, to: $focus)
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
+            .sheet(item: $store.destination.share, id: \.self) { url in
+                ShareActivityView(url: url) { success in
+                    store.send(.linkShared(success, url))
                 }
-                .safeAreaInset(edge: .bottom) { Keyboard() }
-                ._scrollEdgeEffectHidden(!isCommentViewExpanded, for: .bottom)
-                .onTapGesture { focus = nil }
-                .modifier(NavigationBarSettings())
-                .toolbar { Toolbar() }
-                .overlay(alignment: .top) {
-                    if !isLiquidGlass {
-                        ToolbarOverlay()
-                    }
+                .presentationDetents([.medium])
+            }
+            .safeAreaInset(edge: .bottom) { Keyboard() }
+            ._scrollEdgeEffectHidden(!isCommentViewExpanded, for: .bottom)
+            .onTapGesture { focus = nil }
+            .modifier(NavigationBarSettings())
+            .toolbar { Toolbar() }
+            .overlay(alignment: .top) {
+                if !isLiquidGlass {
+                    ToolbarOverlay()
                 }
-                .overlay { RefreshIndicator() }
-                .background(Color(.Background.primary))
-                .onAppear { store.send(.onAppear) }
-                .onChange(of: store.scrollToId) { _ in
-                    guard let scrollId = store.scrollToId, !store.isLoading else { return }
-                    withAnimation { scrollProxy?.scrollTo(scrollId, anchor: .center) }
-                }
-        }
+            }
+            .overlay { RefreshIndicator() }
+            .background(Color(.Background.primary))
+            .onAppear { store.send(.onAppear) }
+            .onChange(of: store.scrollToId) {
+                guard let scrollId = store.scrollToId, !store.isLoading else { return }
+                withAnimation { scrollProxy?.scrollTo(scrollId, anchor: .center) }
+            }
+                
     }
     
     // MARK: - Keyboard
     
     @ViewBuilder
     private func Keyboard() -> some View {
-        WithPerceptionTracking {
-            Group {
-                if #available(iOS 26.0, *) {
-                    LiquidKeyboardView(
-                        store: store,
-                        focus: $focus,
-                        isExpanded: $isCommentViewExpanded,
-                        isScrollDownVisible: $isCommentsViewVisible.inverted
-                    ) {
-                        withAnimation { scrollProxy?.scrollTo(-1, anchor: .top) }
-                    }
-                } else {
-                    KeyboardView(
-                        store: store,
-                        focus: $focus,
-                        isScrollDownVisible: $isCommentsViewVisible.inverted
-                    ) {
-                        withAnimation { scrollProxy?.scrollTo(-1, anchor: .top) }
-                    }
-                    .transition(.push(from: .bottom))
+        Group {
+            if #available(iOS 26.0, *) {
+                LiquidKeyboardView(
+                    store: store,
+                    focus: $focus,
+                    isExpanded: $isCommentViewExpanded,
+                    isScrollDownVisible: $isCommentsViewVisible.inverted
+                ) {
+                    withAnimation { scrollProxy?.scrollTo(-1, anchor: .top) }
                 }
+            } else {
+                KeyboardView(
+                    store: store,
+                    focus: $focus,
+                    isScrollDownVisible: $isCommentsViewVisible.inverted
+                ) {
+                    withAnimation { scrollProxy?.scrollTo(-1, anchor: .top) }
+                }
+                .transition(.push(from: .bottom))
             }
-            .animation(isLiquidGlass ? .bouncy : .default, value: store.canComment)
         }
+        .animation(isLiquidGlass ? .bouncy : .default, value: store.canComment)
+                
     }
     
     // MARK: - Toolbar
@@ -148,47 +143,44 @@ public struct ArticleScreen: View {
     @ViewBuilder
     private func ArticleScrollView() -> some View {
         ScrollViewReader { proxy in
-            WithPerceptionTracking {
-                ScrollView(.vertical) {
-                    VStack(spacing: 0) {
-                        ParallaxHeader(
-                            coordinateSpace: "scroll",
-                            defaultHeight: UIScreen.main.bounds.width,
-                            safeAreaTopHeight: safeAreaTopHeight
-                        ) {
-                            WithPerceptionTracking {
-                                ArticleHeader()
-                            }
-                        }
+            ScrollView(.vertical) {
+                VStack(spacing: 0) {
+                    ParallaxHeader(
+                        coordinateSpace: "scroll",
+                        defaultHeight: UIScreen.main.bounds.width,
+                        safeAreaTopHeight: safeAreaTopHeight
+                    ) {
+                        ArticleHeader()
+                    }
+                    
+                    if store.isLoading {
+                        ArticleLoader()
+                            .padding(.top, 32)
                         
-                        if store.isLoading {
-                            ArticleLoader()
-                                .padding(.top, 32)
-                            
-                        } else if let elements = store.elements {
-                            ArticleView(elements: elements)
-                                .background(Color(.Background.primary))
+                    } else if let elements = store.elements {
+                        ArticleView(elements: elements)
+                            .background(Color(.Background.primary))
+                    }
+                }
+                .animation(.default, value: store.elements)
+                .modifier(
+                    ScrollViewOffsetObserver(
+                        safeAreaTopHeight: safeAreaTopHeight,
+                        navBarOpacity: $navBarOpacity
+                    ) {
+                        if !store.isRefreshing {
+                            store.send(.onRefresh)
                         }
                     }
-                    .animation(.default, value: store.elements)
-                    .modifier(
-                        ScrollViewOffsetObserver(
-                            safeAreaTopHeight: safeAreaTopHeight,
-                            navBarOpacity: $navBarOpacity
-                        ) {
-                            if !store.isRefreshing {
-                                store.send(.onRefresh)
-                            }
-                        }
-                    )
-                }
-                .ignoresSafeArea(.all, edges: .top)
-                .scrollIndicators(.hidden)
-                .coordinateSpace(name: "scroll")
-                .onAppear {
-                    scrollProxy = proxy
-                }
+                )
             }
+            .ignoresSafeArea(.all, edges: .top)
+            .scrollIndicators(.hidden)
+            .coordinateSpace(name: "scroll")
+            .onAppear {
+                scrollProxy = proxy
+            }
+                        
         }
     }
     
@@ -246,7 +238,7 @@ public struct ArticleScreen: View {
                         gradient: .smooth(
                             from: .clear,
                             to: Color(.Background.forcedDark),
-                            easing: .easeInOut
+                            curve: .easeInOut
                         ),
                         startPoint: .top,
                         endPoint: .bottom
@@ -264,20 +256,19 @@ public struct ArticleScreen: View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
                 ForEach(elements, id: \.self) { element in
-                    WithPerceptionTracking {
-                        ArticleElementView(
-                            element: element,
-                            isShowingVoteResults: store.isShowingVoteResults,
-                            isUploadingPollVote: store.isUploadingPollVote,
-                            onPollVoteButtonTapped: { id, selections in
-                                store.send(.pollVoteButtonTapped(id, selections))
-                            },
-                            onLinkInTextTapped: { url in
-                                store.send(.linkInTextTapped(url))
-                            }
-                        )
-                        .padding(.vertical, 10)
-                    }
+                    ArticleElementView(
+                        element: element,
+                        isShowingVoteResults: store.isShowingVoteResults,
+                        isUploadingPollVote: store.isUploadingPollVote,
+                        onPollVoteButtonTapped: { id, selections in
+                            store.send(.pollVoteButtonTapped(id, selections))
+                        },
+                        onLinkInTextTapped: { url in
+                            store.send(.linkInTextTapped(url))
+                        }
+                    )
+                    .padding(.vertical, 10)
+                                        
                 }
             }
             .padding(.vertical, 14)

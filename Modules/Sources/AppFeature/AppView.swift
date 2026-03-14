@@ -37,7 +37,7 @@ public struct AppView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<AppFeature>
+    @Bindable public var store: StoreOf<AppFeature>
     @Environment(\.tintColor) private var tintColor
     
     let pageStore = StoreOf<PageNavigationFeature>.init(
@@ -59,38 +59,36 @@ public struct AppView: View {
     // MARK: - Body
         
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack(alignment: .bottom) {
-                if #available(iOS 26.0, *) {
-                    LiquidTabView(store: store)
-                } else {
-                    OldTabView(store: store)
-                }
-                
-                ToastView(toast: store.toastMessage)
-                    .ignoresSafeArea(.keyboard, edges: .bottom)
+        ZStack(alignment: .bottom) {
+            if #available(iOS 26.0, *) {
+                LiquidTabView(store: store)
+            } else {
+                OldTabView(store: store)
             }
-            .animation(.default, value: store.toastMessage)
-            .ignoresSafeArea(.keyboard, edges: .bottom)
-            .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
-            .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
-                LogStoreScreen(store: store)
+            
+            ToastView(toast: store.toastMessage)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+        }
+        .animation(.default, value: store.toastMessage)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
+        .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
+        .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
+            LogStoreScreen(store: store)
+        }
+        .fullScreenCover(item: $store.scope(state: \.$auth, action: \.auth)) { store in
+            NavigationStack {
+                AuthScreen(store: store)
             }
-            .fullScreenCover(item: $store.scope(state: \.$auth, action: \.auth)) { store in
-                NavigationStack {
-                    AuthScreen(store: store)
-                }
-            }
-            .alert($store.scope(state: \.$alert, action: \.alert))
-            // Tint and environment should be after sheets/covers
-            .tint(store.appSettings.appTintColor.asColor)
-            .environment(\.tintColor, store.appSettings.appTintColor.asColor)
-            .onAppear {
-                store.send(.onAppear)
-            }
-            .onShake {
-                store.send(.onShake)
-            }
+        }
+        .alert($store.scope(state: \.$alert, action: \.alert))
+        // Tint and environment should be after sheets/covers
+        .tint(store.appSettings.appTintColor.asColor)
+        .environment(\.tintColor, store.appSettings.appTintColor.asColor)
+        .onAppear {
+            store.send(.onAppear)
+        }
+        .onShake {
+            store.send(.onShake)
         }
     }
 }
@@ -100,63 +98,61 @@ public struct AppView: View {
 @available(iOS 26.0, *)
 struct LiquidTabView: View {
     
-    @Perception.Bindable var store: StoreOf<AppFeature>
+    @Bindable var store: StoreOf<AppFeature>
     
     var body: some View {
-        WithPerceptionTracking {
-            TabView(selection: $store.selectedTab.sending(\.didSelectTab)) {
-                Tab(
-                    AppTab.articles.title,
-                    systemSymbol: AppTab.articles.iconSymbol,
-                    value: .articles
-                ) {
-                    StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
-                }
-                
-                Tab(
-                    AppTab.favorites.title,
-                    systemSymbol: AppTab.favorites.iconSymbol,
-                    value: .favorites
-                ) {
-                    StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
-                }
-                .badge(store.favoritesBadges)
-                
-                Tab(
-                    AppTab.forum.title,
-                    systemSymbol: AppTab.forum.iconSymbol,
-                    value: .forum
-                ) {
-                    StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
-                }
-                
-                Tab(
-                    AppTab.profile.title,
-                    systemSymbol: AppTab.profile.iconSymbol,
-                    value: .profile
-                ) {
-                    ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
-                }
-                .badge(store.profileBadges)
+        TabView(selection: $store.selectedTab.sending(\.didSelectTab)) {
+            Tab(
+                AppTab.articles.title,
+                systemSymbol: AppTab.articles.iconSymbol,
+                value: .articles
+            ) {
+                StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
             }
-            .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
-            .if(store.appSettings.experimentalFloatingNavigation) { content in
-                if #available(iOS 26.1, *) {
-                    let isEnabled = getNavigation()?.state.totalPages ?? 0 > 1
-                    content
-                        .tabViewBottomAccessory(isEnabled: isEnabled) {
-                            if let navigationStore = getNavigation() {
-                                PageNavigation(store: navigationStore)
-                            }
+            
+            Tab(
+                AppTab.favorites.title,
+                systemSymbol: AppTab.favorites.iconSymbol,
+                value: .favorites
+            ) {
+                StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+            }
+            .badge(store.favoritesBadges)
+            
+            Tab(
+                AppTab.forum.title,
+                systemSymbol: AppTab.forum.iconSymbol,
+                value: .forum
+            ) {
+                StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
+            }
+            
+            Tab(
+                AppTab.profile.title,
+                systemSymbol: AppTab.profile.iconSymbol,
+                value: .profile
+            ) {
+                ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
+            }
+            .badge(store.profileBadges)
+        }
+        .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
+        .if(store.appSettings.experimentalFloatingNavigation) { content in
+            if #available(iOS 26.1, *) {
+                let isEnabled = getNavigation()?.state.totalPages ?? 0 > 1
+                content
+                    .tabViewBottomAccessory(isEnabled: isEnabled) {
+                        if let navigationStore = getNavigation() {
+                            PageNavigation(store: navigationStore)
                         }
-                } else {
-                    content
-                        .tabViewBottomAccessory {
-                            if let navigationStore = getNavigation() {
-                                PageNavigation(store: navigationStore)
-                            }
+                    }
+            } else {
+                content
+                    .tabViewBottomAccessory {
+                        if let navigationStore = getNavigation() {
+                            PageNavigation(store: navigationStore)
                         }
-                }
+                    }
             }
         }
     }
@@ -167,34 +163,33 @@ struct LiquidTabView: View {
 @available(iOS, deprecated: 26.0, message: "Use LiquidTabView instead")
 struct OldTabView: View {
     
-    @Perception.Bindable var store: StoreOf<AppFeature>
+    @Bindable var store: StoreOf<AppFeature>
     @State private var shouldAnimatedTabItem: [Bool] = [false, false, false, false]
 
     var body: some View {
-        WithPerceptionTracking {
-            TabView(selection: $store.selectedTab) {
-                StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
-                    .tag(AppTab.articles)
-                
-                StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
-                    .tag(AppTab.favorites)
-                
-                StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
-                    .tag(AppTab.forum)
-                
-                ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
-                    .tag(AppTab.profile)
-            }
+        TabView(selection: $store.selectedTab) {
+            StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
+                .tag(AppTab.articles)
             
-            Group {
-                if store.showTabBar {
-                    PDATabView()
-                        .transition(.move(edge: .bottom))
-                }
-            }
-            // Animation on whole ZStack breaks safeareainset for next screens
-            .animation(.default, value: store.showTabBar)
+            StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+                .tag(AppTab.favorites)
+            
+            StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
+                .tag(AppTab.forum)
+            
+            ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
+                .tag(AppTab.profile)
         }
+        
+        Group {
+            if store.showTabBar {
+                PDATabView()
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        // Animation on whole ZStack breaks safeareainset for next screens
+        .animation(.default, value: store.showTabBar)
+                
     }
     
     // MARK: - PDA Tab Item
@@ -223,15 +218,14 @@ struct OldTabView: View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 ForEach(AppTab.allCases, id: \.self) { tab in
-                    WithPerceptionTracking {
-                        Button {
-                            store.send(.didSelectTab(tab))
-                            shouldAnimatedTabItem[tab.rawValue].toggle()
-                        } label: {
-                            PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)
-                                .padding(.top, 2.5)
-                        }
+                    Button {
+                        store.send(.didSelectTab(tab))
+                        shouldAnimatedTabItem[tab.rawValue].toggle()
+                    } label: {
+                        PDATabItem(title: tab.title, iconSymbol: tab.iconSymbol, index: tab.rawValue)
+                            .padding(.top, 2.5)
                     }
+                                        
                 }
             }
             .padding(.horizontal, 16)
@@ -289,7 +283,7 @@ struct ToastView: View {
                 .opacity(isExpanded ? 1 : 0)
             }
         }
-        .onChange(of: toast) { newValue in
+        .onChange(of: toast) { _, newValue in
             pendingTask?.cancel()
             
             if let newValue {

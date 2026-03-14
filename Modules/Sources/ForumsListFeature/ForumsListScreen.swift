@@ -15,7 +15,7 @@ public struct ForumsListScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<ForumsListFeature>
+    @Bindable public var store: StoreOf<ForumsListFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
@@ -27,59 +27,56 @@ public struct ForumsListScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if let forums = store.forums {
-                    List(forums, id: \.id) { forumRow in
-                        WithPerceptionTracking {
-                            Section {
-                                if store.isExpanded[forumRow.id]! {
-                                    ForEach(forumRow.forums) { forum in
-                                        ForumRow(
-                                            title: forum.name,
-                                            isUnread: forum.isUnread,
-                                            onAction: {
-                                                if let redirectUrl = forum.redirectUrl {
-                                                    send(.forumRedirectTapped(redirectUrl))
-                                                } else {
-                                                    send(.forumTapped(id: forum.id, name: forum.name))
-                                                }
-                                            }
-                                        )
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if let forums = store.forums {
+                List(forums, id: \.id) { forumRow in
+                    Section {
+                        if store.isExpanded[forumRow.id]! {
+                            ForEach(forumRow.forums) { forum in
+                                ForumRow(
+                                    title: forum.name,
+                                    isUnread: forum.isUnread,
+                                    onAction: {
+                                        if let redirectUrl = forum.redirectUrl {
+                                            send(.forumRedirectTapped(redirectUrl))
+                                        } else {
+                                            send(.forumTapped(id: forum.id, name: forum.name))
+                                        }
                                     }
-                                    
-                                }
-                            } header: {
-                                Header(forumRow: forumRow)
+                                )
                             }
-                            .listRowBackground(Color(.Background.teritary))
+                            
                         }
+                    } header: {
+                        Header(forumRow: forumRow)
                     }
-                    .scrollContentBackground(.hidden)
-                    .animation(.easeInOut(duration: 0.3), value: store.isExpanded)
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
+                    .listRowBackground(Color(.Background.teritary))
                 }
-            }
-            .animation(.default, value: store.forums)
-            .navigationTitle(Text("Forum", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .toolbar {
-                Button {
-                    send(.searchButtonTapped)
-                } label: {
-                    Image(systemSymbol: .magnifyingglass)
-                        .foregroundStyle(foregroundStyle())
-                }
-            }
-            .onAppear {
-                send(.onAppear)
+                .scrollContentBackground(.hidden)
+                .animation(.easeInOut(duration: 0.3), value: store.isExpanded)
+            } else {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .animation(.default, value: store.forums)
+        .navigationTitle(Text("Forum", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .toolbar {
+            Button {
+                send(.searchButtonTapped)
+            } label: {
+                Image(systemSymbol: .magnifyingglass)
+                    .foregroundStyle(foregroundStyle())
+            }
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Header

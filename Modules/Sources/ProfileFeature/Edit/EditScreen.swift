@@ -16,7 +16,7 @@ import SFSafeSymbols
 @ViewAction(for: EditFeature.self)
 public struct EditScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<EditFeature>
+    @Bindable public var store: StoreOf<EditFeature>
     @Environment(\.tintColor) private var tintColor
     
     @State private var pickerItem: PhotosPickerItem?
@@ -28,78 +28,77 @@ public struct EditScreen: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            List {
+                AvatarRow()
                 
-                List {
-                    AvatarRow()
-                    
-                    if store.isUserCanEditStatus {
-                        Field(
-                            content: Binding(unwrapping: $store.draftUser.status, default: ""),
-                            title: LocalizedStringKey("Status"),
-                            focusEqual: .status,
-                            characterLimit: 28
-                        )
-                    }
-                    
+                if store.isUserCanEditStatus {
                     Field(
-                        content: Binding(unwrapping: $store.draftUser.signature, default: ""),
-                        title: LocalizedStringKey("Signature"),
-                        focusEqual: .signature,
-                        characterLimit: 300
-                    )
-                    
-                    Field(
-                        content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
-                        title: LocalizedStringKey("About me"),
-                        focusEqual: .about,
-                        characterLimit: 500
-                    )
-                    
-                    Section {
-                        UserBirthday()
-                        UserGender()
-                    }
-                    .listRowBackground(Color(.Background.teritary))
-                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    
-                    Field(
-                        content: Binding(unwrapping: $store.draftUser.city, default: ""),
-                        title: LocalizedStringKey("City"),
-                        focusEqual: .city,
-                        characterLimit: 50
+                        content: Binding(unwrapping: $store.draftUser.status, default: ""),
+                        title: LocalizedStringKey("Status"),
+                        focusEqual: .status,
+                        characterLimit: 28
                     )
                 }
-                .scrollContentBackground(.hidden)
-            }
-            .alert($store.scope(state: \.$alert, action: \.alert))
-            .navigationTitle(Text("Edit profile", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
-            ._safeAreaBar(edge: .bottom) {
-                SendButton()
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        send(.cancelButtonTapped)
-                    } label: {
-                        Text("Cancel", bundle: .module)
-                            .foregroundStyle(tintColor)
-                    }
-                    .disabled(store.isSending)
+                
+                Field(
+                    content: Binding(unwrapping: $store.draftUser.signature, default: ""),
+                    title: LocalizedStringKey("Signature"),
+                    focusEqual: .signature,
+                    characterLimit: 300
+                )
+                
+                Field(
+                    content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
+                    title: LocalizedStringKey("About me"),
+                    focusEqual: .about,
+                    characterLimit: 500
+                )
+                
+                Section {
+                    UserBirthday()
+                    UserGender()
                 }
+                .listRowBackground(Color(.Background.teritary))
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                
+                Field(
+                    content: Binding(unwrapping: $store.draftUser.city, default: ""),
+                    title: LocalizedStringKey("City"),
+                    focusEqual: .city,
+                    characterLimit: 50
+                )
             }
-            .bind($store.focus, to: $focus)
-            .onTapGesture {
-                focus = nil
-            }
-            .onAppear {
-                send(.onAppear)
+            .scrollContentBackground(.hidden)
+        }
+        .alert($store.scope(state: \.$alert, action: \.alert))
+        .navigationTitle(Text("Edit profile", bundle: .module))
+        .navigationBarTitleDisplayMode(.inline)
+        ._safeAreaBar(edge: .bottom) {
+            SendButton()
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    send(.cancelButtonTapped)
+                } label: {
+                    Text("Cancel", bundle: .module)
+                        .foregroundStyle(tintColor)
+                }
+                .disabled(store.isSending)
             }
         }
+        .bind($store.focus, to: $focus)
+        .onTapGesture {
+            focus = nil
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Send Button

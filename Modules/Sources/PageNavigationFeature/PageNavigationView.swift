@@ -10,13 +10,12 @@ import ComposableArchitecture
 import SFSafeSymbols
 import Models
 import SharedUI
-import Perception
 
 public struct PageNavigation: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<PageNavigationFeature>
+    @Bindable public var store: StoreOf<PageNavigationFeature>
     @FocusState private var focus: PageNavigationFeature.State.Field?
     @Binding private var minimized: Bool
     @Environment(\._tabViewBottomAccessoryPlacement) var placement
@@ -34,14 +33,12 @@ public struct PageNavigation: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            if #available(iOS 26, *), store.appSettings.floatingNavigation {
-                if store.shouldShow {
-                    LiquidNavigation()
-                }
-            } else {
-                LegacyNavigation()
+        if #available(iOS 26, *), store.appSettings.floatingNavigation {
+            if store.shouldShow {
+                LiquidNavigation()
             }
+        } else {
+            LegacyNavigation()
         }
     }
     
@@ -152,7 +149,7 @@ public struct PageNavigation: View {
             .keyboardType(.numberPad)
             .focused($focus, equals: PageNavigationFeature.State.Field.page)
             .fixedSize()
-            .onChange(of: store.page) { newValue in
+            .onChange(of: store.page) {
                 guard !store.page.isEmpty else { return }
                 store.page = String(min(Int(store.page.filter(\.isNumber)) ?? 1, store.totalPages))
             }
@@ -226,7 +223,7 @@ public struct PageNavigation: View {
                     .keyboardType(.numberPad)
                     .focused($focus, equals: PageNavigationFeature.State.Field.page)
                     .fixedSize()
-                    .onChange(of: store.page) { newValue in
+                    .onChange(of: store.page) {
                         guard !store.page.isEmpty else { return }
                         store.page = String(min(Int(store.page.filter(\.isNumber))!, store.totalPages))
                     }
@@ -334,50 +331,49 @@ public struct PageNavigation: View {
     
     @Shared(.appSettings) var appSettings
 
-    WithPerceptionTracking {
-        TabView {
-            Tab {
-                ZStack {
-                    LinearGradient(
-                        colors: [.red, .blue],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .ignoresSafeArea()
-                    
-                    ScrollView(.vertical) {
-                        ForEach(0..<100) { index in
-                            Text(String(index))
-                        }
-                        .frame(maxWidth: .infinity)
+    TabView {
+        Tab {
+            ZStack {
+                LinearGradient(
+                    colors: [.red, .blue],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                ScrollView(.vertical) {
+                    ForEach(0..<100) { index in
+                        Text(String(index))
                     }
-                    .overlay {
-                        VStack {
-                            Button(String("Enable")) {
-                                store.send(.update(count: 50000, offset: 50000-20))
-                            }
-                            Button(String("Disable")) {
-                                store.send(.update(count: 0, offset: 0))
-                            }
-                        }
-                        .background(.white)
-                    }
+                    .frame(maxWidth: .infinity)
                 }
-            } label: {
-                Label(String("Test"), systemSymbol: .paperclip)
+                .overlay {
+                    VStack {
+                        Button(String("Enable")) {
+                            store.send(.update(count: 50000, offset: 50000-20))
+                        }
+                        Button(String("Disable")) {
+                            store.send(.update(count: 0, offset: 0))
+                        }
+                    }
+                    .background(.white)
+                }
             }
-            
-            Tab {}; Tab {}; Tab {}
+        } label: {
+            Label(String("Test"), systemSymbol: .paperclip)
         }
-        .tabViewBottomAccessory(isEnabled: store.totalPages > 1) {
-            PageNavigation(store: store)
-        }
-        .tabBarMinimizeBehavior(.onScrollDown)
-        .onAppear {
-            $appSettings.floatingNavigation.withLock { $0 = true }
-            $appSettings.experimentalFloatingNavigation.withLock { $0 = true }
-            store.send(.update(count: 50000, offset: 50000-20))
-        }
-        .animation(.default, value: store.count)
+        
+        Tab {}; Tab {}; Tab {}
     }
+    .tabViewBottomAccessory(isEnabled: store.totalPages > 1) {
+        PageNavigation(store: store)
+    }
+    .tabBarMinimizeBehavior(.onScrollDown)
+    .onAppear {
+        $appSettings.floatingNavigation.withLock { $0 = true }
+        $appSettings.experimentalFloatingNavigation.withLock { $0 = true }
+        store.send(.update(count: 50000, offset: 50000-20))
+    }
+    .animation(.default, value: store.count)
+        
 }

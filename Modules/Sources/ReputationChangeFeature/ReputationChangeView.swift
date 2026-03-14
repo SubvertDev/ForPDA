@@ -14,7 +14,7 @@ public struct ReputationChangeView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<ReputationChangeFeature>
+    @Bindable public var store: StoreOf<ReputationChangeFeature>
     @Environment(\.tintColor) private var tintColor
     
     @FocusState private var isFocused: Bool
@@ -28,66 +28,65 @@ public struct ReputationChangeView: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            VStack(alignment: .leading, spacing: 0) {
-                Text("For «\(store.username)»", bundle: .module)
-                    .font(.subheadline)
-                    .foregroundStyle(Color(.Labels.secondary))
-                    .padding(.bottom, isLiquidGlass ? 20 : 25)
-                    .frame(maxWidth: .infinity, alignment: isLiquidGlass ? .center : .leading)
-                    .offset(y: isLiquidGlass ? -6 : 0)
-                
-                Section {
-                    Field(
-                        text: $store.changeReason.sending(\.reasonChanged),
-                        description: "",
-                        guideText: "",
-                        isEditor: true,
-                        isFocused: $isFocused
-                    )
-                } header: {
-                    Text("Input reason", bundle: .module)
-                        .font(.footnote)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.bottom, 6)
-                
-                ActionButtons()
+        VStack(alignment: .leading, spacing: 0) {
+            Text("For «\(store.username)»", bundle: .module)
+                .font(.subheadline)
+                .foregroundStyle(Color(.Labels.secondary))
+                .padding(.bottom, isLiquidGlass ? 20 : 25)
+                .frame(maxWidth: .infinity, alignment: isLiquidGlass ? .center : .leading)
+                .offset(y: isLiquidGlass ? -6 : 0)
+            
+            Section {
+                Field(
+                    text: $store.changeReason.sending(\.reasonChanged),
+                    description: "",
+                    guideText: "",
+                    isEditor: true,
+                    isFocused: $isFocused
+                )
+            } header: {
+                Text("Input reason", bundle: .module)
+                    .font(.footnote)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(.Labels.teritary))
             }
-            .padding(.horizontal, 16)
-            .background {
-                if !isLiquidGlass {
-                    Color(.Background.primary)
-                }
+            .padding(.bottom, 6)
+            
+            ActionButtons()
+        }
+        .padding(.horizontal, 16)
+        .background {
+            if !isLiquidGlass {
+                Color(.Background.primary)
             }
-            .onTapGesture {
-                isFocused = false
-            }
-            .modifier(NavigationTitle())
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        store.send(.cancelButtonTapped)
-                    } label: {
-                        if isLiquidGlass {
-                            Image(systemSymbol: .xmark)
-                        } else {
-                            Image(systemSymbol: .xmark)
-                                .font(.caption2)
-                                .fontWeight(.bold)
-                                .foregroundStyle(Color(.Labels.teritary))
-                                .frame(width: 30, height: 30)
-                                .background(
-                                    Circle()
-                                        .fill(Color(.Background.quaternary))
-                                        .clipShape(Circle())
-                                )
-                        }
+        }
+        .onTapGesture {
+            isFocused = false
+        }
+        .modifier(NavigationTitle())
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    store.send(.cancelButtonTapped)
+                } label: {
+                    if isLiquidGlass {
+                        Image(systemSymbol: .xmark)
+                    } else {
+                        Image(systemSymbol: .xmark)
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                Circle()
+                                    .fill(Color(.Background.quaternary))
+                                    .clipShape(Circle())
+                            )
                     }
                 }
             }
         }
+                
     }
     
     @available(iOS, deprecated: 26.0)
@@ -141,20 +140,19 @@ public struct ReputationChangeView: View {
         Button {
             action()
         } label: {
-            WithPerceptionTracking {
-                Label {
-                    Text(title, bundle: .module)
-                } icon: {
-                    Image(image)
-                }
-                .foregroundStyle(store.changeReason.isEmpty ? .secondary : tintColor)
-                .frame(maxWidth: .infinity)
-                .padding(8)
-                .if(!isLiquidGlass) { content in
-                    content
-                        .animation(.default, value: store.changeReason.isEmpty)
-                }
+            Label {
+                Text(title, bundle: .module)
+            } icon: {
+                Image(image)
             }
+            .foregroundStyle(store.changeReason.isEmpty ? .secondary : tintColor)
+            .frame(maxWidth: .infinity)
+            .padding(8)
+            .if(!isLiquidGlass) { content in
+                content
+                    .animation(.default, value: store.changeReason.isEmpty)
+            }
+                        
         }
         .ifElse(
             isLiquidGlass,

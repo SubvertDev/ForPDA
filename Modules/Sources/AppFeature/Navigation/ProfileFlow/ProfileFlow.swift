@@ -29,12 +29,10 @@ public struct ProfileTab: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            switch store.case {
-            case let .loggedIn(store),
-                let .loggedOut(store):
-                StackTabView(store: store)
-            }
+        switch store.case {
+        case let .loggedIn(store),
+            let .loggedOut(store):
+            StackTabView(store: store)
         }
     }
 }

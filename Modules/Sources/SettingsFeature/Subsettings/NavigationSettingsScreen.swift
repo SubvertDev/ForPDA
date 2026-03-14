@@ -15,7 +15,7 @@ public struct NavigationSettingsScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<NavigationSettingsFeature>
+    @Bindable public var store: StoreOf<NavigationSettingsFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
@@ -27,58 +27,57 @@ public struct NavigationSettingsScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                List {
-                    Group {
-                        Row(LocalizedStringResource("Topic opening", bundle: .module)) {
-                            EnumPickerMenu(selection: $store.topicOpening) { strategy in
-                                Text(strategy.text)
-                            } label: {
-                                HStack(spacing: 9) {
-                                    Text(store.topicOpening.text)
-                                    Image(systemSymbol: .chevronUpChevronDown)
-                                }
-                                .foregroundStyle(Color(.Labels.teritary))
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            List {
+                Group {
+                    Row(LocalizedStringResource("Topic opening", bundle: .module)) {
+                        EnumPickerMenu(selection: $store.topicOpening) { strategy in
+                            Text(strategy.text)
+                        } label: {
+                            HStack(spacing: 9) {
+                                Text(store.topicOpening.text)
+                                Image(systemSymbol: .chevronUpChevronDown)
                             }
-                        }
-                        
-                        if isLiquidGlass {
-                            Row(LocalizedStringResource("Hide tabbar on scroll", bundle: .module)) {
-                                Toggle(String(""), isOn: $store.hideTabBarOnScroll)
-                                    .labelsHidden()
-                            }
-                            
-                            Row(LocalizedStringResource("Floating navigation", bundle: .module)) {
-                                Toggle(String(""), isOn: $store.floatingNavigation)
-                                    .labelsHidden()
-                            }
-                            
-                            Row(LocalizedStringResource("Experimental navigation", bundle: .module)) {
-                                Toggle(String(""), isOn: $store.experimentalFloatingNavigation)
-                                    .labelsHidden()
-                            }
-                            .disabled(!store.floatingNavigation)
+                            .foregroundStyle(Color(.Labels.teritary))
                         }
                     }
-                    .tint(tintColor)
-                    .listRowBackground(Color(.Background.teritary))
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                    .frame(minHeight: 60)
+                    
+                    if isLiquidGlass {
+                        Row(LocalizedStringResource("Hide tabbar on scroll", bundle: .module)) {
+                            Toggle(String(""), isOn: $store.hideTabBarOnScroll)
+                                .labelsHidden()
+                        }
+                        
+                        Row(LocalizedStringResource("Floating navigation", bundle: .module)) {
+                            Toggle(String(""), isOn: $store.floatingNavigation)
+                                .labelsHidden()
+                        }
+                        
+                        Row(LocalizedStringResource("Experimental navigation", bundle: .module)) {
+                            Toggle(String(""), isOn: $store.experimentalFloatingNavigation)
+                                .labelsHidden()
+                        }
+                        .disabled(!store.floatingNavigation)
+                    }
                 }
-                .scrollContentBackground(.hidden)
-                ._contentMargins(.top, 16)
+                .tint(tintColor)
+                .listRowBackground(Color(.Background.teritary))
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                .frame(minHeight: 60)
             }
-            .navigationTitle(Text("Navigation", bundle: .module))
-            ._toolbarTitleDisplayMode(.inline)
-            .animation(.default, value: store.state)
-            .onAppear {
-                send(.onAppear)
-            }
+            .scrollContentBackground(.hidden)
+            .contentMargins(.top, 16)
         }
+        .navigationTitle(Text("Navigation", bundle: .module))
+        ._toolbarTitleDisplayMode(.inline)
+        .animation(.default, value: store.state)
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Row

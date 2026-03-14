@@ -16,7 +16,7 @@ struct LiquidKeyboardView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable var store: StoreOf<ArticleFeature>
+    @Bindable var store: StoreOf<ArticleFeature>
     @FocusState.Binding var focus: ArticleFeature.State.Field?
     @Binding var isExpanded: Bool
     @Binding var isScrollDownVisible: Bool
@@ -48,43 +48,42 @@ struct LiquidKeyboardView: View {
     // MARK: - Body
     
     var body: some View {
-        WithPerceptionTracking {
-            GlassEffectContainer(spacing: 16) {
-                VStack(spacing: 10) {
-                    if let comment = store.replyComment {
-                        ReplyView(comment: comment)
+        GlassEffectContainer(spacing: 16) {
+            VStack(spacing: 10) {
+                if let comment = store.replyComment {
+                    ReplyView(comment: comment)
+                }
+                
+                HStack(alignment: .bottom, spacing: 16) {
+                    if isExpanded {
+                        TextFieldView()
                     }
                     
-                    HStack(alignment: .bottom, spacing: 16) {
-                        if isExpanded {
-                            TextFieldView()
+                    VStack(spacing: 16) {
+                        if isScrollDownVisible {
+                            ScrollButton()
                         }
                         
-                        VStack(spacing: 16) {
-                            if isScrollDownVisible {
-                                ScrollButton()
-                            }
-                            
-                            SendButton()
-                        }
+                        SendButton()
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
+                .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .onChange(of: store.replyComment) { _ in
-                if store.replyComment != nil && !isExpanded {
-                    isExpanded = true
-                } else if store.replyComment == nil && isTextEmpty && isExpanded {
-                    isExpanded = false
-                }
-            }
-            .animation(.default, value: store.canComment)
-            .animation(.default, value: isTextEmpty)
-            .animation(.default, value: isExpanded)
-            .animation(.default, value: isScrollDownVisible)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
+        .onChange(of: store.replyComment) {
+            if store.replyComment != nil && !isExpanded {
+                isExpanded = true
+            } else if store.replyComment == nil && isTextEmpty && isExpanded {
+                isExpanded = false
+            }
+        }
+        .animation(.default, value: store.canComment)
+        .animation(.default, value: isTextEmpty)
+        .animation(.default, value: isExpanded)
+        .animation(.default, value: isScrollDownVisible)
+                
     }
     
     // MARK: - Reply View

@@ -15,7 +15,7 @@ public struct SearchScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<SearchFeature>
+    @Bindable public var store: StoreOf<SearchFeature>
     @Environment(\.tintColor) private var tintColor
     
     @FocusState public var focus: SearchFeature.State.Field?
@@ -31,42 +31,41 @@ public struct SearchScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            List {
+                ParametersSection()
                 
-                List {
-                    ParametersSection()
+                if !additionalHidden {
+                    AuthorSection()
                     
-                    if !additionalHidden {
-                        AuthorSection()
-                        
-                        if store.shouldShowAuthorsList {
-                            AuthorsList()
-                        }
+                    if store.shouldShowAuthorsList {
+                        AuthorsList()
                     }
-                    
-                    ShowParametersButton()
                 }
-                .scrollContentBackground(.hidden)
-                ._contentMargins(.top, 0)
+                
+                ShowParametersButton()
             }
-            .navigationTitle(Text("Search", bundle: .module))
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color(.Background.primary))
-            .searchable(text: $store.searchText, placement: .navigationBarDrawer(displayMode: .always))
-            .onSubmit(of: .search) {
-                send(.startSearch)
-            }
-            .bind($store.focus, to: $focus)
-            .onTapGesture {
-                focus = nil
-            }
-            .onAppear {
-                send(.onAppear)
-            }
+            .scrollContentBackground(.hidden)
+            .contentMargins(.top, 0)
         }
+        .navigationTitle(Text("Search", bundle: .module))
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color(.Background.primary))
+        .searchable(text: $store.searchText, placement: .navigationBarDrawer(displayMode: .always))
+        .onSubmit(of: .search) {
+            send(.startSearch)
+        }
+        .bind($store.focus, to: $focus)
+        .onTapGesture {
+            focus = nil
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Search Parameters Section

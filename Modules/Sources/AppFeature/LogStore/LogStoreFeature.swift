@@ -66,24 +66,22 @@ public struct LogStoreScreen: View {
         self.store = store
     }
     public var body: some View {
-        WithPerceptionTracking {
-            ScrollView(.vertical) {
-                ForEach(store.logs, id: \.self) { log in
-                    Text(log)
-                        .font(.subheadline)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, 4)
-                }
+        ScrollView(.vertical) {
+            ForEach(store.logs, id: \.self) { log in
+                Text(log)
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 4)
             }
-            .background {
-                if store.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                }
+        }
+        .background {
+            if store.isLoading {
+                ProgressView()
+                    .progressViewStyle(.circular)
             }
-            .onAppear {
-                store.send(.onAppear)
-            }
+        }
+        .onAppear {
+            store.send(.onAppear)
         }
     }
 }

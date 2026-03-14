@@ -17,7 +17,7 @@ public struct MentionsScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<MentionsFeature>
+    @Bindable public var store: StoreOf<MentionsFeature>
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
@@ -35,62 +35,61 @@ public struct MentionsScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if !store.mentions.isEmpty, !store.isLoading {
-                    List {
-                        Navigation()
-                        
-                        ForEach(store.mentions, id: \.self) { mention in
-                            TopicRow(
-                                title: .plain(mention.sourceName),
-                                date: mention.mentionDate,
-                                username: mention.username,
-                                isClosed: false, // Not used for mentions
-                                isUnread: false, // Not used for mentions
-                                onAction: { _ in
-                                    send(.mentionTapped(mention))
-                                }
-                            )
-                        }
-                        .listRowBackground(Color(.Background.teritary))
-                        
-                        Navigation()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if !store.mentions.isEmpty, !store.isLoading {
+                List {
+                    Navigation()
+                    
+                    ForEach(store.mentions, id: \.self) { mention in
+                        TopicRow(
+                            title: .plain(mention.sourceName),
+                            date: mention.mentionDate,
+                            username: mention.username,
+                            isClosed: false, // Not used for mentions
+                            isUnread: false, // Not used for mentions
+                            onAction: { _ in
+                                send(.mentionTapped(mention))
+                            }
+                        )
                     }
-                    .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                } else if !store.isLoading {
-                    EmptyMentions()
+                    .listRowBackground(Color(.Background.teritary))
+                    
+                    Navigation()
                 }
-            }
-            .animation(.default, value: store.mentions)
-            .navigationTitle(Text("Mentions", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
-                    PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
-                        minimized: $navigationMinimized
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
-                }
-            }
-            .overlay {
-                if store.isLoading {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
-            }
-            .onAppear {
-                send(.onAppear)
+                .scrollContentBackground(.hidden)
+                ._inScrollContentDetector(state: $navigationMinimized)
+            } else if !store.isLoading {
+                EmptyMentions()
             }
         }
+        .animation(.default, value: store.mentions)
+        .navigationTitle(Text("Mentions", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .safeAreaInset(edge: .bottom) {
+            if isLiquidGlass,
+               store.appSettings.floatingNavigation,
+               !store.appSettings.experimentalFloatingNavigation {
+                PageNavigation(
+                    store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                    minimized: $navigationMinimized
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+        }
+        .overlay {
+            if store.isLoading {
+                PDALoader()
+                    .frame(width: 24, height: 24)
+            }
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Page Navigation

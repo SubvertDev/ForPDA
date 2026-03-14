@@ -16,7 +16,7 @@ public struct QMSScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<QMSFeature>
+    @Bindable public var store: StoreOf<QMSFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
@@ -28,58 +28,57 @@ public struct QMSScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if store.chat != nil {
-                    ChatView(messages: store.messages) { message in
-                        send(.sendMessageButtonTapped(message))
-                    } messageMenuAction: { (action: ChatAction, _, message) in
-                        if case .copy = action {
-                            UIPasteboard.general.string = message.text
-                        }
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if store.chat != nil {
+                ChatView(messages: store.messages) { message in
+                    send(.sendMessageButtonTapped(message))
+                } messageMenuAction: { (action: ChatAction, _, message) in
+                    if case .copy = action {
+                        UIPasteboard.general.string = message.text
                     }
-                    .enableLoadMore { _ in
-                        await send(.loadMoreTriggered)
-                    }
-                    .linkPreviewsDisabled()
-                    .messageUseStyler { string in
-                        return QMSBuilder(text: string).build()
-                    }
-                    .setAvailableInputs([.text])
-                    .chatTheme(
-                        ChatTheme(
-                            colors: ChatTheme
-                                .Colors(
-                                    mainBG: Color(.Background.primary),
-                                    messageMyBG: Color(.Background.quaternary),
-                                    messageMyText: Color(.Labels.primary),
-                                    messageMyTimeText: Color(.systemGray),
-                                    messageFriendBG: Color(.Background.quaternary),
-                                    messageFriendText: Color(.Labels.primary),
-                                    messageFriendTimeText: Color(.systemGray),
-                                    statusGray: Color(.Theme.primary),
-                                    sendButtonBackground: Color(.Theme.primary)
-                                )
-                        )
-                    )
-                    .environment(\.openURL, OpenURLAction(handler: { url in
-                        send(.urlTapped(url))
-                        return .handled
-                    }))
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
                 }
-            }
-            .navigationTitle(store.title)
-            ._toolbarTitleDisplayMode(.inline)
-            .onAppear {
-                send(.onAppear)
+                .enableLoadMore(pageSize: 0) { _ in // pageSize doesn't work
+                    await send(.loadMoreTriggered)
+                }
+                .linkPreviewsDisabled()
+                .messageUseStyler { string in
+                    return QMSBuilder(text: string).build()
+                }
+                .setAvailableInputs([.text])
+                .chatTheme(
+                    ChatTheme(
+                        colors: ChatTheme
+                            .Colors(
+                                mainBG: Color(.Background.primary),
+                                messageMyBG: Color(.Background.quaternary),
+                                messageMyText: Color(.Labels.primary),
+                                messageMyTimeText: Color(.systemGray),
+                                messageFriendBG: Color(.Background.quaternary),
+                                messageFriendText: Color(.Labels.primary),
+                                messageFriendTimeText: Color(.systemGray),
+                                statusGray: Color(.Theme.primary),
+                                sendButtonBackground: Color(.Theme.primary)
+                            )
+                    )
+                )
+                .environment(\.openURL, OpenURLAction(handler: { url in
+                    send(.urlTapped(url))
+                    return .handled
+                }))
+            } else {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .navigationTitle(store.title)
+        ._toolbarTitleDisplayMode(.inline)
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
 }
 

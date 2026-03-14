@@ -16,7 +16,7 @@ public struct ReputationScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<ReputationFeature>
+    @Bindable public var store: StoreOf<ReputationFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - init
@@ -28,36 +28,35 @@ public struct ReputationScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            VStack {
+                SegmentPicker()
                 
-                VStack {
-                    SegmentPicker()
-                    
-                    if store.isLoading {
-                        Spacer()
-                        PDALoader()
-                            .frame(width: 24, height: 24)
-                        Spacer()
-                    } else {
-                        ReputationSection()
-                    }
+                if store.isLoading {
+                    Spacer()
+                    PDALoader()
+                        .frame(width: 24, height: 24)
+                    Spacer()
+                } else {
+                    ReputationSection()
                 }
-            }
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
-            .navigationTitle(Text("Reputation", bundle: .module))
-            ._toolbarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).report) { store in
-                NavigationStack {
-                    WriteFormScreen(store: store)
-                }
-            }
-            .onAppear {
-                send(.onAppear)
             }
         }
+        .alert($store.scope(state: \.$destination, action: \.destination).alert)
+        .navigationTitle(Text("Reputation", bundle: .module))
+        ._toolbarTitleDisplayMode(.inline)
+        .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).report) { store in
+            NavigationStack {
+                WriteFormScreen(store: store)
+            }
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Reputation Section
@@ -74,16 +73,15 @@ public struct ReputationScreen: View {
                 Spacer()
             } else {
                 List(store.historyData, id: \.self) { vote in
-                    WithPerceptionTracking {
-                        ReputationRow(vote: vote)
-                            .listRowBackground(Color(.Background.primary))
-                            .onAppear {
-                                if let index = store.historyData.firstIndex(of: vote),
-                                   index == store.historyData.count - 5 {
-                                    send(.loadMore)
-                                }
+                    ReputationRow(vote: vote)
+                        .listRowBackground(Color(.Background.primary))
+                        .onAppear {
+                            if let index = store.historyData.firstIndex(of: vote),
+                               index == store.historyData.count - 5 {
+                                send(.loadMore)
                             }
-                    }
+                        }
+                                        
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)

@@ -13,7 +13,7 @@ import Models
 
 public struct BookmarksScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<BookmarksFeature>
+    @Bindable public var store: StoreOf<BookmarksFeature>
     @Environment(\.tintColor) private var tintColor
     
     public init(store: StoreOf<BookmarksFeature>) {
@@ -21,31 +21,30 @@ public struct BookmarksScreen: View {
     }
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                ComingSoonTape()
+                    .rotationEffect(Angle(degrees: 12))
+                    .padding(.bottom, 100)
                 
-                VStack(spacing: 0) {
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: 12))
-                        .padding(.bottom, 100)
-                    
-                    EmptyBookmarks()
-                    
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: -20))
-                        .padding(.top, 80)
-                }
-                .frame(width: UIScreen.main.bounds.width)
+                EmptyBookmarks()
+                
+                ComingSoonTape()
+                    .rotationEffect(Angle(degrees: -20))
+                    .padding(.top, 80)
             }
-            .navigationTitle(Text("Bookmarks", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .toolbarBackground(Color(.Background.primary), for: .navigationBar)
-            .onAppear {
-                store.send(.onAppear)
-            }
+            .frame(width: UIScreen.main.bounds.width)
         }
+        .navigationTitle(Text("Bookmarks", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .toolbarBackground(Color(.Background.primary), for: .navigationBar)
+        .onAppear {
+            store.send(.onAppear)
+        }
+                
     }
     
     // MARK: - Empty Screen

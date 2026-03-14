@@ -38,7 +38,7 @@ public struct ForField<T: Hashable>: View {
                     .font(.body)
                     .foregroundStyle(Color(.Labels.quaternary))
             }
-            .onChange(of: content.wrappedValue) { newValue in
+            .onChange(of: content.wrappedValue) { _, newValue in
                 if let limit = characterLimit, newValue.count > limit {
                     content.wrappedValue = String(newValue.prefix(limit))
                 }

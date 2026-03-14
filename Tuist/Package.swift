@@ -82,6 +82,7 @@ let package = Package(
 
         // Other
         .package(url: "https://github.com/CSolanaM/SkeletonUI", exact: "2.0.2"),
+        .package(url: "https://github.com/exyte/Chat", exact: "2.7.6"),
         .package(url: "https://github.com/getsentry/sentry-cocoa", exact: "9.6.0"),
         .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", exact: "0.5.2"),
         .package(url: "https://github.com/hyperoslo/Cache", exact: "7.4.0"),
@@ -95,7 +96,6 @@ let package = Package(
 
         // Forks & stuff
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
-        .package(url: "https://github.com/SubvertDev/Chat", branch: "main"),
         .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.7.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
     ]

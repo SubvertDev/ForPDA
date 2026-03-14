@@ -57,7 +57,7 @@ public struct InScrollContentDetector: ViewModifier {
                 guard newSize.height != scrollHeight else { return }
                 scrollHeight = newSize.height
             }
-            .onChange(of: state) { _ in
+            .onChange(of: state) {
                 lastManualChange = .now
             }
     }

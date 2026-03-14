@@ -17,7 +17,7 @@ public struct FavoritesScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<FavoritesFeature>
+    @Bindable public var store: StoreOf<FavoritesFeature>
     @State private var navigationMinimized = false
     @Environment(\.tintColor) private var tintColor
     
@@ -35,82 +35,81 @@ public struct FavoritesScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-
-                if store.shouldShowEmptyState {
-                    EmptyFavorites()
-                } else if !store.isLoading {
-                    List {
-                        if !store.favoritesImportant.isEmpty {
-                            FavoritesSection(favorites: store.favoritesImportant, important: true)
-                        }
-                        
-                        FavoritesSection(favorites: store.favorites, important: false)
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+        
+            if store.shouldShowEmptyState {
+                EmptyFavorites()
+            } else if !store.isLoading {
+                List {
+                    if !store.favoritesImportant.isEmpty {
+                        FavoritesSection(favorites: store.favoritesImportant, important: true)
                     }
-                    .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                    .refreshable {
-                        await send(.onRefresh).finish()
-                    }
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
+                    
+                    FavoritesSection(favorites: store.favorites, important: false)
                 }
-            }
-            .navigationTitle(Text("Favorites", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
-                    PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
-                        minimized: $navigationMinimized
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
+                .scrollContentBackground(.hidden)
+                ._inScrollContentDetector(state: $navigationMinimized)
+                .refreshable {
+                    await send(.onRefresh).finish()
                 }
-            }
-            .animation(.default, value: store.favoritesImportant)
-            .animation(.default, value: store.favorites)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    if store.isUserAuthorized {
-                        Menu {
-                            ContextButton(
-                                text: LocalizedStringResource("Sort", bundle: .module),
-                                symbol: .line3HorizontalDecrease
-                            ) {
-                                send(.contextOptionMenu(.sort))
-                            }
-                            
-                            ContextButton(
-                                text: LocalizedStringResource("Read All", bundle: .module),
-                                symbol: .checkmarkCircle
-                            ) {
-                                send(.contextOptionMenu(.markAllAsRead))
-                            }
-                        } label: {
-                            Image(systemSymbol: .ellipsisCircle)
-                        }
-                    }
-                }
-            }
-            .fittedSheet(
-                item: $store.scope(state: \.$sort, action: \.sort),
-                embedIntoNavStack: true
-            ) { store in
-                SortView(store: store)
-            }
-            .onFirstAppear {
-                send(.onFirstAppear)
-            } onNextAppear: {
-                send(.onNextAppear)
+            } else {
+                PDALoader()
+                    .frame(width: 24, height: 24)
             }
         }
+        .navigationTitle(Text("Favorites", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .safeAreaInset(edge: .bottom) {
+            if isLiquidGlass,
+               store.appSettings.floatingNavigation,
+               !store.appSettings.experimentalFloatingNavigation {
+                PageNavigation(
+                    store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                    minimized: $navigationMinimized
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+        }
+        .animation(.default, value: store.favoritesImportant)
+        .animation(.default, value: store.favorites)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if store.isUserAuthorized {
+                    Menu {
+                        ContextButton(
+                            text: LocalizedStringResource("Sort", bundle: .module),
+                            symbol: .line3HorizontalDecrease
+                        ) {
+                            send(.contextOptionMenu(.sort))
+                        }
+                        
+                        ContextButton(
+                            text: LocalizedStringResource("Read All", bundle: .module),
+                            symbol: .checkmarkCircle
+                        ) {
+                            send(.contextOptionMenu(.markAllAsRead))
+                        }
+                    } label: {
+                        Image(systemSymbol: .ellipsisCircle)
+                    }
+                }
+            }
+        }
+        .fittedSheet(
+            item: $store.scope(state: \.$sort, action: \.sort),
+            embedIntoNavStack: true
+        ) { store in
+            SortView(store: store)
+        }
+        .onFirstAppear {
+            send(.onFirstAppear)
+        } onNextAppear: {
+            send(.onNextAppear)
+        }
+                
     }
     
     // MARK: - Options Menu

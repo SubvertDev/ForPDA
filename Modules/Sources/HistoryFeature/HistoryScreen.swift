@@ -17,7 +17,7 @@ public struct HistoryScreen: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<HistoryFeature>
+    @Bindable public var store: StoreOf<HistoryFeature>
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
@@ -35,52 +35,51 @@ public struct HistoryScreen: View {
     // MARK: - Body
     
     public var body: some View {
-        WithPerceptionTracking {
-            ZStack {
-                Color(.Background.primary)
-                    .ignoresSafeArea()
-                
-                if !store.history.isEmpty, !store.isLoading {
-                    List {
-                        Navigation()
-                        
-                        ForEach(store.history, id: \.self) { history in
-                            HistorySection(history: history)
-                        }
-                        
-                        Navigation()
+        ZStack {
+            Color(.Background.primary)
+                .ignoresSafeArea()
+            
+            if !store.history.isEmpty, !store.isLoading {
+                List {
+                    Navigation()
+                    
+                    ForEach(store.history, id: \.self) { history in
+                        HistorySection(history: history)
                     }
-                    .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                } else if !store.isLoading {
-                    EmptyHistory()
+                    
+                    Navigation()
                 }
-            }
-            .animation(.default, value: store.history)
-            .navigationTitle(Text("History", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
-                    PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
-                        minimized: $navigationMinimized
-                    )
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
-                }
-            }
-            .overlay {
-                if store.isLoading {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
-            }
-            .onAppear {
-                send(.onAppear)
+                .scrollContentBackground(.hidden)
+                ._inScrollContentDetector(state: $navigationMinimized)
+            } else if !store.isLoading {
+                EmptyHistory()
             }
         }
+        .animation(.default, value: store.history)
+        .navigationTitle(Text("History", bundle: .module))
+        ._toolbarTitleDisplayMode(.large)
+        .safeAreaInset(edge: .bottom) {
+            if isLiquidGlass,
+               store.appSettings.floatingNavigation,
+               !store.appSettings.experimentalFloatingNavigation {
+                PageNavigation(
+                    store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                    minimized: $navigationMinimized
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+        }
+        .overlay {
+            if store.isLoading {
+                PDALoader()
+                    .frame(width: 24, height: 24)
+            }
+        }
+        .onAppear {
+            send(.onAppear)
+        }
+                
     }
     
     // MARK: - Page Navigation
