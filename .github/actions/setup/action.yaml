@@ -1,0 +1,41 @@
+name: Setup
+description: Common setup for iOS CI
+
+inputs:
+  fetch-depth:
+    description: Git fetch depth for checkout
+    required: false
+    default: "1"
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+
+    - name: Mise (Ruby + Tuist + SwiftLint)
+      uses: jdx/mise-action@v3
+
+    - name: Cache gems
+      uses: actions/cache@v4
+      with:
+        path: vendor/cache
+        key: ${{ runner.os }}-mise-gems-${{ hashFiles('Gemfile.lock') }}
+
+    - name: Install Fastlane with cache
+      shell: bash
+      run: bundle cache
+
+    - name: Set Xcode 26.3
+      shell: bash
+      run: sudo xcode-select -s /Applications/Xcode_26.3.app
+
+    - name: Cache Tuist .build
+      uses: actions/cache@v4
+      with:
+        path: Tuist/.build
+        key: tuist-cache-${{ hashFiles('Tuist/Package.resolved') }}
+        restore-keys: |
+          tuist-cache-
