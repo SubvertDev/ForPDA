@@ -100,6 +100,9 @@ public struct FormEditorFeature: Reducer {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
+                if !state.text.isEmpty {
+                    state.textRange = NSMakeRange(state.text.count, 0)
+                }
                 if let uploadBox = state.uploadBox {
                     return .concatenate(
                         .send(.binding(.set(\.bbPanel.allowedExtensions, uploadBox.allowedExtensions))),
