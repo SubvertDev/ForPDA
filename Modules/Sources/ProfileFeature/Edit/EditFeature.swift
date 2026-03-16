@@ -33,10 +33,7 @@ public struct EditFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         @Presents public var alert: AlertState<Action.Alert>?
         
-        public var bbPanel = BBPanelFeature.State(
-            for: .post(isCurator: true, canModerate: true),
-            supportsUpload: true
-        )
+        public var bbPanel = BBPanelFeature.State(for: .profile)
         
         let user: User
         var draftUser: User
