@@ -25,7 +25,7 @@ extension BBPanelType {
                 .spoiler, .spoilerWithTitle, .code, .left, .center, .right, .sub, .sup, .offtop, .hide
             ]
         case .profile:
-            return [.b, .i, .u, .s, .url, .left, .center, .right, .sub, .sup, .offtop]
+            return [.b, .i, .u, .s, /*.url,*/ .left, .center, .right, .sub, .sup, .offtop]
         case .custom(let array):
             return array
         }
