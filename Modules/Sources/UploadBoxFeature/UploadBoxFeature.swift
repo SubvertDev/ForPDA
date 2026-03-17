@@ -160,20 +160,20 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case let .destination(.presented(.alert(.selectFileFromFiles(oldFileId)))):
                 if let oldFileId = oldFileId,
                    let oldIndex = state.files.firstIndex(where: { $0.id == oldFileId }) {
-                    return .concatenate(
-                        .send(.view(.removeFileButtonTapped(state.files[oldIndex]))),
-                        .send(.destination(.presented(.confirmationDialog(.files))))
-                    )
+                    return .run { [oldFile = state.files[oldIndex]] send in
+                        await send(.view(.removeFileButtonTapped(oldFile)))
+                        await send(.destination(.presented(.confirmationDialog(.files))))
+                    }
                 }
                 return .send(.destination(.presented(.confirmationDialog(.files))))
                 
             case let .destination(.presented(.alert(.selectFileFromGallery(oldFileId)))):
                 if let oldFileId = oldFileId,
                    let oldIndex = state.files.firstIndex(where: { $0.id == oldFileId }) {
-                    return .concatenate(
-                        .send(.view(.removeFileButtonTapped(state.files[oldIndex]))),
-                        .send(.destination(.presented(.confirmationDialog(.gallery))))
-                    )
+                    return .run { [oldFile = state.files[oldIndex]] send in
+                        await send(.view(.removeFileButtonTapped(oldFile)))
+                        await send(.destination(.presented(.confirmationDialog(.gallery))))
+                    }
                 }
                 return .send(.destination(.presented(.confirmationDialog(.gallery))))
                 
@@ -187,13 +187,12 @@ public struct UploadBoxFeature: Reducer, Sendable {
                    let fileSource = state.files[index].fileSource {
                     state.uploadQueue.append(fileSource)
                     if !state.isAnyFileUploading && state.uploadQueue.count == 1 {
-                        return .concatenate(
-                            .send(.view(.removeFileButtonTapped(state.files[index]))),
-                            .send(.internal(.startNextUpload))
-                        )
-                    } else {
-                        return .send(.view(.removeFileButtonTapped(state.files[index])))
+                        return .run { [file = state.files[index]] send in
+                            await send(.view(.removeFileButtonTapped(file)))
+                            await send(.internal(.startNextUpload))
+                        }
                     }
+                    return .send(.view(.removeFileButtonTapped(state.files[index])))
                 }
                 
             case .destination:
@@ -319,10 +318,10 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 }
                 
                 guard let ext = fileExtension, fileExtensionAllowed(ext, state.allowedExtensions) else {
-                    return .concatenate(
-                        .send(.view(.fileUploadCanceled(nil, .badExtension))),
-                        .send(.internal(.startNextUpload))
-                    )
+                    return .run { send in
+                        await send(.view(.fileUploadCanceled(nil, .badExtension)))
+                        await send(.internal(.startNextUpload))
+                    }
                 }
                 
                 let file = UploadBoxFile(
@@ -415,10 +414,10 @@ public struct UploadBoxFeature: Reducer, Sendable {
                 state.files[index].serverId = responseFileId
                 state.files[index].fileSource = nil
                 state.files[index].isUploading = false
-                return .concatenate(
-                    .send(.delegate(.fileHasBeenUploaded(responseFileId))),
-                    .send(.internal(.startNextUpload))
-                )
+                return .run { send in
+                    await send(.delegate(.fileHasBeenUploaded(responseFileId)))
+                    await send(.internal(.startNextUpload))
+                }
             }
             
             return .none
