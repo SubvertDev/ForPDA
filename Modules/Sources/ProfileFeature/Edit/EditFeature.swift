@@ -38,7 +38,7 @@ public struct EditFeature: Reducer, Sendable {
         let user: User
         var draftUser: User
         var focus: Field?
-        var editorRange: NSRange?
+        var fieldRange: NSRange?
         
         var isSending = false
         var isAvatarUploading = false
@@ -137,6 +137,45 @@ public struct EditFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case let .bbPanel(.delegate(.tagTapped(tag))):
+                var content: String
+                switch state.focus {
+                case .about:
+                    content = state.draftUser.aboutMe ?? ""
+                case .signature:
+                    content = state.draftUser.signature ?? ""
+                default:
+                    fatalError("BBPanel available only for about and aignature field")
+                }
+                var fieldRange = state.fieldRange
+                if let range = fieldRange, !content.isEmpty {
+                    // если мы вставляем в текст БЕЗ выделенной области бб код
+                    if range.lowerBound == range.upperBound {
+                        let index = content.index(content.startIndex, offsetBy: range.lowerBound)
+                        content.insert(contentsOf: "\(tag.0)\(tag.1)", at: index)
+                        fieldRange = NSMakeRange(range.lowerBound + tag.0.count, 0)
+                    } else {
+                        let ubIndex = content.index(content.startIndex, offsetBy: range.upperBound)
+                        let lbIndex = content.index(content.startIndex, offsetBy: range.lowerBound)
+                        content.insert(contentsOf: tag.1, at: ubIndex)
+                        content.insert(contentsOf: tag.0, at: lbIndex)
+                        fieldRange = NSMakeRange(range.lowerBound + tag.0.count, range.upperBound - range.lowerBound)
+                    }
+                } else {
+                    content = "\(tag.0)\(tag.1)"
+                    fieldRange = NSMakeRange(tag.0.count, 0)
+                }
+                switch state.focus {
+                case .about:
+                    state.draftUser.aboutMe = content
+                case .signature:
+                    state.draftUser.signature = content
+                default:
+                    fatalError("BBPanel available only for about and aignature field")
+                }
+                state.fieldRange = fieldRange
+                return .none
+                
             case .binding, .bbPanel:
                 return .none
                 
