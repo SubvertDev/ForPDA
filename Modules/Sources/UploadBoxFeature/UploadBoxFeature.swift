@@ -317,7 +317,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     name = "\(UUID().uuidString).\(fileExtension ?? "bin")"
                 }
                 
-                guard let ext = fileExtension, fileExtensionAllowed(ext, state.allowedExtensions) else {
+                guard let ext = fileExtension, !ext.isEmpty, fileExtensionAllowed(ext, state.allowedExtensions) else {
                     return .run { send in
                         await send(.view(.fileUploadCanceled(nil, .badExtension)))
                         await send(.internal(.startNextUpload))
