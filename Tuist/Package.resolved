@@ -1,5 +1,5 @@
 {
-  "originHash" : "2d554b5f4bcd67fd68337f24c281f6148286471e095228834074e212a04788cf",
+  "originHash" : "05962fe782b2783e7cbd76779c43deadf4ebefa4ee4e19fc165a3c273e568044",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Giphy/giphy-ios-sdk",
       "state" : {
-        "revision" : "f7a8edf513ab14147ef33c942b10b45cdac1e765",
-        "version" : "2.3.0"
+        "revision" : "ed91784fe854a8204a9f994282d87f9c18df5fac",
+        "version" : "2.3.1"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
       "state" : {
-        "revision" : "e227df15448d2ad1a5d4e4c49722a71c68f9058a",
-        "version" : "8.7.0"
+        "revision" : "c92b84898e34ab46ff0dad86c02a0acbe2d87008",
+        "version" : "8.8.0"
       }
     },
     {
@@ -213,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "1a25c6c06bf063c5688ab44e70326cfd1d2af0a2",
-        "version" : "1.25.1"
+        "revision" : "adf6e52161f293fe4ab957dd732e214aca7031d2",
+        "version" : "1.25.2"
       }
     },
     {
