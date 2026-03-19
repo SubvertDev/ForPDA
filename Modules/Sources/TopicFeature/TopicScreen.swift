@@ -378,7 +378,7 @@ public struct TopicScreen: View {
                 try? await Task.sleep(for: .seconds(duration))
                 withAnimation(animation) { scrollScale = 1 }
                 try? await Task.sleep(for: .seconds(duration))
-                send(.finishedPostAnimation)
+                send(.finishedPostAnimation, animation: .default)
             }
         }
     }
