@@ -484,7 +484,7 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .registerBackgroundTask:
                 // return .send(.syncUnreadTaskInvoked) // For test purposes
-                guard state.appSettings.backgroundNotifications else { return .none }
+                guard state.appSettings.backgroundNotifications2 else { return .none }
                 
                 let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
                 request.earliestBeginDate = .now.addingTimeInterval(15 * 60) // 15 minutes by default

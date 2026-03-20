@@ -56,7 +56,7 @@ public struct NotificationsScreen: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
                     Section {
-                        Row("Background notifications", value: $store.appSettings.backgroundNotifications)
+                        Row("Background notifications", value: $store.appSettings.backgroundNotifications2)
                         
                         if store.appSettings.backgroundNotifications {
                             Button {
@@ -76,7 +76,7 @@ public struct NotificationsScreen: View {
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
-                .animation(.default, value: store.appSettings.backgroundNotifications)
+                .animation(.default, value: store.appSettings.backgroundNotifications2)
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Notifications", bundle: .module))
