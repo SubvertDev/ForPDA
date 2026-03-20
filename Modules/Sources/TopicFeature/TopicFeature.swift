@@ -545,7 +545,9 @@ public struct TopicFeature: Reducer, Sendable {
                             await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                         }
                         // Deleting notifications related to posts on the current page
-                        let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970)
+                        // `forumMention` notifications encode topicId in the trailing identifier segment
+                        // Include topic.id so opening a topic clears mentions tied to this topic
+                        let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970) + [TimeInterval(topic.id)]
                         await notificationsClient.removeNotifications(timestamps: timestamps)
                     }
                 )
