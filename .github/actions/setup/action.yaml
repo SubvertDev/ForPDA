@@ -1,20 +1,9 @@
 name: Setup
 description: Common setup for iOS CI
 
-inputs:
-  fetch-depth:
-    description: Git fetch depth for checkout
-    required: false
-    default: "1"
-
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-      with:
-        fetch-depth: ${{ inputs.fetch-depth }}
-
     - name: Mise (Ruby + Tuist + SwiftLint)
       uses: jdx/mise-action@v3
 
