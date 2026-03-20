@@ -307,7 +307,7 @@ public struct AppFeature: Reducer, Sendable {
                 return .run { _ in
                     let isProcessed = await notificationsClient.processNotification(notification)
                     if isProcessed {
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        let unread = try await apiClient.getUnread(type: .all)
                         // let skipCategories: [Unread.Item.Category] = [.topic, .forum]
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
@@ -453,7 +453,7 @@ public struct AppFeature: Reducer, Sendable {
                     if newPhase == .active {
                         try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        let unread = try await apiClient.getUnread(type: .all)
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                     
@@ -504,7 +504,7 @@ public struct AppFeature: Reducer, Sendable {
                         logger.info("[AppRefresh] Successfully connected. Fetching notifications...")
                         
                         cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .gettingNotifications))
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        let unread = try await apiClient.getUnread(type: .all)
                         logger.info("[AppRefresh] Successfully fetched. Preparing to show notifications..")
                         
                         cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .showingNotifications))

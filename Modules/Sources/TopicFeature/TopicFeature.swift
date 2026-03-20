@@ -541,7 +541,7 @@ public struct TopicFeature: Reducer, Sendable {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
                             
                             // Syncing notifications and badges when reading last page
-                            let unread = try await apiClient.getUnread(type: 0, value: 0)
+                            let unread = try await apiClient.getUnread(type: .all)
                             await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                         }
                         // Deleting notifications related to posts on the current page
