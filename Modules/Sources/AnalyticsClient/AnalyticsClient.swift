@@ -170,7 +170,7 @@ extension AnalyticsClient {
                 $0.sessionSampleRate = 1
                 $0.profileAppStarts = true
             }
-            options.enableAppHangTracking = true
+            options.enableAppHangTracking = false // False positives
             options.enableReportNonFullyBlockingAppHangs = false // False positives
             options.enablePreWarmedAppStartTracing = true
             options.enableCoreDataTracing = false // I don't have CoreData
