@@ -340,7 +340,9 @@ public struct AppFeature: Reducer, Sendable {
                 let favoritesBadges =
                 (state.appSettings.notifications.isForumEnabled ? unread.forumCount : 0) +
                 (state.appSettings.notifications.isTopicsEnabled ? unread.topicCount : 0)
-                state.favoritesBadges = favoritesBadges
+                
+                // Sometimes we have more favorites in general count than in an array, so we apply min() fix
+                state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
                 
                 let profileBadges =
                 (state.appSettings.notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
