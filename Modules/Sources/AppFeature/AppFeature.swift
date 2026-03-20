@@ -411,11 +411,26 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .userDidLogin(userId: userId):
                 state.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: userId)))))
-                return .none
+                return .run { _ in
+                    do {
+                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    } catch {
+                        analyticsClient.capture(error)
+                    }
+                }
                 
             case .userDidLogout:
                 state.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
-                return .none
+                state.favoritesBadges = 0
+                state.profileBadges = 0
+                return .run { _ in
+                    notificationsClient.setNotificationContext(context: nil)
+                    await notificationsClient.removeNotifications(
+                        categories: [.qms, .forum, .topic, .forumMention, .siteMention]
+                    )
+                    await notificationsClient.showUnreadNotifications(.mockEmpty, skipCategories: [])
+                }
                 
                 
                 // MARK: - Deeplinks
