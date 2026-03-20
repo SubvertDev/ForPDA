@@ -50,8 +50,6 @@ public struct DeveloperFeature: Reducer, Sendable {
         case onAppear
         case sendCrashButtonTapped
         case binding(BindingAction<State>)
-        
-        case _onCacheLoad([BackgroundTaskEntry])
     }
     
     // MARK: - Dependency
@@ -67,10 +65,7 @@ public struct DeveloperFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                return .run { send in
-                     let entries = cacheClient.getBackgroundTaskEntries()
-                     await send(._onCacheLoad(entries))
-                }
+                return .none
                 
             case .sendCrashButtonTapped:
                 return .run { _ in
@@ -94,10 +89,6 @@ public struct DeveloperFeature: Reducer, Sendable {
                 return .none
                 
             case .binding:
-                return .none
-                
-            case let ._onCacheLoad(entries):
-                state.backgroundTaskEntries = entries
                 return .none
             }
         }
@@ -136,13 +127,6 @@ public struct DeveloperScreen: View {
                         
                         Button("Send test crash to Sentry") {
                             store.send(.sendCrashButtonTapped)
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 4) {
-                            ForEach(store.backgroundTaskEntries, id: \.self) { entry in
-                                Text(verbatim: "[\(entry.date.formatted(date: .numeric, time: .standard))] \(entry.stage)")
-                                    .font(.caption)
-                            }
                         }
                     }
                     .padding(16)

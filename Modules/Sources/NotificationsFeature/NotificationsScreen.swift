@@ -57,18 +57,6 @@ public struct NotificationsScreen: View {
                     
                     Section {
                         Row("Background notifications", value: $store.appSettings.backgroundNotifications2)
-                        
-                        if store.appSettings.backgroundNotifications {
-                            Button {
-                                store.send(.sendLogButtonTapped)
-                            } label: {
-                                HStack {
-                                    Text("Send log", bundle: .module)
-                                    Spacer()
-                                    Image(systemSymbol: .squareAndArrowUp)
-                                }
-                            }
-                        }
                     } header: {
                         Text("Experimental", bundle: .module)
                     }

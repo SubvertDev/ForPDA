@@ -489,47 +489,35 @@ public struct AppFeature: Reducer, Sendable {
                 let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
                 request.earliestBeginDate = .now.addingTimeInterval(15 * 60) // 15 minutes by default
                 do {
-                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationBegin))
                     try BGTaskScheduler.shared.submit(request)
-                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationSuccess))
                     logger.info("[AppRefresh] Successfully scheduled BGAppRefreshTaskRequest")
                     // Set breakpoint here and run:
                     // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
                 } catch {
-                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationFailed(error.localizedDescription)))
                     analyticsClient.capture(error)
                 }
                 return .none
                 
             case .backgroundTaskInvoked:
-                cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .startedSync))
                 return .run { [appSettings = state.appSettings] send in
                     do {
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .startedAsync))
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .checkingForPermission))
                         guard try await notificationsClient.hasPermission() else { return }
                         logger.info("[AppRefresh] Notifications permission is granted")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .checkingForSettings))
                         guard appSettings.notifications.isAnyEnabled else { return }
                         logger.info("[AppRefresh] Notifications enabled in settings")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .connecting))
                         try await apiClient.connect(inBackground: true)
                         logger.info("[AppRefresh] Successfully connected. Fetching notifications...")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .gettingNotifications))
                         let unread = try await apiClient.getUnread(type: .all)
                         logger.info("[AppRefresh] Successfully fetched. Preparing to show notifications..")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .showingNotifications))
                         await notificationsClient.showUnreadNotifications(unread, [])
                         logger.info("[AppRefresh] Successfully shown notifications")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .success))
                     } catch {
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .failure(error.localizedDescription)))
                         analyticsClient.capture(error)
                     }
                 }

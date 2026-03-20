@@ -34,7 +34,6 @@ public struct NotificationsFeature: Reducer, Sendable {
     
     public enum Action: BindableAction {
         case onAppear
-        case sendLogButtonTapped
         
         case binding(BindingAction<State>)
         
@@ -59,24 +58,6 @@ public struct NotificationsFeature: Reducer, Sendable {
                     let result = await Result { try await notificationsClient.requestPermission() }
                     await send(._onNotificationsPermissionResult(result))
                 }
-                
-            case .sendLogButtonTapped:
-                let data = cacheClient.getBackgroundTaskEntries()
-                    .map { "[\($0.date.formatted(date: .numeric, time: .standard))] \($0.stage)"}
-                    .joined(separator: "\n")
-                    .data(using: .utf8)!
-                
-                let url = FileManager.default.temporaryDirectory
-                    .appendingPathComponent("NotificationsLog-\(UUID().uuidString).txt")
-                
-                do {
-                    try data.write(to: url, options: [.atomic])
-                    state.logURL = url
-                } catch {
-                    analyticsClient.capture(error)
-                }
-                
-                return .none
                 
             case let ._onNotificationsPermissionResult(result):
                 switch result {
