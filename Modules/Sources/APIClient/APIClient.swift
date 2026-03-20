@@ -471,11 +471,7 @@ extension APIClient: DependencyKey {
                 let command = if case .category(let type, let value) = type {
                     CommonCommand.syncUnread(timestamp: 0, type: type.rawValue, value: value)
                 } else {
-                    CommonCommand.syncUnread(
-                        timestamp: Int(Date.now.timeIntervalSince1970),
-                        type: 0,
-                        value: 0
-                    )
+                    CommonCommand.syncUnread(timestamp: 0, type: 0, value: 0)
                 }
                 let response = try await api.send(command)
                 return try await parser.parseUnread(response)
