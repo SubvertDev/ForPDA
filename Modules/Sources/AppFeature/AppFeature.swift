@@ -469,15 +469,17 @@ public struct AppFeature: Reducer, Sendable {
                     if newPhase == .active {
                         try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
-                        let unread = try await apiClient.getUnread(type: .all)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
-                    }
-                    
-                    if isLoggedIn, newPhase == .background {
-                        await send(.registerBackgroundTask)
+                        
+                        if isLoggedIn {
+                            let unread = try await apiClient.getUnread(type: .all)
+                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        }
                     }
                     
                     if newPhase == .background {
+                        if isLoggedIn {
+                            await send(.registerBackgroundTask)
+                        }
                         try await apiClient.disconnect()
                     }
                 }
