@@ -104,6 +104,16 @@ struct BBBuilderTests {
         }
     }
     
+    @Test func tokenizer() async throws {
+        let text = "[attachment=\"1234567:1.png"
+        let nodes = BBBuilder.build(text: text)
+        if case let .text(innerText) = nodes.first {
+            #expect(innerText.string == text)
+        } else {
+            Issue.record("Expected node is not text or nodes count is wrong")
+        }
+    }
+    
     // MARK: - Lists
     
     @Test func missedNewlinesAreHandledInList() async throws {

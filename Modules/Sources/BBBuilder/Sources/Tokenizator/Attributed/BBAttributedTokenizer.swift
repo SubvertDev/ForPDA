@@ -71,7 +71,7 @@ public struct BBAttributedTokenizer {
                         return .text(NSAttributedString(string))
                     }
                 } else {
-                    print("TokenizerA1")
+                    return recoverAsText(from: parseStartIndex)
                 }
             } else {
                 // Открывающий тег
@@ -136,15 +136,13 @@ public struct BBAttributedTokenizer {
                     }
                     return .openingTag(tag, tagAttribute.map { NSAttributedString(string: $0) })
                 } else {
-                    print("TokenizerA2")
+                    return recoverAsText(from: parseStartIndex)
                 }
             }
         } else {
             let textStartIndex = currentIndex
             return scanForText(textStartIndex: textStartIndex)
         }
-        
-        return nil
     }
     
     
@@ -225,6 +223,12 @@ public struct BBAttributedTokenizer {
     
     private mutating func advanceIndex() {
         currentIndex = input.index(after: currentIndex)
+    }
+    
+    private mutating func recoverAsText(from startIndex: AttributedString.UnicodeScalarView.Index) -> BBAttributedToken {
+        let text = AttributedString(original[startIndex..<input.endIndex])
+        currentIndex = input.endIndex
+        return .text(NSAttributedString(text))
     }
 }
 
