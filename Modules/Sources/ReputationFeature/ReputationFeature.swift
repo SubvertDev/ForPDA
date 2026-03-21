@@ -5,16 +5,24 @@
 //  Created by Рустам Ойтов on 11.07.2025.
 //
 
+import Foundation
 import AnalyticsClient
 import ComposableArchitecture
 import APIClient
 import Models
 import FormFeature
+import ToastClient
 
 @Reducer
 public struct ReputationFeature: Reducer, Sendable {
     
     public init() {}
+    
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+    }
     
     // MARK: - Destinations
     
@@ -98,6 +106,7 @@ public struct ReputationFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.toastClient) private var toastClient
     
     // MARK: - body
     
@@ -112,6 +121,11 @@ public struct ReputationFeature: Reducer, Sendable {
                 state.isLoading = true
                 return .send(.internal(.loadData))
                     .merge(with: .cancel(id: CancelID.loadData))
+                
+            case .destination(.presented(.report(.delegate(.formSent(.report))))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
+                }
                 
             case .view(.onAppear):
                 return .send(.internal(.loadData))

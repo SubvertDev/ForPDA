@@ -411,6 +411,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.FormFeature,
+                    .Internal.ToastClient,
                     .SPM.TCA,
                 ]
              ),
