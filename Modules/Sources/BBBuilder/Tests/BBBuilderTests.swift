@@ -141,6 +141,17 @@ struct BBBuilderTests {
         }
     }
     
+    @Test func inlineImageAttachmentBeforeTextIsTrimmed() async throws {
+        let id = 0
+        let text = String.imageAttachment(id: id) + "test"
+        let nodes = BBBuilder.build(text: text, attachments: [.image(id: id)])
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(!text.string.contains("\n"))
+        } else {
+            Issue.record("First node is not text or there's more nodes")
+        }
+    }
+    
     @Test func imageAttachmentBeforeNewlineTextIsNotInlineAndTextIsTrimmedLeading() async throws {
         let id = 0
         let text = String.imageAttachment(id: id) + "\nText"

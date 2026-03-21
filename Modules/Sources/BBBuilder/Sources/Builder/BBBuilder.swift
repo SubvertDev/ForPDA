@@ -136,7 +136,8 @@ public struct BBBuilder {
                     let isNextNodeTextable = nodes[safe: index + 1]?.isTextable ?? false
                     let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
                     
-                    if hasPreviousNode(index), nodes[index - 1].isMedia, !node.hasOnlyOneSpace {
+                    if hasPreviousNode(index),
+                        shouldInsertNewlineAfterMedia(previousNode: nodes[index - 1], currentNode: node) {
                         logger.info("Previous node is media, appending newline")
                         mutableText.append(NSAttributedString(string: "\n"))
                     }
@@ -306,6 +307,39 @@ public struct BBBuilder {
         }
         
         return mergedNodes
+    }
+    
+    private func shouldInsertNewlineAfterMedia(previousNode: BBContainerNode, currentNode: BBContainerNode) -> Bool {
+        guard previousNode.isMedia, !currentNode.hasOnlyOneSpace else { return false }
+        
+        switch previousNode {
+        case .img:
+            // Keep inline image + text on the same line unless source text explicitly starts from a newline
+            return currentNode.startsWithNewline
+            
+        case let .attachment(attribute):
+            guard let attachmentId = parseAttachmentId(from: attribute.string),
+                  let attachmentType = attachments.first(where: { $0.id == attachmentId })?.type else {
+                return true
+            }
+            
+            switch attachmentType {
+            case .file:
+                return true
+            case .image:
+                return currentNode.startsWithNewline
+            }
+            
+        default:
+            return false
+        }
+    }
+    
+    private func parseAttachmentId(from attribute: String) -> Int? {
+        guard let delimiterIndex = attribute.firstIndex(of: ":") else { return nil }
+        let rawId = attribute[..<delimiterIndex]
+        let id = rawId.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+        return Int(id)
     }
     
     // MARK: - Unwrap
