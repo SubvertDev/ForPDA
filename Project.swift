@@ -330,6 +330,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBBuilder,
+                    .Internal.BBPanelFeature,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.ParsingClient,
