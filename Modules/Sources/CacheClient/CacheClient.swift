@@ -48,10 +48,6 @@ public struct CacheClient: Sendable {
     public var setQMSChats: @Sendable (_ id: Int, _ chats: [QMSChatInfo]) -> Void
     public var getQMSChats: @Sendable (_ id: Int) -> [QMSChatInfo]?
     
-    // Background Tasks
-    public var setBackgroundTaskEntry: @Sendable (BackgroundTaskEntry) -> Void
-    public var getBackgroundTaskEntries: @Sendable () -> [BackgroundTaskEntry]
-    
     // Notifications
     public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
     public var getLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int) async -> Int?
@@ -154,17 +150,6 @@ extension CacheClient: DependencyKey {
             },
             getQMSChats: { id in
                 return try? qmsChatsStorage.object(forKey: id)
-            },
-            
-            // MARK: - Background Tasks
-            
-            setBackgroundTaskEntry: { date in
-                var invokes = (try? lastBackgroundTaskInvokeTimeStorage.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
-                invokes.append(date)
-                try? lastBackgroundTaskInvokeTimeStorage.setObject(invokes, forKey: lastBackgroundTaskInvokeTimeKey)
-            },
-            getBackgroundTaskEntries: {
-                return (try? lastBackgroundTaskInvokeTimeStorage.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
             },
             
             // MARK: - Notifications

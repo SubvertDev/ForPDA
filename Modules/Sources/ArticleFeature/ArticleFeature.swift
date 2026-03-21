@@ -222,6 +222,12 @@ public struct ArticleFeature: Reducer, Sendable {
                 return .merge([
                     loadingIndicator(),
                     getArticle(id: state.articlePreview.id),
+                    .run { [pendingScrollToId = state.pendingScrollToId] _ in
+                        // `siteMention` notifications encode mentioned comment id in the trailing identifier segment
+                        // When opening an article from such deeplink, clear matching delivered notifications
+                        guard let pendingScrollToId else { return }
+                        await notificationsClient.removeNotifications(timestamps: [TimeInterval(pendingScrollToId)])
+                    },
                     .publisher {
                         state.$userSession.publisher.dropFirst()
                             .map { _ in Action.onRefresh }

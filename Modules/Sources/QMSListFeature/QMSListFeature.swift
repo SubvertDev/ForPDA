@@ -40,6 +40,7 @@ public struct QMSListFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
+            case load
             case qmsLoaded(Result<QMSList, any Error>)
             case userLoaded(Result<QMSUser, any Error>)
         }
@@ -52,6 +53,7 @@ public struct QMSListFeature: Reducer, Sendable {
     
     // MARK: - Dependency
     
+    @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.qmsClient) private var qmsClient
@@ -67,10 +69,15 @@ public struct QMSListFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onAppear):
-                return .run { send in
-                    let result = await Result { try await qmsClient.loadQMSList() }
-                    await send(.internal(.qmsLoaded(result)))
-                }
+                return .concatenate(
+                    .send(.internal(.load)),
+                    .run { send in
+                        for await unread in notificationsClient.unreadPublisher().values {
+                            guard unread.qmsUnreadCount > 0 else { continue }
+                            await send(.internal(.load))
+                        }
+                    }
+                )
 
             case let .view(.chatRowTapped(id)):
                 return .send(.delegate(.openQMSChat(id)))
@@ -89,6 +96,12 @@ public struct QMSListFeature: Reducer, Sendable {
                     }
                 }
                 return .none
+                
+            case .internal(.load):
+                return .run { send in
+                    let result = await Result { try await qmsClient.loadQMSList() }
+                    await send(.internal(.qmsLoaded(result)))
+                }
                 
             case let .internal(.qmsLoaded(result)):
                 switch result {

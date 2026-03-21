@@ -91,16 +91,6 @@
         }
       }
     },
-    "Send log" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отправить лог"
-          }
-        }
-      }
-    },
     "Site mentions" : {
       "localizations" : {
         "ru" : {

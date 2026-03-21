@@ -112,7 +112,7 @@ public struct MentionsFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .run { _ in
                     await notificationsClient.removeNotifications(categories: [.forumMention, .siteMention])
-                    let unread = try await apiClient.getUnread(type: 0, value: 0)
+                    let unread = try await apiClient.getUnread(type: .all)
                     await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                 }
                 

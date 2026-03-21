@@ -34,10 +34,8 @@ struct ForPDAApp: App {
             }
         }
         .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
-            await cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .invoked))
             await appDelegate.store.send(.registerBackgroundTask).finish()
             await appDelegate.store.send(.backgroundTaskInvoked).finish()
-            await cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .finished))
         }
     }
 }

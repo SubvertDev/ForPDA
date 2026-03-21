@@ -56,19 +56,7 @@ public struct NotificationsScreen: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
                     Section {
-                        Row("Background notifications", value: $store.appSettings.backgroundNotifications)
-                        
-                        if store.appSettings.backgroundNotifications {
-                            Button {
-                                store.send(.sendLogButtonTapped)
-                            } label: {
-                                HStack {
-                                    Text("Send log", bundle: .module)
-                                    Spacer()
-                                    Image(systemSymbol: .squareAndArrowUp)
-                                }
-                            }
-                        }
+                        Row("Background notifications", value: $store.appSettings.backgroundNotifications2)
                     } header: {
                         Text("Experimental", bundle: .module)
                     }
@@ -76,7 +64,7 @@ public struct NotificationsScreen: View {
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
-                .animation(.default, value: store.appSettings.backgroundNotifications)
+                .animation(.default, value: store.appSettings.backgroundNotifications2)
                 .scrollContentBackground(.hidden)
             }
             .navigationTitle(Text("Notifications", bundle: .module))

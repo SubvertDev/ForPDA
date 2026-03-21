@@ -72,6 +72,48 @@ struct BBBuilderTests {
         }
     }
     
+    @Test func singleTextAfterSpoilerIsTrimmedLeading() async throws {
+        let text = "[quote]quote[/quote] test"
+        let nodes = BBBuilder.build(text: text)
+        if case let .text(text) = nodes[1], nodes.count == 2 {
+            #expect(text.string.prefix(1) != " ")
+        } else {
+            Issue.record("Expected node is not text or nodes count is wrong")
+        }
+    }
+
+    @Test func htmlEntityIsNotDecodedInsideCodeBlock() async throws {
+        let text = "[code]&#128512;[/code]"
+        let nodes = BBBuilder.build(text: text)
+        if case let .code(_, codeNodes) = nodes.first,
+           case let .text(codeText) = codeNodes.first {
+            #expect(codeText.string == "&#128512;")
+        } else {
+            Issue.record("Expected first node to be code with text")
+        }
+    }
+
+    @Test func smileIsNotConvertedInsideCodeBlock() async throws {
+        let text = "[code]:)[/code]"
+        let nodes = BBBuilder.build(text: text)
+        if case let .code(_, codeNodes) = nodes.first,
+           case let .text(codeText) = codeNodes.first {
+            #expect(codeText.string == ":)")
+        } else {
+            Issue.record("Expected first node to be code with text")
+        }
+    }
+    
+    @Test func tokenizer() async throws {
+        let text = "[attachment=\"1234567:1.png"
+        let nodes = BBBuilder.build(text: text)
+        if case let .text(innerText) = nodes.first {
+            #expect(innerText.string == text)
+        } else {
+            Issue.record("Expected node is not text or nodes count is wrong")
+        }
+    }
+    
     // MARK: - Lists
     
     @Test func missedNewlinesAreHandledInList() async throws {
@@ -128,6 +170,17 @@ struct BBBuilderTests {
             #expect(nodes == [.text(text)])
         } else {
             Issue.record("Node is not text")
+        }
+    }
+    
+    @Test func inlineImageAttachmentBeforeTextIsTrimmed() async throws {
+        let id = 0
+        let text = String.imageAttachment(id: id) + "test"
+        let nodes = BBBuilder.build(text: text, attachments: [.image(id: id)])
+        if case let .text(text) = nodes.first, nodes.count == 1 {
+            #expect(!text.string.contains("\n"))
+        } else {
+            Issue.record("First node is not text or there's more nodes")
         }
     }
     

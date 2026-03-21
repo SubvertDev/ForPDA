@@ -30,7 +30,30 @@ public final class BBRenderer {
     
     public func render(text: String) -> NSAttributedString {
         let elements = BBParser.parse(text: text)
-        let resultNodes = elements.map { $0.render(withAttributes: baseAttributes) }
+        var isInsideCodeBlock = false
+        var resultNodes: [BBContainerNode] = []
+
+        for element in elements {
+            if case let .text(text) = element {
+                if text.isClosingCodeTag {
+                    isInsideCodeBlock = false
+                }
+            }
+
+            resultNodes.append(
+                element.render(
+                    withAttributes: baseAttributes,
+                    shouldDecodeHTMLEntities: !isInsideCodeBlock
+                )
+            )
+
+            if case let .text(text) = element {
+                if text.isOpeningCodeTag {
+                    isInsideCodeBlock = true
+                }
+            }
+        }
+
         let joinedNode = resultNodes.joined()
         guard case let .text(text) = joinedNode else { fatalError() }
         return text
@@ -38,46 +61,61 @@ public final class BBRenderer {
 }
 
 private extension BBNode {
-    func render(withAttributes attributes: [NSAttributedString.Key: Any]) -> BBContainerNode {
+    func render(
+        withAttributes attributes: [NSAttributedString.Key: Any],
+        shouldDecodeHTMLEntities: Bool = true
+    ) -> BBContainerNode {
         guard let currentFont = attributes[NSAttributedString.Key.font] as? UIFont else {
             fatalError("Missing font attribute in \(attributes)")
         }
         
         switch self {
         case .text(let text):
-            let text = text.decodeHTMLEntities()
+            let text = shouldDecodeHTMLEntities ? text.decodeHTMLEntities() : text
             let attributedText = NSAttributedString(string: text, attributes: attributes)
             return .text(attributedText)
 
         case .bold(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.font] = currentFont.boldFont()
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .italic(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.font] = currentFont.italicFont()
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
 
         case .underline(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.underlineStyle] = NSUnderlineStyle.single.rawValue
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .strikethrough(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.strikethroughStyle] = NSUnderlineStyle.single.rawValue
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .sup(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.baselineOffset] = 5
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .sub(let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.baselineOffset] = -5
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .size(let size, let children):
             var newAttributes = attributes
@@ -91,7 +129,9 @@ private extension BBNode {
                     .withSize(UIFont.preferredFont(forBBCodeSize: size).pointSize)
                     .addingSymbolicTraits(of: currentFont)
             }
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .color(let color, let children):
             var newAttributes = attributes
@@ -100,13 +140,17 @@ private extension BBNode {
             } else {
                 newAttributes[NSAttributedString.Key.foregroundColor] = UIColor(hex: color)
             }
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .background(let color, let children):
             var newAttributes = attributes
             let dynamicColor = ForumColors(rawValue: color.lowercased())?.hexColor ?? ("FFFFFF", "000000") // TODO: !!!
             newAttributes[NSAttributedString.Key.backgroundColor] = UIColor(dynamicTuple: dynamicColor)
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .font(let name, let children):
             var newAttributes = attributes
@@ -119,16 +163,22 @@ private extension BBNode {
                     .defaultBBFont
                     .addingSymbolicTraits(of: currentFont)
             }
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .url(let url, let children):
             var newAttributes = attributes
             newAttributes[NSAttributedString.Key.link] = url
             newAttributes[NSAttributedString.Key.underlineStyle] = NSUnderlineStyle.single.rawValue
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .anchor(let children):
-            return children.map { $0.render(withAttributes: attributes) }.joined() // TODO: !
+            return children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined() // TODO: !
             
         case .offtop(let children):
             var newAttributes = attributes
@@ -136,56 +186,82 @@ private extension BBNode {
                 .preferredFont(forTextStyle: .caption2)
                 .addingSymbolicTraits(of: currentFont)
             newAttributes[NSAttributedString.Key.foregroundColor] = UIColor(Color(.Labels.quaternary))
-            return children.map { $0.render(withAttributes: newAttributes) }.joined()
+            return children.map {
+                $0.render(withAttributes: newAttributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }.joined()
             
         case .center(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .center(nodes)
             
         case .left(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .left(nodes)
             
         case .right(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .right(nodes)
             
         case .justify(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .justify(nodes)
             
         case .spoiler(let attribute, let children):
             let attributedString = attribute.map { BBRenderer(baseAttributes: attributes).render(text: $0) }
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .spoiler(attributedString, nodes)
             
         case .quote(let attribute, let children):
             let attributedString = attribute.map { BBRenderer(baseAttributes: attributes).render(text: $0) }
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .quote(attributedString, nodes)
             
         case .list(let type, let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .list(type, nodes)
 
         case .code(let attribute, let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: false)
+            }
             return .code(attribute.map { NSAttributedString(string: $0) }, nodes)
 
         case .hide(let attribute, let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .hide(attribute.map { NSAttributedString(string: $0) }, nodes)
 
         case .cur(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .cur(nodes)
 
         case .mod(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .mod(nodes)
 
         case .ex(let children):
-            let nodes = children.map { $0.render(withAttributes: attributes) }
+            let nodes = children.map {
+                $0.render(withAttributes: attributes, shouldDecodeHTMLEntities: shouldDecodeHTMLEntities)
+            }
             return .ex(nodes)
             
         case .snapback(let postId):
@@ -203,6 +279,16 @@ private extension BBNode {
         case .smile(let smile):
             return .smile(NSAttributedString(string: smile))
         }
+    }
+}
+
+private extension String {
+    var isOpeningCodeTag: Bool {
+        self == "[code]" || (hasPrefix("[code=") && hasSuffix("]"))
+    }
+
+    var isClosingCodeTag: Bool {
+        self == "[/code]"
     }
 }
 

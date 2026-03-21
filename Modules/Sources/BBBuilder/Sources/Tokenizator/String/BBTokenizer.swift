@@ -65,7 +65,7 @@ public struct BBTokenizer {
                         return .text(string)
                     }
                 } else {
-                    fatalError("Tokenizer1")
+                    return recoverAsText(from: parseStartIndex)
                 }
             } else {
                 // Открывающий тег
@@ -127,7 +127,7 @@ public struct BBTokenizer {
                     advanceIndex()
                     return .openingTag(tag, tagAttribute)
                 } else {
-                    fatalError("Tokenizer2")
+                    return recoverAsText(from: parseStartIndex)
                 }
             }
         } else {
@@ -136,8 +136,6 @@ public struct BBTokenizer {
             let text = String(input[textStartIndex..<currentIndex])
             return .text(text)
         }
-        
-        return nil
     }
     
     private mutating func scanUntil(_ unicodeScalar: UnicodeScalar) {
@@ -154,6 +152,12 @@ public struct BBTokenizer {
     
     private mutating func advanceIndex() {
         currentIndex = input.index(after: currentIndex)
+    }
+    
+    private mutating func recoverAsText(from startIndex: String.UnicodeScalarView.Index) -> BBToken {
+        let text = String(input[startIndex..<input.endIndex])
+        currentIndex = input.endIndex
+        return .text(text)
     }
 }
 

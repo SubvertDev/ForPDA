@@ -7,6 +7,7 @@ public struct BBAttributedTokenizer {
     private let original: AttributedString
     private let input: AttributedString.UnicodeScalarView
     private var currentIndex: AttributedString.UnicodeScalarView.Index
+    private var codeTagDepth = 0
     
     // MARK: - Computed Properties
     
@@ -60,6 +61,9 @@ public struct BBAttributedTokenizer {
                     let tag = BBTag(rawValue: string)
                     if let tag {
                         advanceIndex()
+                        if tag == .code, codeTagDepth > 0 {
+                            codeTagDepth -= 1
+                        }
                         return .closingTag(tag)
                     } else {
                         advanceIndex()
@@ -67,7 +71,7 @@ public struct BBAttributedTokenizer {
                         return .text(NSAttributedString(string))
                     }
                 } else {
-                    print("TokenizerA1")
+                    return recoverAsText(from: parseStartIndex)
                 }
             } else {
                 // Открывающий тег
@@ -127,17 +131,18 @@ public struct BBAttributedTokenizer {
                 // Ищем ближайшую закрывающую скобку "]", записываем как открывающий тег
                 if currentIndex < input.endIndex, input[currentIndex] == .closingBracket {
                     advanceIndex()
+                    if tag == .code {
+                        codeTagDepth += 1
+                    }
                     return .openingTag(tag, tagAttribute.map { NSAttributedString(string: $0) })
                 } else {
-                    print("TokenizerA2")
+                    return recoverAsText(from: parseStartIndex)
                 }
             }
         } else {
             let textStartIndex = currentIndex
             return scanForText(textStartIndex: textStartIndex)
         }
-        
-        return nil
     }
     
     
@@ -145,7 +150,11 @@ public struct BBAttributedTokenizer {
         // FIXME: Fix for MIUI page 6, investigate later
         guard layer < 160 else { return .text(NSAttributedString(AttributedString(original[textStartIndex..<currentIndex]))) }
         
-        scanUntil { $0 == .openingBracket || $0 == .colon }
+        if codeTagDepth > 0 {
+            scanUntil(.openingBracket)
+        } else {
+            scanUntil { $0 == .openingBracket || $0 == .colon }
+        }
         
         guard currentIndex < input.endIndex else {
             // TODO: Hotfix, revisit
@@ -214,6 +223,12 @@ public struct BBAttributedTokenizer {
     
     private mutating func advanceIndex() {
         currentIndex = input.index(after: currentIndex)
+    }
+    
+    private mutating func recoverAsText(from startIndex: AttributedString.UnicodeScalarView.Index) -> BBAttributedToken {
+        let text = AttributedString(original[startIndex..<input.endIndex])
+        currentIndex = input.endIndex
+        return .text(NSAttributedString(text))
     }
 }
 

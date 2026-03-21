@@ -55,6 +55,15 @@ public struct BBBuilder {
             return nodes[safe: index + 1] != nil
         }
         
+        func shouldTrimLeadingWhitespace(after node: BBContainerNode) -> Bool {
+            switch node {
+            case .spoiler, .quote:
+                return true
+            default:
+                return false
+            }
+        }
+        
         for (index, node) in nodes.enumerated() {
             // logger.info("NEW NODE: \(node)") // node doesnt conform to CustomStringConvertible
             
@@ -76,11 +85,13 @@ public struct BBBuilder {
                 
                 if mutableText.string.isEmpty {
                     var trimLeading = false
+                    var trimLeadingWhitespace = false
                     var trimTrailing = false
                     
                     if hasPreviousNode(index) {
                         if !nodes[index - 1].isTextable {
                             trimLeading = true
+                            trimLeadingWhitespace = shouldTrimLeadingWhitespace(after: nodes[index - 1])
                         } else if nodes[index - 1].isMedia {
                             trimLeading = false
                         }
@@ -110,6 +121,7 @@ public struct BBBuilder {
                         with: mutableText,
                         listInfo: listInfo,
                         trimLeading: trimLeading,
+                        trimLeadingWhitespace: trimLeadingWhitespace,
                         trimTrailing: trimTrailing
                     )
                     if !textNode.isEmptyTrimmedText {
@@ -124,7 +136,8 @@ public struct BBBuilder {
                     let isNextNodeTextable = nodes[safe: index + 1]?.isTextable ?? false
                     let isNextNodeMedia = nodes[safe: index + 1]?.isMedia ?? false
                     
-                    if hasPreviousNode(index), nodes[index - 1].isMedia, !node.hasOnlyOneSpace {
+                    if hasPreviousNode(index),
+                        shouldInsertNewlineAfterMedia(previousNode: nodes[index - 1], currentNode: node) {
                         logger.info("Previous node is media, appending newline")
                         mutableText.append(NSAttributedString(string: "\n"))
                     }
@@ -296,6 +309,39 @@ public struct BBBuilder {
         return mergedNodes
     }
     
+    private func shouldInsertNewlineAfterMedia(previousNode: BBContainerNode, currentNode: BBContainerNode) -> Bool {
+        guard previousNode.isMedia, !currentNode.hasOnlyOneSpace else { return false }
+        
+        switch previousNode {
+        case .img:
+            // Keep inline image + text on the same line unless source text explicitly starts from a newline
+            return currentNode.startsWithNewline
+            
+        case let .attachment(attribute):
+            guard let attachmentId = parseAttachmentId(from: attribute.string),
+                  let attachmentType = attachments.first(where: { $0.id == attachmentId })?.type else {
+                return true
+            }
+            
+            switch attachmentType {
+            case .file:
+                return true
+            case .image:
+                return currentNode.startsWithNewline
+            }
+            
+        default:
+            return false
+        }
+    }
+    
+    private func parseAttachmentId(from attribute: String) -> Int? {
+        guard let delimiterIndex = attribute.firstIndex(of: ":") else { return nil }
+        let rawId = attribute[..<delimiterIndex]
+        let id = rawId.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+        return Int(id)
+    }
+    
     // MARK: - Unwrap
     
     /// Превращает text / snapback / mergetime / img / attachment / smile в текстовую ноду
@@ -306,6 +352,7 @@ public struct BBBuilder {
         isAttachmentDelimeter: Bool = false,
         listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
+        trimLeadingWhitespace: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
         return unwrap(
@@ -314,6 +361,7 @@ public struct BBBuilder {
             isFirst: isFirst,
             isAttachmentDelimeter: isAttachmentDelimeter,
             trimLeading: trimLeading,
+            trimLeadingWhitespace: trimLeadingWhitespace,
             trimTrailing: trimTrailing
         )
     }
@@ -326,16 +374,21 @@ public struct BBBuilder {
         isAttachmentDelimeter: Bool = false,
         listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
+        trimLeadingWhitespace: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
         // TODO: Вынести isFirst обработчики
         switch node {
         case .text(let text):
+            var normalizedText = text
+                .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                .replacingOccurrences(of: "&#91;", with: "[")
+                .replacingOccurrences(of: "&#93;", with: "]")
+            if trimLeadingWhitespace {
+                normalizedText = normalizedText.trimmingLeadingWhitespaces()
+            }
             let mutableString = NSMutableAttributedString(
-                attributedString: text
-                    .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
-                    .replacingOccurrences(of: "&#91;", with: "[")
-                    .replacingOccurrences(of: "&#93;", with: "]")
+                attributedString: normalizedText
             )
             if isAttachmentDelimeter {
                 if mutableString.string.prefix(1) == " " {
@@ -510,6 +563,17 @@ extension NSAttributedString {
             }
         }
 
+        return mutableAttributedString
+    }
+    
+    func trimmingLeadingWhitespaces() -> NSAttributedString {
+        let mutableAttributedString = NSMutableAttributedString(attributedString: self)
+        let characterSet = CharacterSet.whitespaces
+        
+        while mutableAttributedString.string.first.map({ characterSet.contains($0.unicodeScalars.first!) }) ?? false {
+            mutableAttributedString.deleteCharacters(in: NSRange(location: 0, length: 1))
+        }
+        
         return mutableAttributedString
     }
     

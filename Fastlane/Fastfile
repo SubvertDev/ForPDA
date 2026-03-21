@@ -202,7 +202,7 @@ platform :ios do
             generate_command = ""
             generate_command += "TUIST_LINKING=static " if options[:testflight]
             generate_command += "tuist generate"
-            generate_command += " --no-binary-cache" if options[:testflight]
+            generate_command += " --cache-profile none" if options[:testflight]
             generate_command += " --no-open" unless options[:open]
             
             sh(generate_command)

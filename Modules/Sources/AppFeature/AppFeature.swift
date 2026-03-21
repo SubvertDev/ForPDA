@@ -307,8 +307,7 @@ public struct AppFeature: Reducer, Sendable {
                 return .run { _ in
                     let isProcessed = await notificationsClient.processNotification(notification)
                     if isProcessed {
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
-                        // let skipCategories: [Unread.Item.Category] = [.topic, .forum]
+                        let unread = try await apiClient.getUnread(type: .all)
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                 }
@@ -341,7 +340,9 @@ public struct AppFeature: Reducer, Sendable {
                 let favoritesBadges =
                 (state.appSettings.notifications.isForumEnabled ? unread.forumCount : 0) +
                 (state.appSettings.notifications.isTopicsEnabled ? unread.topicCount : 0)
-                state.favoritesBadges = favoritesBadges
+                
+                // Sometimes we have more favorites in general count than in an array, so we apply min() fix
+                state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
                 
                 let profileBadges =
                 (state.appSettings.notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
@@ -411,11 +412,26 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .userDidLogin(userId: userId):
                 state.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: userId)))))
-                return .none
+                return .run { _ in
+                    do {
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    } catch {
+                        analyticsClient.capture(error)
+                    }
+                }
                 
             case .userDidLogout:
                 state.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
-                return .none
+                state.favoritesBadges = 0
+                state.profileBadges = 0
+                return .run { _ in
+                    notificationsClient.setNotificationContext(context: nil)
+                    await notificationsClient.removeNotifications(
+                        categories: [.qms, .forum, .topic, .forumMention, .siteMention]
+                    )
+                    await notificationsClient.showUnreadNotifications(.mockEmpty, skipCategories: [])
+                }
                 
                 
                 // MARK: - Deeplinks
@@ -453,67 +469,57 @@ public struct AppFeature: Reducer, Sendable {
                     if newPhase == .active {
                         try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
-                    }
-                    
-                    if isLoggedIn, newPhase == .background {
-                        await send(.registerBackgroundTask)
+                        
+                        if isLoggedIn {
+                            let unread = try await apiClient.getUnread(type: .all)
+                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        }
                     }
                     
                     if newPhase == .background {
+                        if isLoggedIn {
+                            await send(.registerBackgroundTask)
+                        }
                         try await apiClient.disconnect()
                     }
                 }
                 
             case .registerBackgroundTask:
                 // return .send(.syncUnreadTaskInvoked) // For test purposes
-                guard state.appSettings.backgroundNotifications else { return .none }
+                guard state.appSettings.backgroundNotifications2 else { return .none }
                 
                 let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
                 request.earliestBeginDate = .now.addingTimeInterval(15 * 60) // 15 minutes by default
                 do {
-                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationBegin))
                     try BGTaskScheduler.shared.submit(request)
-                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationSuccess))
                     logger.info("[AppRefresh] Successfully scheduled BGAppRefreshTaskRequest")
                     // Set breakpoint here and run:
                     // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
                 } catch {
-                    cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .registrationFailed(error.localizedDescription)))
                     analyticsClient.capture(error)
                 }
                 return .none
                 
             case .backgroundTaskInvoked:
-                cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .startedSync))
                 return .run { [appSettings = state.appSettings] send in
                     do {
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .startedAsync))
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .checkingForPermission))
                         guard try await notificationsClient.hasPermission() else { return }
                         logger.info("[AppRefresh] Notifications permission is granted")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .checkingForSettings))
                         guard appSettings.notifications.isAnyEnabled else { return }
                         logger.info("[AppRefresh] Notifications enabled in settings")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .connecting))
                         try await apiClient.connect(inBackground: true)
                         logger.info("[AppRefresh] Successfully connected. Fetching notifications...")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .gettingNotifications))
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
+                        let unread = try await apiClient.getUnread(type: .all)
                         logger.info("[AppRefresh] Successfully fetched. Preparing to show notifications..")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .showingNotifications))
                         await notificationsClient.showUnreadNotifications(unread, [])
                         logger.info("[AppRefresh] Successfully shown notifications")
                         
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .success))
                     } catch {
-                        cacheClient.setBackgroundTaskEntry(BackgroundTaskEntry(stage: .failure(error.localizedDescription)))
                         analyticsClient.capture(error)
                     }
                 }

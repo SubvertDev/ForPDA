@@ -89,6 +89,8 @@ public struct QMSListScreen: View {
                 
                 Text(user.name)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .listRowBackground(Color(.Background.teritary))
