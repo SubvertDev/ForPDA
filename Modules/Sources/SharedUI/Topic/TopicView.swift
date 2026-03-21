@@ -508,11 +508,10 @@ struct CodeView: View {
             }
             
             if isExpanded {
-                if case .text = type {
-                    TopicView(
-                        type: type,
+                if case let .text(text) = type {
+                    RichText(
+                        text: text.monospacedCodeBlockText(),
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap,
                         onQuote: onQuote
                     )
                     .padding(12)
@@ -532,6 +531,30 @@ struct CodeView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .animation(.default, value: isExpanded)
+    }
+}
+
+private extension AttributedString {
+    func monospacedCodeBlockText() -> NSAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: NSAttributedString(self))
+        let range = NSRange(location: 0, length: mutable.length)
+
+        mutable.enumerateAttribute(.font, in: range) { value, effectiveRange, _ in
+            let font = (value as? UIFont) ?? UIFont.preferredFont(forTextStyle: .callout)
+            mutable.addAttribute(.font, value: font.monospacedEquivalent(), range: effectiveRange)
+        }
+
+        return mutable
+    }
+}
+
+private extension UIFont {
+    func monospacedEquivalent() -> UIFont {
+        let monospacedDescriptor = fontDescriptor.withDesign(.monospaced)
+            ?? UIFont.monospacedSystemFont(ofSize: pointSize, weight: .regular).fontDescriptor
+        let descriptorWithTraits = monospacedDescriptor.withSymbolicTraits(fontDescriptor.symbolicTraits)
+            ?? monospacedDescriptor
+        return UIFont(descriptor: descriptorWithTraits, size: pointSize)
     }
 }
 
