@@ -158,6 +158,9 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(.internal(.loadForum(offset: newOffset)))
                 
+            case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
             case .destination, .pageNavigation:
                 return .none
                 
