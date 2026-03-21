@@ -81,6 +81,28 @@ struct BBBuilderTests {
             Issue.record("Expected node is not text or nodes count is wrong")
         }
     }
+
+    @Test func htmlEntityIsNotDecodedInsideCodeBlock() async throws {
+        let text = "[code]&#128512;[/code]"
+        let nodes = BBBuilder.build(text: text)
+        if case let .code(_, codeNodes) = nodes.first,
+           case let .text(codeText) = codeNodes.first {
+            #expect(codeText.string == "&#128512;")
+        } else {
+            Issue.record("Expected first node to be code with text")
+        }
+    }
+
+    @Test func smileIsNotConvertedInsideCodeBlock() async throws {
+        let text = "[code]:)[/code]"
+        let nodes = BBBuilder.build(text: text)
+        if case let .code(_, codeNodes) = nodes.first,
+           case let .text(codeText) = codeNodes.first {
+            #expect(codeText.string == ":)")
+        } else {
+            Issue.record("Expected first node to be code with text")
+        }
+    }
     
     // MARK: - Lists
     
