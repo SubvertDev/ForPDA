@@ -113,7 +113,12 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
+        var editorState = FormEditorFeature.State(
+            id: 0,
+            flag: [.required, .uploadable],
+            defaultText: "",
+            uploadBox: .init(id: 1, allowedExtensions: [])
+        )
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -158,7 +163,12 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
+        var editorState = FormEditorFeature.State(
+            id: 0,
+            flag: [.required, .uploadable],
+            defaultText: "",
+            uploadBox: .init(id: 1, allowedExtensions: [])
+        )
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -208,7 +218,12 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
+        var editorState = FormEditorFeature.State(
+            id: 0,
+            flag: [.required, .uploadable],
+            defaultText: "",
+            uploadBox: .init(id: 1, existsAttachments: [], allowedExtensions: [])
+        )
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -266,7 +281,12 @@ struct FormFeatureTests {
             }
         }
         
-        var editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "")
+        var editorState = FormEditorFeature.State(
+            id: 0,
+            flag: [.required, .uploadable],
+            defaultText: "",
+            uploadBox: .init(id: 1, allowedExtensions: [])
+        )
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -296,12 +316,14 @@ struct FormFeatureTests {
     // MARK: - Edit Post
     
     @Test func editPost() async throws {
+        let attachment = FormAttachment(id: 1, name: "name", type: .file)
+        
         let store = TestStore(
             initialState: FormFeature.State(
                 type: .post(
                     type: .edit(postId: 0),
                     topicId: 0,
-                    content: .simple("some text", [])
+                    content: .simple("some text", [attachment])
                 )
             )
         ) {
@@ -312,7 +334,12 @@ struct FormFeatureTests {
             }
         }
         
-        let editorState = FormEditorFeature.State(id: 0, flag: .required, defaultText: "some text")
+        let editorState = FormEditorFeature.State(
+            id: 0,
+            flag: [.required, .uploadable],
+            defaultText: "some text",
+            uploadBox: .init(id: 1, existsAttachments: [attachment], allowedExtensions: [])
+        )
         await store.send(.view(.onAppear)) {
             $0.rows = [.editor(editorState)]
             $0.focusedField = 0
@@ -396,7 +423,8 @@ struct FormFeatureTests {
             description: "Введите дополнительную полезную информацию, например для:\r\n[b]\"Новая версия\"[/b] - список \"что нового\".\r\n[b]\"Модификация\"[/b] - \"на чем основано\", \"особенности\", \"обновлено\". ",
             placeholder: "",
             flag: [.required, .uploadable],
-            defaultText: ""
+            defaultText: "",
+            uploadBox: .init(id: 6, allowedExtensions: ["apk", "apks", "exe", "zip", "rar", "obb", "7z", "r00", "r01", "apkm", "ipa"])
         )
         var uploadbox = FormUploadBoxFeature.State(
             id: 6,
