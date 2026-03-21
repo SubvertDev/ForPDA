@@ -28,8 +28,6 @@ public struct CommentFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     public enum Localization {
-        static let errorSendingReport = LocalizedStringResource("Error sending report", bundle: .module)
-        static let reportTooShort = LocalizedStringResource("Report too short", bundle: .module)
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
     }
     
@@ -39,7 +37,7 @@ public struct CommentFeature: Reducer, Sendable {
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
         @Presents var changeReputation: ReputationChangeFeature.State?
-        @Presents var writeForm: FormFeature.State?
+        @Presents var report: FormFeature.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
@@ -89,7 +87,7 @@ public struct CommentFeature: Reducer, Sendable {
         case changeReputationButtonTapped
         
         case changeReputation(PresentationAction<ReputationChangeFeature.Action>)
-        case writeForm(PresentationAction<FormFeature.Action>)
+        case report(PresentationAction<FormFeature.Action>)
         
         case _likeResult(Bool)
         case _timerTicked
@@ -130,24 +128,12 @@ public struct CommentFeature: Reducer, Sendable {
             case let .profileTapped(id):
                 return .send(.delegate(.commentHeaderTapped(id)))
 
-            case .writeForm(.presented(.delegate(.formSent(let response)))):
-                if case let .report(result) = response {
-                    let toast: ToastMessage
-                    switch result {
-                    case .error:
-                        toast = ToastMessage(text: Localization.errorSendingReport, isError: true, haptic: .error)
-                    case .tooShort:
-                        toast = ToastMessage(text: Localization.reportTooShort, isError: true, haptic: .error)
-                    case .success:
-                        toast = ToastMessage(text: Localization.reportSent, haptic: .success)
-                    }
-                    return .run { _ in
-                        await toastClient.showToast(toast)
-                    }
+            case .report(.presented(.delegate(.formSent(.report)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
-                return .none
                 
-            case .writeForm, .changeReputation:
+            case .report, .changeReputation:
                 return .none
                 
             case .hiddenLabelTapped:
@@ -158,7 +144,7 @@ public struct CommentFeature: Reducer, Sendable {
                 guard state.isAuthorized else {
                     return .send(.delegate(.unauthorizedAction))
                 }
-                state.writeForm = FormFeature.State(
+                state.report = FormFeature.State(
                     type: .report(
                         id: state.comment.id,
                         type: .comment
@@ -218,7 +204,7 @@ public struct CommentFeature: Reducer, Sendable {
                 return .none
             }
         }
-        .ifLet(\.$writeForm, action: \.writeForm) {
+        .ifLet(\.$report, action: \.report) {
             FormFeature()
         }
         .ifLet(\.$changeReputation, action: \.changeReputation) {

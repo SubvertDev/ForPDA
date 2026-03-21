@@ -177,17 +177,7 @@ public struct FormFeature: Reducer, Sendable {
             case .destination:
                 break
                 
-            case let .delegate(.formSent(result)):
-                switch result {
-                case let .report(status):
-                    if status.isError {
-                        return .none
-                    }
-                    
-                case .topic, .post:
-                    // .formSent not called when an error occurs
-                    break
-                }
+            case .delegate(.formSent):
                 return .run { _ in await dismiss() }
                 
             case .delegate:
@@ -446,8 +436,15 @@ public struct FormFeature: Reducer, Sendable {
                     fatalError()
                 }
                 
-            case let .internal(.reportResponse(.success(report))):
-                return .send(.delegate(.formSent(.report(report))))
+            case let .internal(.reportResponse(.success(result))):
+                switch result {
+                case .error:
+                    state.destination = .alert(.unknownError)
+                case .tooShort:
+                    state.destination = .alert(.reportIsTooShort)
+                case .success:
+                    return .send(.delegate(.formSent(.report)))
+                }
             
             case let .internal(.reportResponse(.failure(error))):
                 state.isPublishing = false
@@ -596,6 +593,18 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     } message: {
         TextState("It will be attached as a dialog to your last post")
     }
+    
+    // Report
+    
+    nonisolated(unsafe) static let reportIsTooShort = AlertState {
+        TextState("Report is too short")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
+    }
+    
+    // Common
     
     nonisolated(unsafe) static let unknownError = AlertState {
         TextState("Unknown error")

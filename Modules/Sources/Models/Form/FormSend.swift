@@ -7,6 +7,6 @@
 
 public enum FormSend: Sendable {
     case post(PostSend)
-    case report(ReportResponseType)
     case topic(Int)
+    case report
 }

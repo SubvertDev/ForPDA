@@ -207,6 +207,16 @@
         }
       }
     },
+    "Report is too short" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком короткая жалоба"
+          }
+        }
+      }
+    },
     "Send report" : {
       "localizations" : {
         "en" : {

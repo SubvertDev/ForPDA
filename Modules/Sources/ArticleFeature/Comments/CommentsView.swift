@@ -118,7 +118,7 @@ struct CommentView: View {
                 }
                 .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
-            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
+            .fullScreenCover(item: $store.scope(state: \.report, action: \.report)) { store in
                 NavigationStack {
                     FormScreen(store: store)
                 }
