@@ -297,7 +297,7 @@ public struct FormFeature: Reducer, Sendable {
             case let .internal(.formResponse(.success(fields))):
                 var combined: (editorId: Int, uploadBox: FormStickedUploadBox?)? = nil
                 for (index, field) in fields.enumerated() {
-                    if case let .editor(content) = field, content.flag == [.required, .uploadable] {
+                    if case let .editor(content) = field, content.flag.contains(.uploadable) {
                         combined = (index, nil)
                     } else if case let .uploadbox(content, extensions) = field {
                         if content.flag == [.required, .uploadable] {
