@@ -72,6 +72,16 @@ struct BBBuilderTests {
         }
     }
     
+    @Test func singleTextAfterSpoilerIsTrimmedLeading() async throws {
+        let text = "[quote]quote[/quote] test"
+        let nodes = BBBuilder.build(text: text)
+        if case let .text(text) = nodes[1], nodes.count == 2 {
+            #expect(text.string.prefix(1) != " ")
+        } else {
+            Issue.record("Expected node is not text or nodes count is wrong")
+        }
+    }
+    
     // MARK: - Lists
     
     @Test func missedNewlinesAreHandledInList() async throws {

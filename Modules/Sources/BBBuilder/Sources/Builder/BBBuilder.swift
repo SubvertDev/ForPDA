@@ -55,6 +55,15 @@ public struct BBBuilder {
             return nodes[safe: index + 1] != nil
         }
         
+        func shouldTrimLeadingWhitespace(after node: BBContainerNode) -> Bool {
+            switch node {
+            case .spoiler, .quote:
+                return true
+            default:
+                return false
+            }
+        }
+        
         for (index, node) in nodes.enumerated() {
             // logger.info("NEW NODE: \(node)") // node doesnt conform to CustomStringConvertible
             
@@ -76,11 +85,13 @@ public struct BBBuilder {
                 
                 if mutableText.string.isEmpty {
                     var trimLeading = false
+                    var trimLeadingWhitespace = false
                     var trimTrailing = false
                     
                     if hasPreviousNode(index) {
                         if !nodes[index - 1].isTextable {
                             trimLeading = true
+                            trimLeadingWhitespace = shouldTrimLeadingWhitespace(after: nodes[index - 1])
                         } else if nodes[index - 1].isMedia {
                             trimLeading = false
                         }
@@ -110,6 +121,7 @@ public struct BBBuilder {
                         with: mutableText,
                         listInfo: listInfo,
                         trimLeading: trimLeading,
+                        trimLeadingWhitespace: trimLeadingWhitespace,
                         trimTrailing: trimTrailing
                     )
                     if !textNode.isEmptyTrimmedText {
@@ -306,6 +318,7 @@ public struct BBBuilder {
         isAttachmentDelimeter: Bool = false,
         listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
+        trimLeadingWhitespace: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
         return unwrap(
@@ -314,6 +327,7 @@ public struct BBBuilder {
             isFirst: isFirst,
             isAttachmentDelimeter: isAttachmentDelimeter,
             trimLeading: trimLeading,
+            trimLeadingWhitespace: trimLeadingWhitespace,
             trimTrailing: trimTrailing
         )
     }
@@ -326,16 +340,21 @@ public struct BBBuilder {
         isAttachmentDelimeter: Bool = false,
         listInfo: ListInfo? = nil,
         trimLeading: Bool = false,
+        trimLeadingWhitespace: Bool = false,
         trimTrailing: Bool = false
     ) -> BBContainerNode {
         // TODO: Вынести isFirst обработчики
         switch node {
         case .text(let text):
+            var normalizedText = text
+                .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
+                .replacingOccurrences(of: "&#91;", with: "[")
+                .replacingOccurrences(of: "&#93;", with: "]")
+            if trimLeadingWhitespace {
+                normalizedText = normalizedText.trimmingLeadingWhitespaces()
+            }
             let mutableString = NSMutableAttributedString(
-                attributedString: text
-                    .trimmingNewlines(leading: trimLeading, trailing: trimTrailing)
-                    .replacingOccurrences(of: "&#91;", with: "[")
-                    .replacingOccurrences(of: "&#93;", with: "]")
+                attributedString: normalizedText
             )
             if isAttachmentDelimeter {
                 if mutableString.string.prefix(1) == " " {
@@ -510,6 +529,17 @@ extension NSAttributedString {
             }
         }
 
+        return mutableAttributedString
+    }
+    
+    func trimmingLeadingWhitespaces() -> NSAttributedString {
+        let mutableAttributedString = NSMutableAttributedString(attributedString: self)
+        let characterSet = CharacterSet.whitespaces
+        
+        while mutableAttributedString.string.first.map({ characterSet.contains($0.unicodeScalars.first!) }) ?? false {
+            mutableAttributedString.deleteCharacters(in: NSRange(location: 0, length: 1))
+        }
+        
         return mutableAttributedString
     }
     
