@@ -212,16 +212,24 @@ extension NotificationsClient: DependencyKey {
                 do {
                     @Shared(.appSettings) var appSettings
                     let notifications = appSettings.notifications
-
-                    let badgeCount =
-                    (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
+                    
+                    var favoritesCount =
                     (notifications.isForumEnabled ? unread.forumCount : 0) +
-                    (notifications.isTopicsEnabled ? unread.topicCount : 0) +
+                    (notifications.isTopicsEnabled ? unread.topicCount : 0)
+                    
+                    // Sometimes we have more favorites in general count than in an array, so we apply min() fix
+                    favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
+                    
+                    let mentionsCount =
                     (notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
                     (notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
                     
-                    logger.info("Setting app notifications badge to \(badgeCount)")
-                    try await center.setBadgeCount(badgeCount)
+                    let qmsCount = (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0)
+                    
+                    let totalCount = favoritesCount + mentionsCount + qmsCount
+                    
+                    logger.info("Setting app notifications badge to \(totalCount)")
+                    try await center.setBadgeCount(totalCount)
                 } catch {
                     analyticsClient.capture(error)
                 }
