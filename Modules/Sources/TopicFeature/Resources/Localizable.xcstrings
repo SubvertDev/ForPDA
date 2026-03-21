@@ -221,6 +221,16 @@
         }
       }
     },
+    "Report sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба отправлена"
+          }
+        }
+      }
+    },
     "Show results" : {
       "localizations" : {
         "ru" : {
