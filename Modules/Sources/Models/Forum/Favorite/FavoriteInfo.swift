@@ -26,6 +26,10 @@ public struct FavoriteInfo: Codable, Identifiable, Hashable, Sendable {
             default: .always
         }
     }
+
+    public var isHatUpdated: Bool {
+        return (flag & 4 != 0) && topic.flag.contains(.marker)
+    }
     
     public var isNotifyHatUpdate: Bool {
         return (flag & 4) > 0
