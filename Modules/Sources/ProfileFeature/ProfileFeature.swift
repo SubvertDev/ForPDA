@@ -134,6 +134,10 @@ public struct ProfileFeature: Reducer, Sendable {
                         await send(.internal(.userResponse(.failure(error))))
                     },
                     .run { send in
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    },
+                    .run { send in
                         for await unread in notificationsClient.unreadPublisher().values {
                             await send(.internal(.updateBadgeCounts(unread)))
                         }
