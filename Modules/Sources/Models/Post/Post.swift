@@ -24,6 +24,14 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         return flag.contains(.hidden)
     }
     
+    public var isProtected: Bool {
+        return flag.contains(.canProtect)
+    }
+    
+    public var canModerate: Bool {
+        return flag.contains(.canModerate)
+    }
+    
     public var canEdit: Bool {
         return flag.contains(.canEdit)
     }
