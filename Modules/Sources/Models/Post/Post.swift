@@ -12,7 +12,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     // MARK: - Properties
     
     public let id: Int
-    public let flag: Int
+    public let flag: ForumFlag
     public let content: String
     public let author: Author
     public let attachments: [Attachment]
@@ -21,15 +21,15 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     private let rawKarma: Int
     
     public var isDeleted: Bool {
-        return flag & 4 > 0
+        return flag.contains(.hidden)
     }
     
     public var canEdit: Bool {
-        return flag & 128 > 0
+        return flag.contains(.canEdit)
     }
     
     public var canDelete: Bool {
-        return flag & 256 > 0
+        return flag.contains(.canDelete)
     }
     
     public var karma: Int {
@@ -64,7 +64,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     
     public init(
         id: Int,
-        flag: Int,
+        flag: ForumFlag,
         content: String,
         author: Author,
         karma: Int,
@@ -107,6 +107,10 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         public let signature: String
         public let reputationCount: Int
         
+        public var isOnline: Bool {
+            (Date().timeIntervalSince1970 - lastSeenDate.timeIntervalSince1970) < 900
+        }
+        
         public init(
             id: Int,
             name: String,
@@ -139,7 +143,7 @@ extension Post {
     static func mock(id: Int = 0) -> Post {
         return Post(
             id: id,
-            flag: 384,
+            flag: [.canDelete, .canEdit, .canModerate],
             content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
             author: Author(
                 id: 6176341,

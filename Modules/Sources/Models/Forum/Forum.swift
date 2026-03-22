@@ -10,7 +10,7 @@ import Foundation
 public struct Forum: Codable, Sendable, Hashable {
     public let id: Int
     public let name: String
-    public let flag: Int
+    public let flag: ForumFlag
     public let globalAnnouncement: String
     public let announcements: [AnnouncementInfo]
     public let subforums: [ForumInfo]
@@ -19,17 +19,17 @@ public struct Forum: Codable, Sendable, Hashable {
     public let navigation: [ForumInfo]
     
     public var canCreateTopic: Bool {
-        return flag & 64 > 0
+        return flag.contains(.canPost)
     }
     
     public var isFavorite: Bool {
-        return (flag & 8) != 0
+        return flag.contains(.favorite)
     }
     
     public init(
         id: Int,
         name: String,
-        flag: Int,
+        flag: ForumFlag,
         globalAnnouncement: String,
         announcements: [AnnouncementInfo],
         subforums: [ForumInfo],
@@ -53,7 +53,7 @@ public extension Forum {
     static let mock = Forum(
         id: 1,
         name: "Test Forum",
-        flag: 64,
+        flag: .canPost,
         globalAnnouncement: "Wow, [b]this is[/b] SPARTA (global announcement)...",
         announcements: [
             .mock
@@ -72,11 +72,7 @@ public extension Forum {
         ].flatMap { $0
         },
         navigation: [
-            ForumInfo(
-                id: 200,
-                name: "Forum heading",
-                flag: 1
-            )
+            .mockCategory
         ]
     )
 }

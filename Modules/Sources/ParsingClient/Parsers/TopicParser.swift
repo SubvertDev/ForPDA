@@ -43,7 +43,7 @@ public struct TopicParser {
             id: id,
             name: name.convertCodes(),
             description: description.convertCodes(),
-            flag: flag,
+            flag: ForumFlag(rawValue: flag),
             createdAt: Date(timeIntervalSince1970: createdAt),
             authorId: authorId,
             authorName: authorName.convertCodes(),
@@ -195,7 +195,7 @@ public struct TopicParser {
         
         return Post(
             id: id,
-            flag: flag,
+            flag: ForumFlag(rawValue: flag),
             content: content,
             author: Post.Author(
                 id: authorId,
