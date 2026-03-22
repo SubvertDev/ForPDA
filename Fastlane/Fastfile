@@ -125,7 +125,6 @@ platform :ios do
             sh("tuist generate --no-open")
             sh("tuist xcodebuild build")
             sh("tuist test")
-            sh("tuist share")
             telegram(
                 token: ENV['TG_BOT_TOKEN'],
                 chat_id: ENV['TG_CHAT_ID'],
