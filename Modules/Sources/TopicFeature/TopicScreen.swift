@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import PageNavigationFeature
-import WriteFormFeature
+import FormFeature
 import SFSafeSymbols
 import SharedUI
 import NukeUI
@@ -155,6 +155,12 @@ public struct TopicScreen: View {
                 Section {
                     ContextButton(text: LocalizedStringResource("Write Post", bundle: .module), symbol: .plusCircle) {
                         send(.contextMenu(.writePost))
+                    }
+                    
+                    if let postTemplate = topic.postTemplateName {
+                        ContextButton(text: LocalizedStringResource(stringLiteral: postTemplate), symbol: .plusApp) {
+                            send(.contextMenu(.writePostWithTemplate))
+                        }
                     }
                 }
             }
@@ -430,9 +436,9 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                    .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
                         NavigationStack {
-                            WriteFormScreen(store: store)
+                            FormScreen(store: store)
                         }
                     }
                     .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
@@ -460,95 +466,7 @@ struct NavigationModifier: ViewModifier {
                     ) { store in
                         ReputationChangeView(store: store)
                     }
-                    .sheet(isPresented: Binding($store.destination.editWarning)) {
-                        EditWarningSheet()
-                            .presentationDetents([.medium])
-                            .presentationDragIndicator(.visible)
-                    }
             }
-        }
-        
-        // TODO: Move to SharedUI?
-        // MARK: - Edit Warning Sheet
-        
-        @ViewBuilder
-        private func EditWarningSheet() -> some View {
-            VStack(spacing: 0) {
-                Spacer()
-                
-                Image(systemSymbol: .hammer)
-                    .font(.title)
-                    .foregroundStyle(tintColor)
-                    .padding(.bottom, 8)
-                
-                Text("Editing posts with attachments is not yet supported", bundle: .module)
-                    .font(.title3)
-                    .bold()
-                    .foregroundStyle(Color(.Labels.primary))
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 6)
-                
-                Spacer()
-                
-                Button {
-                    store.send(.view(.editWarningSheetCloseButtonTapped))
-                } label: {
-                    Text("Understood", bundle: .module)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(tintColor)
-                .frame(height: 48)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 16)
-                .background(ignoresSafeAreaEdges: .bottom)
-            }
-            .background {
-                VStack(spacing: 0) {
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: 12))
-                        .padding(.top, 32)
-                    
-                    Spacer()
-                    
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: -12))
-                        .padding(.bottom, 96)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    store.send(.view(.editWarningSheetCloseButtonTapped))
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(Color(.Background.quaternary))
-                            .frame(width: 30, height: 30)
-                        
-                        Image(systemSymbol: .xmark)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(Color(.Labels.teritary))
-                    }
-                    .padding(.top, 14)
-                    .padding(.trailing, 16)
-                }
-            }
-        }
-        
-        @ViewBuilder
-        private func ComingSoonTape() -> some View {
-            HStack(spacing: 8) {
-                ForEach(0..<6, id: \.self) { index in
-                    Text("IN DEVELOPMENT", bundle: .module)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.Labels.primaryInvariably))
-                        .fixedSize(horizontal: true, vertical: false)
-                        .lineLimit(1)
-                }
-            }
-            .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-            .background(tintColor)
         }
     }
 }
@@ -628,9 +546,9 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
                         )
                     )
@@ -663,9 +581,9 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
                         )
                     )
@@ -677,6 +595,66 @@ private extension TopicPostsFilter {
             $0.apiClient.sendPost = { request in
                 try await Task.sleep(for: .seconds(1))
                 return .failure(.tooLong) // <----------
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("New template post requests") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    templatePostSendingPreview
+}
+
+@MainActor private var templatePostSendingPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
+                            type: .new, topicId: 0, content: .template([])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .success(.post(.init(id: 1, topicId: 0, offset: 0)))
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Post Template sending returns error status") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postTemplateErrorStatusPreview
+}
+
+@MainActor private var postTemplateErrorStatusPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(type: .new, topicId: 0, content: .template([]))
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .failure(.badParam) // <----------
             }
         }
     )

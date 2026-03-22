@@ -12,6 +12,7 @@ import SFSafeSymbols
 import SharedUI
 import Models
 import BBBuilder
+import FormFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -78,6 +79,11 @@ public struct ForumScreen: View {
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+                NavigationStack {
+                    FormScreen(store: store)
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
@@ -122,6 +128,14 @@ public struct ForumScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             if let forum = store.forum {
+                if forum.canCreateTopic {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Create Topic", bundle: .module), symbol: .plusCircle) {
+                            send(.contextOptionMenu(.createTopic))
+                        }
+                    }
+                }
+                
                 CommonContextMenu(
                     id: forum.id,
                     isFavorite: forum.isFavorite,

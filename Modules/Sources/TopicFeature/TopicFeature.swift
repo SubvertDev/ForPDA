@@ -15,7 +15,7 @@ import SharedUI
 import PersistenceKeys
 import ParsingClient
 import PasteboardClient
-import WriteFormFeature
+import FormFeature
 import ReputationChangeFeature
 import TCAExtensions
 import AnalyticsClient
@@ -32,6 +32,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
@@ -48,8 +49,7 @@ public struct TopicFeature: Reducer, Sendable {
         case gallery([URL], [Int], Int)
         @ReducerCaseIgnored
         case karmaChange(Int)
-        case editWarning
-        case writeForm(WriteFormFeature)
+        case form(FormFeature)
         case changeReputation(ReputationChangeFeature)
         case alert(AlertState<Alert>)
         
@@ -139,7 +139,6 @@ public struct TopicFeature: Reducer, Sendable {
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
             case contextPostMenu(PostMenuAction)
-            case editWarningSheetCloseButtonTapped
         }
         
         case `internal`(Internal)
@@ -207,12 +206,13 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(.internal(.loadTopic(newOffset)))
                 ])
                 
-            case let .destination(.presented(.writeForm(.delegate(.writeFormSent(response))))):
-                if case let .post(data) = response,
-                   case let .success(post) = data {
-                    return jumpTo(.post(id: post.id), true, &state)
+            case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
+                return jumpTo(.post(id: post.id), true, &state)
+                
+            case .destination(.presented(.form(.delegate(.formSent(.report))))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
-                return .none
                 
             case let .destination(.presented(.alert(.deletePost(id)))):
                 return .run { send in
@@ -283,14 +283,25 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: topic.id,
                             content: .simple("", [])
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
+                    return .none
+                    
+                case .writePostWithTemplate:
+                    let formState = FormFeature.State(
+                        type: .post(
+                            type: .new,
+                            topicId: topic.id,
+                            content: .template([])
+                        )
+                    )
+                    state.destination = .form(formState)
                     return .none
                     
                 case .openInBrowser:
@@ -322,37 +333,33 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .view(.contextPostMenu(action)):
                 switch action {
-                case .reply(let postId, let authorName):
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                case let .reply(postId, authorName):
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: state.topicId,
                             content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
                     return .none
                     
-                case .edit(let post):
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                case let .edit(post):
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .edit(postId: post.id),
                             topicId: state.topicId,
-                            content: .simple(post.content, post.attachments.map { $0.id })
+                            content: .simple(post.content, post.attachments.map {
+                                .init(id: $0.id, name: $0.name, type: $0.type)
+                            })
                         )
                     )
-                    if post.attachments.isEmpty {
-                        state.destination = .writeForm(feature)
-                    } else {
-                        state.destination = .editWarning
-                    }
+                    state.destination = .form(formState)
                     return .none
                     
-                case .report(let id):
-                    let feature = WriteFormFeature.State(
-                        formFor: .report(id: id, type: .post)
-                    )
-                    state.destination = .writeForm(feature)
+                case let .report(id):
+                    let feature = FormFeature.State(type: .report(id: id, type: .post))
+                    state.destination = .form(feature)
                     return .none
                     
                 case .delete(let id):
@@ -423,23 +430,19 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 let currentDate = Date().formatted(date: .numeric, time: .shortened)
                 let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\n\(quotedText)\n[/quote]\n"
-                let feature = WriteFormFeature.State(
-                    formFor: .post(
+                let feature = FormFeature.State(
+                    type: .post(
                         type: .new,
                         topicId: state.topicId,
                         content: .simple(formattedQuote, [])
                     )
                 )
-                state.destination = .writeForm(feature)
+                state.destination = .form(feature)
                 return .none
                 
             case .view(.finishedPostAnimation):
                 state.postId = nil
                 return .none.animation()
-                
-            case .view(.editWarningSheetCloseButtonTapped):
-                state.destination = nil
-                return .none
                 
             case .internal(.load):
                 switch state.goTo {

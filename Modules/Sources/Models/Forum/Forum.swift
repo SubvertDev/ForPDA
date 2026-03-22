@@ -18,6 +18,10 @@ public struct Forum: Codable, Sendable, Hashable {
     public var topics: [TopicInfo]
     public let navigation: [ForumInfo]
     
+    public var canCreateTopic: Bool {
+        return flag & 64 > 0
+    }
+    
     public var isFavorite: Bool {
         return (flag & 8) != 0
     }

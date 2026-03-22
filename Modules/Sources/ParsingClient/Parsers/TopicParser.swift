@@ -34,7 +34,8 @@ public struct TopicParser {
               let curatorName = array[safe: 11] as? String,
               let poll = array[safe: 12] as? [Any],
               let postsCount = array[safe: 13] as? Int,
-              let posts = array[safe: 14] as? [[Any]] else {
+              let posts = array[safe: 14] as? [[Any]],
+              let postTemplates = array[safe: 15] as? [String] else {
             throw ParsingError.failedToCastFields
         }
         
@@ -51,11 +52,12 @@ public struct TopicParser {
             poll: try parsePoll(poll),
             postsCount: postsCount,
             posts: try parsePosts(posts),
-            navigation: ForumParser.parseNavigation(navigation)
+            navigation: ForumParser.parseNavigation(navigation),
+            postTemplateName: !postTemplates.isEmpty ? postTemplates[safe: 0] : nil
         )
     }
     
-    public static func parsePostPreview(from string: String) throws(ParsingError) -> PostPreview {
+    public static func parsePostPreview(from string: String) throws(ParsingError) -> PreviewResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -65,11 +67,12 @@ public struct TopicParser {
         }
         
         guard let content = array[safe: 2] as? String,
-              let attachmentIds = array[safe: 3] as? [Int] else {
+              let attachmentsRaw = array[safe: 3] as? [[Any]],
+              let attachments = try? AttachmentParser.parseAttachment(attachmentsRaw) else {
             throw ParsingError.failedToCastFields
         }
         
-        return PostPreview(content: content, attachmentIds: attachmentIds)
+        return PreviewResponse(content: content, attachments: attachments)
     }
     
     public static func parsePostSendResponse(from string: String) throws(ParsingError) -> PostSendResponse {

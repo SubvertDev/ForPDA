@@ -14,7 +14,6 @@ public enum TopicEvent: Event {
     case userTapped(Int)
     case urlTapped(URL)
     case imageTapped(URL)
-    case editWarningSheetClosed
     case textQuoted(Int)
     
     case menuCopyLink
@@ -22,6 +21,7 @@ public enum TopicEvent: Event {
     case menuGoToEnd
     case menuSetFavorite
     case menuWritePost
+    case menuWritePostWithTemplate
     
     case menuPostReply(Int)
     case menuPostKarma(Int)

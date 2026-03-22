@@ -113,6 +113,16 @@
         }
       }
     },
+    "Report sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба отправлена"
+          }
+        }
+      }
+    },
     "Reputation" : {
       "localizations" : {
         "ru" : {

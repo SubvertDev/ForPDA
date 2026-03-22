@@ -17,7 +17,7 @@ public struct ReputationChangeView: View {
     @Perception.Bindable public var store: StoreOf<ReputationChangeFeature>
     @Environment(\.tintColor) private var tintColor
     
-    @FocusState private var isFocused: Bool
+    @FocusState public var focus: ReputationChangeFeature.State.Field?
 
     // MARK: - Init
 
@@ -39,11 +39,11 @@ public struct ReputationChangeView: View {
                 
                 Section {
                     Field(
-                        text: $store.changeReason.sending(\.reasonChanged),
-                        description: "",
-                        guideText: "",
-                        isEditor: true,
-                        isFocused: $isFocused
+                        content: $store.changeReason.sending(\.reasonChanged),
+                        placeholder: LocalizedStringResource("Input", bundle: .module),
+                        focusEqual: ReputationChangeFeature.State.Field.reason,
+                        focus: $focus,
+                        minHeight: 144
                     )
                 } header: {
                     Text("Input reason", bundle: .module)
@@ -55,14 +55,12 @@ public struct ReputationChangeView: View {
                 
                 ActionButtons()
             }
+            .bind($store.focus, to: $focus)
             .padding(.horizontal, 16)
             .background {
                 if !isLiquidGlass {
                     Color(.Background.primary)
                 }
-            }
-            .onTapGesture {
-                isFocused = false
             }
             .modifier(NavigationTitle())
             .toolbar {

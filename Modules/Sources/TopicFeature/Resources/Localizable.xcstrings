@@ -71,16 +71,6 @@
         }
       }
     },
-    "Editing posts with attachments is not yet supported" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Редактирование постов с вложениями пока что не поддерживается"
-          }
-        }
-      }
-    },
     "Except deleted" : {
       "localizations" : {
         "ru" : {
@@ -97,16 +87,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перейти в конец"
-          }
-        }
-      }
-    },
-    "IN DEVELOPMENT" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В РАЗРАБОТКЕ"
           }
         }
       }
@@ -241,6 +221,16 @@
         }
       }
     },
+    "Report sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба отправлена"
+          }
+        }
+      }
+    },
     "Show results" : {
       "localizations" : {
         "ru" : {
@@ -277,16 +267,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Шапка темы"
-          }
-        }
-      }
-    },
-    "Understood" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Понятно"
           }
         }
       }

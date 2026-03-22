@@ -12,6 +12,7 @@ import Models
 import SharedUI
 import PhotosUI
 import SFSafeSymbols
+import BBPanelFeature
 
 @ViewAction(for: EditFeature.self)
 public struct EditScreen: View {
@@ -49,14 +50,24 @@ public struct EditScreen: View {
                         content: Binding(unwrapping: $store.draftUser.signature, default: ""),
                         title: LocalizedStringKey("Signature"),
                         focusEqual: .signature,
-                        characterLimit: 300
+                        characterLimit: 300,
+                        selection: $store.fieldRange,
+                        bbPanel: {
+                            BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                                .disabled(focus != .signature)
+                        }
                     )
                     
                     Field(
                         content: Binding(unwrapping: $store.draftUser.aboutMe, default: ""),
                         title: LocalizedStringKey("About me"),
                         focusEqual: .about,
-                        characterLimit: 500
+                        characterLimit: 500,
+                        selection: $store.fieldRange,
+                        bbPanel: {
+                            BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                                .disabled(focus != .about)
+                        }
                     )
                     
                     Section {
@@ -93,9 +104,6 @@ public struct EditScreen: View {
                 }
             }
             .bind($store.focus, to: $focus)
-            .onTapGesture {
-                focus = nil
-            }
             .onAppear {
                 send(.onAppear)
             }
@@ -346,25 +354,31 @@ public struct EditScreen: View {
     // MARK: - Helpers
     
     @ViewBuilder
-    private func Field(
+    private func Field<BBPanel: View>(
         content: Binding<String>,
         title: LocalizedStringKey,
         focusEqual: EditFeature.State.Field,
-        characterLimit: Int? = nil
+        characterLimit: Int? = nil,
+        selection: Binding<NSRange?> = .constant(nil),
+        @ViewBuilder bbPanel: @escaping () -> BBPanel = { EmptyView() }
     ) -> some View {
         Section {
-            ForField(
+            SharedUI.Field(
                 content: content,
                 placeholder: LocalizedStringResource("Input...", bundle: .module),
                 focusEqual: focusEqual,
                 focus: $focus,
-                characterLimit: characterLimit
+                characterLimit: characterLimit,
+                selection: selection,
+                bbPanel: {
+                    bbPanel()
+                }
             )
         } header: {
             Header(title: title)
         }
         .listRowBackground(Color.clear)
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowInsets(EdgeInsets(top: 1, leading: 1, bottom: 1, trailing: 1))
     }
     
     private func Header(title: LocalizedStringKey) -> some View {

@@ -39,15 +39,17 @@ public struct ParsingClient: Sendable {
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
     public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
-    public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parsePostPreview: @Sendable (_ response: String) async throws -> PreviewResponse
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
+    public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PreviewResponse
+    public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
     
     // Search
     public var parseSearch: @Sendable (_ response: String) async throws -> SearchResponse
     public var parseSearchUsers: @Sendable (_ response: String) async throws -> SearchUsersResponse
     
     // Write Form
-    public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
+    public var parseWriteForm: @Sendable (_ response: String) async throws -> [FormFieldType]
     
     // Extra
     public var parseUnread: @Sendable (_ response: String) async throws -> Unread
@@ -121,6 +123,12 @@ extension ParsingClient: DependencyKey {
         },
         parsePostSendResponse: { response in
             return try TopicParser.parsePostSendResponse(from: response)
+		},
+        parseTemplatePreview: { response in
+            return try FormParser.parseTemplatePreview(from: response)
+        },
+        parseTemplateSend: { response in
+            return try FormParser.parseTemplateSend(from: response)
         },
         parseSearch: { response in
             return try SearchParser.parse(from: response)
@@ -129,7 +137,7 @@ extension ParsingClient: DependencyKey {
             return try SearchUsersParser.parse(from: response)
         },
         parseWriteForm: { response in
-            return try WriteFormParser.parse(from: response)
+            return try FormParser.parse(from: response)
         },
         parseUnread: { response in
             return try UnreadParser.parse(from: response)

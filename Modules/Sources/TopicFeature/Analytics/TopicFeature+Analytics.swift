@@ -90,13 +90,12 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuSetFavorite)
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
+                    case .writePostWithTemplate:
+                        analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
 
                 case let .view(.textQuoted(post, _)):
                     analytics.log(TopicEvent.textQuoted(post.id))
-
-                case .view(.editWarningSheetCloseButtonTapped):
-                    analytics.log(TopicEvent.editWarningSheetClosed)
                     
                 case .internal(.loadTopic):
                     break

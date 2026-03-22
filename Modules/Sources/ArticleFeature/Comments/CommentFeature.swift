@@ -12,8 +12,8 @@ import PersistenceKeys
 import APIClient
 import Models
 import ToastClient
-import WriteFormFeature
 import ReputationChangeFeature
+import FormFeature
 
 public enum CommentContextMenuOptions {
     case report
@@ -28,8 +28,6 @@ public struct CommentFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     public enum Localization {
-        static let errorSendingReport = LocalizedStringResource("Error sending report", bundle: .module)
-        static let reportTooShort = LocalizedStringResource("Report too short", bundle: .module)
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
     }
     
@@ -38,8 +36,8 @@ public struct CommentFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
-        @Presents var writeForm: WriteFormFeature.State?
         @Presents var changeReputation: ReputationChangeFeature.State?
+        @Presents var report: FormFeature.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
@@ -88,8 +86,8 @@ public struct CommentFeature: Reducer, Sendable {
         case likeButtonTapped
         case changeReputationButtonTapped
         
-        case writeForm(PresentationAction<WriteFormFeature.Action>)
         case changeReputation(PresentationAction<ReputationChangeFeature.Action>)
+        case report(PresentationAction<FormFeature.Action>)
         
         case _likeResult(Bool)
         case _timerTicked
@@ -130,24 +128,12 @@ public struct CommentFeature: Reducer, Sendable {
             case let .profileTapped(id):
                 return .send(.delegate(.commentHeaderTapped(id)))
 
-            case .writeForm(.presented(.delegate(.writeFormSent(let response)))):
-                if case let .report(result) = response {
-                    let toast: ToastMessage
-                    switch result {
-                    case .error:
-                        toast = ToastMessage(text: Localization.errorSendingReport, isError: true, haptic: .error)
-                    case .tooShort:
-                        toast = ToastMessage(text: Localization.reportTooShort, isError: true, haptic: .error)
-                    case .success:
-                        toast = ToastMessage(text: Localization.reportSent, haptic: .success)
-                    }
-                    return .run { _ in
-                        await toastClient.showToast(toast)
-                    }
+            case .report(.presented(.delegate(.formSent(.report)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
-                return .none
                 
-            case .writeForm, .changeReputation:
+            case .report, .changeReputation:
                 return .none
                 
             case .hiddenLabelTapped:
@@ -158,10 +144,12 @@ public struct CommentFeature: Reducer, Sendable {
                 guard state.isAuthorized else {
                     return .send(.delegate(.unauthorizedAction))
                 }
-                state.writeForm = WriteFormFeature.State(formFor: .report(
-                    id: state.comment.id,
-                    type: .comment
-                ))
+                state.report = FormFeature.State(
+                    type: .report(
+                        id: state.comment.id,
+                        type: .comment
+                    )
+                )
                 return .none
                 
             case .changeReputationButtonTapped:
@@ -216,8 +204,8 @@ public struct CommentFeature: Reducer, Sendable {
                 return .none
             }
         }
-        .ifLet(\.$writeForm, action: \.writeForm) {
-            WriteFormFeature()
+        .ifLet(\.$report, action: \.report) {
+            FormFeature()
         }
         .ifLet(\.$changeReputation, action: \.changeReputation) {
             ReputationChangeFeature()

@@ -9,7 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SharedUI
 import Models
-import WriteFormFeature
+import FormFeature
 
 @ViewAction(for: ReputationFeature.self)
 public struct ReputationScreen: View {
@@ -51,7 +51,7 @@ public struct ReputationScreen: View {
             ._toolbarTitleDisplayMode(.inline)
             .fullScreenCover(item: $store.scope(state: \.destination?.report, action: \.destination.report)) { store in
                 NavigationStack {
-                    WriteFormScreen(store: store)
+                    FormScreen(store: store)
                 }
             }
             .onAppear {

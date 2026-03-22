@@ -31,6 +31,16 @@
         }
       }
     },
+    "Create Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать тему"
+          }
+        }
+      }
+    },
     "Go To End" : {
       "localizations" : {
         "ru" : {

@@ -15,6 +15,7 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
+import FormFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -49,12 +50,21 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case form(FormFeature)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        
+        @Presents public var destination: Destination.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -90,6 +100,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action: ViewAction {
+        case destination(PresentationAction<Destination.Action>)
         case pageNavigation(PageNavigationFeature.Action)
 
         case view(View)
@@ -147,7 +158,10 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(.internal(.loadForum(offset: newOffset)))
                 
-            case .pageNavigation:
+            case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
+            case .destination, .pageNavigation:
                 return .none
                 
             case .view(.onFirstAppear):
@@ -197,8 +211,18 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .view(.contextOptionMenu(let action)):
                 switch action {
-                    // TODO: sort, to bookmarks
-                    // TODO: Add analytics
+                case .createTopic:
+                    let formState = FormFeature.State(
+                        type: .topic(
+                            forumId: state.forumId,
+                            content: []
+                        )
+                    )
+                    state.destination = .form(formState)
+                    return .none
+                    
+                // TODO: sort, to bookmarks
+                // TODO: Add analytics
                 default: return .none
                 }
                 
@@ -308,6 +332,7 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }
@@ -320,3 +345,5 @@ public struct ForumFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ForumFeature.Destination.State: Equatable {}
