@@ -1,11 +1,13 @@
-import Foundation
+import SwiftUI
 
-public struct BBTokenizer {
+public struct BBAttributedTokenizer {
     
     // MARK: - Stored Properties
     
-    private let input: String.UnicodeScalarView
-    private var currentIndex: String.UnicodeScalarView.Index
+    private let original: AttributedString
+    private let input: AttributedString.UnicodeScalarView
+    private var currentIndex: AttributedString.UnicodeScalarView.Index
+    private var codeTagDepth = 0
     
     // MARK: - Computed Properties
     
@@ -29,14 +31,15 @@ public struct BBTokenizer {
     
     // MARK: - Init
     
-    public init(string: String) {
+    public init(string: AttributedString) {
+        self.original = string
         self.input = string.unicodeScalars
         self.currentIndex = string.unicodeScalars.startIndex
     }
     
     // MARK: - Implementation
     
-    public mutating func nextToken() -> BBToken? {
+    public mutating func nextToken() -> BBAttributedToken? {
         // Проверяем есть ли у нас текущий символ, если нет, то текст кончился
         guard let currentChar else { return nil }
         if currentChar == "[" {
@@ -54,41 +57,44 @@ public struct BBTokenizer {
                 }
                 
                 if currentIndex < input.endIndex {
-                    let string = String(input[tagStartIndex..<currentIndex])
+                    let string = input[tagStartIndex..<currentIndex].toString()
                     let tag = BBTag(rawValue: string)
                     if let tag {
                         advanceIndex()
+                        if tag == .code, codeTagDepth > 0 {
+                            codeTagDepth -= 1
+                        }
                         return .closingTag(tag)
                     } else {
                         advanceIndex()
-                        let string = String(input[parseStartIndex..<currentIndex])
-                        return .text(string)
+                        let string = AttributedString(original[parseStartIndex..<currentIndex])
+                        return .text(NSAttributedString(string))
                     }
                 } else {
-                    fatalError("Tokenizer1")
+                    return recoverAsText(from: parseStartIndex)
                 }
             } else {
                 // Открывающий тег
                 let tagStartIndex = currentIndex
                 var tagAttribute: String?
                 
-                // Ищем ближайшие делители "]" "=" " "
-                while currentIndex < input.endIndex, input[currentIndex] != .closingBracket, input[currentIndex] != .equal, input[currentIndex] != .space {
+                // ] =
+                while currentIndex < input.endIndex, input[currentIndex] != .closingBracket, input[currentIndex] != .equal {
                     advanceIndex()
                 }
                 
-                let string = String(input[tagStartIndex..<currentIndex])
+                let string = input[tagStartIndex..<currentIndex].toString()
                 guard let tag = BBTag(rawValue: string) else {
                     // Если мы встретили открывающий тег который не закрылся до конца сообщения, то advance делать не надо
                     if currentIndex < input.endIndex {
                         advanceIndex()
                     }
-                    let string = String(input[parseStartIndex..<currentIndex])
-                    return .text(string)
+                    let string = AttributedString(original[parseStartIndex..<currentIndex])
+                    return .text(NSAttributedString(string))
                 }
                 
                 // Ищем ближайший знак равенства "=" или пробела " "
-                if currentIndex < input.endIndex, input[currentIndex] == .equal || input[currentIndex] == .space {
+                if currentIndex < input.endIndex, input[currentIndex] == .equal {
                     // Тег с атрибутами e.g. [color=red] или [quote name="Govnuk"]
                     advanceIndex()
                     
@@ -105,9 +111,9 @@ public struct BBTokenizer {
                                 tagsBalance -= 1
                             }
                             if tagsBalance < 0 {
-                                let attributeTextWithTags = String(input[attributeStartIndex..<currentIndex])
+                                let attributeTextWithTags = AttributedString(original[attributeStartIndex..<currentIndex])
                                 advanceIndex()
-                                return .openingTag(tag == .spoiler ? .spoiler : .quote, attributeTextWithTags)
+                                return .openingTag(tag == .spoiler ? .spoiler : .quote, NSAttributedString(attributeTextWithTags))
                             }
                             advanceIndex()
                         }
@@ -117,26 +123,89 @@ public struct BBTokenizer {
                             advanceIndex()
                         }
                         
-                        // Создаем атрибут начиная с "="/" " и заканчивая "]"
-                        tagAttribute = String(input[attributeStartIndex..<currentIndex])
+                        // Создаем атрибут начиная с "=" и заканчивая "]"
+                        tagAttribute = input[attributeStartIndex..<currentIndex].toString()
                     }
                 }
                 
                 // Ищем ближайшую закрывающую скобку "]", записываем как открывающий тег
                 if currentIndex < input.endIndex, input[currentIndex] == .closingBracket {
                     advanceIndex()
-                    return .openingTag(tag, tagAttribute)
+                    if tag == .code {
+                        codeTagDepth += 1
+                    }
+                    return .openingTag(tag, tagAttribute.map { NSAttributedString(string: $0) })
                 } else {
-                    fatalError("Tokenizer2")
+                    return recoverAsText(from: parseStartIndex)
                 }
             }
         } else {
             let textStartIndex = currentIndex
+            return scanForText(textStartIndex: textStartIndex)
+        }
+    }
+    
+    
+    private mutating func scanForText(textStartIndex: AttributedString.UnicodeScalarView.Index, layer: Int = 0) -> BBAttributedToken? {
+        // FIXME: Fix for MIUI page 6, investigate later
+        guard layer < 160 else { return .text(NSAttributedString(AttributedString(original[textStartIndex..<currentIndex]))) }
+        
+        if codeTagDepth > 0 {
             scanUntil(.openingBracket)
-            let text = String(input[textStartIndex..<currentIndex])
-            return .text(text)
+        } else {
+            scanUntil { $0 == .openingBracket || $0 == .colon }
         }
         
+        guard currentIndex < input.endIndex else {
+            // TODO: Hotfix, revisit
+            let text = AttributedString(original[textStartIndex..<currentIndex])
+            return .text(NSAttributedString(text))
+        }
+        
+        if input[currentIndex] == .openingBracket {
+            let text = AttributedString(original[textStartIndex..<currentIndex])
+            return .text(NSAttributedString(text))
+        } else if input[currentIndex] == .colon {
+            if let smile = scanForSmile() {
+                if textStartIndex == currentIndex {
+                    for _ in 0..<smile.code.count {
+                        advanceIndex()
+                    }
+                    return .openingTag(.smile, NSAttributedString(string: smile.resourceName))
+                } else {
+                    let text = AttributedString(original[textStartIndex..<currentIndex])
+                    return .text(NSAttributedString(text))
+                }
+            } else {
+                advanceIndex()
+                return scanForText(textStartIndex: textStartIndex, layer: layer + 1)
+            }
+        } else {
+            fatalError("Kak?")
+        }
+    }
+    
+    private mutating func scanForSmile() -> BBSmile? {
+        if input.index(after: currentIndex) < input.endIndex,
+            input[input.index(after: currentIndex)] == "\n" {
+            return nil
+        }
+        
+        var smileIndex = 0
+        while true {
+            let smile = BBSmile.list[smileIndex]
+            if smile.code.count <= input[currentIndex..<input.endIndex].count {
+                if smile.code == input[currentIndex..<input.index(currentIndex, offsetBy: smile.code.count)].toString() {
+                    return smile
+                }
+            }
+            
+            smileIndex += 1
+            if smileIndex >= BBSmile.list.count {
+                break
+            }
+        }
+                
         return nil
     }
     
@@ -155,16 +224,20 @@ public struct BBTokenizer {
     private mutating func advanceIndex() {
         currentIndex = input.index(after: currentIndex)
     }
+    
+    private mutating func recoverAsText(from startIndex: AttributedString.UnicodeScalarView.Index) -> BBAttributedToken {
+        let text = AttributedString(original[startIndex..<input.endIndex])
+        currentIndex = input.endIndex
+        return .text(NSAttributedString(text))
+    }
 }
 
-extension UnicodeScalar {
-    static let space = UnicodeScalar(" ")
-    static let equal = UnicodeScalar("=")
-    static let openingBracket = UnicodeScalar("[")
-    static let closingBracket = UnicodeScalar("]")
-    static let colon = UnicodeScalar(":")
-}
-
-extension CharacterSet {
-    static let delimeters = CharacterSet(charactersIn: "]=: ")
+extension BidirectionalCollection where Element == UnicodeScalar {
+    func toString() -> String {
+        return String(String.UnicodeScalarView(self)) // TODO: Revisit performance-wise
+    }
+    
+    func toAttributedString() -> AttributedString {
+        return AttributedString(map { Character($0) }) // TODO: Revisit performance-wise
+    }
 }

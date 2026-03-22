@@ -48,16 +48,14 @@ public struct CacheClient: Sendable {
     public var setQMSChats: @Sendable (_ id: Int, _ chats: [QMSChatInfo]) -> Void
     public var getQMSChats: @Sendable (_ id: Int) -> [QMSChatInfo]?
     
-    // Background Tasks
-    public var setLastBackgroundTaskInvokeTime: @Sendable (TimeInterval) async -> Void
-    public var getLastBackgroundTaskInvokeTime: @Sendable () async -> [TimeInterval]
-    
     // Notifications
     public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
     public var getLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int) async -> Int?
     public var setTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
     public var deleteTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
     public var getTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Int?
+    public var getUnread: @Sendable () -> Unread?
+    public var setUnread: @Sendable (_ unread: Unread) -> Void
 }
 
 // MARK: - Dependency Key
@@ -154,17 +152,6 @@ extension CacheClient: DependencyKey {
                 return try? qmsChatsStorage.object(forKey: id)
             },
             
-            // MARK: - Background Tasks
-            
-            setLastBackgroundTaskInvokeTime: { date in
-                var invokes = (try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
-                invokes.append(date)
-                try? await lastBackgroundTaskInvokeTimeStorage.async.setObject(invokes, forKey: lastBackgroundTaskInvokeTimeKey)
-            },
-            getLastBackgroundTaskInvokeTime: {
-                return (try? await lastBackgroundTaskInvokeTimeStorage.async.object(forKey: lastBackgroundTaskInvokeTimeKey)) ?? []
-            },
-            
             // MARK: - Notifications
             
             setLastTimestampOfUnreadItem: { timestamp, itemId in
@@ -181,6 +168,12 @@ extension CacheClient: DependencyKey {
             },
             getTopicIdOfUnreadItem: { topicId in
                 return try? await notificationsStorage.async.object(forKey: topicId)
+            },
+            getUnread: {
+                return try? unreadStorage.object(forKey: unreadKey)
+            },
+            setUnread: { unread in
+                try? unreadStorage.setObject(unread, forKey: unreadKey)
             }
         )
     }
@@ -256,12 +249,12 @@ private extension CacheClient {
     }
     
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
-    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [TimeInterval]> {
+    private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [BackgroundTaskEntry]> {
         return try! Storage(
             diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30))),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
-            transformer: TransformerFactory.forCodable(ofType: [TimeInterval].self)
+            transformer: TransformerFactory.forCodable(ofType: [BackgroundTaskEntry].self)
         )
     }
     
@@ -271,6 +264,16 @@ private extension CacheClient {
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Int.self)
+        )
+    }
+    
+    private static var unreadKey: String { "unreadKey" }
+    private static var unreadStorage: Storage<String, Unread> {
+        return try! Storage(
+            diskConfig: DiskConfig(name: "Unread", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            memoryConfig: MemoryConfig(),
+            fileManager: .default,
+            transformer: TransformerFactory.forCodable(ofType: Unread.self)
         )
     }
 }

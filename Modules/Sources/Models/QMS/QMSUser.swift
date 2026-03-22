@@ -39,3 +39,27 @@ public struct QMSUser: Sendable, Codable, Hashable, Identifiable {
         self.chats = chats
     }
 }
+
+public extension QMSUser {
+    static let mock = QMSUser(
+        userId: 3640948,
+        name: "subvertd",
+        flag: 0,
+        avatarUrl: URL(string: "https://4pda.to/s/mQ607BUjRwtJPp6EchK6OieRFbeetg0cLkoz12ABdz0UIO0yJd.jpg"),
+        lastSeenOnline: .now,
+        lastMessageDate: .now,
+        unreadCount: 3,
+        chats: [.mock1, .mock2]
+    )
+    
+    static let mockEmpty = QMSUser(
+        userId: 6176341,
+        name: "AirFlare",
+        flag: 0,
+        avatarUrl: nil,
+        lastSeenOnline: .now,
+        lastMessageDate: Date(timeIntervalSince1970: 0),
+        unreadCount: 0,
+        chats: []
+    )
+}

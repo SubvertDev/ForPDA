@@ -15,7 +15,10 @@ public struct PostRowView: View {
     // MARK: - Enums
     
     public enum PostAction {
-        case userTapped, urlTapped(URL), imageTapped(URL)
+        case userTapped
+        case urlTapped(URL)
+        case imageTapped(URL)
+        case textQuoted(String)
     }
     
     // MARK: - Properties
@@ -122,11 +125,19 @@ public struct PostRowView: View {
     private func PostBody(_ post: UIPost) -> some View {
         VStack(spacing: 8) {
             ForEach(post.content, id: \.self) { type in
-                TopicView(type: type.value, attachments: post.post.attachments) { url in
-                    action(.urlTapped(url))
-                } onImageTap: { url in
-                    action(.imageTapped(url))
-                }
+                TopicView(
+                    type: type.value,
+                    attachments: post.post.attachments,
+                    onUrlTap: { url in
+                        action(.urlTapped(url))
+                    },
+                    onImageTap: { url in
+                        action(.imageTapped(url))
+                    },
+                    onQuote: { text in
+                        action(.textQuoted(text))
+                    }
+                )
             }
         }
     }
@@ -136,7 +147,13 @@ public struct PostRowView: View {
     @ViewBuilder
     private func Footer(_ lastEdit: Post.LastEdit) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Edited: \(lastEdit.username) • \(lastEdit.date.formatted())", bundle: .module)
+            let link = "https://4pda.to/forum/index.php?showuser=\(lastEdit.userId)"
+            Text(LocalizedStringResource("Edited: [\(lastEdit.username)](\(link)) • \(lastEdit.date.formatted())", bundle: .module))
+                .environment(\.openURL, OpenURLAction(handler: { url in
+                    action(.urlTapped(url))
+                    return .handled
+                }))
+            
             if !lastEdit.reason.isEmpty {
                 Text("Reason: \(lastEdit.reason)", bundle: .module)
             }

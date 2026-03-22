@@ -9,6 +9,7 @@ import AnalyticsClient
 import ComposableArchitecture
 import APIClient
 import Models
+import WriteFormFeature
 
 @Reducer
 public struct ReputationFeature: Reducer, Sendable {
@@ -18,8 +19,9 @@ public struct ReputationFeature: Reducer, Sendable {
     // MARK: - Destinations
     
     @Reducer
-    public enum Destination: Hashable {
+    public enum Destination {
         case alert(AlertState<Alert>)
+        case report(WriteFormFeature)
         
         public enum Alert { case ok }
     }
@@ -68,6 +70,7 @@ public struct ReputationFeature: Reducer, Sendable {
             case loadMore
             case refresh
             case profileTapped(Int)
+            case complainButtonTapped(Int)
             case sourceTapped(ReputationVote)
         }
         
@@ -125,6 +128,13 @@ public struct ReputationFeature: Reducer, Sendable {
             case let .view(.profileTapped(profileId)):
                 return .send(.delegate(.openProfile(profileId: profileId)))
                 
+            case let .view(.complainButtonTapped(voteId)):
+                let feature = WriteFormFeature.State(
+                    formFor: .report(id: voteId, type: .reputation)
+                )
+                state.destination = .report(feature)
+                return .none
+                
             case let .view(.sourceTapped(vote)):
                 switch vote.createdIn {
                 case .profile:
@@ -174,6 +184,7 @@ public struct ReputationFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
     }
     
     private func reportFullyDisplayed(_ state: inout State) {

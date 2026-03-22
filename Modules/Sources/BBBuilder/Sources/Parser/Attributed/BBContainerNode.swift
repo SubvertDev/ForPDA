@@ -32,6 +32,7 @@ public enum BBContainerNode: Equatable {
         case bullet = ""
         case numeric = "1"
         case alphabet = "A"
+        case alphabetSmall = "a"
         case romanBig = "I"
         case romanSmall = "i"
     }

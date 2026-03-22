@@ -17,7 +17,7 @@ public struct ForumParser {
                     id: array[3] as! Int,
                     name: array[4] as! String,
                     flag: array[5] as! Int,
-                    description: array[6] as! String,
+                    globalAnnouncement: array[6] as! String,
                     announcements: parseAnnouncementInfo(array[7] as! [[Any]]),
                     subforums: parseForumInfo(array[8] as! [[Any]]),
                     topicsCount: array[9] as! Int,
@@ -75,7 +75,7 @@ public struct ForumParser {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 
                 return Announcement(
-                    name: array[2] as! String,
+                    name: (array[2] as! String).convertCodes(),
                     content: array[3] as! String
                 )
             } catch {

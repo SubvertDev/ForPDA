@@ -185,6 +185,24 @@ public struct TopicScreen: View {
                         send(.contextMenu(.setFavorite))
                     }
                 }
+                
+                if topic.canModerate {
+                    Section {
+                        Menu {
+                            Picker(String(), selection: $store.postsFilter) {
+                                ForEach(TopicPostsFilter.allCases) { mode in
+                                    Text(mode.title, bundle: .module)
+                                        .tag(mode)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text("Posts Filter", bundle: .module)
+                                Image(systemSymbol: .line3HorizontalDecrease)
+                            }
+                        }
+                    }
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
@@ -308,6 +326,8 @@ public struct TopicScreen: View {
                     send(.urlTapped(url))
                 case .imageTapped(let url):
                     send(.imageTapped(url))
+                case .textQuoted(let text):
+                    send(.textQuoted(post, text))
                 }
             },
             menuAction: { action in
@@ -380,6 +400,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
                 ._toolbarTitleDisplayMode(.inline)
+                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
@@ -557,6 +578,23 @@ private extension Date {
     }
 }
 
+private extension TopicPostsFilter {
+    var title: LocalizedStringKey {
+        switch self {
+        case .all:
+            LocalizedStringKey("All")
+        case .onlyHidden:
+            LocalizedStringKey("Only hidden")
+        case .onlyDefault:
+            LocalizedStringKey("Only default")
+        case .onlyDeleted:
+            LocalizedStringKey("Only deleted")
+        case .exceptDeleted:
+            LocalizedStringKey("Except deleted")
+        }
+    }
+}
+
 // MARK: - Previews
 
 #Preview {
@@ -569,7 +607,7 @@ private extension Date {
             ) {
                 TopicFeature()
             } withDependencies: {
-                $0.apiClient.getTopic = { @Sendable _, _, _ in
+                $0.apiClient.getTopic = { @Sendable _, _, _, _ in
                     return .mock
                 }
             }

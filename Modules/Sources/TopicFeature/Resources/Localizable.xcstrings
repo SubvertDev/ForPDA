@@ -31,6 +31,26 @@
         }
       }
     },
+    "All" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все посты"
+          }
+        }
+      }
+    },
+    "Are you sure, that you want to delete this post?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить этот пост?"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
@@ -57,6 +77,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Редактирование постов с вложениями пока что не поддерживается"
+          }
+        }
+      }
+    },
+    "Except deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кроме удаленных"
           }
         }
       }
@@ -101,6 +131,46 @@
         }
       }
     },
+    "No" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
+    "Only default" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только обычные"
+          }
+        }
+      }
+    },
+    "Only deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только удаленные"
+          }
+        }
+      }
+    },
+    "Only hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только скрытые"
+          }
+        }
+      }
+    },
     "Open In Browser" : {
       "localizations" : {
         "ru" : {
@@ -141,6 +211,16 @@
         }
       }
     },
+    "Posts Filter" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтр постов"
+          }
+        }
+      }
+    },
     "Remove from favorites" : {
       "localizations" : {
         "ru" : {
@@ -167,6 +247,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Результаты"
+          }
+        }
+      }
+    },
+    "The post has been deleted, showing the nearest one" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост был удален, показываю ближайший"
           }
         }
       }
@@ -237,6 +327,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Написать пост"
+          }
+        }
+      }
+    },
+    "Yes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
           }
         }
       }

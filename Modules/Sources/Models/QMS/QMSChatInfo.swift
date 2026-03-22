@@ -34,3 +34,25 @@ public struct QMSChatInfo: Sendable, Codable, Hashable, Identifiable {
         self.lastMessageId = lastMessageId
     }
 }
+
+public extension QMSChatInfo {
+    static let mock1 = QMSChatInfo(
+        id: 1,
+        creationDate: .now.addingTimeInterval(-1800),
+        lastMessageDate: .now,
+        name: "Mock Chat 1",
+        totalCount: 10,
+        unreadCount: 1,
+        lastMessageId: 0
+    )
+    
+    static let mock2 = QMSChatInfo(
+        id: 2,
+        creationDate: .now.addingTimeInterval(-3600),
+        lastMessageDate: .now,
+        name: "Mock Chat 2",
+        totalCount: 100,
+        unreadCount: 2,
+        lastMessageId: 0
+    )
+}

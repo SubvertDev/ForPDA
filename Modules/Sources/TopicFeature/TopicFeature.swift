@@ -37,6 +37,7 @@ public struct TopicFeature: Reducer, Sendable {
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
+        static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
     }
     
     // MARK: - Destinations
@@ -50,6 +51,12 @@ public struct TopicFeature: Reducer, Sendable {
         case editWarning
         case writeForm(WriteFormFeature)
         case changeReputation(ReputationChangeFeature)
+        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Alert: Equatable {
+            case deletePost(Int)
+        }
     }
     
     // MARK: - State
@@ -70,6 +77,7 @@ public struct TopicFeature: Reducer, Sendable {
         public var goTo: GoTo
         
         var posts: [UIPost] = []
+        var postsFilter: TopicPostsFilter = .exceptDeleted
         
         var isLoadingTopic = true
         var isRefreshing = false
@@ -128,6 +136,7 @@ public struct TopicFeature: Reducer, Sendable {
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
+            case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
             case contextPostMenu(PostMenuAction)
             case editWarningSheetCloseButtonTapped
@@ -204,6 +213,18 @@ public struct TopicFeature: Reducer, Sendable {
                     return jumpTo(.post(id: post.id), true, &state)
                 }
                 return .none
+                
+            case let .destination(.presented(.alert(.deletePost(id)))):
+                return .run { send in
+                    let status = try await apiClient.deletePosts(postIds: [id])
+                    let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
+                    await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
+                    await send(.internal(.refresh))
+                }
+                .cancellable(id: CancelID.loading)
+                
+            case .binding(\.postsFilter):
+                return .send(.internal(.load))
                 
             case .destination, .pageNavigation, .binding:
                 return .none
@@ -335,15 +356,8 @@ public struct TopicFeature: Reducer, Sendable {
                     return .none
                     
                 case .delete(let id):
-                    return .concatenate(
-                        .run { _ in
-                            let status = try await apiClient.deletePosts(postIds: [id])
-                            let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
-                            await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
-                        }.cancellable(id: CancelID.loading),
-                        
-                        jumpTo(.post(id: id), true, &state)
-                    )
+                    state.destination = .alert(.deletePostConfirmation(postId: id))
+                    return .none
                     
                 case .karma(let id):
                     state.destination = .karmaChange(id)
@@ -404,6 +418,21 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case let .view(.textQuoted(post, quotedText)):
+                guard state.topic != nil else { return .none }
+                
+                let currentDate = Date().formatted(date: .numeric, time: .shortened)
+                let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\n\(quotedText)\n[/quote]\n"
+                let feature = WriteFormFeature.State(
+                    formFor: .post(
+                        type: .new,
+                        topicId: state.topicId,
+                        content: .simple(formattedQuote, [])
+                    )
+                )
+                state.destination = .writeForm(feature)
+                return .none
+                
             case .view(.finishedPostAnimation):
                 state.postId = nil
                 return .none.animation()
@@ -456,9 +485,14 @@ public struct TopicFeature: Reducer, Sendable {
                 if !state.isRefreshing {
                     state.isLoadingTopic = true
                 }
-                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage, isRefreshing = state.isRefreshing] send in
+                return .run { [
+                    id = state.topicId,
+                    perPage = state.appSettings.topicPerPage,
+                    isRefreshing = state.isRefreshing,
+                    postsFilter = state.postsFilter
+                ] send in
                     let startTime = Date()
-                    let topic = try await apiClient.getTopic(id, offset, perPage)
+                    let topic = try await apiClient.getTopic(id, offset, perPage, postsFilter)
                     if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
                     await send(.internal(.topicResponse(.success(topic))))
                 } catch: { error, send in
@@ -505,7 +539,16 @@ public struct TopicFeature: Reducer, Sendable {
                     .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
+                            
+                            // Syncing notifications and badges when reading last page
+                            let unread = try await apiClient.getUnread(type: .all)
+                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                         }
+                        // Deleting notifications related to posts on the current page
+                        // `forumMention` notifications encode topicId in the trailing identifier segment
+                        // Include topic.id so opening a topic clears mentions tied to this topic
+                        let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970) + [TimeInterval(topic.id)]
+                        await notificationsClient.removeNotifications(timestamps: timestamps)
                     }
                 )
                 
@@ -603,8 +646,17 @@ public struct TopicFeature: Reducer, Sendable {
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
             let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
+            if response.id != topicId {
+                // Handling case where post is in another topic
+                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
+                return await send(.delegate(.handleUrl(url)))
+            }
             let offset = response.offset - (response.offset % topicPerPage)
             await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
+            
+            if jump.type == .post && jump.postId != response.postId {
+                await toastClient.showToast(ToastMessage(text: Localization.showingNearestPost))
+            }
         } catch: { error, send in
             await send(.internal(.jumpRequestFailed))
         }
@@ -630,6 +682,27 @@ public struct TopicFeature: Reducer, Sendable {
 }
 
 extension TopicFeature.Destination.State: Equatable {}
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == TopicFeature.Destination.Alert {
+    
+    nonisolated static func deletePostConfirmation(postId: Int) -> AlertState {
+        return AlertState(
+            title: { TextState("Are you sure, that you want to delete this post?", bundle: .module) },
+            actions: {
+                ButtonState(role: .destructive, action: .deletePost(postId)) {
+                    TextState("Yes", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("No", bundle: .module)
+                }
+            }
+        )
+    }
+}
+
+// MARK: - Helpers
 
 func measureElapsedTime(_ operation: () throws -> Void) throws -> UInt64 {
     let startTime = DispatchTime.now()

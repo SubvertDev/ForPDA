@@ -9,6 +9,7 @@ import SwiftUI
 import RichTextKit
 
 public typealias URLTapHandler = (URL) -> Void
+public typealias QuoteHandler = (String) -> Void
 
 public struct RichText: View {
     
@@ -17,6 +18,7 @@ public struct RichText: View {
     public let font: Font?
     public let foregroundStyle: Color?
     public var onUrlTap: URLTapHandler?
+    public var onQuote: QuoteHandler?
     public let configuration: (any RichTextViewComponent) -> Void
     @State private var delegate: TextViewDelegate
     @State private var refreshId = UUID()
@@ -29,6 +31,7 @@ public struct RichText: View {
         foregroundStyle: Color? = nil,
         captureUrlTaps: Bool = false,
         onUrlTap: URLTapHandler? = nil,
+        onQuote: QuoteHandler? = nil,
         configuration: @escaping (any RichTextViewComponent) -> Void = { _ in }
     ) {
         self.text = text
@@ -36,9 +39,10 @@ public struct RichText: View {
         self.font = font
         self.foregroundStyle = foregroundStyle
         self.onUrlTap = onUrlTap
+        self.onQuote = onQuote
         self.configuration = configuration
         
-        self.delegate = TextViewDelegate(onUrlTap: onUrlTap)
+        self.delegate = TextViewDelegate(onUrlTap: onUrlTap, onQuote: onQuote)
     }
     
     public init(
@@ -48,6 +52,7 @@ public struct RichText: View {
         foregroundStyle: Color? = nil,
         captureUrlTaps: Bool = false,
         onUrlTap: URLTapHandler? = nil,
+        onQuote: QuoteHandler? = nil,
         configuration: @escaping (any RichTextViewComponent) -> Void = { _ in }
     ) {
         self.text = NSAttributedString(text)
@@ -55,9 +60,10 @@ public struct RichText: View {
         self.font = font
         self.foregroundStyle = foregroundStyle
         self.onUrlTap = onUrlTap
+        self.onQuote = onQuote
         self.configuration = configuration
         
-        self.delegate = TextViewDelegate(onUrlTap: onUrlTap)
+        self.delegate = TextViewDelegate(onUrlTap: onUrlTap, onQuote: onQuote)
         
         let attributedString = NSAttributedString(text)
         let range = NSRange(location: 0, length: attributedString.length)
@@ -94,7 +100,7 @@ public struct RichText: View {
 //                .underlineStyle: NSUnderlineStyle.single.rawValue
 //            ]
             
-            if onUrlTap != nil {
+            if onUrlTap != nil || onQuote != nil {
                 textView?.delegate = delegate
             }
             delegate.textView = textView
@@ -129,12 +135,18 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     
     @Binding var refreshId: UUID
     private let onUrlTap: URLTapHandler?
+    private let onQuote: QuoteHandler?
 //    @Binding var text: NSAttributedString?
     weak var textView: UITextView?
     
-    init(refreshId: Binding<UUID> = .constant(UUID()), onUrlTap: URLTapHandler?) {
+    init(
+        refreshId: Binding<UUID> = .constant(UUID()),
+        onUrlTap: URLTapHandler? = nil,
+        onQuote: QuoteHandler? = nil
+    ) {
         self._refreshId = refreshId
         self.onUrlTap = onUrlTap
+        self.onQuote = onQuote
     }
     
     func setRefresh(_ refreshId: Binding<UUID>) {
@@ -152,8 +164,7 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     }
     
     func textView(_ textView: UITextView, shouldInteractWith textAttachment: NSTextAttachment, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        if let postIdString = (textAttachment as? AsyncTextAttachment)?.postId, let postId = Int(postIdString) {
-            let url = URL(string: "snapback://\(postId)")!
+        if let url = (textAttachment as? AsyncTextAttachment)?.link {
             onUrlTap?(url)
         } else {
             print("[ERROR] Couldn't extract postId from SnapbackImage")
@@ -164,5 +175,30 @@ private class TextViewDelegate: NSObject, UITextViewDelegate, @preconcurrency As
     func textAttachmentDidLoadImage(textAttachment: AsyncTextAttachment, displaySizeChanged: Bool) {
         // print("Delegate called \(displaySizeChanged) \(textAttachment)")
         refreshId = UUID()
+    }
+    
+    func textView(_ textView: UITextView, editMenuForTextIn range: NSRange, suggestedActions: [UIMenuElement]) -> UIMenu? {
+        guard let onQuote else {
+            return UIMenu(children: suggestedActions)
+        }
+        
+        let title = String(localized: "Quote", bundle: .module)
+        let quoteAction = UIAction(title: title) { [weak self] _ in
+            guard let self,
+                  let textView = self.textView,
+                  let attributedText = textView.attributedText,
+                  range.location + range.length <= attributedText.length
+            else {
+                return
+            }
+            
+            let selectedText = attributedText.attributedSubstring(from: range).string
+            
+            onQuote(selectedText)
+        }
+        
+        var actions = suggestedActions
+        actions.insert(quoteAction, at: 0)
+        return UIMenu(children: actions)
     }
 }

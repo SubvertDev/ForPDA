@@ -58,9 +58,10 @@ public struct APIClient: Sendable {
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
-    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
+    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
+    public var getMentions: @Sendable (_ showPosts: Bool, _ offset: Int, _ perPage: Int) async throws -> Mentions
     public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
@@ -75,7 +76,7 @@ public struct APIClient: Sendable {
     public var readAllFavorites: @Sendable () async throws -> Bool
     
     // Extra
-    public var getUnread: @Sendable (_ type: Int, _ value: Int) async throws -> Unread
+    public var getUnread: @Sendable (_ type: UnreadType) async throws -> Unread
     public var getAttachment: @Sendable (_ id: Int) async throws -> URL
     public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
@@ -324,8 +325,13 @@ extension APIClient: DependencyKey {
                 return try await parser.parseAnnouncement(response)
             },
             
-            getTopic: { id, offset, perPage in
-                let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
+            getTopic: { id, offset, perPage, postsFilter in
+                let request = TopicRequest(
+                    id: id,
+                    offset: offset,
+                    itemsPerPage: perPage,
+                    showPostMode: postsFilter.rawValue
+                )
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
@@ -342,6 +348,11 @@ extension APIClient: DependencyKey {
 			getHistory: { offset, perPage in
                 let response = try await api.send(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
+			},
+            
+            getMentions: { showPosts, offset, perPage in
+                let response = try await api.send(MemberCommand.mention(showPosts: showPosts, offset: offset, itemsPerPage: perPage))
+                return try await parser.parseMentions(response)
             },
             
             previewPost: { request in
@@ -456,8 +467,13 @@ extension APIClient: DependencyKey {
             
             // MARK: - Extra
             
-            getUnread: { type, value in
-                let response = try await api.send(CommonCommand.syncUnread(type: type, value: value))
+            getUnread: { type in
+                let command = if case .category(let type, let value) = type {
+                    CommonCommand.syncUnread(timestamp: 0, type: type.rawValue, value: value)
+                } else {
+                    CommonCommand.syncUnread(timestamp: 0, type: 0, value: 0)
+                }
+                let response = try await api.send(command)
                 return try await parser.parseUnread(response)
             },
             
@@ -600,7 +616,7 @@ extension APIClient: DependencyKey {
             getAnnouncement: { _ in
                 return .mock
             },
-            getTopic: { _, _, _ in
+            getTopic: { _, _, _, _ in
                 return .mock
             },
             getTemplate: { _, _ in
@@ -609,6 +625,9 @@ extension APIClient: DependencyKey {
 			getHistory: { _, _ in
                 return .mock
 			},
+            getMentions: { _, _, _ in
+                return .mock
+            },
             previewPost: { request in
                 return PostPreview(
                     content: request.post.content,
@@ -644,7 +663,7 @@ extension APIClient: DependencyKey {
             readAllFavorites: {
                 return true
             },
-            getUnread: { _, _ in
+            getUnread: { _ in
                 return .mock
             },
             getAttachment: { _ in

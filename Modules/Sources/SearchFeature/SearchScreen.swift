@@ -60,6 +60,9 @@ public struct SearchScreen: View {
                 send(.startSearch)
             }
             .bind($store.focus, to: $focus)
+            .onTapGesture {
+                focus = nil
+            }
             .onAppear {
                 send(.onAppear)
             }
@@ -116,6 +119,7 @@ public struct SearchScreen: View {
         .padding(12)
         .frame(minHeight: 60)
         .cornerRadius(10)
+        .pickerStyle(.menu) // focus override tap fix
     }
     
     // MARK: - Search Sort Picker
@@ -138,6 +142,7 @@ public struct SearchScreen: View {
         .padding(12)
         .frame(minHeight: 60)
         .cornerRadius(10)
+        .pickerStyle(.menu) // focus override tap fix
     }
     
     // MARK: - Search Result as Topics Row Toggle
@@ -178,6 +183,7 @@ public struct SearchScreen: View {
         .padding(12)
         .frame(minHeight: 60)
         .cornerRadius(10)
+        .pickerStyle(.menu) // focus override tap fix
     }
     
     // MARK: - Author Section
@@ -207,9 +213,6 @@ public struct SearchScreen: View {
                 .foregroundStyle(Color(.Labels.teritary))
                 .textCase(nil)
                 .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .onTapGesture {
-            focus = nil
         }
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

@@ -11,6 +11,7 @@ import AnalyticsClient
 import DeeplinkHandler
 import Models
 import TCAExtensions
+import NotificationsClient
 
 import ComposableArchitecture
 import ArticleFeature
@@ -24,6 +25,7 @@ import FavoritesFeature
 import ProfileFeature
 import AnnouncementFeature
 import HistoryFeature
+import MentionsFeature
 import QMSListFeature
 import QMSFeature
 import ReputationFeature
@@ -42,6 +44,23 @@ public struct StackTab: Reducer, Sendable {
         public var path: StackState<Path.State>
         public var showTabBar: Bool
         
+        public var notificationsContext: NotificationContext? {
+            if path.isEmpty, case .favorites = root {
+                return .favorites
+            }
+            
+            switch path.last {
+            case .profile(.mentions):
+                return .mentions
+            case let .qms(.qms(state)):
+                return .chat(id: state.chatId)
+            case let .forum(.topic(state)):
+                return .topic(id: state.topicId)
+            default:
+                return nil
+            }
+        }
+        
         public init(
             root: Path.State,
             path: StackState<Path.State> = .init(),
@@ -56,6 +75,7 @@ public struct StackTab: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
+        case onAppear
         case root(Path.Action)
         case path(StackActionOf<Path>)
         
@@ -70,6 +90,7 @@ public struct StackTab: Reducer, Sendable {
     
     @Dependency(\.analyticsClient) private var analytics
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
@@ -80,6 +101,10 @@ public struct StackTab: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .onAppear:
+                notificationsClient.setNotificationContext(context: state.notificationsContext)
+                return .none
+                
             case let .root(pathAction), let .path(.element(id: _, action: pathAction)):
                 return handleNavigation(action: pathAction, state: &state)
                 
@@ -90,6 +115,8 @@ public struct StackTab: Reducer, Sendable {
         .forEach(\.path, action: \.path)
         .onChange(of: \.path) { _, path in
             Reduce<State, Action> { state, action in
+                notificationsClient.setNotificationContext(context: state.notificationsContext)
+                
                 let hasArticle = path.contains(where: { $0.is(\.articles.article) })
                 let hasSettings = path.contains(where: { $0.is(\.settings) })
                 let hasQms = path.contains(where: { $0.is(\.qms) })
@@ -243,6 +270,9 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.openHistory)):
             state.path.append(.profile(.history(HistoryFeature.State())))
             
+        case .profile(.delegate(.openMentions)):
+            state.path.append(.profile(.mentions(MentionsFeature.State())))
+            
         case let .profile(.delegate(.openSearch(options))):
             state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
             
@@ -259,6 +289,13 @@ public struct StackTab: Reducer, Sendable {
             return handleDeeplink(url: url, state: &state)
             
         case let .history(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
+            
+        case let .mentions(.delegate(.openArticle(sourceId: sourceId, targetId: targetId))):
+            let articlePreview = ArticlePreview.innerDeeplink(id: sourceId)
+            state.path.append(.articles(.article(ArticleFeature.State.init(articlePreview: articlePreview, scrollToId: targetId))))
+            
+        case let .mentions(.delegate(.openTopic(id: id, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         case let .reputation(.delegate(.openProfile(id))):
@@ -359,24 +396,10 @@ public struct StackTab: Reducer, Sendable {
     enum DeeplinkHandlingError: Error {
         case failedToParseSamePagePost
         case unknownGoToType(GoTo)
+        case unknownTopicCase(URL)
     }
     
     private func handleDeeplink(url: URL, state: inout State) -> Effect<Action> {
-        var url = url
-        
-        if url.absoluteString.prefix(7) == "link://" {
-            return .run { [url] _ in
-                let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
-                await open(url: resultUrl)
-            }
-        }
-        
-        if url.scheme == "snapback" {
-            if case let .forum(.topic(topic)) = state.path.last {
-                url = URL(string: url.absoluteString + "/\(topic.topicId)")!
-            }
-        }
-        
         do {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
@@ -405,14 +428,16 @@ public struct StackTab: Reducer, Sendable {
                         }
                     }
                     
-                    // Different topic or announcement, using app navigation
+                    // Different topic id or non-topic screen, pushing new screen instead
                     state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
-                } else {
+                } else if let (id, _) = state.path.last(is: \.forum.topic) {
                     // Deeplink in the same topic ONLY (inner-inner deeplink case)
-                    if let (id, _) = state.path.last(is: \.forum.topic) {
-                        state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                        return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
-                    }
+                    state.path[id: id, case: \.forum.topic]?.goTo = goTo
+                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                } else {
+                    // Deeplink from non-topic screen (e.g. QMS) with no targetId
+                    analytics.capture(DeeplinkHandlingError.unknownTopicCase(url))
+                    return .run { [url] _ in await open(url: url) }
                 }
                 
             case let .forum(id: id, page: page):
@@ -430,21 +455,26 @@ public struct StackTab: Reducer, Sendable {
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 
-            case let .article(id: id, title: title, imageUrl: imageUrl):
+            case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId: scrollToId):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
-                state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
+                state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId))))
             }
             
             return .none
         } catch {
             if case .externalURL = error {
                 // Skipping externalURL case since it's not error per-se
+            } else if case let .fileDownload(url: url) = error {
+                return .run { [url] _ in
+                    let resultUrl = await DeeplinkHandler().handleInnerToOuterURL(url)
+                    await open(url: resultUrl)
+                }
             } else {
                 analytics.capture(error)
             }
+            
+            return .run { [url] _ in await open(url: url) }
         }
-        
-        return .run { [url] _ in await open(url: url) }
     }
 }
 

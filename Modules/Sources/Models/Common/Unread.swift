@@ -14,6 +14,22 @@ public struct Unread: Codable, Sendable, Hashable {
     public let mentionsUnreadCount: Int
     public let items: [Item]
     
+    public var forumCount: Int {
+        return items.filter { $0.category == .forum }.count
+    }
+    
+    public var topicCount: Int {
+        return items.filter { $0.category == .topic }.count
+    }
+    
+    public var siteMentionsCount: Int {
+        return items.filter { $0.category == .siteMention }.count
+    }
+    
+    public var forumMentionsCount: Int {
+        return items.filter { $0.category == .forumMention }.count
+    }
+    
     public init(
         date: Date,
         qmsUnreadCount: Int,
@@ -94,5 +110,21 @@ public extension Unread {
                 category: Item.Category.qms
             )
         ]
+    )
+    
+    static let mockEmpty = Unread(
+        date: .now,
+        qmsUnreadCount: 0,
+        favoritesUnreadCount: 0,
+        mentionsUnreadCount: 0,
+        items: []
+    )
+    
+    static let mockBadges = Unread(
+        date: .now,
+        qmsUnreadCount: 15,
+        favoritesUnreadCount: 20,
+        mentionsUnreadCount: 3,
+        items: []
     )
 }

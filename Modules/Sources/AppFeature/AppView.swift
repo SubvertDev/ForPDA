@@ -18,6 +18,7 @@ import FavoritesRootFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
+import MentionsFeature
 import Models
 import NotificationsFeature
 import ProfileFeature
@@ -119,6 +120,7 @@ struct LiquidTabView: View {
                 ) {
                     StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
                 }
+                .badge(store.favoritesBadges)
                 
                 Tab(
                     AppTab.forum.title,
@@ -135,6 +137,7 @@ struct LiquidTabView: View {
                 ) {
                     ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
                 }
+                .badge(store.profileBadges)
             }
             .tabBarMinimizeBehavior(store.appSettings.hideTabBarOnScroll ? .onScrollDown : .never)
             .if(store.appSettings.experimentalFloatingNavigation) { content in
@@ -415,6 +418,8 @@ extension LiquidTabView {
         case let .profile(path):
             switch path.case {
             case let .history(store):
+                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+            case let .mentions(store):
                 return store.scope(state: \.pageNavigation, action: \.pageNavigation)
             default:
                 return nil

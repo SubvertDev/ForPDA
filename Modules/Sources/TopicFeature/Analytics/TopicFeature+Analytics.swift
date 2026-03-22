@@ -91,7 +91,10 @@ extension TopicFeature {
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
                     }
-                    
+
+                case let .view(.textQuoted(post, _)):
+                    analytics.log(TopicEvent.textQuoted(post.id))
+
                 case .view(.editWarningSheetCloseButtonTapped):
                     analytics.log(TopicEvent.editWarningSheetClosed)
                     

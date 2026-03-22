@@ -11,7 +11,7 @@ public struct Forum: Codable, Sendable, Hashable {
     public let id: Int
     public let name: String
     public let flag: Int
-    public let description: String
+    public let globalAnnouncement: String
     public let announcements: [AnnouncementInfo]
     public let subforums: [ForumInfo]
     public let topicsCount: Int
@@ -26,7 +26,7 @@ public struct Forum: Codable, Sendable, Hashable {
         id: Int,
         name: String,
         flag: Int,
-        description: String,
+        globalAnnouncement: String,
         announcements: [AnnouncementInfo],
         subforums: [ForumInfo],
         topicsCount: Int,
@@ -36,7 +36,7 @@ public struct Forum: Codable, Sendable, Hashable {
         self.id = id
         self.name = name
         self.flag = flag
-        self.description = description
+        self.globalAnnouncement = globalAnnouncement
         self.announcements = announcements
         self.subforums = subforums
         self.topicsCount = topicsCount
@@ -50,7 +50,7 @@ public extension Forum {
         id: 1,
         name: "Test Forum",
         flag: 64,
-        description: "Wow, this is forum description...",
+        globalAnnouncement: "Wow, [b]this is[/b] SPARTA (global announcement)...",
         announcements: [
             .mock
         ],

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import SentrySwiftUI
+import Sentry
 
 // MARK: - View
 

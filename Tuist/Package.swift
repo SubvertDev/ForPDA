@@ -1,8 +1,8 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 #if TUIST
-    import struct ProjectDescription.PackageSettings
+    import ProjectDescription
 
     let packageSettings = PackageSettings(
         productTypes: [
@@ -34,44 +34,65 @@ import PackageDescription
             "RichTextKit": .framework,
             "SkeletonUI": .framework,
             "SFSafeSymbols": .framework,
+            "SwiftyGif": .framework,
             
             "YouTubePlayerKit": .framework
+        ],
+        targetSettings: [
+            "ComposableArchitecture": .settings(
+                base: .moduleAliasForSharing,
+                defaultSettings: .recommended
+            ),
+            "Sharing": .settings(
+                base: .moduleAliasForSharing.merging(.productNameForSharing),
+                defaultSettings: .recommended
+            )
         ]
     )
+extension SettingsDictionary {
+    static let moduleAliasForSharing = SettingsDictionary()
+        .otherSwiftFlags(["-module-alias", "Sharing=PFSharing"])
+    
+    static let productNameForSharing = SettingsDictionary()
+        .merging(["PRODUCT_NAME": "PFSharing"])
+}
 #endif
 
 let package = Package(
     name: "ForPDA",
     dependencies: [
         // TCA
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.23.1"),
-        
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.24.1"),
+                
         // TCA Dependencies
-        .package(url: "https://github.com/apple/swift-async-algorithms", from: "1.0.4"),
-        .package(url: "https://github.com/pointfreeco/swift-clocks", from: "1.0.6"),
-        .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", from: "1.3.2"),
-        .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
-        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
-        .package(url: "https://github.com/pointfreeco/swift-navigation", from: "2.6.0"),
-        .package(url: "https://github.com/pointfreeco/swift-perception", from: "2.0.9"),
-        .package(url: "https://github.com/pointfreeco/swift-sharing", from: "2.7.4"),
-        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.7"),
-        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.7.0"),
+        .package(url: "https://github.com/apple/swift-async-algorithms", exact: "1.1.2"),
+        .package(url: "https://github.com/pointfreeco/swift-clocks", exact: "1.0.6"),
+        .package(url: "https://github.com/pointfreeco/swift-concurrency-extras", exact: "1.3.2"),
+        .package(url: "https://github.com/pointfreeco/swift-custom-dump", exact: "1.4.1"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", exact: "1.11.0"),
+        .package(url: "https://github.com/pointfreeco/swift-navigation", exact: "2.7.0"),
+        .package(url: "https://github.com/pointfreeco/swift-perception", exact: "2.0.9"),
+        .package(url: "https://github.com/pointfreeco/swift-sharing", exact: "2.7.4"),
+        .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", exact: "1.18.9"),
+        .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", exact: "1.9.0"),
+
         // Other
-        .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", from: "7.0.0"),
-        .package(url: "https://github.com/hyperoslo/Cache.git", from: "7.4.0"),
-        .package(url: "https://github.com/kean/Nuke.git", from: "12.8.0"),
-        .package(url: "https://github.com/PostHog/posthog-ios.git", exact: "3.34.0"),
-        .package(url: "https://github.com/getsentry/sentry-cocoa.git", exact: "8.57.1"),
-        .package(url: "https://github.com/CSolanaM/SkeletonUI.git", from: "2.0.2"),
-        .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", branch: "main"),
-        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit.git", from: "2.0.4"),
+        .package(url: "https://github.com/CSolanaM/SkeletonUI", exact: "2.0.2"),
+        .package(url: "https://github.com/getsentry/sentry-cocoa", exact: "9.6.0"),
+        .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro", exact: "0.5.2"),
+        .package(url: "https://github.com/hyperoslo/Cache", exact: "7.4.0"),
+        .package(url: "https://github.com/kean/Nuke", exact: "12.8.0"),
+        .package(url: "https://github.com/kirualex/SwiftyGif", exact: "5.4.5"),
+        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.45.1"),
+        .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", exact: "1.0.1"),
+        .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", exact: "7.0.0"),
+        .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", exact: "2.0.5"),
+        .package(url: "https://github.com/ZhgChgLi/ZMarkupParser", exact: "1.12.0"),
+
+        // Forks & stuff
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
-        .package(url: "https://github.com/kirualex/SwiftyGif.git", from: "5.4.4"),
-        .package(url: "https://github.com/ZhgChgLi/ZMarkupParser.git", from: "1.12.0"),
-        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.6.5"),
+        .package(url: "https://github.com/SubvertDev/Chat", branch: "main"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.7.3"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
-        .package(url: "https://github.com/exyte/Chat.git", exact: "2.4.2"), // 2.5.0+ is iOS 17+
-        .package(url: "https://github.com/gohanlon/swift-memberwise-init-macro.git", from: "0.5.2"),
     ]
 )

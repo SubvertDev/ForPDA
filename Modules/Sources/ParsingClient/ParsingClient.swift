@@ -38,6 +38,7 @@ public struct ParsingClient: Sendable {
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
+    public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
     public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
     
@@ -111,6 +112,9 @@ extension ParsingClient: DependencyKey {
         },
         parseHistory: { response in
             return try HistoryParser.parse(from: response)
+        },
+        parseMentions: { response in
+            return try MentionsParser.parse(from: response)
         },
         parsePostPreview: { response in
             return try TopicParser.parsePostPreview(from: response)

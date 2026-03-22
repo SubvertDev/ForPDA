@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SharedUI
 import Models
+import WriteFormFeature
 
 @ViewAction(for: ReputationFeature.self)
 public struct ReputationScreen: View {
@@ -48,6 +49,11 @@ public struct ReputationScreen: View {
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Reputation", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
+            .fullScreenCover(item: $store.scope(state: \.destination?.report, action: \.destination.report)) { store in
+                NavigationStack {
+                    WriteFormScreen(store: store)
+                }
+            }
             .onAppear {
                 send(.onAppear)
             }
@@ -68,14 +74,16 @@ public struct ReputationScreen: View {
                 Spacer()
             } else {
                 List(store.historyData, id: \.self) { vote in
-                    ReputationRow(vote: vote)
-                        .listRowBackground(Color(.Background.primary))
-                        .onAppear {
-                            if let index = store.historyData.firstIndex(of: vote),
-                               index == store.historyData.count - 5 {
-                                send(.loadMore)
+                    WithPerceptionTracking {
+                        ReputationRow(vote: vote)
+                            .listRowBackground(Color(.Background.primary))
+                            .onAppear {
+                                if let index = store.historyData.firstIndex(of: vote),
+                                   index == store.historyData.count - 5 {
+                                    send(.loadMore)
+                                }
                             }
-                        }
+                    }
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
@@ -105,10 +113,11 @@ public struct ReputationScreen: View {
     
     @ViewBuilder
     private func ReputationRow(vote: ReputationVote) -> some View {
+        let authorId = store.pickerSection == .history ? vote.authorId : vote.toId
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Button {
-                    send(.profileTapped(store.pickerSection == .history ? vote.authorId : vote.toId))
+                    send(.profileTapped(authorId))
                 } label: {
                     Text(store.pickerSection == .history ? vote.authorName : vote.toName)
                         .foregroundStyle(Color(.Labels.primary))
@@ -164,7 +173,7 @@ public struct ReputationScreen: View {
                 Spacer()
                 
                 Menu {
-                    MenuButtons(id: store.pickerSection == .history ? vote.authorId : vote.toId)
+                    MenuButtons(voteId: vote.id, authorId: authorId)
                 } label: {
                     Image(systemSymbol: .ellipsis)
                         .foregroundStyle(Color(.Labels.teritary))
@@ -179,7 +188,7 @@ public struct ReputationScreen: View {
         .contentShape(Rectangle())
         .background(Color(.Background.primary))
         .contextMenu {
-            MenuButtons(id: vote.authorId)
+            MenuButtons(voteId: vote.id, authorId: authorId)
         }
     }
     // MARK: - Empty Reputation
@@ -222,19 +231,20 @@ public struct ReputationScreen: View {
     // MARK: - Menu Buttons
     
     @ViewBuilder
-    private func MenuButtons(id: Int) -> some View {
+    private func MenuButtons(voteId: Int, authorId: Int) -> some View {
         ContextButton(
             text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
-            action: { send(.profileTapped(id)) }
+            action: { send(.profileTapped(authorId)) }
         )
         
-        ContextButton(
-            text: LocalizedStringResource("Complain", bundle: .module),
-            symbol: .exclamationmarkTriangle,
-            action: { print("Complain") }
-        )
-        .disabled(true)
+        if store.pickerSection == .history {
+            ContextButton(
+                text: LocalizedStringResource("Complain", bundle: .module),
+                symbol: .exclamationmarkTriangle,
+                action: { send(.complainButtonTapped(voteId)) }
+            )
+        }
     }
     
     // MARK: - format Date

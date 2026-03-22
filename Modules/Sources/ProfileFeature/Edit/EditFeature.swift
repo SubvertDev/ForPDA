@@ -20,12 +20,7 @@ public struct EditFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination: Hashable, Equatable {
-        case alert(AlertState<Alert>)
         case avatarPicker
-        
-        public enum Alert {
-            case yes, no
-        }
     }
     
     // MARK: - State
@@ -104,6 +99,7 @@ public struct EditFeature: Reducer, Sendable {
         case alert(PresentationAction<Alert>)
         public enum Alert {
             case cancel
+            case deleteAvatar
         }
         
         case `internal`(Internal)
@@ -135,6 +131,10 @@ public struct EditFeature: Reducer, Sendable {
             case .binding:
                 return .none
                 
+            case .alert(.presented(.deleteAvatar)):
+                let empty = Data()
+                return .send(.internal(.updateAvatar(empty)))
+                
             case .view(.onAppear):
                 state.birthdayDate = state.draftUser.birthdayDate ?? nil
                 return .none
@@ -143,8 +143,8 @@ public struct EditFeature: Reducer, Sendable {
                 return .send(.internal(.updateAvatar(data)))
                 
             case .view(.deleteAvatar):
-                let empty = Data()
-                return .send(.internal(.updateAvatar(empty)))
+                state.alert = .deleteAvatarConfirmation
+                return .none
             
             case .view(.onAvatarBadFileSizeProvided):
                 state.alert = .avatarFileSizeError
@@ -189,10 +189,10 @@ public struct EditFeature: Reducer, Sendable {
                     let status = try await apiClient.editUserProfile(UserProfileEditRequest(
                         userId: user.id,
                         city: user.city ?? "",
-                        about: user.aboutMe?.simplify() ?? "",
+                        about: user.aboutMe ?? "",
                         gender: user.gender ?? .unknown,
                         status: user.status ?? "",
-                        signature: user.signature?.simplify() ?? "",
+                        signature: user.signature ?? "",
                         birthdayDate: birthdayDate
                     ))
                     await send(.delegate(.profileUpdated(status)))
@@ -253,6 +253,18 @@ private extension AlertState where Action == EditFeature.Action.Alert {
             TextState("Ok", bundle: .module)
         }
     }
+    
+    nonisolated(unsafe) static let deleteAvatarConfirmation = Self {
+        TextState("Are you sure, that you want to delete an avatar?", bundle: .module)
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("Cancel", bundle: .module)
+        }
+        
+        ButtonState(role: .destructive, action: .deleteAvatar) {
+            TextState("Delete", bundle: .module)
+        }
+    }
 }
 
 // MARK: - Helpers
@@ -262,11 +274,5 @@ private extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd-MM-yyyy"
         return dateFormatter.string(from: self)
-    }
-}
-
-private extension String {
-    func simplify() -> String {
-        return String(self.debugDescription.dropFirst().dropLast())
     }
 }
