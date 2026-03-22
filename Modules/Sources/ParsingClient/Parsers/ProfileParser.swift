@@ -36,8 +36,8 @@ public struct ProfileParser {
     /// 23. [] - devices on forum
     /// 24. [] - warning log
     /// 25. something@gmail.com - email
-    /// 26. "" - empty = no warnings
-    /// 27. "" - empty = no warnings
+    /// 26. "" - registrationIP
+    /// 27. "" - sessionIP
     /// 28. -1 - warning level (-1 => 0%)
     /// 29. 0 - user premod (1 - always | 0 - before ...)
     /// 30. 0 - user readonly (if != 0 => before ...)
@@ -73,6 +73,8 @@ public struct ProfileParser {
                     qmsMessages: (array[22] as! Int),
                     forumDevices: nil,
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
+                    registrationIP: array[26] as! String,
+                    sessionIP: array[27] as! String,
                     achievements: parseUserAchievements(array[32] as! [[Any]])
                 )
             } catch {

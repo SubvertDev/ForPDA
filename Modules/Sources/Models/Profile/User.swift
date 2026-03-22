@@ -32,7 +32,13 @@ public struct User: Sendable, Hashable, Codable {
     public let qmsMessages: Int?
     public let forumDevices: [Device]?
     public let email: String?
+    public let registrationIP: String
+    public let sessionIP: String
     public let achievements: [Achievement]
+    
+    public var canModerate: Bool {
+        return !registrationIP.isEmpty || !sessionIP.isEmpty
+    }
     
     public var birthdayDate: Date? {
         if let birthdate {
@@ -92,6 +98,8 @@ public struct User: Sendable, Hashable, Codable {
         qmsMessages: Int?,
         forumDevices: [Device]?,
         email: String?,
+        registrationIP: String,
+        sessionIP: String,
         achievements: [Achievement]
     ) {
         self.id = id
@@ -117,6 +125,8 @@ public struct User: Sendable, Hashable, Codable {
         self.qmsMessages = qmsMessages
         self.forumDevices = forumDevices
         self.email = email
+        self.registrationIP = registrationIP
+        self.sessionIP = sessionIP
         self.achievements = achievements
     }
 }
@@ -297,6 +307,8 @@ public extension User {
         qmsMessages: nil,
         forumDevices: nil,
         email: "some@email.com",
+        registrationIP: "8.8.8.8",
+        sessionIP: "1.1.1.1",
         achievements: [
             .init(
                 name: "Призер Аллеи Славы",

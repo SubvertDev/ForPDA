@@ -229,6 +229,7 @@ public struct ProfileScreen: View {
     }
     
     // MARK: - Groups Section
+    
     @ViewBuilder
     private func GroupsSection(user: User) -> some View {
         Section {
@@ -289,6 +290,26 @@ public struct ProfileScreen: View {
                     Color(.Background.teritary)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                 )
+                
+                if user.canModerate {
+                    HStack {
+                        Text("Registration IP", bundle: .module)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                        
+                        Spacer()
+                        
+                        Text(verbatim: user.registrationIP)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 19)
+                    .background(
+                        Color(.Background.teritary)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    )
+                }
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

@@ -421,6 +421,16 @@
         }
       }
     },
+    "Registration IP" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IP регистрации"
+          }
+        }
+      }
+    },
     "Replies" : {
       "localizations" : {
         "ru" : {
