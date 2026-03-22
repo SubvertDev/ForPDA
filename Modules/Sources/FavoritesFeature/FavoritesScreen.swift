@@ -229,6 +229,8 @@ public struct FavoritesScreen: View {
                             username: favorite.topic.lastPost.username,
                             isClosed: favorite.topic.isClosed,
                             isUnread: favorite.topic.isUnread,
+                            isHatUpdated: favorite.isHatUpdated,
+                            hasHatUpdateTracking: favorite.isNotifyHatUpdate,
                             onAction: { unreadTapped in
                                 send(.favoriteTapped(favorite, showUnread: unreadTapped))
                             }

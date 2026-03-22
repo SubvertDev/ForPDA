@@ -18,6 +18,8 @@ public struct TopicRow: View {
     public let username: String
     public let isClosed: Bool
     public let isUnread: Bool
+    public let isHatUpdated: Bool
+    public let hasHatUpdateTracking: Bool
     public let onAction: (_ unreadTapped: Bool) -> Void
     
     public init(
@@ -26,6 +28,8 @@ public struct TopicRow: View {
         username: String,
         isClosed: Bool,
         isUnread: Bool,
+        isHatUpdated: Bool = false,
+        hasHatUpdateTracking: Bool = false,
         onAction: @escaping (_ unreadTapped: Bool) -> Void
     ) {
         self.title = title
@@ -33,6 +37,8 @@ public struct TopicRow: View {
         self.username = username
         self.isClosed = isClosed
         self.isUnread = isUnread
+        self.isHatUpdated = isHatUpdated
+        self.hasHatUpdateTracking = hasHatUpdateTracking
         self.onAction = onAction
     }
     
@@ -72,6 +78,15 @@ public struct TopicRow: View {
                 Spacer(minLength: 0)
                 
                 HStack(spacing: 0) {
+                    if hasHatUpdateTracking {
+                        Image(systemSymbol: .bellFill)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(isHatUpdated ? .green : Color(.Main.greyAlpha))
+                            .padding(.trailing, isUnread ? -2 : 12)
+                    }
+                    
                     if isClosed {
                         Image(systemSymbol: .lock)
                             .resizable()
