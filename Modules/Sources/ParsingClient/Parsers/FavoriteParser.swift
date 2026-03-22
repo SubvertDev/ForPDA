@@ -56,7 +56,7 @@ public struct FavoriteParser {
                     id: id,
                     name: name.convertCodes(),
                     description: description.convertCodes(),
-                    flag: topicFlag,
+                    flag: ForumFlag(rawValue: topicFlag),
                     postsCount: postsCount,
                     lastPost: TopicInfo.LastPost(
                         date: Date(timeIntervalSince1970: date),

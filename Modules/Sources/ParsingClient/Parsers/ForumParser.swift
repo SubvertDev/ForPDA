@@ -16,7 +16,7 @@ public struct ForumParser {
                 return Forum(
                     id: array[3] as! Int,
                     name: array[4] as! String,
-                    flag: array[5] as! Int,
+                    flag: ForumFlag(rawValue: array[5] as! Int),
                     globalAnnouncement: array[6] as! String,
                     announcements: parseAnnouncementInfo(array[7] as! [[Any]]),
                     subforums: parseForumInfo(array[8] as! [[Any]]),
@@ -91,7 +91,7 @@ public struct ForumParser {
             return ForumInfo(
                 id: navigation[1] as! Int,
                 name: navigation[2] as! String,
-                flag: navigation[0] as! Int
+                flag: ForumFlag(rawValue: navigation[0] as! Int)
             )
         }
     }
@@ -112,7 +112,7 @@ public struct ForumParser {
             return ForumInfo(
                 id: forum[0] as! Int,
                 name: (forum[1] as! String).convertCodes(),
-                flag: forum[2] as! Int,
+                flag: ForumFlag(rawValue: forum[2] as! Int),
                 redirectUrl: redirectUrl
             )
         }
@@ -129,7 +129,7 @@ public struct ForumParser {
             id: topic[0] as! Int,
             name: (topic[1] as! String).convertCodes(),
             description: (topic[2] as! String).convertCodes(),
-            flag: topic[3] as! Int,
+            flag: ForumFlag(rawValue: topic[3] as! Int),
             postsCount: topic[4] as! Int,
             lastPost: TopicInfo.LastPost(
                 date: Date(timeIntervalSince1970: topic[5] as! TimeInterval),
