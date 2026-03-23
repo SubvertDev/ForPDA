@@ -10,16 +10,18 @@ import Foundation
 public enum TopicEvent: Event {
     case onRefresh
     case topicHatOpenButtonTapped
+    case topicPollOpenButtonTapped
     case userTapped(Int)
     case urlTapped(URL)
     case imageTapped(URL)
-    case editWarningSheetClosed
+    case textQuoted(Int)
     
     case menuCopyLink
     case menuOpenInBrowser
     case menuGoToEnd
     case menuSetFavorite
     case menuWritePost
+    case menuWritePostWithTemplate
     
     case menuPostReply(Int)
     case menuPostKarma(Int)
@@ -27,12 +29,9 @@ public enum TopicEvent: Event {
     case menuPostDelete(Int)
     case menuPostReport(Int)
     case menuChangeReputation(Int, Int)
+    case menuUserPostsInTopic(Int)
+    case menuPostMentions(Int)
     case menuPostCopyLink(Int)
-    
-    case loadingStart(Int)
-    case loadingSuccess
-    case loadingFailure(any Error)
-    case setFavoriteResponse(Bool)
     
     public var name: String {
         return "Topic " + eventName(for: self).inProperCase
@@ -41,12 +40,15 @@ public enum TopicEvent: Event {
     public var properties: [String: String]? {
         switch self {
         case let .userTapped(id),
-             let .menuPostReply(id):
+             let .menuPostReply(id),
+             let .menuUserPostsInTopic(id):
             return ["userId": String(id)]
             
-        case let .menuPostDelete(postId),
+        case let .textQuoted(postId),
+             let .menuPostDelete(postId),
              let .menuPostKarma(postId),
              let .menuPostReport(postId),
+             let .menuPostMentions(postId),
              let .menuPostCopyLink(postId):
             return ["postId": String(postId)]
             
@@ -56,15 +58,6 @@ public enum TopicEvent: Event {
         case let .urlTapped(url),
              let .imageTapped(url):
             return ["url": url.absoluteString]
-            
-        case let .loadingStart(offset):
-            return ["offset": String(offset)]
-            
-        case let .loadingFailure(error):
-            return ["error": error.localizedDescription]
-            
-        case let .setFavoriteResponse(state):
-            return ["state": state.description]
             
         default:
             return nil

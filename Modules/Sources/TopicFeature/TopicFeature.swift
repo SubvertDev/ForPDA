@@ -11,10 +11,11 @@ import PageNavigationFeature
 import APIClient
 import DeeplinkHandler
 import Models
+import SharedUI
 import PersistenceKeys
 import ParsingClient
 import PasteboardClient
-import WriteFormFeature
+import FormFeature
 import ReputationChangeFeature
 import TCAExtensions
 import AnalyticsClient
@@ -30,23 +31,32 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     private enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
+        static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
+        static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
     }
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         @ReducerCaseIgnored
         case gallery([URL], [Int], Int)
         @ReducerCaseIgnored
         case karmaChange(Int)
-        case editWarning
-        case writeForm(WriteFormFeature)
+        case form(FormFeature)
         case changeReputation(ReputationChangeFeature)
+        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Alert: Equatable {
+            case deletePost(Int)
+        }
     }
     
     // MARK: - State
@@ -67,6 +77,7 @@ public struct TopicFeature: Reducer, Sendable {
         public var goTo: GoTo
         
         var posts: [UIPost] = []
+        var postsFilter: TopicPostsFilter = .exceptDeleted
         
         var isLoadingTopic = true
         var isRefreshing = false
@@ -81,6 +92,7 @@ public struct TopicFeature: Reducer, Sendable {
         }
         
         var shouldShowTopicHatButton = false
+        var shouldShowTopicPollButton = true
         
         public init(
             topicId: Int,
@@ -117,13 +129,16 @@ public struct TopicFeature: Reducer, Sendable {
             case onRefresh
             case finishedPostAnimation
             case topicHatOpenButtonTapped
+            case topicPollOpenButtonTapped
+            case topicPollVoteButtonTapped([Int: Set<Int>])
             case changeKarmaTapped(Int, Bool)
+            case searchButtonTapped
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
+            case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
-            case contextPostMenu(TopicPostContextMenuAction)
-            case editWarningSheetCloseButtonTapped
+            case contextPostMenu(PostMenuAction)
         }
         
         case `internal`(Internal)
@@ -132,8 +147,9 @@ public struct TopicFeature: Reducer, Sendable {
             case refresh
             case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
             case changeKarma(postId: Int, isUp: Bool)
+            case voteInPoll(selections: [[Int]])
             case loadTopic(Int)
-            case loadTypes([[TopicTypeUI]])
+            case loadTypes([[UITopicType]])
             case topicResponse(Result<Topic, any Error>)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
@@ -143,6 +159,8 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
+            case openSearch(SearchOn, ForumInfo?)
+            case openSearchResult(SearchResult)
             case openedLastPage
         }
     }
@@ -188,12 +206,25 @@ public struct TopicFeature: Reducer, Sendable {
                     .send(.internal(.loadTopic(newOffset)))
                 ])
                 
-            case let .destination(.presented(.writeForm(.delegate(.writeFormSent(response))))):
-                if case let .post(data) = response,
-                   case let .success(post) = data {
-                    return jumpTo(.post(id: post.id), true, &state)
+            case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
+                return jumpTo(.post(id: post.id), true, &state)
+                
+            case .destination(.presented(.form(.delegate(.formSent(.report))))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
-                return .none
+                
+            case let .destination(.presented(.alert(.deletePost(id)))):
+                return .run { send in
+                    let status = try await apiClient.deletePosts(postIds: [id])
+                    let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
+                    await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
+                    await send(.internal(.refresh))
+                }
+                .cancellable(id: CancelID.loading)
+                
+            case .binding(\.postsFilter):
+                return .send(.internal(.load))
                 
             case .destination, .pageNavigation, .binding:
                 return .none
@@ -221,12 +252,26 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.onRefresh):
                 return .send(.internal(.refresh))
                 
+            case .view(.searchButtonTapped):
+                let navigation: ForumInfo? = state.topic?.navigation.first
+                return .send(.delegate(.openSearch(.topic(ids: [state.topicId], noHighlight: false), navigation)))
+                
             case .view(.topicHatOpenButtonTapped):
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
-                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { .init(value: $0) })
+                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) })
                 state.shouldShowTopicHatButton = false
                 return .none
+                
+            case .view(.topicPollOpenButtonTapped):
+                state.shouldShowTopicPollButton = false
+                return .none
+                
+            case let .view(.topicPollVoteButtonTapped(selections)):
+                let values = selections.sorted(by: { $0.key < $1.key }).map {
+                    Array($0.value)
+                }
+                return .send(.internal(.voteInPoll(selections: values)))
                 
             case let .view(.userTapped(id)):
                 return .send(.delegate(.openUser(id: id)))
@@ -238,14 +283,25 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: topic.id,
                             content: .simple("", [])
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
+                    return .none
+                    
+                case .writePostWithTemplate:
+                    let formState = FormFeature.State(
+                        type: .post(
+                            type: .new,
+                            topicId: topic.id,
+                            content: .template([])
+                        )
+                    )
+                    state.destination = .form(formState)
                     return .none
                     
                 case .openInBrowser:
@@ -254,7 +310,9 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .copyLink:
                     pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .setFavorite:
                     return .run { [id = state.topicId] send in
@@ -275,49 +333,38 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .view(.contextPostMenu(action)):
                 switch action {
-                case .reply(let postId, let authorName):
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                case let .reply(postId, authorName):
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .new,
                             topicId: state.topicId,
                             content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
                         )
                     )
-                    state.destination = .writeForm(feature)
+                    state.destination = .form(formState)
                     return .none
                     
-                case .edit(let post):
-                    let feature = WriteFormFeature.State(
-                        formFor: .post(
+                case let .edit(post):
+                    let formState = FormFeature.State(
+                        type: .post(
                             type: .edit(postId: post.id),
                             topicId: state.topicId,
-                            content: .simple(post.content, post.attachments.map { $0.id })
+                            content: .simple(post.content, post.attachments.map {
+                                .init(id: $0.id, name: $0.name, type: $0.type)
+                            })
                         )
                     )
-                    if post.attachments.isEmpty {
-                        state.destination = .writeForm(feature)
-                    } else {
-                        state.destination = .editWarning
-                    }
+                    state.destination = .form(formState)
                     return .none
                     
-                case .report(let id):
-                    let feature = WriteFormFeature.State(
-                        formFor: .report(id: id, type: .post)
-                    )
-                    state.destination = .writeForm(feature)
+                case let .report(id):
+                    let feature = FormFeature.State(type: .report(id: id, type: .post))
+                    state.destination = .form(feature)
                     return .none
                     
                 case .delete(let id):
-                    return .concatenate(
-                        .run { _ in
-                            let status = try await apiClient.deletePosts(postIds: [id])
-                            let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
-                            await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
-                        }.cancellable(id: CancelID.loading),
-                        
-                        jumpTo(.post(id: id), true, &state)
-                    )
+                    state.destination = .alert(.deletePostConfirmation(postId: id))
+                    return .none
                     
                 case .karma(let id):
                     state.destination = .karmaChange(id)
@@ -332,12 +379,27 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .changeReputation(feature)
                     return .none
                     
+                case .userPostsInTopic(let authorId):
+                    return .send(.delegate(.openSearchResult(SearchResult(
+                        on: .topic(ids: [state.topicId], noHighlight: true),
+                        author: .id(authorId),
+                        text: "",
+                        sort: .dateDescSort
+                    ))))
+                    
+                case .mentions(let postId):
+                    return .send(.delegate(.openSearchResult(SearchResult(
+                        on: .topic(ids: [state.topicId], noHighlight: true),
+                        author: nil,
+                        text: "\(postId)",
+                        sort: .dateDescSort
+                    ))))
+                    
                 case .copyLink(let postId):
                     let link = "https://4pda.to/forum/index.php?showtopic=\(state.topicId)&view=findpost&p=\(postId)"
                     pasteboardClient.copy(link)
                     return .run { _ in
-                        let toast = ToastMessage(text: LocalizedStringResource("Link copied", bundle: .module), haptic: .success)
-                        await toastClient.showToast(toast)
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
                 }
                 
@@ -363,13 +425,24 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case let .view(.textQuoted(post, quotedText)):
+                guard state.topic != nil else { return .none }
+                
+                let currentDate = Date().formatted(date: .numeric, time: .shortened)
+                let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\n\(quotedText)\n[/quote]\n"
+                let feature = FormFeature.State(
+                    type: .post(
+                        type: .new,
+                        topicId: state.topicId,
+                        content: .simple(formattedQuote, [])
+                    )
+                )
+                state.destination = .form(feature)
+                return .none
+                
             case .view(.finishedPostAnimation):
                 state.postId = nil
                 return .none.animation()
-                
-            case .view(.editWarningSheetCloseButtonTapped):
-                state.destination = nil
-                return .none
                 
             case .internal(.load):
                 switch state.goTo {
@@ -397,13 +470,32 @@ public struct TopicFeature: Reducer, Sendable {
                     jumpTo(.post(id: postId), true, &state)
                 )
                 
+            case let .internal(.voteInPoll(selections)):
+                return .concatenate(
+                    .run { [topicId = state.topicId] _ in
+                        let status = try await apiClient.voteInTopicPoll(
+                            topicId: topicId,
+                            selections: selections
+                        )
+                        let voteApproved = ToastMessage(text: Localization.topicVoteApproved, haptic: .success)
+                        await toastClient.showToast(status ? voteApproved : .whoopsSomethingWentWrong)
+                    }.cancellable(id: CancelID.loading),
+                    
+                    .send(.internal(.refresh))
+                )
+                
             case let .internal(.loadTopic(offset)):
                 if !state.isRefreshing {
                     state.isLoadingTopic = true
                 }
-                return .run { [id = state.topicId, perPage = state.appSettings.topicPerPage, isRefreshing = state.isRefreshing] send in
+                return .run { [
+                    id = state.topicId,
+                    perPage = state.appSettings.topicPerPage,
+                    isRefreshing = state.isRefreshing,
+                    postsFilter = state.postsFilter
+                ] send in
                     let startTime = Date()
-                    let topic = try await apiClient.getTopic(id, offset, perPage)
+                    let topic = try await apiClient.getTopic(id, offset, perPage, postsFilter)
                     if isRefreshing { await delayUntilTimePassed(1.0, since: startTime) }
                     await send(.internal(.topicResponse(.success(topic))))
                 } catch: { error, send in
@@ -423,9 +515,9 @@ public struct TopicFeature: Reducer, Sendable {
                         topicPerPage = state.appSettings.topicPerPage,
                         shouldShowTopicHatButton = state.shouldShowTopicHatButton
                     ] send in
-                        var topicTypes: [[TopicTypeUI]] = []
+                        var topicTypes: [[UITopicType]] = []
                         
-                        topicTypes = await withTaskGroup(of: (Int, [TopicTypeUI]).self, returning: [[TopicTypeUI]].self) { taskGroup in
+                        topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
                             for (index, post) in topic.posts.enumerated() {
                                 // guard index == 0 else { continue } // For test purposes
                                 var text = post.content
@@ -438,7 +530,7 @@ public struct TopicFeature: Reducer, Sendable {
                                 }
                             }
                             
-                            var types = Array<[TopicTypeUI]?>(repeating: nil, count: topicPerPage + 1)
+                            var types = Array<[UITopicType]?>(repeating: nil, count: topicPerPage + 1)
                             for await (index, result) in taskGroup {
                                 types[index] = result
                             }
@@ -450,7 +542,16 @@ public struct TopicFeature: Reducer, Sendable {
                     .run { [isLastPage = state.pageNavigation.isLastPage] send in
                         if isLastPage {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
+                            
+                            // Syncing notifications and badges when reading last page
+                            let unread = try await apiClient.getUnread(type: .all)
+                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                         }
+                        // Deleting notifications related to posts on the current page
+                        // `forumMention` notifications encode topicId in the trailing identifier segment
+                        // Include topic.id so opening a topic clears mentions tied to this topic
+                        let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970) + [TimeInterval(topic.id)]
+                        await notificationsClient.removeNotifications(timestamps: timestamps)
                     }
                 )
                 
@@ -465,6 +566,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 state.isLoadingTopic = false
                 state.isRefreshing = false
+                state.shouldShowTopicPollButton = true
                 state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
                 reportFullyDisplayed(&state)
@@ -515,7 +617,7 @@ public struct TopicFeature: Reducer, Sendable {
         )
     }
     
-    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[TopicTypeUI]]) -> [UIPost] {
+    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[UITopicType]]) -> [UIPost] {
         zip(newPosts, newTypes).map { newPost, newTypes in
             if let oldPost = old.first(where: { $0.id == newPost.id }) {
                 let mergedContent = mergePostContent(
@@ -529,37 +631,12 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    private func mergePostContent(old: [UIPost.Content], new: [TopicTypeUI]) -> [UIPost.Content] {
+    private func mergePostContent(old: [UIPost.Content], new: [UITopicType]) -> [UIPost.Content] {
         new.map { newType in
             if let match = old.first(where: { $0.value.hashValue == newType.hashValue }) {
                 return match
             } else {
                 return UIPost.Content(value: newType)
-            }
-        }
-    }
-    
-    #warning("move")
-    public enum JumpTo: Sendable {
-        case unread
-        case last
-        case post(id: Int)
-        case page(Int)
-        
-        var postId: Int {
-            switch self {
-            case .unread, .last: return 0
-            case let .post(id):  return id
-            case .page: fatalError("Unsupported interaction")
-            }
-        }
-        
-        var type: JumpForumRequest.ForumJumpType {
-            switch self {
-            case .unread: return .new
-            case .last:   return .last
-            case .post:   return .post
-            case .page:   fatalError("Unsupported interaction")
             }
         }
     }
@@ -572,8 +649,17 @@ public struct TopicFeature: Reducer, Sendable {
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
             let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
             let response = try await apiClient.jumpForum(request)
+            if response.id != topicId {
+                // Handling case where post is in another topic
+                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
+                return await send(.delegate(.handleUrl(url)))
+            }
             let offset = response.offset - (response.offset % topicPerPage)
             await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
+            
+            if jump.type == .post && jump.postId != response.postId {
+                await toastClient.showToast(ToastMessage(text: Localization.showingNearestPost))
+            }
         } catch: { error, send in
             await send(.internal(.jumpRequestFailed))
         }
@@ -597,6 +683,29 @@ public struct TopicFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension TopicFeature.Destination.State: Equatable {}
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == TopicFeature.Destination.Alert {
+    
+    nonisolated static func deletePostConfirmation(postId: Int) -> AlertState {
+        return AlertState(
+            title: { TextState("Are you sure, that you want to delete this post?", bundle: .module) },
+            actions: {
+                ButtonState(role: .destructive, action: .deletePost(postId)) {
+                    TextState("Yes", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("No", bundle: .module)
+                }
+            }
+        )
+    }
+}
+
+// MARK: - Helpers
 
 func measureElapsedTime(_ operation: () throws -> Void) throws -> UInt64 {
     let startTime = DispatchTime.now()

@@ -79,16 +79,11 @@ extension FavoritesFeature {
                         analytics.log(FavoritesEvent.sortCancelButtonTapped)
                     }
                     
-                case let .internal(.favoritesResponse(response)):
-                    switch response {
-                    case .success:
-                        analytics.log(FavoritesEvent.loadingSuccess)
-                    case let .failure(error):
-                        analytics.log(FavoritesEvent.loadingFailure(error))
-                    }
+                case .internal(.favoritesResponse):
+                    break
                     
-                case let .internal(.loadFavorites(offset: offset)):
-                    analytics.log(FavoritesEvent.loadingStart(offset))
+                case .internal(.loadFavorites):
+                    break
                     
                 case .internal(.refresh):
                     break

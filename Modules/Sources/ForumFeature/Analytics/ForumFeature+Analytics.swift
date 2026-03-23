@@ -19,10 +19,10 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .pageNavigation:
+                case .destination, .pageNavigation:
                     break
                     
-                case .view(.onFirstAppear), .view(.onNextAppear):
+                case .view(.onFirstAppear), .view(.onNextAppear), .view(.searchButtonTapped):
                     break
                     
                 case .view(.onRefresh):
@@ -33,6 +33,9 @@ extension ForumFeature {
                     
                 case let .view(.subforumRedirectTapped(url)):
                     analytics.log(ForumEvent.subforumRedirectTapped(url))
+                    
+                case let .view(.globalAnnouncementUrlTapped(url)):
+                    analytics.log(ForumEvent.globalAnnouncementUrlTapped(url))
                     
                 case let .view(.subforumTapped(forum)):
                     analytics.log(ForumEvent.subforumTapped(forum.id, forum.name))
@@ -48,6 +51,8 @@ extension ForumFeature {
                     case .sort:
                         break // TODO: Add
                     case .toBookmarks:
+                        break // TODO: Add
+                    case .createTopic:
                         break // TODO: Add
                     }
                     

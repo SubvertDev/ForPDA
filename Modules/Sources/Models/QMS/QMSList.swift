@@ -14,3 +14,7 @@ public struct QMSList: Sendable, Codable, Hashable {
         self.users = users
     }
 }
+
+public extension QMSList {
+    static let mock = QMSList(users: [.mock, .mockEmpty])
+}

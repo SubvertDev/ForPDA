@@ -55,6 +55,22 @@ One-off upload to TF without tests/notify/bump
 
 One-off ipa build
 
+### ios ci_pull_request
+
+```sh
+[bundle exec] fastlane ios ci_pull_request
+```
+
+CI pull requests checks
+
+### ios ci_push
+
+```sh
+[bundle exec] fastlane ios ci_push
+```
+
+CI cache warmup & tests
+
 ### ios prepare_certificates
 
 ```sh

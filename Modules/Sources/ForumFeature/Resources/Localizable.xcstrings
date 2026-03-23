@@ -1,16 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "About Forum" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "О форуме"
-          }
-        }
-      }
-    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {
@@ -31,22 +21,22 @@
         }
       }
     },
-    "Close" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закрыть"
-          }
-        }
-      }
-    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Копировать ссылку"
+          }
+        }
+      }
+    },
+    "Create Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать тему"
           }
         }
       }
@@ -61,6 +51,16 @@
         }
       }
     },
+    "Link copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
     "Mark Read" : {
       "localizations" : {
         "ru" : {
@@ -71,12 +71,12 @@
         }
       }
     },
-    "Moderators" : {
+    "Marked as read" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Модераторы"
+            "value" : "Отмечено прочитанным"
           }
         }
       }
@@ -107,16 +107,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрепленные темы"
-          }
-        }
-      }
-    },
-    "Posts" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Посты"
           }
         }
       }

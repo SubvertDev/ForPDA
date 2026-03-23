@@ -49,7 +49,7 @@ public struct ArticleParser {
                     imageUrl: URL(string: (fields[10] as! String))!,
                     title: (fields[11] as! String).convertHtmlCodes(),
                     description: (fields[12] as! String).convertHtmlCodes(),
-                    attachments: extractAttachments(from: fields[13] as! [[Any]]),
+                    attachments: try AttachmentParser.parseArticleAttachment(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
                     comments: extractComments(from: fields[15] as! [[Any]]),
                     poll: extractPoll(from: pollFields)
@@ -63,27 +63,6 @@ public struct ArticleParser {
     }
     
     // MARK: - Helpers
-    
-    /**
-    0. 1 - id
-    1. "https..." - small image url
-    2. 480 - width
-    3. 300 - height
-    4. "description" - description
-    5. "https..." - (optional) full image url
-    */
-    private static func extractAttachments(from array: [[Any]]) -> [Attachment] {
-        return array.map { fields in
-            return Attachment(
-                id: fields[0] as! Int,
-                smallUrl: URL(string: fields[1] as! String)!,
-                width: fields[2] as! Int,
-                height: fields[3] as! Int,
-                description: fields[4] as! String,
-                fullUrl: URL(string: fields[5] as! String)
-            )
-        }
-    }
     
     /**
     0. 24540 - id

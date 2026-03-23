@@ -45,7 +45,10 @@ extension AuthFeature {
                     
                 case let .delegate(.loginSuccess(reason, userId)):
                     analyticsClient.log(AuthEvent.loginSuccess(reason: reason.rawValue, userId: userId))
-                    analyticsClient.identify(String(userId))
+                    return .run { _ in
+                        let properties = await AccessibilityAnalytics.current(for: .current).asDictionary()
+                        analyticsClient.identify(id: String(userId), userProperties: properties)
+                    }
                     
                 case .delegate(.showSettings):
                     break

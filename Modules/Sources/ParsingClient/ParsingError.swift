@@ -28,4 +28,7 @@ public enum ParsingError: Error {
     case failedToExtractAdvertisment
     
     case failedToFindPost
+    
+    // Search
+    case unknownSearchContentType(Int)
 }

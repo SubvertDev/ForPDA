@@ -11,17 +11,27 @@ import APIClient
 import PersistenceKeys
 import Models
 import AnalyticsClient
+import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    private enum Localization {
+        static let profileUpdated = LocalizedStringResource("Profile updated", bundle: .module)
+        static let profileUpdateError = LocalizedStringResource("Profile update error", bundle: .module)
+    }
+    
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination {
         case alert(AlertState<ProfileFeature.Action.Alert>)
+        case editProfile(EditFeature)
     }
     
     // MARK: - State
@@ -33,6 +43,8 @@ public struct ProfileFeature: Reducer, Sendable {
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
+        var qmsBadgeCount = 0
+        var mentionsBadgeCount = 0
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
@@ -60,16 +72,21 @@ public struct ProfileFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case qmsButtonTapped
+            case editButtonTapped
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
+            case mentionsButtonTapped
             case reputationButtonTapped
+            case searchTopicsButtonTapped
+            case searchRepliesButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
         }
         
         case `internal`(Internal)
         public enum Internal {
             case userResponse(Result<User, any Error>)
+            case updateBadgeCounts(Unread)
         }
         
         case destination(PresentationAction<Destination.Action>)
@@ -82,7 +99,9 @@ public struct ProfileFeature: Reducer, Sendable {
             case openQms
             case openSettings
             case openHistory
+            case openMentions
             case openReputation(Int)
+            case openSearch(SearchResult)
             case handleUrl(URL)
         }
     }
@@ -92,6 +111,8 @@ public struct ProfileFeature: Reducer, Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
+    @Dependency(\.toastClient) private var toastClient
     @Dependency(\.dismiss) private var dismiss
     
     // MARK: - Body
@@ -104,21 +125,61 @@ public struct ProfileFeature: Reducer, Sendable {
             case .view(.onAppear):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
-                return .run { send in
-                    for try await user in try await apiClient.getUser(userId, .cacheAndLoad) {
-                        await send(.internal(.userResponse(.success(user))))
+                return .merge(
+                    .run { send in
+                        for try await user in try await apiClient.getUser(userId, .cacheAndLoad) {
+                            await send(.internal(.userResponse(.success(user))))
+                        }
+                    } catch: { error, send in
+                        await send(.internal(.userResponse(.failure(error))))
+                    },
+                    .run { send in
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    },
+                    .run { send in
+                        for await unread in notificationsClient.unreadPublisher().values {
+                            await send(.internal(.updateBadgeCounts(unread)))
+                        }
                     }
-                } catch: { error, send in
-                    await send(.internal(.userResponse(.failure(error))))
-                }
+                )
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
+                
+            case .view(.mentionsButtonTapped):
+                return .send(.delegate(.openMentions))
                 
             case .view(.reputationButtonTapped):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .send(.delegate(.openReputation(userId)))
+                
+            case .view(.searchTopicsButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openSearch(SearchResult(
+                    on: .profile(.topics),
+                    author: .id(userId),
+                    text: "",
+                    sort: .dateDescSort
+                ))))
+                
+            case .view(.searchRepliesButtonTapped):
+                let userId = state.userId == nil ? state.userSession?.userId : state.userId
+                guard let userId else { return .none }
+                return .send(.delegate(.openSearch(SearchResult(
+                    on: .profile(.posts),
+                    author: .id(userId),
+                    text: "",
+                    sort: .dateDescSort
+                ))))
+                
+            case .view(.editButtonTapped):
+                if let user = state.user {
+                    state.destination = .editProfile(EditFeature.State(user: user))
+                }
+                return .none
                 
             case .view(.qmsButtonTapped):
                 return .send(.delegate(.openQms))
@@ -134,8 +195,12 @@ public struct ProfileFeature: Reducer, Sendable {
                 return .none
                 
             case .internal(.userResponse(.success(let user))):
-                state.isLoading = false
+                var user = user
+                user.devDBdevices.removeAll(where: { $0.name.isEmpty })
+                user.devDBdevices.sort(by: { $0.main && !$1.main })
+                
                 state.user = user
+                state.isLoading = false
                 reportFullyDisplayed(&state)
                 return .none
                 
@@ -145,6 +210,22 @@ public struct ProfileFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
+            case let .internal(.updateBadgeCounts(unread)):
+                state.qmsBadgeCount = unread.qmsUnreadCount
+                state.mentionsBadgeCount = unread.mentionsUnreadCount
+                return .none
+                
+            case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):
+                return .concatenate(
+                    .run { _ in
+                        await toastClient.showToast(ToastMessage(
+                            text: status ? Localization.profileUpdated : Localization.profileUpdateError,
+                            haptic: status ? .success : .error
+                        ))
+                    },
+                    .send(.view(.onAppear))
+                )
+            
             case .destination(.presented(.alert(.logout))):
                 state.$userSession.withLock { $0 = nil }
                 state.isLoading = true
@@ -169,6 +250,8 @@ public struct ProfileFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ProfileFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extension
 

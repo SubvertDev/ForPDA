@@ -29,7 +29,11 @@ struct KeyboardView: View {
                 // Not available below 18 due to scroll position detection
                 if #available(iOS 18.0, *) {
                     if isScrollDownVisible {
-                        ScrollButton()
+                        HStack(spacing: 0) {
+                            Spacer()
+                            ScrollButton()
+                                .padding(.trailing, 8)
+                        }
                     }
                 }
                 

@@ -9,10 +9,14 @@ import Foundation
 
 public enum ProfileEvent: Event {
     case qmsTapped
+    case editTapped
     case settingsTapped
     case logoutTapped
     case historyTapped
+    case mentionsTapped
     case reputationTapped
+    case searchTopicsTapped
+    case searchRepliesTapped
     case userLoaded(Int)
     case userLoadingFailed
     case achievementTapped

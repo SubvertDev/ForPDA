@@ -37,6 +37,7 @@ public struct ForumsListFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
+            case searchButtonTapped
             case forumRedirectTapped(URL)
             case forumTapped(id: Int, name: String)
             case forumSectionExpandTapped(Int)
@@ -49,6 +50,7 @@ public struct ForumsListFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openSearch(SearchOn)
             case openForum(id: Int, name: String)
             case handleForumRedirect(URL)
         }
@@ -73,6 +75,9 @@ public struct ForumsListFeature: Reducer, Sendable {
                 } catch: { error, send in
                     await send(.internal(.forumsListResponse(.failure(error))))
                 }
+                
+            case .view(.searchButtonTapped):
+                return .send(.delegate(.openSearch(.forum(ids: [], sIn: .all, asTopics: false))))
                 
             case let .view(.forumTapped(id: id, name: name)):
                 return .send(.delegate(.openForum(id: id, name: name)))
@@ -101,7 +106,8 @@ public struct ForumsListFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 
             case let .internal(.forumsListResponse(.failure(error))):
-                #warning("add toast")
+                print(error)
+                // TODO: Add toast
                 reportFullyDisplayed(&state)
                 
             case .delegate:

@@ -11,6 +11,8 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
+import BBBuilder
+import FormFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -42,6 +44,10 @@ public struct ForumScreen: View {
                 
                 if let forum = store.forum, !store.isLoadingTopics {
                     List {
+                        if let globalAnnouncement = forum.globalAnnouncementAttributed {
+                            GlobalAnnouncementRow(announce: globalAnnouncement)
+                        }
+                        
                         if !forum.subforums.isEmpty {
                             SubforumsSection(subforums: forum.subforums)
                         }
@@ -73,7 +79,12 @@ public struct ForumScreen: View {
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             ._toolbarTitleDisplayMode(.large)
-            ._safeAreaBar(edge: .bottom) {
+            .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+                NavigationStack {
+                    FormScreen(store: store)
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
@@ -91,7 +102,22 @@ public struct ForumScreen: View {
                 }
             }
             .toolbar {
-                OptionsMenu()
+                ToolbarItem {
+                    Button {
+                        send(.searchButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .magnifyingglass)
+                            .foregroundStyle(foregroundStyle())
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
+                }
+                
+                ToolbarItem {
+                    OptionsMenu()
+                }
             }
             .onFirstAppear {
                 send(.onFirstAppear)
@@ -107,6 +133,14 @@ public struct ForumScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             if let forum = store.forum {
+                if forum.canCreateTopic {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Create Topic", bundle: .module), symbol: .plusCircle) {
+                            send(.contextOptionMenu(.createTopic))
+                        }
+                    }
+                }
+                
                 CommonContextMenu(
                     id: forum.id,
                     isFavorite: forum.isFavorite,
@@ -129,6 +163,29 @@ public struct ForumScreen: View {
         }
     }
     
+    // MARK: - Global Announcement Row
+    
+    @ViewBuilder
+    private func GlobalAnnouncementRow(announce: NSAttributedString) -> some View {
+        RichText(text: announce, onUrlTap: { url in
+            send(.globalAnnouncementUrlTapped(url))
+        })
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background {
+            if #available(iOS 26, *) {
+                ConcentricRectangle()
+                    .fill(Color(.Background.teritary))
+            } else {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(.Background.teritary))
+            }
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 0, trailing: 0))
+    }
+    
     // MARK: - Topics
     
     @ViewBuilder
@@ -141,7 +198,7 @@ public struct ForumScreen: View {
                     WithPerceptionTracking {
                         let radius: CGFloat = isLiquidGlass ? 24 : 10
                         TopicRow(
-                            title: topic.name,
+                            title: .plain(topic.name),
                             date: topic.lastPost.date,
                             username: topic.lastPost.username,
                             isClosed: topic.isClosed,
@@ -329,6 +386,13 @@ public struct ForumScreen: View {
 extension Bundle {
     static var models: Bundle? {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+    }
+}
+
+extension Forum {
+    var globalAnnouncementAttributed: NSAttributedString? {
+        guard !globalAnnouncement.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer().render(text: globalAnnouncement)
     }
 }
 

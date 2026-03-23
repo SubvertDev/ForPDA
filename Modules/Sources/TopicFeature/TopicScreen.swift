@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import PageNavigationFeature
-import WriteFormFeature
+import FormFeature
 import SFSafeSymbols
 import SharedUI
 import NukeUI
@@ -45,6 +45,11 @@ public struct TopicScreen: View {
         return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
+    private var isPollAvailable: Bool {
+        let topicLoaded = store.topic != nil && !store.isLoadingTopic
+        return topicLoaded && store.topic!.poll != nil
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
@@ -68,6 +73,12 @@ public struct TopicScreen: View {
                                 }
                                 
                                 if !store.isLoadingTopic {
+                                    Header()
+                                    
+                                    if let poll = store.topic?.poll {
+                                        Poll(poll)
+                                    }
+                                    
                                     PostList()
                                 }
                                 
@@ -96,8 +107,24 @@ public struct TopicScreen: View {
                 }
             }
             .navigations(store: store)
-            .toolbar { OptionsMenu() }
-            ._safeAreaBar(edge: .bottom) {
+            .toolbar {
+                ToolbarItem {
+                    Button {
+                        send(.searchButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .magnifyingglass)
+                            .foregroundStyle(foregroundStyle())
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
+                }
+                ToolbarItem {
+                    OptionsMenu()
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
@@ -129,6 +156,12 @@ public struct TopicScreen: View {
                     ContextButton(text: LocalizedStringResource("Write Post", bundle: .module), symbol: .plusCircle) {
                         send(.contextMenu(.writePost))
                     }
+                    
+                    if let postTemplate = topic.postTemplateName {
+                        ContextButton(text: LocalizedStringResource(stringLiteral: postTemplate), symbol: .plusApp) {
+                            send(.contextMenu(.writePostWithTemplate))
+                        }
+                    }
                 }
             }
             
@@ -158,6 +191,24 @@ public struct TopicScreen: View {
                         send(.contextMenu(.setFavorite))
                     }
                 }
+                
+                if topic.canModerate {
+                    Section {
+                        Menu {
+                            Picker(String(), selection: $store.postsFilter) {
+                                ForEach(TopicPostsFilter.allCases) { mode in
+                                    Text(mode.title, bundle: .module)
+                                        .tag(mode)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text("Posts Filter", bundle: .module)
+                                Image(systemSymbol: .line3HorizontalDecrease)
+                            }
+                        }
+                    }
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
@@ -184,210 +235,134 @@ public struct TopicScreen: View {
         }
     }
     
+    // MARK: - Header
+    
+    @ViewBuilder
+    private func Header() -> some View {
+        HStack {
+            if isPollAvailable, store.shouldShowTopicPollButton {
+                Button {
+                    send(.topicPollOpenButtonTapped)
+                } label: {
+                    Text("Poll", bundle: .module)
+                        .font(.headline)
+                        .bold()
+                }
+            }
+            
+            if store.shouldShowTopicHatButton {
+                Button {
+                    send(.topicHatOpenButtonTapped)
+                } label: {
+                    Text("Topic Hat", bundle: .module)
+                        .font(.headline)
+                        .bold()
+                }
+            }
+        }
+    }
+    
+    // MARK: - Poll
+    
+    @ViewBuilder
+    private func Poll(_ poll: Topic.Poll) -> some View {
+        VStack(spacing: 0) {
+            if !store.shouldShowTopicPollButton {
+                if store.shouldShowTopicHatButton {
+                    PostSeparator()
+                }
+                
+                PollView(poll: poll, onVoteButtonTapped: { selections in
+                    send(.topicPollVoteButtonTapped(selections))
+                })
+                .padding(.top, store.shouldShowTopicHatButton ? 16 : 0)
+            }
+            
+            PostSeparator()
+        }
+    }
+    
     // MARK: - Post List
     
     @ViewBuilder
     private func PostList() -> some View {
         ForEach(store.posts) { post in
             WithPerceptionTracking {
-                VStack(spacing: 0) {
-                    if store.shouldShowTopicHatButton && store.posts.first == post {
-                        Button {
-                            send(.topicHatOpenButtonTapped)
-                        } label: {
-                            Text("Topic Hat", bundle: .module)
-                                .font(.headline)
-                                .bold()
-                                .padding(16)
-                        }
-                    } else {
+                if store.shouldShowTopicHatButton && store.posts.first == post {
+                    if !isPollAvailable {
+                        PostSeparator()
+                    }
+                } else {
+                    VStack(spacing: 0) {
                         Post(post)
                             .padding(.horizontal, 16)
                             .padding(.bottom, 16)
+                        
+                        PostSeparator()
                     }
-                    
-                    Rectangle()
-                        .foregroundStyle(Color(.Separator.post))
-                        .frame(height: 10)
                 }
             }
         }
+    }
+    
+    @ViewBuilder
+    private func PostSeparator() -> some View {
+        Rectangle()
+            .foregroundStyle(Color(.Separator.post))
+            .frame(height: 10)
     }
     
     // MARK: - Post
     
     @ViewBuilder
     private func Post(_ post: UIPost) -> some View {
-        VStack(spacing: 8) {
-            PostHeader(post.post)
-            PostBody(post)
-            if let lastEdit = post.post.lastEdit {
-                PostFooter(lastEdit)
+        PostRowView(
+            state: PostRowView.State(
+                post: post,
+                sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
+                canPostInTopic: store.topic?.canPost ?? false,
+                isUserAuthorized: store.isUserAuthorized,
+                isContextMenuAvailable: true
+            ),
+            action: { action in
+                switch action {
+                case .userTapped:
+                    send(.userTapped(post.post.author.id))
+                case .urlTapped(let url):
+                    send(.urlTapped(url))
+                case .imageTapped(let url):
+                    send(.imageTapped(url))
+                case .textQuoted(let text):
+                    send(.textQuoted(post, text))
+                }
+            },
+            menuAction: { action in
+                switch action {
+                case .reply(let id, let authorName):
+                    send(.contextPostMenu(.reply(id, authorName)))
+                case .edit(let post):
+                    send(.contextPostMenu(.edit(post)))
+                case .delete(let postId):
+                    send(.contextPostMenu(.delete(postId)))
+                case .karma(let postId):
+                    send(.contextPostMenu(.karma(postId)))
+                case .report(let postId):
+                    send(.contextPostMenu(.report(postId)))
+                case .changeReputation(let postId, let userId, let username):
+                    send(.contextPostMenu(.changeReputation(postId, userId, username)))
+                case .userPostsInTopic(let authorId):
+                    send(.contextPostMenu(.userPostsInTopic(authorId)))
+                case .mentions(let postId):
+                    send(.contextPostMenu(.mentions(postId)))
+                case .copyLink(let postId):
+                    send(.contextPostMenu(.copyLink(postId)))
+                }
             }
-        }
+        )
         .listRowBackground(Color.clear)
-        .listRowSeparator(.hidden)
+        .listRowSeparator(Visibility.hidden)
         .scaleEffect(store.postId == post.id ? scrollScale : 1)
         .id(post.id)
-    }
-    
-    // MARK: - Post Header
-    
-    @ViewBuilder
-    private func PostHeader(_ post: Post) -> some View {
-        HStack(spacing: 8) {
-            LazyImage(url: URL(string: post.author.avatarUrl)) { state in
-                if let image = state.image {
-                    image.resizable().scaledToFill()
-                } else {
-                    Image(.avatarDefault).resizable().scaledToFill()
-                }
-            }
-            .frame(width: 32, height: 32)
-            .clipShape(Circle())
-            .onTapGesture {
-                send(.userTapped(post.author.id))
-            }
-            
-            VStack(spacing: 4) {
-                HStack(spacing: 8) {
-                    Group {
-                        Text(post.author.name)
-                            .font(.subheadline)
-                            .bold()
-                            .foregroundStyle(Color(.Labels.primary))
-                            .lineLimit(1)
-                        
-                        Text(String(post.author.reputationCount))
-                            .font(.caption)
-                            .foregroundStyle(Color(.Labels.secondary))
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 6)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .foregroundStyle(Color(.Background.teritary))
-                            )
-                    }
-                    .onTapGesture {
-                        send(.userTapped(post.author.id))
-                    }
-                    
-                    Spacer()
-                    
-                    if post.karma != 0 {
-                        Text(String(post.karma))
-                            .font(.caption)
-                            .foregroundStyle(Color(.Labels.primary))
-                    }
-                }
-                
-                HStack(spacing: 8) {
-                    Text(User.Group(rawValue: post.author.groupId)!.title)
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.teritary))
-                    
-                    Spacer()
-                    
-                    Text(post.createdAt.formattedDate(), bundle: .module)
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.quaternary))
-                        .frame(maxHeight: .infinity, alignment: .bottom)
-                }
-            }
-            
-            if store.isUserAuthorized, let topic = store.topic, topic.canPost {
-                OptionsPostMenu(post)
-            }
-        }
-    }
-    
-    // MARK: - Post Body
-    
-    @ViewBuilder
-    private func PostBody(_ post: UIPost) -> some View {
-        VStack(spacing: 8) {
-            ForEach(post.content, id: \.self) { type in
-                TopicView(type: type.value, attachments: post.post.attachments) { url in
-                    send(.urlTapped(url))
-                } onImageTap: { url in
-                    send(.imageTapped(url))
-                }
-            }
-        }
-    }
-    
-    // MARK: - Post Footer
-    
-    @ViewBuilder
-    private func PostFooter(_ lastEdit: Post.LastEdit) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Edited: \(lastEdit.username) • \(lastEdit.date.formatted())", bundle: .module)
-            if !lastEdit.reason.isEmpty {
-                Text("Reason: \(lastEdit.reason)", bundle: .module)
-            }
-        }
-        .font(.caption2)
-        .foregroundStyle(Color(.Labels.teritary))
-        .padding(.top, 6)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    
-    // MARK: - Options Post Menu
-    
-    @ViewBuilder
-    private func OptionsPostMenu(_ post: Post) -> some View {
-        Menu {
-            Section {
-                ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
-                    send(.contextPostMenu(.reply(post.id, post.author.name)))
-                }
-            }
-            
-            if store.isUserAuthorized, store.userSession!.userId != post.author.id, post.canChangeKarma {
-                ContextButton(text: LocalizedStringResource("Rate", bundle: .module), symbol: .chevronUpChevronDown) {
-                    send(.contextPostMenu(.karma(post.id)))
-                }
-            }
-            
-            if post.canEdit {
-                ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
-                    send(.contextPostMenu(.edit(post)))
-                }
-            }
-            
-            ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
-                send(.contextPostMenu(.report(post.id)))
-            }
-            
-            if post.canDelete {
-                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    send(.contextPostMenu(.delete(post.id)))
-                }
-            }
-            
-            if store.isUserAuthorized, post.author.id != store.userSession!.userId {
-                Section {
-                    ContextButton(text: LocalizedStringResource("Reputation", bundle: .module), symbol: .plusminus) {
-                        send(.contextPostMenu(.changeReputation(post.id, post.author.id, post.author.name)))
-                    }
-                }
-            }
-            
-            Section {
-                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
-                    send(.contextPostMenu(.copyLink(post.id)))
-                }
-            }
-        } label: {
-            Image(systemSymbol: .ellipsis)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.teritary))
-                .padding(.horizontal, 8) // Padding for tap area
-                .padding(.vertical, 16)
-                .rotationEffect(.degrees(90))
-        }
-        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
-        .frame(width: 8, height: 22)
     }
     
     // MARK: - Helpers
@@ -431,6 +406,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
                 ._toolbarTitleDisplayMode(.inline)
+                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
@@ -460,9 +436,9 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                    .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
                         NavigationStack {
-                            WriteFormScreen(store: store)
+                            FormScreen(store: store)
                         }
                     }
                     .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
@@ -490,95 +466,7 @@ struct NavigationModifier: ViewModifier {
                     ) { store in
                         ReputationChangeView(store: store)
                     }
-                    .sheet(isPresented: Binding($store.destination.editWarning)) {
-                        EditWarningSheet()
-                            .presentationDetents([.medium])
-                            .presentationDragIndicator(.visible)
-                    }
             }
-        }
-        
-        // TODO: Move to SharedUI?
-        // MARK: - Edit Warning Sheet
-        
-        @ViewBuilder
-        private func EditWarningSheet() -> some View {
-            VStack(spacing: 0) {
-                Spacer()
-                
-                Image(systemSymbol: .hammer)
-                    .font(.title)
-                    .foregroundStyle(tintColor)
-                    .padding(.bottom, 8)
-                
-                Text("Editing posts with attachments is not yet supported", bundle: .module)
-                    .font(.title3)
-                    .bold()
-                    .foregroundStyle(Color(.Labels.primary))
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 6)
-                
-                Spacer()
-                
-                Button {
-                    store.send(.view(.editWarningSheetCloseButtonTapped))
-                } label: {
-                    Text("Understood", bundle: .module)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(tintColor)
-                .frame(height: 48)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 16)
-                .background(ignoresSafeAreaEdges: .bottom)
-            }
-            .background {
-                VStack(spacing: 0) {
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: 12))
-                        .padding(.top, 32)
-                    
-                    Spacer()
-                    
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: -12))
-                        .padding(.bottom, 96)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    store.send(.view(.editWarningSheetCloseButtonTapped))
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(Color(.Background.quaternary))
-                            .frame(width: 30, height: 30)
-                        
-                        Image(systemSymbol: .xmark)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(Color(.Labels.teritary))
-                    }
-                    .padding(.top, 14)
-                    .padding(.trailing, 16)
-                }
-            }
-        }
-        
-        @ViewBuilder
-        private func ComingSoonTape() -> some View {
-            HStack(spacing: 8) {
-                ForEach(0..<6, id: \.self) { index in
-                    Text("IN DEVELOPMENT", bundle: .module)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.Labels.primaryInvariably))
-                        .fixedSize(horizontal: true, vertical: false)
-                        .lineLimit(1)
-                }
-            }
-            .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-            .background(tintColor)
         }
     }
 }
@@ -608,6 +496,23 @@ private extension Date {
     }
 }
 
+private extension TopicPostsFilter {
+    var title: LocalizedStringKey {
+        switch self {
+        case .all:
+            LocalizedStringKey("All")
+        case .onlyHidden:
+            LocalizedStringKey("Only hidden")
+        case .onlyDefault:
+            LocalizedStringKey("Only default")
+        case .onlyDeleted:
+            LocalizedStringKey("Only deleted")
+        case .exceptDeleted:
+            LocalizedStringKey("Except deleted")
+        }
+    }
+}
+
 // MARK: - Previews
 
 #Preview {
@@ -620,7 +525,7 @@ private extension Date {
             ) {
                 TopicFeature()
             } withDependencies: {
-                $0.apiClient.getTopic = { @Sendable _, _, _ in
+                $0.apiClient.getTopic = { @Sendable _, _, _, _ in
                     return .mock
                 }
             }
@@ -641,9 +546,9 @@ private extension Date {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
                         )
                     )
@@ -676,9 +581,9 @@ private extension Date {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
                         )
                     )
@@ -690,6 +595,66 @@ private extension Date {
             $0.apiClient.sendPost = { request in
                 try await Task.sleep(for: .seconds(1))
                 return .failure(.tooLong) // <----------
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("New template post requests") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    templatePostSendingPreview
+}
+
+@MainActor private var templatePostSendingPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
+                            type: .new, topicId: 0, content: .template([])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .success(.post(.init(id: 1, topicId: 0, offset: 0)))
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Post Template sending returns error status") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postTemplateErrorStatusPreview
+}
+
+@MainActor private var postTemplateErrorStatusPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(type: .new, topicId: 0, content: .template([]))
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .failure(.badParam) // <----------
             }
         }
     )

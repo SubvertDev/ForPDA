@@ -11,14 +11,21 @@ import SharedUI
 import NukeUI
 import Models
 
+@ViewAction(for: QMSListFeature.self)
 public struct QMSListScreen: View {
+    
+    // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<QMSListFeature>
     @Environment(\.tintColor) private var tintColor
     
+    // MARK: - Init
+    
     public init(store: StoreOf<QMSListFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
@@ -32,6 +39,7 @@ public struct QMSListScreen: View {
                             WithPerceptionTracking {
                                 if user.chats.isEmpty {
                                     UserRow(user)
+                                        .listRowBackground(Color(.Background.teritary))
                                 } else {
                                     DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
                                         ChatList(user.chats)
@@ -54,7 +62,7 @@ public struct QMSListScreen: View {
             ._toolbarTitleDisplayMode(.inline)
             .animation(.default, value: store.expandedGroups)
             .onAppear {
-                store.send(.onAppear)
+                send(.onAppear)
             }
         }
     }
@@ -64,7 +72,7 @@ public struct QMSListScreen: View {
     @ViewBuilder
     private func UserRow(_ user: QMSUser) -> some View {
         Button {
-            store.send(.userRowTapped(user.id))
+            send(.userRowTapped(user.id))
         } label: {
             HStack(spacing: 8) {
                 LazyImage(url: user.avatarUrl ?? Links.defaultQMSAvatar) { state in
@@ -80,20 +88,14 @@ public struct QMSListScreen: View {
                 .frame(width: 50, height: 50)
                 
                 Text(user.name)
-                
-                Spacer()
-                
-                if user.unreadCount > 0 {
-                    Circle()
-                        .font(.title2)
-                        .foregroundStyle(tintColor)
-                        .frame(width: 8)
-                }
             }
-            .contentShape(Rectangle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .listRowBackground(Color(.Background.teritary))
+        .badge(user.unreadCount)
+        ._badgeProminence(.increased)
     }
     
     // MARK: - Chat Row
@@ -102,28 +104,20 @@ public struct QMSListScreen: View {
     private func ChatRow(_ chat: QMSChatInfo) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
-                store.send(.chatRowTapped(chat.id))
+                send(.chatRowTapped(chat.id))
             } label: {
-                HStack(spacing: 8) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(chat.name)
-                        Text(chat.lastMessageDate.formatted())
-                    }
-                    
-                    Spacer()
-                    
-                    if chat.unreadCount > 0 {
-                        Circle()
-                            .font(.title2)
-                            .foregroundStyle(tintColor)
-                            .frame(width: 8)
-                    }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(chat.name)
+                    Text(chat.lastMessageDate.formatted())
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
         }
         .buttonStyle(.plain)
         .listRowBackground(Color(.Background.teritary))
+        .badge(chat.unreadCount)
+        ._badgeProminence(.increased)
     }
     
     // MARK: - Chat List
@@ -136,8 +130,12 @@ public struct QMSListScreen: View {
     }
 }
 
+// MARK: - Previews
+
 #Preview {
-    QMSListScreen(store: Store(initialState: QMSListFeature.State()) {
-        QMSListFeature()
-    })
+    NavigationStack {
+        QMSListScreen(store: Store(initialState: QMSListFeature.State()) {
+            QMSListFeature()
+        })
+    }
 }

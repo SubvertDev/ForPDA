@@ -13,7 +13,7 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
     case favorites
     case forum
     case profile
-        
+    
     public var iconSymbol: SFSymbol {
         switch self {
         case .articles:

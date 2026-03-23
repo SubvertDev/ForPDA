@@ -25,6 +25,7 @@ public struct ArticleRowView: View {
     public let state: State
     public let rowType: RowType
     public let bundle: Bundle
+    public let isContextMenuSupported: Bool // used for search
     public let action: (ContextAction) -> Void
     
     private var isShort: Bool {
@@ -41,11 +42,13 @@ public struct ArticleRowView: View {
         state: State,
         rowType: RowType,
         bundle: Bundle,
+        isContextMenuSupported: Bool = true,
         action: @escaping (ContextAction) -> Void
     ) {
         self.state = state
         self.rowType = rowType
         self.bundle = bundle
+        self.isContextMenuSupported = isContextMenuSupported
         self.action = action
     }
     
@@ -61,7 +64,9 @@ public struct ArticleRowView: View {
             }
         }
         .contextMenu {
-            ContextMenu()
+            if isContextMenuSupported {
+                ContextMenu()
+            }
         }
     }
     
@@ -152,13 +157,18 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func Description() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(state.title)
-                .font(isShort ? .callout : .title3)
-                .fontWeight(.semibold)
-                .lineLimit(nil)
-                .foregroundStyle(Color(.Labels.primary))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.bottom, isShort ? 8 : 12)
+            switch state.title {
+            case .plain(let title):
+                Text(title)
+                    .font(isShort ? .callout : .title3)
+                    .fontWeight(.semibold)
+                    .lineLimit(nil)
+                    .foregroundStyle(Color(.Labels.primary))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, isShort ? 8 : 12)
+            case .render(let attributedTitle):
+                RichText(text: attributedTitle, isSelectable: false)
+            }
         }
     }
     
@@ -186,7 +196,9 @@ public struct ArticleRowView: View {
             
             Spacer()
             
-            ContextMenuButton()
+            if isContextMenuSupported {
+                ContextMenuButton()
+            }
         }
     }
     
@@ -221,13 +233,17 @@ public struct ArticleRowView: View {
     @ViewBuilder
     private func ContextMenu() -> some View {
         VStack(spacing: 0) {
-            Section {
-                Button {
-                    action(.shareLink)
-                } label: {
-                    Text(state.title)
-                    Text(state.authorName)
-                    Image(systemSymbol: .squareAndArrowUp)
+            // In the .render case, the title will contain BB-codes
+            // This is used for searching
+            if case .plain(let title) = state.title {
+                Section {
+                    Button {
+                        action(.shareLink)
+                    } label: {
+                        Text(title)
+                        Text(state.authorName)
+                        Image(systemSymbol: .squareAndArrowUp)
+                    }
                 }
             }
             
@@ -248,13 +264,13 @@ public struct ArticleRowView: View {
 public extension ArticleRowView {
     struct State {
         public let id: Int
-        public let title: String
+        public let title: UITitleType
         public let authorName: String
         public let imageUrl: URL
         public let commentsAmount: Int
         public let date: Date
         
-        public init(id: Int, title: String, authorName: String, imageUrl: URL, commentsAmount: Int, date: Date) {
+        public init(id: Int, title: UITitleType, authorName: String, imageUrl: URL, commentsAmount: Int, date: Date) {
             self.id = id
             self.title = title
             self.authorName = authorName

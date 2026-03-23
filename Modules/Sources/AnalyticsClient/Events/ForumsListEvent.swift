@@ -10,6 +10,7 @@ import Foundation
 public enum ForumsListEvent: Event {
     case forumRedirectTapped(URL)
     case forumTapped(Int, String)
+    case forumSearchTapped
     case forumListLoadSuccess
     case forumListLoadFailure(any Error)
     case forumSectionExpanded(Int)

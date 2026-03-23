@@ -92,6 +92,7 @@ platform :ios do
         upload_dsym_to_sentry
         upload_bundle_to_tuist
         upload_app_to_testflight
+        notify_all
         unless ENV['CI']
             run_tuist(testflight: false)
         end
@@ -111,6 +112,44 @@ platform :ios do
         update_build_number(build_number: options[:build_number])
         run_tuist(testflight: true)
         build_ipa
+        run_tuist(testflight: false)
+    end
+    
+    desc "CI pull requests checks"
+    lane :ci_pull_request do
+        setup_ci if ENV['CI']
+        prepare_certificates
+        update_build_number(build_number: "1")
+        Dir.chdir("..") do
+            sh("tuist install")
+            sh("tuist generate --no-open")
+            sh("tuist xcodebuild build")
+            sh("tuist test")
+            telegram(
+                token: ENV['TG_BOT_TOKEN'],
+                chat_id: ENV['TG_CHAT_ID'],
+                text: "[CI] (PR) Проверка пройдена: #{pull_request_url}"
+            )
+        end
+    end
+    
+    desc "CI cache warmup & tests"
+    lane :ci_push do
+        setup_ci if ENV['CI']
+        prepare_certificates
+        update_build_number(build_number: "1")
+        Dir.chdir("..") do
+            sh("tuist install")
+            sh("tuist generate --no-open")
+            sh("tuist cache --external-only")
+            sh("tuist test")
+	    commit_sha = sh("git rev-parse --short=7 HEAD").strip
+            telegram(
+                token: ENV['TG_BOT_TOKEN'],
+                chat_id: ENV['TG_CHAT_ID'],
+                text: "[CI] (#{commit_sha}) Прогрев кэша и тестирование успешно завершены"
+            )
+        end
     end
     
     # --------------------------------------------------
@@ -162,7 +201,7 @@ platform :ios do
             generate_command = ""
             generate_command += "TUIST_LINKING=static " if options[:testflight]
             generate_command += "tuist generate"
-            generate_command += " --no-binary-cache" if options[:testflight]
+            generate_command += " --cache-profile none" if options[:testflight]
             generate_command += " --no-open" unless options[:open]
             
             sh(generate_command)
@@ -252,7 +291,7 @@ platform :ios do
 
         upload_to_testflight(
             ipa: "./Builds/#{ipa_name}"
-	    )
+	)
     end
     
     desc "Notifies to all available channels"
@@ -284,11 +323,19 @@ platform :ios do
     # --------------------------------------------------
 
     error do |lane, exception, options|
-        notification(
-            subtitle: "Error while executing #{lane}!",
-            message: "#{exception}",
-            content_image: "Images/logo.png"
-        )
+	if ENV['CI']
+            telegram(
+                token: ENV['TG_BOT_TOKEN'],
+                chat_id: ENV['TG_CHAT_ID'],
+                text: "[CI] Ошибка: #{ci_run_url}"
+            )
+	else
+            notification(
+                subtitle: "Error while executing #{lane}!",
+                message: "#{exception}",
+                content_image: "Images/logo.png"
+            )
+        end
     end
 
 end
@@ -303,6 +350,22 @@ def print_lane_options(lane_name, options = {})
     UI.message("• #{key}: #{value[:description]}#{default_str}")
   end
 end 
+
+def ci_run_url
+  return nil unless ENV["GITHUB_RUN_ID"]
+
+  "https://github.com/#{ENV['GITHUB_REPOSITORY']}/actions/runs/#{ENV['GITHUB_RUN_ID']}"
+end
+
+def pull_request_url
+  return nil unless ENV["GITHUB_EVENT_NAME"] == "pull_request"
+
+  repo = ENV["GITHUB_REPOSITORY"]
+  pr_number = ENV["GITHUB_REF_NAME"] # e.g. "123/merge"
+
+  pr_number = pr_number.split("/").first
+  "https://github.com/#{repo}/pull/#{pr_number}"
+end
 
 def get_secret_value(name)
   is_ci = ENV['CI'] == 'true'

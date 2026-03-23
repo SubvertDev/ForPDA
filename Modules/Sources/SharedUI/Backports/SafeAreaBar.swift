@@ -9,6 +9,9 @@ import SwiftUI
 
 public extension View {
     
+    // NOTE:
+    // safeAreaBar blocks taps so you can't scroll anything behind it
+    
     @available(iOS, deprecated: 26, message: "Use native safeAreaBar instead")
     func _safeAreaBar<Content: View>(
         edge: VerticalEdge,

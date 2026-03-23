@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Action completed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Действие выполнено"
+          }
+        }
+      }
+    },
     "Whoops, something went wrong.." : {
       "localizations" : {
         "ru" : {

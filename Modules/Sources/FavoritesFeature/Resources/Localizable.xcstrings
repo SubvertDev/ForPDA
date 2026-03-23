@@ -131,12 +131,32 @@
         }
       }
     },
+    "Link copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
     "Mark As Read" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Прочитано"
+          }
+        }
+      }
+    },
+    "Marked as read" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмечено прочитанным"
           }
         }
       }
@@ -167,6 +187,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Уведомлять"
+          }
+        }
+      }
+    },
+    "Notify type changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тип уведомлений изменен"
           }
         }
       }
@@ -207,6 +237,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сортировка"
+          }
+        }
+      }
+    },
+    "Sort filters are changed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фильтры сортировки обновлены"
           }
         }
       }

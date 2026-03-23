@@ -19,7 +19,8 @@ import OSLog
 @DependencyClient
 public struct AnalyticsClient: Sendable {
     public var configure: @Sendable (AnalyticsConfiguration) -> Void
-    public var identify: @Sendable (_ id: String) -> Void
+    public var identify: @Sendable (_ id: String, _ userProperties: [String: Any]?) -> Void
+    public var setUserProperties: @Sendable (_ properties: [String: Any]?) -> Void
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
     public var capture: @Sendable (any Error) -> Void
@@ -49,9 +50,14 @@ extension AnalyticsClient: DependencyKey {
                     isDebugEnabled: config.isCrashlyticsDebugEnabled
                 )
             },
-            identify: { id in
+            identify: { id, userProperties in
                 logger.info("Identifying user with id: \(id)")
-                PostHogSDK.shared.identify(id)
+                PostHogSDK.shared.identify(id, userProperties: userProperties)
+            },
+            setUserProperties: { properties in
+                // Always make sure that properties are serializable
+                // PostHog will show an error in console when used in debug mode
+                PostHogSDK.shared.setPersonProperties(userPropertiesToSet: properties)
             },
             logout: {
                 logger.info("Analytics has been reset after logout")
@@ -74,7 +80,8 @@ extension AnalyticsClient: DependencyKey {
     
     public static let previewValue = Self(
         configure: { _ in },
-        identify: { _ in },
+        identify: { _, _ in },
+        setUserProperties: { _ in },
         logout: { },
         log: { event in
             if let properties = event.properties {
@@ -91,7 +98,8 @@ extension AnalyticsClient: DependencyKey {
     
     public static let testValue = Self(
         configure: { _ in },
-        identify: { _ in },
+        identify: { _, _ in },
+        setUserProperties: { _ in },
         logout: { },
         log: { _ in },
         capture: { _ in },
@@ -146,7 +154,7 @@ extension AnalyticsClient {
             } else {
                 // If there's mismatch, we're doomed (jk)
                 logger.warning("Analytics user ID & user session ID mismatch, identifying as \(userId)")
-                analytics.identify(String(userId))
+                analytics.identify(id: String(userId), userProperties: nil)
             }
         } else {
             logger.info("User session not found, using default analytics ID: \(id)")
@@ -162,11 +170,8 @@ extension AnalyticsClient {
                 $0.sessionSampleRate = 1
                 $0.profileAppStarts = true
             }
-            options.enableMetricKit = true
-            options.enableAppHangTracking = false // Not working properly
-            options.enableAppHangTrackingV2 = false // Not working properly
+            options.enableAppHangTracking = false // False positives
             options.enableReportNonFullyBlockingAppHangs = false // False positives
-            options.enablePerformanceV2 = true
             options.enablePreWarmedAppStartTracing = true
             options.enableCoreDataTracing = false // I don't have CoreData
             options.enableUserInteractionTracing = false // Doesn't work with SwiftUI
@@ -177,6 +182,8 @@ extension AnalyticsClient {
             options.attachScreenshot = true
             options.tracesSampleRate = 1.0
             options.diagnosticLevel = .warning
+            
+            options.experimental.enableWatchdogTerminationsV2 = true
         }
         SentrySDK.setUser(User(userId: id))
         

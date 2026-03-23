@@ -29,6 +29,9 @@ extension ProfileFeature {
                 case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)
                     
+                case .view(.editButtonTapped):
+                    analyticsClient.log(ProfileEvent.editTapped)
+                
                 case .view(.settingsButtonTapped):
                     analyticsClient.log(ProfileEvent.settingsTapped)
                     
@@ -38,8 +41,17 @@ extension ProfileFeature {
                 case .view(.historyButtonTapped):
                     analyticsClient.log(ProfileEvent.historyTapped)
                     
+                case .view(.mentionsButtonTapped):
+                    analyticsClient.log(ProfileEvent.mentionsTapped)
+                    
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
+                    
+                case .view(.searchTopicsButtonTapped):
+                    analyticsClient.log(ProfileEvent.searchTopicsTapped)
+                    
+                case .view(.searchRepliesButtonTapped):
+                    analyticsClient.log(ProfileEvent.searchRepliesTapped)
                     
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {
@@ -57,7 +69,7 @@ extension ProfileFeature {
                 case .internal(.userResponse(.failure)):
                     analyticsClient.log(ProfileEvent.userLoadingFailed)
                     
-                case .destination:
+                case .internal, .destination:
                     break
                 }
                 return .none

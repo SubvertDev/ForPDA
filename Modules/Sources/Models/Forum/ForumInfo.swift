@@ -10,25 +10,25 @@ import Foundation
 public struct ForumInfo: Codable, Hashable, Sendable, Identifiable {
     public let id: Int
     public let name: String
-    public let flag: Int
+    public let flag: ForumFlag
     public let redirectUrl: URL?
     
     public var isCategory: Bool {
-         return (flag & 16) != 0
+        return flag.contains(.marker)
     }
     
     public var isUnread: Bool {
-        return (flag & 32) > 0
+        return flag.contains(.updated)
     }
     
     public var isFavorite: Bool {
-        return (flag & 8) != 0
+        return flag.contains(.favorite)
     }
     
     public init(
         id: Int,
         name: String,
-        flag: Int,
+        flag: ForumFlag,
         redirectUrl: URL? = nil
     ) {
         self.id = id
@@ -42,12 +42,12 @@ public extension ForumInfo {
     static let mock = ForumInfo(
         id: 5,
         name: "Site work",
-        flag: 0
+        flag: []
     )
     
     static let mockCategory = ForumInfo(
         id: 200,
         name: "Administrative",
-        flag: 16
+        flag: .marker
     )
 }

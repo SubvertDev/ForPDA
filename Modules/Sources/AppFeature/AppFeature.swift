@@ -16,6 +16,7 @@ import ForumFeature
 import TopicFeature
 import AnnouncementFeature
 import FavoritesRootFeature
+import FavoritesFeature
 import HistoryFeature
 import AuthFeature
 import ProfileFeature
@@ -33,6 +34,8 @@ import LoggerClient
 import NotificationsClient
 import ToastClient
 import Combine
+import SearchResultFeature
+import CacheClient
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -69,6 +72,9 @@ public struct AppFeature: Reducer, Sendable {
         public var showTabBar: Bool
         public var toastMessage: ToastMessage?
         
+        public var favoritesBadges = 0
+        public var profileBadges = 0
+        
         public var isAuthorized: Bool {
             return userSession != nil
         }
@@ -84,7 +90,7 @@ public struct AppFeature: Reducer, Sendable {
         public init(
             appDelegate: AppDelegateFeature.State = AppDelegateFeature.State(),
             articlesTab: StackTab.State = StackTab.State(root: .articles(.articlesList(ArticlesListFeature.State()))),
-            favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesRootFeature.State())),
+            favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
@@ -98,7 +104,7 @@ public struct AppFeature: Reducer, Sendable {
             self.articlesTab = articlesTab
             self.favoritesTab = favoritesTab
             self.forumTab = forumTab
-            
+
             if let session = _userSession.wrappedValue {
                 self.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: session.userId)))))
             } else {
@@ -138,11 +144,11 @@ public struct AppFeature: Reducer, Sendable {
         case binding(BindingAction<State>) // For Toast
         case didSelectTab(AppTab)
         case deeplink(URL)
-        case notificationDeeplink(String)
         case scenePhaseDidChange(from: ScenePhase, to: ScenePhase)
         case registerBackgroundTask
         case backgroundTaskInvoked
         case didFinishToastAnimation
+        case updateBadges(Unread)
         
         case connectionStateChanged(ConnectionState)
         case networkStateChanged(Bool)
@@ -251,8 +257,8 @@ public struct AppFeature: Reducer, Sendable {
                     },
                     
                     .run { send in
-                        for await identifier in notificationsClient.delegate() {
-                            await send(.notificationDeeplink(identifier))
+                        for await unread in notificationsClient.unreadPublisher().values {
+                            await send(.updateBadges(unread))
                         }
                     },
                     
@@ -301,9 +307,8 @@ public struct AppFeature: Reducer, Sendable {
                 return .run { _ in
                     let isProcessed = await notificationsClient.processNotification(notification)
                     if isProcessed {
-                        let unread = try await apiClient.getUnread(type: 0, value: 0)
-                        let skipCategories: [Unread.Item.Category] = [.topic, .forum]
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: skipCategories)
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                 }
                 
@@ -329,6 +334,23 @@ public struct AppFeature: Reducer, Sendable {
                 
             case .didFinishToastAnimation:
                 state.toastMessage = nil
+                return .none
+                
+            case let .updateBadges(unread):
+                let favoritesBadges =
+                (state.appSettings.notifications.isForumEnabled ? unread.forumCount : 0) +
+                (state.appSettings.notifications.isTopicsEnabled ? unread.topicCount : 0)
+                
+                // Sometimes we have more favorites in general count than in an array, so we apply min() fix
+                state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
+                
+                let profileBadges =
+                (state.appSettings.notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
+                (state.appSettings.notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
+                (state.appSettings.notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+                state.profileBadges = profileBadges
+                
+                cacheClient.setUnread(unread)
                 return .none
                 
             case ._failedToConnect:
@@ -357,7 +379,7 @@ public struct AppFeature: Reducer, Sendable {
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
-            case .appDelegate, .binding, .alert:
+            case .binding, .alert:
                 return .none
                 
             case let .didSelectTab(tab):
@@ -390,16 +412,31 @@ public struct AppFeature: Reducer, Sendable {
                 
             case let .userDidLogin(userId: userId):
                 state.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: userId)))))
-                return .none
+                return .run { _ in
+                    do {
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    } catch {
+                        analyticsClient.capture(error)
+                    }
+                }
                 
             case .userDidLogout:
                 state.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
-                return .none
+                state.favoritesBadges = 0
+                state.profileBadges = 0
+                return .run { _ in
+                    notificationsClient.setNotificationContext(context: nil)
+                    await notificationsClient.removeNotifications(
+                        categories: [.qms, .forum, .topic, .forumMention, .siteMention]
+                    )
+                    await notificationsClient.showUnreadNotifications(.mockEmpty, skipCategories: [])
+                }
                 
                 
                 // MARK: - Deeplinks
                 
-                #warning("merge these two actions somehow")
+                // TODO: Merge these two actions below somehow
                 
             case let .deeplink(url):
                 do {
@@ -413,7 +450,7 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case let .notificationDeeplink(identifier):
+            case let .appDelegate(.userNotification(identifier)):
                 do {
                     let deeplink = try DeeplinkHandler().handleNotification(identifier)
                     return showScreenForDeeplink(deeplink, &state)
@@ -432,23 +469,30 @@ public struct AppFeature: Reducer, Sendable {
                     if newPhase == .active {
                         try? await apiClient.connect(inBackground: false)
                         notificationCenter.post(name: .sceneBecomeActive, object: nil)
-                    }
-                    
-                    if isLoggedIn, newPhase == .background {
-                        // await send(.registerBackgroundTask)
+                        
+                        if isLoggedIn {
+                            let unread = try await apiClient.getUnread(type: .all)
+                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        }
                     }
                     
                     if newPhase == .background {
+                        if isLoggedIn {
+                            await send(.registerBackgroundTask)
+                        }
                         try await apiClient.disconnect()
                     }
                 }
                 
             case .registerBackgroundTask:
                 // return .send(.syncUnreadTaskInvoked) // For test purposes
+                guard state.appSettings.backgroundNotifications2 else { return .none }
+                
                 let request = BGAppRefreshTaskRequest(identifier: state.notificationsId)
+                request.earliestBeginDate = .now.addingTimeInterval(15 * 60) // 15 minutes by default
                 do {
                     try BGTaskScheduler.shared.submit(request)
-                    logger.info("Successfully scheduled BGAppRefreshTaskRequest")
+                    logger.info("[AppRefresh] Successfully scheduled BGAppRefreshTaskRequest")
                     // Set breakpoint here and run:
                     // e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.subvert.forpda.background.notifications"]
                 } catch {
@@ -457,38 +501,28 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .backgroundTaskInvoked:
-                return .none
-                
-                // TEMPORARY DISABLED DUE TO BACKGROUND PAUSE BUG
-                
-                // return .run { [appSettings = state.appSettings] send in
-                //     do {
-                //         // Refresh task might pause in background and resume in foreground
-                //         // hence we need to always check current application state
-                //         let appState = await UIApplication.shared.applicationState
-                //         logger.warning("Background task invoked on '\(appState.description, privacy: .public)' state")
-                //
-                //         guard await UIApplication.shared.applicationState == .background else { return }
-                //         guard try await notificationsClient.hasPermission() else { return }
-                //         guard appSettings.notifications.isAnyEnabled else { return }
-                //
-                //         try await apiClient.connect(inBackground: true)
-                //         let unread = try await apiClient.getUnread()
-                //
-                //         guard await UIApplication.shared.applicationState == .background else { return }
-                //         logger.warning("Preparing to show unread notifications")
-                //         await notificationsClient.showUnreadNotifications(unread, [])
-                //         logger.warning("Did show unread notifications")
-                //
-                //         guard await UIApplication.shared.applicationState == .background else { return }
-                //         logger.warning("STOPPING CONNECTION ON BG TASK REQUEST")
-                //         try await apiClient.disconnect()
-                //     } catch {
-                //         analyticsClient.capture(error)
-                //     }
-                //
-                //     await send(.registerBackgroundTask)
-                // }
+                return .run { [appSettings = state.appSettings] send in
+                    do {
+                        
+                        guard try await notificationsClient.hasPermission() else { return }
+                        logger.info("[AppRefresh] Notifications permission is granted")
+                        
+                        guard appSettings.notifications.isAnyEnabled else { return }
+                        logger.info("[AppRefresh] Notifications enabled in settings")
+                        
+                        try await apiClient.connect(inBackground: true)
+                        logger.info("[AppRefresh] Successfully connected. Fetching notifications...")
+                        
+                        let unread = try await apiClient.getUnread(type: .all)
+                        logger.info("[AppRefresh] Successfully fetched. Preparing to show notifications..")
+                        
+                        await notificationsClient.showUnreadNotifications(unread, [])
+                        logger.info("[AppRefresh] Successfully shown notifications")
+                        
+                    } catch {
+                        analyticsClient.capture(error)
+                    }
+                }
                 
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
@@ -508,6 +542,9 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
+                return .none
+                
+            case .appDelegate:
                 return .none
             }
         }
@@ -580,23 +617,24 @@ public struct AppFeature: Reducer, Sendable {
             case .articles, .forum, .profile:
                 break
             case .favorites:
-                await notificationsClient.removeNotifications(categories: [.forum, .topic])
+                break
+                // await notificationsClient.removeNotifications(categories: [.forum, .topic])
             }
         }
     }
     
     private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
         return StackTab()
-            .reduce(into: &state.favoritesTab, action: .root(.favorites(.favorites(.internal(.refresh)))))
+            .reduce(into: &state.favoritesTab, action: .root(.favorites(.internal(.refresh))))
             .map(Action.favoritesTab)
     }
     
     private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
         let screen: Path.State
         switch deeplink {
-        case let .article(id, _, _):
+        case let .article(id, _, _, scrollToId):
             let preview = ArticlePreview.innerDeeplink(id: id)
-            screen = .articles(.article(ArticleFeature.State(articlePreview: preview)))
+            screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
         case let .topic(id, goTo):
@@ -607,6 +645,8 @@ public struct AppFeature: Reducer, Sendable {
             screen = .profile(.profile(ProfileFeature.State(userId: id)))
         case let .qms(id: id):
             screen = .qms(.qms(QMSFeature.State(chatId: id)))
+        case let .search(options: options):
+            screen = .search(.searchResult(SearchResultFeature.State(search: options)))
         }
         
         openScreenOnCurrentStack(screen, state: &state)

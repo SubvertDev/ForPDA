@@ -83,6 +83,26 @@ public struct ProfileParser {
         }
     }
     
+    public static func parseAvatarUrl(from string: String) throws -> UserAvatarResponseType {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                let status = array[1] as! Int
+                
+                if status == 0 {
+                    let stringUrl = if array.count > 2 { array[2] as! String } else { "" }
+                    return .success(URL(string: stringUrl))
+                } else {
+                    return .error
+                }
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
     private static func parseUserDevDBDevices(_ array: [[Any]]) -> [User.Device] {
         return array.map { device in
             return User.Device(

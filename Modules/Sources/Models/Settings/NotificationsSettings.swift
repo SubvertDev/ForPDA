@@ -30,6 +30,16 @@ public struct NotificationsSettings: Sendable, Codable, Hashable {
         self.isForumMentionsEnabled = isForumMentionsEnabled
         self.isSiteMentionsEnabled = isSiteMentionsEnabled
     }
+    
+    public func asDictionary() -> [String: Any] {
+        return [
+            "isQmsEnabled": isQmsEnabled,
+            "isForumEnabled": isForumEnabled,
+            "isTopicsEnabled": isTopicsEnabled,
+            "isForumMentionsEnabled": isForumMentionsEnabled,
+            "isSiteMentionsEnabled": isSiteMentionsEnabled,
+        ]
+    }
 }
 
 extension NotificationsSettings {

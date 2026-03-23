@@ -59,7 +59,7 @@ public struct HistoryScreen: View {
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
@@ -99,7 +99,7 @@ public struct HistoryScreen: View {
         Section {
             ForEach(history.topics, id: \.id) { topic in
                 TopicRow(
-                    title: topic.name,
+                    title: .plain(topic.name),
                     date: topic.lastPost.date,
                     username: topic.lastPost.username,
                     isClosed: topic.isClosed,

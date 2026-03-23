@@ -37,7 +37,8 @@ public struct FavoritesRootScreen: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    SegmentPicker()
+                    // For the Good Times
+                    //SegmentPicker()
                     
                     switch store.pickerSelection {
                     case .favorites:

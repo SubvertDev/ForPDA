@@ -62,7 +62,7 @@ public struct FavoritesScreen: View {
             }
             .navigationTitle(Text("Favorites", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
-            ._safeAreaBar(edge: .bottom) {
+            .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
                    !store.appSettings.experimentalFloatingNavigation {
@@ -224,11 +224,13 @@ public struct FavoritesScreen: View {
                         )
                     } else {
                         TopicRow(
-                            title: favorite.topic.name,
+                            title: .plain(favorite.topic.name),
                             date: favorite.topic.lastPost.date,
                             username: favorite.topic.lastPost.username,
                             isClosed: favorite.topic.isClosed,
                             isUnread: favorite.topic.isUnread,
+                            isHatUpdated: favorite.isHatUpdated,
+                            hasHatUpdateTracking: favorite.isNotifyHatUpdate,
                             onAction: { unreadTapped in
                                 send(.favoriteTapped(favorite, showUnread: unreadTapped))
                             }

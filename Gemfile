@@ -1,15 +1,11 @@
 source "https://rubygems.org"
 
-gem "fastlane"
-
-# bundle exec fix for ruby 3.4
-gem "abbrev"
-gem "csv"
+gem "fastlane", "2.232.2"
 
 # warnings fix
 gem "ostruct"
 
-# ssl connection & certificates fix
+# telegram notify fix
 gem "openssl"
 
 plugins_path = File.join(File.dirname(__FILE__), 'fastlane', 'Pluginfile')

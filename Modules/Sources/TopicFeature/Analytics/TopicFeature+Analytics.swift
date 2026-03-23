@@ -23,10 +23,13 @@ extension TopicFeature {
                         .view(.onNextAppear),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
+                        .view(.topicPollVoteButtonTapped),
+                        .view(.searchButtonTapped),
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
                         .internal(.changeKarma),
+                        .internal(.voteInPoll),
                         .internal(.load),
                         .internal(.refresh),
                         .pageNavigation,
@@ -40,6 +43,9 @@ extension TopicFeature {
                     
                 case .view(.topicHatOpenButtonTapped):
                     analytics.log(TopicEvent.topicHatOpenButtonTapped)
+                    
+                case .view(.topicPollOpenButtonTapped):
+                    analytics.log(TopicEvent.topicPollOpenButtonTapped)
                     
                 case let .view(.userTapped(userId: userId)):
                     analytics.log(TopicEvent.userTapped(userId))
@@ -64,6 +70,10 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostDelete(postId))
                     case .changeReputation(let postId, let userId, _):
                         analytics.log(TopicEvent.menuChangeReputation(postId, userId))
+                    case .userPostsInTopic(let userId):
+                        analytics.log(TopicEvent.menuUserPostsInTopic(userId))
+                    case .mentions(let postId):
+                        analytics.log(TopicEvent.menuPostMentions(postId))
                     case .copyLink(let postId):
                         analytics.log(TopicEvent.menuPostCopyLink(postId))
                     }
@@ -80,24 +90,21 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuSetFavorite)
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
+                    case .writePostWithTemplate:
+                        analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
+
+                case let .view(.textQuoted(post, _)):
+                    analytics.log(TopicEvent.textQuoted(post.id))
                     
-                case .view(.editWarningSheetCloseButtonTapped):
-                    analytics.log(TopicEvent.editWarningSheetClosed)
+                case .internal(.loadTopic):
+                    break
                     
-                case let .internal(.loadTopic(offset: offset)):
-                    analytics.log(TopicEvent.loadingStart(offset))
+                case .internal(.topicResponse):
+                    break
                     
-                case let .internal(.topicResponse(response)):
-                    switch response {
-                    case .success:
-                        analytics.log(TopicEvent.loadingSuccess)
-                    case let .failure(error):
-                        analytics.log(TopicEvent.loadingFailure(error))
-                    }
-                    
-                case let .internal(.setFavoriteResponse(response)):
-                    analytics.log(TopicEvent.setFavoriteResponse(response))
+                case .internal(.setFavoriteResponse):
+                    break
                 }
                 
                 return .none

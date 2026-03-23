@@ -42,6 +42,14 @@ public struct ToastMessage: Equatable, Sendable {
 }
 
 public extension ToastMessage {
+    static let actionCompleted = ToastMessage(
+        text: LocalizedStringResource("Action completed", bundle: .module),
+        isError: false,
+        haptic: .success,
+        duration: 3,
+        priority: .low
+    )
+    
     static let whoopsSomethingWentWrong = ToastMessage(
         text: LocalizedStringResource("Whoops, something went wrong..", bundle: .module),
         isError: true,

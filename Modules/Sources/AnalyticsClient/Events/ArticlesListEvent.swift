@@ -19,6 +19,7 @@ public enum ArticlesListEvent: Event {
     case listGridTypeChanged(String)
     case refreshTriggered
     case loadMoreTriggered
+    case searchButtonTapped
     case tryAgainButtonTapped
     case menuTapped
     case articlesHasLoaded // TODO: Rename?

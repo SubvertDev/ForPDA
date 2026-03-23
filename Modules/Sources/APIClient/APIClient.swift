@@ -15,7 +15,9 @@ import ComposableArchitecture
 import PersistenceKeys
 
 public typealias ConnectionState = API.ConnectionState
+public typealias UploadRequest = PDAPI.UploadRequest
 public typealias UploadProgressStatus = PDAPI.UploadProgressStatus
+public typealias PDAPIDocument = PDAPI.Document
 public typealias PDAPIError = APIError
 
 // MARK: - Client
@@ -43,8 +45,11 @@ public struct APIClient: Sendable {
     
     // User
     public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
+    public var editUserProfile: @Sendable (_ request: UserProfileEditRequest) async throws -> Bool
     public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
+    public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
+    public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -56,14 +61,18 @@ public struct APIClient: Sendable {
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
-    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
-    public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
+    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
+    public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
+    public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
-    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
+    public var getMentions: @Sendable (_ showPosts: Bool, _ offset: Int, _ perPage: Int) async throws -> Mentions
+    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PreviewResponse
+    public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> PreviewResponse
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
     public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
+    public var voteInTopicPoll: @Sendable (_ topicId: Int, _ selections: [[Int]]) async throws -> Bool
     
     // Favorites
     public var getFavorites: @Sendable (_ request: FavoritesRequest, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Favorite, any Error>
@@ -72,15 +81,15 @@ public struct APIClient: Sendable {
     public var readAllFavorites: @Sendable () async throws -> Bool
     
     // Extra
-    public var getUnread: @Sendable (_ type: Int, _ value: Int) async throws -> Unread
+    public var getUnread: @Sendable (_ type: UnreadType) async throws -> Unread
     public var getAttachment: @Sendable (_ id: Int) async throws -> URL
     public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
-    // QMS
-    public var loadQMSList: @Sendable () async throws -> QMSList
-    public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
-    public var loadQMSChat: @Sendable (_ id: Int) async throws -> QMSChat
-    public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
+    // QMS -> MOVED TO QMSCLIENT
+
+    // Search
+    public var search: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
+    public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // STREAMS
     public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }
@@ -94,7 +103,7 @@ public struct APIClient: Sendable {
 
 extension APIClient: DependencyKey {
     
-    private static let api = API()
+    public static let api = API()
     
     // MARK: - Live Value
     
@@ -204,7 +213,22 @@ extension APIClient: DependencyKey {
                     policy: policy
                 )
             },
-            
+            editUserProfile: { request in
+                let command = MemberCommand.profile(
+                    data: MemberProfileRequest(
+                        memberId: request.userId,
+                        city: request.city,
+                        gender: request.transferGender,
+                        status: request.status,
+                        about: request.about,
+                        signature: request.signature,
+                        birthday: request.birthdayDate
+                    )
+                )
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
             getReputationVotes: { request in
                 let command = MemberCommand.reputationVotes(data: MemberReputationVotesRequest(
                     memberId: request.userId,
@@ -227,8 +251,30 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return ReputationChangeResponseType(rawValue: status)
             },
+            updateUserAvatar: { userId, image in
+                let command = MemberCommand.avatar(memberId: userId, avatar: image)
+                let response = try await api.send(command)
+                return try await parser.parseAvatarUrl(response: response)
+            },
+            updateUserDevice: { userId, action, fullTag, isPrimary in
+                let action: MemberDeviceRequest.Action = switch action {
+                case .add:    .add
+                case .modify: .modify
+                case .remove: .remove
+                }
+                let command = MemberCommand.device(data: MemberDeviceRequest(
+                    memberId: userId,
+                    action: action,
+                    fullTag: fullTag,
+                    primary: isPrimary
+                ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
             
             // MARK: - Bookmarks
+            
             getBookmarksList: {
                 let response = try await api.send(MemberCommand.Bookmarks.list)
                 return try await parser.parseBookmarksList(response)
@@ -290,8 +336,13 @@ extension APIClient: DependencyKey {
                 return try await parser.parseAnnouncement(response)
             },
             
-            getTopic: { id, offset, perPage in
-                let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
+            getTopic: { id, offset, perPage, postsFilter in
+                let request = TopicRequest(
+                    id: id,
+                    offset: offset,
+                    itemsPerPage: perPage,
+                    showPostMode: postsFilter.rawValue
+                )
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
@@ -304,10 +355,23 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 return try await parser.parseWriteForm(response)
             },
+            sendTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .send(content)
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTemplateSend(response: response)
+            },
             
 			getHistory: { offset, perPage in
                 let response = try await api.send(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
+			},
+            
+            getMentions: { showPosts, offset, perPage in
+                let response = try await api.send(MemberCommand.mention(showPosts: showPosts, offset: offset, itemsPerPage: perPage))
+                return try await parser.parseMentions(response)
             },
             
             previewPost: { request in
@@ -319,6 +383,14 @@ extension APIClient: DependencyKey {
                 ), postId: request.id)
                 let response = try await api.send(command)
                 return try await parser.parsePostPreview(response)
+            },
+            previewTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .preview(content)
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTemplatePreview(response: response)
             },
             
             sendPost: { request in
@@ -359,6 +431,13 @@ extension APIClient: DependencyKey {
                     postId: id,
                     action: isUp ? .plus : .minus
                 )
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            
+            voteInTopicPoll: { topicId, selections in
+                let command = ForumCommand.Topic.Poll.vote(topicId: topicId, selections: selections)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -415,8 +494,13 @@ extension APIClient: DependencyKey {
             
             // MARK: - Extra
             
-            getUnread: { type, value in
-                let response = try await api.send(CommonCommand.syncUnread(type: type, value: value))
+            getUnread: { type in
+                let command = if case .category(let type, let value) = type {
+                    CommonCommand.syncUnread(timestamp: 0, type: type.rawValue, value: value)
+                } else {
+                    CommonCommand.syncUnread(timestamp: 0, type: 0, value: 0)
+                }
+                let response = try await api.send(command)
                 return try await parser.parseUnread(response)
             },
             
@@ -445,30 +529,30 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return ReportResponseType(rawValue: status)
             },
-            
-            // MARK: - QMS
-            
-            loadQMSList: {
-                let response = try await api.send(QMSCommand.list)
-                return try await parser.parseQmsList(response)
+
+			// MARK: - Search
+
+            search: { request in
+                let command = SearchCommand.content(
+                    on: request.transferOn,
+                    authors: request.transferAuthors,
+                    text: request.text,
+                    sort: request.transferSort,
+                    offset: request.offset,
+                    amount: request.amount
+                )
+                let response = try await api.send(command)
+                return try await parser.parseSearch(response)
             },
-            
-            loadQMSUser: { id in
-                let response = try await api.send(QMSCommand.info(id: id))
-                return try await parser.parseQmsUser(response)
+            searchUsers: { request in
+                let command = SearchCommand.members(
+                    term: request.term,
+                    offset: request.offset,
+                    number: request.number
+                )
+                let response = try await api.send(command)
+                return try await parser.parseSearchUsers(response)
             },
-            
-            loadQMSChat: { id in
-                let request = QMSViewDialogRequest(dialogId: id, messageId: 0, limit: 0)
-                let response = try await api.send(QMSCommand.Dialog.view(data: request))
-                return try await parser.parseQmsChat(response)
-            },
-            
-            sendQMSMessage: { chatId, message in
-                let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
-                let _ = try await api.send(QMSCommand.Message.send(data: request))
-                // Returns chatId + new messageId
-			},
             
             // MARK: - Streams
             
@@ -526,11 +610,20 @@ extension APIClient: DependencyKey {
             getUser: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }
             },
+            editUserProfile: { _ in
+                return true
+            },
             getReputationVotes: { _ in
                 return .mock
             },
             changeReputation: { _ in
                 return .success
+            },
+            updateUserAvatar: { _, _ in
+                return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
+            },
+            updateUserDevice: { _, _, _, _ in
+                return true
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
@@ -553,20 +646,26 @@ extension APIClient: DependencyKey {
             getAnnouncement: { _ in
                 return .mock
             },
-            getTopic: { _, _, _ in
+            getTopic: { _, _, _, _ in
                 return .mock
             },
             getTemplate: { _, _ in
-                return [.mockTitle, .mockText, .mockEditor]
+                return [.mockTitle, .mockRequiredText, .mockRequiredEditor, .mockEditor, .mockUploadBox]
+            },
+            sendTemplate: { _, _, isTopic in
+                return .success(isTopic ? .topic(id: 0) : .post(PostSend(id: 0, topicId: 1, offset: 2)))
             },
 			getHistory: { _, _ in
                 return .mock
 			},
+            getMentions: { _, _, _ in
+                return .mock
+            },
             previewPost: { request in
-                return PostPreview(
-                    content: request.post.content,
-                    attachmentIds: request.post.attachments
-                )
+                return PreviewResponse(content: request.post.content, attachments: [.mock])
+            },
+            previewTemplate: { _, _, _ in
+                return PreviewResponse(content: "content", attachments: [.mock])
             },
             sendPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
@@ -578,6 +677,9 @@ extension APIClient: DependencyKey {
                 return true
             },
             postKarma: { _, _ in
+                return true
+            },
+            voteInTopicPoll: { _, _ in
                 return true
             },
             getFavorites: { _, _ in
@@ -594,7 +696,7 @@ extension APIClient: DependencyKey {
             readAllFavorites: {
                 return true
             },
-            getUnread: { _, _ in
+            getUnread: { _ in
                 return .mock
             },
             getAttachment: { _ in
@@ -603,17 +705,11 @@ extension APIClient: DependencyKey {
             sendReport: { _ in
                 return .success
             },
-            loadQMSList: {
-                return QMSList(users: [])
+            search: { _ in
+                return .mock
             },
-            loadQMSUser: { _ in
-                return QMSUser(userId: 0, name: "", flag: 0, avatarUrl: nil, lastSeenOnline: .now, lastMessageDate: .now, unreadCount: 0, chats: [])
-            },
-            loadQMSChat: { _ in
-                return QMSChat(id: 0, creationDate: .now, lastMessageDate: .now, name: "", partnerId: 0, partnerName: "", flag: 0, avatarUrl: nil, unknownId1: 0, totalCount: 0, unknownId2: 0, lastMessageId: 0, unreadCount: 0, messages: [])
-            },
-            sendQMSMessage: { _, _ in
-                
+            searchUsers: { _ in
+                return .mock
             },
             connectionState: {
                 return .finished

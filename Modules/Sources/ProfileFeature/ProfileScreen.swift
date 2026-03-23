@@ -70,6 +70,11 @@ public struct ProfileScreen: View {
             .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.editProfile, action: \.destination.editProfile)) { store in
+                NavigationStack {
+                    EditScreen(store: store)
+                }
+            }
             .toolbar {
                 ToolbarButtons()
             }
@@ -98,6 +103,14 @@ public struct ProfileScreen: View {
             
             ToolbarItem {
                 Button {
+                    send(.editButtonTapped)
+                } label: {
+                    Image(systemSymbol: .pencil)
+                }
+            }
+            
+            ToolbarItem {
+                Button {
                     send(.settingsButtonTapped)
                 } label: {
                     Image(systemSymbol: .gearshape)
@@ -111,37 +124,39 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func Header(user: User) -> some View {
         VStack(alignment: .center, spacing: 0) {
-            LazyImage(url: user.imageUrl) { state in
-                Group {
-                    if let image = state.image {
-                        image.resizable().scaledToFill()
-                    } else {
-                        Color(.systemBackground)
+            HStack {
+                LazyImage(url: user.imageUrl) { state in
+                    Group {
+                        if let image = state.image {
+                            image.resizable().scaledToFill()
+                        } else {
+                            Color(.systemBackground)
+                        }
+                    }
+                    .skeleton(with: state.isLoading, shape: .circle)
+                }
+                .frame(width: 56, height: 56)
+                .clipShape(Circle())
+                
+                VStack(alignment: .leading) {
+                    Text(user.nickname)
+                        .font(.headline)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    if !user.lastSeenDate.isOnlineHidden() {
+                        Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
+                            .font(.footnote)
+                            .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
                     }
                 }
-                .skeleton(with: state.isLoading, shape: .circle)
             }
-            .frame(width: 128, height: 128)
-            .clipShape(Circle())
             .padding(.bottom, 10)
-            
-            Text(user.nickname)
-                .font(.headline)
-                .foregroundStyle(Color(.Labels.primary))
-                .padding(.bottom, 4)
-            
-            if !user.lastSeenDate.isOnlineHidden() {
-                Text(user.lastSeenDate.formattedOnlineDate(), bundle: .module)
-                    .font(.footnote)
-                    .foregroundStyle(user.lastSeenDate.isUserOnline() ? Color(.Main.green) : Color(.Labels.teritary))
-                    .padding(.bottom, 8)
-            }
             
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
                     send(.deeplinkTapped(url, .signature))
-                }) {
-                    ($0 as? UITextView)?.textAlignment = .center
+                }) { _ in
+                    // ($0 as? UITextView)?.textAlignment = .center
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
@@ -162,14 +177,16 @@ public struct ProfileScreen: View {
     private func NavigationSection() -> some View {
         if store.shouldShowToolbarButtons {
             Section {
-                Row(symbol: .person2, title: "QMS", type: .navigation) {
+                Row(symbol: .person2, title: "QMS", type: .navigation(badge: store.qmsBadgeCount)) {
                     send(.qmsButtonTapped)
                 }
                 
-                Section {
-                    Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
-                        send(.historyButtonTapped)
-                    }
+                Row(symbol: .at, title: "Mentions", type: .navigation(badge: store.mentionsBadgeCount)) {
+                    send(.mentionsButtonTapped)
+                }
+                
+                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation(badge: 0)) {
+                    send(.historyButtonTapped)
                 }
             }
             .listRowBackground(Color(.Background.teritary))
@@ -291,7 +308,7 @@ public struct ProfileScreen: View {
                 Row(title: "Birthdate", type: .description(birthdate))
             }
             if let gender = user.gender, gender != .unknown {
-                Row(title: "Gender", type: .description(gender.title))
+                Row(title: "Gender", type: .localizedDescription(gender.title))
             }
             if let city = user.city {
                 Row(title: "City", type: .description(city))
@@ -390,8 +407,12 @@ public struct ProfileScreen: View {
             Row(title: "Reputation", type: .navigationDescription(String(user.reputation))) {
                 send(.reputationButtonTapped)
             }
-            Row(title: "Topics", type: .description(String(user.topics)))
-            Row(title: "Replies", type: .description(String(user.replies)))
+            Row(title: "Topics", type: .navigationDescription(String(user.topics))) {
+                send(.searchTopicsButtonTapped)
+            }
+            Row(title: "Replies", type: .navigationDescription(String(user.replies))) {
+                send(.searchRepliesButtonTapped)
+            }
         } header: {
             SectionHeader(title: "Forum statistics")
         }
@@ -488,8 +509,9 @@ public struct ProfileScreen: View {
     enum RowType {
         case basic
         case description(String)
-        case navigation
+        case navigation(badge: Int)
         case navigationDescription(String)
+        case localizedDescription(LocalizedStringKey)
     }
     
     @ViewBuilder
@@ -522,10 +544,21 @@ public struct ProfileScreen: View {
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
-                    case .navigation:
-                        Image(systemSymbol: .chevronRight)
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundStyle(Color(.Labels.quintuple))
+                    case let .localizedDescription(text):
+                        Text(text, bundle: .module)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.teritary))
+                        
+                    case let .navigation(badgeCount):
+                        if badgeCount <= 0 {
+                            Image(systemSymbol: .chevronRight)
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(Color(.Labels.quintuple))
+                        } else {
+                            EmptyView()
+                                .badge(badgeCount)
+                                ._badgeProminence(.increased)
+                        }
                         
                     case let .navigationDescription(text):
                         Text(text)
@@ -643,6 +676,7 @@ extension User {
 // MARK: - Previews
 
 #Preview {
+    @Shared(.userSession) var userSession = .mock
     NavigationStack {
         ProfileScreen(
             store: Store(

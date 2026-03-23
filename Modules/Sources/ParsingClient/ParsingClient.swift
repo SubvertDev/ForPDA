@@ -25,6 +25,7 @@ public struct ParsingClient: Sendable {
     // User
     public var parseUser: @Sendable (_ response: String) async throws -> User
     public var parseReputationVotes: @Sendable ( _ response: String) async throws -> ReputationVotes
+    public var parseAvatarUrl: @Sendable (_ response: String) async throws -> UserAvatarResponseType
     
     // Bookmarks
     public var parseBookmarksList: @Sendable (_ response: String) async throws -> [Bookmark]
@@ -38,11 +39,18 @@ public struct ParsingClient: Sendable {
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
-    public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
+    public var parsePostPreview: @Sendable (_ response: String) async throws -> PreviewResponse
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
+    public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PreviewResponse
+    public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
+    
+    // Search
+    public var parseSearch: @Sendable (_ response: String) async throws -> SearchResponse
+    public var parseSearchUsers: @Sendable (_ response: String) async throws -> SearchUsersResponse
     
     // Write Form
-    public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
+    public var parseWriteForm: @Sendable (_ response: String) async throws -> [FormFieldType]
     
     // Extra
     public var parseUnread: @Sendable (_ response: String) async throws -> Unread
@@ -81,6 +89,9 @@ extension ParsingClient: DependencyKey {
         parseReputationVotes: { response in
             return try ReputationParser.parse(from: response)
         },
+        parseAvatarUrl: { response in
+            return try ProfileParser.parseAvatarUrl(from: response)
+        },
         parseBookmarksList: { response in
             return try BookmarksParser.parse(from: response)
         },
@@ -108,14 +119,29 @@ extension ParsingClient: DependencyKey {
         parseHistory: { response in
             return try HistoryParser.parse(from: response)
         },
+        parseMentions: { response in
+            return try MentionsParser.parse(from: response)
+        },
         parsePostPreview: { response in
             return try TopicParser.parsePostPreview(from: response)
         },
         parsePostSendResponse: { response in
             return try TopicParser.parsePostSendResponse(from: response)
+		},
+        parseTemplatePreview: { response in
+            return try FormParser.parseTemplatePreview(from: response)
+        },
+        parseTemplateSend: { response in
+            return try FormParser.parseTemplateSend(from: response)
+        },
+        parseSearch: { response in
+            return try SearchParser.parse(from: response)
+        },
+        parseSearchUsers: { response in
+            return try SearchUsersParser.parse(from: response)
         },
         parseWriteForm: { response in
-            return try WriteFormParser.parse(from: response)
+            return try FormParser.parse(from: response)
         },
         parseUnread: { response in
             return try UnreadParser.parse(from: response)

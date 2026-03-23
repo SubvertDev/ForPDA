@@ -1,0 +1,176 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "An error occurred while uploading the file" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Во время загрузки файла произошла ошибка"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
+    "Choose from Files" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из файлов"
+          }
+        }
+      }
+    },
+    "Choose from Gallery" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать из галереи"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
+    "File import failed. Please, try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка получения файлов. Пожалуйста, попробуйте снова"
+          }
+        }
+      }
+    },
+    "File size too big" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком большой размер"
+          }
+        }
+      }
+    },
+    "Incorrect size" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некорректный размер"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
+    "Select another file. If there are already files in the queue, it will be uploaded last" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите другой файл. Если в очереди уже есть файлы, то он будет загружен последним"
+          }
+        }
+      }
+    },
+    "Select files..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите файлы…"
+          }
+        }
+      }
+    },
+    "Sorry, this format is not supported" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, данный формат не поддерживается"
+          }
+        }
+      }
+    },
+    "Sorry, unknown error occured" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Извините, произошла неизвестная ошибка"
+          }
+        }
+      }
+    },
+    "The selected file will be inserted into the text as code wherever your cursor is located. Or it will also be automatically added to the end of the post." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбранный файл будет вставлен в текст, в виде кода, где у вас находится курсор. Или добавится автоматически в конец поста."
+          }
+        }
+      }
+    },
+    "Try Again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробовать еще раз"
+          }
+        }
+      }
+    },
+    "Unable to access security scoped resource" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to access security scoped resource"
+          }
+        }
+      }
+    },
+    "You can try uploading it again. If there are already files in the queue, it will be uploaded last" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы можете попробовать загрузить его еще раз. Если в очереди уже есть файлы, то он будет загружен последним"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.1"
+}

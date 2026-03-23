@@ -15,19 +15,26 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
+import FormFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
+	// MARK: - Localizations
+    
+    public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
+    }
+
     // MARK: - Destinations
     
     @Reducer(state: .equatable)
     public enum Destination {
         case stat(StatFeature)
-    }
-    
+
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -49,6 +56,14 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case form(FormFeature)
+		case stat(StatFeature)
+    }
+    
     // MARK: - State
     
     @ObservableState
@@ -57,6 +72,8 @@ public struct ForumFeature: Reducer, Sendable {
         
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        
+        @Presents public var destination: Destination.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -92,6 +109,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action: ViewAction {
+        case destination(PresentationAction<Destination.Action>)
         case pageNavigation(PageNavigationFeature.Action)
 
         case view(View)
@@ -99,10 +117,12 @@ public struct ForumFeature: Reducer, Sendable {
             case onFirstAppear
             case onNextAppear
             case onRefresh
+            case searchButtonTapped
             case topicTapped(TopicInfo, showUnread: Bool)
             case subforumRedirectTapped(URL)
             case subforumTapped(ForumInfo)
             case announcementTapped(id: Int, name: String)
+            case globalAnnouncementUrlTapped(URL)
             case sectionExpandTapped(SectionExpand.Kind)
             
             case contextOptionMenu(ForumOptionContextMenuAction)
@@ -124,6 +144,7 @@ public struct ForumFeature: Reducer, Sendable {
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
+            case openSearch(on: SearchOn, navigation: ForumInfo?)
             case handleRedirect(URL)
         }
     }
@@ -148,7 +169,10 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(.internal(.loadForum(offset: newOffset)))
                 
-            case .pageNavigation:
+            case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
+            case .destination, .pageNavigation:
                 return .none
                 
             case .view(.onFirstAppear):
@@ -168,6 +192,18 @@ public struct ForumFeature: Reducer, Sendable {
                 state.sectionsExpandState.toggle(kind: kind)
                 return .none
                 
+            case .view(.searchButtonTapped):
+                let navigation: ForumInfo? = if let forum = state.forum {
+                    ForumInfo(id: forum.id, name: forum.name, flag: forum.flag)
+                } else { nil }
+                return .send(.delegate(.openSearch(
+                    on: .forum(ids: [state.forumId], sIn: .all, asTopics: false),
+                    navigation: navigation
+                )))
+                
+            case let .view(.globalAnnouncementUrlTapped(url)):
+                return .send(.delegate(.handleRedirect(url)))
+                
             case let .view(.topicTapped(topic, showUnread)):
                 guard !showUnread else {
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
@@ -186,8 +222,18 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .view(.contextOptionMenu(let action)):
                 switch action {
-                    // TODO: sort, to bookmarks
-                    // TODO: Add analytics
+                case .createTopic:
+                    let formState = FormFeature.State(
+                        type: .topic(
+                            forumId: state.forumId,
+                            content: []
+                        )
+                    )
+                    state.destination = .form(formState)
+                    return .none
+                    
+                // TODO: sort, to bookmarks
+                // TODO: Add analytics
                 default: return .none
                 }
                 
@@ -208,7 +254,9 @@ public struct ForumFeature: Reducer, Sendable {
                 case .copyLink:
                     let show = isForum ? "showforum" : "showtopic"
                     pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
-                    return .none
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
                     
                 case .openInBrowser:
                     let show = isForum ? "showforum" : "showtopic"
@@ -217,7 +265,9 @@ public struct ForumFeature: Reducer, Sendable {
                     
                 case .markRead:
                     return .run { [id, isForum] send in
-                        let _ = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        let status = try await apiClient.markRead(id: id, isTopic: !isForum)
+                        let markedAsRead = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
+                        await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
                     
@@ -232,18 +282,10 @@ public struct ForumFeature: Reducer, Sendable {
                             action: isFavorite ? .delete : .add,
                             type: isForum ? .forum : .topic
                         )
-                        let _ = try await apiClient.setFavorite(request)
+                        let status = try await apiClient.setFavorite(request)
                         notificationCenter.post(name: .favoritesUpdated, object: nil)
                         await send(.internal(.refresh))
-                        // TODO: We don't know if it's added or removed from api
-                        // let text: LocalizedStringResource
-                        // if isAdded {
-                        //     text = LocalizedStringResource("Added to favorites", bundle: .module)
-                        // } else {
-                        //     text = LocalizedStringResource("Removed from favorites", bundle: .module)
-                        // }
-                        // let toast = ToastMessage(text: text, haptic: .success)
-                        // await toastClient.showToast(toast)
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                     } catch: { _, _ in
                         await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
@@ -318,3 +360,5 @@ public struct ForumFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ForumFeature.Destination.State: Equatable {}

@@ -46,8 +46,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
-    public enum Destination: Hashable {
+    @Reducer
+    public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
         case alert(AlertState<Never>)
@@ -58,7 +58,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
-        @Shared(.appSettings) public var appSettings: AppSettings
+        @Shared(.appSettings) public var appSettings
+        @Shared(.userSession) private var userSession
         
         public var viewState: ViewState = .loading
         
@@ -79,6 +80,10 @@ public struct ArticlesListFeature: Reducer, Sendable {
         }
         
         var didLoadOnce = false
+        
+        public var isAuthorized: Bool {
+            return userSession != nil
+        }
         
         public init(
             destination: Destination.State? = nil,
@@ -110,6 +115,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
         case linkShared(Bool, URL)
         case listGridTypeButtonTapped
         case tryAgainButtonTapped
+        case searchButtonTapped
         case onRefresh
         case loadMoreArticles
         case scrollToTop
@@ -118,6 +124,8 @@ public struct ArticlesListFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openSearch(SearchOn)
+            case openUserProfile(Int)
             case openArticle(ArticlePreview)
         }
     }
@@ -170,6 +178,9 @@ public struct ArticlesListFeature: Reducer, Sendable {
                     try await clock.sleep(for: .nanoseconds(1_000_000_000 - timeInterval))
                     await send(._articlesResponse(result))
                 }
+                
+            case .searchButtonTapped:
+                return .send(.delegate(.openSearch(.site)))
                 
             case .listGridTypeButtonTapped:
                 state.listRowType = AppSettings.ArticleListRowType.toggle(from: state.listRowType)
@@ -254,3 +265,5 @@ public struct ArticlesListFeature: Reducer, Sendable {
         return .none
     }
 }
+
+extension ArticlesListFeature.Destination.State: Equatable {}
