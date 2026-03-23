@@ -17,7 +17,7 @@ public struct StatFeature: Reducer, Sendable {
     
     // MARK: - Destinations
     
-    @Reducer(state: .equatable)
+    @Reducer
     public enum Destination: Hashable {
         @ReducerCaseIgnored
         case share(URL)
@@ -124,3 +124,5 @@ public struct StatFeature: Reducer, Sendable {
         .ifLet(\.$destination, action: \.destination)
     }
 }
+
+extension StatFeature.Destination.State: Equatable {}
