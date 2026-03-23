@@ -29,12 +29,6 @@ public struct ForumFeature: Reducer, Sendable {
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
     }
 
-    // MARK: - Destinations
-    
-    @Reducer(state: .equatable)
-    public enum Destination {
-        case stat(StatFeature)
-
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -68,8 +62,6 @@ public struct ForumFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        @Presents public var destination: Destination.State?
-        
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
         
@@ -130,8 +122,6 @@ public struct ForumFeature: Reducer, Sendable {
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
         
-        case destination(PresentationAction<Destination.Action>)
-                
         case `internal`(Internal)
         public enum Internal {
             case refresh
