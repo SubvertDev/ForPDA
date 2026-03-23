@@ -13,12 +13,18 @@ import SharedUI
 @ViewAction(for: StatFeature.self)
 public struct StatView: View {
     
+    // MARK: - Properties
+    
     @Perception.Bindable public var store: StoreOf<StatFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    // MARK: - Init
     
     public init(store: StoreOf<StatFeature>) {
         self.store = store
     }
+    
+    // MARK: - Body
     
     public var body: some View {
         WithPerceptionTracking {
