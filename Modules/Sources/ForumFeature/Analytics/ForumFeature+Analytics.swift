@@ -92,7 +92,7 @@ extension ForumFeature {
                         analytics.log(ForumEvent.loadingFailure(error))
                     }
                     
-                case .delegate, .destination:
+                case .delegate:
                     break
                 }
                 
