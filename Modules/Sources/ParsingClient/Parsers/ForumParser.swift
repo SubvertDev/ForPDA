@@ -59,7 +59,7 @@ public struct ForumParser {
                     id: array[3] as! Int,
                     name: array[4] as! String,
                     description: array[5] as! String,
-                    flag: array[6] as! Int,
+                    flag: ForumFlag(rawValue: array[6] as! Int),
                     globalAnnouncement: array[7] as! String,
                     subforumsCount: array[8] as! Int,
                     topicsCount: array[9] as! Int,

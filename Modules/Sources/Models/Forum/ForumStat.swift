@@ -9,8 +9,8 @@ public struct ForumStat: Sendable, Equatable {
     public let id: Int
     public let name: String
     public let description: String
-    public let flag: Int
-    public let globalAnnouncement: String // TODO: Think about good naming & rename in TopicInfo/Topic (I forgot xD)
+    public let flag: ForumFlag
+    public let globalAnnouncement: String
     public let subforumsCount: Int
     public let topicsCount: Int
     public let postsCount: Int
@@ -32,7 +32,7 @@ public struct ForumStat: Sendable, Equatable {
         id: Int,
         name: String,
         description: String,
-        flag: Int,
+        flag: ForumFlag,
         globalAnnouncement: String,
         subforumsCount: Int,
         topicsCount: Int,
@@ -56,7 +56,7 @@ public extension ForumStat {
         id: 5,
         name: "4PDA - Administrative",
         description: "Simple description.",
-        flag: 100,
+        flag: [.canPost, .updated],
         globalAnnouncement: "This is global announcement title.",
         subforumsCount: 3,
         topicsCount: 1456,
