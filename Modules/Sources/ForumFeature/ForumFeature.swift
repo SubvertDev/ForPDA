@@ -333,7 +333,7 @@ public struct ForumFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
-            case .delegate, .destination:
+            case .delegate:
                 return .none
             }
         }
