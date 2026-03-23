@@ -43,7 +43,7 @@ public struct ProfileParser {
     /// 30. 0 - user readonly (if != 0 => before ...)
     /// 31. 0 - ban reason (1 - last chanse | 2 - permanent | 3 - security block)
     /// 32. [] - rewards list
-    /// 33. "" - ???
+    /// 33. "" - previous nicknames
     
     public static func parseUser(from string: String) throws -> User {
         if let data = string.data(using: .utf8) {
@@ -75,7 +75,8 @@ public struct ProfileParser {
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
                     registrationIP: array[26] as! String,
                     sessionIP: array[27] as! String,
-                    achievements: parseUserAchievements(array[32] as! [[Any]])
+                    achievements: parseUserAchievements(array[32] as! [[Any]]),
+                    previousNicknames: array[33] as! String
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)

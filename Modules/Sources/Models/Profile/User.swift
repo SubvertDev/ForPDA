@@ -35,6 +35,7 @@ public struct User: Sendable, Hashable, Codable {
     public let registrationIP: String
     public let sessionIP: String
     public let achievements: [Achievement]
+    public let previousNicknames: String
     
     public var canModerate: Bool {
         return !registrationIP.isEmpty || !sessionIP.isEmpty
@@ -100,7 +101,8 @@ public struct User: Sendable, Hashable, Codable {
         email: String?,
         registrationIP: String,
         sessionIP: String,
-        achievements: [Achievement]
+        achievements: [Achievement],
+        previousNicknames: String
     ) {
         self.id = id
         self.nickname = nickname
@@ -128,6 +130,7 @@ public struct User: Sendable, Hashable, Codable {
         self.registrationIP = registrationIP
         self.sessionIP = sessionIP
         self.achievements = achievements
+        self.previousNicknames = previousNicknames
     }
 }
 
@@ -318,6 +321,7 @@ public extension User {
                 forumUrl: URL(string: "/")!,
                 presentationDate: .now
             )
-        ]
+        ],
+        previousNicknames: "Previous1, Previous2, Previous3"
     )
 }
