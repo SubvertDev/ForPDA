@@ -163,7 +163,7 @@ public struct ForumStatView: View {
     @ViewBuilder
     private func UserBrickButton(_ moderator: ForumStat.ForumModerator) -> some View {
         Button {
-            // TODO: Handle click
+            send(.userButtonTapped(moderator.id))
         } label: {
             Text(verbatim: "\(moderator.name)")
                 .font(.footnote)

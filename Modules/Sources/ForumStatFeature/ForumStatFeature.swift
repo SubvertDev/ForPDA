@@ -54,6 +54,7 @@ public struct ForumStatFeature: Reducer, Sendable {
             case onAppear
             
             case linkShared
+            case userButtonTapped(Int)
             
             case closeButtonTapped
             case shareLinkButtonTapped
@@ -66,6 +67,11 @@ public struct ForumStatFeature: Reducer, Sendable {
         public enum Internal {
             case loadForumStat
             case forumStatResponse(Result<ForumStat, any Error>)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case userTapped(Int)
         }
     }
     
@@ -89,6 +95,12 @@ public struct ForumStatFeature: Reducer, Sendable {
             case .view(.linkShared):
                 state.destination = nil
                 return .none
+                
+            case let .view(.userButtonTapped(id)):
+                return .run { send in
+                    await send(.delegate(.userTapped(id)))
+                    await dismiss()
+                }
                 
             case .view(.shareLinkButtonTapped):
                 state.destination = .share(URL(string: state.shareLink)!)
@@ -117,7 +129,7 @@ public struct ForumStatFeature: Reducer, Sendable {
                 print(error)
                 return .none
                 
-            case .destination:
+            case .destination, .delegate:
                 return .none
             }
         }

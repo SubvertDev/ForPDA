@@ -132,6 +132,7 @@ public struct ForumFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openUser(id: Int)
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
@@ -162,6 +163,9 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
                 return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
+            case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
+                return .send(.delegate(.openUser(id: id)))
                 
             case .destination, .pageNavigation:
                 return .none
