@@ -267,7 +267,7 @@ public struct ForumFeature: Reducer, Sendable {
                     }
                     
                 case .stat:
-                    state.destination = .stat(ForumStatFeature.State(forumId: id))
+                    state.destination = .stat(ForumStatFeature.State(type: .forum(id: state.forumId)))
                     return .none
                     
                 case .setFavorite(let isFavorite):

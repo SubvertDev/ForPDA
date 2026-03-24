@@ -29,20 +29,25 @@ public struct ForumStatFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
         
-        let forumId: Int
+        let type: ForumStatType
         
         var isLoading = false
         
         public var stat: ForumStat?
+        public var topicViewers: TopicViewers?
         
-        public var shareLink: String {
-            return "https://4pda.to/forum/index.php?showforum=\(forumId)"
+        var shareLink: String {
+            let show = switch type {
+            case .forum(let id): "showforum=\(id)"
+            case .topic(let topic): "showtopic=\(topic.id)"
+            }
+            return "https://4pda.to/forum/index.php?\(show)"
         }
         
         public init(
-            forumId: Int
+            type: ForumStatType
         ) {
-            self.forumId = forumId
+            self.type = type
         }
     }
     
@@ -65,8 +70,11 @@ public struct ForumStatFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            case loadForumStat
+            case loadTopicStat(Topic)
+            case loadTopicViewers(Int)
+            case loadForumStat(id: Int)
             case forumStatResponse(Result<ForumStat, any Error>)
+            case topicViewersResponse(TopicViewers)
         }
         
         case delegate(Delegate)
@@ -78,8 +86,8 @@ public struct ForumStatFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
-    @Dependency(\.openURL) var openURL
-    @Dependency(\.dismiss) var dismiss
+    @Dependency(\.openURL) private var openURL
+    @Dependency(\.dismiss) private var dismiss
     
     // MARK: - Body
     
@@ -87,7 +95,12 @@ public struct ForumStatFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                return .send(.internal(.loadForumStat))
+                switch state.type {
+                case .forum(let id):
+                    return .send(.internal(.loadForumStat(id: id)))
+                case .topic(let topic):
+                    return .send(.internal(.loadTopicStat(topic)))
+                }
                 
             case .view(.closeButtonTapped):
                 return .run { _ in await dismiss() }
@@ -111,9 +124,24 @@ public struct ForumStatFeature: Reducer, Sendable {
                     await openURL(URL(string: shareLink)!)
                 }
                 
-            case .internal(.loadForumStat):
+            case let .internal(.loadTopicStat(topic)):
+                return .send(.internal(.loadTopicViewers(topic.id)))
+                
+            case let .internal(.loadTopicViewers(topicId)):
                 state.isLoading = true
-                return .run { [id = state.forumId] send in
+                return .run { send in
+                    let response = try await apiClient.getTopicViewers(id: topicId)
+                    await send(.internal(.topicViewersResponse(response)))
+                }
+                
+            case let .internal(.topicViewersResponse(response)):
+                state.topicViewers = response
+                state.isLoading = false
+                return .none
+                
+            case let .internal(.loadForumStat(id)):
+                state.isLoading = true
+                return .run { send in
                     let response = try await apiClient.getForumStat(id)
                     await send(.internal(.forumStatResponse(.success(response))))
                 } catch: { error, send in

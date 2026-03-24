@@ -5,12 +5,16 @@
 //  Created by Xialtal on 24.03.26.
 //
 
-public struct TopicViewers: Sendable {
+public struct TopicViewers: Sendable, Equatable {
     public let guestsCount: Int
     public let hiddenUsersCount: Int
     public let users: [SimplifiedUser]
     
-    public struct SimplifiedUser: Sendable, Identifiable {
+    public var allCount: Int {
+        return guestsCount + hiddenUsersCount + users.count
+    }
+    
+    public struct SimplifiedUser: Sendable, Identifiable, Equatable {
         public let id: Int
         public let name: String
         public let group: User.Group
