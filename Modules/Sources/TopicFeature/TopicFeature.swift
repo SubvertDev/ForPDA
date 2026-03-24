@@ -22,6 +22,7 @@ import AnalyticsClient
 import TopicBuilder
 import ToastClient
 import NotificationsClient
+import ForumStatFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -50,6 +51,7 @@ public struct TopicFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case karmaChange(Int)
         case form(FormFeature)
+        case stat(ForumStatFeature)
         case changeReputation(ReputationChangeFeature)
         case alert(AlertState<Alert>)
         
@@ -214,6 +216,9 @@ public struct TopicFeature: Reducer, Sendable {
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
                 
+            case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
+                return .send(.delegate(.openUser(id: id)))
+                
             case let .destination(.presented(.alert(.deletePost(id)))):
                 return .run { send in
                     let status = try await apiClient.deletePosts(postIds: [id])
@@ -302,6 +307,13 @@ public struct TopicFeature: Reducer, Sendable {
                         )
                     )
                     state.destination = .form(formState)
+                    return .none
+                    
+                case .about:
+                    let statState = ForumStatFeature.State(
+                        type: .topic(topic)
+                    )
+                    state.destination = .stat(statState)
                     return .none
                     
                 case .openInBrowser:

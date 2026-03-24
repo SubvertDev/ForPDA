@@ -499,6 +499,7 @@ let project = Project(
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
                     .Internal.FormFeature,
+                    .Internal.ForumStatFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
