@@ -145,11 +145,9 @@ public struct StatView: View {
                     .multilineTextAlignment(.center)
                 
             case .moderators(let moderators):
-                Group {
+                BrickLayout(verticalSpacing: 6, horizontalSpacing: 8) {
                     ForEach(moderators) { moderator in
-                        Text(verbatim: "\(moderator.name)")
-                            .font(.body)
-                            .multilineTextAlignment(.center)
+                        UserBrickButton(moderator)
                     }
                 }
             }
@@ -159,6 +157,25 @@ public struct StatView: View {
         .background(
             Color(.Background.teritary)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+        )
+    }
+    
+    @ViewBuilder
+    private func UserBrickButton(_ moderator: ForumStat.ForumModerator) -> some View {
+        Button {
+            // TODO: Handle click
+        } label: {
+            Text(verbatim: "\(moderator.name)")
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(tintColor)
+        }
+        .buttonStyle(.plain)
+        .padding(.vertical, 9)
+        .padding(.horizontal, 8)
+        .background(
+            Color(.Background.teritary)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
         )
     }
 }
