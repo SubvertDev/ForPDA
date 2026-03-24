@@ -81,7 +81,7 @@ public struct ForumStatFeature: Reducer, Sendable {
             case loadTopicViewers(Int)
             case loadForumStat(id: Int)
             case forumStatResponse(Result<ForumStat, any Error>)
-            case topicViewersResponse(TopicViewers)
+            case topicViewersResponse(Result<TopicViewers, any Error>)
         }
         
         case delegate(Delegate)
@@ -141,11 +141,18 @@ public struct ForumStatFeature: Reducer, Sendable {
                 state.isLoading = true
                 return .run { send in
                     let response = try await apiClient.getTopicViewers(id: topicId)
-                    await send(.internal(.topicViewersResponse(response)))
+                    await send(.internal(.topicViewersResponse(.success(response))))
+                } catch: { error, send in
+                    await send(.internal(.topicViewersResponse(.failure(error))))
                 }
                 
-            case let .internal(.topicViewersResponse(response)):
+            case let .internal(.topicViewersResponse(.success(response))):
                 state.topicViewers = response
+                state.isLoading = false
+                return .none
+                
+            case let .internal(.topicViewersResponse(.failure(error))):
+                print(error)
                 state.isLoading = false
                 return .none
                 
