@@ -31,16 +31,6 @@
         }
       }
     },
-    "Close" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закрыть"
-          }
-        }
-      }
-    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
@@ -101,16 +91,6 @@
         }
       }
     },
-    "Moderators" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Модераторы"
-          }
-        }
-      }
-    },
     "Open" : {
       "localizations" : {
         "ru" : {
@@ -137,16 +117,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Закрепленные темы"
-          }
-        }
-      }
-    },
-    "Posts" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Постов"
           }
         }
       }
