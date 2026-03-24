@@ -33,7 +33,7 @@ public struct ProfileParser {
     /// 20. 0 - topics amount
     /// 21. 10 - replies amount
     /// 22. 0 - qms messages
-    /// 23. [] - devices on forum
+    /// 23. [] - curated topics
     /// 24. [] - warning log
     /// 25. something@gmail.com - email
     /// 26. "" - empty = no warnings
@@ -71,7 +71,7 @@ public struct ProfileParser {
                     topics: array[20] as! Int,
                     replies: array[21] as! Int,
                     qmsMessages: (array[22] as! Int),
-                    forumDevices: nil,
+                    curatedTopics: parseCuratedTopics(array[23] as! [[Any]]),
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
                     achievements: parseUserAchievements(array[32] as! [[Any]])
                 )
@@ -125,6 +125,12 @@ public struct ProfileParser {
                     timeIntervalSince1970: achievement[4] as! TimeInterval
                 )
             )
+        }
+    }
+    
+    private static func parseCuratedTopics(_ array: [[Any]]) -> [User.CuratedTopic] {
+        return array.map { topic in
+            return User.CuratedTopic(id: topic[0] as! Int, name: topic[1] as! String)
         }
     }
 }

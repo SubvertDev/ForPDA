@@ -25,7 +25,7 @@ public struct ProfileScreen: View {
     @Environment(\.tintColor) private var tintColor
     
     public enum PickerSelection {
-        case general, statistics, achievements
+        case general, statistics, achievements, curation
     }
     @State private var pickerSelection: PickerSelection = .general
     
@@ -58,6 +58,9 @@ public struct ProfileScreen: View {
                             
                         case .achievements:
                             AchievementsSegment(user: user)
+                            
+                        case .curation:
+                            CurationSegment(user.curatedTopics)
                         }
                     }
                     .listSectionSpacingBackport(28)
@@ -207,6 +210,11 @@ public struct ProfileScreen: View {
             if !store.user!.achievements.isEmpty {
                 Text("Achievements", bundle: .module)
                     .tag(PickerSelection.achievements)
+            }
+            
+            if !store.user!.curatedTopics.isEmpty {
+                Text("Curation", bundle: .module)
+                    .tag(PickerSelection.curation)
             }
         }
         .pickerStyle(.segmented)
@@ -492,6 +500,21 @@ public struct ProfileScreen: View {
         .listRowBackground(Color.clear)
     }
     
+    // MARK: - Curation Segment
+    
+    @ViewBuilder
+    private func CurationSegment(_ topics: [User.CuratedTopic]) -> some View {
+        Section {
+            ForEach(topics) { topic in
+                Row(title: LocalizedStringKey(topic.name), type: .basicNavigation) {
+                    send(.curatedTopicButtonTapped(topic.id))
+                }
+            }
+        }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
     // MARK: - Section Header
     
     @ViewBuilder
@@ -508,6 +531,7 @@ public struct ProfileScreen: View {
     
     enum RowType {
         case basic
+        case basicNavigation
         case description(String)
         case navigation(badge: Int)
         case navigationDescription(String)
@@ -538,6 +562,11 @@ public struct ProfileScreen: View {
                     switch type {
                     case .basic:
                         EmptyView()
+                        
+                    case .basicNavigation:
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color(.Labels.quintuple))
                         
                     case let .description(text):
                         Text(text)

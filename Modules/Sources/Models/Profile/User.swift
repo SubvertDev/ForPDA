@@ -30,7 +30,7 @@ public struct User: Sendable, Hashable, Codable {
     public let topics: Int
     public let replies: Int
     public let qmsMessages: Int?
-    public let forumDevices: [Device]?
+    public let curatedTopics: [CuratedTopic]
     public let email: String?
     public let achievements: [Achievement]
     
@@ -90,7 +90,7 @@ public struct User: Sendable, Hashable, Codable {
         topics: Int,
         replies: Int,
         qmsMessages: Int?,
-        forumDevices: [Device]?,
+        curatedTopics: [CuratedTopic],
         email: String?,
         achievements: [Achievement]
     ) {
@@ -115,7 +115,7 @@ public struct User: Sendable, Hashable, Codable {
         self.topics = topics
         self.replies = replies
         self.qmsMessages = qmsMessages
-        self.forumDevices = forumDevices
+        self.curatedTopics = curatedTopics
         self.email = email
         self.achievements = achievements
     }
@@ -257,6 +257,18 @@ public extension User {
             self.id = name.hashValue
         }
     }
+    
+    // MARK: Curated Topic
+    
+    struct CuratedTopic: Codable, Hashable, Sendable, Identifiable {
+        public let id: Int
+        public let name: String
+        
+        public init(id: Int, name: String) {
+            self.id = id
+            self.name = name
+        }
+    }
 }
 
 // MARK: - Mock
@@ -295,7 +307,11 @@ public extension User {
         topics: 5,
         replies: 82,
         qmsMessages: nil,
-        forumDevices: nil,
+        curatedTopics: [
+            .init(id: 1, name: "ForPDA [iOS]"),
+            .init(id: 2, name: "My Little Pony"),
+            .init(id: 3, name: "Topic with long name, with very long name")
+        ],
         email: "some@email.com",
         achievements: [
             .init(

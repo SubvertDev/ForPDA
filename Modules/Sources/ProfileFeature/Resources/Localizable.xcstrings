@@ -121,6 +121,16 @@
         }
       }
     },
+    "Curation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курирование"
+          }
+        }
+      }
+    },
     "Delete" : {
       "localizations" : {
         "ru" : {

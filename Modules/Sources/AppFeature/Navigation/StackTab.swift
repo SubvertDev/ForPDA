@@ -288,6 +288,9 @@ public struct StackTab: Reducer, Sendable {
         case .profile(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
             
+        case let .profile(.delegate(.openTopic(id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id))))
+            
         case let .profile(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
             
