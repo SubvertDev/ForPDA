@@ -1,5 +1,5 @@
 //
-//  StatFeature.swift
+//  ForumStatFeature.swift
 //  ForPDA
 //
 //  Created by Xialtal on 14.06.25.
@@ -11,7 +11,7 @@ import APIClient
 import Models
 
 @Reducer
-public struct StatFeature: Reducer, Sendable {
+public struct ForumStatFeature: Reducer, Sendable {
     
     public init() {}
     
@@ -125,4 +125,4 @@ public struct StatFeature: Reducer, Sendable {
     }
 }
 
-extension StatFeature.Destination.State: Equatable {}
+extension ForumStatFeature.Destination.State: Equatable {}

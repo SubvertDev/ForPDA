@@ -13,6 +13,7 @@ import SharedUI
 import Models
 import BBBuilder
 import FormFeature
+import ForumStatFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -98,7 +99,7 @@ public struct ForumScreen: View {
             }
             .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
                 NavigationStack {
-                    StatView(store: store)
+                    ForumStatView(store: store)
                 }
             }
             .toolbar {

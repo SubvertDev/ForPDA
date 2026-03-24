@@ -16,6 +16,7 @@ import PersistenceKeys
 import TCAExtensions
 import ToastClient
 import FormFeature
+import ForumStatFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -55,7 +56,7 @@ public struct ForumFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case form(FormFeature)
-		case stat(StatFeature)
+		case stat(ForumStatFeature)
     }
     
     // MARK: - State
@@ -262,7 +263,7 @@ public struct ForumFeature: Reducer, Sendable {
                     }
                     
                 case .stat:
-                    state.destination = .stat(StatFeature.State(forumId: id))
+                    state.destination = .stat(ForumStatFeature.State(forumId: id))
                     return .none
                     
                 case .setFavorite(let isFavorite):

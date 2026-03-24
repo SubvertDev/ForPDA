@@ -1,5 +1,5 @@
 //
-//  StatView.swift
+//  ForumStatView.swift
 //  ForPDA
 //
 //  Created by Xialtal on 14.06.25.
@@ -10,17 +10,17 @@ import ComposableArchitecture
 import Models
 import SharedUI
 
-@ViewAction(for: StatFeature.self)
-public struct StatView: View {
+@ViewAction(for: ForumStatFeature.self)
+public struct ForumStatView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable public var store: StoreOf<StatFeature>
+    @Perception.Bindable public var store: StoreOf<ForumStatFeature>
     @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
     
-    public init(store: StoreOf<StatFeature>) {
+    public init(store: StoreOf<ForumStatFeature>) {
         self.store = store
     }
     
@@ -184,13 +184,13 @@ public struct StatView: View {
 
 #Preview {
     NavigationStack {
-        StatView(
+        ForumStatView(
             store: Store(
-                initialState: StatFeature.State(
+                initialState: ForumStatFeature.State(
                     forumId: 0
                 )
             ) {
-                StatFeature()
+                ForumStatFeature()
             }
         )
     }
