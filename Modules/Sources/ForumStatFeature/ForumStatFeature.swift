@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import APIClient
 import Models
+import PersistenceKeys
 
 @Reducer
 public struct ForumStatFeature: Reducer, Sendable {
@@ -27,6 +28,8 @@ public struct ForumStatFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Shared(.userSession) var userSession: UserSession?
+        
         @Presents public var destination: Destination.State?
         
         let type: ForumStatType
@@ -35,6 +38,10 @@ public struct ForumStatFeature: Reducer, Sendable {
         
         public var stat: ForumStat?
         public var topicViewers: TopicViewers?
+        
+        var isUserAuthorized: Bool {
+            return userSession != nil
+        }
         
         var shareLink: String {
             let show = switch type {
@@ -125,7 +132,10 @@ public struct ForumStatFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.loadTopicStat(topic)):
-                return .send(.internal(.loadTopicViewers(topic.id)))
+                if state.isUserAuthorized {
+                    return .send(.internal(.loadTopicViewers(topic.id)))
+                }
+                return .none
                 
             case let .internal(.loadTopicViewers(topicId)):
                 state.isLoading = true

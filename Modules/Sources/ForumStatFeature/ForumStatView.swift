@@ -115,13 +115,15 @@ public struct ForumStatView: View {
                 )
             }
             
-            if let viewers = store.topicViewers, !store.isLoading {
-                TopicViewers(viewers)
-            } else {
-                PDALoader()
-                    .frame(width: 24, height: 24)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 28)
+            if store.isUserAuthorized {
+                if let viewers = store.topicViewers, !store.isLoading {
+                    TopicViewers(viewers)
+                } else {
+                    PDALoader()
+                        .frame(width: 24, height: 24)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 28)
+                }
             }
         }
     }

@@ -274,6 +274,7 @@ let project = Project(
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.Models,
+                    .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
