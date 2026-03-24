@@ -13,6 +13,7 @@ import SharedUI
 import Models
 import BBBuilder
 import FormFeature
+import ForumStatFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -94,6 +95,11 @@ public struct ForumScreen: View {
                     )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
+                }
+            }
+            .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                NavigationStack {
+                    ForumStatView(store: store)
                 }
             }
             .toolbar {
@@ -323,14 +329,14 @@ public struct ForumScreen: View {
             send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
-        if store.isUserAuthorized {
-            if isUnread {
-                ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
-                    send(.contextCommonMenu(.markRead, id, isForum))
-                }
+        if store.isUserAuthorized, isUnread {
+            ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
+                send(.contextCommonMenu(.markRead, id, isForum))
             }
-            
-            Section {
+        }
+        
+        Section {
+            if store.isUserAuthorized {
                 ContextButton(
                     text: isFavorite
                     ? LocalizedStringResource("Remove from favorites", bundle: .module)
@@ -338,6 +344,12 @@ public struct ForumScreen: View {
                     symbol: isFavorite ? .starFill : .star
                 ) {
                     send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+                }
+            }
+            
+            if isForum {
+                ContextButton(text: LocalizedStringResource("About Forum", bundle: .module), symbol: .infoCircle) {
+                    send(.contextCommonMenu(.stat, id, isForum))
                 }
             }
         }

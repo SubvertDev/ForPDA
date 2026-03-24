@@ -20,6 +20,7 @@ public enum TopicEvent: Event {
     case menuOpenInBrowser
     case menuGoToEnd
     case menuSetFavorite
+    case menuAboutTopic
     case menuWritePost
     case menuWritePostWithTemplate
     

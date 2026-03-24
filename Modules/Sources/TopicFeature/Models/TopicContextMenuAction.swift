@@ -12,4 +12,5 @@ public enum TopicContextMenuAction {
     case openInBrowser
     case goToEnd
     case setFavorite
+    case about
 }

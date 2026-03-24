@@ -1,92 +1,92 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "About Forum" : {
+    "Author" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "О форуме"
+            "value" : "Автор"
           }
         }
       }
     },
-    "Add to favorites" : {
+    "Close" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "В избранное"
+            "value" : "Закрыть"
           }
         }
       }
     },
-    "Announcements" : {
+    "Closed" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Объявления"
+            "value" : "Закрыта"
           }
         }
       }
     },
-    "Copy Link" : {
+    "Created At" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Копировать ссылку"
+            "value" : "Дата создания"
           }
         }
       }
     },
-    "Create Topic" : {
+    "Curator" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Создать тему"
+            "value" : "Куратор"
           }
         }
       }
     },
-    "Go To End" : {
+    "Guests: **%lld**" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перейти в конец"
+            "value" : "Гостей: **%lld**"
           }
         }
       }
     },
-    "Link copied" : {
+    "Hidden users: **%lld**" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ссылка скопирована"
+            "value" : "Скрытых пользователей: **%lld**"
           }
         }
       }
     },
-    "Mark Read" : {
+    "Moderators" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прочитано"
+            "value" : "Модераторы"
           }
         }
       }
     },
-    "Marked as read" : {
+    "no" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отмечено прочитанным"
+            "value" : "нет"
           }
         }
       }
@@ -96,37 +96,37 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть"
+            "value" : "Открыта"
           }
         }
       }
     },
-    "Open In Browser" : {
+    "Posts" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть в браузере"
+            "value" : "Постов"
           }
         }
       }
     },
-    "Pinned topics" : {
+    "Reading this topic: **%lld people**" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрепленные темы"
+            "value" : "Читают эту тему: **%lld чел.**"
           }
         }
       }
     },
-    "Remove from favorites" : {
+    "Status" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Удалить из избранного"
+            "value" : "Статус"
           }
         }
       }
@@ -152,5 +152,5 @@
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

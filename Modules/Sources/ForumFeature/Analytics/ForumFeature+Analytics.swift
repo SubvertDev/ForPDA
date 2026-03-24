@@ -66,6 +66,8 @@ extension ForumFeature {
                     
                 case let .view(.contextCommonMenu(option, id, isForum)):
                     switch option {
+                    case .stat:
+                        analytics.log(ForumEvent.menuStat(id, isForum))
                     case .markRead:
                         analytics.log(ForumEvent.menuMarkRead(id, isForum))
                     case .copyLink:

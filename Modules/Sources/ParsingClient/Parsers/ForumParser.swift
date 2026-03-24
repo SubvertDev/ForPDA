@@ -46,6 +46,44 @@ public struct ForumParser {
         }
     }
     
+    public static func parseForumStat(from string: String) throws -> ForumStat {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                if array.count == 2 {
+                    throw ParsingError.failedToFindPost
+                }
+                
+                return ForumStat(
+                    id: array[3] as! Int,
+                    name: array[4] as! String,
+                    description: array[5] as! String,
+                    flag: ForumFlag(rawValue: array[6] as! Int),
+                    globalAnnouncement: array[7] as! String,
+                    subforumsCount: array[8] as! Int,
+                    topicsCount: array[9] as! Int,
+                    postsCount: array[10] as! Int,
+                    moderators: parseForumStatModerators(array[11] as! [[Any]])
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
+    internal static func parseForumStatModerators(_ array: [[Any]]) -> [ForumStat.ForumModerator] {
+        return array.map { moderator in
+            return ForumStat.ForumModerator(
+                id: moderator[0] as! Int,
+                name: moderator[1] as! String,
+                group: User.Group(rawValue: moderator[2] as! Int)!
+            )
+        }
+    }
+    
     public static func parseForumJump(from string: String) throws -> ForumJump {
         if let data = string.data(using: .utf8) {
             do {

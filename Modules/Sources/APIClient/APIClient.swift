@@ -57,10 +57,12 @@ public struct APIClient: Sendable {
     // Forum
     public var getForumsList: @Sendable (_ policy: CachePolicy) async throws -> AsyncThrowingStream<[ForumInfo], any Error>
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Forum, any Error>
+    public var getForumStat: @Sendable (_ id: Int) async throws -> ForumStat
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
+    public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
     public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
@@ -306,6 +308,12 @@ extension APIClient: DependencyKey {
                 )
             },
             
+            getForumStat: { id in
+                let command = ForumCommand.info(id: id)
+                let response = try await api.send(command)
+                return try await parser.parseForumStat(response)
+            },
+            
             jumpForum: { request in
                 let command = ForumCommand.jump(data: ForumJumpRequest(
                     type: request.transferType,
@@ -338,6 +346,14 @@ extension APIClient: DependencyKey {
                 )
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
+            },
+            getTopicViewers: { topicId in
+                let command = MemberCommand.sessions(
+                    pageType: .topic,
+                    pageId: topicId
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTopicViewers(response)
             },
             
             getTemplate: { request, isTopic in
@@ -627,6 +643,9 @@ extension APIClient: DependencyKey {
             getForum: { _, _, _, _ in
                 return .finished()
             },
+            getForumStat: { _ in
+                return .mock
+            },
             jumpForum: { _ in
                 return .mock
             },
@@ -637,6 +656,9 @@ extension APIClient: DependencyKey {
                 return .mock
             },
             getTopic: { _, _, _, _ in
+                return .mock
+            },
+            getTopicViewers: { _ in
                 return .mock
             },
             getTemplate: { _, _ in
