@@ -31,6 +31,10 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         return flag.contains(.canModerate)
     }
     
+    public var isClosed: Bool {
+        return flag.contains(.closed)
+    }
+    
     public var isFavorite: Bool
     
     public struct Poll: Sendable, Codable, Hashable {
