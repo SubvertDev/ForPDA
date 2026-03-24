@@ -72,6 +72,7 @@ public struct ProfileParser {
                     replies: array[21] as! Int,
                     qmsMessages: (array[22] as! Int),
                     curatedTopics: parseCuratedTopics(array[23] as! [[Any]]),
+                    warningLogs: parseWarningLogs(array[24] as! [[Any]]),
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
                     achievements: parseUserAchievements(array[32] as! [[Any]])
                 )
@@ -131,6 +132,20 @@ public struct ProfileParser {
     private static func parseCuratedTopics(_ array: [[Any]]) -> [User.CuratedTopic] {
         return array.map { topic in
             return User.CuratedTopic(id: topic[0] as! Int, name: topic[1] as! String)
+        }
+    }
+    
+    private static func parseWarningLogs(_ array: [[Any]]) -> [User.WarningLog] {
+        return array.map { warning in
+            return User.WarningLog(
+                timestamp: warning[0] as! Int,
+                level: .init(rawValue: warning[1] as! Int) ?? .unknown,
+                authorId: warning[2] as! Int,
+                authorName: warning[3] as! String,
+                reason: warning[4] as! String,
+                postId: warning[5] as! Int,
+                canBeCanceled: ((warning[6] as! Int) != 0)
+            )
         }
     }
 }
