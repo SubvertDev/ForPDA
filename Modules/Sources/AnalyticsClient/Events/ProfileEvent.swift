@@ -22,6 +22,7 @@ public enum ProfileEvent: Event {
     case achievementTapped
     case linkInAboutTapped
     case linkInSignatureTapped
+    case linkInWarningLogTapped
     case curatedTopicTapped(Int)
     
     public var name: String {

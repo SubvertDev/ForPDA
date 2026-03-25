@@ -62,6 +62,8 @@ extension ProfileFeature {
                         analyticsClient.log(ProfileEvent.linkInAboutTapped)
                     case .signature:
                         analyticsClient.log(ProfileEvent.linkInSignatureTapped)
+                    case .warningLog:
+                        analyticsClient.log(ProfileEvent.linkInWarningLogTapped)
                     case .achievement:
                         analyticsClient.log(ProfileEvent.achievementTapped)
                     }

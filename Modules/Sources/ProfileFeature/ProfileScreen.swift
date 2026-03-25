@@ -25,7 +25,7 @@ public struct ProfileScreen: View {
     @Environment(\.tintColor) private var tintColor
     
     public enum PickerSelection {
-        case general, statistics, achievements, curation
+        case general, statistics, achievements, curation, logging
     }
     @State private var pickerSelection: PickerSelection = .general
     
@@ -61,6 +61,9 @@ public struct ProfileScreen: View {
                             
                         case .curation:
                             CurationSegment(user.curatedTopics)
+                            
+                        case .logging:
+                            LoggingSegment(user: user)
                         }
                     }
                     .listSectionSpacingBackport(28)
@@ -215,6 +218,11 @@ public struct ProfileScreen: View {
             if !store.user!.curatedTopics.isEmpty {
                 Text("Curation", bundle: .module)
                     .tag(PickerSelection.curation)
+            }
+            
+            if !store.user!.warningLogs.isEmpty {
+                Text("Logging", bundle: .module)
+                    .tag(PickerSelection.logging)
             }
         }
         .pickerStyle(.segmented)
@@ -513,6 +521,21 @@ public struct ProfileScreen: View {
         }
         .listRowBackground(Color(.Background.teritary))
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Logging Segment
+    
+    @ViewBuilder
+    private func LoggingSegment(user: User) -> some View {
+        ForEach(user.warningLogs) { warning in
+            WarningLogView(
+                warningLog: warning,
+                deeplinkTapped: { url in
+                    send(.deeplinkTapped(url, .warningLog))
+                }
+            )
+            .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0))
+        }
     }
     
     // MARK: - Section Header
