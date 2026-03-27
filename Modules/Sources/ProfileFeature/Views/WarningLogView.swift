@@ -40,6 +40,19 @@ struct WarningLogView: View {
                     .fontWeight(.medium)
                     .foregroundStyle(warningLog.levelColor)
             }
+            .padding(.bottom, 8)
+            
+            if warningLog.canBeCanceled {
+                Text("Undo available", bundle: .module)
+                    .font(.caption)
+                    .foregroundStyle(Color(.Labels.teritary))
+                    .padding(.vertical, 2)
+                    .padding(.horizontal, 4)
+                    .background(
+                        Color(.Background.teritary)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    )
+            }
 
             if let reason = warningLog.reasonAttributed {
                 RichText(text: reason, onUrlTap: { url in
@@ -52,9 +65,9 @@ struct WarningLogView: View {
             if warningLog.postId != 0 {
                 let link = "https://4pda.to/forum/index.php?act=findpost&pid=\(warningLog.postId)"
                 Text(LocalizedStringResource("[Go to Post](\(link))", bundle: .module))
+                    .tint(tintColor)
                     .font(.subheadline)
                     .padding(.bottom, 8)
-                    .foregroundStyle(tintColor)
                     .environment(\.openURL, OpenURLAction(handler: { url in
                         deeplinkTapped(url)
                         return .handled
@@ -68,16 +81,20 @@ struct WarningLogView: View {
                 
                 Spacer()
                 
-                if warningLog.canBeCanceled {
-                    Text("Undo available", bundle: .module)
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.teritary))
-                        .padding(.vertical, 2)
-                        .padding(.horizontal, 4)
-                        .background(
-                            Color(.Background.teritary)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        )
+                if warningLog.authorId != 0 {
+                    HStack(spacing: 4) {
+                        let link = "https://4pda.to/forum/index.php?showuser=\(warningLog.authorId)"
+                        Text(.init("[\(warningLog.authorName)](\(link))"))
+                            .environment(\.openURL, OpenURLAction(handler: { url in
+                                deeplinkTapped(url)
+                                return .handled
+                            }))
+                        
+                        Image(systemSymbol: .chevronRight)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Color(.Labels.quaternary))
+                    .tint(Color(.Labels.quaternary))
                 }
             }
             
@@ -96,7 +113,7 @@ struct WarningLogView: View {
 
 // MARK: - Extensions
 
-extension User.WarningLog {
+private extension User.WarningLog {
     var reasonAttributed: NSAttributedString? {
         guard !reason.isEmpty else { return nil }
         return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .subheadline)])
