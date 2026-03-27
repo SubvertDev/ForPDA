@@ -76,7 +76,7 @@ public struct DeviceSpecificationsScreen: View {
         Button {
             send(.markAsMyDeviceButtonTapped(myDevice))
         } label: {
-            if false {
+            if store.isMyDeviceLoading {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .frame(maxWidth: .infinity)
