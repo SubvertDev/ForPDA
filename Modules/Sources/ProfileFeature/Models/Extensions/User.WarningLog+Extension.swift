@@ -15,14 +15,14 @@ extension User.WarningLog {
             return switch level {
             case .decreased: .arrowshapeDownFill
             case .increased: .arrowshapeUpFill
-            case .notice:    ._2hCircle
+            case .notice:    noteTextIcon
             case .unknown:   .info
             }
         } else {
             return switch level {
             case .decreased: .arrowDown
             case .increased: .arrowUp
-            case .notice:    .info
+            case .notice:    noteTextIcon
             case .unknown:   .info
             }
         }
@@ -47,6 +47,15 @@ extension User.WarningLog {
             LocalizedStringKey("Note added")
         case .unknown:
             LocalizedStringKey("Unknown level")
+        }
+    }
+    
+    @available(iOS, deprecated: 26.0)
+    private var noteTextIcon: SFSymbol {
+        if #available(iOS 26.0, *) {
+            return .textPadHeader
+        } else {
+            return .noteText
         }
     }
 }
