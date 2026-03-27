@@ -60,7 +60,7 @@ public struct ProfileScreen: View {
                             AchievementsSegment(user: user)
                         }
                     }
-                    .listSectionSpacingBackport(28)
+                    ._listSectionSpacing(28)
                     .scrollContentBackground(.hidden)
                 } else {
                     PDALoader()
@@ -635,26 +635,6 @@ private extension Date {
         
         formatter.dateFormat = "dd.MM.yy, HH:mm"
         return LocalizedStringKey("Last seen \(formatter.string(from: self))")
-    }
-}
-
-private extension View {
-    func listSectionSpacingBackport(_ value: CGFloat) -> some View {
-        self.modifier(ListSectionSpacing(value: value))
-    }
-}
-
-private struct ListSectionSpacing: ViewModifier {
-    
-    var value: CGFloat
-    
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            content
-                .listSectionSpacing(value)
-        } else {
-            content
-        }
     }
 }
 
