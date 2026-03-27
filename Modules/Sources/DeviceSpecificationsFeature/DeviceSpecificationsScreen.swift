@@ -16,6 +16,7 @@ public struct DeviceSpecificationsScreen: View {
     // MARK: - Properties
     
     @Perception.Bindable public var store: StoreOf<DeviceSpecificationsFeature>
+    @Environment(\.tintColor) private var tintColor
     
     // MARK: - Init
     
@@ -46,6 +47,11 @@ public struct DeviceSpecificationsScreen: View {
             .navigationTitle(Text(store.specifications?.deviceName ?? String(localized: "Loading...", bundle: .module)))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
+            .safeAreaInset(edge: .bottom) {
+                if let specifications = store.specifications, store.isUserAuthorized {
+                    MyDeviceButton(specifications.isMyDevice)
+                }
+            }
             .overlay {
                 if store.isLoading {
                     PDALoader()
@@ -56,6 +62,37 @@ public struct DeviceSpecificationsScreen: View {
                 send(.onAppear)
             }
         }
+    }
+    
+    // MARK: - My Device Button
+    
+    @ViewBuilder
+    private func MyDeviceButton(_ myDevice: Bool) -> some View {
+        Button {
+            send(.markAsMyDeviceButtonTapped(!myDevice))
+        } label: {
+            if false {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            } else {
+                HStack {
+                    Image(systemSymbol: myDevice ? .checkmarkCircleFill : .circle)
+                    
+                    Text(myDevice ? "My Device" : "Mark as My Device", bundle: .module)
+                }
+                .padding(8)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        ._buttonStyle(myDevice ? .borderedProminent : .bordered)
+        .tint(tintColor)
+        .disabled(store.isMyDeviceLoading)
+        .frame(height: 48)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(Color(.Background.primary))
     }
     
     // MARK: - Header
@@ -163,6 +200,25 @@ public struct DeviceSpecificationsScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
         .frame(height: 60)
+    }
+}
+
+// MARK: - Extensions
+
+private extension Button {
+    enum ButtonStyle {
+        case bordered
+        case borderedProminent
+    }
+    
+    @ViewBuilder
+    func _buttonStyle(_ style: ButtonStyle) -> some View {
+        switch style {
+        case .bordered:
+            self.buttonStyle(BorderedButtonStyle())
+        case .borderedProminent:
+            self.buttonStyle(BorderedProminentButtonStyle())
+        }
     }
 }
 

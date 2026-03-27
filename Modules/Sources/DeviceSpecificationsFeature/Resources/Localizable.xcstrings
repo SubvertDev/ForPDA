@@ -1,8 +1,45 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "DevDB" : {
-
+    "Loading..." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка…"
+          }
+        }
+      }
+    },
+    "Mark as My Device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сделать моим устройством"
+          }
+        }
+      }
+    },
+    "My Device" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моё устройство"
+          }
+        }
+      }
+    },
+    "Unable to change device status" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка изменения статуса устройства"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

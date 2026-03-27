@@ -16,10 +16,17 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let changeDeviceStatusError = LocalizedStringResource("Unable to change device status", bundle: .module)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
+        @Shared(.userSession) var userSession
         
         public let tag: String
         public let subTag: String?
@@ -27,6 +34,11 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         var specifications: DeviceSpecificationsResponse?
         
         var isLoading = false
+        var isMyDeviceLoading = false
+        
+        var isUserAuthorized: Bool {
+            return userSession != nil
+        }
         
         public init(
             tag: String,
@@ -45,12 +57,14 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
             case onAppear
             
             case editionButtonTapped(String)
+            case markAsMyDeviceButtonTapped(Bool)
         }
         
         case `internal`(Internal)
         public enum Internal {
             case loadSpecifications
             case specificationsResponse(Result<DeviceSpecificationsResponse, any Error>)
+            case markAsMyDeviceResponse(Result<Bool, any Error>)
         }
         
         case delegate(Delegate)
@@ -76,7 +90,30 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 return .send(.delegate(.openDevice(tag: state.tag, subTag: subTag)))
                 
             case let .view(.markAsMyDeviceButtonTapped(myDevice)):
+                guard let session = state.userSession else { return .none }
+                return .run { [fullTag = state.tag] send in
+                    let status = try await apiClient.updateUserDevice(
+                        userId: session.userId,
+                        action: myDevice ? .remove : .add,
+                        fullTag: fullTag,
+                        isPrimary: false
+                    )
+                    await send(.internal(.markAsMyDeviceResponse(.success(status))))
+                } catch: { error, send in
+                    await send(.internal(.markAsMyDeviceResponse(.failure(error))))
+                }
+                
+            case let .internal(.markAsMyDeviceResponse(.success(status))):
+                state.specifications?.isMyDevice = status
+                state.isMyDeviceLoading = false
                 return .none
+                
+            case let .internal(.markAsMyDeviceResponse(.failure(error))):
+                state.isMyDeviceLoading = false
+                return .run { _ in
+                    let message = ToastMessage(text: Localization.changeDeviceStatusError, isError: true)
+                    await toastClient.showToast(message)
+                }
                 
             case .internal(.loadSpecifications):
                 state.isLoading = true

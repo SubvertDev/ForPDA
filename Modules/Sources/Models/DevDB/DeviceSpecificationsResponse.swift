@@ -17,7 +17,7 @@ public struct DeviceSpecificationsResponse: Sendable, Equatable {
     public let images: [DeviceImage]
     public let editions: [Edition]
     public let specifications: [Specification]
-    public let isMyDevice: Bool
+    public var isMyDevice: Bool
     
     public struct DeviceImage: Sendable, Equatable {
         public let url: URL
