@@ -43,7 +43,7 @@ public struct DeviceSpecificationsScreen: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle(Text("DevDB", bundle: .module))
+            .navigationTitle(Text(store.specifications?.deviceName ?? String(localized: "Loading...", bundle: .module)))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
             .overlay {
