@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import Models
 import ToastClient
+import PasteboardClient
 
 @Reducer
 public struct DeviceSpecificationsFeature: Reducer, Sendable {
@@ -19,6 +20,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     public enum Localization {
+        static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let changeDeviceStatusError = LocalizedStringResource("Unable to change device status", bundle: .module)
     }
     
@@ -56,6 +58,8 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             
+            case contextMenu(DeviceSpecificationsContextMenuAction)
+            
             case editionButtonTapped(String)
             case markAsMyDeviceButtonTapped(Bool)
         }
@@ -76,6 +80,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.toastClient) private var toastClient
     
     // MARK: - Body
@@ -85,6 +90,17 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
             switch action {
             case .view(.onAppear):
                 return .send(.internal(.loadSpecifications))
+                
+            case let .view(.contextMenu(action)):
+                guard let specifications = state.specifications else { return .none }
+                switch action {
+                case .copyLink:
+                    let tag = "\(state.tag)\(state.subTag != nil ? ":\(state.subTag!)" : "")"
+                    pasteboardClient.copy("https://4pda.to/devdb/\(specifications.tag)_\(tag)")
+                    return .run { _ in
+                        await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
+                }
                 
             case let .view(.editionButtonTapped(subTag)):
                 return .send(.delegate(.openDevice(tag: state.tag, subTag: subTag)))
@@ -109,6 +125,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 return .none
                 
             case let .internal(.markAsMyDeviceResponse(.failure(error))):
+                print(error)
                 state.isMyDeviceLoading = false
                 return .run { _ in
                     let message = ToastMessage(text: Localization.changeDeviceStatusError, isError: true)
