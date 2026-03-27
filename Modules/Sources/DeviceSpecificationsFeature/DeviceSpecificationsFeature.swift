@@ -21,6 +21,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let devicesLimitError = LocalizedStringResource("You can add a maximum of 5 devices", bundle: .module)
         static let changeDeviceStatusError = LocalizedStringResource("Unable to change device status", bundle: .module)
     }
     
@@ -37,6 +38,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         
         var isLoading = false
         var isMyDeviceLoading = false
+        var isDevicesLimit = false
         
         var isUserAuthorized: Bool {
             return userSession != nil
@@ -119,9 +121,17 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.markAsMyDeviceResponse(.success(status))):
-                state.specifications?.isMyDevice = status
+                if let specifications = state.specifications, status {
+                    state.specifications?.isMyDevice = !specifications.isMyDevice
+                    state.isMyDeviceLoading = false
+                    return .none
+                }
+                state.isDevicesLimit = true
                 state.isMyDeviceLoading = false
-                return .none
+                return .run { _ in
+                    let message = ToastMessage(text: Localization.devicesLimitError, isError: true)
+                    await toastClient.showToast(message)
+                }
                 
             case let .internal(.markAsMyDeviceResponse(.failure(error))):
                 print(error)
@@ -144,7 +154,6 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.specificationsResponse(.success(response))):
-                customDump(response)
                 state.specifications = response
                 state.isLoading = false
                 return .none

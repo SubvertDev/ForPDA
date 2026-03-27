@@ -93,7 +93,7 @@ public struct DeviceSpecificationsScreen: View {
         }
         ._buttonStyle(myDevice ? .borderedProminent : .bordered)
         .tint(tintColor)
-        .disabled(store.isMyDeviceLoading)
+        .disabled(store.isMyDeviceLoading || store.isDevicesLimit)
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)

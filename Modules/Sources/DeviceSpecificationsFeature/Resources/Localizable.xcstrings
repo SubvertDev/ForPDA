@@ -60,6 +60,16 @@
           }
         }
       }
+    },
+    "You can add a maximum of 5 devices" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нельзя добавить более 5 устройств"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
