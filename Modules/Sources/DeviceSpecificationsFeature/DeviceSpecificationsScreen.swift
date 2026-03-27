@@ -106,6 +106,8 @@ public struct DeviceSpecificationsScreen: View {
                 .foregroundStyle(Color(.Labels.primary))
             
             HeaderImages(specs.images)
+            
+            HeaderEditions(specs.editions)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
@@ -137,6 +139,22 @@ public struct DeviceSpecificationsScreen: View {
             }
         }
     }
+    
+    @ViewBuilder
+    private func HeaderEditions(_ editions: [DeviceSpecificationsResponse.Edition]) -> some View {
+        VStack(spacing: 6) {
+            ForEach(editions, id: \.name) { edition in
+                Button {
+                    send(.editionButtonTapped(edition.subTag))
+                } label: {
+                    Text(verbatim: edition.name)
+                        .foregroundStyle(Color(.Labels.teritary))
+                }
+            }
+        }
+    }
+    
+    // MARK: - Specification Section
     
     private func SpecificationSection(_ spec: DeviceSpecificationsResponse.Specification) -> some View {
         Section {
