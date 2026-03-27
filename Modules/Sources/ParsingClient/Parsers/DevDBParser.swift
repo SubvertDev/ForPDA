@@ -73,8 +73,8 @@ public struct DevDBParser {
     private static func parseDeviceEditions(_ editionsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecificationsResponse.Edition] {
         var editions: [DeviceSpecificationsResponse.Edition] = []
         for edition in editionsRaw {
-            guard let name = edition[safe: 0] as? String,
-                  let subTag = edition[safe: 1] as? String else {
+            guard let subTag = edition[safe: 0] as? String,
+                  let name = edition[safe: 1] as? String else {
                 throw ParsingError.failedToCastFields
             }
             
