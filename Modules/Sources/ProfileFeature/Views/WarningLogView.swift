@@ -29,7 +29,7 @@ struct WarningLogView: View {
     // MARK: - Body
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemSymbol: warningLog.levelSymbol)
                     .font(.body)
@@ -40,14 +40,13 @@ struct WarningLogView: View {
                     .fontWeight(.medium)
                     .foregroundStyle(warningLog.levelColor)
             }
-            .padding(.bottom, 8)
             
             if warningLog.canBeCanceled {
                 Text("Undo available", bundle: .module)
                     .font(.caption)
                     .foregroundStyle(Color(.Labels.teritary))
-                    .padding(.vertical, 2)
-                    .padding(.horizontal, 4)
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 6)
                     .background(
                         Color(.Background.teritary)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -58,7 +57,6 @@ struct WarningLogView: View {
                 RichText(text: reason, onUrlTap: { url in
                     deeplinkTapped(url)
                 })
-                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             
@@ -67,7 +65,6 @@ struct WarningLogView: View {
                 Text(LocalizedStringResource("[Go to Post](\(link))", bundle: .module))
                     .tint(tintColor)
                     .font(.subheadline)
-                    .padding(.bottom, 8)
                     .environment(\.openURL, OpenURLAction(handler: { url in
                         deeplinkTapped(url)
                         return .handled
