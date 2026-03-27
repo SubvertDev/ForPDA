@@ -92,11 +92,10 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 return .send(.internal(.loadSpecifications))
                 
             case let .view(.contextMenu(action)):
-                guard let specifications = state.specifications else { return .none }
                 switch action {
                 case .copyLink:
-                    let tag = "\(state.tag)\(state.subTag != nil ? ":\(state.subTag!)" : "")"
-                    pasteboardClient.copy("https://4pda.to/devdb/\(specifications.tag)_\(tag)")
+                    let subTag = "\(state.subTag != nil ? ":\(state.subTag!)" : "")"
+                    pasteboardClient.copy("https://4pda.to/devdb/\(state.tag)\(subTag)")
                     return .run { _ in
                         await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
@@ -145,6 +144,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.specificationsResponse(.success(response))):
+                customDump(response)
                 state.specifications = response
                 state.isLoading = false
                 return .none

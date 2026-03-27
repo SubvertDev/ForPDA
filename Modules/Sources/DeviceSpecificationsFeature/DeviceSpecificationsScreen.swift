@@ -58,6 +58,11 @@ public struct DeviceSpecificationsScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
+            .toolbar {
+                ToolbarItem {
+                    OptionsMenu()
+                }
+            }
             .onAppear {
                 send(.onAppear)
             }
@@ -218,6 +223,20 @@ public struct DeviceSpecificationsScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
         .frame(height: 60)
+    }
+    
+    // MARK: - Options Menu
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                send(.contextMenu(.copyLink))
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
+                .foregroundStyle(tintColor)
+        }
     }
     
     // MARK: - Helpers
