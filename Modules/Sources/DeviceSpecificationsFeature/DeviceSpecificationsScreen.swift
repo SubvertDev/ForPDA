@@ -44,7 +44,7 @@ public struct DeviceSpecificationsScreen: View {
                     .scrollContentBackground(.hidden)
                 }
             }
-            .navigationTitle(Text(store.specifications?.deviceName ?? String(localized: "Loading...", bundle: .module)))
+            .navigationTitle(Text(navigationTitleText()))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
             .safeAreaInset(edge: .bottom) {
@@ -200,6 +200,16 @@ public struct DeviceSpecificationsScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .buttonStyle(.plain)
         .frame(height: 60)
+    }
+    
+    // MARK: - Helpers
+    
+    private func navigationTitleText() -> String {
+        return if let specifications = store.specifications {
+            "\(specifications.deviceName) \(specifications.editionName)"
+        } else {
+            String(localized: "Loading...", bundle: .module)
+        }
     }
 }
 
