@@ -100,7 +100,7 @@ public struct DeviceSpecificationsScreen: View {
     @ViewBuilder
     private func Header(_ specs: DeviceSpecificationsResponse) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(verbatim: "\(specs.vendorName) \(specs.deviceName)")
+            Text(verbatim: "\(specs.vendorName) \(specs.deviceName) \(specs.editionName)")
                 .font(.title2)
                 .fontWeight(.bold)
                 .foregroundStyle(Color(.Labels.primary))
