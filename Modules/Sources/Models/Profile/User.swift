@@ -384,7 +384,7 @@ public extension User {
 
 public extension User.WarningLog {
     static let mockDecreasedAsUserWithPost = User.WarningLog(
-        timestamp: Int(Date.now.timeIntervalSince1970),
+        timestamp: Int(Date.now.timeIntervalSince1970 + Double.random(in: 0...100)),
         level: .decreased,
         authorId: 0,
         authorName: "",
@@ -394,7 +394,7 @@ public extension User.WarningLog {
     )
     
     static let mockIncreasedAsUserWithoutPost = User.WarningLog(
-        timestamp: Int(Date.now.timeIntervalSince1970),
+        timestamp: Int(Date.now.timeIntervalSince1970 + Double.random(in: 0...100)),
         level: .increased,
         authorId: 0,
         authorName: "",
@@ -405,7 +405,7 @@ public extension User.WarningLog {
     
     static func mockAsModerator(level: User.WarningLog.WarningLevel) -> Self {
         return User.WarningLog(
-            timestamp: Int(Date.now.timeIntervalSince1970),
+            timestamp: Int(Date.now.timeIntervalSince1970 + Double.random(in: 0...100)),
             level: level,
             authorId: 6176341,
             authorName: "AirFlare",
