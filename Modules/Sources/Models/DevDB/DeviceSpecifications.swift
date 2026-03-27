@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct DeviceSpecificationsResponse: Sendable, Equatable {
+public struct DeviceSpecifications: Sendable, Equatable {
     public let tag: String
     public let type: DeviceType
     public let vendorName: String
@@ -44,9 +44,9 @@ public struct DeviceSpecificationsResponse: Sendable, Equatable {
     public struct Specification: Sendable, Equatable, Identifiable {
         public let id: Int
         public let title: String
-        public var entries: [SpecificationEntry]
+        public var entries: [Entry]
         
-        public struct SpecificationEntry: Sendable, Equatable, Hashable {
+        public struct Entry: Sendable, Equatable, Hashable {
             public let name: String
             public let value: String
             
@@ -56,7 +56,7 @@ public struct DeviceSpecificationsResponse: Sendable, Equatable {
             }
         }
         
-        public init(id: Int, title: String, entries: [SpecificationEntry]) {
+        public init(id: Int, title: String, entries: [Entry]) {
             self.id = id
             self.title = title
             self.entries = entries
@@ -88,8 +88,8 @@ public struct DeviceSpecificationsResponse: Sendable, Equatable {
     }
 }
 
-public extension DeviceSpecificationsResponse {
-    static let mock = DeviceSpecificationsResponse(
+public extension DeviceSpecifications {
+    static let mock = DeviceSpecifications(
         tag: "apple",
         type: .phone,
         vendorName: "Apple",

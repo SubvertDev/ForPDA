@@ -33,7 +33,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         case gallery
         
         @ReducerCaseIgnored
-        case longEntry(DeviceSpecificationsResponse.Specification.SpecificationEntry)
+        case longEntry(DeviceSpecifications.Specification.Entry)
     }
     
     // MARK: - State
@@ -47,7 +47,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         public let tag: String
         public let subTag: String?
         
-        var specifications: DeviceSpecificationsResponse?
+        var specifications: DeviceSpecifications?
         
         var isLoading = false
         var isMyDeviceLoading = false
@@ -84,14 +84,14 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
             
             case editionButtonTapped(String)
             case markAsMyDeviceButtonTapped(Bool)
-            case longEntryButtonTapped(DeviceSpecificationsResponse.Specification.SpecificationEntry)
+            case longEntryButtonTapped(DeviceSpecifications.Specification.Entry)
             case longEntryCloseButtonTapped
         }
         
         case `internal`(Internal)
         public enum Internal {
             case loadSpecifications
-            case specificationsResponse(Result<DeviceSpecificationsResponse, any Error>)
+            case specificationsResponse(Result<DeviceSpecifications, any Error>)
             case markAsMyDeviceResponse(Result<Bool, any Error>)
         }
         

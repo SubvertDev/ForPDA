@@ -62,7 +62,7 @@ public struct ParsingClient: Sendable {
     public var parseQmsChat: @Sendable (_ response: String) async throws -> QMSChat
     
     // DevDB
-    public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecificationsResponse
+    public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
 }
 
 // MARK: - Dependency Key

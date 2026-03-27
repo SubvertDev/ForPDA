@@ -93,7 +93,7 @@ public struct APIClient: Sendable {
     public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // DevDB
-    public var deviceSpecifications: @Sendable (_ tag: String, _ subTag: String) async throws -> DeviceSpecificationsResponse
+    public var deviceSpecifications: @Sendable (_ tag: String, _ subTag: String) async throws -> DeviceSpecifications
     
     // STREAMS
     public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }

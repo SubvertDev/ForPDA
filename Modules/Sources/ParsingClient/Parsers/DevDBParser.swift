@@ -12,7 +12,7 @@ public struct DevDBParser {
     
     // MARK: - Device Specs Response
     
-    public static func parse(from string: String) throws(ParsingError) -> DeviceSpecificationsResponse {
+    public static func parse(from string: String) throws(ParsingError) -> DeviceSpecifications {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -34,7 +34,7 @@ public struct DevDBParser {
             throw ParsingError.failedToCastFields
         }
         
-        return DeviceSpecificationsResponse(
+        return DeviceSpecifications(
             tag: tag,
             type: DeviceType(rawValue: type) ?? .unknown,
             vendorName: vendorName,
@@ -50,8 +50,8 @@ public struct DevDBParser {
     
     // MARK: - Images
     
-    private static func parseDeviceImages(_ imagesRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecificationsResponse.DeviceImage] {
-        var images: [DeviceSpecificationsResponse.DeviceImage] = []
+    private static func parseDeviceImages(_ imagesRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.DeviceImage] {
+        var images: [DeviceSpecifications.DeviceImage] = []
         for image in imagesRaw {
             guard let isDeviceFront = image[safe: 0] as? Int,
                   let url = image[safe: 1] as? String,
@@ -70,8 +70,8 @@ public struct DevDBParser {
     
     // MARK: - Editions
     
-    private static func parseDeviceEditions(_ editionsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecificationsResponse.Edition] {
-        var editions: [DeviceSpecificationsResponse.Edition] = []
+    private static func parseDeviceEditions(_ editionsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.Edition] {
+        var editions: [DeviceSpecifications.Edition] = []
         for edition in editionsRaw {
             guard let subTag = edition[safe: 0] as? String,
                   let name = edition[safe: 1] as? String else {
@@ -85,8 +85,8 @@ public struct DevDBParser {
     
     // MARK: - Specifications
     
-    private static func parseDeviceSpecifications(_ specsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecificationsResponse.Specification] {
-        var specs: [DeviceSpecificationsResponse.Specification] = []
+    private static func parseDeviceSpecifications(_ specsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.Specification] {
+        var specs: [DeviceSpecifications.Specification] = []
         for (index, spec) in specsRaw.enumerated() {
             guard let specType = spec[safe: 0] as? Int,
                   let title = spec[safe: 2] as? String else {

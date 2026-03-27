@@ -123,7 +123,7 @@ public struct DeviceSpecificationsScreen: View {
     // MARK: - Header
     
     @ViewBuilder
-    private func Header(_ specs: DeviceSpecificationsResponse) -> some View {
+    private func Header(_ specs: DeviceSpecifications) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(verbatim: "\(specs.vendorName) \(specs.deviceName) \(specs.editionName)")
                 .font(.title2)
@@ -146,7 +146,7 @@ public struct DeviceSpecificationsScreen: View {
     }
     
     @ViewBuilder
-    private func HeaderImages(_ images: [DeviceSpecificationsResponse.DeviceImage]) -> some View {
+    private func HeaderImages(_ images: [DeviceSpecifications.DeviceImage]) -> some View {
         HStack(spacing: 8) {
             ForEach(Array(images.enumerated()), id: \.element) { index, image in
                 LazyImage(url: image.url) { state in
@@ -169,7 +169,7 @@ public struct DeviceSpecificationsScreen: View {
     }
     
     @ViewBuilder
-    private func HeaderEditions(_ editions: [DeviceSpecificationsResponse.Edition]) -> some View {
+    private func HeaderEditions(_ editions: [DeviceSpecifications.Edition]) -> some View {
         VStack(spacing: 6) {
             ForEach(editions, id: \.name) { edition in
                 Button {
@@ -184,7 +184,7 @@ public struct DeviceSpecificationsScreen: View {
     
     // MARK: - Specification Section
     
-    private func SpecificationSection(_ spec: DeviceSpecificationsResponse.Specification) -> some View {
+    private func SpecificationSection(_ spec: DeviceSpecifications.Specification) -> some View {
         Section {
             ForEach(spec.entries, id: \.name) { entry in
                 Row(entry: entry) {
@@ -213,7 +213,7 @@ public struct DeviceSpecificationsScreen: View {
     // MARK: - Row
     
     @ViewBuilder
-    private func Row(entry: DeviceSpecificationsResponse.Specification.SpecificationEntry, action: @escaping () -> Void = {}) -> some View {
+    private func Row(entry: DeviceSpecifications.Specification.Entry, action: @escaping () -> Void = {}) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             ViewThatFits(in: .vertical) {
                 HStack(spacing: 0) {
