@@ -209,6 +209,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,
+                    .Internal.ToastClient,
                     .SPM.TCA
                 ]
             ),

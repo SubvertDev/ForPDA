@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import APIClient
 import Models
+import ToastClient
 
 @Reducer
 public struct DeviceSpecificationsFeature: Reducer, Sendable {
@@ -42,14 +43,14 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
-            case loadSpecifications
             
             case editionButtonTapped(String)
         }
         
         case `internal`(Internal)
         public enum Internal {
-            case specificationsResponse(DeviceSpecificationsResponse)
+            case loadSpecifications
+            case specificationsResponse(Result<DeviceSpecificationsResponse, any Error>)
         }
         
         case delegate(Delegate)
@@ -61,6 +62,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.toastClient) private var toastClient
     
     // MARK: - Body
     
@@ -68,25 +70,37 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                return .send(.view(.loadSpecifications))
+                return .send(.internal(.loadSpecifications))
                 
             case let .view(.editionButtonTapped(subTag)):
                 return .send(.delegate(.openDevice(tag: state.tag, subTag: subTag)))
                 
-            case .view(.loadSpecifications):
+            case let .view(.markAsMyDeviceButtonTapped(myDevice)):
+                return .none
+                
+            case .internal(.loadSpecifications):
                 state.isLoading = true
                 return .run { [tag = state.tag, subTag = state.subTag] send in
                     let respone = try await apiClient.deviceSpecifications(
                         tag: tag,
                         subTag: subTag ?? ""
                     )
-                    await send(.internal(.specificationsResponse(respone)))
+                    await send(.internal(.specificationsResponse(.success(respone))))
+                } catch: { error, send in
+                    await send(.internal(.specificationsResponse(.failure(error))))
                 }
                 
-            case let .internal(.specificationsResponse(response)):
+            case let .internal(.specificationsResponse(.success(response))):
                 state.specifications = response
                 state.isLoading = false
                 return .none
+                
+            case let .internal(.specificationsResponse(.failure(error))):
+                print(error)
+                state.isLoading = false
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
             case .delegate:
                 return .none
