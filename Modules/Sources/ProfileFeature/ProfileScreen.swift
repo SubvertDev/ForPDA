@@ -177,15 +177,15 @@ public struct ProfileScreen: View {
     private func NavigationSection() -> some View {
         if store.shouldShowToolbarButtons {
             Section {
-                Row(symbol: .person2, title: "QMS", type: .navigation(badge: store.qmsBadgeCount)) {
+                Row(symbol: .person2, title: "QMS", type: .navigation(.badge(store.qmsBadgeCount))) {
                     send(.qmsButtonTapped)
                 }
                 
-                Row(symbol: .at, title: "Mentions", type: .navigation(badge: store.mentionsBadgeCount)) {
+                Row(symbol: .at, title: "Mentions", type: .navigation(.badge(store.mentionsBadgeCount))) {
                     send(.mentionsButtonTapped)
                 }
                 
-                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation(badge: 0)) {
+                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation(.badge(0))) {
                     send(.historyButtonTapped)
                 }
             }
@@ -350,28 +350,9 @@ public struct ProfileScreen: View {
     private func DevicesSection(devices: [User.Device]) -> some View {
         Section {
             ForEach(devices) { device in
-                Button {
+                Row(title: LocalizedStringKey(device.name), type: .navigation(.indicator(device.main))) {
                     send(.deviceButtonTapped(device.id))
-                } label: {
-                    HStack(spacing: 0) {
-                        Text(device.name)
-                            .font(.body)
-                            .foregroundStyle(Color(.Labels.primary))
-                        
-                        Spacer(minLength: 8)
-                        
-                        if device.main {
-                            Circle()
-                                .font(.title2)
-                                .foregroundStyle(tintColor)
-                                .frame(width: 8)
-                                .padding(.trailing, 12)
-                        }
-                    }
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .buttonStyle(.plain)
-                .frame(height: 60)
             }
         } header: {
             SectionHeader(title: "Devices List")
@@ -513,9 +494,14 @@ public struct ProfileScreen: View {
     enum RowType {
         case basic
         case description(String)
-        case navigation(badge: Int)
+        case navigation(NavigationRowType)
         case navigationDescription(String)
         case localizedDescription(LocalizedStringKey)
+        
+        enum NavigationRowType {
+            case badge(Int)
+            case indicator(Bool)
+        }
     }
     
     @ViewBuilder
@@ -553,16 +539,28 @@ public struct ProfileScreen: View {
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
-                    case let .navigation(badgeCount):
-                        if badgeCount <= 0 {
-                            Image(systemSymbol: .chevronRight)
-                                .font(.system(size: 17, weight: .semibold))
-                                .foregroundStyle(Color(.Labels.quintuple))
-                        } else {
-                            EmptyView()
-                                .badge(badgeCount)
-                                ._badgeProminence(.increased)
+                    case let .navigation(type):
+                        switch type {
+                        case .badge(let badgeCount):
+                            if badgeCount > 0 {
+                                EmptyView()
+                                    .badge(badgeCount)
+                                    ._badgeProminence(.increased)
+                            }
+                            
+                        case .indicator(let show):
+                            if show {
+                                Circle()
+                                    .font(.title2)
+                                    .foregroundStyle(tintColor)
+                                    .frame(width: 8)
+                                    .padding(.trailing, 12)
+                            }
                         }
+                        
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color(.Labels.quintuple))
                         
                     case let .navigationDescription(text):
                         Text(text)
