@@ -481,7 +481,7 @@ public struct StackTab: Reducer, Sendable {
             case let .device(tag, subTag):
                 state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
                 
-            case let .article(id: id, title: title, imageUrl: imageUrl):
+            case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
                 state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId))))
             }
