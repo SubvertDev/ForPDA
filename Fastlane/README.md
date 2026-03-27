@@ -63,13 +63,13 @@ One-off ipa build
 
 CI pull requests checks
 
-### ios ci_cache_warmup
+### ios ci_push
 
 ```sh
-[bundle exec] fastlane ios ci_cache_warmup
+[bundle exec] fastlane ios ci_push
 ```
 
-CI cache warm up
+CI cache warmup & tests
 
 ### ios prepare_certificates
 

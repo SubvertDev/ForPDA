@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "About Forum" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О форуме"
+          }
+        }
+      }
+    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {
@@ -27,6 +37,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Копировать ссылку"
+          }
+        }
+      }
+    },
+    "Create Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать тему"
           }
         }
       }

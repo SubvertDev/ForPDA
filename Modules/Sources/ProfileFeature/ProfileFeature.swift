@@ -12,6 +12,7 @@ import PersistenceKeys
 import Models
 import AnalyticsClient
 import ToastClient
+import NotificationsClient
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -42,6 +43,8 @@ public struct ProfileFeature: Reducer, Sendable {
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
+        var qmsBadgeCount = 0
+        var mentionsBadgeCount = 0
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
@@ -73,6 +76,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
+            case mentionsButtonTapped
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
@@ -83,6 +87,7 @@ public struct ProfileFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case userResponse(Result<User, any Error>)
+            case updateBadgeCounts(Unread)
         }
         
         case destination(PresentationAction<Destination.Action>)
@@ -95,6 +100,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openQms
             case openSettings
             case openHistory
+            case openMentions
             case openDevice(String)
             case openReputation(Int)
             case openSearch(SearchResult)
@@ -107,6 +113,7 @@ public struct ProfileFeature: Reducer, Sendable {
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.toastClient) private var toastClient
     @Dependency(\.dismiss) private var dismiss
     
@@ -120,19 +127,33 @@ public struct ProfileFeature: Reducer, Sendable {
             case .view(.onAppear):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
-                return .run { send in
-                    for try await user in try await apiClient.getUser(userId, .cacheAndLoad) {
-                        await send(.internal(.userResponse(.success(user))))
+                return .merge(
+                    .run { send in
+                        for try await user in try await apiClient.getUser(userId, .cacheAndLoad) {
+                            await send(.internal(.userResponse(.success(user))))
+                        }
+                    } catch: { error, send in
+                        await send(.internal(.userResponse(.failure(error))))
+                    },
+                    .run { send in
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    },
+                    .run { send in
+                        for await unread in notificationsClient.unreadPublisher().values {
+                            await send(.internal(.updateBadgeCounts(unread)))
+                        }
                     }
-                } catch: { error, send in
-                    await send(.internal(.userResponse(.failure(error))))
-                }
+                )
                 
             case let .view(.deviceButtonTapped(tag)):
                 return .send(.delegate(.openDevice(tag)))
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
+                
+            case .view(.mentionsButtonTapped):
+                return .send(.delegate(.openMentions))
                 
             case .view(.reputationButtonTapped):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
@@ -192,6 +213,11 @@ public struct ProfileFeature: Reducer, Sendable {
                 state.isLoading = false
                 print(error, #line)
                 reportFullyDisplayed(&state)
+                return .none
+                
+            case let .internal(.updateBadgeCounts(unread)):
+                state.qmsBadgeCount = unread.qmsUnreadCount
+                state.mentionsBadgeCount = unread.mentionsUnreadCount
                 return .none
                 
             case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):

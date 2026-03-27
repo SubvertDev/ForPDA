@@ -1,13 +1,13 @@
 {
-  "originHash" : "ee0e3f856a054524d5bd9e93a6fcbc05691c9c5dccea70c43fe82afab082d916",
+  "originHash" : "e6d5a9007a3b62d455ccc82ac03ba92905cf6642417339c37fafd1de6e2d8d8d",
   "pins" : [
     {
       "identity" : "activityindicatorview",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/ActivityIndicatorView",
       "state" : {
-        "revision" : "9970fd0bb7a05dad0b6566ae1f56937716686b24",
-        "version" : "1.1.1"
+        "revision" : "36140867802ae4a1d2b11490bcbbefe058001d14",
+        "version" : "1.2.1"
       }
     },
     {
@@ -17,6 +17,15 @@
       "state" : {
         "branch" : "d0f7d6b",
         "revision" : "d0f7d6bafd3e8ffe99afba4995822d24aee044fb"
+      }
+    },
+    {
+      "identity" : "anchoredpopup",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SubvertDev/AnchoredPopup.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c409740455e14866a223715ed285da33cfd0f044"
       }
     },
     {
@@ -31,10 +40,10 @@
     {
       "identity" : "chat",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/Chat.git",
+      "location" : "https://github.com/SubvertDev/Chat",
       "state" : {
-        "revision" : "b86c12a57f64b72bae1d81d3310146ebbe29c073",
-        "version" : "2.4.2"
+        "branch" : "main",
+        "revision" : "44a08c5141ac32dde14e5707ad25d8bbed5be0e9"
       }
     },
     {
@@ -51,8 +60,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Giphy/giphy-ios-sdk",
       "state" : {
-        "revision" : "37f5b1ff6cf8bc4a78c0bc5eb1b814381bac9580",
-        "version" : "2.2.16"
+        "revision" : "f7a8edf513ab14147ef33c942b10b45cdac1e765",
+        "version" : "2.3.0"
+      }
+    },
+    {
+      "identity" : "kingfisher",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/onevcat/Kingfisher",
+      "state" : {
+        "revision" : "e227df15448d2ad1a5d4e4c49722a71c68f9058a",
+        "version" : "8.7.0"
       }
     },
     {
@@ -67,10 +85,10 @@
     {
       "identity" : "mediapicker",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/exyte/MediaPicker.git",
+      "location" : "https://github.com/SubvertDev/MediaPicker.git",
       "state" : {
-        "revision" : "6f8745755530209462b60445ec4ba332c3058474",
-        "version" : "2.2.4"
+        "branch" : "main",
+        "revision" : "199f445c1efa65291160d9589ad8509848130783"
       }
     },
     {
@@ -87,8 +105,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
       "state" : {
-        "revision" : "8c9d5c5f3b2bb9a93e4b49075fb0430a7f2c3a26",
-        "version" : "0.6.5"
+        "revision" : "a5c09f445c880c45921257a2bbfa0a03d17775f5",
+        "version" : "0.7.3"
+      }
+    },
+    {
+      "identity" : "plcrashreporter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/microsoft/plcrashreporter.git",
+      "state" : {
+        "revision" : "0254f941c646b1ed17b243654723d0f071e990d0",
+        "version" : "1.12.2"
       }
     },
     {
@@ -96,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "ba5dd65d2341ab8ea1949f072594ef67c490af3a",
-        "version" : "3.34.0"
+        "revision" : "759a19e1e824bc80dde9cd4ff9a8204a4f50752e",
+        "version" : "3.45.1"
       }
     },
     {
@@ -114,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "e1e94efb9d5a688af85c607ae34a8b56961ca118",
-        "version" : "8.57.1"
+        "revision" : "990135f0881e56ac6b39404de0f5b0cd0dcf2131",
+        "version" : "9.6.0"
       }
     },
     {
@@ -141,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/raymondjavaxx/SmoothGradient.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "7f11f2e0f2e3c4466ec78087242be49f6e8b00cc"
+        "revision" : "77ac160533ce312f92b566754731e07b20315a41",
+        "version" : "1.0.1"
       }
     },
     {
@@ -150,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms",
       "state" : {
-        "revision" : "042e1c4d9d19748c9c228f8d4ebc97bb1e339b0b",
-        "version" : "1.0.4"
+        "revision" : "2971dd5d9f6e0515664b01044826bcea16e59fac",
+        "version" : "1.1.2"
       }
     },
     {
@@ -186,8 +213,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "5b0890fabfd68a2d375d68502bc3f54a8548c494",
-        "version" : "1.23.1"
+        "revision" : "74a5fa0d02b17ba5bbd9743dc49b4d7f3bbbed96",
+        "version" : "1.24.1"
       }
     },
     {
@@ -204,8 +231,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-custom-dump",
       "state" : {
-        "revision" : "82645ec760917961cfa08c9c0c7104a57a0fa4b1",
-        "version" : "1.3.3"
+        "revision" : "2a2a938798236b8fa0bc57c453ee9de9f9ec3ab0",
+        "version" : "1.4.1"
       }
     },
     {
@@ -213,8 +240,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "a10f9feeb214bc72b5337b6ef6d5a029360db4cc",
-        "version" : "1.10.0"
+        "revision" : "c79f72b3e67a1eb64f66f76704c22ed6a5c1ed84",
+        "version" : "1.11.0"
       }
     },
     {
@@ -240,8 +267,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-navigation",
       "state" : {
-        "revision" : "bf498690e1f6b4af790260f542e8428a4ba10d78",
-        "version" : "2.6.0"
+        "revision" : "e7441dc4dfec6a4ae929e614e3c1e67c6639d164",
+        "version" : "2.7.0"
       }
     },
     {
@@ -267,8 +294,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-snapshot-testing",
       "state" : {
-        "revision" : "a8b7c5e0ed33d8ab8887d1654d9b59f2cbad529b",
-        "version" : "1.18.7"
+        "revision" : "bf8d8c27f0f0c6d5e77bff0db76ab68f2050d15d",
+        "version" : "1.18.9"
       }
     },
     {
@@ -294,8 +321,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "4c27acf5394b645b70d8ba19dc249c0472d5f618",
-        "version" : "1.7.0"
+        "revision" : "dfd70507def84cb5fb821278448a262c6ff2bbad",
+        "version" : "1.9.0"
       }
     },
     {
@@ -303,8 +330,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SvenTiigi/YouTubePlayerKit.git",
       "state" : {
-        "revision" : "0f9a98c58462686afc7d3a1355baf21f07e5d330",
-        "version" : "2.0.4"
+        "revision" : "1ae827573024ab13dd6adea33b25d3eef6ff667c",
+        "version" : "2.0.5"
       }
     },
     {

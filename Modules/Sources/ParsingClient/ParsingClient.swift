@@ -34,19 +34,24 @@ public struct ParsingClient: Sendable {
     public var parseForumsList: @Sendable (_ response: String) async throws -> [ForumInfo]
     public var parseForumJump: @Sendable (_ response: String) async throws -> ForumJump
     public var parseForum: @Sendable (_ response: String) async throws -> Forum
+    public var parseForumStat: @Sendable (_ response: String) async throws -> ForumStat
     public var parseTopic: @Sendable (_ response: String) async throws -> Topic
+    public var parseTopicViewers: @Sendable (_ response: String) async throws -> TopicViewers
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
-    public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
+    public var parsePostPreview: @Sendable (_ response: String) async throws -> PreviewResponse
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
+    public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PreviewResponse
+    public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
     
     // Search
     public var parseSearch: @Sendable (_ response: String) async throws -> SearchResponse
     public var parseSearchUsers: @Sendable (_ response: String) async throws -> SearchUsersResponse
     
     // Write Form
-    public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
+    public var parseWriteForm: @Sendable (_ response: String) async throws -> [FormFieldType]
     
     // Extra
     public var parseUnread: @Sendable (_ response: String) async throws -> Unread
@@ -103,8 +108,14 @@ extension ParsingClient: DependencyKey {
         parseForum: { response in
             return try ForumParser.parse(from: response)
         },
+        parseForumStat: { response in
+            return try ForumParser.parseForumStat(from: response)
+        },
         parseTopic: { response in
             return try TopicParser.parse(from: response)
+        },
+        parseTopicViewers: { response in
+            return try TopicParser.parseTopicViewers(from: response)
         },
         parseAnnouncement: { response in
             return try ForumParser.parseAnnouncement(from: response)
@@ -115,11 +126,20 @@ extension ParsingClient: DependencyKey {
         parseHistory: { response in
             return try HistoryParser.parse(from: response)
         },
+        parseMentions: { response in
+            return try MentionsParser.parse(from: response)
+        },
         parsePostPreview: { response in
             return try TopicParser.parsePostPreview(from: response)
         },
         parsePostSendResponse: { response in
             return try TopicParser.parsePostSendResponse(from: response)
+		},
+        parseTemplatePreview: { response in
+            return try FormParser.parseTemplatePreview(from: response)
+        },
+        parseTemplateSend: { response in
+            return try FormParser.parseTemplateSend(from: response)
         },
         parseSearch: { response in
             return try SearchParser.parse(from: response)
@@ -128,7 +148,7 @@ extension ParsingClient: DependencyKey {
             return try SearchUsersParser.parse(from: response)
         },
         parseWriteForm: { response in
-            return try WriteFormParser.parse(from: response)
+            return try FormParser.parse(from: response)
         },
         parseUnread: { response in
             return try UnreadParser.parse(from: response)

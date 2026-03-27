@@ -48,14 +48,8 @@ public extension AlertState {
 // MARK: - Open URL
 
 public func open(url: URL) async {
-    if #available(iOS 18, *) {
-        Task { @MainActor in
-            await UIApplication.shared.open(url)
-        }
-    } else {
-        @Dependency(\.openURL) var openURL
-        await openURL(url)
-    }
+    @Dependency(\.openURL) var openURL
+    await openURL(url)
 }
 
 // MARK: - Delay

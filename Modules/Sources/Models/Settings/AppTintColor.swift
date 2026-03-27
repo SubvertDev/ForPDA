@@ -16,4 +16,17 @@ public enum AppTintColor: CaseIterable, Codable, Sendable {
     case scarlet
     case sky
     case yellow
+    
+    var _rawValue: String {
+        switch self {
+        case .lettuce: "lettuce"
+        case .orange:  "orange"
+        case .pink:    "pink"
+        case .primary: "primary"
+        case .purple:  "purple"
+        case .scarlet: "scarlet"
+        case .sky:     "sky"
+        case .yellow:  "yellow"
+        }
+    }
 }

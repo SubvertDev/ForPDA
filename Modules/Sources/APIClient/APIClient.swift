@@ -15,7 +15,9 @@ import ComposableArchitecture
 import PersistenceKeys
 
 public typealias ConnectionState = API.ConnectionState
+public typealias UploadRequest = PDAPI.UploadRequest
 public typealias UploadProgressStatus = PDAPI.UploadProgressStatus
+public typealias PDAPIDocument = PDAPI.Document
 public typealias PDAPIError = APIError
 
 // MARK: - Client
@@ -55,13 +57,18 @@ public struct APIClient: Sendable {
     // Forum
     public var getForumsList: @Sendable (_ policy: CachePolicy) async throws -> AsyncThrowingStream<[ForumInfo], any Error>
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Forum, any Error>
+    public var getForumStat: @Sendable (_ id: Int) async throws -> ForumStat
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
-    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int) async throws -> Topic
-    public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [WriteFormFieldType]
+    public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
+    public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
+    public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
+    public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
-    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PostPreview
+    public var getMentions: @Sendable (_ showPosts: Bool, _ offset: Int, _ perPage: Int) async throws -> Mentions
+    public var previewPost: @Sendable (_ request: PostPreviewRequest) async throws -> PreviewResponse
+    public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> PreviewResponse
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
@@ -75,7 +82,7 @@ public struct APIClient: Sendable {
     public var readAllFavorites: @Sendable () async throws -> Bool
     
     // Extra
-    public var getUnread: @Sendable (_ type: Int, _ value: Int) async throws -> Unread
+    public var getUnread: @Sendable (_ type: UnreadType) async throws -> Unread
     public var getAttachment: @Sendable (_ id: Int) async throws -> URL
     public var sendReport: @Sendable (_ request: ReportRequest) async throws -> ReportResponseType
     
@@ -304,6 +311,12 @@ extension APIClient: DependencyKey {
                 )
             },
             
+            getForumStat: { id in
+                let command = ForumCommand.info(id: id)
+                let response = try await api.send(command)
+                return try await parser.parseForumStat(response)
+            },
+            
             jumpForum: { request in
                 let command = ForumCommand.jump(data: ForumJumpRequest(
                     type: request.transferType,
@@ -327,10 +340,23 @@ extension APIClient: DependencyKey {
                 return try await parser.parseAnnouncement(response)
             },
             
-            getTopic: { id, offset, perPage in
-                let request = TopicRequest(id: id, offset: offset, itemsPerPage: perPage, showPostMode: 1)
+            getTopic: { id, offset, perPage, postsFilter in
+                let request = TopicRequest(
+                    id: id,
+                    offset: offset,
+                    itemsPerPage: perPage,
+                    showPostMode: postsFilter.rawValue
+                )
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
+            },
+            getTopicViewers: { topicId in
+                let command = MemberCommand.sessions(
+                    pageType: .topic,
+                    pageId: topicId
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTopicViewers(response)
             },
             
             getTemplate: { request, isTopic in
@@ -341,10 +367,23 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 return try await parser.parseWriteForm(response)
             },
+            sendTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .send(content)
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTemplateSend(response: response)
+            },
             
 			getHistory: { offset, perPage in
                 let response = try await api.send(MemberCommand.history(page: offset, perPage: perPage))
                 return try await parser.parseHistory(response)
+			},
+            
+            getMentions: { showPosts, offset, perPage in
+                let response = try await api.send(MemberCommand.mention(showPosts: showPosts, offset: offset, itemsPerPage: perPage))
+                return try await parser.parseMentions(response)
             },
             
             previewPost: { request in
@@ -356,6 +395,14 @@ extension APIClient: DependencyKey {
                 ), postId: request.id)
                 let response = try await api.send(command)
                 return try await parser.parsePostPreview(response)
+            },
+            previewTemplate: { id, content, isTopic in
+                let command = ForumCommand.template(
+                    type: isTopic ? .topic(forumId: id) : .post(topicId: id),
+                    action: .preview(content)
+                )
+                let response = try await api.send(command)
+                return try await parser.parseTemplatePreview(response: response)
             },
             
             sendPost: { request in
@@ -459,8 +506,13 @@ extension APIClient: DependencyKey {
             
             // MARK: - Extra
             
-            getUnread: { type, value in
-                let response = try await api.send(CommonCommand.syncUnread(type: type, value: value))
+            getUnread: { type in
+                let command = if case .category(let type, let value) = type {
+                    CommonCommand.syncUnread(timestamp: 0, type: type.rawValue, value: value)
+                } else {
+                    CommonCommand.syncUnread(timestamp: 0, type: 0, value: 0)
+                }
+                let response = try await api.send(command)
                 return try await parser.parseUnread(response)
             },
             
@@ -602,6 +654,9 @@ extension APIClient: DependencyKey {
             getForum: { _, _, _, _ in
                 return .finished()
             },
+            getForumStat: { _ in
+                return .mock
+            },
             jumpForum: { _ in
                 return .mock
             },
@@ -611,20 +666,29 @@ extension APIClient: DependencyKey {
             getAnnouncement: { _ in
                 return .mock
             },
-            getTopic: { _, _, _ in
+            getTopic: { _, _, _, _ in
+                return .mock
+            },
+            getTopicViewers: { _ in
                 return .mock
             },
             getTemplate: { _, _ in
-                return [.mockTitle, .mockText, .mockEditor]
+                return [.mockTitle, .mockRequiredText, .mockRequiredEditor, .mockEditor, .mockUploadBox]
+            },
+            sendTemplate: { _, _, isTopic in
+                return .success(isTopic ? .topic(id: 0) : .post(PostSend(id: 0, topicId: 1, offset: 2)))
             },
 			getHistory: { _, _ in
                 return .mock
 			},
+            getMentions: { _, _, _ in
+                return .mock
+            },
             previewPost: { request in
-                return PostPreview(
-                    content: request.post.content,
-                    attachmentIds: request.post.attachments
-                )
+                return PreviewResponse(content: request.post.content, attachments: [.mock])
+            },
+            previewTemplate: { _, _, _ in
+                return PreviewResponse(content: "content", attachments: [.mock])
             },
             sendPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
@@ -655,7 +719,7 @@ extension APIClient: DependencyKey {
             readAllFavorites: {
                 return true
             },
-            getUnread: { _, _ in
+            getUnread: { _ in
                 return .mock
             },
             getAttachment: { _ in

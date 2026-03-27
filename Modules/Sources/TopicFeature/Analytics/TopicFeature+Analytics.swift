@@ -88,12 +88,16 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuGoToEnd)
                     case .setFavorite:
                         analytics.log(TopicEvent.menuSetFavorite)
+                    case .about:
+                        analytics.log(TopicEvent.menuAboutTopic)
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
+                    case .writePostWithTemplate:
+                        analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
-                    
-                case .view(.editWarningSheetCloseButtonTapped):
-                    analytics.log(TopicEvent.editWarningSheetClosed)
+
+                case let .view(.textQuoted(post, _)):
+                    analytics.log(TopicEvent.textQuoted(post.id))
                     
                 case .internal(.loadTopic):
                     break

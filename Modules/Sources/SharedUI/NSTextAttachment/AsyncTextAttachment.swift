@@ -43,7 +43,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
     private var screenWidth: CGFloat?
     private var showPlaceholder: Bool
     
-    public var postId: String?
+    public var link: URL?
 	
 	/// Designated initializer
 //    public init(imageURL: URL, showPlaceholder: Bool = true, delegate: AsyncTextAttachmentDelegate? = nil) {

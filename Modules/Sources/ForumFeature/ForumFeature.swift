@@ -15,19 +15,21 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
+import FormFeature
+import ForumStatFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Localizations
+	// MARK: - Localizations
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
     }
-    
+
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -49,12 +51,22 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case form(FormFeature)
+		case stat(ForumStatFeature)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        
+        @Presents public var destination: Destination.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -90,6 +102,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action: ViewAction {
+        case destination(PresentationAction<Destination.Action>)
         case pageNavigation(PageNavigationFeature.Action)
 
         case view(View)
@@ -102,13 +115,14 @@ public struct ForumFeature: Reducer, Sendable {
             case subforumRedirectTapped(URL)
             case subforumTapped(ForumInfo)
             case announcementTapped(id: Int, name: String)
+            case globalAnnouncementUrlTapped(URL)
             case sectionExpandTapped(SectionExpand.Kind)
             
             case contextOptionMenu(ForumOptionContextMenuAction)
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
-                
+        
         case `internal`(Internal)
         public enum Internal {
             case refresh
@@ -118,6 +132,7 @@ public struct ForumFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openUser(id: Int)
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
@@ -146,7 +161,13 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(.internal(.loadForum(offset: newOffset)))
                 
-            case .pageNavigation:
+            case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
+            case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
+                return .send(.delegate(.openUser(id: id)))
+                
+            case .destination, .pageNavigation:
                 return .none
                 
             case .view(.onFirstAppear):
@@ -175,6 +196,9 @@ public struct ForumFeature: Reducer, Sendable {
                     navigation: navigation
                 )))
                 
+            case let .view(.globalAnnouncementUrlTapped(url)):
+                return .send(.delegate(.handleRedirect(url)))
+                
             case let .view(.topicTapped(topic, showUnread)):
                 guard !showUnread else {
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
@@ -193,8 +217,18 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .view(.contextOptionMenu(let action)):
                 switch action {
-                    // TODO: sort, to bookmarks
-                    // TODO: Add analytics
+                case .createTopic:
+                    let formState = FormFeature.State(
+                        type: .topic(
+                            forumId: state.forumId,
+                            content: []
+                        )
+                    )
+                    state.destination = .form(formState)
+                    return .none
+                    
+                // TODO: sort, to bookmarks
+                // TODO: Add analytics
                 default: return .none
                 }
                 
@@ -231,6 +265,10 @@ public struct ForumFeature: Reducer, Sendable {
                         await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
+                    
+                case .stat:
+                    state.destination = .stat(ForumStatFeature.State(type: .forum(id: state.forumId)))
+                    return .none
                     
                 case .setFavorite(let isFavorite):
                     return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in
@@ -304,6 +342,7 @@ public struct ForumFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }
@@ -316,3 +355,5 @@ public struct ForumFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
 }
+
+extension ForumFeature.Destination.State: Equatable {}

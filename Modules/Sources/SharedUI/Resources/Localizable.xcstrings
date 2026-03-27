@@ -51,18 +51,18 @@
         }
       }
     },
-    "Edited: %@ • %@" : {
+    "Edited: [%@](%@) • %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Edited: %1$@ • %2$@"
+            "value" : "Edited: [%1$@](%2$@) • %3$@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отредактировал: %1$@ • %2$@"
+            "value" : "Отредактировал: [%1$@](%2$@) • %3$@"
           }
         }
       }
@@ -73,6 +73,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скрытый текст"
+          }
+        }
+      }
+    },
+    "IN DEVELOPMENT" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В РАЗРАБОТКЕ"
           }
         }
       }
@@ -93,6 +103,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упоминания поста"
+          }
+        }
+      }
+    },
+    "Quote" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Цитировать"
           }
         }
       }
@@ -163,6 +183,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
+    "Understood" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понятно"
           }
         }
       }

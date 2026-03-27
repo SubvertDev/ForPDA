@@ -26,13 +26,17 @@ public struct FavoriteInfo: Codable, Identifiable, Hashable, Sendable {
             default: .always
         }
     }
-    
-    public var isImportant: Bool {
-        return (topic.flag & 1) > 0
+
+    public var isHatUpdated: Bool {
+        return (flag & 4 != 0) && topic.flag.contains(.marker)
     }
     
     public var isNotifyHatUpdate: Bool {
         return (flag & 4) > 0
+    }
+    
+    public var isImportant: Bool {
+        return topic.flag.contains(.pinned)
     }
     
     public init(

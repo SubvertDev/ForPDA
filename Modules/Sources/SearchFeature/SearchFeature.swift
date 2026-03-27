@@ -20,6 +20,7 @@ public struct SearchFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         public enum Field { case authorName }
+        @Shared(.appSettings) var appSettings: AppSettings
         
         let searchOn: SearchOn
         let navigation: ForumInfo?
@@ -27,7 +28,7 @@ public struct SearchFeature: Reducer, Sendable {
         var focus: Field?
         
         var authorId: Int? = nil
-        var searchSort: SearchSort = .relevance
+        var searchSort: SearchSort
         var whereSearch: SearchWhere = .site
         var forumSearchIn: ForumSearchIn = .all
         
@@ -44,6 +45,7 @@ public struct SearchFeature: Reducer, Sendable {
         ) {
             self.searchOn = on
             self.navigation = navigation
+            self.searchSort = _appSettings.searchSort.wrappedValue
         }
     }
     
@@ -86,6 +88,10 @@ public struct SearchFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .binding(\.searchSort):
+                state.$appSettings.searchSort.withLock { $0 = state.searchSort }
+                return .none
+                
             case .binding(\.authorName):
                 if !state.authorName.isEmpty, state.authorName.count >= 3 {
                     return .send(.view(.searchAuthorName(state.authorName)))

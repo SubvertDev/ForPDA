@@ -17,6 +17,7 @@ import FavoritesFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
+import MentionsFeature
 import NotificationsFeature
 import ProfileFeature
 import QMSFeature
@@ -55,6 +56,7 @@ public enum Path {
     public enum Profile {
         case profile(ProfileFeature)
         case history(HistoryFeature)
+        case mentions(MentionsFeature)
         case reputation(ReputationFeature)
     }
     
@@ -163,6 +165,10 @@ extension Path {
         case let .history(store):
             HistoryScreen(store: store)
                 .tracking(for: HistoryScreen.self)
+            
+        case let .mentions(store):
+            MentionsScreen(store: store)
+                .tracking(for: MentionsScreen.self)
             
         case let .reputation(store):
             ReputationScreen(store: store)

@@ -34,7 +34,8 @@ public struct TopicParser {
               let curatorName = array[safe: 11] as? String,
               let poll = array[safe: 12] as? [Any],
               let postsCount = array[safe: 13] as? Int,
-              let posts = array[safe: 14] as? [[Any]] else {
+              let posts = array[safe: 14] as? [[Any]],
+              let postTemplates = array[safe: 15] as? [String] else {
             throw ParsingError.failedToCastFields
         }
         
@@ -42,7 +43,7 @@ public struct TopicParser {
             id: id,
             name: name.convertCodes(),
             description: description.convertCodes(),
-            flag: flag,
+            flag: ForumFlag(rawValue: flag),
             createdAt: Date(timeIntervalSince1970: createdAt),
             authorId: authorId,
             authorName: authorName.convertCodes(),
@@ -51,11 +52,46 @@ public struct TopicParser {
             poll: try parsePoll(poll),
             postsCount: postsCount,
             posts: try parsePosts(posts),
-            navigation: ForumParser.parseNavigation(navigation)
+            navigation: ForumParser.parseNavigation(navigation),
+            postTemplateName: !postTemplates.isEmpty ? postTemplates[safe: 0] : nil
         )
     }
     
-    public static func parsePostPreview(from string: String) throws(ParsingError) -> PostPreview {
+    // MARK: - Viewers
+    
+    public static func parseTopicViewers(from string: String) throws (ParsingError) -> TopicViewers {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let guestsCount = array[safe: 2] as? Int,
+              let hiddenUsersCount = array[safe: 3] as? Int,
+              let usersRaw = array[safe: 4] as? [[Any]],
+              let users = try? parseTopicViewer(usersRaw) else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return TopicViewers(guestsCount: guestsCount, hiddenUsersCount: hiddenUsersCount, users: users)
+    }
+    
+    private static func parseTopicViewer(_ usersRaw: [[Any]]) throws -> [TopicViewers.SimplifiedUser] {
+        return try usersRaw.map { user in
+            guard let id = user[safe: 0] as? Int,
+                  let name = user[safe: 1] as? String,
+                  let group = user[2] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            return TopicViewers.SimplifiedUser(id: id, name: name, group: User.Group(rawValue: group)!)
+        }
+    }
+    
+    // MARK: - Form
+    
+    public static func parsePostPreview(from string: String) throws(ParsingError) -> PreviewResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -65,11 +101,12 @@ public struct TopicParser {
         }
         
         guard let content = array[safe: 2] as? String,
-              let attachmentIds = array[safe: 3] as? [Int] else {
+              let attachmentsRaw = array[safe: 3] as? [[Any]],
+              let attachments = try? AttachmentParser.parseAttachment(attachmentsRaw) else {
             throw ParsingError.failedToCastFields
         }
         
-        return PostPreview(content: content, attachmentIds: attachmentIds)
+        return PreviewResponse(content: content, attachments: attachments)
     }
     
     public static func parsePostSendResponse(from string: String) throws(ParsingError) -> PostSendResponse {
@@ -192,7 +229,7 @@ public struct TopicParser {
         
         return Post(
             id: id,
-            flag: flag,
+            flag: ForumFlag(rawValue: flag),
             content: content,
             author: Post.Author(
                 id: authorId,
@@ -227,7 +264,7 @@ public struct TopicParser {
         return Post.LastEdit(
             userId: userId,
             username: username.convertCodes(),
-            reason: reason,
+            reason: reason.convertCodes(),
             date: Date(timeIntervalSince1970: date)
         )
     }

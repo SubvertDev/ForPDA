@@ -20,6 +20,7 @@ public struct TopicView: View {
     let textAlignment: NSTextAlignment?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
+    let onQuote: QuoteHandler?
     
     public init(
         type: UITopicType,
@@ -28,7 +29,8 @@ public struct TopicView: View {
         alignment: NSTextAlignment? = nil,
         lineLimit: Int? = nil,
         onUrlTap: URLTapHandler? = nil,
-        onImageTap: ImageTapHandler? = nil
+        onImageTap: ImageTapHandler? = nil,
+        onQuote: QuoteHandler? = nil
     ) {
         self.type = type
         self.nestLevel = nestLevel
@@ -36,6 +38,7 @@ public struct TopicView: View {
         self.textAlignment = alignment
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
+        self.onQuote = onQuote
     }
     
     public var body: some View {
@@ -44,6 +47,7 @@ public struct TopicView: View {
             RichText(
                 text: text,
                 onUrlTap: onUrlTap,
+                onQuote: onQuote,
                 configuration: {
                     if let textAlignment {
                         ($0 as? UITextView)?.textAlignment = textAlignment
@@ -60,8 +64,12 @@ public struct TopicView: View {
             let scaleFactor = availableWidth / CGFloat(metadata.width)
             let isWidthMoreThanAvailable = scaleFactor < 1
 
-            let width = isWidthMoreThanAvailable ? availableWidth : CGFloat(metadata.width)
-            let height = width / ratioWH
+            let width: CGFloat? = if metadata.width != 0 {
+                isWidthMoreThanAvailable ? availableWidth : CGFloat(metadata.width)
+            } else {
+                nil
+            }
+            let height: CGFloat? = if let width = width { (width / ratioWH) } else { nil }
             
             LazyImage(url: metadata.url) { state in
                 if let container = state.imageContainer {
@@ -100,7 +108,8 @@ public struct TopicView: View {
                         attachments: attachments,
                         alignment: .left,
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onImageTap: onImageTap,
+                        onQuote: onQuote
                     )
                 }
             }
@@ -114,7 +123,8 @@ public struct TopicView: View {
                         attachments: attachments,
                         alignment: .center,
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onImageTap: onImageTap,
+                        onQuote: onQuote
                     )
                 }
             }
@@ -129,7 +139,8 @@ public struct TopicView: View {
                         attachments: attachments,
                         alignment: .right,
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onImageTap: onImageTap,
+                        onQuote: onQuote
                     )
                 }
             }
@@ -141,7 +152,8 @@ public struct TopicView: View {
                 info: info,
                 attachments: attachments,
                 onUrlTap: onUrlTap,
-                onImageTap: onImageTap
+                onImageTap: onImageTap,
+                onQuote: onQuote
             )
             
         case let .quote(types, info):
@@ -151,7 +163,8 @@ public struct TopicView: View {
                 info: info,
                 attachments: attachments,
                 onUrlTap: onUrlTap,
-                onImageTap: onImageTap
+                onImageTap: onImageTap,
+                onQuote: onQuote
             )
             
         case let .code(type, info):
@@ -160,7 +173,8 @@ public struct TopicView: View {
                 nestLevel: nestLevel,
                 info: info,
                 onUrlTap: onUrlTap,
-                onImageTap: onImageTap
+                onImageTap: onImageTap,
+                onQuote: onQuote
             )
             
         case let .hide(types, info):
@@ -170,7 +184,8 @@ public struct TopicView: View {
                 info: info,
                 attachments: attachments,
                 onUrlTap: onUrlTap,
-                onImageTap: onImageTap
+                onImageTap: onImageTap,
+                onQuote: onQuote
             )
             
         case let .list(types, _):
@@ -181,7 +196,8 @@ public struct TopicView: View {
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onImageTap: onImageTap,
+                        onQuote: onQuote
                     )
                     .padding(.leading, nestLevel == 1 ? 0 : 8)
                 }
@@ -194,7 +210,8 @@ public struct TopicView: View {
                 info: info,
                 attachments: attachments,
                 onUrlTap: onUrlTap,
-                onImageTap: onImageTap
+                onImageTap: onImageTap,
+                onQuote: onQuote
             )
             
         case let .bullet(types):
@@ -212,7 +229,8 @@ public struct TopicView: View {
                             type: type,
                             attachments: attachments,
                             onUrlTap: onUrlTap,
-                            onImageTap: onImageTap
+                            onImageTap: onImageTap,
+                            onQuote: onQuote
                         )
                     }
                 }
@@ -233,6 +251,7 @@ struct SpoilerView: View {
     let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
+    let onQuote: QuoteHandler?
     private let text: AttributedString
     
     private static var defaultAttributes: AttributeContainer {
@@ -248,7 +267,8 @@ struct SpoilerView: View {
         info: AttributedString?,
         attachments: [Attachment],
         onUrlTap: URLTapHandler?,
-        onImageTap: ImageTapHandler?
+        onImageTap: ImageTapHandler?,
+        onQuote: QuoteHandler?
     ) {
         self.types = types
         self.nestLevel = nestLevel
@@ -256,6 +276,7 @@ struct SpoilerView: View {
         self.attachments = attachments
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
+        self.onQuote = onQuote
         
         var attrString = AttributedString("Спойлер\(info != nil ? ": " : "")")
         attrString.setAttributes(SpoilerView.defaultAttributes)
@@ -301,7 +322,8 @@ struct SpoilerView: View {
                             nestLevel: nestLevel + 1,
                             attachments: attachments,
                             onUrlTap: onUrlTap,
-                            onImageTap: onImageTap
+                            onImageTap: onImageTap,
+                            onQuote: onQuote
                         )
                     }
                 }
@@ -326,8 +348,10 @@ struct QuoteView: View {
     let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
+    let onQuote: QuoteHandler?
     private let text: AttributedString
     private var date: String?
+    private var postId: Int?
     
     private static var defaultAttributes: AttributeContainer {
         var container = AttributeContainer()
@@ -342,7 +366,8 @@ struct QuoteView: View {
         info: QuoteType?,
         attachments: [Attachment],
         onUrlTap: URLTapHandler?,
-        onImageTap: ImageTapHandler?
+        onImageTap: ImageTapHandler?,
+        onQuote: QuoteHandler?
     ) {
         self.types = types
         self.nestLevel = nestLevel
@@ -351,6 +376,7 @@ struct QuoteView: View {
         self.onUrlTap = onUrlTap
         self.date = nil
         self.onImageTap = onImageTap
+        self.onQuote = onQuote
         
         var text = AttributedString("Цитата\(info != nil ? ": " : "")")
         if let info {
@@ -367,6 +393,7 @@ struct QuoteView: View {
                 infoText.setAttributes(QuoteView.defaultAttributes)
                 text.append(infoText)
                 self.date = metadata.date
+                self.postId = metadata.postId
             }
         } else {
             text.setAttributes(QuoteView.defaultAttributes)
@@ -377,6 +404,16 @@ struct QuoteView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
+                if let postId {
+                    Button {
+                        onUrlTap?(URL(string: "https://4pda.to/forum/index.php?act=findpost&pid=\(postId)")!)
+                    } label: {
+                        Image(systemSymbol: .arrowLeftSquare)
+                            .frame(width: 16, height: 16)
+                    }
+                    .padding(.trailing, 8)
+                }
+                
                 Text(text)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
@@ -405,7 +442,8 @@ struct QuoteView: View {
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onImageTap: onImageTap,
+                        onQuote: onQuote
                     )
                 }
             }
@@ -429,6 +467,7 @@ struct CodeView: View {
     let info: CodeType
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
+    let onQuote: QuoteHandler?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -473,11 +512,11 @@ struct CodeView: View {
             }
             
             if isExpanded {
-                if case .text = type {
-                    TopicView(
-                        type: type,
+                if case let .text(text) = type {
+                    RichText(
+                        text: text.monospacedCodeBlockText(),
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onQuote: onQuote
                     )
                     .padding(12)
                 } else {
@@ -499,6 +538,30 @@ struct CodeView: View {
     }
 }
 
+private extension AttributedString {
+    func monospacedCodeBlockText() -> NSAttributedString {
+        let mutable = NSMutableAttributedString(attributedString: NSAttributedString(self))
+        let range = NSRange(location: 0, length: mutable.length)
+
+        mutable.enumerateAttribute(.font, in: range) { value, effectiveRange, _ in
+            let font = (value as? UIFont) ?? UIFont.preferredFont(forTextStyle: .callout)
+            mutable.addAttribute(.font, value: font.monospacedEquivalent(), range: effectiveRange)
+        }
+
+        return mutable
+    }
+}
+
+private extension UIFont {
+    func monospacedEquivalent() -> UIFont {
+        let monospacedDescriptor = fontDescriptor.withDesign(.monospaced)
+            ?? UIFont.monospacedSystemFont(ofSize: pointSize, weight: .regular).fontDescriptor
+        let descriptorWithTraits = monospacedDescriptor.withSymbolicTraits(fontDescriptor.symbolicTraits)
+            ?? monospacedDescriptor
+        return UIFont(descriptor: descriptorWithTraits, size: pointSize)
+    }
+}
+
 // MARK: - Hide View
 
 struct HideView: View {
@@ -509,6 +572,7 @@ struct HideView: View {
     let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
+    let onQuote: QuoteHandler?
     
     @State var isShown: Bool
     @State private var shouldLoadUser: Int?
@@ -519,7 +583,8 @@ struct HideView: View {
         info: Int?,
         attachments: [Attachment],
         onUrlTap: URLTapHandler?,
-        onImageTap: ImageTapHandler?
+        onImageTap: ImageTapHandler?,
+        onQuote: QuoteHandler?
     ) {
         self.types = types
         self.nestLevel = nestLevel
@@ -527,6 +592,7 @@ struct HideView: View {
         self.attachments = attachments
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
+        self.onQuote = onQuote
         
         self.isShown = false
         
@@ -566,7 +632,7 @@ struct HideView: View {
                     if isShown {
                         VStack(spacing: 8) {
                             ForEach(types, id: \.self) { type in
-                                TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap)
+                                TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap, onQuote: onQuote)
                             }
                         }
                         .padding(12)
@@ -603,6 +669,7 @@ struct NoticeView: View {
     let attachments: [Attachment]
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
+    let onQuote: QuoteHandler?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -628,7 +695,8 @@ struct NoticeView: View {
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
                         onUrlTap: onUrlTap,
-                        onImageTap: onImageTap
+                        onImageTap: onImageTap,
+                        onQuote: onQuote
                     )
                 }
             }
@@ -669,7 +737,8 @@ public extension NoticeType {
             nestLevel: 1,
             info: .none,
             onUrlTap: nil,
-            onImageTap: nil
+            onImageTap: nil,
+            onQuote: nil
         )
         Color.white
     }
@@ -685,7 +754,8 @@ public extension NoticeType {
             info: .moderator,
             attachments: [],
             onUrlTap: nil,
-            onImageTap: nil
+            onImageTap: nil,
+            onQuote: nil
         )
         Color.white
     }

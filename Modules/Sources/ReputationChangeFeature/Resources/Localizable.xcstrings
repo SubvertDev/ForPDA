@@ -61,6 +61,16 @@
         }
       }
     },
+    "Input" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите"
+          }
+        }
+      }
+    },
     "Input reason" : {
       "localizations" : {
         "ru" : {

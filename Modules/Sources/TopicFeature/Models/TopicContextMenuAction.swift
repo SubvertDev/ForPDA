@@ -7,8 +7,10 @@
 
 public enum TopicContextMenuAction {
     case writePost
+    case writePostWithTemplate
     case copyLink
     case openInBrowser
     case goToEnd
     case setFavorite
+    case about
 }

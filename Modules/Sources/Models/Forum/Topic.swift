@@ -11,7 +11,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let id: Int
     public let name: String
     public let description: String
-    public let flag: Int
+    public let flag: ForumFlag
     public let createdAt: Date
     public let authorId: Int
     public let authorName: String
@@ -21,9 +21,18 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let postsCount: Int
     public let posts: [Post]
     public let navigation: [ForumInfo]
+    public let postTemplateName: String?
     
     public var canPost: Bool {
-        return (flag & 64) != 0 && (flag & 16) == 0
+        return flag.contains(.canPost) && !flag.contains(.marker)
+    }
+    
+    public var canModerate: Bool {
+        return flag.contains(.canModerate)
+    }
+    
+    public var isClosed: Bool {
+        return flag.contains(.closed)
     }
     
     public var isFavorite: Bool
@@ -72,7 +81,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         id: Int,
         name: String,
         description: String,
-        flag: Int,
+        flag: ForumFlag,
         createdAt: Date,
         authorId: Int,
         authorName: String,
@@ -81,7 +90,8 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         poll: Poll?,
         postsCount: Int,
         posts: [Post],
-        navigation: [ForumInfo]
+        navigation: [ForumInfo],
+        postTemplateName: String?
     ) {
         self.id = id
         self.name = name
@@ -96,8 +106,9 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         self.postsCount = postsCount
         self.posts = posts
         self.navigation = navigation
+        self.postTemplateName = postTemplateName
         
-        self.isFavorite = (flag & 8) != 0
+        self.isFavorite = flag.contains(.favorite)
     }
 }
 
@@ -106,7 +117,7 @@ public extension Topic {
         id: 3242552,
         name: "ForPDA",
         description: "Unofficial 4PDA client for iOS.",
-        flag: 64,
+        flag: .canPost,
         createdAt: Date(timeIntervalSince1970: 1725706883),
         authorId: 3640948,
         authorName: "4spander",
@@ -118,8 +129,9 @@ public extension Topic {
             .mock(id: 0), .mock(id: 1), .mock(id: 2)
         ],
         navigation: [
-            ForumInfo(id: 1, name: "iOS - Apps", flag: 32)
-        ]
+            .mock, .mockCategory
+        ],
+        postTemplateName: "New update"
     )
 }
 

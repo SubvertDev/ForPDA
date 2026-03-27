@@ -11,6 +11,9 @@ import PageNavigationFeature
 import SFSafeSymbols
 import SharedUI
 import Models
+import BBBuilder
+import FormFeature
+import ForumStatFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -42,6 +45,10 @@ public struct ForumScreen: View {
                 
                 if let forum = store.forum, !store.isLoadingTopics {
                     List {
+                        if let globalAnnouncement = forum.globalAnnouncementAttributed {
+                            GlobalAnnouncementRow(announce: globalAnnouncement)
+                        }
+                        
                         if !forum.subforums.isEmpty {
                             SubforumsSection(subforums: forum.subforums)
                         }
@@ -73,6 +80,11 @@ public struct ForumScreen: View {
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(store.forumName ?? "Загрузка..."))
             ._toolbarTitleDisplayMode(.large)
+            .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+                NavigationStack {
+                    FormScreen(store: store)
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if isLiquidGlass,
                    store.appSettings.floatingNavigation,
@@ -83,6 +95,11 @@ public struct ForumScreen: View {
                     )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
+                }
+            }
+            .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                NavigationStack {
+                    ForumStatView(store: store)
                 }
             }
             .toolbar {
@@ -117,6 +134,14 @@ public struct ForumScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             if let forum = store.forum {
+                if forum.canCreateTopic {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Create Topic", bundle: .module), symbol: .plusCircle) {
+                            send(.contextOptionMenu(.createTopic))
+                        }
+                    }
+                }
+                
                 CommonContextMenu(
                     id: forum.id,
                     isFavorite: forum.isFavorite,
@@ -137,6 +162,29 @@ public struct ForumScreen: View {
         } else {
             return AnyShapeStyle(tintColor)
         }
+    }
+    
+    // MARK: - Global Announcement Row
+    
+    @ViewBuilder
+    private func GlobalAnnouncementRow(announce: NSAttributedString) -> some View {
+        RichText(text: announce, onUrlTap: { url in
+            send(.globalAnnouncementUrlTapped(url))
+        })
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .background {
+            if #available(iOS 26, *) {
+                ConcentricRectangle()
+                    .fill(Color(.Background.teritary))
+            } else {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(.Background.teritary))
+            }
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Topics
@@ -281,14 +329,14 @@ public struct ForumScreen: View {
             send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
-        if store.isUserAuthorized {
-            if isUnread {
-                ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
-                    send(.contextCommonMenu(.markRead, id, isForum))
-                }
+        if store.isUserAuthorized, isUnread {
+            ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
+                send(.contextCommonMenu(.markRead, id, isForum))
             }
-            
-            Section {
+        }
+        
+        Section {
+            if store.isUserAuthorized {
                 ContextButton(
                     text: isFavorite
                     ? LocalizedStringResource("Remove from favorites", bundle: .module)
@@ -296,6 +344,12 @@ public struct ForumScreen: View {
                     symbol: isFavorite ? .starFill : .star
                 ) {
                     send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+                }
+            }
+            
+            if isForum {
+                ContextButton(text: LocalizedStringResource("About Forum", bundle: .module), symbol: .infoCircle) {
+                    send(.contextCommonMenu(.stat, id, isForum))
                 }
             }
         }
@@ -333,6 +387,13 @@ public struct ForumScreen: View {
 extension Bundle {
     static var models: Bundle? {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+    }
+}
+
+extension Forum {
+    var globalAnnouncementAttributed: NSAttributedString? {
+        guard !globalAnnouncement.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+        return BBRenderer().render(text: globalAnnouncement)
     }
 }
 

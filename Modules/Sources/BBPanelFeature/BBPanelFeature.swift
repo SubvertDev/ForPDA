@@ -1,0 +1,223 @@
+//
+//  BBPanelFeature.swift
+//  ForPDA
+//
+//  Created by Xialtal on 28.12.25.
+//
+
+import Foundation
+import ComposableArchitecture
+import UploadBoxFeature
+
+@Reducer
+public struct BBPanelFeature: Reducer, Sendable {
+    
+    public init() {}
+    
+    // MARK: - Localizations
+    
+    public enum Localization {
+        static let inputFullUrl = LocalizedStringResource("Input full URL-address", bundle: .module)
+        static let inputSpoilerTitle = LocalizedStringResource("Input spoiler title", bundle: .module)
+    }
+    
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case colorTag
+        
+        case urlTag
+        case spoilerWithTitleTag
+        
+        case listTag(ListTagBuilderFeature)
+    }
+    
+    // MARK: - View State
+    
+    public enum BBPanelViewState {
+        case tags
+        case fontSizes
+    }
+    
+    // MARK: - State
+    
+    @ObservableState
+    public struct State: Equatable {
+        @Presents var destination: Destination.State?
+        
+        var upload = UploadBoxFeature.State(type: .bbPanel)
+        
+        let panelWith: BBPanelType
+        public var supportsUpload: Bool
+        public var allowedExtensions: [String]
+        
+        public var existsFiles: [UploadBoxFile] {
+            get { upload.files }
+            set(files) {
+                if !isUploading {
+                    upload.files = files
+                } else {
+                    fatalError("Could not update files, cause some is uploading (\(upload.files))")
+                }
+            }
+        }
+        
+        var tags: [BBPanelTag] = []
+        var viewState: BBPanelViewState = .tags
+        
+        var alertInput = ""
+        var textSize = 1
+        
+        var isUploading = false
+        var uploadedFiles = 0
+        var showUploadBox = false
+        
+        public init(
+            for panelType: BBPanelType,
+            supportsUpload: Bool = false,
+            allowedExtensions: [String] = [],
+            existsFiles: [UploadBoxFile] = []
+        ) {
+            self.panelWith = panelType
+            self.supportsUpload = supportsUpload
+            self.allowedExtensions = allowedExtensions
+            self.existsFiles = existsFiles
+        }
+    }
+    
+    // MARK: - Action
+    
+    public enum Action: BindableAction, ViewAction {
+        case binding(BindingAction<State>)
+        case destination(PresentationAction<Destination.Action>)
+        case upload(UploadBoxFeature.Action)
+        
+        case view(View)
+        public enum View {
+            case onAppear
+            case tagButtonTapped(BBPanelTag)
+            case fontSizeButtonTapped(Int)
+            case colorButtonTapped(String)
+            case colorCancelButtonTapped
+            case alertTagButtonTapped(BBPanelTag)
+            case hideUploadBoxButtonTapped
+            case returnTagsButtonTapped
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case tagTapped((String, String))
+        }
+    }
+    
+    // MARK: - Body
+    
+    public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
+        Scope(state: \.upload, action: \.upload) {
+            UploadBoxFeature()
+        }
+        
+        Reduce<State, Action> { state, action in
+            switch action {
+            case .view(.onAppear):
+                var tags = state.panelWith.kit
+                if state.supportsUpload {
+                    tags.insert(.upload, at: 0)
+                    
+                    state.upload.files = state.existsFiles
+                    state.uploadedFiles = state.existsFiles.count
+                    state.upload.allowedExtensions = state.allowedExtensions
+                }
+                if case let .post(isCurator, canModerate) = state.panelWith {
+                    if canModerate {
+                        tags.append(.cur)
+                        tags.append(.mod)
+                        tags.append(.ex)
+                    } else if isCurator {
+                        tags.append(.cur)
+                    }
+                }
+                state.tags = tags
+                return .none
+                
+            case let .view(.tagButtonTapped(tag)):
+                switch tag {
+                case .b, .i, .s, .u, .sup, .sub, .offtop, .center, .left, .right, .hide, .code, .cur, .mod, .ex, .quote, .spoiler:
+                    return .send(.delegate(.tagTapped(("[\(tag.code)]", "[/\(tag.code)]"))))
+                case .size:
+                    state.viewState = .fontSizes
+                case .color:
+                    state.destination = .colorTag
+                case .url:
+                    state.destination = .urlTag
+                case .spoilerWithTitle:
+                    state.destination = .spoilerWithTitleTag
+                case .listNumber:
+                    state.destination = .listTag(ListTagBuilderFeature.State(isBullet: false))
+                case .listBullet:
+                    state.destination = .listTag(ListTagBuilderFeature.State(isBullet: true))
+                case .upload:
+                    state.showUploadBox.toggle()
+                }
+                return .none
+                
+            case let .view(.fontSizeButtonTapped(size)):
+                return .send(.delegate(.tagTapped(("[SIZE=\(size)]", "[/SIZE]"))))
+                
+            case .view(.returnTagsButtonTapped):
+                state.viewState = .tags
+                return .none
+                
+            case let .view(.colorButtonTapped(name)):
+                state.destination = nil
+                return .send(.delegate(.tagTapped(("[COLOR=\(name)]", "[/COLOR]"))))
+                
+            case .view(.colorCancelButtonTapped):
+                state.destination = nil
+                return .none
+                
+            case let .view(.alertTagButtonTapped(tag)):
+                let input = state.alertInput
+                state.alertInput = ""
+                return .send(.delegate(.tagTapped(("[\(tag.code)=\(input)]", "[/\(tag.code)]"))))
+                
+            case .view(.hideUploadBoxButtonTapped):
+                state.showUploadBox = false
+                return .none
+                
+            case let .destination(.presented(.listTag(.delegate(.listTagBuilded(tag))))):
+                return .send(.delegate(.tagTapped(tag)))
+                
+            case let .upload(.delegate(.fileHasBeenTapped(id, name))):
+                return .send(.delegate(.tagTapped(("[attachment=\"\(id):\(name)\"]", ""))))
+                
+            case .upload(.delegate(.someFileUploading)):
+                state.isUploading = true
+                return .none
+                
+            case .upload(.delegate(.fileHasBeenUploaded)):
+                state.uploadedFiles += 1
+                return .none
+                
+            case .upload(.delegate(.fileHasBeenRemoved)):
+                if state.uploadedFiles != 0 {
+                    state.uploadedFiles -= 1
+                }
+                return .none
+                
+            case .upload(.delegate(.allFilesAreUploaded)):
+                state.isUploading = false
+                return .none
+                
+            case .delegate, .destination, .binding, .upload:
+                return .none
+            }
+        }
+        .ifLet(\.$destination, action: \.destination)
+    }
+}
+
+extension BBPanelFeature.Destination.State: Equatable {}

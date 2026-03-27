@@ -12,7 +12,7 @@ import APIClient
 import Models
 
 public enum Deeplink {
-    case article(id: Int, title: String, imageUrl: URL)
+    case article(id: Int, title: String, imageUrl: URL, scrollToId: Int?)
     case announcement(id: Int)
     case topic(id: Int?, goTo: GoTo)
     case forum(id: Int, page: Int)
@@ -39,6 +39,7 @@ public struct DeeplinkHandler {
         case unknownType(type: String, for: String)
         case noType(of: String, for: String)
         case noDeeplinkAvailable(for: URL)
+        case fileDownload(url: URL)
         case externalURL
     }
     
@@ -71,7 +72,7 @@ public struct DeeplinkHandler {
             guard let titleEncoded = queryItems.first(where: { $0.name == "title"} )?.value else { throw .noTitle(in: url) }
             guard let title = titleEncoded.removingPercentEncoding else { throw .badTitle(in: url) }
 
-            return .article(id: id, title: title, imageUrl: imageUrl)
+            return .article(id: id, title: title, imageUrl: imageUrl, scrollToId: nil)
             
         case "forum":
             guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
@@ -113,17 +114,14 @@ public struct DeeplinkHandler {
     
     // MARK: - Inner To Inner
     
+    
     public func handleInnerToInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink {
-        if url.scheme == "snapback", let postIdString = url.host(), let postId = Int(postIdString) {
-            let topicIdString = url.path()
-            if let topicId = Int(String(topicIdString.dropFirst())) {
-                return .topic(id: topicId, goTo: .post(id: postId))
-            }
-        }
-        
         let url = URL(string: url.absoluteString.replacingOccurrences(of: "&amp;", with: "&"))!
         
         guard let host = url.host, host == "4pda.to" else { throw .externalURL }
+        
+        // File download link type
+        guard !url.pathComponents.contains("dl") else { throw .fileDownload(url: url) }
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents(in: url) }
         
@@ -148,7 +146,7 @@ public struct DeeplinkHandler {
         
         // site search
         
-        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value {
+        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value, !value.isEmpty {
             // https://4pda.to/?s=4pda
             let searchText = if let decodedSearchText = value.removingPercentEncoding {
                 decodedSearchText
@@ -176,6 +174,10 @@ public struct DeeplinkHandler {
                     
                 case "getnewpost":
                     // https://4pda.to/forum/index.php?showtopic=123456&view=getnewpost
+                    return .topic(id: topicId, goTo: .unread)
+                    
+                case "getlastpost":
+                    // https://4pda.to/forum/index.php?showtopic=673755&view=getlastpost
                     return .topic(id: topicId, goTo: .last)
                     
                 default:
@@ -294,8 +296,11 @@ public struct DeeplinkHandler {
     
     // MARK: - Inner To Outer
     
+    // TODO: Rename to file download case?
     public func handleInnerToOuterURL(_ url: URL) async -> URL {
-        let id = Int(url.absoluteString.replacingOccurrences(of: "link://", with: ""))!
+        let downloadIndex = url.pathComponents.firstIndex(of: "dl")!
+        let idString = url.pathComponents[downloadIndex + 2]
+        let id = Int(idString)!
         @Dependency(\.apiClient) var apiClient
         let url = try! await apiClient.getAttachment(id)
         return url
@@ -325,7 +330,7 @@ public struct DeeplinkHandler {
             // Forum mention has topic id in timestamp place
             return Deeplink.topic(id: timestamp, goTo: .post(id: id))
         case .siteMention:
-            return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!)
+            return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!, scrollToId: timestamp)
         }
     }
 }
@@ -340,16 +345,22 @@ extension Array {
 
 extension Array where Element == URLQueryItem {
     func extractSearchIds(forItem name: String) -> [Int] {
-        return self.compactMap { item -> Int? in
-            let isSingleItem = item.name == name
-            let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
-            
-            guard (isSingleItem || isMultiItems),
-                  let value = item.value,
-                  let id = Int(value) else {
-                return nil
+        return self
+            .filter { item -> Bool in
+                let isSingleItem = item.name == name
+                let isMultiItems = item.name.removingPercentEncoding == "\(name)[]"
+                return isSingleItem || isMultiItems
             }
-            return id
-        }
+            .compactMap { item -> [Int]? in
+                guard let value = item.value else { return nil }
+                if value.contains(",") {
+                    return value
+                        .split(separator: ",")
+                        .compactMap { Int(String($0).trimmingCharacters(in: .whitespaces)) }
+                } else {
+                    return [Int(value) ?? 0]
+                }
+            }
+            .flatMap { $0 }
     }
 }

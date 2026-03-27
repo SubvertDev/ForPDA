@@ -196,6 +196,9 @@ public struct FavoritesFeature: Reducer, Sendable {
                         let success = ToastMessage(text: Localization.markAsReadSuccess, haptic: .success)
                         await toastClient.showToast(status ? success : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
+                        
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     }
                 }
                 
@@ -286,6 +289,10 @@ public struct FavoritesFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.favoritesResponse(.success(response))):
+                if response.favorites.isEmpty && !state.pageNavigation.isFirstPage {
+                    return .send(.pageNavigation(.firstPageTapped))
+                }
+
                 var favsImportant: [FavoriteInfo] = []
                 var favorites: [FavoriteInfo] = []
 

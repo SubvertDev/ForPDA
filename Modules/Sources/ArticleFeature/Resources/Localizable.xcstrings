@@ -92,6 +92,7 @@
       }
     },
     "Error sending report" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -167,16 +168,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Жалоба отправлена"
-          }
-        }
-      }
-    },
-    "Report too short" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Слишком короткая жалоба"
           }
         }
       }

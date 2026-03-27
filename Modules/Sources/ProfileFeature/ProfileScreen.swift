@@ -155,8 +155,8 @@ public struct ProfileScreen: View {
             if let signature = user.signatureAttributed {
                 RichText(text: signature, onUrlTap: { url in
                     send(.deeplinkTapped(url, .signature))
-                }) {
-                    ($0 as? UITextView)?.textAlignment = .center
+                }) { _ in
+                    // ($0 as? UITextView)?.textAlignment = .center
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 10)
@@ -177,14 +177,16 @@ public struct ProfileScreen: View {
     private func NavigationSection() -> some View {
         if store.shouldShowToolbarButtons {
             Section {
-                Row(symbol: .person2, title: "QMS", type: .navigation) {
+                Row(symbol: .person2, title: "QMS", type: .navigation(badge: store.qmsBadgeCount)) {
                     send(.qmsButtonTapped)
                 }
                 
-                Section {
-                    Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation) {
-                        send(.historyButtonTapped)
-                    }
+                Row(symbol: .at, title: "Mentions", type: .navigation(badge: store.mentionsBadgeCount)) {
+                    send(.mentionsButtonTapped)
+                }
+                
+                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation(badge: 0)) {
+                    send(.historyButtonTapped)
                 }
             }
             .listRowBackground(Color(.Background.teritary))
@@ -511,7 +513,7 @@ public struct ProfileScreen: View {
     enum RowType {
         case basic
         case description(String)
-        case navigation
+        case navigation(badge: Int)
         case navigationDescription(String)
         case localizedDescription(LocalizedStringKey)
     }
@@ -551,10 +553,16 @@ public struct ProfileScreen: View {
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
-                    case .navigation:
-                        Image(systemSymbol: .chevronRight)
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundStyle(Color(.Labels.quintuple))
+                    case let .navigation(badgeCount):
+                        if badgeCount <= 0 {
+                            Image(systemSymbol: .chevronRight)
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(Color(.Labels.quintuple))
+                        } else {
+                            EmptyView()
+                                .badge(badgeCount)
+                                ._badgeProminence(.increased)
+                        }
                         
                     case let .navigationDescription(text):
                         Text(text)
@@ -672,6 +680,7 @@ extension User {
 // MARK: - Previews
 
 #Preview {
+    @Shared(.userSession) var userSession = .mock
     NavigationStack {
         ProfileScreen(
             store: Store(

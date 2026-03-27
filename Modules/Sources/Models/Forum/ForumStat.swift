@@ -1,0 +1,73 @@
+//
+//  ForumStat.swift
+//  ForPDA
+//
+//  Created by Xialtal on 14.06.25.
+//
+
+public struct ForumStat: Sendable, Equatable {
+    public let id: Int
+    public let name: String
+    public let description: String
+    public let flag: ForumFlag
+    public let globalAnnouncement: String
+    public let subforumsCount: Int
+    public let topicsCount: Int
+    public let postsCount: Int
+    public let moderators: [ForumModerator]
+    
+    public struct ForumModerator: Sendable, Equatable, Identifiable {
+        public let id: Int
+        public let name: String
+        public let group: User.Group
+        
+        public init(id: Int, name: String, group: User.Group) {
+            self.id = id
+            self.name = name
+            self.group = group
+        }
+    }
+    
+    public init(
+        id: Int,
+        name: String,
+        description: String,
+        flag: ForumFlag,
+        globalAnnouncement: String,
+        subforumsCount: Int,
+        topicsCount: Int,
+        postsCount: Int,
+        moderators: [ForumModerator]
+    ) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.flag = flag
+        self.globalAnnouncement = globalAnnouncement
+        self.subforumsCount = subforumsCount
+        self.topicsCount = topicsCount
+        self.postsCount = postsCount
+        self.moderators = moderators
+    }
+}
+
+public extension ForumStat {
+    static let mock = ForumStat(
+        id: 5,
+        name: "4PDA - Administrative",
+        description: "Simple description.",
+        flag: [.canPost, .updated],
+        globalAnnouncement: "This is global announcement title.",
+        subforumsCount: 3,
+        topicsCount: 1456,
+        postsCount: 81734,
+        moderators: [
+            .init(id: 0, name: "Admins", group: .admin),
+            .init(id: 1, name: "AirFlare", group: .regular),
+            .init(id: 2, name: "subvertd", group: .regular),
+            .init(id: 3, name: "Test1", group: .moderator),
+            .init(id: 4, name: "LongNickName999", group: .moderator),
+            .init(id: 5, name: "Lia", group: .supermoderator)
+        ]
+    )
+}

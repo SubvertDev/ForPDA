@@ -29,7 +29,7 @@ public struct DeveloperFeature: Reducer, Sendable {
         @Shared(.appSettings) public var appSettings: AppSettings
         @Shared(.appStorage("analytics_id")) var analyticsId: String = UUID().uuidString
         
-        public var lastBackgroundTaskInvokeTime: [TimeInterval] = []
+        public var backgroundTaskEntries: [BackgroundTaskEntry] = []
         public var isAnalyticsEnabled: Bool
         public var isCrashlyticsEnabled: Bool
         
@@ -50,8 +50,6 @@ public struct DeveloperFeature: Reducer, Sendable {
         case onAppear
         case sendCrashButtonTapped
         case binding(BindingAction<State>)
-        
-        case _onCacheLoad([TimeInterval])
     }
     
     // MARK: - Dependency
@@ -67,10 +65,7 @@ public struct DeveloperFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                return .run { send in
-                    let timeIntervals = await cacheClient.getLastBackgroundTaskInvokeTime()
-                    await send(._onCacheLoad(timeIntervals))
-                }
+                return .none
                 
             case .sendCrashButtonTapped:
                 return .run { _ in
@@ -95,10 +90,6 @@ public struct DeveloperFeature: Reducer, Sendable {
                 
             case .binding:
                 return .none
-                
-            case let ._onCacheLoad(timeIntervals):
-                state.lastBackgroundTaskInvokeTime = timeIntervals
-                return .none
             }
         }
     }
@@ -120,26 +111,26 @@ public struct DeveloperScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("ID: \(store.analyticsId)")
-                    
-                    HStack(spacing: 8) {
-                        Text("Is analytics enabled: ")
-                        Toggle("", isOn: $store.isAnalyticsEnabled)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("ID: \(store.analyticsId)")
+                        
+                        HStack(spacing: 8) {
+                            Text("Is analytics enabled: ")
+                            Toggle("", isOn: $store.isAnalyticsEnabled)
+                        }
+                        
+                        HStack(spacing: 8) {
+                            Text("Is Sentry enabled: ")
+                            Toggle("", isOn: $store.isCrashlyticsEnabled)
+                        }
+                        
+                        Button("Send test crash to Sentry") {
+                            store.send(.sendCrashButtonTapped)
+                        }
                     }
-                    
-                    HStack(spacing: 8) {
-                        Text("Is Sentry enabled: ")
-                        Toggle("", isOn: $store.isCrashlyticsEnabled)
-                    }
-                    
-                    Button("Send test crash to Sentry") {
-                        store.send(.sendCrashButtonTapped)
-                    }
-                    
-                    Spacer()
+                    .padding(16)
                 }
-                .padding(16)
             }
             .navigationTitle("Developer menu")
             ._toolbarTitleDisplayMode(.inline)
