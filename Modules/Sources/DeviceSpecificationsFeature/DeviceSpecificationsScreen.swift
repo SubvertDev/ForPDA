@@ -98,6 +98,7 @@ public struct DeviceSpecificationsScreen: View {
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
         .background(Color(.Background.primary))
+        .animation(.default, value: store.isMyDeviceLoading)
     }
     
     // MARK: - Header
