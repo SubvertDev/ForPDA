@@ -11,13 +11,14 @@ import APIClient
 import Models
 import ToastClient
 import PasteboardClient
+import GalleryFeature
 
 @Reducer
 public struct DeviceSpecificationsFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Localizations
+    // MARK: - Localization
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
@@ -25,10 +26,19 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         static let changeDeviceStatusError = LocalizedStringResource("Unable to change device status", bundle: .module)
     }
     
+    // MARK: - Destination
+    
+    @Reducer
+    public enum Destination {
+        case gallery
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var destination: Destination.State?
+        
         @Shared(.userSession) var userSession
         
         public let tag: String
@@ -39,6 +49,8 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         var isLoading = false
         var isMyDeviceLoading = false
         var isDevicesLimit = false
+        
+        var selectedHeaderImageId = 0
         
         var isUserAuthorized: Bool {
             return userSession != nil
@@ -55,12 +67,17 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action: ViewAction {
+    public enum Action: BindableAction, ViewAction {
+        case binding(BindingAction<State>)
+        case destination(PresentationAction<Destination.Action>)
+        
         case view(View)
         public enum View {
             case onAppear
             
             case contextMenu(DeviceSpecificationsContextMenuAction)
+            
+            case headerImageTapped(Int)
             
             case editionButtonTapped(String)
             case markAsMyDeviceButtonTapped(Bool)
@@ -88,6 +105,8 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
@@ -102,6 +121,11 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                         await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
                 }
+                
+            case let .view(.headerImageTapped(id)):
+                state.selectedHeaderImageId = id
+                state.destination = .gallery
+                return .none
                 
             case let .view(.editionButtonTapped(subTag)):
                 return .send(.delegate(.openDevice(tag: state.tag, subTag: subTag)))
@@ -165,9 +189,12 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
-            case .delegate:
+            case .delegate, .destination, .binding:
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
     }
 }
+
+extension DeviceSpecificationsFeature.Destination.State: Equatable {}

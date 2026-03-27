@@ -19,7 +19,7 @@ public struct DeviceSpecificationsResponse: Sendable, Equatable {
     public let specifications: [Specification]
     public var isMyDevice: Bool
     
-    public struct DeviceImage: Sendable, Equatable {
+    public struct DeviceImage: Sendable, Equatable, Hashable {
         public let url: URL
         public let fullUrl: URL
         public let isFront: Bool

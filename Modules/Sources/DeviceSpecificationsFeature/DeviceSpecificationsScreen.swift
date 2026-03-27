@@ -9,6 +9,8 @@ import SwiftUI
 import ComposableArchitecture
 import SharedUI
 import Models
+import NukeUI
+import GalleryFeature
 
 @ViewAction(for: DeviceSpecificationsFeature.self)
 public struct DeviceSpecificationsScreen: View {
@@ -47,6 +49,14 @@ public struct DeviceSpecificationsScreen: View {
             .navigationTitle(Text(navigationTitleText()))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
+            .fullScreenCover(isPresented: Binding($store.destination.gallery)) {
+                WithPerceptionTracking {
+                    TabViewGallery(
+                        gallery: store.specifications?.images.map{ $0.fullUrl } ?? [],
+                        selectedImageID: store.selectedHeaderImageId
+                    )
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if let specifications = store.specifications, store.isUserAuthorized {
                     MyDeviceButton(specifications.isMyDevice)
@@ -129,7 +139,7 @@ public struct DeviceSpecificationsScreen: View {
     @ViewBuilder
     private func HeaderImages(_ images: [DeviceSpecificationsResponse.DeviceImage]) -> some View {
         HStack(spacing: 8) {
-            ForEach(images, id: \.url.hashValue) { image in
+            ForEach(Array(images.enumerated()), id: \.element) { index, image in
                 LazyImage(url: image.url) { state in
                     Group {
                         if let image = state.image {
@@ -142,6 +152,9 @@ public struct DeviceSpecificationsScreen: View {
                 }
                 .frame(width: 37, height: 75)
                 .clipped()
+                .onTapGesture {
+                    send(.headerImageTapped(index))
+                }
             }
         }
     }

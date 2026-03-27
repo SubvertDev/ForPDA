@@ -207,6 +207,7 @@ let project = Project(
                 name: "DeviceSpecificationsFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.GalleryFeature,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
