@@ -41,7 +41,7 @@ public struct DeviceSpecificationsResponse: Sendable, Equatable {
         }
     }
     
-    public struct Specification: Sendable, Equatable {
+    public struct Specification: Sendable, Equatable, Identifiable {
         public let id: Int
         public let title: String
         public var entries: [SpecificationEntry]
