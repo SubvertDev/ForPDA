@@ -1,9 +1,19 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Link copied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка скопирована"
+          }
+        }
+      }
+    },
     "Loading..." : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загрузка…"
@@ -13,7 +23,7 @@
     },
     "Mark as My Device" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сделать моим устройством"
@@ -23,7 +33,7 @@
     },
     "My Device" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Моё устройство"
@@ -33,7 +43,7 @@
     },
     "Unable to change device status" : {
       "localizations" : {
-        "en" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка изменения статуса устройства"
