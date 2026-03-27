@@ -74,7 +74,7 @@ public struct DeviceSpecificationsScreen: View {
     @ViewBuilder
     private func MyDeviceButton(_ myDevice: Bool) -> some View {
         Button {
-            send(.markAsMyDeviceButtonTapped(!myDevice))
+            send(.markAsMyDeviceButtonTapped(myDevice))
         } label: {
             if false {
                 ProgressView()
