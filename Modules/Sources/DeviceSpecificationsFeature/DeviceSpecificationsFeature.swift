@@ -29,8 +29,11 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     // MARK: - Destination
     
     @Reducer
-    public enum Destination {
+    public enum Destination: Hashable {
         case gallery
+        
+        @ReducerCaseIgnored
+        case longEntry(DeviceSpecificationsResponse.Specification.SpecificationEntry)
     }
     
     // MARK: - State
@@ -81,6 +84,8 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
             
             case editionButtonTapped(String)
             case markAsMyDeviceButtonTapped(Bool)
+            case longEntryButtonTapped(DeviceSpecificationsResponse.Specification.SpecificationEntry)
+            case longEntryCloseButtonTapped
         }
         
         case `internal`(Internal)
@@ -129,6 +134,14 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 
             case let .view(.editionButtonTapped(subTag)):
                 return .send(.delegate(.openDevice(tag: state.tag, subTag: subTag)))
+                
+            case let .view(.longEntryButtonTapped(entry)):
+                state.destination = .longEntry(entry)
+                return .none
+                
+            case .view(.longEntryCloseButtonTapped):
+                state.destination = nil
+                return .none
                 
             case let .view(.markAsMyDeviceButtonTapped(myDevice)):
                 guard let session = state.userSession else { return .none }

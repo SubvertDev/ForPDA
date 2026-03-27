@@ -57,6 +57,15 @@ public struct DeviceSpecificationsScreen: View {
                     )
                 }
             }
+            .sheet(item: $store.destination.longEntry, id: \.self) { entry in
+                NavigationStack {
+                    DeviceSpecificationLongEntryView(title: entry.name, content: entry.value) {
+                        send(.longEntryCloseButtonTapped)
+                    }
+                    .presentationDetents([.medium])
+                    .presentationDragIndicator(.visible)
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if let specifications = store.specifications, store.isUserAuthorized {
                     MyDeviceButton(specifications.isMyDevice)
@@ -178,7 +187,9 @@ public struct DeviceSpecificationsScreen: View {
     private func SpecificationSection(_ spec: DeviceSpecificationsResponse.Specification) -> some View {
         Section {
             ForEach(spec.entries, id: \.name) { entry in
-                Row(title: entry.name, type: .description(entry.value))
+                Row(entry: entry) {
+                    send(.longEntryButtonTapped(entry))
+                }
             }
         } header: {
             SectionHeader(title: spec.title)
@@ -201,37 +212,47 @@ public struct DeviceSpecificationsScreen: View {
     
     // MARK: - Row
     
-    enum RowType {
-        case description(String)
-        case bigDescription(String)
-    }
-    
     @ViewBuilder
-    private func Row(title: String, type: RowType, action: @escaping () -> Void = {}) -> some View {
+    private func Row(entry: DeviceSpecificationsResponse.Specification.SpecificationEntry, action: @escaping () -> Void = {}) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
-            Button {
-                action()
-            } label: {
+            ViewThatFits(in: .vertical) {
                 HStack(spacing: 0) {
-                    Text(verbatim: title)
+                    Text(verbatim: entry.name)
                         .font(.body)
                         .foregroundStyle(Color(.Labels.primary))
                     
                     Spacer(minLength: 8)
                     
-                    switch type {
-                    case let .description(text):
-                        Text(verbatim: text)
-                            .font(.body)
-                            .foregroundStyle(Color(.Labels.teritary))
-                        
-                    case let .bigDescription(text):
-                        Text(verbatim: text)
-                            .font(.body)
-                            .foregroundStyle(Color(.Labels.teritary))
-                    }
+                    Text(verbatim: entry.value)
+                        .font(.body)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .foregroundStyle(Color(.Labels.teritary))
                 }
                 .contentShape(Rectangle())
+                
+                Button {
+                    action()
+                } label: {
+                    HStack(spacing: 0) {
+                        Text(verbatim: entry.name)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                        
+                        Spacer(minLength: 8)
+                        
+                        HStack(spacing: 4) {
+                            Text(verbatim: entry.value)
+                                .font(.body)
+                                .foregroundStyle(Color(.Labels.teritary))
+                            
+                            Image(systemSymbol: .chevronRight)
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundStyle(Color(.Labels.quintuple))
+                        }
+                    }
+                    .contentShape(Rectangle())
+                }
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
