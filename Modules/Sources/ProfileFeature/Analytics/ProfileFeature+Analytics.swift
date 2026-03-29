@@ -47,6 +47,9 @@ extension ProfileFeature {
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     
+                case .view(.curatedTopicButtonTapped(let id)):
+                    analyticsClient.log(ProfileEvent.curatedTopicTapped(id))
+                    
                 case .view(.searchTopicsButtonTapped):
                     analyticsClient.log(ProfileEvent.searchTopicsTapped)
                     
@@ -59,6 +62,8 @@ extension ProfileFeature {
                         analyticsClient.log(ProfileEvent.linkInAboutTapped)
                     case .signature:
                         analyticsClient.log(ProfileEvent.linkInSignatureTapped)
+                    case .warningLog:
+                        analyticsClient.log(ProfileEvent.linkInWarningLogTapped)
                     case .achievement:
                         analyticsClient.log(ProfileEvent.achievementTapped)
                     }
