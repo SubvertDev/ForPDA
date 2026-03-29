@@ -291,15 +291,16 @@ public struct ProfileScreen: View {
                 
                 InformationRow(
                     title: "Registration date",
-                    content: user.registrationDate.formatted(date: .numeric, time: .omitted)
+                    content: user.registrationDate.formatted(date: .numeric, time: .omitted),
+                    type: .horizontal
                 )
                 
                 if user.canModerate || (store.shouldShowToolbarButtons && user.warningLevel != -1) {
-                    InformationRow(title: "Warning level", content: "\(user.warningLevel)%")
+                    InformationRow(title: "Warning level", content: "\(user.warningLevel)%", type: .horizontal)
                 }
                 
                 if user.canModerate {
-                    InformationRow(title: "Registration IP", content: user.registrationIP)
+                    InformationRow(title: "Registration IP", content: user.registrationIP, type: .horizontal)
                 }
             }
         }
@@ -508,15 +509,35 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func LoggingSegment(user: User) -> some View {
-        ForEach(user.warningLogs) { warning in
-            WarningLogView(
-                warningLog: warning,
-                deeplinkTapped: { url in
-                    send(.deeplinkTapped(url, .warningLog))
+        if user.canModerate {
+            Section {
+                VStack {
+                    HStack(spacing: 12) {
+                        InformationRow(title: "Registration IP", content: user.registrationIP, type: .vertical)
+                        
+                        InformationRow(title: "Session IP", content: user.sessionIP, type: .vertical)
+                    }
+                    
+                    InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
                 }
-            )
-            .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0))
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            }
         }
+        
+        Section {
+            ForEach(user.warningLogs) { warning in
+                WarningLogView(
+                    warningLog: warning,
+                    deeplinkTapped: { url in
+                        send(.deeplinkTapped(url, .warningLog))
+                    }
+                )
+                .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0))
+            }
+            .listRowSeparator(.visible)
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Section Header
@@ -629,21 +650,46 @@ public struct ProfileScreen: View {
         .frame(height: 60)
     }
     
+    // MARK: - Information Row
+    
+    enum InformationRowType {
+        case horizontal
+        case vertical
+    }
+    
     @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, content: String) -> some View {
-        HStack {
-            Text(title, bundle: .module)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primary))
-            
-            Spacer()
-            
-            Text(verbatim: content)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.teritary))
+    private func InformationRow(title: LocalizedStringKey, content: String, type: InformationRowType) -> some View {
+        Group {
+            switch type {
+            case .horizontal:
+                HStack {
+                    Text(title, bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    Spacer()
+                    
+                    Text(verbatim: content)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.teritary))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 19)
+                
+            case .vertical:
+                VStack {
+                    Text(title, bundle: .module)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.Labels.teritary))
+                    
+                    Text(verbatim: content)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.primary))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(12)
+            }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 19)
         .background(
             Color(.Background.teritary)
                 .clipShape(RoundedRectangle(cornerRadius: 10))

@@ -411,6 +411,16 @@
         }
       }
     },
+    "Previous nicknames" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предыдущие никнеймы"
+          }
+        }
+      }
+    },
     "Profile" : {
       "localizations" : {
         "ru" : {
@@ -497,6 +507,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Session IP" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IP сессии"
           }
         }
       }
