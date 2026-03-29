@@ -60,6 +60,9 @@ public struct ParsingClient: Sendable {
     public var parseQmsList: @Sendable (_ response: String) async throws -> QMSList
     public var parseQmsUser: @Sendable (_ response: String) async throws -> QMSUser
     public var parseQmsChat: @Sendable (_ response: String) async throws -> QMSChat
+    
+    // DevDB
+    public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
 }
 
 // MARK: - Dependency Key
@@ -158,6 +161,9 @@ extension ParsingClient: DependencyKey {
         },
         parseQmsChat: { response in
             return try QMSChatParser.parse(from: response)
+        },
+        parseDeviceSpecifications: { response in
+            return try DevDBParser.parse(from: response)
         }
     )
 }

@@ -92,6 +92,9 @@ public struct APIClient: Sendable {
     public var search: @Sendable (_ request: SearchRequest) async throws -> SearchResponse
     public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
+    // DevDB
+    public var deviceSpecifications: @Sendable (_ tag: String, _ subTag: String) async throws -> DeviceSpecifications
+    
     // STREAMS
     public var connectionState: @Sendable () -> AsyncStream<ConnectionState> = { .finished }
     public var notificationStream: @Sendable () -> AsyncStream<String> = { .finished }
@@ -563,6 +566,14 @@ extension APIClient: DependencyKey {
                 return try await parser.parseSearchUsers(response)
             },
             
+            // MARK: - Device Specs
+            
+            deviceSpecifications: { tag, subTag in
+                let command = DeviceCommand.entry(tag: tag, subTag: subTag)
+                let response = try await api.send(command)
+                return try await parser.parseDeviceSpecifications(response: response)
+            },
+            
             // MARK: - Streams
             
             connectionState: {
@@ -721,6 +732,9 @@ extension APIClient: DependencyKey {
                 return .mock
             },
             searchUsers: { _ in
+                return .mock
+            },
+            deviceSpecifications: { _, _ in
                 return .mock
             },
             connectionState: {

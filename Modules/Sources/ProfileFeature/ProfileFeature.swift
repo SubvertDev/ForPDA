@@ -80,6 +80,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
+            case deviceButtonTapped(String)
             case curatedTopicButtonTapped(Int)
             case deeplinkTapped(URL, ProfileDeeplinkType)
         }
@@ -101,6 +102,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case openSettings
             case openHistory
             case openMentions
+            case openDevice(String)
             case openTopic(Int)
             case openReputation(Int)
             case openSearch(SearchResult)
@@ -145,6 +147,9 @@ public struct ProfileFeature: Reducer, Sendable {
                         }
                     }
                 )
+                
+            case let .view(.deviceButtonTapped(tag)):
+                return .send(.delegate(.openDevice(tag)))
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
