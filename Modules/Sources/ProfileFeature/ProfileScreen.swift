@@ -289,42 +289,17 @@ public struct ProfileScreen: View {
                     }
                 }
                 
-                HStack {
-                    Text("Registration date", bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                    
-                    Spacer()
-                    
-                    Text(user.registrationDate.formatted(date: .numeric, time: .omitted))
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 19)
-                .background(
-                    Color(.Background.teritary)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                InformationRow(
+                    title: "Registration date",
+                    content: user.registrationDate.formatted(date: .numeric, time: .omitted)
                 )
                 
                 if user.canModerate {
-                    HStack {
-                        Text("Registration IP", bundle: .module)
-                            .font(.body)
-                            .foregroundStyle(Color(.Labels.primary))
+                    if store.shouldShowToolbarButtons {
                         
-                        Spacer()
-                        
-                        Text(verbatim: user.registrationIP)
-                            .font(.body)
-                            .foregroundStyle(Color(.Labels.teritary))
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 19)
-                    .background(
-                        Color(.Background.teritary)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                    )
+                    
+                    InformationRow(title: "Registration IP", content: user.registrationIP)
                 }
             }
         }
@@ -655,27 +630,24 @@ public struct ProfileScreen: View {
     }
     
     @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, description: String) -> some View {
+    private func InformationRow(title: LocalizedStringKey, content: String) -> some View {
         HStack {
             Text(title, bundle: .module)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.primary))
             
             Spacer()
             
-            Text(description)
-                .foregroundStyle(.secondary)
+            Text(verbatim: content)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.teritary))
         }
-    }
-    
-    @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
-        HStack {
-            Text(title, bundle: .module)
-            
-            Spacer()
-            
-            Text(description, bundle: .module)
-                .foregroundStyle(.secondary)
-        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 19)
+        .background(
+            Color(.Background.teritary)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        )
     }
 }
 
