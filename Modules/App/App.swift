@@ -21,21 +21,23 @@ struct ForPDAApp: App {
     @Dependency(\.cacheClient) private var cacheClient
     
     var body: some Scene {
-        WindowGroup {
-            if TestContext.current == nil {
-                AppView(store: appDelegate.store)
-                    .onChange(of: scenePhase) { newScenePhase in
-                        appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
-                    }
-                    .onOpenURL { url in
-                        appDelegate.store.send(.deeplink(url))
-                    }
-                    .tint(Color(.Theme.primary))
+        WithPerceptionTracking {
+            WindowGroup {
+                if TestContext.current == nil {
+                    AppView(store: appDelegate.store)
+                        .onChange(of: scenePhase) { newScenePhase in
+                            appDelegate.store.send(.scenePhaseDidChange(from: scenePhase, to: newScenePhase))
+                        }
+                        .onOpenURL { url in
+                            appDelegate.store.send(.deeplink(url))
+                        }
+                        .tint(Color(.Theme.primary))
+                }
             }
-        }
-        .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
-            await appDelegate.store.send(.registerBackgroundTask).finish()
-            await appDelegate.store.send(.backgroundTaskInvoked).finish()
+            .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
+                await appDelegate.store.send(.registerBackgroundTask).finish()
+                await appDelegate.store.send(.backgroundTaskInvoked).finish()
+            }
         }
     }
 }

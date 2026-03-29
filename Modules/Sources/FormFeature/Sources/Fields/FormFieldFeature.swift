@@ -116,35 +116,37 @@ struct FormFieldRow: View {
     @FocusState.Binding var focusedField: Int?
     
     var body: some View {
-        switch store.state {
-        case .checkBoxList:
-            if let store = store.scope(state: \.checkBoxList, action: \.checkBoxList) {
-                FormCheckBoxListRow(store: store)
-            }
-            
-        case .dropdown:
-            if let store = store.scope(state: \.dropdown, action: \.dropdown) {
-                FormDropdownRow(store: store)
-            }
-            
-        case .editor:
-            if let store = store.scope(state: \.editor, action: \.editor) {
-                FormEditorRow(store: store, focusedField: $focusedField)
-            }
-            
-        case .textField:
-            if let store = store.scope(state: \.textField, action: \.textField) {
-                FormTextFieldRow(store: store, focusedField: $focusedField)
-            }
-            
-        case .title:
-            if let store = store.scope(state: \.title, action: \.title) {
-                FormTitleRow(store: store)
-            }
-        
-        case .uploadBox:
-            if let store = store.scope(state: \.uploadBox, action: \.uploadBox) {
-                FormUploadBoxRow(store: store)
+        WithPerceptionTracking {
+            switch store.state {
+            case .checkBoxList:
+                if let store = store.scope(state: \.checkBoxList, action: \.checkBoxList) {
+                    FormCheckBoxListRow(store: store)
+                }
+                
+            case .dropdown:
+                if let store = store.scope(state: \.dropdown, action: \.dropdown) {
+                    FormDropdownRow(store: store)
+                }
+                
+            case .editor:
+                if let store = store.scope(state: \.editor, action: \.editor) {
+                    FormEditorRow(store: store, focusedField: $focusedField)
+                }
+                
+            case .textField:
+                if let store = store.scope(state: \.textField, action: \.textField) {
+                    FormTextFieldRow(store: store, focusedField: $focusedField)
+                }
+                
+            case .title:
+                if let store = store.scope(state: \.title, action: \.title) {
+                    FormTitleRow(store: store)
+                }
+                
+            case .uploadBox:
+                if let store = store.scope(state: \.uploadBox, action: \.uploadBox) {
+                    FormUploadBoxRow(store: store)
+                }
             }
         }
     }
