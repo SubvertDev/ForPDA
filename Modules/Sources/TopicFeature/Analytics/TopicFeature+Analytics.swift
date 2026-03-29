@@ -88,6 +88,8 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuGoToEnd)
                     case .setFavorite:
                         analytics.log(TopicEvent.menuSetFavorite)
+                    case .about:
+                        analytics.log(TopicEvent.menuAboutTopic)
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
                     case .writePostWithTemplate:

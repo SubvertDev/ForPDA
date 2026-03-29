@@ -16,19 +16,20 @@ import PersistenceKeys
 import TCAExtensions
 import ToastClient
 import FormFeature
+import ForumStatFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Localizations
+	// MARK: - Localizations
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
     }
-    
+
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -55,6 +56,7 @@ public struct ForumFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case form(FormFeature)
+		case stat(ForumStatFeature)
     }
     
     // MARK: - State
@@ -120,7 +122,7 @@ public struct ForumFeature: Reducer, Sendable {
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
-                
+        
         case `internal`(Internal)
         public enum Internal {
             case refresh
@@ -130,6 +132,7 @@ public struct ForumFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openUser(id: Int)
             case openTopic(id: Int, name: String, goTo: GoTo)
             case openForum(id: Int, name: String)
             case openAnnouncement(id: Int, name: String)
@@ -160,6 +163,9 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
                 return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
+            case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
+                return .send(.delegate(.openUser(id: id)))
                 
             case .destination, .pageNavigation:
                 return .none
@@ -259,6 +265,10 @@ public struct ForumFeature: Reducer, Sendable {
                         await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
+                    
+                case .stat:
+                    state.destination = .stat(ForumStatFeature.State(type: .forum(id: state.forumId)))
+                    return .none
                     
                 case .setFavorite(let isFavorite):
                     return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in

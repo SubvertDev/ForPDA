@@ -19,6 +19,7 @@ public enum Deeplink {
     case user(id: Int)
     case qms(id: Int)
     case search(SearchResult)
+    case device(tag: String, subTag: String)
 }
 
 public struct DeeplinkHandler {
@@ -123,6 +124,23 @@ public struct DeeplinkHandler {
         guard !url.pathComponents.contains("dl") else { throw .fileDownload(url: url) }
         
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { throw .noUrlComponents(in: url) }
+        
+        // devdb
+        
+        if url.pathComponents.contains("devdb") {
+            if url.pathComponents.count == 4 { // /devdb/phones/apple
+                // TODO: vendor deeplink
+            } else if url.pathComponents.count == 3, !url.pathComponents[2].isEmpty {
+                if let _ = DeviceType(rawValue: url.pathComponents[2]) { // /devdb/phones
+                    // TODO: deviceType deeplink
+                } else { // /devdb/apple_iphone_13
+                    let tags = url.pathComponents[2].components(separatedBy: ":")
+                    let subTag = tags.first == tags.last ? "" : tags.last!
+                    
+                    return .device(tag: tags.first!, subTag: subTag)
+                }
+            }
+        }
         
         guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
         

@@ -30,7 +30,8 @@ public struct User: Sendable, Hashable, Codable {
     public let topics: Int
     public let replies: Int
     public let qmsMessages: Int?
-    public let forumDevices: [Device]?
+    public let curatedTopics: [CuratedTopic]
+    public let warningLogs: [WarningLog]
     public let email: String?
     public let registrationIP: String
     public let sessionIP: String
@@ -97,7 +98,8 @@ public struct User: Sendable, Hashable, Codable {
         topics: Int,
         replies: Int,
         qmsMessages: Int?,
-        forumDevices: [Device]?,
+        curatedTopics: [CuratedTopic],
+        warningLogs: [WarningLog],
         email: String?,
         registrationIP: String,
         sessionIP: String,
@@ -125,7 +127,8 @@ public struct User: Sendable, Hashable, Codable {
         self.topics = topics
         self.replies = replies
         self.qmsMessages = qmsMessages
-        self.forumDevices = forumDevices
+        self.curatedTopics = curatedTopics
+        self.warningLogs = warningLogs
         self.email = email
         self.registrationIP = registrationIP
         self.sessionIP = sessionIP
@@ -270,6 +273,64 @@ public extension User {
             self.id = name.hashValue
         }
     }
+    
+    // MARK: Curated Topic
+    
+    struct CuratedTopic: Codable, Hashable, Sendable, Identifiable {
+        public let id: Int
+        public let name: String
+        
+        public init(id: Int, name: String) {
+            self.id = id
+            self.name = name
+        }
+    }
+    
+    // MARK: Warning Log
+    
+    struct WarningLog: Codable, Hashable, Sendable, Identifiable {
+        public let timestamp: Int
+        public let level: WarningLevel
+        public let authorId: Int
+        public let authorName: String
+        public let reason: String
+        public let postId: Int
+        public let canBeCanceled: Bool
+        
+        public var id: Int {
+            return timestamp
+        }
+        
+        public var createdAt: Date {
+            return Date(timeIntervalSince1970: TimeInterval(timestamp))
+        }
+        
+        public enum WarningLevel: Int, Codable, Hashable, Sendable {
+            case notice = 0
+            case increased = 1
+            case decreased = 2
+            
+            case unknown
+        }
+        
+        public init(
+            timestamp: Int,
+            level: WarningLevel,
+            authorId: Int,
+            authorName: String,
+            reason: String,
+            postId: Int,
+            canBeCanceled: Bool
+        ) {
+            self.timestamp = timestamp
+            self.level = level
+            self.authorId = authorId
+            self.authorName = authorName
+            self.reason = reason
+            self.postId = postId
+            self.canBeCanceled = canBeCanceled
+        }
+    }
 }
 
 // MARK: - Mock
@@ -308,7 +369,18 @@ public extension User {
         topics: 5,
         replies: 82,
         qmsMessages: nil,
-        forumDevices: nil,
+        curatedTopics: [
+            .init(id: 1, name: "ForPDA [iOS]"),
+            .init(id: 2, name: "My Little Pony"),
+            .init(id: 3, name: "Topic with long name, with very long name")
+        ],
+        warningLogs: [
+            .mockAsModerator(level: .decreased),
+            .mockAsModerator(level: .increased),
+            .mockAsModerator(level: .notice),
+            .mockDecreasedAsUserWithPost,
+            .mockIncreasedAsUserWithoutPost
+        ],
         email: "some@email.com",
         registrationIP: "8.8.8.8",
         sessionIP: "1.1.1.1",
@@ -324,4 +396,38 @@ public extension User {
         ],
         previousNicknames: "Previous1, Previous2, Previous3"
     )
+}
+
+public extension User.WarningLog {
+    static let mockDecreasedAsUserWithPost = User.WarningLog(
+        timestamp: Int(Date.now.timeIntervalSince1970 + Double.random(in: 0...100)),
+        level: .decreased,
+        authorId: 0,
+        authorName: "",
+        reason: "Warning as user see, with post",
+        postId: 123,
+        canBeCanceled: false
+    )
+    
+    static let mockIncreasedAsUserWithoutPost = User.WarningLog(
+        timestamp: Int(Date.now.timeIntervalSince1970 + Double.random(in: 0...100)),
+        level: .increased,
+        authorId: 0,
+        authorName: "",
+        reason: "Warning as user see, without post",
+        postId: 0,
+        canBeCanceled: false
+    )
+    
+    static func mockAsModerator(level: User.WarningLog.WarningLevel) -> Self {
+        return User.WarningLog(
+            timestamp: Int(Date.now.timeIntervalSince1970 + Double.random(in: 0...100)),
+            level: level,
+            authorId: 6176341,
+            authorName: "AirFlare",
+            reason: "Warning as moderator see",
+            postId: 123,
+            canBeCanceled: true
+        )
+    }
 }

@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "[Go to Post](%@)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Перейти к посту](%@)"
+          }
+        }
+      }
+    },
     "About me" : {
       "localizations" : {
         "ru" : {
@@ -117,6 +127,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментариев"
+          }
+        }
+      }
+    },
+    "Curation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курирование"
           }
         }
       }
@@ -291,6 +311,16 @@
         }
       }
     },
+    "Logging" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Логирование"
+          }
+        }
+      }
+    },
     "Logout" : {
       "localizations" : {
         "ru" : {
@@ -327,6 +357,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не указан"
+          }
+        }
+      }
+    },
+    "Note added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавлена заметка"
           }
         }
       }
@@ -521,6 +561,26 @@
         }
       }
     },
+    "Undo available" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступна отмена"
+          }
+        }
+      }
+    },
+    "Unknown level" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестный уровень"
+          }
+        }
+      }
+    },
     "Update avatar" : {
       "localizations" : {
         "ru" : {
@@ -537,6 +597,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Время у юзера"
+          }
+        }
+      }
+    },
+    "Warning level decreased" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понижен уровень предупреждений"
+          }
+        }
+      }
+    },
+    "Warning level increased" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повышен уровень предупреждений"
           }
         }
       }

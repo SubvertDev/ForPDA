@@ -57,6 +57,40 @@ public struct TopicParser {
         )
     }
     
+    // MARK: - Viewers
+    
+    public static func parseTopicViewers(from string: String) throws (ParsingError) -> TopicViewers {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let guestsCount = array[safe: 2] as? Int,
+              let hiddenUsersCount = array[safe: 3] as? Int,
+              let usersRaw = array[safe: 4] as? [[Any]],
+              let users = try? parseTopicViewer(usersRaw) else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return TopicViewers(guestsCount: guestsCount, hiddenUsersCount: hiddenUsersCount, users: users)
+    }
+    
+    private static func parseTopicViewer(_ usersRaw: [[Any]]) throws -> [TopicViewers.SimplifiedUser] {
+        return try usersRaw.map { user in
+            guard let id = user[safe: 0] as? Int,
+                  let name = user[safe: 1] as? String,
+                  let group = user[2] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            return TopicViewers.SimplifiedUser(id: id, name: name, group: User.Group(rawValue: group)!)
+        }
+    }
+    
+    // MARK: - Form
+    
     public static func parsePostPreview(from string: String) throws(ParsingError) -> PreviewResponse {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString

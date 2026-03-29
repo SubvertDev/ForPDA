@@ -17,6 +17,7 @@ import ParsingClient
 import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
+import ForumStatFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -189,6 +190,10 @@ public struct TopicScreen: View {
                         symbol: topic.isFavorite ? .starFill : .star
                     ) {
                         send(.contextMenu(.setFavorite))
+                    }
+                    
+                    ContextButton(text: LocalizedStringResource("About Topic", bundle: .module), symbol: .infoCircle) {
+                        send(.contextMenu(.about))
                     }
                 }
                 
@@ -465,6 +470,11 @@ struct NavigationModifier: ViewModifier {
                         embedIntoNavStack: true
                     ) { store in
                         ReputationChangeView(store: store)
+                    }
+                    .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                        NavigationStack {
+                            ForumStatView(store: store)
+                        }
                     }
             }
         }

@@ -32,6 +32,7 @@ import ReputationFeature
 import AuthFeature
 import SearchFeature
 import SearchResultFeature
+import DeviceSpecificationsFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -138,6 +139,9 @@ public struct StackTab: Reducer, Sendable {
         case let .articles(action):
             return handleArticlesPathNavigation(action: action, state: &state)
             
+        case let .devDB(action):
+            return handleDevDBPathNavigation(action: action, state: &state)
+            
         case let .favorites(action):
             return handleFavoritesPathNavigation(action: action, state: &state)
             
@@ -177,6 +181,19 @@ public struct StackTab: Reducer, Sendable {
             
         case let .article(.comments(.element(id: _, action: .profileTapped(id)))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
+        default:
+            break
+        }
+        return .none
+    }
+    
+    // MARK: - DevDB
+    
+    private func handleDevDBPathNavigation(action: Path.DevDB.Action, state: inout State) -> Effect<Action> {
+        switch action {
+        case let .specifications(.delegate(.openDevice(tag, subTag))):
+            state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
             
         default:
             break
@@ -229,6 +246,9 @@ public struct StackTab: Reducer, Sendable {
             
         case let .forum(.delegate(.openSearch(on, navigation))):
             state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))
+            
+        case let .forum(.delegate(.openUser(id))):
+            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
         case let .forum(.delegate(.handleRedirect(url))):
             return handleDeeplink(url: url, state: &state)
@@ -284,6 +304,11 @@ public struct StackTab: Reducer, Sendable {
             
         case .profile(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
+            
+        case let .profile(.delegate(.openDevice(tag))):
+            state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: ""))))
+        case let .profile(.delegate(.openTopic(id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id))))
             
         case let .profile(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
@@ -455,7 +480,10 @@ public struct StackTab: Reducer, Sendable {
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 
-            case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId: scrollToId):
+            case let .device(tag, subTag):
+                state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
+                
+            case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
                 state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId))))
             }

@@ -41,6 +41,7 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
                     .Internal.DeveloperFeature,
+                    .Internal.DeviceSpecificationsFeature,
                     .Internal.FavoritesFeature,
                     .Internal.FavoritesRootFeature,
                     .Internal.ForumFeature,
@@ -201,6 +202,18 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+            
+            .feature(
+                name: "DeviceSpecificationsFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.GalleryFeature,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .SPM.TCA
+                ]
+            ),
         
             .feature(
                 name: "FavoritesFeature",
@@ -249,6 +262,7 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.FormFeature,
+                    .Internal.ForumStatFeature,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA,
@@ -267,6 +281,18 @@ let project = Project(
                     .SPM.TCA,
                 ]
             ),
+            
+            .feature(
+                name: "ForumStatFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+             ),
         
             .feature(
                 name: "GalleryFeature",
@@ -487,6 +513,7 @@ let project = Project(
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
                     .Internal.FormFeature,
+                    .Internal.ForumStatFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
@@ -1015,11 +1042,13 @@ extension TargetDependency.Internal {
     static let BookmarksFeature =       TargetDependency.target(name: "BookmarksFeature")
     static let DeeplinkHandler =        TargetDependency.target(name: "DeeplinkHandler")
     static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
+    static let DeviceSpecificationsFeature = TargetDependency.target(name: "DeviceSpecificationsFeature")
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let FormFeature =            TargetDependency.target(name: "FormFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
+    static let ForumStatFeature =       TargetDependency.target(name: "ForumStatFeature")
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
     static let MentionsFeature =        TargetDependency.target(name: "MentionsFeature")

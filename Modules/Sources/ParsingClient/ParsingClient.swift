@@ -34,7 +34,9 @@ public struct ParsingClient: Sendable {
     public var parseForumsList: @Sendable (_ response: String) async throws -> [ForumInfo]
     public var parseForumJump: @Sendable (_ response: String) async throws -> ForumJump
     public var parseForum: @Sendable (_ response: String) async throws -> Forum
+    public var parseForumStat: @Sendable (_ response: String) async throws -> ForumStat
     public var parseTopic: @Sendable (_ response: String) async throws -> Topic
+    public var parseTopicViewers: @Sendable (_ response: String) async throws -> TopicViewers
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
@@ -58,6 +60,9 @@ public struct ParsingClient: Sendable {
     public var parseQmsList: @Sendable (_ response: String) async throws -> QMSList
     public var parseQmsUser: @Sendable (_ response: String) async throws -> QMSUser
     public var parseQmsChat: @Sendable (_ response: String) async throws -> QMSChat
+    
+    // DevDB
+    public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
 }
 
 // MARK: - Dependency Key
@@ -103,8 +108,14 @@ extension ParsingClient: DependencyKey {
         parseForum: { response in
             return try ForumParser.parse(from: response)
         },
+        parseForumStat: { response in
+            return try ForumParser.parseForumStat(from: response)
+        },
         parseTopic: { response in
             return try TopicParser.parse(from: response)
+        },
+        parseTopicViewers: { response in
+            return try TopicParser.parseTopicViewers(from: response)
         },
         parseAnnouncement: { response in
             return try ForumParser.parseAnnouncement(from: response)
@@ -150,6 +161,9 @@ extension ParsingClient: DependencyKey {
         },
         parseQmsChat: { response in
             return try QMSChatParser.parse(from: response)
+        },
+        parseDeviceSpecifications: { response in
+            return try DevDBParser.parse(from: response)
         }
     )
 }

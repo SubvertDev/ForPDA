@@ -17,11 +17,14 @@ public enum ProfileEvent: Event {
     case reputationTapped
     case searchTopicsTapped
     case searchRepliesTapped
+    case deviceButtonTapped(String)
     case userLoaded(Int)
     case userLoadingFailed
     case achievementTapped
     case linkInAboutTapped
     case linkInSignatureTapped
+    case linkInWarningLogTapped
+    case curatedTopicTapped(Int)
     
     public var name: String {
         return "Profile " + eventName(for: self).inProperCase
@@ -31,6 +34,10 @@ public enum ProfileEvent: Event {
         switch self {
         case let .userLoaded(userId):
             return ["userId": String(userId)]
+        case let .deviceButtonTapped(tag):
+            return ["deviceTag": tag]
+        case let .curatedTopicTapped(topicId):
+            return ["topicId": String(topicId)]
         default:
             return nil
         }

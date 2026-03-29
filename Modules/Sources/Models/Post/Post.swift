@@ -147,7 +147,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
 
 // MARK: - Mocks
 
-extension Post {
+public extension Post {
     static func mock(id: Int = 0) -> Post {
         return Post(
             id: id,

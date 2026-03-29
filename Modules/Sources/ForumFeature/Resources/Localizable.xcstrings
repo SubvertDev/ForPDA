@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "About Forum" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О форуме"
+          }
+        }
+      }
+    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {

@@ -47,11 +47,17 @@ extension ProfileFeature {
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     
+                case .view(.curatedTopicButtonTapped(let id)):
+                    analyticsClient.log(ProfileEvent.curatedTopicTapped(id))
+                    
                 case .view(.searchTopicsButtonTapped):
                     analyticsClient.log(ProfileEvent.searchTopicsTapped)
                     
                 case .view(.searchRepliesButtonTapped):
                     analyticsClient.log(ProfileEvent.searchRepliesTapped)
+                    
+                case .view(.deviceButtonTapped(let tag)):
+                    analyticsClient.log(ProfileEvent.deviceButtonTapped(tag))
                     
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {
@@ -59,6 +65,8 @@ extension ProfileFeature {
                         analyticsClient.log(ProfileEvent.linkInAboutTapped)
                     case .signature:
                         analyticsClient.log(ProfileEvent.linkInSignatureTapped)
+                    case .warningLog:
+                        analyticsClient.log(ProfileEvent.linkInWarningLogTapped)
                     case .achievement:
                         analyticsClient.log(ProfileEvent.achievementTapped)
                     }

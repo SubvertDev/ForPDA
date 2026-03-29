@@ -78,7 +78,16 @@ public struct FormFeature: Reducer, Sendable {
         
         var content: [FormValue] {
             if rows.count == 1, case let .editor(editorState) = rows.first {
-                let attachments = editorState.getAttachments()
+                var attachments = editorState.getAttachments()
+                if case .post(_, _, let content) = type, case .simple(_, let oldAttachments) = content {
+                    var removedAttachments: [Int] = []
+                    for oldAttachment in oldAttachments {
+                        if !attachments.contains(oldAttachment.id) {
+                            removedAttachments.append(-oldAttachment.id)
+                        }
+                    }
+                    attachments.append(contentsOf: removedAttachments)
+                }
                 return [editorState.getValue(), .array(attachments.map { .integer($0) })]
             } else {
                 var content: [FormValue] = []
