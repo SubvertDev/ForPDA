@@ -307,6 +307,8 @@ public struct StackTab: Reducer, Sendable {
             
         case let .profile(.delegate(.openDevice(tag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: ""))))
+        case let .profile(.delegate(.openTopic(id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id))))
             
         case let .profile(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)

@@ -9,4 +9,5 @@ public enum ProfileDeeplinkType {
     case achievement
     case about
     case signature
+    case warningLog
 }
