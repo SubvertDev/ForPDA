@@ -38,10 +38,10 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public var isFavorite: Bool
     
     public struct Poll: Sendable, Codable, Hashable {
-        public let name: String
+        public var name: String
         public let voted: Bool
         public let totalVotes: Int
-        public let options: [Option]
+        public var options: [Option]
         
         public init(name: String, voted: Bool, totalVotes: Int, options: [Option]) {
             self.name = name
@@ -52,8 +52,8 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         
         public struct Choice: Sendable, Codable, Hashable, Identifiable {
             public let id: Int
-            public let votes: Int
-            public let name: String
+            public var votes: Int
+            public var name: String
             
             public init(id: Int, name: String, votes: Int) {
                 self.id = id
@@ -64,9 +64,9 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         
         public struct Option: Sendable, Codable, Hashable, Identifiable {
             public let id: Int
-            public let name: String
-            public let several: Bool
-            public let choices: [Choice]
+            public var name: String
+            public var several: Bool
+            public var choices: [Choice]
             
             public init(id: Int, name: String, several: Bool, choices: [Choice]) {
                 self.id = id
