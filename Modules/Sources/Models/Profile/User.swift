@@ -36,6 +36,9 @@ public struct User: Sendable, Hashable, Codable {
     public let registrationIP: String
     public let sessionIP: String
     public let warningLevel: Int
+    public let premoderation: Premoderation?
+    public let readOnlyUntil: Date?
+    public let banReason: BanReason?
     public let achievements: [Achievement]
     public let previousNicknames: String
     
@@ -105,6 +108,9 @@ public struct User: Sendable, Hashable, Codable {
         registrationIP: String,
         sessionIP: String,
         warningLevel: Int,
+        premoderation: Premoderation?,
+        readOnlyUntil: Date?,
+        banReason: BanReason?,
         achievements: [Achievement],
         previousNicknames: String
     ) {
@@ -135,6 +141,9 @@ public struct User: Sendable, Hashable, Codable {
         self.registrationIP = registrationIP
         self.sessionIP = sessionIP
         self.warningLevel = warningLevel
+        self.premoderation = premoderation
+        self.readOnlyUntil = readOnlyUntil
+        self.banReason = banReason
         self.achievements = achievements
         self.previousNicknames = previousNicknames
     }
@@ -334,6 +343,21 @@ public extension User {
             self.canBeCanceled = canBeCanceled
         }
     }
+    
+    // MARK: - Ban Reason
+    
+    enum BanReason: Int, Codable, Hashable, Sendable {
+        case lastChanse = 1
+        case permanent = 2
+        case securityBlock = 3
+    }
+    
+    // MARK: - Premoderation
+    
+    enum Premoderation: Sendable, Codable, Hashable {
+        case always
+        case until(Date)
+    }
 }
 
 // MARK: - Mock
@@ -388,6 +412,9 @@ public extension User {
         registrationIP: "8.8.8.8",
         sessionIP: "1.1.1.1",
         warningLevel: 40,
+        premoderation: .always,
+        readOnlyUntil: Date.now,
+        banReason: .lastChanse,
         achievements: [
             .init(
                 name: "Призер Аллеи Славы",

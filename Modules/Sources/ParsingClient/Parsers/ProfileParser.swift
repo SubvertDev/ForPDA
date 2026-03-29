@@ -49,6 +49,18 @@ public struct ProfileParser {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                guard let readOnlyUntil = array[30] as? Int,
+                      let premoderationRaw = array[29] as? Int else {
+                    throw ParsingError.failedToCastFields
+                }
+                let readOnlyDate: Date? = readOnlyUntil != 0 ? Date(timeIntervalSince1970: TimeInterval(readOnlyUntil)) : nil
+                let premoderation: User.Premoderation? = switch premoderationRaw {
+                case 0: nil
+                case 1: .always
+                default: .until(Date(timeIntervalSince1970: TimeInterval(premoderationRaw)))
+                }
+                
                 return User(
                     id: array[2] as! Int,
                     nickname: (array[3] as! String).convertHtmlCodes(),
@@ -77,6 +89,9 @@ public struct ProfileParser {
                     registrationIP: array[26] as! String,
                     sessionIP: array[27] as! String,
                     warningLevel: array[28] as! Int,
+                    premoderation: premoderation,
+                    readOnlyUntil: readOnlyDate,
+                    banReason: User.BanReason(rawValue: array[31] as! Int),
                     achievements: parseUserAchievements(array[32] as! [[Any]]),
                     previousNicknames: array[33] as! String
                 )
