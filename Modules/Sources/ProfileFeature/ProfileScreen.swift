@@ -235,6 +235,9 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func GeneralSegment(user: User) -> some View {
         GroupsSection(user: user)
+        if user.canModerate {
+            RestrictionsSection(user: user)
+        }
         PersonalSection(user: user)
         if user.aboutMe != nil {
             AboutSection(user: user)
@@ -245,6 +248,7 @@ public struct ProfileScreen: View {
     }
     
     // MARK: - Groups Section
+    
     @ViewBuilder
     private func GroupsSection(user: User) -> some View {
         Section {
@@ -288,27 +292,63 @@ public struct ProfileScreen: View {
                     }
                 }
                 
-                HStack {
-                    Text("Registration date", bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                    
-                    Spacer()
-                    
-                    Text(user.registrationDate.formatted(date: .numeric, time: .omitted))
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 19)
-                .background(
-                    Color(.Background.teritary)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                InformationRow(
+                    title: "Registration date",
+                    content: user.registrationDate.formatted(date: .numeric, time: .omitted),
+                    type: .horizontal
                 )
+                
+                if user.canModerate || (store.shouldShowToolbarButtons && user.warningLevel != -1) {
+                    InformationRow(title: "Warning level", content: "\(user.warningLevel)%", type: .horizontal)
+                }
+                
+                if user.canModerate {
+                    InformationRow(title: "Registration IP", content: user.registrationIP, type: .horizontal)
+                }
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Restrictions Section
+    
+    @ViewBuilder
+    private func RestrictionsSection(user: User) -> some View {
+        Section {
+            let premoderation = switch user.premoderation {
+            case .always:
+                LocalizedStringKey("always")
+            case .until(let date):
+                LocalizedStringKey("until \(date.formatted())")
+            case .none:
+                LocalizedStringKey("no")
+            }
+            Row(title: "Premoderation", type: .localizedDescription(premoderation))
+            
+            let readOnlyUntil: LocalizedStringKey = if let date = user.readOnlyUntil {
+                LocalizedStringKey("until \(date.formatted())")
+            } else {
+                LocalizedStringKey("no")
+            }
+            Row(title: "Readonly", type: .localizedDescription(readOnlyUntil))
+            
+            let banReason = switch user.banReason {
+            case .lastChanse:
+                LocalizedStringKey("last chance")
+            case .permanent:
+                LocalizedStringKey("permanent")
+            case .securityBlock:
+                LocalizedStringKey("security block")
+            case .none:
+                LocalizedStringKey("no")
+            }
+            Row(title: "Ban", type: .localizedDescription(banReason))
+        } header: {
+            SectionHeader(title: "Restrictions")
+        }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Personal Section
@@ -512,15 +552,35 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func LoggingSegment(user: User) -> some View {
-        ForEach(user.warningLogs) { warning in
-            WarningLogView(
-                warningLog: warning,
-                deeplinkTapped: { url in
-                    send(.deeplinkTapped(url, .warningLog))
+        if user.canModerate {
+            Section {
+                VStack {
+                    HStack(spacing: 12) {
+                        InformationRow(title: "Registration IP", content: user.registrationIP, type: .vertical)
+                        
+                        InformationRow(title: "Session IP", content: user.sessionIP, type: .vertical)
+                    }
+                    
+                    InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
                 }
-            )
-            .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0))
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            }
         }
+        
+        Section {
+            ForEach(user.warningLogs) { warning in
+                WarningLogView(
+                    warningLog: warning,
+                    deeplinkTapped: { url in
+                        send(.deeplinkTapped(url, .warningLog))
+                    }
+                )
+                .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0))
+            }
+            .listRowSeparator(.visible)
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Section Header
@@ -633,28 +693,50 @@ public struct ProfileScreen: View {
         .frame(height: 60)
     }
     
-    @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, description: String) -> some View {
-        HStack {
-            Text(title, bundle: .module)
-            
-            Spacer()
-            
-            Text(description)
-                .foregroundStyle(.secondary)
-        }
+    // MARK: - Information Row
+    
+    enum InformationRowType {
+        case horizontal
+        case vertical
     }
     
     @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
-        HStack {
-            Text(title, bundle: .module)
-            
-            Spacer()
-            
-            Text(description, bundle: .module)
-                .foregroundStyle(.secondary)
+    private func InformationRow(title: LocalizedStringKey, content: String, type: InformationRowType) -> some View {
+        Group {
+            switch type {
+            case .horizontal:
+                HStack {
+                    Text(title, bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    Spacer()
+                    
+                    Text(verbatim: content)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.teritary))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 19)
+                
+            case .vertical:
+                VStack {
+                    Text(title, bundle: .module)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.Labels.teritary))
+                    
+                    Text(verbatim: content)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.primary))
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(12)
+            }
         }
+        .background(
+            Color(.Background.teritary)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        )
     }
 }
 

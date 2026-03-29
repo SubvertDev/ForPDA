@@ -36,19 +36,31 @@ public struct ProfileParser {
     /// 23. [] - curated topics
     /// 24. [] - warning log
     /// 25. something@gmail.com - email
-    /// 26. "" - empty = no warnings
-    /// 27. "" - empty = no warnings
+    /// 26. "" - registrationIP
+    /// 27. "" - sessionIP
     /// 28. -1 - warning level (-1 => 0%)
     /// 29. 0 - user premod (1 - always | 0 - before ...)
     /// 30. 0 - user readonly (if != 0 => before ...)
     /// 31. 0 - ban reason (1 - last chanse | 2 - permanent | 3 - security block)
     /// 32. [] - rewards list
-    /// 33. "" - ???
+    /// 33. "" - previous nicknames
     
     public static func parseUser(from string: String) throws -> User {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                guard let readOnlyUntil = array[30] as? Int,
+                      let premoderationRaw = array[29] as? Int else {
+                    throw ParsingError.failedToCastFields
+                }
+                let readOnlyDate: Date? = readOnlyUntil != 0 ? Date(timeIntervalSince1970: TimeInterval(readOnlyUntil)) : nil
+                let premoderation: User.Premoderation? = switch premoderationRaw {
+                case 0: nil
+                case 1: .always
+                default: .until(Date(timeIntervalSince1970: TimeInterval(premoderationRaw)))
+                }
+                
                 return User(
                     id: array[2] as! Int,
                     nickname: (array[3] as! String).convertHtmlCodes(),
@@ -74,7 +86,14 @@ public struct ProfileParser {
                     curatedTopics: parseCuratedTopics(array[23] as! [[Any]]),
                     warningLogs: parseWarningLogs(array[24] as! [[Any]]),
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
-                    achievements: parseUserAchievements(array[32] as! [[Any]])
+                    registrationIP: array[26] as! String,
+                    sessionIP: array[27] as! String,
+                    warningLevel: array[28] as! Int,
+                    premoderation: premoderation,
+                    readOnlyUntil: readOnlyDate,
+                    banReason: User.BanReason(rawValue: array[31] as! Int),
+                    achievements: parseUserAchievements(array[32] as! [[Any]]),
+                    previousNicknames: array[33] as! String
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)

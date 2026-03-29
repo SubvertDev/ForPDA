@@ -106,6 +106,12 @@ public struct PostRowView: View {
                     
                     Spacer()
                     
+                    if state.post.post.canModerate, state.post.post.isProtected {
+                        Image(systemSymbol: .shield)
+                            .font(.caption)
+                            .foregroundStyle(Color(.Labels.quaternary))
+                    }
+                    
                     Text(state.post.post.createdAt.formattedDate(), bundle: .module)
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.quaternary))
