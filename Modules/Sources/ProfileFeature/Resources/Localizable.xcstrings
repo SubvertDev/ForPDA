@@ -31,6 +31,16 @@
         }
       }
     },
+    "always" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "всегда"
+          }
+        }
+      }
+    },
     "Are you sure you want to log out of your profile ?" : {
       "localizations" : {
         "ru" : {
@@ -77,6 +87,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ошибка обновления аватара"
+          }
+        }
+      }
+    },
+    "Ban" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бан"
           }
         }
       }
@@ -281,6 +301,16 @@
         }
       }
     },
+    "last chance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "последний шанс"
+          }
+        }
+      }
+    },
     "Last seen %@" : {
       "localizations" : {
         "ru" : {
@@ -351,6 +381,16 @@
         }
       }
     },
+    "no" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "нет"
+          }
+        }
+      }
+    },
     "Not set" : {
       "localizations" : {
         "ru" : {
@@ -391,6 +431,16 @@
         }
       }
     },
+    "permanent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "перманентный"
+          }
+        }
+      }
+    },
     "Personal info" : {
       "localizations" : {
         "ru" : {
@@ -407,6 +457,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Постов"
+          }
+        }
+      }
+    },
+    "Premoderation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Премод"
           }
         }
       }
@@ -461,6 +521,16 @@
         }
       }
     },
+    "Readonly" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только чтение"
+          }
+        }
+      }
+    },
     "Registration date" : {
       "localizations" : {
         "ru" : {
@@ -497,6 +567,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Репутация"
+          }
+        }
+      }
+    },
+    "Restrictions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ограничения"
+          }
+        }
+      }
+    },
+    "security block" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "защитный"
           }
         }
       }
@@ -597,6 +687,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Неизвестный уровень"
+          }
+        }
+      }
+    },
+    "until %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "до %@"
           }
         }
       }

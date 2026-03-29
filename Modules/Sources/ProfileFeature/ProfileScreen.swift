@@ -235,6 +235,9 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func GeneralSegment(user: User) -> some View {
         GroupsSection(user: user)
+        if user.canModerate {
+            RestrictionsSection(user: user)
+        }
         PersonalSection(user: user)
         if user.aboutMe != nil {
             AboutSection(user: user)
@@ -306,6 +309,46 @@ public struct ProfileScreen: View {
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Restrictions Section
+    
+    @ViewBuilder
+    private func RestrictionsSection(user: User) -> some View {
+        Section {
+            let premoderation = switch user.premoderation {
+            case .always:
+                LocalizedStringKey("always")
+            case .until(let date):
+                LocalizedStringKey("until \(date.formatted())")
+            case .none:
+                LocalizedStringKey("no")
+            }
+            Row(title: "Premoderation", type: .localizedDescription(premoderation))
+            
+            let readOnlyUntil: LocalizedStringKey = if let date = user.readOnlyUntil {
+                LocalizedStringKey("until \(date.formatted())")
+            } else {
+                LocalizedStringKey("no")
+            }
+            Row(title: "Readonly", type: .localizedDescription(readOnlyUntil))
+            
+            let banReason = switch user.banReason {
+            case .lastChanse:
+                LocalizedStringKey("last chance")
+            case .permanent:
+                LocalizedStringKey("permanent")
+            case .securityBlock:
+                LocalizedStringKey("security block")
+            case .none:
+                LocalizedStringKey("no")
+            }
+            Row(title: "Ban", type: .localizedDescription(banReason))
+        } header: {
+            SectionHeader(title: "Restrictions")
+        }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Personal Section
