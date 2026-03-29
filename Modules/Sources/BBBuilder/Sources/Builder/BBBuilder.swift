@@ -456,7 +456,8 @@ public struct BBBuilder {
                 asyncAttachment.image = UIImage.placeholder(color: .gray, size: CGSize(width: 32, height: 32)) // TODO: Skeleton loader
                 attachmentString = NSAttributedString(attachment: asyncAttachment)
             } else {
-                let downloadUrl = URL(string: "https://4pda.to/forum/dl/post/\(id)/\(name)")!
+                let downloadLink = "https://4pda.to/forum/dl/post/\(id)/\(name)"
+                let downloadUrl = URL(string: downloadLink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
                 let image = UIImage(systemSymbol: .arrowDownDoc).withTintColor(.tintColor)//, withConfiguration: config)
                 let textAttachment = AsyncTextAttachment(image: image)//, displaySize: CGSize(width: 16, height: 16))
                 textAttachment.link = downloadUrl
