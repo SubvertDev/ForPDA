@@ -601,6 +601,16 @@
         }
       }
     },
+    "Warning level" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предупреждения"
+          }
+        }
+      }
+    },
     "Warning level decreased" : {
       "localizations" : {
         "ru" : {

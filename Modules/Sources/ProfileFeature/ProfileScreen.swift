@@ -294,11 +294,11 @@ public struct ProfileScreen: View {
                     content: user.registrationDate.formatted(date: .numeric, time: .omitted)
                 )
                 
+                if user.canModerate || (store.shouldShowToolbarButtons && user.warningLevel != -1) {
+                    InformationRow(title: "Warning level", content: "\(user.warningLevel)%")
+                }
+                
                 if user.canModerate {
-                    if store.shouldShowToolbarButtons {
-                        
-                    }
-                    
                     InformationRow(title: "Registration IP", content: user.registrationIP)
                 }
             }

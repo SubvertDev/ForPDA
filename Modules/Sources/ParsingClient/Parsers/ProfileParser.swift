@@ -76,6 +76,7 @@ public struct ProfileParser {
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
                     registrationIP: array[26] as! String,
                     sessionIP: array[27] as! String,
+                    warningLevel: array[28] as! Int,
                     achievements: parseUserAchievements(array[32] as! [[Any]]),
                     previousNicknames: array[33] as! String
                 )

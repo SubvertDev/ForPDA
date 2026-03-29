@@ -35,6 +35,7 @@ public struct User: Sendable, Hashable, Codable {
     public let email: String?
     public let registrationIP: String
     public let sessionIP: String
+    public let warningLevel: Int
     public let achievements: [Achievement]
     public let previousNicknames: String
     
@@ -103,6 +104,7 @@ public struct User: Sendable, Hashable, Codable {
         email: String?,
         registrationIP: String,
         sessionIP: String,
+        warningLevel: Int,
         achievements: [Achievement],
         previousNicknames: String
     ) {
@@ -132,6 +134,7 @@ public struct User: Sendable, Hashable, Codable {
         self.email = email
         self.registrationIP = registrationIP
         self.sessionIP = sessionIP
+        self.warningLevel = warningLevel
         self.achievements = achievements
         self.previousNicknames = previousNicknames
     }
@@ -384,6 +387,7 @@ public extension User {
         email: "some@email.com",
         registrationIP: "8.8.8.8",
         sessionIP: "1.1.1.1",
+        warningLevel: 40,
         achievements: [
             .init(
                 name: "Призер Аллеи Славы",
