@@ -13,4 +13,5 @@ public enum TopicContextMenuAction {
     case goToEnd
     case setFavorite
     case about
+    case edit
 }

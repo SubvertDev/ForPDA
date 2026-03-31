@@ -23,6 +23,7 @@ import TopicBuilder
 import ToastClient
 import NotificationsClient
 import ForumStatFeature
+import TopicEditFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -52,6 +53,7 @@ public struct TopicFeature: Reducer, Sendable {
         case karmaChange(Int)
         case form(FormFeature)
         case stat(ForumStatFeature)
+        case edit(TopicEditFeature)
         case changeReputation(ReputationChangeFeature)
         case alert(AlertState<Alert>)
         
@@ -307,6 +309,16 @@ public struct TopicFeature: Reducer, Sendable {
                         )
                     )
                     state.destination = .form(formState)
+                    return .none
+                    
+                case .edit:
+                    let editState = TopicEditFeature.State(
+                        id: topic.id,
+                        title: topic.name,
+                        description: topic.description,
+                        poll: topic.poll
+                    )
+                    state.destination = .edit(editState)
                     return .none
                     
                 case .about:

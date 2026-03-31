@@ -18,6 +18,7 @@ import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
 import ForumStatFeature
+import TopicEditFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -197,8 +198,14 @@ public struct TopicScreen: View {
                     }
                 }
                 
-                if topic.canModerate {
-                    Section {
+                Section {
+                    if topic.canEdit {
+                        ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
+                            send(.contextMenu(.edit))
+                        }
+                    }
+                    
+                    if topic.canModerate {
                         Menu {
                             Picker(String(), selection: $store.postsFilter) {
                                 ForEach(TopicPostsFilter.allCases) { mode in
@@ -444,6 +451,11 @@ struct NavigationModifier: ViewModifier {
                     .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
                         NavigationStack {
                             FormScreen(store: store)
+                        }
+                    }
+                    .fullScreenCover(item: $store.scope(state: \.destination?.edit, action: \.destination.edit)) { store in
+                        NavigationStack {
+                            TopicEditView(store: store)
                         }
                     }
                     .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
