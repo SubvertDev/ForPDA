@@ -121,7 +121,7 @@ public extension Topic {
         id: 3242552,
         name: "ForPDA",
         description: "Unofficial 4PDA client for iOS.",
-        flag: .canPost,
+        flag: [.canPost, .canEdit, .canModerate],
         createdAt: Date(timeIntervalSince1970: 1725706883),
         authorId: 3640948,
         authorName: "4spander",
@@ -150,8 +150,8 @@ public extension Topic.Poll {
                 name: "Select not several...",
                 several: false,
                 choices: [
-                    .init(id: 2, name: "First choice", votes: 2),
-                    .init(id: 3, name: "Second choice", votes: 4)
+                    .init(id: 0, name: "First choice", votes: 2),
+                    .init(id: 1, name: "Second choice", votes: 4)
                 ]
             ),
             .init(
@@ -159,8 +159,8 @@ public extension Topic.Poll {
                 name: "Select several...",
                 several: true,
                 choices: [
-                    .init(id: 4, name: "First choice", votes: 4),
-                    .init(id: 5, name: "Second choice", votes: 2)
+                    .init(id: 0, name: "First choice", votes: 4),
+                    .init(id: 1, name: "Second choice", votes: 2)
                 ]
             ),
         ]
