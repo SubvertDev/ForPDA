@@ -56,7 +56,7 @@ public struct TopicEditView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        //send(.cancelButtonTapped)
+                        send(.cancelButtonTapped)
                     } label: {
                         if isLiquidGlass {
                             Image(systemSymbol: .xmark)
@@ -108,34 +108,36 @@ public struct TopicEditView: View {
     // MARK: - Poll
     
     private func Poll() -> some View {
-        VStack {
-            HStack(spacing: 0) {
-                Text("Enable poll", bundle: .module)
-                    .foregroundStyle(Color(.Labels.teritary))
-                    .font(.footnote)
-                    .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        WithPerceptionTracking {
+            VStack {
+                HStack(spacing: 0) {
+                    Text("Enable poll", bundle: .module)
+                        .foregroundStyle(Color(.Labels.teritary))
+                        .font(.footnote)
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Toggle(String(""), isOn: $store.isPollEnabled)
+                        .labelsHidden()
+                        .tint(tintColor)
+                }
+                .padding(.horizontal, 2)
                 
-                Toggle(String(""), isOn: $store.isPollEnabled)
-                    .labelsHidden()
-                    .tint(tintColor)
-            }
-            .padding(.horizontal, 2)
-            
-            if store.isPollEnabled {
-                VStack(spacing: 16) {
-                    Field(
-                        content: $store.draftPoll.name,
-                        placeholder: LocalizedStringResource("Input poll name", bundle: .module),
-                        focusEqual: .pollName
-                    )
-                    
-                    ForEach(store.draftPoll.options) { question in
-                        PollQuestion(question)
-                    }
-                    
-                    AddPollElementButton(title: "Question") {
-                        send(.addQuestionButtonTapped)
+                if store.isPollEnabled {
+                    VStack(spacing: 16) {
+                        Field(
+                            content: $store.draftPoll.name,
+                            placeholder: LocalizedStringResource("Input poll name", bundle: .module),
+                            focusEqual: .pollName
+                        )
+                        
+                        ForEach($store.draftPoll.options, id: \.id) { question in
+                            PollQuestion(question)
+                        }
+                        
+                        AddPollElementButton(title: "Question") {
+                            send(.addQuestionButtonTapped)
+                        }
                     }
                 }
             }
@@ -146,16 +148,16 @@ public struct TopicEditView: View {
     // MARK: - Poll Question
     
     @ViewBuilder
-    private func PollQuestion(_ question: Topic.Poll.Option) -> some View {
+    private func PollQuestion(_ question: Binding<Topic.Poll.Option>) -> some View {
         VStack(spacing: 10) {
             Field(
-                title: "Question \(question.id + 1)",
-                content: $store.draftPoll.options[question.id].name,
-                placeholder: LocalizedStringResource("Input poll name", bundle: .module),
-                focusEqual: .pollQuestion(question.id),
+                title: "Question",
+                content: question.name,
+                placeholder: LocalizedStringResource("Input question", bundle: .module),
+                focusEqual: .pollQuestion(question.wrappedValue.id),
                 action: {
                     Button {
-                        send(.removeQuestionButtonTapped(question.id))
+                        send(.removeQuestionButtonTapped(question.wrappedValue.id))
                     } label: {
                         Image(systemSymbol: .trash)
                             .foregroundStyle(.red)
@@ -166,12 +168,12 @@ public struct TopicEditView: View {
             )
             
             HStack(spacing: 0) {
-                Toggle(String(""), isOn: $store.draftPoll.options[question.id].several)
+                Toggle(String(""), isOn: question.several)
                     .labelsHidden()
                     .tint(tintColor)
                     .padding(.trailing, 8)
                 
-                Text("Question type", bundle: .module)
+                Text("Enable multi-selection", bundle: .module)
                     .foregroundStyle(Color(.Labels.teritary))
                     .font(.footnote)
                     .fontWeight(.semibold)
@@ -179,10 +181,10 @@ public struct TopicEditView: View {
             }
             .padding(.bottom, 12)
             
-            PollAnswers(questionId: question.id, question.choices)
+            PollAnswers(questionId: question.wrappedValue.id, question.choices)
             
             AddPollElementButton(title: "Answer") {
-                send(.addAnswerButtonTapped(questionId: question.id))
+                send(.addAnswerButtonTapped(questionId: question.wrappedValue.id))
             }
         }
         .padding(16)
@@ -195,18 +197,18 @@ public struct TopicEditView: View {
     // MARK: - Poll Answer
     
     @ViewBuilder
-    private func PollAnswers(questionId: Int, _ answers: [Topic.Poll.Choice]) -> some View {
+    private func PollAnswers(questionId: Int, _ answers: Binding<[Topic.Poll.Choice]>) -> some View {
         VStack(spacing: 6) {
             Header(title: "Answers")
             
             ForEach(answers) { answer in
                 Field(
-                    content: $store.draftPoll.options[questionId].choices[answer.id].name,
+                    content: answer.name,
                     placeholder: LocalizedStringResource("Input answer", bundle: .module),
-                    focusEqual: .pollAnswer(questionId: questionId, answer.id),
+                    focusEqual: .pollAnswer(questionId: questionId, answer.wrappedValue.id),
                     action: {
                         Button {
-                            send(.removeAnswerButtonTapped(questionId: questionId, answer.id))
+                            send(.removeAnswerButtonTapped(questionId: questionId, answer.wrappedValue.id))
                         } label: {
                             Image(systemSymbol: .trash)
                                 .foregroundStyle(.red)

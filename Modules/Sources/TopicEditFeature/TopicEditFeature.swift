@@ -65,6 +65,8 @@ public struct TopicEditFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             
+            case cancelButtonTapped
+            
             case addQuestionButtonTapped
             case removeQuestionButtonTapped(Int)
             
@@ -75,6 +77,7 @@ public struct TopicEditFeature: Reducer, Sendable {
     
     // MARK: - Dependencies
     
+    @Dependency(\.dismiss) private var dismiss
     @Dependency(\.apiClient) private var apiClient
     
     // MARK: - Body
@@ -84,7 +87,7 @@ public struct TopicEditFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .binding(\.isPollEnabled):
+            case .binding:
                 return .none
                 
             case .view(.onAppear):
@@ -94,10 +97,12 @@ public struct TopicEditFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case .view(.cancelButtonTapped):
+                return .run { _ in await dismiss() }
+                
             case .view(.addQuestionButtonTapped):
-                let questionsCount = state.draftPoll.options.count
                 state.draftPoll.options.append(.init(
-                    id: questionsCount,
+                    id: Int(Date.now.timeIntervalSince1970),
                     name: "",
                     several: false,
                     choices: []
@@ -105,21 +110,23 @@ public struct TopicEditFeature: Reducer, Sendable {
                 return .none
                 
             case let .view(.removeQuestionButtonTapped(id)):
-                state.draftPoll.options.remove(at: id)
+                state.draftPoll.options.removeAll(where: { $0.id == id })
                 return .none
                 
             case let .view(.addAnswerButtonTapped(questionId)):
-                let answersCount = state.draftPoll.options[questionId].choices.count
-                state.draftPoll.options[questionId].choices.append(
-                    .init(id: answersCount, name: "", votes: 0)
-                )
+                let id = Int(Date.now.timeIntervalSince1970)
+                if let index = state.draftPoll.options.firstIndex(where: { $0.id == questionId }) {
+                    state.draftPoll.options[index].choices.append(
+                        .init(id: id, name: "", votes: 0)
+                    )
+                }
                 return .none
                 
             case let .view(.removeAnswerButtonTapped(questionId, answerId)):
-                state.draftPoll.options[questionId].choices.remove(at: answerId)
-                return .none
-                
-            case .binding:
+                if let questionIndex = state.draftPoll.options.firstIndex(where: { $0.id == questionId }),
+                   let answerIndex = state.draftPoll.options[questionIndex].choices.firstIndex(where: { $0.id == answerId }) {
+                    state.draftPoll.options[questionIndex].choices.remove(at: answerIndex)
+                }
                 return .none
             }
         }
