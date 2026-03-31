@@ -23,6 +23,10 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let navigation: [ForumInfo]
     public let postTemplateName: String?
     
+    public var canEdit: Bool {
+        return flag.contains(.canEdit)
+    }
+    
     public var canPost: Bool {
         return flag.contains(.canPost) && !flag.contains(.marker)
     }
