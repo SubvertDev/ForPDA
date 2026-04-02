@@ -42,6 +42,7 @@ let project = Project(
                     .Internal.DeeplinkHandler,
                     .Internal.DeveloperFeature,
                     .Internal.DeviceSpecificationsFeature,
+                    .Internal.DeviceVendorFeature,
                     .Internal.FavoritesFeature,
                     .Internal.FavoritesRootFeature,
                     .Internal.ForumFeature,
@@ -208,6 +209,17 @@ let project = Project(
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.GalleryFeature,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .SPM.TCA
+                ]
+            ),
+            
+            .feature(
+                name: "DeviceVendorFeature",
+                dependencies: [
+                    .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
@@ -1043,6 +1055,7 @@ extension TargetDependency.Internal {
     static let DeeplinkHandler =        TargetDependency.target(name: "DeeplinkHandler")
     static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
     static let DeviceSpecificationsFeature = TargetDependency.target(name: "DeviceSpecificationsFeature")
+    static let DeviceVendorFeature =    TargetDependency.target(name: "DeviceVendorFeature")
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let FormFeature =            TargetDependency.target(name: "FormFeature")
