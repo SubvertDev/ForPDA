@@ -107,12 +107,17 @@ public struct DeviceVendorFeature: Reducer, Sendable {
                 return .none
                 
             case let .internal(.loadBrands(type)):
-                return .none
+                state.isLoading = true
+                return .run { send in
+                    let response = try await apiClient.deviceBrands(type: type)
+                    await send(.internal(.brandsResponse(.success(response))))
+                } catch: { error, send in
+                    await send(.internal(.brandsResponse(.failure(error))))
+                }
                 
             case let .internal(.brandsResponse(.success(response))):
-                return .none
-                
-            case let .internal(.brandsResponse(.failure(error))):
+                state.brands = response
+                state.isLoading = false
                 return .none
                 
             case let .internal(.loadVendor(name, type)):
@@ -129,7 +134,8 @@ public struct DeviceVendorFeature: Reducer, Sendable {
                 state.isLoading = false
                 return .none
                 
-            case let .internal(.vendorResponse(.failure(error))):
+            case .internal(.vendorResponse(.failure(let error))),
+                 .internal(.brandsResponse(.failure(let error))):
                 print(error)
                 state.isLoading = false
                 return .run { _ in

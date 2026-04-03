@@ -34,8 +34,7 @@ public struct DeviceVendorScreen: View {
                         DeviceTypes()
                     case .brands:
                         if let brands = store.brands {
-                            //Vendor(vendor)
-                            Text("brands")
+                            Brands(brands)
                         }
                     case .vendor:
                         if let vendor = store.vendor {
@@ -74,6 +73,39 @@ public struct DeviceVendorScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
+    // MARK: - Brands
+    
+    @ViewBuilder
+    private func Brands(_ brands: DeviceBrands) -> some View {
+        Header(
+            actualCount: brands.actualCount,
+            allCount: brands.brands.count
+        )
+        
+        BrandsList(brands.brands, type: brands.type)
+    }
+    
+    @ViewBuilder
+    private func BrandsList(_ brands: [DeviceBrands.Brand], type: DeviceType) -> some View {
+        Section {
+            ForEach(brands) { brand in
+                WithPerceptionTracking {
+                    if store.categorySelection == .all {
+                        Row(title: LocalizedStringKey(brand.name), type: .navigation) {
+                            send(.vendorButtonTapped(brand.tag, type))
+                        }
+                    } else if store.categorySelection == .actual, brand.isActual {
+                        Row(title: LocalizedStringKey(brand.name), type: .navigation) {
+                            send(.vendorButtonTapped(brand.tag, type))
+                        }
+                    }
+                }
+            }
+        }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
     // MARK: - Vendor
     
     @ViewBuilder
@@ -86,37 +118,23 @@ public struct DeviceVendorScreen: View {
         VendorProducts(vendor.products)
     }
     
-    // MARK: - Header
-    
-    @ViewBuilder
-    private func Header(actualCount: Int, allCount: Int) -> some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                InformationRow(title: "Actual", content: String(actualCount))
-                
-                InformationRow(title: "All", content: String(allCount))
-            }
-            
-            ChangeCategoryButton()
-        }
-        .listRowBackground(Color.clear)
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-    }
-    
     // MARK: - Products
     
     @ViewBuilder
     private func VendorProducts(_ products: [DeviceVendor.Product]) -> some View {
-        ForEach(products) { product in
-            WithPerceptionTracking {
-                if store.categorySelection == .all {
-                    VendorProductRow(product)
-                } else if store.categorySelection == .actual, product.isActual {
-                    VendorProductRow(product)
+        Section {
+            ForEach(products) { product in
+                WithPerceptionTracking {
+                    if store.categorySelection == .all {
+                        VendorProductRow(product)
+                    } else if store.categorySelection == .actual, product.isActual {
+                        VendorProductRow(product)
+                    }
                 }
             }
-            .padding(.horizontal, 16)
         }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     @ViewBuilder
@@ -157,6 +175,9 @@ public struct DeviceVendorScreen: View {
             Color(.Background.teritary)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         )
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 8, trailing: 0))
     }
     
     @ViewBuilder
@@ -196,6 +217,23 @@ public struct DeviceVendorScreen: View {
             .background(Color(.Background.primary))
             .animation(.default, value: store.categorySelection)
         }
+    }
+    
+    // MARK: - Header
+    
+    @ViewBuilder
+    private func Header(actualCount: Int, allCount: Int) -> some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 12) {
+                InformationRow(title: "Actual", content: String(actualCount))
+                
+                InformationRow(title: "All", content: String(allCount))
+            }
+            
+            ChangeCategoryButton()
+        }
+        .listRowBackground(Color.clear)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Row
@@ -272,7 +310,11 @@ public struct DeviceVendorScreen: View {
         case .index:
             String(localized: "Devices", bundle: .module)
         case .brands:
-            String("Now emppty for brands")
+            if let brand = store.brands {
+                brand.typeName
+            } else {
+                String(localized: "Loading...", bundle: .module)
+            }
         case .vendor:
             if let vendor = store.vendor {
                 "\(vendor.name) (\(vendor.categoryName))"
