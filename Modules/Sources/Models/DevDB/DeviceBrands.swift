@@ -10,6 +10,10 @@ public struct DeviceBrands: Sendable, Equatable {
     public let typeName: String
     public let brands: [Brand]
     
+    public var actualCount: Int {
+        return brands.count(where: { $0.isActual })
+    }
+    
     public struct Brand: Sendable, Equatable, Identifiable {
         public let tag: String
         public let name: String
