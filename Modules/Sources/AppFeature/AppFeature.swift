@@ -643,8 +643,8 @@ public struct AppFeature: Reducer, Sendable {
             screen = switch goTo {
             case .index:
                 .devDB(.type(DeviceTypeFeature.State(content: .index)))
-            case .brands(let type):
-                .devDB(.type(DeviceTypeFeature.State(content: .brands(type))))
+            case .vendorsList(let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type))))
             case .vendor(let vendorName, let type):
                 .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
             case .device(let tag, let subTag):

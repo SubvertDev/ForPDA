@@ -5,16 +5,16 @@
 //  Created by Xialtal on 3.04.26.
 //
 
-public struct DeviceBrands: Sendable, Equatable {
+public struct DeviceVendorsList: Sendable, Equatable {
     public let type: DeviceType
     public let typeName: String
-    public let brands: [Brand]
+    public let vendors: [VendorInfo]
     
     public var actualCount: Int {
-        return brands.count(where: { $0.isActual })
+        return vendors.count(where: { $0.isActual })
     }
     
-    public struct Brand: Sendable, Equatable, Identifiable {
+    public struct VendorInfo: Sendable, Equatable, Identifiable {
         public let tag: String
         public let name: String
         public let devicesCount: Int
@@ -40,16 +40,16 @@ public struct DeviceBrands: Sendable, Equatable {
     public init(
         type: DeviceType,
         typeName: String,
-        brands: [Brand]
+        brands: [VendorInfo]
     ) {
         self.type = type
         self.typeName = typeName
-        self.brands = brands
+        self.vendors = brands
     }
 }
 
-public extension DeviceBrands {
-    static let mock = DeviceBrands(
+public extension DeviceVendorsList {
+    static let mock = DeviceVendorsList(
         type: .phone,
         typeName: "Смартфоны",
         brands: [

@@ -9,6 +9,6 @@ import Models
 
 public enum DeviceTypeContent: Equatable {
     case index
-    case brands(DeviceType)
+    case vendorsList(DeviceType)
     case vendor(String, type: DeviceType)
 }

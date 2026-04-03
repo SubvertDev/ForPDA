@@ -29,8 +29,8 @@ public struct DeviceTypeFeature: Reducer, Sendable {
     public struct State: Equatable {
         public let content: DeviceTypeContent
         
-        var brands: DeviceBrands?
         var vendor: DeviceVendor?
+        var vendorsList: DeviceVendorsList?
         
         var categorySelection: CategorySelection = .actual
         var isLoading = false
@@ -56,8 +56,8 @@ public struct DeviceTypeFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            case loadBrands(DeviceType)
-            case brandsResponse(Result<DeviceBrands, any Error>)
+            case loadVendorsList(DeviceType)
+            case vendorsListResponse(Result<DeviceVendorsList, any Error>)
             
             case loadVendor(String, DeviceType)
             case vendorResponse(Result<DeviceVendor, any Error>)
@@ -65,7 +65,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
-            case openBrands(DeviceType)
+            case openVendorsList(DeviceType)
             case openDevice(tag: String)
             case openVendor(String, DeviceType)
         }
@@ -84,8 +84,8 @@ public struct DeviceTypeFeature: Reducer, Sendable {
             switch action {
             case .view(.onAppear):
                 switch state.content {
-                case .brands(let type):
-                    return .send(.internal(.loadBrands(type)))
+                case .vendorsList(let type):
+                    return .send(.internal(.loadVendorsList(type)))
                 case .vendor(let name, let type):
                     return .send(.internal(.loadVendor(name, type)))
                 case .index:
@@ -97,7 +97,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
                 return .send(.delegate(.openDevice(tag: tag)))
                 
             case let .view(.typeButtonTapped(type)):
-                return .send(.delegate(.openBrands(type)))
+                return .send(.delegate(.openVendorsList(type)))
                 
             case let .view(.vendorButtonTapped(name, type)):
                 return .send(.delegate(.openVendor(name, type)))
@@ -106,17 +106,17 @@ public struct DeviceTypeFeature: Reducer, Sendable {
                 state.categorySelection = category
                 return .none
                 
-            case let .internal(.loadBrands(type)):
+            case let .internal(.loadVendorsList(type)):
                 state.isLoading = true
                 return .run { send in
                     let response = try await apiClient.deviceBrands(type: type)
-                    await send(.internal(.brandsResponse(.success(response))))
+                    await send(.internal(.vendorsListResponse(.success(response))))
                 } catch: { error, send in
-                    await send(.internal(.brandsResponse(.failure(error))))
+                    await send(.internal(.vendorsListResponse(.failure(error))))
                 }
                 
-            case let .internal(.brandsResponse(.success(response))):
-                state.brands = response
+            case let .internal(.vendorsListResponse(.success(response))):
+                state.vendorsList = response
                 state.isLoading = false
                 return .none
                 
@@ -135,7 +135,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
                 return .none
                 
             case .internal(.vendorResponse(.failure(let error))),
-                 .internal(.brandsResponse(.failure(let error))):
+                 .internal(.vendorsListResponse(.failure(let error))):
                 print(error)
                 state.isLoading = false
                 return .run { _ in

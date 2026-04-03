@@ -12,13 +12,13 @@ public struct DeviceVendor: Sendable, Equatable {
     public let name: String
     public let code: String
     public let categoryName: String
-    public let products: [Product]
+    public let devices: [DeviceInfo]
     
     public var actualCount: Int {
-        return products.count(where: { $0.isActual })
+        return devices.count(where: { $0.isActual })
     }
     
-    public struct Product: Sendable, Identifiable, Equatable {
+    public struct DeviceInfo: Sendable, Identifiable, Equatable {
         public let tag: String
         public let name: String
         public let imageUrl: URL
@@ -59,13 +59,13 @@ public struct DeviceVendor: Sendable, Equatable {
         name: String,
         code: String,
         categoryName: String,
-        products: [Product]
+        devices: [DeviceInfo]
     ) {
         self.type = type
         self.name = name
         self.code = code
         self.categoryName = categoryName
-        self.products = products
+        self.devices = devices
     }
 }
 
@@ -75,7 +75,7 @@ public extension DeviceVendor {
         name: "Apple",
         code: "apple",
         categoryName: "Смартфоны",
-        products: [
+        devices: [
             .init(
                 tag: "apple_iphone_16e",
                 name: "iPhone 16e",

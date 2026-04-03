@@ -32,9 +32,9 @@ public struct DeviceTypeScreen: View {
                     switch store.content {
                     case .index:
                         DeviceTypes()
-                    case .brands:
-                        if let brands = store.brands {
-                            Brands(brands)
+                    case .vendorsList:
+                        if let vendors = store.vendorsList {
+                            VendorsList(vendors)
                         }
                     case .vendor:
                         if let vendor = store.vendor {
@@ -73,30 +73,30 @@ public struct DeviceTypeScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
-    // MARK: - Brands
+    // MARK: - Vendors
     
     @ViewBuilder
-    private func Brands(_ brands: DeviceBrands) -> some View {
+    private func VendorsList(_ vendors: DeviceVendorsList) -> some View {
         Header(
-            actualCount: brands.actualCount,
-            allCount: brands.brands.count
+            actualCount: vendors.actualCount,
+            allCount: vendors.vendors.count
         )
         
-        BrandsList(brands.brands, type: brands.type)
+        VendorsInfo(vendors.vendors, type: vendors.type)
     }
     
     @ViewBuilder
-    private func BrandsList(_ brands: [DeviceBrands.Brand], type: DeviceType) -> some View {
+    private func VendorsInfo(_ vendors: [DeviceVendorsList.VendorInfo], type: DeviceType) -> some View {
         Section {
-            ForEach(brands) { brand in
+            ForEach(vendors) { vendor in
                 WithPerceptionTracking {
                     if store.categorySelection == .all {
-                        Row(title: LocalizedStringKey(brand.name), type: .navigation) {
-                            send(.vendorButtonTapped(brand.tag, type))
+                        Row(title: LocalizedStringKey(vendor.name), type: .navigation) {
+                            send(.vendorButtonTapped(vendor.tag, type))
                         }
-                    } else if store.categorySelection == .actual, brand.isActual {
-                        Row(title: LocalizedStringKey(brand.name), type: .navigation) {
-                            send(.vendorButtonTapped(brand.tag, type))
+                    } else if store.categorySelection == .actual, vendor.isActual {
+                        Row(title: LocalizedStringKey(vendor.name), type: .navigation) {
+                            send(.vendorButtonTapped(vendor.tag, type))
                         }
                     }
                 }
@@ -112,23 +112,23 @@ public struct DeviceTypeScreen: View {
     private func Vendor(_ vendor: DeviceVendor) -> some View {
         Header(
             actualCount: vendor.actualCount,
-            allCount: vendor.products.count
+            allCount: vendor.devices.count
         )
         
-        VendorProducts(vendor.products)
+        VendorDevices(vendor.devices)
     }
     
     // MARK: - Products
     
     @ViewBuilder
-    private func VendorProducts(_ products: [DeviceVendor.Product]) -> some View {
+    private func VendorDevices(_ devices: [DeviceVendor.DeviceInfo]) -> some View {
         Section {
-            ForEach(products) { product in
+            ForEach(devices) { device in
                 WithPerceptionTracking {
                     if store.categorySelection == .all {
-                        VendorProductRow(product)
-                    } else if store.categorySelection == .actual, product.isActual {
-                        VendorProductRow(product)
+                        VendorDeviceInfoRow(device)
+                    } else if store.categorySelection == .actual, device.isActual {
+                        VendorDeviceInfoRow(device)
                     }
                 }
             }
@@ -138,12 +138,12 @@ public struct DeviceTypeScreen: View {
     }
     
     @ViewBuilder
-    private func VendorProductRow(_ product: DeviceVendor.Product) -> some View {
+    private func VendorDeviceInfoRow(_ device: DeviceVendor.DeviceInfo) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
-                send(.productButtonTapped(product.tag))
+                send(.productButtonTapped(device.tag))
             } label: {
-                Text(verbatim: product.name)
+                Text(verbatim: device.name)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundStyle(Color(.Labels.primary))
@@ -151,10 +151,10 @@ public struct DeviceTypeScreen: View {
             .buttonStyle(.plain)
             
             HStack(spacing: 16) {
-                LazyImage(url: product.imageUrl) { state in
+                LazyImage(url: device.imageUrl) { state in
                     Group {
                         if let image = state.image {
-                            image.resizable().scaledToFill()
+                            image.resizable().frame(width: 74, height: 74).scaledToFit()
                         } else {
                             Color(.systemBackground)
                         }
@@ -165,7 +165,7 @@ public struct DeviceTypeScreen: View {
                 .frame(width: 74, height: 74)
                 .frame(maxHeight: .infinity, alignment: .top)
                 
-                VendorProductSpecifications(product.entries)
+                VendorDeviceSpecifications(device.entries)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -181,7 +181,7 @@ public struct DeviceTypeScreen: View {
     }
     
     @ViewBuilder
-    private func VendorProductSpecifications(_ specifications: [DeviceVendor.Product.Entry]) -> some View {
+    private func VendorDeviceSpecifications(_ specifications: [DeviceVendor.DeviceInfo.Entry]) -> some View {
         VStack(spacing: 6) {
             ForEach(specifications, id: \.name) { specification in
                 HStack {
@@ -309,9 +309,9 @@ public struct DeviceTypeScreen: View {
         return switch store.content {
         case .index:
             String(localized: "Devices", bundle: .module)
-        case .brands:
-            if let brand = store.brands {
-                brand.typeName
+        case .vendorsList:
+            if let vendorsList = store.vendorsList {
+                vendorsList.typeName
             } else {
                 String(localized: "Loading...", bundle: .module)
             }
@@ -346,7 +346,7 @@ public struct DeviceTypeScreen: View {
         DeviceTypeScreen(
             store: Store(
                 initialState: DeviceTypeFeature.State(
-                    content: .brands(.phone)
+                    content: .vendorsList(.phone)
                 )
             ) {
                 DeviceTypeFeature()

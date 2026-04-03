@@ -93,7 +93,7 @@ public struct APIClient: Sendable {
     public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // DevDB
-    public var deviceBrands: @Sendable (_ type: DeviceType) async throws -> DeviceBrands
+    public var deviceBrands: @Sendable (_ type: DeviceType) async throws -> DeviceVendorsList
     public var deviceVendor: @Sendable (_ name: String, _ type: DeviceType) async throws -> DeviceVendor
     public var deviceSpecifications: @Sendable (_ tag: String, _ subTag: String) async throws -> DeviceSpecifications
     

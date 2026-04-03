@@ -196,8 +196,8 @@ public struct StackTab: Reducer, Sendable {
         case let .type(.delegate(.openDevice(tag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: nil))))
             
-        case let .type(.delegate(.openBrands(type))):
-            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .brands(type)))))
+        case let .type(.delegate(.openVendorsList(type))):
+            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type)))))
             
         case let .type(.delegate(.openVendor(code, type))):
             state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendor(code, type: type)))))
@@ -494,8 +494,8 @@ public struct StackTab: Reducer, Sendable {
                 switch goTo {
                 case .index:
                     state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .index))))
-                case .brands(let type):
-                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .brands(type)))))
+                case .vendorsList(let type):
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type)))))
                 case .vendor(let vendorName, let type):
                     state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type)))))
                 case .device(let tag, let subTag):

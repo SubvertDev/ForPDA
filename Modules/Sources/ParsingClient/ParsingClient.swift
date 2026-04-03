@@ -62,7 +62,7 @@ public struct ParsingClient: Sendable {
     public var parseQmsChat: @Sendable (_ response: String) async throws -> QMSChat
     
     // DevDB
-    public var parseDeviceBrands: @Sendable (_ response: String) async throws -> DeviceBrands
+    public var parseDeviceBrands: @Sendable (_ response: String) async throws -> DeviceVendorsList
     public var parseDeviceVendor: @Sendable (_ response: String) async throws -> DeviceVendor
     public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
 }

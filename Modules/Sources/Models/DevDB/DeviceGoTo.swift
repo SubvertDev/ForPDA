@@ -7,7 +7,7 @@
 
 public enum DeviceGoTo {
     case index
-    case brands(DeviceType)
+    case vendorsList(DeviceType)
     case vendor(tag: String, type: DeviceType)
     case device(tag: String, subTag: String?)
 }

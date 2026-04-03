@@ -137,7 +137,7 @@ public struct DeeplinkHandler {
                 return .device(.vendor(tag: tag, type: type))
             } else if url.pathComponents.count == 3, !url.pathComponents[2].isEmpty {
                 if let type = DeviceType(rawValue: url.pathComponents[2]) { // /devdb/phones
-                    return .device(.brands(type))
+                    return .device(.vendorsList(type))
                 } else { // /devdb/apple_iphone_13
                     let tags = url.pathComponents[2].components(separatedBy: ":")
                     let subTag = tags.first == tags.last ? "" : tags.last!
