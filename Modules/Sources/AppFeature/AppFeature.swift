@@ -640,15 +640,15 @@ public struct AppFeature: Reducer, Sendable {
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
         case let .device(goTo):
-            switch goTo {
+            screen = switch goTo {
             case .index:
-                screen = .devDB(.type(DeviceTypeFeature.State(content: .index)))
+                .devDB(.type(DeviceTypeFeature.State(content: .index)))
             case .brands(let type):
-                screen = .devDB(.type(DeviceTypeFeature.State(content: .brands(type))))
+                .devDB(.type(DeviceTypeFeature.State(content: .brands(type))))
             case .vendor(let vendorName, let type):
-                screen = .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
+                .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
             case .device(let tag, let subTag):
-                screen = .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
+                .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
             }
         case let .topic(id, goTo):
             screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
