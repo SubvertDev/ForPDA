@@ -136,14 +136,16 @@ public struct DeeplinkHandler {
                 
                 return .device(.vendor(tag: tag, type: type))
             } else if url.pathComponents.count == 3, !url.pathComponents[2].isEmpty {
-                if let _ = DeviceType(rawValue: url.pathComponents[2]) { // /devdb/phones
-                    // TODO: deviceType deeplink
+                if let type = DeviceType(rawValue: url.pathComponents[2]) { // /devdb/phones
+                    return .device(.brands(type))
                 } else { // /devdb/apple_iphone_13
                     let tags = url.pathComponents[2].components(separatedBy: ":")
                     let subTag = tags.first == tags.last ? "" : tags.last!
                     
                     return .device(.device(tag: tags.first!, subTag: subTag))
                 }
+            } else if url.pathComponents.count == 2, url.pathComponents[1] == "devdb" {
+                return .device(.index)
             }
         }
         
