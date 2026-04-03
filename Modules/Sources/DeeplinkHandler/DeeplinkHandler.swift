@@ -19,7 +19,7 @@ public enum Deeplink {
     case user(id: Int)
     case qms(id: Int)
     case search(SearchResult)
-    case device(tag: String, subTag: String)
+    case device(DeviceGoTo)
 }
 
 public struct DeeplinkHandler {
@@ -129,7 +129,12 @@ public struct DeeplinkHandler {
         
         if url.pathComponents.contains("devdb") {
             if url.pathComponents.count == 4 { // /devdb/phones/apple
-                // TODO: vendor deeplink
+                guard let type = DeviceType(rawValue: String(url.pathComponents[2])) else {
+                    throw .unknownType(type: "DeviceType", for: url.absoluteString)
+                }
+                let tag = String(url.pathComponents[3])
+                
+                return .device(.vendor(tag: tag, type: type))
             } else if url.pathComponents.count == 3, !url.pathComponents[2].isEmpty {
                 if let _ = DeviceType(rawValue: url.pathComponents[2]) { // /devdb/phones
                     // TODO: deviceType deeplink
@@ -137,7 +142,7 @@ public struct DeeplinkHandler {
                     let tags = url.pathComponents[2].components(separatedBy: ":")
                     let subTag = tags.first == tags.last ? "" : tags.last!
                     
-                    return .device(tag: tags.first!, subTag: subTag)
+                    return .device(.device(tag: tags.first!, subTag: subTag))
                 }
             }
         }

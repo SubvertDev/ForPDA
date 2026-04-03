@@ -484,8 +484,15 @@ public struct StackTab: Reducer, Sendable {
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 
-            case let .device(tag, subTag):
-                state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
+            case let .device(goTo):
+                switch goTo {
+                case .index: break
+                case .type(let type): break
+                case .vendor(let vendorName, let type):
+                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(type: type, vendorName: vendorName))))
+                case .device(let tag, let subTag):
+                    state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
+                }
                 
             case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)

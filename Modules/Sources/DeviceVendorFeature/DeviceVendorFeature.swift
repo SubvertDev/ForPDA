@@ -81,7 +81,7 @@ public struct DeviceVendorFeature: Reducer, Sendable {
                 return .send(.internal(.loadVendor))
                 
             case let .view(.productButtonTapped(tag)):
-                return .send(.delegate(.deviceTapped(tag: tag)))
+                return .send(.delegate(.openDevice(tag: tag)))
                 
             case let .view(.changeCategoryButtonTapped(category)):
                 state.categorySelection = category
