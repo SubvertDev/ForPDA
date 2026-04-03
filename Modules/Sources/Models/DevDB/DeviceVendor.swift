@@ -7,14 +7,18 @@
 
 import Foundation
 
-public struct DeviceVendor: Sendable {
+public struct DeviceVendor: Sendable, Equatable {
     public let type: DeviceType
     public let name: String
     public let code: String
     public let categoryName: String
     public let products: [Product]
     
-    public struct Product: Sendable, Identifiable {
+    public var actualCount: Int {
+        return products.count(where: { $0.isActual })
+    }
+    
+    public struct Product: Sendable, Identifiable, Equatable {
         public let tag: String
         public let name: String
         public let imageUrl: URL
@@ -25,7 +29,7 @@ public struct DeviceVendor: Sendable {
             return tag
         }
         
-        public struct Entry: Sendable {
+        public struct Entry: Sendable, Equatable {
             public let name: String
             public let value: String
             

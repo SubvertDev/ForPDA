@@ -9,11 +9,19 @@ import Foundation
 import ComposableArchitecture
 import APIClient
 import Models
+import ToastClient
 
 @Reducer
 public struct DeviceVendorFeature: Reducer, Sendable {
     
     public init() {}
+    
+    // MARK: - Category
+    
+    public enum CategorySelection: Int, Equatable {
+        case all
+        case actual
+    }
     
     // MARK: - State
     
@@ -21,6 +29,11 @@ public struct DeviceVendorFeature: Reducer, Sendable {
     public struct State: Equatable {
         public let type: DeviceType
         public let vendorName: String
+        
+        var vendor: DeviceVendor?
+        var categorySelection: CategorySelection = .actual
+        
+        var isLoading = false
         
         public init(
             type: DeviceType,
@@ -37,6 +50,13 @@ public struct DeviceVendorFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
+            case changeCategoryButtonTapped(CategorySelection)
+        }
+        
+        case `internal`(Internal)
+        public enum Internal {
+            case loadVendor
+            case vendorResponse(Result<DeviceVendor, any Error>)
         }
     }
     
@@ -44,6 +64,7 @@ public struct DeviceVendorFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.openURL) var openURL
+    @Dependency(\.toastClient) var toastClient
     
     // MARK: - Body
     
@@ -51,7 +72,32 @@ public struct DeviceVendorFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
+                return .send(.internal(.loadVendor))
+                
+            case let .view(.changeCategoryButtonTapped(category)):
+                state.categorySelection = category
                 return .none
+                
+            case .internal(.loadVendor):
+                state.isLoading = true
+                return .run { [name = state.vendorName, type = state.type] send in
+                    let response = try await apiClient.deviceVendor(name: name, type: type)
+                    await send(.internal(.vendorResponse(.success(response))))
+                } catch: { error, send in
+                    await send(.internal(.vendorResponse(.failure(error))))
+                }
+                
+            case let .internal(.vendorResponse(.success(response))):
+                state.vendor = response
+                state.isLoading = false
+                return .none
+                
+            case let .internal(.vendorResponse(.failure(error))):
+                print(error)
+                state.isLoading = false
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
             }
         }
     }
