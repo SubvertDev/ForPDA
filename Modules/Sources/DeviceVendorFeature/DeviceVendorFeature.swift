@@ -50,6 +50,7 @@ public struct DeviceVendorFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
+            case productButtonTapped(String)
             case changeCategoryButtonTapped(CategorySelection)
         }
         
@@ -57,6 +58,11 @@ public struct DeviceVendorFeature: Reducer, Sendable {
         public enum Internal {
             case loadVendor
             case vendorResponse(Result<DeviceVendor, any Error>)
+        }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case openDevice(tag: String)
         }
     }
     
@@ -73,6 +79,9 @@ public struct DeviceVendorFeature: Reducer, Sendable {
             switch action {
             case .view(.onAppear):
                 return .send(.internal(.loadVendor))
+                
+            case let .view(.productButtonTapped(tag)):
+                return .send(.delegate(.deviceTapped(tag: tag)))
                 
             case let .view(.changeCategoryButtonTapped(category)):
                 state.categorySelection = category
@@ -98,6 +107,9 @@ public struct DeviceVendorFeature: Reducer, Sendable {
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
+                
+            case .delegate:
+                return .none
             }
         }
     }

@@ -33,6 +33,7 @@ import AuthFeature
 import SearchFeature
 import SearchResultFeature
 import DeviceSpecificationsFeature
+import DeviceVendorFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -192,6 +193,9 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleDevDBPathNavigation(action: Path.DevDB.Action, state: inout State) -> Effect<Action> {
         switch action {
+        case let .vendor(.delegate(.openDevice(tag))):
+            state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: nil))))
+            
         case let .specifications(.delegate(.openDevice(tag, subTag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
             

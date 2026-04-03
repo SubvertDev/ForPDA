@@ -12,6 +12,7 @@ import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
 import DeviceSpecificationsFeature
+import DeviceVendorFeature
 import FavoritesRootFeature
 import FavoritesFeature
 import ForumFeature
@@ -49,6 +50,7 @@ public enum Path {
     
     @Reducer
     public enum DevDB {
+        case vendor(DeviceVendorFeature)
         case specifications(DeviceSpecificationsFeature)
     }
     

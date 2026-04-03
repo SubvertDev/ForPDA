@@ -70,10 +70,15 @@ public struct DeviceVendorScreen: View {
     @ViewBuilder
     private func ProductRow(_ product: DeviceVendor.Product) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(verbatim: product.name)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundStyle(Color(.Labels.primary))
+            Button {
+                send(.productButtonTapped(product.tag))
+            } label: {
+                Text(verbatim: product.name)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color(.Labels.primary))
+            }
+            .buttonStyle(.plain)
             
             HStack(spacing: 16) {
                 LazyImage(url: product.imageUrl) { state in
