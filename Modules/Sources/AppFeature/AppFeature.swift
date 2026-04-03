@@ -37,7 +37,7 @@ import Combine
 import SearchResultFeature
 import CacheClient
 import DeviceSpecificationsFeature
-import DeviceVendorFeature
+import DeviceTypeFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -639,14 +639,14 @@ public struct AppFeature: Reducer, Sendable {
             screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
-        case let .device(type):
-            switch type {
+        case let .device(goTo):
+            switch goTo {
             case .index:
-                screen = .devDB(.vendor(DeviceVendorFeature.State(content: .index)))
+                screen = .devDB(.type(DeviceTypeFeature.State(content: .index)))
             case .brands(let type):
-                screen = .devDB(.vendor(DeviceVendorFeature.State(content: .brands(type))))
+                screen = .devDB(.type(DeviceTypeFeature.State(content: .brands(type))))
             case .vendor(let vendorName, let type):
-                screen = .devDB(.vendor(DeviceVendorFeature.State(content: .vendor(vendorName, type: type))))
+                screen = .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
             case .device(let tag, let subTag):
                 screen = .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
             }

@@ -33,7 +33,7 @@ import AuthFeature
 import SearchFeature
 import SearchResultFeature
 import DeviceSpecificationsFeature
-import DeviceVendorFeature
+import DeviceTypeFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -193,7 +193,7 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleDevDBPathNavigation(action: Path.DevDB.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case let .vendor(.delegate(.openDevice(tag))):
+        case let .type(.delegate(.openDevice(tag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: nil))))
             
         case let .specifications(.delegate(.openDevice(tag, subTag))):
@@ -487,11 +487,11 @@ public struct StackTab: Reducer, Sendable {
             case let .device(goTo):
                 switch goTo {
                 case .index:
-                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(content: .index))))
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .index))))
                 case .brands(let type):
-                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(content: .brands(type)))))
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .brands(type)))))
                 case .vendor(let vendorName, let type):
-                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(content: .vendor(vendorName, type: type)))))
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type)))))
                 case .device(let tag, let subTag):
                     state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
                 }

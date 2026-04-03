@@ -1,5 +1,5 @@
 //
-//  DeviceVendorScreen.swift
+//  DeviceTypeScreen.swift
 //  ForPDA
 //
 //  Created by Xialtal on 2.04.26.
@@ -12,13 +12,13 @@ import SharedUI
 import NukeUI
 import SFSafeSymbols
 
-@ViewAction(for: DeviceVendorFeature.self)
-public struct DeviceVendorScreen: View {
+@ViewAction(for: DeviceTypeFeature.self)
+public struct DeviceTypeScreen: View {
     
-    @Perception.Bindable public var store: StoreOf<DeviceVendorFeature>
+    @Perception.Bindable public var store: StoreOf<DeviceTypeFeature>
     @Environment(\.tintColor) private var tintColor
     
-    public init(store: StoreOf<DeviceVendorFeature>) {
+    public init(store: StoreOf<DeviceTypeFeature>) {
         self.store = store
     }
     
@@ -329,13 +329,13 @@ public struct DeviceVendorScreen: View {
 
 #Preview("Index") {
     NavigationStack {
-        DeviceVendorScreen(
+        DeviceTypeScreen(
             store: Store(
-                initialState: DeviceVendorFeature.State(
+                initialState: DeviceTypeFeature.State(
                     content: .index
                 )
             ) {
-                DeviceVendorFeature()
+                DeviceTypeFeature()
             }
         )
     }
@@ -343,13 +343,13 @@ public struct DeviceVendorScreen: View {
 
 #Preview("Phone Brands") {
     NavigationStack {
-        DeviceVendorScreen(
+        DeviceTypeScreen(
             store: Store(
-                initialState: DeviceVendorFeature.State(
+                initialState: DeviceTypeFeature.State(
                     content: .brands(.phone)
                 )
             ) {
-                DeviceVendorFeature()
+                DeviceTypeFeature()
             }
         )
     }
@@ -357,13 +357,13 @@ public struct DeviceVendorScreen: View {
 
 #Preview("Phone Vendor") {
     NavigationStack {
-        DeviceVendorScreen(
+        DeviceTypeScreen(
             store: Store(
-                initialState: DeviceVendorFeature.State(
+                initialState: DeviceTypeFeature.State(
                     content: .vendor("apple", type: .phone)
                 )
             ) {
-                DeviceVendorFeature()
+                DeviceTypeFeature()
             }
         )
     }

@@ -12,7 +12,7 @@ import Models
 import ToastClient
 
 @Reducer
-public struct DeviceVendorFeature: Reducer, Sendable {
+public struct DeviceTypeFeature: Reducer, Sendable {
     
     public init() {}
     
