@@ -151,6 +151,10 @@ extension Path {
     @MainActor @ViewBuilder
     private static func DevDBViews(_ store: Store<Path.DevDB.State, Path.DevDB.Action>) -> some View {
         switch store.case {
+        case let .vendor(store):
+            DeviceVendorScreen(store: store)
+                .tracking(for: DeviceVendorScreen.self)
+            
         case let .specifications(store):
             DeviceSpecificationsScreen(store: store)
                 .tracking(for: DeviceSpecificationsScreen.self)
