@@ -27,20 +27,18 @@ public struct DeviceVendorFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
-        public let type: DeviceType
-        public let vendorName: String
+        public let content: DeviceTypeContent
         
+        var brands: DeviceBrands?
         var vendor: DeviceVendor?
-        var categorySelection: CategorySelection = .actual
         
+        var categorySelection: CategorySelection = .actual
         var isLoading = false
         
         public init(
-            type: DeviceType,
-            vendorName: String
+            content: DeviceTypeContent
         ) {
-            self.type = type
-            self.vendorName = vendorName
+            self.content = content
         }
     }
     
@@ -51,18 +49,25 @@ public struct DeviceVendorFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case productButtonTapped(String)
+            case typeButtonTapped(DeviceType)
+            case vendorButtonTapped(String, DeviceType)
             case changeCategoryButtonTapped(CategorySelection)
         }
         
         case `internal`(Internal)
         public enum Internal {
-            case loadVendor
+            case loadBrands(DeviceType)
+            case brandsResponse(Result<DeviceBrands, any Error>)
+            
+            case loadVendor(String, DeviceType)
             case vendorResponse(Result<DeviceVendor, any Error>)
         }
         
         case delegate(Delegate)
         public enum Delegate {
+            case openBrands(DeviceType)
             case openDevice(tag: String)
+            case openVendor(String, DeviceType)
         }
     }
     
@@ -78,18 +83,41 @@ public struct DeviceVendorFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                return .send(.internal(.loadVendor))
+                switch state.content {
+                case .brands(let type):
+                    return .send(.internal(.loadBrands(type)))
+                case .vendor(let name, let type):
+                    return .send(.internal(.loadVendor(name, type)))
+                case .index:
+                    break
+                }
+                return .none
                 
             case let .view(.productButtonTapped(tag)):
                 return .send(.delegate(.openDevice(tag: tag)))
+                
+            case let .view(.typeButtonTapped(type)):
+                return .send(.delegate(.openBrands(type)))
+                
+            case let .view(.vendorButtonTapped(name, type)):
+                return .send(.delegate(.openVendor(name, type)))
                 
             case let .view(.changeCategoryButtonTapped(category)):
                 state.categorySelection = category
                 return .none
                 
-            case .internal(.loadVendor):
+            case let .internal(.loadBrands(type)):
+                return .none
+                
+            case let .internal(.brandsResponse(.success(response))):
+                return .none
+                
+            case let .internal(.brandsResponse(.failure(error))):
+                return .none
+                
+            case let .internal(.loadVendor(name, type)):
                 state.isLoading = true
-                return .run { [name = state.vendorName, type = state.type] send in
+                return .run { send in
                     let response = try await apiClient.deviceVendor(name: name, type: type)
                     await send(.internal(.vendorResponse(.success(response))))
                 } catch: { error, send in

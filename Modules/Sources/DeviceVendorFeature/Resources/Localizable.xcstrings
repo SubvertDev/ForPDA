@@ -21,12 +21,55 @@
         }
       }
     },
+    "brands" : {
+
+    },
+    "Devices" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Устройства"
+          }
+        }
+      }
+    },
+    "E-Books" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Эл. книги"
+          }
+        }
+      }
+    },
     "Loading..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загрузка…"
+          }
+        }
+      }
+    },
+    "Pads" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Планшеты"
+          }
+        }
+      }
+    },
+    "Phones" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Телефоны"
           }
         }
       }
@@ -47,6 +90,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Показать все"
+          }
+        }
+      }
+    },
+    "Smart Watch" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Смарт часы"
           }
         }
       }

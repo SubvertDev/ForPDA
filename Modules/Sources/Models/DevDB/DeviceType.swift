@@ -5,9 +5,13 @@
 //  Created by Xialtal on 14.12.25.
 //
 
-public enum DeviceType: String, Sendable {
+public enum DeviceType: String, Sendable, CaseIterable, Identifiable {
     case phone = "phones"
     case ebook = "ebook"
     case pad = "pad"
     case smartWatch = "smartwatch"
+    
+    public var id: String {
+        self.rawValue
+    }
 }

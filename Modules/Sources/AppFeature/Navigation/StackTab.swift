@@ -486,10 +486,12 @@ public struct StackTab: Reducer, Sendable {
                 
             case let .device(goTo):
                 switch goTo {
-                case .index: break
-                case .type(let type): break
+                case .index:
+                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(content: .index))))
+                case .brands(let type):
+                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(content: .brands(type)))))
                 case .vendor(let vendorName, let type):
-                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(type: type, vendorName: vendorName))))
+                    state.path.append(.devDB(.vendor(DeviceVendorFeature.State(content: .vendor(vendorName, type: type)))))
                 case .device(let tag, let subTag):
                     state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
                 }
