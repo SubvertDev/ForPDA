@@ -58,13 +58,15 @@ public struct DeviceVendorScreen: View {
     @ViewBuilder
     private func Products(_ products: [DeviceVendor.Product]) -> some View {
         ForEach(products) { product in
-            if store.categorySelection == .all {
-                ProductRow(product)
-            } else if store.categorySelection == .actual, product.isActual {
-                ProductRow(product)
+            WithPerceptionTracking {
+                if store.categorySelection == .all {
+                    ProductRow(product)
+                } else if store.categorySelection == .actual, product.isActual {
+                    ProductRow(product)
+                }
             }
+            .padding(.horizontal, 16)
         }
-        .padding(.horizontal, 16)
     }
     
     @ViewBuilder
@@ -130,18 +132,20 @@ public struct DeviceVendorScreen: View {
     
     @ViewBuilder
     private func ChangeCategoryButton() -> some View {
-        Button {
-            send(.changeCategoryButtonTapped(store.categorySelection == .all ? .actual : .all))
-        } label: {
-            Text(store.categorySelection == .all ? "Show actual" : "Show all", bundle: .module)
-                .padding(6)
-                .frame(maxWidth: .infinity)
+        WithPerceptionTracking {
+            Button {
+                send(.changeCategoryButtonTapped(store.categorySelection == .all ? .actual : .all))
+            } label: {
+                Text(store.categorySelection == .all ? "Show actual" : "Show all", bundle: .module)
+                    .padding(6)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(tintColor)
+            .frame(height: 48)
+            .background(Color(.Background.primary))
+            .animation(.default, value: store.categorySelection)
         }
-        .buttonStyle(.bordered)
-        .tint(tintColor)
-        .frame(height: 48)
-        .background(Color(.Background.primary))
-        .animation(.default, value: store.categorySelection)
     }
     
     // MARK: - Information Row
