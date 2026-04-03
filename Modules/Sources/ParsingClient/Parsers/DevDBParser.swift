@@ -36,7 +36,7 @@ public struct DevDBParser {
         
         return DeviceSpecifications(
             tag: tag,
-            type: DeviceType(rawValue: type) ?? .unknown,
+            type: DeviceType(rawValue: type)!,
             vendorName: vendorName,
             deviceName: deviceName,
             editionName: editionName,
@@ -48,7 +48,77 @@ public struct DevDBParser {
         )
     }
     
-    // MARK: - Images
+    // MARK: - Device Vendor Response
+    
+    public static func parseDeviceVendor(from string: String) throws(ParsingError) -> DeviceVendor {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let type = array[safe: 2] as? String,
+              let categoryName = array[safe: 3] as? String,
+              let name = array[safe: 4] as? String,
+              let code = array[safe: 5] as? String,
+              let productsRaw = array[safe: 8] as? [[Any]],
+              let imagesRaw = array[safe: 9] as? [[Any]],
+              let specsRaw = array[safe: 10] as? [[Any]],
+              let isMyDevice = array[safe: 11] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return DeviceVendor(
+            type: DeviceType(rawValue: type)!,
+            name: name,
+            code: code,
+            categoryName: categoryName,
+            products: try parseVendorProducts(productsRaw)
+        )
+    }
+    
+    // MARK: - Vendor Products
+    
+    private static func parseVendorProducts(_ productsRaw: [[Any]]) throws(ParsingError) -> [DeviceVendor.Product] {
+        var products: [DeviceVendor.Product] = []
+        for product in productsRaw {
+            guard let tag = product[safe: 0] as? String,
+                  let name = product[safe: 1] as? String,
+                  let url = product[safe: 2] as? String,
+                  let isActual = product[safe: 3] as? Int,
+                  let entriesRaw = product[4] as? [[Any]] else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            products.append(.init(
+                tag: tag,
+                name: name,
+                imageUrl: URL(string: url)!,
+                entries: try parseVendorProductEntry(entriesRaw),
+                isActual: isActual != 0
+            ))
+        }
+        return products
+    }
+    
+    // MARK: - Vendor Product Entry
+    
+    private static func parseVendorProductEntry(_ entriesRaw: [[Any]]) throws(ParsingError) -> [DeviceVendor.Product.Entry] {
+        var entries: [DeviceVendor.Product.Entry] = []
+        for entry in entriesRaw {
+            guard let name = entry[safe: 2] as? String,
+                  let value = entry[safe: 4] as? String else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            entries.append(.init(name: name, value: value))
+        }
+        return entries
+    }
+    
+    // MARK: - Specification Images
     
     private static func parseDeviceImages(_ imagesRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.DeviceImage] {
         var images: [DeviceSpecifications.DeviceImage] = []
@@ -68,7 +138,7 @@ public struct DevDBParser {
         return images
     }
     
-    // MARK: - Editions
+    // MARK: - Specification Editions
     
     private static func parseDeviceEditions(_ editionsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.Edition] {
         var editions: [DeviceSpecifications.Edition] = []
@@ -83,7 +153,7 @@ public struct DevDBParser {
         return editions
     }
     
-    // MARK: - Specifications
+    // MARK: - Device Specifications
     
     private static func parseDeviceSpecifications(_ specsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.Specification] {
         var specs: [DeviceSpecifications.Specification] = []

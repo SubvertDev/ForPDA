@@ -10,5 +10,4 @@ public enum DeviceType: String, Sendable {
     case ebook = "ebook"
     case pad = "pad"
     case smartWatch = "smartwatch"
-    case unknown
 }
