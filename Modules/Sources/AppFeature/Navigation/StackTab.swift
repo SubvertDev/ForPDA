@@ -196,6 +196,12 @@ public struct StackTab: Reducer, Sendable {
         case let .type(.delegate(.openDevice(tag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: nil))))
             
+        case let .type(.delegate(.openBrands(type))):
+            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .brands(type)))))
+            
+        case let .type(.delegate(.openVendor(code, type))):
+            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendor(code, type: type)))))
+            
         case let .specifications(.delegate(.openDevice(tag, subTag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
             
