@@ -61,12 +61,9 @@ public struct DevDBParser {
         
         guard let type = array[safe: 2] as? String,
               let categoryName = array[safe: 3] as? String,
-              let name = array[safe: 4] as? String,
-              let code = array[safe: 5] as? String,
-              let productsRaw = array[safe: 8] as? [[Any]],
-              let imagesRaw = array[safe: 9] as? [[Any]],
-              let specsRaw = array[safe: 10] as? [[Any]],
-              let isMyDevice = array[safe: 11] as? Int else {
+              let name = array[safe: 5] as? String,
+              let code = array[safe: 4] as? String,
+              let productsRaw = array[safe: 6] as? [[Any]] else {
             throw ParsingError.failedToCastFields
         }
         
