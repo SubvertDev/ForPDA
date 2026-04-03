@@ -48,6 +48,52 @@ public struct DevDBParser {
         )
     }
     
+    // MARK: - Device Brands Response
+    
+    public static func parseDeviceBrands(from string: String) throws(ParsingError) -> DeviceBrands {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let type = array[safe: 2] as? String,
+              let typeName = array[safe: 3] as? String,
+              let brandsRaw = array[safe: 4] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return DeviceBrands(
+            type: DeviceType(rawValue: type)!,
+            typeName: typeName,
+            brands: try parseDeviceBrands(brandsRaw)
+        )
+    }
+    
+    // MARK: - Device Brands
+    
+    private static func parseDeviceBrands(_ brandsRaw: [[Any]]) throws(ParsingError) -> [DeviceBrands.Brand] {
+        var brands: [DeviceBrands.Brand] = []
+        for brand in brandsRaw {
+            guard let tag = brand[safe: 0] as? String,
+                  let name = brand[safe: 1] as? String,
+                  let devicesCount = brand[safe: 2] as? Int,
+                  let isActual = brand[safe: 3] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            brands.append(.init(
+                tag: tag,
+                name: name,
+                devicesCount: devicesCount,
+                isActual: isActual != 0
+            ))
+        }
+        return brands
+    }
+    
     // MARK: - Device Vendor Response
     
     public static func parseDeviceVendor(from string: String) throws(ParsingError) -> DeviceVendor {
