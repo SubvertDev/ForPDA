@@ -64,7 +64,7 @@ public struct DeviceTypeScreen: View {
     private func DeviceTypes() -> some View {
         Section {
             ForEach(DeviceType.allCases) { type in
-                Row(symbol: type.icon, title: type.title, type: .navigation) {
+                Row(symbol: type.icon, title: .localized(type.title)) {
                     send(.typeButtonTapped(type))
                 }
             }
@@ -91,11 +91,11 @@ public struct DeviceTypeScreen: View {
             ForEach(vendors) { vendor in
                 WithPerceptionTracking {
                     if store.categorySelection == .all {
-                        Row(title: LocalizedStringKey(vendor.name), type: .navigation) {
+                        Row(title: .text(vendor.name)) {
                             send(.vendorButtonTapped(vendor.tag, type))
                         }
                     } else if store.categorySelection == .actual, vendor.isActual {
-                        Row(title: LocalizedStringKey(vendor.name), type: .navigation) {
+                        Row(title: .text(vendor.name)) {
                             send(.vendorButtonTapped(vendor.tag, type))
                         }
                     }
@@ -238,15 +238,15 @@ public struct DeviceTypeScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
-    // MARK: - Row
-    
-    enum RowType {
-        case basic
-        case navigation
+    public enum RowTitle {
+        case text(String)
+        case localized(LocalizedStringKey)
     }
     
+    // MARK: - Row
+    
     @ViewBuilder
-    private func Row(symbol: SFSymbol? = nil, title: LocalizedStringKey, type: RowType, action: @escaping () -> Void = {}) -> some View {
+    private func Row(symbol: SFSymbol? = nil, title: RowTitle, action: @escaping () -> Void = {}) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
             Button {
                 action()
@@ -260,21 +260,22 @@ public struct DeviceTypeScreen: View {
                             .padding(.trailing, 12)
                     }
                     
-                    Text(title, bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
+                    Group {
+                        switch title {
+                        case .text(let title):
+                            Text(verbatim: title)
+                        case .localized(let title):
+                            Text(title, bundle: .module)
+                        }
+                    }
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
                     
                     Spacer(minLength: 8)
                     
-                    switch type {
-                    case .basic:
-                        EmptyView()
-                        
-                    case .navigation:
-                        Image(systemSymbol: .chevronRight)
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundStyle(Color(.Labels.quintuple))
-                    }
+                    Image(systemSymbol: .chevronRight)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color(.Labels.quintuple))
                 }
                 .contentShape(Rectangle())
             }
