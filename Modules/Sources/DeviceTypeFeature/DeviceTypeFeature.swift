@@ -48,7 +48,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
-            case productButtonTapped(String)
+            case deviceButtonTapped(String)
             case typeButtonTapped(DeviceType)
             case vendorButtonTapped(String, DeviceType)
             case changeCategoryButtonTapped(CategorySelection)
@@ -93,7 +93,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case let .view(.productButtonTapped(tag)):
+            case let .view(.deviceButtonTapped(tag)):
                 return .send(.delegate(.openDevice(tag: tag)))
                 
             case let .view(.typeButtonTapped(type)):

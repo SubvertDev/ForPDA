@@ -141,7 +141,7 @@ public struct DeviceTypeScreen: View {
     private func VendorDeviceInfoRow(_ device: DeviceVendor.DeviceInfo) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Button {
-                send(.productButtonTapped(device.tag))
+                send(.deviceButtonTapped(device.tag))
             } label: {
                 Text(verbatim: device.name)
                     .font(.title2)
