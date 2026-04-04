@@ -154,15 +154,17 @@ public struct DeviceTypeScreen: View {
                 LazyImage(url: device.imageUrl) { state in
                     Group {
                         if let image = state.image {
-                            image.resizable().frame(width: 74, height: 74).scaledToFit()
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 74, height: 74)
                         } else {
                             Color(.systemBackground)
                         }
                     }
                     .skeleton(with: state.isLoading, shape: .rectangle)
                 }
-                .padding(.top, 16)
-                .frame(width: 74, height: 74)
+                .padding(.top, 8)
                 .frame(maxHeight: .infinity, alignment: .top)
                 
                 VendorDeviceSpecifications(device.entries)
