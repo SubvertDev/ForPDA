@@ -67,6 +67,7 @@ public struct APIClient: Sendable {
     public var deleteTopic: @Sendable (_ id: Int) async throws -> Bool
     public var moveTopic: @Sendable (_ id: Int, _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
+    public var setTopicCurator: @Sendable (_ topicId: Int, _ userId: Int, _ reason: String) async throws -> Bool
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
     public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
@@ -388,6 +389,16 @@ extension APIClient: DependencyKey {
                 )
                 let response = try await api.send(command)
                 return try await parser.parseTopicViewers(response)
+            },
+            setTopicCurator: { topicId, userId, reason in
+                let command = ForumCommand.Topic.setCurator(
+                    topicId: topicId,
+                    memberId: userId,
+                    reason: reason
+                )
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             getTemplate: { request, isTopic in
@@ -714,6 +725,9 @@ extension APIClient: DependencyKey {
             },
             getTopicViewers: { _ in
                 return .mock
+            },
+            setTopicCurator: { _, _, _ in
+                return true
             },
             getTemplate: { _, _ in
                 return [.mockTitle, .mockRequiredText, .mockRequiredEditor, .mockEditor, .mockUploadBox]
