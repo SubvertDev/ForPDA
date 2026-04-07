@@ -60,6 +60,7 @@ public struct TopicFeature: Reducer, Sendable {
         @CasePathable
         public enum Alert: Equatable {
             case deletePost(Int)
+            case deleteTopic
         }
     }
     
@@ -231,6 +232,15 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 .cancellable(id: CancelID.loading)
                 
+            case .destination(.presented(.alert(.deleteTopic))):
+                return .run { [id = state.topicId] send in
+                    let status = try await apiClient.deleteTopic(id: id)
+                    let text = status ? Localization.topicDeleted : Localization.topicDeleteError
+                    await toastClient.showToast(ToastMessage(text: text, isError: !status))
+                    await send(.internal(.refresh))
+                }
+                .cancellable(id: CancelID.loading)
+                
             case .binding(\.postsFilter):
                 return .send(.internal(.load))
                 
@@ -372,16 +382,8 @@ public struct TopicFeature: Reducer, Sendable {
                     }
                     
                 case .delete:
-                    return .run { [id = state.topicId] send in
-                        let status = try await apiClient.deleteTopic(id: id)
-                        
-                        await send(.internal(.refresh))
-                        let text = status ? Localization.topicDeleted : Localization.topicDeleteError
-                        await toastClient.showToast(ToastMessage(text: text, isError: !status))
-                    } catch: { error, send in
-                        analyticsClient.capture(error)
-                        await toastClient.showToast(.whoopsSomethingWentWrong)
-                    }
+                    state.destination = .alert(.deleteTopicConfirmation)
+                    return .none
                 }
                 
             case let .view(.contextPostMenu(action)):
@@ -756,6 +758,18 @@ extension AlertState where Action == TopicFeature.Destination.Alert {
             }
         )
     }
+    
+    nonisolated(unsafe) static var deleteTopicConfirmation = AlertState(
+        title: { TextState("Are you sure, that you want to delete this topic?", bundle: .module) },
+        actions: {
+            ButtonState(role: .destructive, action: .deleteTopic) {
+                TextState("Yes", bundle: .module)
+            }
+            ButtonState(role: .cancel) {
+                TextState("No", bundle: .module)
+            }
+        }
+    )
 }
 
 // MARK: - Helpers
