@@ -62,6 +62,7 @@ public struct APIClient: Sendable {
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
+    public var hideTopic: @Sendable (_ id: Int, _ isUndo: Bool) async throws -> Bool
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
     public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
@@ -349,6 +350,12 @@ extension APIClient: DependencyKey {
                 )
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
+            },
+            hideTopic: { id, isUndo in
+                let command = ForumCommand.Topic.setHidden(id: id, isHidden: !isUndo)
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             getTopicViewers: { topicId in
                 let command = MemberCommand.sessions(
@@ -668,6 +675,9 @@ extension APIClient: DependencyKey {
             },
             getTopic: { _, _, _, _ in
                 return .mock
+            },
+            hideTopic: { _, _ in
+                return true
             },
             getTopicViewers: { _ in
                 return .mock
