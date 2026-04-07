@@ -238,12 +238,12 @@ public struct DeviceTypeScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
-    public enum RowTitle {
+    // MARK: - Row
+    
+    private enum RowTitle {
         case text(String)
         case localized(LocalizedStringKey)
     }
-    
-    // MARK: - Row
     
     @ViewBuilder
     private func Row(symbol: SFSymbol? = nil, title: RowTitle, action: @escaping () -> Void = {}) -> some View {
