@@ -246,6 +246,11 @@ public struct TopicScreen: View {
                 send(.contextToolsMenu(.close))
             }
             
+            if topic.canDelete {
+                ContextButton(text: LocalizedStringResource("Delete Topic", bundle: .module), symbol: .trash) {
+                    send(.contextToolsMenu(.delete))
+                }
+            }
         } label: {
             HStack {
                 Text("Tools", bundle: .module)

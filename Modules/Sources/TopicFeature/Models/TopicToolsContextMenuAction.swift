@@ -8,4 +8,5 @@
 public enum TopicToolsContextMenuAction {
     case hide
     case close
+    case delete
 }

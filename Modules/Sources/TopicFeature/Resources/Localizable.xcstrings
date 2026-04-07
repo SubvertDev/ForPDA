@@ -81,6 +81,16 @@
         }
       }
     },
+    "Delete Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить тему"
+          }
+        }
+      }
+    },
     "Down" : {
       "localizations" : {
         "ru" : {
@@ -321,12 +331,32 @@
         }
       }
     },
+    "Topic deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема удалена"
+          }
+        }
+      }
+    },
     "Topic Hat" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Шапка темы"
+          }
+        }
+      }
+    },
+    "Unable to delete topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось удалить тему"
           }
         }
       }

@@ -36,6 +36,8 @@ public struct TopicFeature: Reducer, Sendable {
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
+        static let topicDeleted = LocalizedStringResource("Topic deleted", bundle: .module)
+        static let topicDeleteError = LocalizedStringResource("Unable to delete topic", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
@@ -364,6 +366,18 @@ public struct TopicFeature: Reducer, Sendable {
                         
                         await send(.internal(.refresh))
                         await toastClient.showToast(.actionCompleted)
+                    } catch: { error, send in
+                        analyticsClient.capture(error)
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    }
+                    
+                case .delete:
+                    return .run { [id = state.topicId] send in
+                        let status = try await apiClient.deleteTopic(id: id)
+                        
+                        await send(.internal(.refresh))
+                        let text = status ? Localization.topicDeleted : Localization.topicDeleteError
+                        await toastClient.showToast(ToastMessage(text: text, isError: !status))
                     } catch: { error, send in
                         analyticsClient.capture(error)
                         await toastClient.showToast(.whoopsSomethingWentWrong)
