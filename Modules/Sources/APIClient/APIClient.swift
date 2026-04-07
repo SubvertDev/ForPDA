@@ -439,7 +439,7 @@ extension APIClient: DependencyKey {
 			},
             
             deletePosts: { ids in
-                let command = ForumCommand.Post.delete(postIds: ids)
+                let command = ForumCommand.Post.delete(postIds: ids, isUndo: false)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
