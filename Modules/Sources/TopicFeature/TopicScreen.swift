@@ -199,6 +199,8 @@ public struct TopicScreen: View {
                 
                 if topic.canModerate {
                     Section {
+                        ToolsOptionsMenu(topic: topic)
+                        
                         Menu {
                             Picker(String(), selection: $store.postsFilter) {
                                 ForEach(TopicPostsFilter.allCases) { mode in
@@ -218,6 +220,28 @@ public struct TopicScreen: View {
         } label: {
             Image(systemSymbol: .ellipsisCircle)
                 .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    // MARK: - Tools Options Menu
+    
+    @ViewBuilder
+    private func ToolsOptionsMenu(topic: Topic) -> some View {
+        Menu {
+            ContextButton(
+                text: topic.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                send(.contextToolsMenu(.hide))
+            }
+            
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
+            }
         }
     }
     

@@ -140,6 +140,7 @@ public struct TopicFeature: Reducer, Sendable {
             case imageTapped(URL)
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
+            case contextToolsMenu(TopicToolsContextMenuAction)
             case contextPostMenu(PostMenuAction)
         }
         
@@ -341,6 +342,21 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .goToEnd:
                     return .send(.pageNavigation(.lastPageTapped))
+                }
+                
+            case let .view(.contextToolsMenu(action)):
+                guard let topic = state.topic else { return .none }
+                switch action {
+                case .hide:
+                    return .run { [id = state.topicId] send in
+                        _ = try await apiClient.hideTopic(id: id, isUndo: !topic.isHidden)
+                        
+                        await send(.internal(.refresh))
+                        await toastClient.showToast(.actionCompleted)
+                    } catch: { error, send in
+                        analyticsClient.capture(error)
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    }
                 }
                 
             case let .view(.contextPostMenu(action)):

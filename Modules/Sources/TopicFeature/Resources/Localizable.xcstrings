@@ -101,6 +101,16 @@
         }
       }
     },
+    "Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть тему"
+          }
+        }
+      }
+    },
     "Link copied" : {
       "localizations" : {
         "ru" : {
@@ -221,6 +231,16 @@
         }
       }
     },
+    "Remove Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать скрытие темы"
+          }
+        }
+      }
+    },
     "Removed from favorites" : {
       "localizations" : {
         "ru" : {
@@ -267,6 +287,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
+    "Tools" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструменты"
           }
         }
       }
