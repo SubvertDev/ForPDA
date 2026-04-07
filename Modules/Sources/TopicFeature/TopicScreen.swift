@@ -237,6 +237,15 @@ public struct TopicScreen: View {
                 send(.contextToolsMenu(.hide))
             }
             
+            ContextButton(
+                text: topic.isClosed
+                ? LocalizedStringResource("Open Topic", bundle: .module)
+                : LocalizedStringResource("Close Topic", bundle: .module),
+                symbol: topic.isClosed ? .lockFill : .lock
+            ) {
+                send(.contextToolsMenu(.close))
+            }
+            
         } label: {
             HStack {
                 Text("Tools", bundle: .module)

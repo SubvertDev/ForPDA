@@ -61,6 +61,16 @@
         }
       }
     },
+    "Close Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть тему"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
@@ -177,6 +187,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открыть в браузере"
+          }
+        }
+      }
+    },
+    "Open Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть тему"
           }
         }
       }

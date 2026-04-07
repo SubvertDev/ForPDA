@@ -95,6 +95,10 @@ extension TopicFeature {
                     case .writePostWithTemplate:
                         analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
+                    
+                case .view(.contextToolsMenu(_)):
+                    // TODO: At now moment, moderator tools are skip analytics
+                    break
 
                 case let .view(.textQuoted(post, _)):
                     analytics.log(TopicEvent.textQuoted(post.id))

@@ -357,6 +357,17 @@ public struct TopicFeature: Reducer, Sendable {
                         analyticsClient.capture(error)
                         await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
+                    
+                case .close:
+                    return .run { [id = state.topicId] send in
+                        _ = try await apiClient.hideTopic(id: id, isUndo: !topic.isClosed)
+                        
+                        await send(.internal(.refresh))
+                        await toastClient.showToast(.actionCompleted)
+                    } catch: { error, send in
+                        analyticsClient.capture(error)
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    }
                 }
                 
             case let .view(.contextPostMenu(action)):
