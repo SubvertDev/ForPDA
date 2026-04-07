@@ -64,6 +64,7 @@ public struct APIClient: Sendable {
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var hideTopic: @Sendable (_ id: Int, _ isUndo: Bool) async throws -> Bool
     public var closeTopic: @Sendable (_ id: Int, _ isUndo: Bool) async throws -> Bool
+    public var deleteTopic: @Sendable (_ id: Int) async throws -> Bool
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
     public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
@@ -361,6 +362,11 @@ extension APIClient: DependencyKey {
             closeTopic: { id, isUndo in
                 let command = ForumCommand.Topic.setClosed(id: id, isClosed: !isUndo)
                 let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            deleteTopic: { id in
+                let response = try await api.send(ForumCommand.Topic.delete(id: id))
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
@@ -687,6 +693,9 @@ extension APIClient: DependencyKey {
                 return true
             },
             closeTopic: { _, _ in
+                return true
+            },
+            deleteTopic: { _ in
                 return true
             },
             getTopicViewers: { _ in
