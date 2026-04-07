@@ -372,7 +372,7 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .close:
                     return .run { [id = state.topicId] send in
-                        _ = try await apiClient.hideTopic(id: id, isUndo: !topic.isClosed)
+                        _ = try await apiClient.closeTopic(id: id, isUndo: !topic.isClosed)
                         
                         await send(.internal(.refresh))
                         await toastClient.showToast(.actionCompleted)
