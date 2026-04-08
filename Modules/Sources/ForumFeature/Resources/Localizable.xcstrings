@@ -31,6 +31,16 @@
         }
       }
     },
+    "Close" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть тему"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
@@ -51,12 +61,32 @@
         }
       }
     },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить тему"
+          }
+        }
+      }
+    },
     "Go To End" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перейти в конец"
+          }
+        }
+      }
+    },
+    "Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыть тему"
           }
         }
       }
@@ -111,6 +141,16 @@
         }
       }
     },
+    "Pin" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрепить тему"
+          }
+        }
+      }
+    },
     "Pinned topics" : {
       "localizations" : {
         "ru" : {
@@ -131,6 +171,16 @@
         }
       }
     },
+    "Remove Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать тему"
+          }
+        }
+      }
+    },
     "Subforums" : {
       "localizations" : {
         "ru" : {
@@ -141,12 +191,32 @@
         }
       }
     },
+    "Tools" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструменты"
+          }
+        }
+      }
+    },
     "Topics" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Темы"
+          }
+        }
+      }
+    },
+    "Unpin" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открепить тему"
           }
         }
       }

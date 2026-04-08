@@ -120,6 +120,7 @@ public struct ForumFeature: Reducer, Sendable {
             
             case contextOptionMenu(ForumOptionContextMenuAction)
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
+            case contextTopicToolsMenu(TopicModifyAction, Int, Bool)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
         
@@ -242,6 +243,20 @@ public struct ForumFeature: Reducer, Sendable {
                         .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
                         .send(.internal(.refresh))
                     )
+                }
+                
+            case let .view(.contextTopicToolsMenu(action, topicId, isUndo)):
+                return .run { send in
+                    let status = try await apiClient.modifyForum(
+                        ids: [topicId],
+                        type: .topic(action),
+                        isUndo: isUndo
+                    )
+                    await send(.internal(.refresh))
+                    await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                } catch: { error, send in
+                    analyticsClient.capture(error)
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
             case .view(.contextCommonMenu(let action, let id, let isForum)):

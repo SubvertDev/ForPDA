@@ -212,6 +212,10 @@ public struct ForumScreen: View {
                             
                             Section {
                                 CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                                
+                                if topic.canModerate {
+                                    TopicToolsContextMenu(topic: topic)
+                                }
                             }
                         }
                         .listRowBackground(
@@ -250,6 +254,51 @@ public struct ForumScreen: View {
                 ContextButton(text: LocalizedStringResource("Go To End", bundle: .module), symbol: .chevronRight2) {
                     send(.contextTopicMenu(.goToEnd, topic))
                 }
+            }
+        }
+    }
+    
+    // MARK: - Topic Tools Context Menu
+    
+    @ViewBuilder
+    private func TopicToolsContextMenu(topic: TopicInfo) -> some View {
+        Menu {
+            ContextButton(
+                text: topic.isPinned
+                ? LocalizedStringResource("Unpin", bundle: .module)
+                : LocalizedStringResource("Pin", bundle: .module),
+                symbol: topic.isPinned ? .pinFill : .pin
+            ) {
+                send(.contextTopicToolsMenu(.pin, topic.id, !topic.isPinned))
+            }
+            
+            ContextButton(
+                text: topic.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                send(.contextTopicToolsMenu(.hide, topic.id, !topic.isHidden))
+            }
+            
+            ContextButton(
+                text: topic.isClosed
+                ? LocalizedStringResource("Open", bundle: .module)
+                : LocalizedStringResource("Close", bundle: .module),
+                symbol: topic.isClosed ? .lockFill : .lock
+            ) {
+                send(.contextTopicToolsMenu(.close, topic.id, !topic.isClosed))
+            }
+            
+            if topic.canDelete {
+                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
+                    send(.contextTopicToolsMenu(.delete, topic.id, false))
+                }
+            }
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
             }
         }
     }

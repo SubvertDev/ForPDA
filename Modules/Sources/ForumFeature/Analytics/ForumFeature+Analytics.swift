@@ -56,6 +56,10 @@ extension ForumFeature {
                         break // TODO: Add
                     }
                     
+                case .view(.contextTopicToolsMenu(_, _, _)):
+                    // MARK: Moderator tools are skip analytics
+                    break
+                    
                 case let .view(.contextTopicMenu(option, topic)):
                     switch option {
                     case .open:
