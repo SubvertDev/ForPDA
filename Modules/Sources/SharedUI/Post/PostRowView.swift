@@ -119,7 +119,7 @@ public struct PostRowView: View {
                 }
             }
             
-            if state.isContextMenuAvailable, state.isUserAuthorized, state.canPostInTopic {
+            if state.isContextMenuAvailable {
                 ContextMenu()
             }
         }
@@ -174,9 +174,11 @@ public struct PostRowView: View {
     
     private func ContextMenu() -> some View {
         Menu {
-            Section {
-                ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
-                    menuAction(.reply(state.post.id, state.post.post.author.name))
+            if state.canPostInTopic {
+                Section {
+                    ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
+                        menuAction(.reply(state.post.id, state.post.post.author.name))
+                    }
                 }
             }
             
@@ -192,8 +194,10 @@ public struct PostRowView: View {
                 }
             }
             
-            ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
-                menuAction(.report(state.post.id))
+            if state.isUserAuthorized {
+                ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
+                    menuAction(.report(state.post.id))
+                }
             }
             
             if state.post.post.canDelete {
