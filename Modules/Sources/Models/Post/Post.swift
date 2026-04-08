@@ -20,8 +20,16 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let lastEdit: LastEdit?
     private let rawKarma: Int
     
-    public var isDeleted: Bool {
+    public var isPinned: Bool {
+        return flag.contains(.pinned)
+    }
+    
+    public var isHidden: Bool {
         return flag.contains(.hidden)
+    }
+    
+    public var isDeleted: Bool {
+        return flag.contains(.closed)
     }
     
     public var isProtected: Bool {

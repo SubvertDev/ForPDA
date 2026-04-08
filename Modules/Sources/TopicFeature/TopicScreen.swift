@@ -234,7 +234,7 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextToolsMenu(.hide))
+                send(.contextToolsMenu(.hide, !topic.isHidden))
             }
             
             ContextButton(
@@ -243,12 +243,12 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Close Topic", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextToolsMenu(.close))
+                send(.contextToolsMenu(.close, !topic.isClosed))
             }
             
             if topic.canDelete {
                 ContextButton(text: LocalizedStringResource("Delete Topic", bundle: .module), symbol: .trash) {
-                    send(.contextToolsMenu(.delete))
+                    send(.contextToolsMenu(.delete, false))
                 }
             }
         } label: {
@@ -385,8 +385,6 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.reply(id, authorName)))
                 case .edit(let post):
                     send(.contextPostMenu(.edit(post)))
-                case .delete(let postId):
-                    send(.contextPostMenu(.delete(postId)))
                 case .karma(let postId):
                     send(.contextPostMenu(.karma(postId)))
                 case .report(let postId):
@@ -399,6 +397,8 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.mentions(postId)))
                 case .copyLink(let postId):
                     send(.contextPostMenu(.copyLink(postId)))
+                case .tools(let action, let postId, let isUndo):
+                    send(.contextPostMenu(.tools(action, postId, isUndo)))
                 }
             }
         )

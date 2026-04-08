@@ -35,6 +35,10 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         return flag.contains(.canModerate)
     }
     
+    public var isPinned: Bool {
+        return flag.contains(.pinned)
+    }
+    
     public var isHidden: Bool {
         return flag.contains(.hidden)
     }

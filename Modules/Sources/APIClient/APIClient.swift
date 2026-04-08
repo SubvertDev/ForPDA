@@ -62,9 +62,7 @@ public struct APIClient: Sendable {
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
-    public var hideTopic: @Sendable (_ id: Int, _ isUndo: Bool) async throws -> Bool
-    public var closeTopic: @Sendable (_ id: Int, _ isUndo: Bool) async throws -> Bool
-    public var deleteTopic: @Sendable (_ id: Int) async throws -> Bool
+    public var modifyForum: @Sendable (_ ids: [Int], _ type: ForumModifyType, _ isUndo: Bool) async throws -> Bool
     public var moveTopic: @Sendable (_ id: Int, _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var setTopicCurator: @Sendable (_ topicId: Int, _ userId: Int, _ reason: String) async throws -> Bool
@@ -76,7 +74,6 @@ public struct APIClient: Sendable {
     public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> PreviewResponse
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
-    public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
     public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
     public var voteInTopicPoll: @Sendable (_ topicId: Int, _ selections: [[Int]]) async throws -> Bool
     
@@ -355,20 +352,13 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
-            hideTopic: { id, isUndo in
-                let command = ForumCommand.Topic.setHidden(id: id, isHidden: !isUndo)
+            modifyForum: { ids, type, isUndo in
+                let command = ForumCommand.modify(
+                    ids: ids,
+                    type: type.transfer,
+                    isUndo: isUndo
+                )
                 let response = try await api.send(command)
-                let status = Int(response.getResponseStatus())!
-                return status == 0
-            },
-            closeTopic: { id, isUndo in
-                let command = ForumCommand.Topic.setClosed(id: id, isClosed: !isUndo)
-                let response = try await api.send(command)
-                let status = Int(response.getResponseStatus())!
-                return status == 0
-            },
-            deleteTopic: { id in
-                let response = try await api.send(ForumCommand.Topic.delete(id: id))
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
@@ -472,13 +462,6 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 return try await parser.parsePostSendResponse(response)
 			},
-            
-            deletePosts: { ids in
-                let command = ForumCommand.Post.delete(postIds: ids, isUndo: false)
-                let response = try await api.send(command)
-                let status = Int(response.getResponseStatus())!
-                return status == 0
-            },
             
             postKarma: { id, isUp in
                 let command = ForumCommand.Post.karma(
@@ -711,13 +694,7 @@ extension APIClient: DependencyKey {
             getTopic: { _, _, _, _ in
                 return .mock
             },
-            hideTopic: { _, _ in
-                return true
-            },
-            closeTopic: { _, _ in
-                return true
-            },
-            deleteTopic: { _ in
+            modifyForum: { _, _, _ in
                 return true
             },
             moveTopic: { _, _, _ in
@@ -753,9 +730,6 @@ extension APIClient: DependencyKey {
             editPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
 			},
-            deletePosts: { _ in
-                return true
-            },
             postKarma: { _, _ in
                 return true
             },

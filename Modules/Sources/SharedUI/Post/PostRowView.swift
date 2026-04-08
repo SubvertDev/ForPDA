@@ -202,8 +202,12 @@ public struct PostRowView: View {
             
             if state.post.post.canDelete {
                 ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    menuAction(.delete(state.post.id))
+                    menuAction(.tools(.delete, state.post.id, false))
                 }
+            }
+            
+            if state.post.post.canModerate {
+                ToolsContextMenu()
             }
             
             Section {
@@ -240,6 +244,51 @@ public struct PostRowView: View {
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 8, height: 22)
+    }
+    
+    // MARK: - Tools Context Menu
+    
+    @ViewBuilder
+    private func ToolsContextMenu() -> some View {
+        Menu {
+            if state.post.post.isDeleted {
+                ContextButton(text: LocalizedStringResource("Recover", bundle: .module), symbol: .trashSlash) {
+                    menuAction(.tools(.delete, state.post.id, true))
+                }
+            }
+            
+            ContextButton(
+                text: state.post.post.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: state.post.post.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                menuAction(.tools(.hide, state.post.id, !state.post.post.isHidden))
+            }
+            
+            ContextButton(
+                text: state.post.post.isPinned
+                ? LocalizedStringResource("Unpin", bundle: .module)
+                : LocalizedStringResource("Pin", bundle: .module),
+                symbol: state.post.post.isPinned ? .pinFill : .pin
+            ) {
+                menuAction(.tools(.pin, state.post.id, !state.post.post.isPinned))
+            }
+            
+            ContextButton(
+                text: state.post.post.isProtected
+                ? LocalizedStringResource("Remove Protection", bundle: .module)
+                : LocalizedStringResource("Protect", bundle: .module),
+                symbol: state.post.post.isProtected ? .shieldFill : .shield
+            ) {
+                menuAction(.tools(.protect, state.post.id, !state.post.post.isProtected))
+            }
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
+            }
+        }
     }
 }
 

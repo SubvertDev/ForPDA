@@ -66,8 +66,6 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostEdit(post.id))
                     case .report(let postId):
                         analytics.log(TopicEvent.menuPostReport(postId))
-                    case .delete(let postId):
-                        analytics.log(TopicEvent.menuPostDelete(postId))
                     case .changeReputation(let postId, let userId, _):
                         analytics.log(TopicEvent.menuChangeReputation(postId, userId))
                     case .userPostsInTopic(let userId):
@@ -76,6 +74,16 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostMentions(postId))
                     case .copyLink(let postId):
                         analytics.log(TopicEvent.menuPostCopyLink(postId))
+                    case .tools(let action, let postId, let isUndo):
+                        switch action {
+                        case .delete:
+                            if !isUndo {
+                                analytics.log(TopicEvent.menuPostDelete(postId))
+                            }
+                        default:
+                            // MARK: Moderator tools are skip analytics
+                            break
+                        }
                     }
                     
                 case let .view(.contextMenu(option)):
@@ -96,8 +104,8 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
                     
-                case .view(.contextToolsMenu(_)):
-                    // TODO: At now moment, moderator tools are skip analytics
+                case .view(.contextToolsMenu(_, _)):
+                    // MARK: Moderator tools are skip analytics
                     break
 
                 case let .view(.textQuoted(post, _)):

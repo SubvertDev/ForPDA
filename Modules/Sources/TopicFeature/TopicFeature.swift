@@ -143,7 +143,7 @@ public struct TopicFeature: Reducer, Sendable {
             case imageTapped(URL)
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
-            case contextToolsMenu(TopicToolsContextMenuAction)
+            case contextToolsMenu(TopicModifyAction, Bool)
             case contextPostMenu(PostMenuAction)
         }
         
@@ -225,7 +225,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .destination(.presented(.alert(.deletePost(id)))):
                 return .run { send in
-                    let status = try await apiClient.deletePosts(postIds: [id])
+                    let status = try await apiClient.modifyForum(ids: [id], type: .post(.delete), isUndo: false)
                     let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
                     await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
                     await send(.internal(.refresh))
@@ -234,7 +234,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .destination(.presented(.alert(.deleteTopic))):
                 return .run { [id = state.topicId] send in
-                    let status = try await apiClient.deleteTopic(id: id)
+                    let status = try await apiClient.modifyForum(ids: [id], type: .topic(.delete), isUndo: false)
                     let text = status ? Localization.topicDeleted : Localization.topicDeleteError
                     await toastClient.showToast(ToastMessage(text: text, isError: !status))
                     await send(.internal(.refresh))
@@ -356,23 +356,12 @@ public struct TopicFeature: Reducer, Sendable {
                     return .send(.pageNavigation(.lastPageTapped))
                 }
                 
-            case let .view(.contextToolsMenu(action)):
+            case let .view(.contextToolsMenu(action, isUndo)):
                 guard let topic = state.topic else { return .none }
                 switch action {
-                case .hide:
+                case .hide, .close:
                     return .run { [id = state.topicId] send in
-                        _ = try await apiClient.hideTopic(id: id, isUndo: !topic.isHidden)
-                        
-                        await send(.internal(.refresh))
-                        await toastClient.showToast(.actionCompleted)
-                    } catch: { error, send in
-                        analyticsClient.capture(error)
-                        await toastClient.showToast(.whoopsSomethingWentWrong)
-                    }
-                    
-                case .close:
-                    return .run { [id = state.topicId] send in
-                        _ = try await apiClient.closeTopic(id: id, isUndo: !topic.isClosed)
+                        _ = try await apiClient.modifyForum(ids: [id], type: .topic(action), isUndo: isUndo)
                         
                         await send(.internal(.refresh))
                         await toastClient.showToast(.actionCompleted)
@@ -383,6 +372,9 @@ public struct TopicFeature: Reducer, Sendable {
                     
                 case .delete:
                     state.destination = .alert(.deleteTopicConfirmation)
+                    return .none
+                    
+                default:
                     return .none
                 }
                 
@@ -415,10 +407,6 @@ public struct TopicFeature: Reducer, Sendable {
                 case let .report(id):
                     let feature = FormFeature.State(type: .report(id: id, type: .post))
                     state.destination = .form(feature)
-                    return .none
-                    
-                case .delete(let id):
-                    state.destination = .alert(.deletePostConfirmation(postId: id))
                     return .none
                     
                 case .karma(let id):
@@ -455,6 +443,23 @@ public struct TopicFeature: Reducer, Sendable {
                     pasteboardClient.copy(link)
                     return .run { _ in
                         await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
+                    }
+                    
+                case .tools(let action, let postId, let isUndo):
+                    switch action {
+                    case .pin, .hide, .protect:
+                        return .run { [id = state.topicId] send in
+                            _ = try await apiClient.modifyForum(ids: [id], type: .post(action), isUndo: isUndo)
+                            
+                            await send(.internal(.refresh))
+                            await toastClient.showToast(.actionCompleted)
+                        } catch: { error, send in
+                            analyticsClient.capture(error)
+                            await toastClient.showToast(.whoopsSomethingWentWrong)
+                        }
+                    case .delete:
+                        state.destination = .alert(.deletePostConfirmation(postId: postId))
+                        return .none
                     }
                 }
                 
