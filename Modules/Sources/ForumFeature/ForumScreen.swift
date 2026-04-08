@@ -409,10 +409,6 @@ extension Forum {
                 )
             ) {
                 ForumFeature()
-            } withDependencies: {
-                $0.apiClient.getForum = { @Sendable _, _, _, _ in
-                    return .finished()
-                }
             }
         )
     }

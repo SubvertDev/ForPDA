@@ -677,7 +677,9 @@ extension APIClient: DependencyKey {
                 return .finished()
             },
             getForum: { _, _, _, _ in
-                return .finished()
+                let (stream, continuation) = AsyncThrowingStream.makeStream(of: Forum.self)
+                continuation.yield(with: .success(.mock))
+                return stream
             },
             getForumStat: { _ in
                 return .mock
