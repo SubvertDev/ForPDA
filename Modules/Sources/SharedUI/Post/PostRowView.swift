@@ -252,7 +252,10 @@ public struct PostRowView: View {
     private func ToolsContextMenu() -> some View {
         Menu {
             if state.post.post.isDeleted {
-                ContextButton(text: LocalizedStringResource("Recover", bundle: .module), symbol: .trashSlash) {
+                ContextButton(
+                    text: LocalizedStringResource("Restore", bundle: .module),
+                    symbol: .arrowCounterclockwiseCircle
+                ) {
                     menuAction(.tools(.delete, state.post.id, true))
                 }
             }

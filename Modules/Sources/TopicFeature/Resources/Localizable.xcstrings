@@ -71,6 +71,16 @@
         }
       }
     },
+    "Are you sure, that you want to restore this post?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите восстановить этот пост?"
+          }
+        }
+      }
+    },
     "Close Topic" : {
       "localizations" : {
         "ru" : {
@@ -247,6 +257,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Голос засчитан"
+          }
+        }
+      }
+    },
+    "Post restored" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост восстановлен"
           }
         }
       }

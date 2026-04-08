@@ -167,16 +167,6 @@
         }
       }
     },
-    "Recover" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Восстановить"
-          }
-        }
-      }
-    },
     "Remove Hide" : {
       "localizations" : {
         "ru" : {
@@ -223,6 +213,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Репутация"
+          }
+        }
+      }
+    },
+    "Restore" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановить"
           }
         }
       }

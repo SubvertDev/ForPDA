@@ -39,6 +39,7 @@ public struct TopicFeature: Reducer, Sendable {
         static let topicDeleted = LocalizedStringResource("Topic deleted", bundle: .module)
         static let topicDeleteError = LocalizedStringResource("Unable to delete topic", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
+        static let postRestored = LocalizedStringResource("Post restored", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
         static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
@@ -59,7 +60,7 @@ public struct TopicFeature: Reducer, Sendable {
         
         @CasePathable
         public enum Alert: Equatable {
-            case deletePost(Int)
+            case deletePost(Int, Bool)
             case deleteTopic
         }
     }
@@ -223,10 +224,13 @@ public struct TopicFeature: Reducer, Sendable {
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
-            case let .destination(.presented(.alert(.deletePost(id)))):
+            case let .destination(.presented(.alert(.deletePost(id, isUndo)))):
                 return .run { send in
-                    let status = try await apiClient.modifyForum(ids: [id], type: .post(.delete), isUndo: false)
-                    let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
+                    let status = try await apiClient.modifyForum(ids: [id], type: .post(.delete), isUndo: isUndo)
+                    let postDeletedToast = ToastMessage(
+                        text: isUndo ? Localization.postRestored : Localization.postDeleted,
+                        haptic: .success
+                    )
                     await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
                     await send(.internal(.refresh))
                 }
@@ -357,7 +361,6 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 
             case let .view(.contextToolsMenu(action, isUndo)):
-                guard let topic = state.topic else { return .none }
                 switch action {
                 case .hide, .close:
                     return .run { [id = state.topicId] send in
@@ -458,7 +461,7 @@ public struct TopicFeature: Reducer, Sendable {
                             await toastClient.showToast(.whoopsSomethingWentWrong)
                         }
                     case .delete:
-                        state.destination = .alert(.deletePostConfirmation(postId: postId))
+                        state.destination = .alert(.deletePostConfirmation(postId: postId, isUndo: isUndo))
                         return .none
                     }
                 }
@@ -750,11 +753,17 @@ extension TopicFeature.Destination.State: Equatable {}
 
 extension AlertState where Action == TopicFeature.Destination.Alert {
     
-    nonisolated static func deletePostConfirmation(postId: Int) -> AlertState {
+    nonisolated static func deletePostConfirmation(postId: Int, isUndo: Bool) -> AlertState {
         return AlertState(
-            title: { TextState("Are you sure, that you want to delete this post?", bundle: .module) },
+            title: {
+                if isUndo {
+                    TextState("Are you sure, that you want to restore this post?", bundle: .module)
+                } else {
+                    TextState("Are you sure, that you want to delete this post?", bundle: .module)
+                }
+            },
             actions: {
-                ButtonState(role: .destructive, action: .deletePost(postId)) {
+                ButtonState(role: .destructive, action: .deletePost(postId, isUndo)) {
                     TextState("Yes", bundle: .module)
                 }
                 ButtonState(role: .cancel) {
