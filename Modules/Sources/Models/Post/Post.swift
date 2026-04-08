@@ -159,7 +159,7 @@ public extension Post {
     static func mock(id: Int = 0) -> Post {
         return Post(
             id: id,
-            flag: [.canDelete, .canEdit, .canModerate],
+            flag: [.closed, .hidden, .canDelete, .canEdit, .canModerate, .canProtect],
             content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
             author: Author(
                 id: 6176341,
