@@ -129,7 +129,7 @@ public extension Topic {
         id: 3242552,
         name: "ForPDA",
         description: "Unofficial 4PDA client for iOS.",
-        flag: [.canEdit, .canPost, .canDelete, .canModerate, .canProtect],
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         createdAt: Date(timeIntervalSince1970: 1725706883),
         authorId: 3640948,
         authorName: "4spander",
