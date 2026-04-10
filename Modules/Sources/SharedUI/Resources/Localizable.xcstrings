@@ -237,6 +237,26 @@
         }
       }
     },
+    "This post deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот пост удалён"
+          }
+        }
+      }
+    },
+    "This post hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Этот пост скрыт"
+          }
+        }
+      }
+    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {

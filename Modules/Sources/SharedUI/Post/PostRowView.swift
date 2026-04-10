@@ -46,6 +46,7 @@ public struct PostRowView: View {
             if let lastEdit = state.post.post.lastEdit {
                 Footer(lastEdit)
             }
+            PostStatus()
         }
     }
     
@@ -146,6 +147,27 @@ public struct PostRowView: View {
                 )
             }
         }
+    }
+    
+    // MARK: - Post Status
+    
+    @ViewBuilder
+    private func PostStatus() -> some View {
+        if state.post.post.isDeleted {
+            PostStatusLabel(icon: .trash, text: "This post deleted")
+        } else if state.post.post.isHidden {
+            PostStatusLabel(icon: .eyeSlash, text: "This post hidden")
+        }
+    }
+        
+    private func PostStatusLabel(icon: SFSymbol, text: LocalizedStringKey) -> some View {
+        HStack(spacing: 6) {
+            Image(systemSymbol: icon)
+            Text(text, bundle: .module)
+        }
+        .font(.caption2)
+        .foregroundStyle(.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     // MARK: - Footer
