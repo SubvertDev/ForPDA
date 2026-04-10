@@ -57,6 +57,37 @@ public struct TopicParser {
         )
     }
     
+    // MARK: - Post Karma History
+    
+    public static func parsePostKarmaHistory(from string: String) throws (ParsingError) -> [PostKarmaVote] {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let votesRaw = array[safe: 2] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return try! votesRaw.map { vote in
+            guard let timestamp = vote[safe: 0] as? Int,
+                  let userId = vote[safe: 1] as? Int,
+                  let nickname = vote[safe: 2] as? String,
+                  let vote = vote[safe: 3] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            return PostKarmaVote(
+                userId: userId,
+                nickname: nickname,
+                voteDate: Date(timeIntervalSince1970: TimeInterval(timestamp)),
+                vote: vote
+            )
+        }
+    }
+    
     // MARK: - Viewers
     
     public static func parseTopicViewers(from string: String) throws (ParsingError) -> TopicViewers {

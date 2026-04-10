@@ -75,6 +75,7 @@ public struct APIClient: Sendable {
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
     public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
+    public var postKarmaHistory: @Sendable (_ postId: Int) async throws -> [PostKarmaVote]
     public var voteInTopicPoll: @Sendable (_ topicId: Int, _ selections: [[Int]]) async throws -> Bool
     
     // Favorites
@@ -472,6 +473,11 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
+            postKarmaHistory: { postId in
+                let command = ForumCommand.Post.history(id: postId)
+                let response = try await api.send(command)
+                return try await parser.parsePostKarmaHistory(response)
+            },
             
             voteInTopicPoll: { topicId, selections in
                 let command = ForumCommand.Topic.Poll.vote(topicId: topicId, selections: selections)
@@ -734,6 +740,9 @@ extension APIClient: DependencyKey {
 			},
             postKarma: { _, _ in
                 return true
+            },
+            postKarmaHistory: { _ in
+                return .mock
             },
             voteInTopicPoll: { _, _ in
                 return true
