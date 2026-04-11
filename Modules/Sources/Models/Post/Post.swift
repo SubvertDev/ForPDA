@@ -48,8 +48,17 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         return flag.contains(.canDelete)
     }
     
-    public var karma: Int {
-        return rawKarma >> 3
+    public var karma: Int? {
+        if rawKarma & 1 > 0 {
+            let karma = rawKarma >> 3
+            if karma != 0 {
+                return karma
+            }
+            if rawKarma & 2 > 0 && karma == 0 {
+                return 0
+            }
+        }
+        return nil
     }
     
     public var canChangeKarma: Bool {
