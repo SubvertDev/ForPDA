@@ -170,7 +170,7 @@ public extension Post {
                 signature: "",
                 reputationCount: 312
             ),
-            karma: 1,
+            karma: 15,
             attachments: [
                 Attachment(
                     id: 14308454,
