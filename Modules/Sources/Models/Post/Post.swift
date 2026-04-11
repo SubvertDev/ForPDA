@@ -36,6 +36,10 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         return flag.contains(.protected)
     }
     
+    public var isLastEditHidden: Bool {
+        return flag.contains(.marker)
+    }
+    
     public var canModerate: Bool {
         return flag.contains(.canModerate)
     }
@@ -168,7 +172,7 @@ public extension Post {
     static func mock(id: Int = 0) -> Post {
         return Post(
             id: id,
-            flag: [.closed, .hidden, .protected, .canDelete, .canEdit, .canModerate],
+            flag: [.closed, .hidden, .marker, .protected, .canDelete, .canEdit, .canModerate],
             content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
             author: Author(
                 id: 6176341,

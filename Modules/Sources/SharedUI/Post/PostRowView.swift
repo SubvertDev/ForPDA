@@ -183,13 +183,18 @@ public struct PostRowView: View {
     @ViewBuilder
     private func Footer(_ lastEdit: Post.LastEdit) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            let link = "https://4pda.to/forum/index.php?showuser=\(lastEdit.userId)"
-            Text(LocalizedStringResource("Edited: [\(lastEdit.username)](\(link)) • \(lastEdit.date.formatted())", bundle: .module))
-                .environment(\.openURL, OpenURLAction(handler: { url in
-                    action(.urlTapped(url))
-                    return .handled
-                }))
-            
+            HStack(spacing: 6) {
+                let link = "https://4pda.to/forum/index.php?showuser=\(lastEdit.userId)"
+                Text(LocalizedStringResource("Edited: [\(lastEdit.username)](\(link)) • \(lastEdit.date.formatted())", bundle: .module))
+                    .environment(\.openURL, OpenURLAction(handler: { url in
+                        action(.urlTapped(url))
+                        return .handled
+                    }))
+                
+                if state.post.post.isLastEditHidden {
+                    LastEditHiddenTag()
+                }
+            }
             if !lastEdit.reason.isEmpty {
                 Text("Reason: \(lastEdit.reason)", bundle: .module)
             }
@@ -198,6 +203,18 @@ public struct PostRowView: View {
         .foregroundStyle(Color(.Labels.teritary))
         .padding(.top, 6)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private func LastEditHiddenTag() -> some View {
+        Text("Hidden", bundle: .module)
+            .font(.caption)
+            .foregroundStyle(Color(.Labels.teritary))
+            .padding(.vertical, 2)
+            .padding(.horizontal, 6)
+            .background(
+                Color(.Background.teritary)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            )
     }
     
     // MARK: - Context Menu

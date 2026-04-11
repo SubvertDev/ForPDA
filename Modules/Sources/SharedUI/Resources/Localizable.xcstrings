@@ -67,6 +67,16 @@
         }
       }
     },
+    "Hidden" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скрыто"
+          }
+        }
+      }
+    },
     "Hidden text" : {
       "localizations" : {
         "ru" : {
