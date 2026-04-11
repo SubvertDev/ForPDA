@@ -23,6 +23,7 @@ extension TopicFeature {
                         .view(.onNextAppear),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
+                        .view(.karmaHistoryTapped),
                         .view(.topicPollVoteButtonTapped),
                         .view(.searchButtonTapped),
                         .internal(.loadTypes),

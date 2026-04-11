@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct PostKarmaVote: Sendable, Identifiable {
+public struct PostKarmaVote: Sendable, Identifiable, Equatable {
     public let userId: Int
     public let nickname: String
     public let voteDate: Date

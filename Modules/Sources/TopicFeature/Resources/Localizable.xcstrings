@@ -151,6 +151,16 @@
         }
       }
     },
+    "Karma History" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "История кармы"
+          }
+        }
+      }
+    },
     "Link copied" : {
       "localizations" : {
         "ru" : {

@@ -377,6 +377,8 @@ public struct TopicScreen: View {
                     send(.imageTapped(url))
                 case .textQuoted(let text):
                     send(.textQuoted(post, text))
+                case .karmaHistoryTapped:
+                    send(.karmaHistoryTapped(post.id))
                 }
             },
             menuAction: { action in
@@ -509,6 +511,11 @@ struct NavigationModifier: ViewModifier {
                     ) { store in
                         ReputationChangeView(store: store)
                     }
+                    .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
+                        NavigationStack {
+                            PostKarmaHistoryView(store: store)
+                        }
+                    }
                     .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
                         NavigationStack {
                             ForumStatView(store: store)
@@ -528,7 +535,7 @@ extension View {
 // MARK: - Extensions
 
 // TODO: Move to extensions?
-private extension Date {
+extension Date {
     func formattedDate() -> LocalizedStringKey {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"

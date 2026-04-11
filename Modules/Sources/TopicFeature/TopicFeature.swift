@@ -53,6 +53,7 @@ public struct TopicFeature: Reducer, Sendable {
         case gallery([URL], [Int], Int)
         @ReducerCaseIgnored
         case karmaChange(Int)
+        case karmaHistory(PostKarmaHistoryFeature)
         case form(FormFeature)
         case stat(ForumStatFeature)
         case changeReputation(ReputationChangeFeature)
@@ -142,6 +143,7 @@ public struct TopicFeature: Reducer, Sendable {
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
+            case karmaHistoryTapped(Int)
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
             case contextToolsMenu(TopicModifyAction, Bool)
@@ -486,6 +488,10 @@ public struct TopicFeature: Reducer, Sendable {
                         }
                     }
                 }
+                return .none
+                
+            case let .view(.karmaHistoryTapped(postId)):
+                state.destination = .karmaHistory(PostKarmaHistoryFeature.State(postId: postId))
                 return .none
                 
             case let .view(.textQuoted(post, quotedText)):

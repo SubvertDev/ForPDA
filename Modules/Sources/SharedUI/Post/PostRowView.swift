@@ -19,6 +19,7 @@ public struct PostRowView: View {
         case urlTapped(URL)
         case imageTapped(URL)
         case textQuoted(String)
+        case karmaHistoryTapped
     }
     
     // MARK: - Properties
@@ -93,10 +94,17 @@ public struct PostRowView: View {
                     
                     Spacer()
                     
-                    if state.post.post.karma != 0 {
-                        Text(String(state.post.post.karma))
-                            .font(.caption)
-                            .foregroundStyle(Color(.Labels.primary))
+                    if let karma = state.post.post.karma {
+                        Button {
+                            action(.karmaHistoryTapped)
+                        } label: {
+                            Text(verbatim: String(karma))
+                                .font(.caption)
+                                .foregroundStyle(Color(.Labels.primary))
+                        }
+                        .buttonStyle(.plain)
+                        .allowsHitTesting(state.post.post.canModerate)
+                        .frame(width: 8, height: 22)
                     }
                 }
                 
