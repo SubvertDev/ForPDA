@@ -226,6 +226,9 @@ public struct TopicFeature: Reducer, Sendable {
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
+            case let .destination(.presented(.karmaHistory(.delegate(.openUser(id))))):
+                return .send(.delegate(.openUser(id: id)))
+                
             case let .destination(.presented(.alert(.deletePost(id, isUndo)))):
                 return .run { send in
                     let status = try await apiClient.modifyForum(ids: [id], type: .post(.delete), isUndo: isUndo)
