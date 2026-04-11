@@ -74,6 +74,7 @@ public struct APIClient: Sendable {
     public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> PreviewResponse
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
+    public var movePosts: @Sendable (_ ids: [Int], _ toTopicId: Int) async throws -> Bool
     public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
     public var postKarmaHistory: @Sendable (_ postId: Int) async throws -> [PostKarmaVote]
     public var voteInTopicPoll: @Sendable (_ topicId: Int, _ selections: [[Int]]) async throws -> Bool
@@ -464,6 +465,13 @@ extension APIClient: DependencyKey {
                 return try await parser.parsePostSendResponse(response)
 			},
             
+            movePosts: { ids, toTopicId in
+                let command = ForumCommand.Post.move(ids: ids, toTopicId: toTopicId)
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            
             postKarma: { id, isUp in
                 let command = ForumCommand.Post.karma(
                     postId: id,
@@ -738,6 +746,9 @@ extension APIClient: DependencyKey {
             editPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
 			},
+            movePosts: { _, _ in
+                return true
+            },
             postKarma: { _, _ in
                 return true
             },
