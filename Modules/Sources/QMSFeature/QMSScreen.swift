@@ -98,12 +98,12 @@ public struct QMSScreen: View {
         HStack {
             #if DEBUG
             if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
-                Button("+") { text.wrappedValue += "text" }
+                Button(String("+")) { text.wrappedValue += "text" }
                     .buttonStyle(.borderedProminent)
             }
             #endif
             
-            TextField("qms.textfield.placeholder", text: text)
+            TextField(String(""), text: text, prompt: Text("qms.textfield.placeholder", bundle: .module))
                 .padding()
                 .background(Color(.Background.quaternary), in: .rect(cornerRadius: 16))
             

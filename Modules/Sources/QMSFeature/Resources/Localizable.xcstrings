@@ -3,6 +3,12 @@
   "strings" : {
     "Copy" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21,7 +27,7 @@
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Сообщение"
           }
         }
