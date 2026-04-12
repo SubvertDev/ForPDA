@@ -121,6 +121,16 @@
         }
       }
     },
+    "Move" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить"
+          }
+        }
+      }
+    },
     "Open" : {
       "localizations" : {
         "ru" : {

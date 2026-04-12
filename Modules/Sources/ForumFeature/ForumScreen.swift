@@ -14,6 +14,7 @@ import Models
 import BBBuilder
 import FormFeature
 import ForumStatFeature
+import ForumMoveFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -101,6 +102,12 @@ public struct ForumScreen: View {
                 NavigationStack {
                     ForumStatView(store: store)
                 }
+            }
+            .fittedSheet(
+                item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                embedIntoNavStack: true
+            ) { store in
+                ForumMoveView(store: store)
             }
             .toolbar {
                 ToolbarItem {
@@ -269,7 +276,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Pin", bundle: .module),
                 symbol: topic.isPinned ? .pinFill : .pin
             ) {
-                send(.contextTopicToolsMenu(.pin, topic.id, !topic.isPinned))
+                send(.contextTopicToolsMenu(.modify(.pin, topic.id, !topic.isPinned)))
             }
             
             ContextButton(
@@ -278,7 +285,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextTopicToolsMenu(.hide, topic.id, !topic.isHidden))
+                send(.contextTopicToolsMenu(.modify(.hide, topic.id, !topic.isHidden)))
             }
             
             ContextButton(
@@ -287,13 +294,20 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Close", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextTopicToolsMenu(.close, topic.id, !topic.isClosed))
+                send(.contextTopicToolsMenu(.modify(.close, topic.id, !topic.isClosed)))
             }
             
             if topic.canDelete {
                 ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    send(.contextTopicToolsMenu(.delete, topic.id, false))
+                    send(.contextTopicToolsMenu(.modify(.delete, topic.id, false)))
                 }
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                send(.contextTopicToolsMenu(.move(topic.id)))
             }
         } label: {
             HStack {
