@@ -14,5 +14,4 @@ public enum PostMenuAction {
     case userPostsInTopic(Int)
     case mentions(Int)
     case copyLink(Int)
-    case tools(PostModifyAction, Int, Bool)
 }

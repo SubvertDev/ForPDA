@@ -27,17 +27,20 @@ public struct PostRowView: View {
     public let state: State
     public let action: (PostAction) -> Void
     public let menuAction: (PostMenuAction) -> Void
+    public let toolsMenuAction: (PostToolsMenuAction) -> Void
     
     // MARK: - Init
     
     public init(
         state: State,
         action: @escaping (PostAction) -> Void,
-        menuAction: @escaping (PostMenuAction) -> Void
+        menuAction: @escaping (PostMenuAction) -> Void,
+        toolsMenuAction: @escaping (PostToolsMenuAction) -> Void
     ) {
         self.state = state
         self.action = action
         self.menuAction = menuAction
+        self.toolsMenuAction = toolsMenuAction
     }
     
     public var body: some View {
@@ -249,7 +252,7 @@ public struct PostRowView: View {
             
             if state.post.post.canDelete {
                 ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    menuAction(.tools(.delete, state.post.id, false))
+                    toolsMenuAction(.modify(.delete, state.post.id, false))
                 }
             }
             
@@ -303,7 +306,7 @@ public struct PostRowView: View {
                     text: LocalizedStringResource("Restore", bundle: .module),
                     symbol: .arrowCounterclockwiseCircle
                 ) {
-                    menuAction(.tools(.delete, state.post.id, true))
+                    toolsMenuAction(.modify(.delete, state.post.id, true))
                 }
             }
             
@@ -313,7 +316,7 @@ public struct PostRowView: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: state.post.post.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                menuAction(.tools(.hide, state.post.id, !state.post.post.isHidden))
+                toolsMenuAction(.modify(.hide, state.post.id, !state.post.post.isHidden))
             }
             
             ContextButton(
@@ -322,7 +325,7 @@ public struct PostRowView: View {
                 : LocalizedStringResource("Pin", bundle: .module),
                 symbol: state.post.post.isPinned ? .pinFill : .pin
             ) {
-                menuAction(.tools(.pin, state.post.id, !state.post.post.isPinned))
+                toolsMenuAction(.modify(.pin, state.post.id, !state.post.post.isPinned))
             }
             
             ContextButton(
@@ -331,7 +334,14 @@ public struct PostRowView: View {
                 : LocalizedStringResource("Protect", bundle: .module),
                 symbol: state.post.post.isProtected ? .shieldFill : .shield
             ) {
-                menuAction(.tools(.protect, state.post.id, !state.post.post.isProtected))
+                toolsMenuAction(.modify(.protect, state.post.id, !state.post.post.isProtected))
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                toolsMenuAction(.move(state.post.id))
             }
         } label: {
             HStack {

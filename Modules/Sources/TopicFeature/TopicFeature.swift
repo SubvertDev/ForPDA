@@ -23,6 +23,7 @@ import TopicBuilder
 import ToastClient
 import NotificationsClient
 import ForumStatFeature
+import ForumMoveFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -56,6 +57,7 @@ public struct TopicFeature: Reducer, Sendable {
         case karmaHistory(PostKarmaHistoryFeature)
         case form(FormFeature)
         case stat(ForumStatFeature)
+        case move(ForumMoveFeature)
         case changeReputation(ReputationChangeFeature)
         case alert(AlertState<Alert>)
         
@@ -146,8 +148,9 @@ public struct TopicFeature: Reducer, Sendable {
             case karmaHistoryTapped(Int)
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
-            case contextToolsMenu(TopicModifyAction, Bool)
+            case contextToolsMenu(TopicToolsContextMenuAction)
             case contextPostMenu(PostMenuAction)
+            case contextPostToolsMenu(PostToolsMenuAction)
         }
         
         case `internal`(Internal)
@@ -365,25 +368,33 @@ public struct TopicFeature: Reducer, Sendable {
                     return .send(.pageNavigation(.lastPageTapped))
                 }
                 
-            case let .view(.contextToolsMenu(action, isUndo)):
+            case let .view(.contextToolsMenu(action)):
+                guard let topic = state.topic else { return .none }
                 switch action {
-                case .hide, .close:
-                    return .run { [id = state.topicId] send in
-                        _ = try await apiClient.modifyForum(ids: [id], type: .topic(action), isUndo: isUndo)
+                case .move:
+                    state.destination = .move(ForumMoveFeature.State(type: .topic(topic.id)))
+                    return .none
+                    
+                case .modify(let action, let isUndo):
+                    switch action {
+                    case .hide, .close:
+                        return .run { [id = state.topicId] send in
+                            _ = try await apiClient.modifyForum(ids: [id], type: .topic(action), isUndo: isUndo)
+                            
+                            await send(.internal(.refresh))
+                            await toastClient.showToast(.actionCompleted)
+                        } catch: { error, send in
+                            analyticsClient.capture(error)
+                            await toastClient.showToast(.whoopsSomethingWentWrong)
+                        }
                         
-                        await send(.internal(.refresh))
-                        await toastClient.showToast(.actionCompleted)
-                    } catch: { error, send in
-                        analyticsClient.capture(error)
-                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    case .delete:
+                        state.destination = .alert(.deleteTopicConfirmation)
+                        return .none
+                        
+                    default:
+                        return .none
                     }
-                    
-                case .delete:
-                    state.destination = .alert(.deleteTopicConfirmation)
-                    return .none
-                    
-                default:
-                    return .none
                 }
                 
             case let .view(.contextPostMenu(action)):
@@ -452,8 +463,15 @@ public struct TopicFeature: Reducer, Sendable {
                     return .run { _ in
                         await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
+                }
+                
+            case let .view(.contextPostToolsMenu(action)):
+                switch action {
+                case .move(let postId):
+                    state.destination = .move(ForumMoveFeature.State(type: .posts([postId])))
+                    return .none
                     
-                case .tools(let action, let postId, let isUndo):
+                case .modify(let action, let postId, let isUndo):
                     switch action {
                     case .pin, .hide, .protect:
                         return .run { [id = state.topicId] send in

@@ -181,6 +181,16 @@
         }
       }
     },
+    "Move" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить"
+          }
+        }
+      }
+    },
     "No" : {
       "localizations" : {
         "ru" : {

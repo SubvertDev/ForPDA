@@ -18,6 +18,7 @@ import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
 import ForumStatFeature
+import ForumMoveFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -234,7 +235,7 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextToolsMenu(.hide, !topic.isHidden))
+                send(.contextToolsMenu(.modify(.hide, !topic.isHidden)))
             }
             
             ContextButton(
@@ -243,13 +244,20 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Close Topic", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextToolsMenu(.close, !topic.isClosed))
+                send(.contextToolsMenu(.modify(.close, !topic.isClosed)))
             }
             
             if topic.canDelete {
                 ContextButton(text: LocalizedStringResource("Delete Topic", bundle: .module), symbol: .trash) {
-                    send(.contextToolsMenu(.delete, false))
+                    send(.contextToolsMenu(.modify(.delete, false)))
                 }
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                send(.contextToolsMenu(.move))
             }
         } label: {
             HStack {
@@ -399,8 +407,14 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.mentions(postId)))
                 case .copyLink(let postId):
                     send(.contextPostMenu(.copyLink(postId)))
-                case .tools(let action, let postId, let isUndo):
-                    send(.contextPostMenu(.tools(action, postId, isUndo)))
+                }
+            },
+            toolsMenuAction: { action in
+                switch action {
+                case .move(let postId):
+                    send(.contextPostToolsMenu(.move(postId)))
+                case .modify(let action, let postId, let isUndo):
+                    send(.contextPostToolsMenu(.modify(action, postId, isUndo)))
                 }
             }
         )
@@ -510,6 +524,12 @@ struct NavigationModifier: ViewModifier {
                         embedIntoNavStack: true
                     ) { store in
                         ReputationChangeView(store: store)
+                    }
+                    .fittedSheet(
+                        item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                        embedIntoNavStack: true
+                    ) { store in
+                        ForumMoveView(store: store)
                     }
                     .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
                         NavigationStack {

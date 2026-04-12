@@ -134,7 +134,8 @@ public struct SearchResultScreen: View {
             PostRowView(
                 state: .init(post: post.post),
                 action: { _ in },
-                menuAction: { _ in }
+                menuAction: { _ in },
+                toolsMenuAction: { _ in }
             )
             .highPriorityGesture(
                 TapGesture()

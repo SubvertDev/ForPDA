@@ -75,16 +75,6 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostMentions(postId))
                     case .copyLink(let postId):
                         analytics.log(TopicEvent.menuPostCopyLink(postId))
-                    case .tools(let action, let postId, let isUndo):
-                        switch action {
-                        case .delete:
-                            if !isUndo {
-                                analytics.log(TopicEvent.menuPostDelete(postId))
-                            }
-                        default:
-                            // MARK: Moderator tools are skip analytics
-                            break
-                        }
                     }
                     
                 case let .view(.contextMenu(option)):
@@ -105,7 +95,7 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
                     
-                case .view(.contextToolsMenu(_, _)):
+                case .view(.contextToolsMenu), .view(.contextPostToolsMenu):
                     // MARK: Moderator tools are skip analytics
                     break
 

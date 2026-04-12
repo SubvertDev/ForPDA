@@ -107,6 +107,16 @@
         }
       }
     },
+    "Move" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить"
+          }
+        }
+      }
+    },
     "Open In Browser" : {
       "localizations" : {
         "ru" : {
