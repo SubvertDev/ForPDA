@@ -262,6 +262,7 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.FormFeature,
+                    .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
@@ -278,6 +279,18 @@ let project = Project(
                     .Internal.SharedUI,
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
+                    .SPM.TCA,
+                ]
+            ),
+
+            .feature(
+                name: "ForumMoveFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.DeeplinkHandler,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
                     .SPM.TCA,
                 ]
             ),
@@ -513,6 +526,7 @@ let project = Project(
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
                     .Internal.FormFeature,
+                    .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
@@ -1048,6 +1062,7 @@ extension TargetDependency.Internal {
     static let FormFeature =            TargetDependency.target(name: "FormFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
+    static let ForumMoveFeature =       TargetDependency.target(name: "ForumMoveFeature")
     static let ForumStatFeature =       TargetDependency.target(name: "ForumStatFeature")
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
