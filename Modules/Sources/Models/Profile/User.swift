@@ -367,7 +367,7 @@ public extension User {
         id: 0,
         nickname: "Test Nickname",
         imageUrl: Links.defaultAvatar,
-        group: .active,
+        group: .admin,
         status: "Just a status",
         signature: "[b][color=blue]Developer[/color][/b]",
         aboutMe: "A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me.",
