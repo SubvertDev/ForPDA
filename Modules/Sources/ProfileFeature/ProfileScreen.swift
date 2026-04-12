@@ -614,6 +614,7 @@ public struct ProfileScreen: View {
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }
+            .listRowBackground(Color(.clear))
         }
         
         Section {
@@ -628,6 +629,7 @@ public struct ProfileScreen: View {
             }
             .listRowSeparator(.visible)
         }
+        .listRowBackground(Color(.clear))
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
