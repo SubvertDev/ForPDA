@@ -37,7 +37,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     }
     
     public var isLastEditHidden: Bool {
-        return flag.contains(.marker)
+        return !flag.contains(.marker)
     }
     
     public var canModerate: Bool {
