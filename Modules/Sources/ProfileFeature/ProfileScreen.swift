@@ -15,6 +15,7 @@ import Models
 import RichTextKit
 import ParsingClient
 import BBBuilder
+import FormFeature
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -81,6 +82,11 @@ public struct ProfileScreen: View {
                     EditScreen(store: store)
                 }
             }
+            .fullScreenCover(item: $store.scope(state: \.destination?.note, action: \.destination.note)) { store in
+                NavigationStack {
+                    FormScreen(store: store)
+                }
+            }
             .toolbar {
                 ToolbarButtons()
             }
@@ -106,15 +112,15 @@ public struct ProfileScreen: View {
             if #available(iOS 26.0, *) {
                 ToolbarSpacer(.fixed)
             }
-            
+        }
+        
+        if store.shouldShowOptionsToolbarButton {
             ToolbarItem {
-                Button {
-                    send(.editButtonTapped)
-                } label: {
-                    Image(systemSymbol: .pencil)
-                }
+                OptionsMenu()
             }
-            
+        }
+        
+        if store.shouldShowToolbarButtons {
             ToolbarItem {
                 Button {
                     send(.settingsButtonTapped)
@@ -122,6 +128,37 @@ public struct ProfileScreen: View {
                     Image(systemSymbol: .gearshape)
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            let canEditProfile = store.userSessionGroup == .admin
+                || store.userSessionGroup == .supermoderator
+                || store.userSessionGroup == .moderator
+            if store.shouldShowToolbarButtons || canEditProfile {
+                ContextButton(
+                    text: LocalizedStringResource("Edit profile", bundle: .module),
+                    symbol: .pencil
+                ) {
+                    send(.contextMenu(.edit))
+                }
+            }
+            
+            let canAddNotice = canEditProfile
+                || store.userSessionGroup == .moderatorHelper
+                || store.userSessionGroup == .moderatorSchool
+            if canAddNotice, !store.shouldShowToolbarButtons {
+                ContextButton(
+                    text: LocalizedStringResource("Add notice", bundle: .module),
+                    symbol: .scribble
+                ) {
+                    send(.contextMenu(.addNotice))
+                }
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
         }
     }
     
@@ -797,7 +834,7 @@ extension User {
         ProfileScreen(
             store: Store(
                 initialState: ProfileFeature.State(
-                    userId: 3640948
+                    userId: 0
                 )
             ) {
                 ProfileFeature()

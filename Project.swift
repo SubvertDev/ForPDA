@@ -376,6 +376,7 @@ let project = Project(
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
+                    .Internal.FormFeature,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,

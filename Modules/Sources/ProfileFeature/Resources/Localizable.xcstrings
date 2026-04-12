@@ -31,6 +31,16 @@
         }
       }
     },
+    "Add notice" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить заметку"
+          }
+        }
+      }
+    },
     "always" : {
       "localizations" : {
         "ru" : {
@@ -406,7 +416,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Добавлена заметка"
+            "value" : "Заметка добавлена"
           }
         }
       }
