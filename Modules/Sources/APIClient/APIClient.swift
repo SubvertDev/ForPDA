@@ -46,6 +46,7 @@ public struct APIClient: Sendable {
     // User
     public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
     public var editUserProfile: @Sendable (_ request: UserProfileEditRequest) async throws -> Bool
+    public var addUserNote: @Sendable (_ userId: Int, _ content: String) async throws -> UserNoteResponse
     public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
@@ -236,6 +237,12 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
+            },
+            addUserNote: { userId, message in
+                let command = MemberCommand.notice(memberId: userId, message: message)
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return UserNoteResponse(rawValue: status)
             },
             getReputationVotes: { request in
                 let command = MemberCommand.reputationVotes(data: MemberReputationVotesRequest(
@@ -671,6 +678,9 @@ extension APIClient: DependencyKey {
             },
             editUserProfile: { _ in
                 return true
+            },
+            addUserNote: { _, _ in
+                return .success
             },
             getReputationVotes: { _ in
                 return .mock
