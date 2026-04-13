@@ -14,7 +14,7 @@ import CacheClient
 import ComposableArchitecture
 import PersistenceKeys
 
-public typealias ConnectionState = API.ConnectionState
+public typealias APIConnectionState = ConnectionState
 public typealias UploadRequest = PDAPI.UploadRequest
 public typealias UploadProgressStatus = PDAPI.UploadProgressStatus
 public typealias PDAPIDocument = PDAPI.Document
@@ -27,8 +27,8 @@ public struct APIClient: Sendable {
     
     // Common
     public var connect: @Sendable (_ inBackground: Bool) async throws -> Void
-    public var disconnect: @Sendable () async throws -> Void
-    public var setLogResponses: @Sendable (_ type: ResponsesLogType) -> Void
+    public var disconnect: @Sendable () async -> Void
+    public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -100,7 +100,7 @@ public struct APIClient: Sendable {
     public var notificationStream: @Sendable () -> AsyncStream<String> = { .finished }
     
     // UPLOAD
-    public var upload: @Sendable (UploadRequest) -> AsyncStream<UploadProgressStatus> = { _ in .finished }
+    public var upload: @Sendable (UploadRequest) async -> AsyncThrowingStream<UploadProgressStatus, any Error> = { _ in .finished() }
 }
 
 // MARK: - Dependency Key
@@ -121,20 +121,21 @@ extension APIClient: DependencyKey {
             
             connect: { inBackground in
                 @Shared(.userSession) var userSession
+                @Shared(.appSettings) var appSettings
                 if let userSession {
                     let request = AuthRequest(memberId: userSession.userId, token: userSession.token, hidden: userSession.isHidden)
-                    try await api.connect(as: .account(data: request), inBackground: inBackground)
+                    try await api.connect(as: .account(data: request), inBackground: inBackground, route: appSettings.backupServer ? .backup : .primary)
                 } else {
-                    try await api.connect(as: .anonymous)
+                    try await api.connect(as: .anonymous, route: appSettings.backupServer ? .backup : .primary)
                 }
             },
             
             disconnect: {
-                api.disconnect()
+                await api.disconnect()
             },
             
             setLogResponses: { type in
-                api.setLogResponses(to: type)
+                await api.setLogResponses(to: type)
             },
             
             // MARK: - Articles
@@ -432,10 +433,11 @@ extension APIClient: DependencyKey {
 			},
             
             deletePosts: { ids in
-                let command = ForumCommand.Post.delete(postIds: ids)
-                let response = try await api.send(command)
-                let status = Int(response.getResponseStatus())!
-                return status == 0
+//                let command = ForumCommand.Post.delete(postIds: ids)
+//                let response = try await api.send(command)
+//                let status = Int(response.getResponseStatus())!
+//                return status == 0
+                return true
             },
             
             postKarma: { id, isUp in
@@ -587,7 +589,7 @@ extension APIClient: DependencyKey {
             // MARK: - Upload
             
             upload: { request in
-                return api.upload(request: request)
+                return await api.upload(request: request)
             }
         )
     }
@@ -744,7 +746,7 @@ extension APIClient: DependencyKey {
                 return .finished
             },
             upload: { _ in
-                return .finished
+                return .finished()
             }
         )
     }

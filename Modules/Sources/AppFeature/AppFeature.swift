@@ -85,7 +85,7 @@ public struct AppFeature: Reducer, Sendable {
             return identifiers?.first ?? ""
         }
         
-        public var connectionState: ConnectionState = .disconnected
+        public var connectionState: APIConnectionState = .disconnected
         public var isNetworkOnline = true
         
         public init(
@@ -151,7 +151,7 @@ public struct AppFeature: Reducer, Sendable {
         case didFinishToastAnimation
         case updateBadges(Unread)
         
-        case connectionStateChanged(ConnectionState)
+        case connectionStateChanged(APIConnectionState)
         case networkStateChanged(Bool)
         case receivedNotification(String)
         
@@ -238,7 +238,7 @@ public struct AppFeature: Reducer, Sendable {
                     
                     .run { send in
                         do {
-                            apiClient.setLogResponses(.none)
+                            await apiClient.setLogResponses(.none)
                             try await apiClient.connect(inBackground: false)
                         } catch {
                             await send(._failedToConnect(error))
@@ -481,7 +481,7 @@ public struct AppFeature: Reducer, Sendable {
                         if isLoggedIn {
                             await send(.registerBackgroundTask)
                         }
-                        try await apiClient.disconnect()
+                        await apiClient.disconnect()
                     }
                 }
                 
@@ -688,6 +688,17 @@ extension UIApplication.State {
             return "background"
         @unknown default:
             fatalError()
+        }
+    }
+}
+
+extension ScenePhase {
+    var description: String {
+        switch self {
+        case .background: return "background"
+        case .inactive: return "inactive"
+        case .active: return "active"
+        @unknown default: fatalError()
         }
     }
 }
