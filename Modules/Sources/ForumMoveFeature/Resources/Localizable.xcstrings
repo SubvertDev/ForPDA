@@ -11,6 +11,36 @@
         }
       }
     },
+    "Enter..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите…"
+          }
+        }
+      }
+    },
+    "Entered URL is not forum URL" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введеный URL-адрес не является адресом форума"
+          }
+        }
+      }
+    },
+    "Entered URL is not topic URL" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введеный URL-адрес не является адресом темы"
+          }
+        }
+      }
+    },
     "Error moving posts" : {
       "localizations" : {
         "ru" : {
@@ -37,36 +67,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Некорректный URL-адрес"
-          }
-        }
-      }
-    },
-    "Input..." : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введите…"
-          }
-        }
-      }
-    },
-    "Inputted URL is not forum URL" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введеный URL-адрес не является адресом форума"
-          }
-        }
-      }
-    },
-    "Inputted URL is not topic URL" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введеный URL-адрес не является адресом темы"
           }
         }
       }

@@ -115,7 +115,7 @@ public struct ForumMoveView: View {
             
             Field(
                 content: $store.inputUrl,
-                placeholder: LocalizedStringResource("Input...", bundle: .module),
+                placeholder: LocalizedStringResource("Enter...", bundle: .module),
                 focusEqual: ForumMoveFeature.State.Field.url,
                 focus: $focus
             )
@@ -216,8 +216,8 @@ private extension ForumMoveFeature.URLValidationErrorReason {
     var title: LocalizedStringKey {
         switch self {
         case .badURL: "Incorrect URL"
-        case .needTopicUrl: "Inputted URL is not topic URL"
-        case .needForumUrl: "Inputted URL is not forum URL"
+        case .needTopicUrl: "Entered URL is not topic URL"
+        case .needForumUrl: "Entered URL is not forum URL"
         case .unableToExtractTopicId: "Unable to extract topic id from URL"
         }
     }

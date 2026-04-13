@@ -46,7 +46,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
         var isSending = false
         
         var inputUrl = ""
-        var isSaveLinkForTopic: Bool = false
+        var isSaveLinkForTopic = false
         
         var isMoveButtonDisabled: Bool {
             return error != nil || inputUrl.isEmpty
