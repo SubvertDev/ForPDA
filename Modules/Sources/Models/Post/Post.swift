@@ -20,12 +20,24 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let lastEdit: LastEdit?
     private let rawKarma: Int
     
-    public var isDeleted: Bool {
+    public var isPinned: Bool {
+        return flag.contains(.pinned)
+    }
+    
+    public var isHidden: Bool {
         return flag.contains(.hidden)
     }
     
+    public var isDeleted: Bool {
+        return flag.contains(.closed)
+    }
+    
     public var isProtected: Bool {
-        return flag.contains(.canProtect)
+        return flag.contains(.protected)
+    }
+    
+    public var isLastEditHidden: Bool {
+        return !flag.contains(.marker)
     }
     
     public var canModerate: Bool {
@@ -40,8 +52,19 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         return flag.contains(.canDelete)
     }
     
-    public var karma: Int {
-        return rawKarma >> 3
+    public var karma: Int? {
+        let karma = rawKarma >> 3
+        let hasVotes = rawKarma & 2 > 0
+        let canBeChanged = rawKarma & 1 > 0
+        if canBeChanged {
+            if karma != 0 {
+                return karma
+            }
+            if hasVotes && karma == 0 {
+                return 0
+            }
+        }
+        return nil
     }
     
     public var canChangeKarma: Bool {
@@ -151,7 +174,7 @@ public extension Post {
     static func mock(id: Int = 0) -> Post {
         return Post(
             id: id,
-            flag: [.canDelete, .canEdit, .canModerate],
+            flag: [.closed, .hidden, .marker, .protected, .canDelete, .canEdit, .canModerate],
             content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
             author: Author(
                 id: 6176341,
@@ -162,7 +185,7 @@ public extension Post {
                 signature: "",
                 reputationCount: 312
             ),
-            karma: 1,
+            karma: 15,
             attachments: [
                 Attachment(
                     id: 14308454,

@@ -46,6 +46,7 @@ public struct APIClient: Sendable {
     // User
     public var getUser: @Sendable (_ userId: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<User, any Error>
     public var editUserProfile: @Sendable (_ request: UserProfileEditRequest) async throws -> Bool
+    public var addUserNote: @Sendable (_ userId: Int, _ content: String) async throws -> UserNoteResponse
     public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
@@ -62,7 +63,10 @@ public struct APIClient: Sendable {
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
+    public var modifyForum: @Sendable (_ ids: [Int], _ type: ForumModifyType, _ isUndo: Bool) async throws -> Bool
+    public var moveTopic: @Sendable (_ id: Int, _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
+    public var setTopicCurator: @Sendable (_ topicId: Int, _ userId: Int, _ reason: String) async throws -> Bool
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
     public var sendTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> TemplateSend
     public var getHistory: @Sendable (_ offset: Int, _ perPage: Int) async throws -> History
@@ -71,8 +75,9 @@ public struct APIClient: Sendable {
     public var previewTemplate: @Sendable (_ id: Int, _ content: PDAPIDocument, _ isTopic: Bool) async throws -> PreviewResponse
     public var sendPost: @Sendable (_ request: PostRequest) async throws -> PostSendResponse
     public var editPost: @Sendable (_ request: PostEditRequest) async throws -> PostSendResponse
-    public var deletePosts: @Sendable (_ postIds: [Int]) async throws -> Bool
+    public var movePosts: @Sendable (_ ids: [Int], _ toTopicId: Int) async throws -> Bool
     public var postKarma: @Sendable (_ postId: Int, _ isUp: Bool) async throws -> Bool
+    public var postKarmaHistory: @Sendable (_ postId: Int) async throws -> [PostKarmaVote]
     public var voteInTopicPoll: @Sendable (_ topicId: Int, _ selections: [[Int]]) async throws -> Bool
     
     // Favorites
@@ -233,6 +238,12 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
+            addUserNote: { userId, message in
+                let command = MemberCommand.notice(memberId: userId, message: message)
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return UserNoteResponse(rawValue: status)
+            },
             getReputationVotes: { request in
                 let command = MemberCommand.reputationVotes(data: MemberReputationVotesRequest(
                     memberId: request.userId,
@@ -350,6 +361,26 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(ForumCommand.Topic.view(data: request))
                 return try await parser.parseTopic(response)
             },
+            modifyForum: { ids, type, isUndo in
+                let command = ForumCommand.modify(
+                    ids: ids,
+                    type: type.transfer,
+                    isUndo: isUndo
+                )
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            moveTopic: { id, toForumId, saveLink in
+                let command = ForumCommand.Topic.move(
+                    id: id,
+                    toForumId: toForumId,
+                    saveLink: saveLink
+                )
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
             getTopicViewers: { topicId in
                 let command = MemberCommand.sessions(
                     pageType: .topic,
@@ -357,6 +388,16 @@ extension APIClient: DependencyKey {
                 )
                 let response = try await api.send(command)
                 return try await parser.parseTopicViewers(response)
+            },
+            setTopicCurator: { topicId, userId, reason in
+                let command = ForumCommand.Topic.setCurator(
+                    topicId: topicId,
+                    memberId: userId,
+                    reason: reason
+                )
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             getTemplate: { request, isTopic in
@@ -431,8 +472,8 @@ extension APIClient: DependencyKey {
                 return try await parser.parsePostSendResponse(response)
 			},
             
-            deletePosts: { ids in
-                let command = ForumCommand.Post.delete(postIds: ids)
+            movePosts: { ids, toTopicId in
+                let command = ForumCommand.Post.move(ids: ids, toTopicId: toTopicId)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -446,6 +487,11 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
+            },
+            postKarmaHistory: { postId in
+                let command = ForumCommand.Post.history(id: postId)
+                let response = try await api.send(command)
+                return try await parser.parsePostKarmaHistory(response)
             },
             
             voteInTopicPoll: { topicId, selections in
@@ -633,6 +679,9 @@ extension APIClient: DependencyKey {
             editUserProfile: { _ in
                 return true
             },
+            addUserNote: { _, _ in
+                return .success
+            },
             getReputationVotes: { _ in
                 return .mock
             },
@@ -652,7 +701,9 @@ extension APIClient: DependencyKey {
                 return .finished()
             },
             getForum: { _, _, _, _ in
-                return .finished()
+                let (stream, continuation) = AsyncThrowingStream.makeStream(of: Forum.self)
+                continuation.yield(with: .success(.mock))
+                return stream
             },
             getForumStat: { _ in
                 return .mock
@@ -669,8 +720,17 @@ extension APIClient: DependencyKey {
             getTopic: { _, _, _, _ in
                 return .mock
             },
+            modifyForum: { _, _, _ in
+                return true
+            },
+            moveTopic: { _, _, _ in
+                return true
+            },
             getTopicViewers: { _ in
                 return .mock
+            },
+            setTopicCurator: { _, _, _ in
+                return true
             },
             getTemplate: { _, _ in
                 return [.mockTitle, .mockRequiredText, .mockRequiredEditor, .mockEditor, .mockUploadBox]
@@ -696,11 +756,14 @@ extension APIClient: DependencyKey {
             editPost: { _ in
                 return .success(PostSend(id: 0, topicId: 1, offset: 2))
 			},
-            deletePosts: { _ in
+            movePosts: { _, _ in
                 return true
             },
             postKarma: { _, _ in
                 return true
+            },
+            postKarmaHistory: { _ in
+                return .mock
             },
             voteInTopicPoll: { _, _ in
                 return true

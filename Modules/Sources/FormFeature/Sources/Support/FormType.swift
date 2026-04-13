@@ -11,6 +11,7 @@ public enum FormType: Sendable, Equatable {
     case post(type: PostType, topicId: Int, content: PostContentType)
     case report(id: Int, type: ReportType)
     case topic(forumId: Int, content: [FormValue])
+    case note(userId: Int)
     
     public enum PostType: Sendable, Equatable {
         case new

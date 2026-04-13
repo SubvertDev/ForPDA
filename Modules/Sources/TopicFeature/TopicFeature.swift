@@ -23,6 +23,7 @@ import TopicBuilder
 import ToastClient
 import NotificationsClient
 import ForumStatFeature
+import ForumMoveFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -36,7 +37,10 @@ public struct TopicFeature: Reducer, Sendable {
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
+        static let topicDeleted = LocalizedStringResource("Topic deleted", bundle: .module)
+        static let topicDeleteError = LocalizedStringResource("Unable to delete topic", bundle: .module)
         static let postDeleted = LocalizedStringResource("Post deleted", bundle: .module)
+        static let postRestored = LocalizedStringResource("Post restored", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
         static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
@@ -50,14 +54,17 @@ public struct TopicFeature: Reducer, Sendable {
         case gallery([URL], [Int], Int)
         @ReducerCaseIgnored
         case karmaChange(Int)
+        case karmaHistory(PostKarmaHistoryFeature)
         case form(FormFeature)
         case stat(ForumStatFeature)
+        case move(ForumMoveFeature)
         case changeReputation(ReputationChangeFeature)
         case alert(AlertState<Alert>)
         
         @CasePathable
         public enum Alert: Equatable {
-            case deletePost(Int)
+            case deletePost(Int, Bool)
+            case deleteTopic
         }
     }
     
@@ -138,9 +145,12 @@ public struct TopicFeature: Reducer, Sendable {
             case userTapped(Int)
             case urlTapped(URL)
             case imageTapped(URL)
+            case karmaHistoryTapped(Int)
             case textQuoted(UIPost, String)
             case contextMenu(TopicContextMenuAction)
+            case contextToolsMenu(TopicToolsContextMenuAction)
             case contextPostMenu(PostMenuAction)
+            case contextPostToolsMenu(PostToolsMenuAction)
         }
         
         case `internal`(Internal)
@@ -219,11 +229,26 @@ public struct TopicFeature: Reducer, Sendable {
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
-            case let .destination(.presented(.alert(.deletePost(id)))):
+            case let .destination(.presented(.karmaHistory(.delegate(.openUser(id))))):
+                return .send(.delegate(.openUser(id: id)))
+                
+            case let .destination(.presented(.alert(.deletePost(id, isUndo)))):
                 return .run { send in
-                    let status = try await apiClient.deletePosts(postIds: [id])
-                    let postDeletedToast = ToastMessage(text: Localization.postDeleted, haptic: .success)
+                    let status = try await apiClient.modifyForum(ids: [id], type: .post(.delete), isUndo: isUndo)
+                    let postDeletedToast = ToastMessage(
+                        text: isUndo ? Localization.postRestored : Localization.postDeleted,
+                        haptic: .success
+                    )
                     await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
+                    await send(.internal(.refresh))
+                }
+                .cancellable(id: CancelID.loading)
+                
+            case .destination(.presented(.alert(.deleteTopic))):
+                return .run { [id = state.topicId] send in
+                    let status = try await apiClient.modifyForum(ids: [id], type: .topic(.delete), isUndo: false)
+                    let text = status ? Localization.topicDeleted : Localization.topicDeleteError
+                    await toastClient.showToast(ToastMessage(text: text, isError: !status))
                     await send(.internal(.refresh))
                 }
                 .cancellable(id: CancelID.loading)
@@ -343,6 +368,35 @@ public struct TopicFeature: Reducer, Sendable {
                     return .send(.pageNavigation(.lastPageTapped))
                 }
                 
+            case let .view(.contextToolsMenu(action)):
+                guard let topic = state.topic else { return .none }
+                switch action {
+                case .move:
+                    state.destination = .move(ForumMoveFeature.State(type: .topic(topic.id)))
+                    return .none
+                    
+                case .modify(let action, let isUndo):
+                    switch action {
+                    case .hide, .close:
+                        return .run { [id = state.topicId] send in
+                            _ = try await apiClient.modifyForum(ids: [id], type: .topic(action), isUndo: isUndo)
+                            
+                            await send(.internal(.refresh))
+                            await toastClient.showToast(.actionCompleted)
+                        } catch: { error, send in
+                            analyticsClient.capture(error)
+                            await toastClient.showToast(.whoopsSomethingWentWrong)
+                        }
+                        
+                    case .delete:
+                        state.destination = .alert(.deleteTopicConfirmation)
+                        return .none
+                        
+                    default:
+                        return .none
+                    }
+                }
+                
             case let .view(.contextPostMenu(action)):
                 switch action {
                 case let .reply(postId, authorName):
@@ -372,10 +426,6 @@ public struct TopicFeature: Reducer, Sendable {
                 case let .report(id):
                     let feature = FormFeature.State(type: .report(id: id, type: .post))
                     state.destination = .form(feature)
-                    return .none
-                    
-                case .delete(let id):
-                    state.destination = .alert(.deletePostConfirmation(postId: id))
                     return .none
                     
                 case .karma(let id):
@@ -415,6 +465,30 @@ public struct TopicFeature: Reducer, Sendable {
                     }
                 }
                 
+            case let .view(.contextPostToolsMenu(action)):
+                switch action {
+                case .move(let postId):
+                    state.destination = .move(ForumMoveFeature.State(type: .posts([postId])))
+                    return .none
+                    
+                case .modify(let action, let postId, let isUndo):
+                    switch action {
+                    case .pin, .hide, .protect:
+                        return .run { [id = state.topicId] send in
+                            _ = try await apiClient.modifyForum(ids: [id], type: .post(action), isUndo: isUndo)
+                            
+                            await send(.internal(.refresh))
+                            await toastClient.showToast(.actionCompleted)
+                        } catch: { error, send in
+                            analyticsClient.capture(error)
+                            await toastClient.showToast(.whoopsSomethingWentWrong)
+                        }
+                    case .delete:
+                        state.destination = .alert(.deletePostConfirmation(postId: postId, isUndo: isUndo))
+                        return .none
+                    }
+                }
+                
             case .view(.changeKarmaTapped(let postId, let isUp)):
                 return .send(.internal(.changeKarma(postId: postId, isUp: isUp)))
                 
@@ -435,6 +509,10 @@ public struct TopicFeature: Reducer, Sendable {
                         }
                     }
                 }
+                return .none
+                
+            case let .view(.karmaHistoryTapped(postId)):
+                state.destination = .karmaHistory(PostKarmaHistoryFeature.State(postId: postId))
                 return .none
                 
             case let .view(.textQuoted(post, quotedText)):
@@ -702,11 +780,17 @@ extension TopicFeature.Destination.State: Equatable {}
 
 extension AlertState where Action == TopicFeature.Destination.Alert {
     
-    nonisolated static func deletePostConfirmation(postId: Int) -> AlertState {
+    nonisolated static func deletePostConfirmation(postId: Int, isUndo: Bool) -> AlertState {
         return AlertState(
-            title: { TextState("Are you sure, that you want to delete this post?", bundle: .module) },
+            title: {
+                if isUndo {
+                    TextState("Are you sure, that you want to restore this post?", bundle: .module)
+                } else {
+                    TextState("Are you sure, that you want to delete this post?", bundle: .module)
+                }
+            },
             actions: {
-                ButtonState(role: .destructive, action: .deletePost(postId)) {
+                ButtonState(role: .destructive, action: .deletePost(postId, isUndo)) {
                     TextState("Yes", bundle: .module)
                 }
                 ButtonState(role: .cancel) {
@@ -715,6 +799,18 @@ extension AlertState where Action == TopicFeature.Destination.Alert {
             }
         )
     }
+    
+    nonisolated(unsafe) static var deleteTopicConfirmation = AlertState(
+        title: { TextState("Are you sure, that you want to delete this topic?", bundle: .module) },
+        actions: {
+            ButtonState(role: .destructive, action: .deleteTopic) {
+                TextState("Yes", bundle: .module)
+            }
+            ButtonState(role: .cancel) {
+                TextState("No", bundle: .module)
+            }
+        }
+    )
 }
 
 // MARK: - Helpers

@@ -1,14 +1,17 @@
 //
-//  CheckBox.swift
+//  CheckBoxToggleStyle.swift
 //  ForPDA
 //
-//  Created by Ilia Lubianoi on 13.08.2025.
+//  Created by Xialtal on 7.04.26.
 //
 
 import SwiftUI
 
-struct CheckBox: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
+public struct CheckBoxToggleStyle: ToggleStyle {
+    
+    public init() {}
+    
+    public func makeBody(configuration: Configuration) -> some View {
         HStack {
             Button(action: {
                 configuration.isOn.toggle()
@@ -32,4 +35,21 @@ struct CheckBox: ToggleStyle {
             configuration.label
         }
     }
+}
+
+@available(iOS 17.0, *)
+#Preview {
+    @Previewable @State var isEnabled = false
+    VStack {
+        Toggle(isOn: $isEnabled) {
+            Text(verbatim: "Show mark")
+                .font(.subheadline)
+                .foregroundStyle(Color(.Labels.secondary))
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .toggleStyle(CheckBoxToggleStyle())
+        .padding(6)
+    }
+    .padding(15)
+    .environment(\.tintColor, Color(.Theme.primary))
 }

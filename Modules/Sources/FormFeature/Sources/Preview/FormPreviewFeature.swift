@@ -84,7 +84,7 @@ public struct FormPreviewFeature: Reducer, Sendable {
                         return .send(.internal(.loadPreview(id: topicId, content: content)))
                     }
                     
-                case .report(_, _):
+                case .report, .note:
                     // handling as .post
                     break
                 }

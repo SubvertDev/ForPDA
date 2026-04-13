@@ -53,7 +53,7 @@ struct EditReasonView: View {
                             .foregroundStyle(Color(.Labels.secondary))
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .toggleStyle(CheckBox())
+                    .toggleStyle(CheckBoxToggleStyle())
                     .tint(tintColor)
                     .padding(6)
                 }

@@ -43,6 +43,7 @@ public struct ParsingClient: Sendable {
     public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
     public var parsePostPreview: @Sendable (_ response: String) async throws -> PreviewResponse
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
+    public var parsePostKarmaHistory: @Sendable (_ response: String) async throws -> [PostKarmaVote]
     public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PreviewResponse
     public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
     
@@ -135,6 +136,9 @@ extension ParsingClient: DependencyKey {
         parsePostSendResponse: { response in
             return try TopicParser.parsePostSendResponse(from: response)
 		},
+        parsePostKarmaHistory: { response in
+            return try TopicParser.parsePostKarmaHistory(from: response)
+        },
         parseTemplatePreview: { response in
             return try FormParser.parseTemplatePreview(from: response)
         },
