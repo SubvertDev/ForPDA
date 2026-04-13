@@ -53,12 +53,14 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     }
     
     public var karma: Int? {
-        if rawKarma & 1 > 0 {
-            let karma = rawKarma >> 3
+        let karma = rawKarma >> 3
+        let hasVotes = rawKarma & 2 > 0
+        let canBeChanged = rawKarma & 1 > 0
+        if canBeChanged {
             if karma != 0 {
                 return karma
             }
-            if rawKarma & 2 > 0 && karma == 0 {
+            if hasVotes && karma == 0 {
                 return 0
             }
         }
