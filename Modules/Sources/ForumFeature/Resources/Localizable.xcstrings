@@ -36,7 +36,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть тему"
+            "value" : "Закрыть"
           }
         }
       }
@@ -66,7 +66,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Удалить тему"
+            "value" : "Удалить"
           }
         }
       }
@@ -86,7 +86,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрыть тему"
+            "value" : "Скрыть"
           }
         }
       }
@@ -156,7 +156,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрепить тему"
+            "value" : "Закрепить"
           }
         }
       }
@@ -186,7 +186,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Показать тему"
+            "value" : "Показать"
           }
         }
       }
@@ -226,7 +226,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открепить тему"
+            "value" : "Открепить"
           }
         }
       }
