@@ -98,6 +98,8 @@ public struct APIClient: Sendable {
     public var searchUsers: @Sendable (_ request: SearchUsersRequest) async throws -> SearchUsersResponse
     
     // DevDB
+    public var deviceBrands: @Sendable (_ type: DeviceType) async throws -> DeviceVendorsList
+    public var deviceVendor: @Sendable (_ name: String, _ type: DeviceType) async throws -> DeviceVendor
     public var deviceSpecifications: @Sendable (_ tag: String, _ subTag: String) async throws -> DeviceSpecifications
     
     // STREAMS
@@ -614,6 +616,19 @@ extension APIClient: DependencyKey {
             
             // MARK: - Device Specs
             
+            deviceBrands: { type in
+                let command = DeviceCommand.type(typeCode: type.transferType)
+                let response = try await api.send(command)
+                return try await parser.parseDeviceBrands(response)
+            },
+            deviceVendor: { name, type in
+                let command = DeviceCommand.vendor(
+                    typeCode: type.transferType,
+                    vendorCode: name
+                )
+                let response = try await api.send(command)
+                return try await parser.parseDeviceVendor(response)
+            },
             deviceSpecifications: { tag, subTag in
                 let command = DeviceCommand.entry(tag: tag, subTag: subTag)
                 let response = try await api.send(command)
@@ -795,6 +810,12 @@ extension APIClient: DependencyKey {
                 return .mock
             },
             searchUsers: { _ in
+                return .mock
+            },
+            deviceBrands: { _ in
+                return .mock
+            },
+            deviceVendor: { _, _ in
                 return .mock
             },
             deviceSpecifications: { _, _ in
