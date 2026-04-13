@@ -219,6 +219,7 @@ let project = Project(
             .feature(
                 name: "DeviceTypeFeature",
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.Models,
                     .Internal.SharedUI,

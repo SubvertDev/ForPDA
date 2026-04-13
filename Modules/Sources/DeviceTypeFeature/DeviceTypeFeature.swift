@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import Models
 import ToastClient
+import AnalyticsClient
 
 @Reducer
 public struct DeviceTypeFeature: Reducer, Sendable {
@@ -74,6 +75,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.openURL) var openURL
     @Dependency(\.toastClient) var toastClient
     
@@ -136,8 +138,8 @@ public struct DeviceTypeFeature: Reducer, Sendable {
                 
             case .internal(.vendorResponse(.failure(let error))),
                  .internal(.vendorsListResponse(.failure(let error))):
-                print(error)
                 state.isLoading = false
+                analyticsClient.capture(error)
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -146,5 +148,7 @@ public struct DeviceTypeFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
 }
