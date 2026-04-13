@@ -12,6 +12,7 @@ import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
 import DeviceSpecificationsFeature
+import DeviceTypeFeature
 import FavoritesRootFeature
 import FavoritesFeature
 import ForumFeature
@@ -49,6 +50,7 @@ public enum Path {
     
     @Reducer
     public enum DevDB {
+        case type(DeviceTypeFeature)
         case specifications(DeviceSpecificationsFeature)
     }
     
@@ -149,6 +151,10 @@ extension Path {
     @MainActor @ViewBuilder
     private static func DevDBViews(_ store: Store<Path.DevDB.State, Path.DevDB.Action>) -> some View {
         switch store.case {
+        case let .type(store):
+            DeviceTypeScreen(store: store)
+                .tracking(for: DeviceTypeScreen.self)
+
         case let .specifications(store):
             DeviceSpecificationsScreen(store: store)
                 .tracking(for: DeviceSpecificationsScreen.self)

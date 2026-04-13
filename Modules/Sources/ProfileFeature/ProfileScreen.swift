@@ -15,6 +15,7 @@ import Models
 import RichTextKit
 import ParsingClient
 import BBBuilder
+import FormFeature
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -81,6 +82,11 @@ public struct ProfileScreen: View {
                     EditScreen(store: store)
                 }
             }
+            .fullScreenCover(item: $store.scope(state: \.destination?.note, action: \.destination.note)) { store in
+                NavigationStack {
+                    FormScreen(store: store)
+                }
+            }
             .toolbar {
                 ToolbarButtons()
             }
@@ -106,15 +112,15 @@ public struct ProfileScreen: View {
             if #available(iOS 26.0, *) {
                 ToolbarSpacer(.fixed)
             }
-            
+        }
+        
+        if store.shouldShowOptionsToolbarButton {
             ToolbarItem {
-                Button {
-                    send(.editButtonTapped)
-                } label: {
-                    Image(systemSymbol: .pencil)
-                }
+                OptionsMenu()
             }
-            
+        }
+        
+        if store.shouldShowToolbarButtons {
             ToolbarItem {
                 Button {
                     send(.settingsButtonTapped)
@@ -122,6 +128,37 @@ public struct ProfileScreen: View {
                     Image(systemSymbol: .gearshape)
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            let canEditProfile = store.userSessionGroup == .admin
+                || store.userSessionGroup == .supermoderator
+                || store.userSessionGroup == .moderator
+            if store.shouldShowToolbarButtons || canEditProfile {
+                ContextButton(
+                    text: LocalizedStringResource("Edit profile", bundle: .module),
+                    symbol: .pencil
+                ) {
+                    send(.contextMenu(.edit))
+                }
+            }
+            
+            let canAddNotice = canEditProfile
+                || store.userSessionGroup == .moderatorHelper
+                || store.userSessionGroup == .moderatorSchool
+            if canAddNotice, !store.shouldShowToolbarButtons {
+                ContextButton(
+                    text: LocalizedStringResource("Add notice", bundle: .module),
+                    symbol: .scribble
+                ) {
+                    send(.contextMenu(.addNotice))
+                }
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
         }
     }
     
@@ -204,30 +241,41 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
+        let useIcon = !store.user!.achievements.isEmpty && !store.user!.curatedTopics.isEmpty
         Picker(String(""), selection: $pickerSelection) {
-            Text("General", bundle: .module)
+            SegmentLabel("General", .house, useIcon)
                 .tag(PickerSelection.general)
-            Text("Statistics", bundle: .module)
+            
+            SegmentLabel("Statistics", .chartBar, useIcon)
                 .tag(PickerSelection.statistics)
             
             if !store.user!.achievements.isEmpty {
-                Text("Achievements", bundle: .module)
+                SegmentLabel("Achievements", .trophy, useIcon)
                     .tag(PickerSelection.achievements)
             }
             
             if !store.user!.curatedTopics.isEmpty {
-                Text("Curation", bundle: .module)
+                SegmentLabel("Curation", .eyeglasses, useIcon)
                     .tag(PickerSelection.curation)
             }
             
             if !store.user!.warningLogs.isEmpty {
-                Text("Logging", bundle: .module)
+                SegmentLabel("Logging", .serverRack, useIcon)
                     .tag(PickerSelection.logging)
             }
         }
         .pickerStyle(.segmented)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
+    }
+    
+    @ViewBuilder
+    private func SegmentLabel(_ text: LocalizedStringKey, _ icon: SFSymbol, _ useIcon: Bool) -> some View {
+        if useIcon {
+            Image(systemSymbol: icon)
+        } else {
+            Text(text, bundle: .module)
+        }
     }
     
     // MARK: - General Segment
@@ -566,6 +614,7 @@ public struct ProfileScreen: View {
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             }
+            .listRowBackground(Color(.clear))
         }
         
         Section {
@@ -580,6 +629,7 @@ public struct ProfileScreen: View {
             }
             .listRowSeparator(.visible)
         }
+        .listRowBackground(Color(.clear))
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
@@ -797,7 +847,7 @@ extension User {
         ProfileScreen(
             store: Store(
                 initialState: ProfileFeature.State(
-                    userId: 3640948
+                    userId: 0
                 )
             ) {
                 ProfileFeature()

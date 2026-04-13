@@ -19,6 +19,7 @@ public struct PostRowView: View {
         case urlTapped(URL)
         case imageTapped(URL)
         case textQuoted(String)
+        case karmaHistoryTapped
     }
     
     // MARK: - Properties
@@ -26,17 +27,20 @@ public struct PostRowView: View {
     public let state: State
     public let action: (PostAction) -> Void
     public let menuAction: (PostMenuAction) -> Void
+    public let toolsMenuAction: (PostToolsMenuAction) -> Void
     
     // MARK: - Init
     
     public init(
         state: State,
         action: @escaping (PostAction) -> Void,
-        menuAction: @escaping (PostMenuAction) -> Void
+        menuAction: @escaping (PostMenuAction) -> Void,
+        toolsMenuAction: @escaping (PostToolsMenuAction) -> Void
     ) {
         self.state = state
         self.action = action
         self.menuAction = menuAction
+        self.toolsMenuAction = toolsMenuAction
     }
     
     public var body: some View {
@@ -46,6 +50,7 @@ public struct PostRowView: View {
             if let lastEdit = state.post.post.lastEdit {
                 Footer(lastEdit)
             }
+            PostStatus()
         }
     }
     
@@ -92,10 +97,17 @@ public struct PostRowView: View {
                     
                     Spacer()
                     
-                    if state.post.post.karma != 0 {
-                        Text(String(state.post.post.karma))
-                            .font(.caption)
-                            .foregroundStyle(Color(.Labels.primary))
+                    if let karma = state.post.post.karma {
+                        Button {
+                            action(.karmaHistoryTapped)
+                        } label: {
+                            Text(verbatim: String(karma))
+                                .font(.caption)
+                                .foregroundStyle(Color(.Labels.primary))
+                        }
+                        .buttonStyle(.plain)
+                        .allowsHitTesting(state.post.post.canModerate)
+                        .frame(width: 8, height: 22)
                     }
                 }
                 
@@ -119,7 +131,7 @@ public struct PostRowView: View {
                 }
             }
             
-            if state.isContextMenuAvailable, state.isUserAuthorized, state.canPostInTopic {
+            if state.isContextMenuAvailable {
                 ContextMenu()
             }
         }
@@ -148,18 +160,44 @@ public struct PostRowView: View {
         }
     }
     
+    // MARK: - Post Status
+    
+    @ViewBuilder
+    private func PostStatus() -> some View {
+        if state.post.post.isDeleted {
+            PostStatusLabel(icon: .trash, text: "This post deleted")
+        } else if state.post.post.isHidden {
+            PostStatusLabel(icon: .eyeSlash, text: "This post hidden")
+        }
+    }
+        
+    private func PostStatusLabel(icon: SFSymbol, text: LocalizedStringKey) -> some View {
+        HStack(spacing: 6) {
+            Image(systemSymbol: icon)
+            Text(text, bundle: .module)
+        }
+        .font(.caption2)
+        .foregroundStyle(.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
     // MARK: - Footer
     
     @ViewBuilder
     private func Footer(_ lastEdit: Post.LastEdit) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            let link = "https://4pda.to/forum/index.php?showuser=\(lastEdit.userId)"
-            Text(LocalizedStringResource("Edited: [\(lastEdit.username)](\(link)) • \(lastEdit.date.formatted())", bundle: .module))
-                .environment(\.openURL, OpenURLAction(handler: { url in
-                    action(.urlTapped(url))
-                    return .handled
-                }))
-            
+            HStack(spacing: 6) {
+                let link = "https://4pda.to/forum/index.php?showuser=\(lastEdit.userId)"
+                Text(LocalizedStringResource("Edited: [\(lastEdit.username)](\(link)) • \(lastEdit.date.formatted())", bundle: .module))
+                    .environment(\.openURL, OpenURLAction(handler: { url in
+                        action(.urlTapped(url))
+                        return .handled
+                    }))
+                
+                if state.post.post.isLastEditHidden {
+                    LastEditHiddenTag()
+                }
+            }
             if !lastEdit.reason.isEmpty {
                 Text("Reason: \(lastEdit.reason)", bundle: .module)
             }
@@ -170,13 +208,27 @@ public struct PostRowView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
+    private func LastEditHiddenTag() -> some View {
+        Text("Hidden", bundle: .module)
+            .font(.caption)
+            .foregroundStyle(Color(.Labels.teritary))
+            .padding(.vertical, 2)
+            .padding(.horizontal, 6)
+            .background(
+                Color(.Background.teritary)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            )
+    }
+    
     // MARK: - Context Menu
     
     private func ContextMenu() -> some View {
         Menu {
-            Section {
-                ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
-                    menuAction(.reply(state.post.id, state.post.post.author.name))
+            if state.canPostInTopic {
+                Section {
+                    ContextButton(text: LocalizedStringResource("Reply", bundle: .module), symbol: .arrowTurnUpRight) {
+                        menuAction(.reply(state.post.id, state.post.post.author.name))
+                    }
                 }
             }
             
@@ -192,14 +244,20 @@ public struct PostRowView: View {
                 }
             }
             
-            ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
-                menuAction(.report(state.post.id))
+            if state.isUserAuthorized {
+                ContextButton(text: LocalizedStringResource("Report", bundle: .module), symbol: .exclamationmarkTriangle) {
+                    menuAction(.report(state.post.id))
+                }
             }
             
             if state.post.post.canDelete {
                 ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    menuAction(.delete(state.post.id))
+                    toolsMenuAction(.modify(.delete, state.post.id, false))
                 }
+            }
+            
+            if state.post.post.canModerate {
+                ToolsContextMenu()
             }
             
             Section {
@@ -236,6 +294,61 @@ public struct PostRowView: View {
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
         .frame(width: 8, height: 22)
+    }
+    
+    // MARK: - Tools Context Menu
+    
+    @ViewBuilder
+    private func ToolsContextMenu() -> some View {
+        Menu {
+            if state.post.post.isDeleted {
+                ContextButton(
+                    text: LocalizedStringResource("Restore", bundle: .module),
+                    symbol: .arrowCounterclockwiseCircle
+                ) {
+                    toolsMenuAction(.modify(.delete, state.post.id, true))
+                }
+            }
+            
+            ContextButton(
+                text: state.post.post.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: state.post.post.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                toolsMenuAction(.modify(.hide, state.post.id, !state.post.post.isHidden))
+            }
+            
+            ContextButton(
+                text: state.post.post.isPinned
+                ? LocalizedStringResource("Unpin", bundle: .module)
+                : LocalizedStringResource("Pin", bundle: .module),
+                symbol: state.post.post.isPinned ? .pinFill : .pin
+            ) {
+                toolsMenuAction(.modify(.pin, state.post.id, !state.post.post.isPinned))
+            }
+            
+            ContextButton(
+                text: state.post.post.isProtected
+                ? LocalizedStringResource("Remove Protection", bundle: .module)
+                : LocalizedStringResource("Protect", bundle: .module),
+                symbol: state.post.post.isProtected ? .shieldFill : .shield
+            ) {
+                toolsMenuAction(.modify(.protect, state.post.id, !state.post.post.isProtected))
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                toolsMenuAction(.move(state.post.id))
+            }
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
+            }
+        }
     }
 }
 

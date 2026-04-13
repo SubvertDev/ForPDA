@@ -37,6 +37,7 @@ import Combine
 import SearchResultFeature
 import CacheClient
 import DeviceSpecificationsFeature
+import DeviceTypeFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -638,8 +639,17 @@ public struct AppFeature: Reducer, Sendable {
             screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
-        case let .device(tag, subTag):
-            screen = .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
+        case let .device(goTo):
+            screen = switch goTo {
+            case .index:
+                .devDB(.type(DeviceTypeFeature.State(content: .index)))
+            case .vendorsList(let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type))))
+            case .vendor(let vendorName, let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
+            case .device(let tag, let subTag):
+                .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
+            }
         case let .topic(id, goTo):
             screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
         case let .forum(id, page):

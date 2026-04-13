@@ -33,6 +33,7 @@ import AuthFeature
 import SearchFeature
 import SearchResultFeature
 import DeviceSpecificationsFeature
+import DeviceTypeFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -192,6 +193,15 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleDevDBPathNavigation(action: Path.DevDB.Action, state: inout State) -> Effect<Action> {
         switch action {
+        case let .type(.delegate(.openDevice(tag))):
+            state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: nil))))
+            
+        case let .type(.delegate(.openVendorsList(type))):
+            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type)))))
+            
+        case let .type(.delegate(.openVendor(code, type))):
+            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendor(code, type: type)))))
+            
         case let .specifications(.delegate(.openDevice(tag, subTag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
             
@@ -480,8 +490,17 @@ public struct StackTab: Reducer, Sendable {
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 
-            case let .device(tag, subTag):
-                state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
+            case let .device(goTo):
+                switch goTo {
+                case .index:
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .index))))
+                case .vendorsList(let type):
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type)))))
+                case .vendor(let vendorName, let type):
+                    state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type)))))
+                case .device(let tag, let subTag):
+                    state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag))))
+                }
                 
             case let .article(id: id, title: title, imageUrl: imageUrl, scrollToId):
                 let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)

@@ -18,6 +18,7 @@ import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
 import ForumStatFeature
+import ForumMoveFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -199,6 +200,8 @@ public struct TopicScreen: View {
                 
                 if topic.canModerate {
                     Section {
+                        ToolsOptionsMenu(topic: topic)
+                        
                         Menu {
                             Picker(String(), selection: $store.postsFilter) {
                                 ForEach(TopicPostsFilter.allCases) { mode in
@@ -218,6 +221,49 @@ public struct TopicScreen: View {
         } label: {
             Image(systemSymbol: .ellipsisCircle)
                 .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    // MARK: - Tools Options Menu
+    
+    @ViewBuilder
+    private func ToolsOptionsMenu(topic: Topic) -> some View {
+        Menu {
+            ContextButton(
+                text: topic.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                send(.contextToolsMenu(.modify(.hide, !topic.isHidden)))
+            }
+            
+            ContextButton(
+                text: topic.isClosed
+                ? LocalizedStringResource("Open Topic", bundle: .module)
+                : LocalizedStringResource("Close Topic", bundle: .module),
+                symbol: topic.isClosed ? .lockFill : .lock
+            ) {
+                send(.contextToolsMenu(.modify(.close, !topic.isClosed)))
+            }
+            
+            if topic.canDelete {
+                ContextButton(text: LocalizedStringResource("Delete Topic", bundle: .module), symbol: .trash) {
+                    send(.contextToolsMenu(.modify(.delete, false)))
+                }
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                send(.contextToolsMenu(.move))
+            }
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
+            }
         }
     }
     
@@ -339,6 +385,8 @@ public struct TopicScreen: View {
                     send(.imageTapped(url))
                 case .textQuoted(let text):
                     send(.textQuoted(post, text))
+                case .karmaHistoryTapped:
+                    send(.karmaHistoryTapped(post.id))
                 }
             },
             menuAction: { action in
@@ -347,8 +395,6 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.reply(id, authorName)))
                 case .edit(let post):
                     send(.contextPostMenu(.edit(post)))
-                case .delete(let postId):
-                    send(.contextPostMenu(.delete(postId)))
                 case .karma(let postId):
                     send(.contextPostMenu(.karma(postId)))
                 case .report(let postId):
@@ -361,6 +407,14 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.mentions(postId)))
                 case .copyLink(let postId):
                     send(.contextPostMenu(.copyLink(postId)))
+                }
+            },
+            toolsMenuAction: { action in
+                switch action {
+                case .move(let postId):
+                    send(.contextPostToolsMenu(.move(postId)))
+                case .modify(let action, let postId, let isUndo):
+                    send(.contextPostToolsMenu(.modify(action, postId, isUndo)))
                 }
             }
         )
@@ -471,6 +525,17 @@ struct NavigationModifier: ViewModifier {
                     ) { store in
                         ReputationChangeView(store: store)
                     }
+                    .fittedSheet(
+                        item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                        embedIntoNavStack: true
+                    ) { store in
+                        ForumMoveView(store: store)
+                    }
+                    .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
+                        NavigationStack {
+                            PostKarmaHistoryView(store: store)
+                        }
+                    }
                     .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
                         NavigationStack {
                             ForumStatView(store: store)
@@ -490,7 +555,7 @@ extension View {
 // MARK: - Extensions
 
 // TODO: Move to extensions?
-private extension Date {
+extension Date {
     func formattedDate() -> LocalizedStringKey {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"

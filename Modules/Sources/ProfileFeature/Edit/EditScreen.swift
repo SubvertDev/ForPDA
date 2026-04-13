@@ -225,7 +225,7 @@ public struct EditScreen: View {
                 .overlay(alignment: .bottomTrailing) {
                     if store.isUserSetAvatar {
                         AvatarContextMenu()
-                    } else {
+                    } else if let session = store.userSession, session.userId == store.user.id {
                         AvatarUploadButton()
                     }
                 }
@@ -313,12 +313,14 @@ public struct EditScreen: View {
     @ViewBuilder
     private func AvatarContextMenu() -> some View {
         Menu {
-            Button {
-                send(.addAvatarButtonTapped)
-            } label: {
-                HStack {
-                    Text("Update avatar", bundle: .module)
-                    Image(systemSymbol: .plusCircle)
+            if let session = store.userSession, session.userId == store.user.id {
+                Button {
+                    send(.addAvatarButtonTapped)
+                } label: {
+                    HStack {
+                        Text("Update avatar", bundle: .module)
+                        Image(systemSymbol: .plusCircle)
+                    }
                 }
             }
             

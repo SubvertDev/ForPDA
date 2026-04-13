@@ -17,6 +17,7 @@ import TCAExtensions
 import ToastClient
 import FormFeature
 import ForumStatFeature
+import ForumMoveFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -56,6 +57,7 @@ public struct ForumFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case form(FormFeature)
+        case move(ForumMoveFeature)
 		case stat(ForumStatFeature)
     }
     
@@ -120,6 +122,7 @@ public struct ForumFeature: Reducer, Sendable {
             
             case contextOptionMenu(ForumOptionContextMenuAction)
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
+            case contextTopicToolsMenu(ForumTopicToolsContextMenuAction)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
         
@@ -242,6 +245,27 @@ public struct ForumFeature: Reducer, Sendable {
                         .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
                         .send(.internal(.refresh))
                     )
+                }
+                
+            case let .view(.contextTopicToolsMenu(action)):
+                switch action {
+                case .move(let topicId):
+                    state.destination = .move(ForumMoveFeature.State(type: .topic(topicId)))
+                    return .none
+                    
+                case .modify(let action, let topicId, let isUndo):
+                    return .run { send in
+                        let status = try await apiClient.modifyForum(
+                            ids: [topicId],
+                            type: .topic(action),
+                            isUndo: isUndo
+                        )
+                        await send(.internal(.refresh))
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                    } catch: { error, send in
+                        analyticsClient.capture(error)
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    }
                 }
                 
             case .view(.contextCommonMenu(let action, let id, let isForum)):
