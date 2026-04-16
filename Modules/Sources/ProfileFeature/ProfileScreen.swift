@@ -770,7 +770,7 @@ public struct ProfileScreen: View {
                 .padding(.vertical, 19)
                 
             case .vertical:
-                VStack {
+                VStack(spacing: 2) {
                     Text(title, bundle: .module)
                         .font(.footnote)
                         .foregroundStyle(Color(.Labels.teritary))
