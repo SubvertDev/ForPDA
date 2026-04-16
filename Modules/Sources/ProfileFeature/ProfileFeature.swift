@@ -256,7 +256,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 state.userSessionGroup = group
                 return .none
                 
-            case let .destination(.presented(.note(.delegate(.formSent(.note))))):
+            case .destination(.presented(.note(.delegate(.formSent(.note))))):
                 return .run { send in
                     await toastClient.showToast(ToastMessage(text: Localization.noteAdded))
                     await send(.view(.onAppear))
