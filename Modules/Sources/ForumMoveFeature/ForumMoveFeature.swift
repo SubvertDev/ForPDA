@@ -118,7 +118,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
                     switch artefact {
                     case .topic(let topicId, _):
                         guard case .posts(let ids) = state.type else {
-                            state.error = .needTopicUrl
+                            state.error = .needForumUrl
                             break
                         }
                         guard let topicId = topicId else {
@@ -129,15 +129,17 @@ public struct ForumMoveFeature: Reducer, Sendable {
                         
                     case .forum(let forumId, _):
                         guard case .topic(let topicId) = state.type else {
-                            state.error = .needForumUrl
+                            state.error = .needTopicUrl
                             break
                         }
                         return .send(.internal(.moveTopic(topicId, toForumid: forumId)))
                         
-                    default: break
+                    default:
+                        state.error = .badURL
                     }
+                } else {
+                    state.error = .badURL
                 }
-                state.error = .badURL
                 return .none
                 
             case let .internal(.movePosts(ids, toTopicId)):
@@ -182,7 +184,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
                 if status {
                     return .send(.delegate(.openDeeplink(.forum(id: toForumId, page: 0))))
                 }
-                return .send(.internal(.movePostsResponse(.failure(NSError(domain: "MT", code: -1)))))
+                return .send(.internal(.moveTopicResponse(.failure(NSError(domain: "MT", code: -1)))))
                 
             case let .internal(.moveTopicResponse(.failure(error))):
                 print(error)
