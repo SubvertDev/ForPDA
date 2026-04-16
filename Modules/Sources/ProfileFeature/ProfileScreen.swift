@@ -347,7 +347,8 @@ public struct ProfileScreen: View {
                 )
                 
                 if user.canModerate || (store.shouldShowToolbarButtons && user.warningLevel != -1) {
-                    InformationRow(title: "Warning level", content: "\(20 * user.warningLevel)%", type: .horizontal)
+                    let warningLevel = user.warningLevel != -1 ? 20 * user.warningLevel : 0
+                    InformationRow(title: "Warning level", content: "\(warningLevel)%", type: .horizontal)
                 }
                 
                 if user.canModerate {
