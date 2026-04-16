@@ -55,13 +55,12 @@ public struct ProfileFeature: Reducer, Sendable {
             return userSession != nil && user?.id == userSession?.userId
         }
         
-        var shouldShowOptionsToolbarButton: Bool {
+        var isUserSessionHasModerationGroup: Bool {
             return userSessionGroup == .admin
                 || userSessionGroup == .supermoderator
                 || userSessionGroup == .moderator
                 || userSessionGroup == .moderatorHelper
                 || userSessionGroup == .moderatorSchool
-                || userSession?.userId == userId
         }
         
         var didLoadOnce = false

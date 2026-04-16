@@ -114,7 +114,7 @@ public struct ProfileScreen: View {
             }
         }
         
-        if store.shouldShowOptionsToolbarButton {
+        if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
             ToolbarItem {
                 OptionsMenu()
             }
