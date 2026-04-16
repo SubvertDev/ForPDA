@@ -379,10 +379,10 @@ public struct TopicFeature: Reducer, Sendable {
                     switch action {
                     case .hide, .close:
                         return .run { [id = state.topicId] send in
-                            _ = try await apiClient.modifyForum(ids: [id], type: .topic(action), isUndo: isUndo)
+                            let status = try await apiClient.modifyForum(ids: [id], type: .topic(action), isUndo: isUndo)
                             
                             await send(.internal(.refresh))
-                            await toastClient.showToast(.actionCompleted)
+                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                         } catch: { error, send in
                             analyticsClient.capture(error)
                             await toastClient.showToast(.whoopsSomethingWentWrong)
