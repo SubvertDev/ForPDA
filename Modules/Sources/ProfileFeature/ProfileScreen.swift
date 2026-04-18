@@ -603,7 +603,7 @@ public struct ProfileScreen: View {
     private func LoggingSegment(user: User) -> some View {
         if user.canModerate {
             Section {
-                VStack {
+                VStack(spacing: 12) {
                     HStack(spacing: 12) {
                         InformationRow(title: "Registration IP", content: user.registrationIP, type: .vertical)
                         
