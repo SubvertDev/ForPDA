@@ -225,6 +225,7 @@ public struct ForumStatView: View {
                 BrickLayout(verticalSpacing: 6, horizontalSpacing: 8) {
                     ForEach(moderators) { moderator in
                         UserBrickButton(id: moderator.id, name: moderator.name)
+                            .disabled(moderator.id == 0)
                     }
                 }
             }
