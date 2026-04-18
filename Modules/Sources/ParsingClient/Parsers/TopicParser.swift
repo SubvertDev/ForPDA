@@ -116,7 +116,11 @@ public struct TopicParser {
                   let group = user[2] as? Int else {
                 throw ParsingError.failedToCastFields
             }
-            return TopicViewers.SimplifiedUser(id: id, name: name, group: User.Group(rawValue: group)!)
+            return TopicViewers.SimplifiedUser(
+                id: id,
+                name: name.convertCodes(),
+                group: User.Group(rawValue: group)!
+            )
         }
     }
     

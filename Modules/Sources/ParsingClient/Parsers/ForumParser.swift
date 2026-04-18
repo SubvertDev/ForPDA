@@ -57,7 +57,7 @@ public struct ForumParser {
                 
                 return ForumStat(
                     id: array[3] as! Int,
-                    name: array[4] as! String,
+                    name: (array[4] as! String).convertCodes(),
                     description: array[5] as! String,
                     flag: ForumFlag(rawValue: array[6] as! Int),
                     globalAnnouncement: array[7] as! String,
