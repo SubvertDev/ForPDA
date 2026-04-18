@@ -57,7 +57,7 @@ public struct ForumParser {
                 
                 return ForumStat(
                     id: array[3] as! Int,
-                    name: (array[4] as! String).convertCodes(),
+                    name: array[4] as! String,
                     description: array[5] as! String,
                     flag: ForumFlag(rawValue: array[6] as! Int),
                     globalAnnouncement: array[7] as! String,
@@ -78,7 +78,7 @@ public struct ForumParser {
         return array.map { moderator in
             return ForumStat.ForumModerator(
                 id: moderator[0] as! Int,
-                name: moderator[1] as! String,
+                name: (moderator[1] as! String).convertCodes(),
                 group: User.Group(rawValue: moderator[2] as! Int)!
             )
         }

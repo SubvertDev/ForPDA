@@ -313,6 +313,7 @@ let project = Project(
                 name: "ForumStatFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,

@@ -144,7 +144,9 @@ public struct ForumStatView: View {
             
             BrickLayout(verticalSpacing: 6, horizontalSpacing: 8) {
                 ForEach(viewers.users) { user in
-                    UserBrickButton(id: user.id, name: user.name)
+                    if !user.isHidden || (user.isHidden && store.isUserHasModerationGroup) {
+                        UserBrickButton(id: user.id, name: user.name, isHidden: user.isHidden)
+                    }
                 }
             }
             .padding(.top, 12)
@@ -241,7 +243,7 @@ public struct ForumStatView: View {
     // MARK: - User Brick Button
     
     @ViewBuilder
-    private func UserBrickButton(id: Int, name: String) -> some View {
+    private func UserBrickButton(id: Int, name: String, isHidden: Bool = false) -> some View {
         Button {
             send(.userButtonTapped(id))
         } label: {
@@ -249,6 +251,14 @@ public struct ForumStatView: View {
                 .font(.footnote)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(tintColor)
+                .overlay(alignment: .bottomTrailing) {
+                    if isHidden {
+                        Text(verbatim: "*")
+                            .font(.headline)
+                            .offset(x: 4, y: -4)
+                            .foregroundStyle(Color(.Labels.quintuple))
+                    }
+                }
         }
         .buttonStyle(.plain)
         .padding(.vertical, 9)
