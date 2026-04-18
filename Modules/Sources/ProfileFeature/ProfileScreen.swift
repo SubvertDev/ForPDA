@@ -780,7 +780,7 @@ public struct ProfileScreen: View {
                         .font(.body)
                         .foregroundStyle(Color(.Labels.primary))
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
                 .padding(12)
             }
         }
