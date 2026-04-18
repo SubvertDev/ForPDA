@@ -610,7 +610,9 @@ public struct ProfileScreen: View {
                         InformationRow(title: "Session IP", content: user.sessionIP, type: .vertical)
                     }
                     
-                    InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
+                    if !user.previousNicknames.isEmpty {
+                        InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
+                    }
                 }
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
