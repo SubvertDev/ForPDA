@@ -107,7 +107,7 @@ public struct PostRowView: View {
                         }
                         .buttonStyle(.plain)
                         .allowsHitTesting(state.post.post.canModerate)
-                        .frame(width: 8, height: 22)
+                        .frame(minWidth: 8, minHeight: 22)
                     }
                 }
                 

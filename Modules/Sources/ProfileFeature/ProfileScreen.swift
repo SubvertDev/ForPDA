@@ -114,7 +114,7 @@ public struct ProfileScreen: View {
             }
         }
         
-        if store.shouldShowOptionsToolbarButton {
+        if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
             ToolbarItem {
                 OptionsMenu()
             }
@@ -347,7 +347,8 @@ public struct ProfileScreen: View {
                 )
                 
                 if user.canModerate || (store.shouldShowToolbarButtons && user.warningLevel != -1) {
-                    InformationRow(title: "Warning level", content: "\(20 * user.warningLevel)%", type: .horizontal)
+                    let warningLevel = user.warningLevel != -1 ? 20 * user.warningLevel : 0
+                    InformationRow(title: "Warning level", content: "\(warningLevel)%", type: .horizontal)
                 }
                 
                 if user.canModerate {
@@ -602,14 +603,16 @@ public struct ProfileScreen: View {
     private func LoggingSegment(user: User) -> some View {
         if user.canModerate {
             Section {
-                VStack {
+                VStack(spacing: 12) {
                     HStack(spacing: 12) {
                         InformationRow(title: "Registration IP", content: user.registrationIP, type: .vertical)
                         
                         InformationRow(title: "Session IP", content: user.sessionIP, type: .vertical)
                     }
                     
-                    InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
+                    if !user.previousNicknames.isEmpty {
+                        InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
+                    }
                 }
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -770,7 +773,7 @@ public struct ProfileScreen: View {
                 .padding(.vertical, 19)
                 
             case .vertical:
-                VStack {
+                VStack(spacing: 2) {
                     Text(title, bundle: .module)
                         .font(.footnote)
                         .foregroundStyle(Color(.Labels.teritary))
@@ -779,7 +782,7 @@ public struct ProfileScreen: View {
                         .font(.body)
                         .foregroundStyle(Color(.Labels.primary))
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
                 .padding(12)
             }
         }

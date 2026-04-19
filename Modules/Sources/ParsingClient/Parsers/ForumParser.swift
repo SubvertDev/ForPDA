@@ -78,7 +78,7 @@ public struct ForumParser {
         return array.map { moderator in
             return ForumStat.ForumModerator(
                 id: moderator[0] as! Int,
-                name: moderator[1] as! String,
+                name: (moderator[1] as! String).convertCodes(),
                 group: User.Group(rawValue: moderator[2] as! Int)!
             )
         }

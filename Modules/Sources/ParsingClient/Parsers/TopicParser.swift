@@ -113,10 +113,16 @@ public struct TopicParser {
         return try usersRaw.map { user in
             guard let id = user[safe: 0] as? Int,
                   let name = user[safe: 1] as? String,
-                  let group = user[2] as? Int else {
+                  let group = user[2] as? Int,
+                  let isHidden = user[3] as? Int else {
                 throw ParsingError.failedToCastFields
             }
-            return TopicViewers.SimplifiedUser(id: id, name: name, group: User.Group(rawValue: group)!)
+            return TopicViewers.SimplifiedUser(
+                id: id,
+                name: name.convertCodes(),
+                group: User.Group(rawValue: group)!,
+                isHidden: isHidden != 0
+            )
         }
     }
     

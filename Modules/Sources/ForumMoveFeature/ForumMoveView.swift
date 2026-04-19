@@ -107,11 +107,11 @@ public struct ForumMoveView: View {
     
     private func InputField() -> some View {
         VStack(spacing: 6) {
-            let header = switch store.type {
+            let header: LocalizedStringKey = switch store.type {
             case .topic: "Enter the forum link"
             case .posts: "Enter the topic link"
             }
-            Header(title: LocalizedStringKey(header))
+            Header(title: header)
             
             Field(
                 content: $store.inputUrl,

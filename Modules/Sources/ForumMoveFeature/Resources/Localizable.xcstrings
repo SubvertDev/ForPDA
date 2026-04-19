@@ -11,6 +11,26 @@
         }
       }
     },
+    "Enter the forum link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите ссылку на форум"
+          }
+        }
+      }
+    },
+    "Enter the topic link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите ссылку на тему"
+          }
+        }
+      }
+    },
     "Enter..." : {
       "localizations" : {
         "ru" : {

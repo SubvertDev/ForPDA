@@ -18,7 +18,7 @@ public enum DeviceTypeEvent: Event {
     public var properties: [String: String]? {
         switch self {
         case .deviceTapped(let tag):
-            return ["tag": name]
+            return ["tag": tag]
         case .typeTapped(let type):
             return ["type": type]
         case .vendorTapped(let name, let type):
