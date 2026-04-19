@@ -26,6 +26,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var appTintColor: AppTintColor
     public var notifications: NotificationsSettings
     public var backgroundNotifications2: Bool
+    public var backupServer: Bool
     public var favorites: FavoritesSettings
     public var searchSort: SearchSort
     public var forumPerPage: Int
@@ -48,6 +49,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         appTintColor: AppTintColor,
         notifications: NotificationsSettings,
         backgroundNotifications2: Bool,
+        backupServer: Bool,
         favorites: FavoritesSettings,
         searchSort: SearchSort,
         forumPerPage: Int,
@@ -69,6 +71,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appTintColor = appTintColor
         self.notifications = notifications
         self.backgroundNotifications2 = backgroundNotifications2
+        self.backupServer = backupServer
         self.favorites = favorites
         self.searchSort = searchSort
         self.forumPerPage = forumPerPage
@@ -93,6 +96,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.appTintColor = try container.decodeIfPresent(AppTintColor.self, forKey: .appTintColor) ?? AppSettings.default.appTintColor
         self.notifications = try container.decodeIfPresent(NotificationsSettings.self, forKey: .notifications) ?? AppSettings.default.notifications
         self.backgroundNotifications2 = try container.decodeIfPresent(Bool.self, forKey: .backgroundNotifications2) ?? AppSettings.default.backgroundNotifications2
+        self.backupServer = try container.decodeIfPresent(Bool.self, forKey: .backupServer) ?? AppSettings.default.backupServer
         self.favorites = try container.decodeIfPresent(FavoritesSettings.self, forKey: .favorites) ?? AppSettings.default.favorites
         self.searchSort = try container.decodeIfPresent(SearchSort.self, forKey: .searchSort) ?? AppSettings.default.searchSort
         self.forumPerPage = try container.decodeIfPresent(Int.self, forKey: .forumPerPage) ?? AppSettings.default.forumPerPage
@@ -119,6 +123,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
             "appTintColor": appTintColor._rawValue,
             "notifications": notifications.asDictionary(),
             "backgroundNotifications": backgroundNotifications2,
+            "backupServer": backupServer,
             "favorites": favorites.asDictionary(),
             "searchSort": searchSort._rawValue,
             "hideTabBarOnScroll": hideTabBarOnScroll,
@@ -140,6 +145,7 @@ public extension AppSettings {
         appTintColor: .primary,
         notifications: .default,
         backgroundNotifications2: true,
+        backupServer: false,
         favorites: .default,
         searchSort: .relevance,
         forumPerPage: 30,

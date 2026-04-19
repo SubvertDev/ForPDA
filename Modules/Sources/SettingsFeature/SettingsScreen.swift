@@ -74,6 +74,7 @@ public struct SettingsScreen: View {
     private func Row(
         symbol: SFSymbol,
         title: LocalizedStringKey,
+        description: LocalizedStringKey? = nil,
         type: RowType,
         isBold: Bool = false,
         toggle: Binding<Bool>? = nil,
@@ -90,10 +91,18 @@ public struct SettingsScreen: View {
                         .frame(width: 36)
                         .padding(.trailing, 12)
                     
-                    Text(title, bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                        .bold(isBold)
+                    VStack(alignment: .leading) {
+                        Text(title, bundle: .module)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                            .bold(isBold)
+                        
+                        if let description {
+                            Text(description, bundle: .module)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     
                     Spacer(minLength: 8)
                     
@@ -259,6 +268,15 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func AdvancedSection() -> some View {
         Section {
+            Row(
+                symbol: .linkIcloud,
+                title: "Backup connection",
+                description: "Restart required",
+                type: .toggle,
+                toggle: $store.appSettings.backupServer
+            )
+
+            
             Row(symbol: .safari, title: "Safari extension", type: .navigation) {
                 store.send(.safariExtensionButtonTapped)
             }

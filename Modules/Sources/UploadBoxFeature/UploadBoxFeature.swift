@@ -362,7 +362,7 @@ public struct UploadBoxFeature: Reducer, Sendable {
                     
                     await send(.delegate(.someFileUploading))
                     
-                    for await status in apiClient.upload(request) {
+                    for try await status in await apiClient.upload(request) {
                         await send(.internal(.updateFileUploadStatus(file.id, status)))
                     }
                 }
