@@ -1128,7 +1128,7 @@ extension TargetDependency.SPM {
     static let MemberwiseInit = TargetDependency.external(name: "MemberwiseInit")
     static let Nuke =           TargetDependency.external(name: "Nuke")
     static let NukeUI =         TargetDependency.external(name: "NukeUI")
-    static let PDAPI =          TargetDependency.external(name: "PDAPI")
+    static let PDAPI =          TargetDependency.external(name: "PDAPI_SPM")
     static let PostHog =        TargetDependency.external(name: "PostHog")
     static let RichTextKit =    TargetDependency.external(name: "RichTextKit")
     static let Sentry =         TargetDependency.external(name: "Sentry")
