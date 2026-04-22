@@ -26,7 +26,7 @@ public struct ReputationChangeRequest: Sendable {
         case recover
     }
     
-    nonisolated var transferVoteType: MemberReputationRequest.VoteType {
+    nonisolated var transferVoteType: MemberReputationRequest.ActionType {
         switch action {
         case .up:   .plus
         case .down: .minus

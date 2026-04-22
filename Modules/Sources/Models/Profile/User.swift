@@ -33,7 +33,18 @@ public struct User: Sendable, Hashable, Codable {
     public let curatedTopics: [CuratedTopic]
     public let warningLogs: [WarningLog]
     public let email: String?
+    public let registrationIP: String
+    public let sessionIP: String
+    public let warningLevel: Int
+    public let premoderation: Premoderation?
+    public let readOnlyUntil: Date?
+    public let banReason: BanReason?
     public let achievements: [Achievement]
+    public let previousNicknames: String
+    
+    public var canModerate: Bool {
+        return !registrationIP.isEmpty || !sessionIP.isEmpty
+    }
     
     public var birthdayDate: Date? {
         if let birthdate {
@@ -94,7 +105,14 @@ public struct User: Sendable, Hashable, Codable {
         curatedTopics: [CuratedTopic],
         warningLogs: [WarningLog],
         email: String?,
-        achievements: [Achievement]
+        registrationIP: String,
+        sessionIP: String,
+        warningLevel: Int,
+        premoderation: Premoderation?,
+        readOnlyUntil: Date?,
+        banReason: BanReason?,
+        achievements: [Achievement],
+        previousNicknames: String
     ) {
         self.id = id
         self.nickname = nickname
@@ -120,7 +138,14 @@ public struct User: Sendable, Hashable, Codable {
         self.curatedTopics = curatedTopics
         self.warningLogs = warningLogs
         self.email = email
+        self.registrationIP = registrationIP
+        self.sessionIP = sessionIP
+        self.warningLevel = warningLevel
+        self.premoderation = premoderation
+        self.readOnlyUntil = readOnlyUntil
+        self.banReason = banReason
         self.achievements = achievements
+        self.previousNicknames = previousNicknames
     }
 }
 
@@ -318,6 +343,21 @@ public extension User {
             self.canBeCanceled = canBeCanceled
         }
     }
+    
+    // MARK: - Ban Reason
+    
+    enum BanReason: Int, Codable, Hashable, Sendable {
+        case lastChanse = 1
+        case permanent = 2
+        case securityBlock = 3
+    }
+    
+    // MARK: - Premoderation
+    
+    enum Premoderation: Sendable, Codable, Hashable {
+        case always
+        case until(Date)
+    }
 }
 
 // MARK: - Mock
@@ -327,7 +367,7 @@ public extension User {
         id: 0,
         nickname: "Test Nickname",
         imageUrl: Links.defaultAvatar,
-        group: .active,
+        group: .admin,
         status: "Just a status",
         signature: "[b][color=blue]Developer[/color][/b]",
         aboutMe: "A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me. A lot of text about me.",
@@ -369,6 +409,12 @@ public extension User {
             .mockIncreasedAsUserWithoutPost
         ],
         email: "some@email.com",
+        registrationIP: "8.8.8.8",
+        sessionIP: "1.1.1.1",
+        warningLevel: 40,
+        premoderation: .always,
+        readOnlyUntil: Date.now,
+        banReason: .lastChanse,
         achievements: [
             .init(
                 name: "Призер Аллеи Славы",
@@ -378,7 +424,8 @@ public extension User {
                 forumUrl: URL(string: "/")!,
                 presentationDate: .now
             )
-        ]
+        ],
+        previousNicknames: "Previous1, Previous2, Previous3"
     )
 }
 

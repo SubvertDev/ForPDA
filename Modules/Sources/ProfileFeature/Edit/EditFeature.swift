@@ -8,6 +8,7 @@
 import Foundation
 import ComposableArchitecture
 import APIClient
+import PersistenceKeys
 import Models
 import ToastClient
 import BBPanelFeature
@@ -29,6 +30,8 @@ public struct EditFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         public enum Field: CaseIterable { case status, signature, about, city }
+        
+        @Shared(.userSession) public var userSession: UserSession?
         
         @Presents public var destination: Destination.State?
         @Presents public var alert: AlertState<Action.Alert>?

@@ -67,6 +67,16 @@
         }
       }
     },
+    "New note" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Новая заметка"
+          }
+        }
+      }
+    },
     "New post" : {
       "localizations" : {
         "en" : {
@@ -115,6 +125,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заполните все обязательные поля"
+          }
+        }
+      }
+    },
+    "Not set reason for note" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не указана причина"
           }
         }
       }

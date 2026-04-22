@@ -92,7 +92,7 @@ let package = Package(
         // Forks & stuff
         .package(url: "https://github.com/SubvertDev/AlertToast.git", revision: "d0f7d6b"),
         .package(url: "https://github.com/SubvertDev/Chat", branch: "main"),
-        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.7.3"),
+        .package(url: "https://github.com/SubvertDev/PDAPI_SPM.git", exact: "0.8.0"),
         .package(url: "https://github.com/SubvertDev/RichTextKit.git", branch: "main"),
     ]
 )

@@ -41,10 +41,13 @@ public struct QMSFeature: Reducer, Sendable {
         public let chatId: Int
         public var chat: QMSChat?
         public var messages: [Message] = []
-        var idMap: [Int: String] = [:] // Remote -> Local
         
+        var hasMoreOlderMessages = true
         var isLoadingMore = false
         var didLoadOnce = false
+        var isSending = false
+        
+        var draftText = ""
         
         public var title: String {
             if let chat {
@@ -81,7 +84,7 @@ public struct QMSFeature: Reducer, Sendable {
         public enum Internal {
             case loadChat
             case chatLoaded(Result<QMSChat, any Error>, LoadKind)
-            case messageSendError(id: String, message: String)
+            case messageSendError(any Error)
         }
         
         case delegate(Delegate)
@@ -100,6 +103,8 @@ public struct QMSFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce<State, Action> { state, action in
             switch action {
             case .alert, .delegate:
@@ -123,34 +128,20 @@ public struct QMSFeature: Reducer, Sendable {
                 ])
                 
             case let .view(.sendMessageButtonTapped(draftMessage)):
-                let id: String
+                guard !state.isSending, !draftMessage.text.isEmpty else { return .none }
                 
-                if let index = state.messages.firstIndex(where: { $0.id == draftMessage.id }) {
-                    // If this message is already exists with same id it means that it's errored out and we're retrying
-                    state.messages[index].status = .sending
-                    id = draftMessage.id!
-                } else {
-                    // If the same id doesn't exists it's a new message
-                    id = UUID().uuidString
-                    let localMessage = Message(
-                        id: id,
-                        user: User(id: String(state.userSession!.userId), name: "You", avatarURL: nil, isCurrentUser: true),
-                        status: .sending,
-                        createdAt: .now,
-                        text: draftMessage.text
-                    )
-                    state.messages.append(localMessage)
-                }
-
+                state.isSending = true
+                
                 return .run { [chatId = state.chatId, message = draftMessage.text] send in
                     try await qmsClient.sendQMSMessage(chatId: chatId, message: message)
-                } catch: { [id, message = draftMessage.text] error, send in
-                    await send(.internal(.messageSendError(id: id, message: message)))
+                } catch: { error, send in
+                    await send(.internal(.messageSendError(error)))
                 }
                 
             case .view(.loadMoreTriggered):
-                guard (state.chat?.totalCount ?? defaultOffset) > abs(defaultOffset) else { return .none }
                 guard !state.isLoadingMore else { return .none }
+                guard state.hasMoreOlderMessages else { return .none }
+                guard (state.chat?.totalCount ?? defaultOffset) > abs(defaultOffset) else { return .none }
                 state.isLoadingMore = true
                 return .run { [id = state.chatId, chat = state.chat] send in
                     let lastMessageId = chat?.messages.first?.id ?? 0
@@ -158,21 +149,26 @@ public struct QMSFeature: Reducer, Sendable {
                     await send(.internal(.chatLoaded(result, .older)))
                 }
                 
-            case let .internal(.messageSendError(id, message)):
-                let draft = DraftMessage(
-                    id: id, text: message, medias: [], giphyMedia: nil, recording: nil, replyMessage: nil, createdAt: .now
-                )
-                let index = state.messages.firstIndex(where: { $0.id == id })!
-                state.messages[index].status = .error(draft)
+            case let .internal(.messageSendError(error)):
+                state.isSending = false
+                state.alert = .somethingWentWrong
+                analyticsClient.capture(error)
                 return .none
                 
             case let .view(.urlTapped(url)):
-                guard url.absoluteString.contains("act=findpost") else {
+                guard url.absoluteString.contains("act=findpost"),
+                      let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+                      let act = components.queryItems?.first(where: { $0.name == "act" })?.value,
+                      act == "findpost",
+                      let pidRaw = components.queryItems?.first(where: { $0.name == "pid"})?.value,
+                      let pid = Int(pidRaw)
+                else {
                     return .send(.delegate(.handleUrl(url)))
                 }
+                
                 return .run { send in
                     @Dependency(\.apiClient) var api
-                    let request = JumpForumRequest(postId: 85632963, topicId: 0, allPosts: true, type: .post)
+                    let request = JumpForumRequest(postId: pid, topicId: 0, allPosts: true, type: .post)
                     let response = try await api.jumpForum(request: request)
                     let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
                     await send(.delegate(.handleUrl(url)))
@@ -185,72 +181,35 @@ public struct QMSFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.chatLoaded(result, loadKind)):
+                state.draftText = ""
+                state.isSending = false
                 state.isLoadingMore = false
                 
                 switch result {
                 case let .success(chat):
-                    state.chat = mergeChat(state.chat, with: chat, loadKind: loadKind)
+                    let existingRemote = state.chat?.messages ?? []
+                    let mergeResult = mergeRemoteMessages(
+                        existing: existingRemote,
+                        incoming: chat.messages,
+                        loadKind: loadKind
+                    )
                     
-                    var newLocalMessages: [Message] = []
-                                        
-                    for remoteMessage in chat.messages {
-                        // Skip if message is already mapped
-                        guard state.idMap[remoteMessage.id] == nil else { continue }
-                        
-                        // Matching with currently 'sending' statuses
-                        if loadKind == .latest,
-                           let pending = state.messages.last(
-                            where: { $0.user.isCurrentUser && $0.status == .sending && $0.text == remoteMessage.processedText }
-                           ) {
-                            state.idMap[remoteMessage.id] = pending.id
-                            continue
-                        }
-                        
-                        // No 'sending' status, treating as remote-only message
-                        let isCurrentUser = state.userSession!.userId == remoteMessage.senderId
-                        let user = User(
-                            id: String(remoteMessage.senderId),
-                            name: isCurrentUser ? "You" : chat.partnerName,
-                            avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
-                            isCurrentUser: isCurrentUser
-                        )
-                        
-                        let newLocalMessage = Message(
-                            id: UUID().uuidString,
-                            user: user,
-                            status: .none,
-                            createdAt: remoteMessage.date,
-                            text: remoteMessage.processedText
-                        )
-                        
-                        newLocalMessages.append(newLocalMessage)
-                        state.idMap[remoteMessage.id] = newLocalMessage.id
-                    }
+                    var mergedChat = chat
+                    mergedChat.messages = mergeResult.messages
                     
-                    switch loadKind {
-                    case .latest:
-                        state.messages.append(contentsOf: newLocalMessages)
-                    case .older:
-                        state.messages.insert(contentsOf: newLocalMessages, at: 0)
-                    }
+                    state.messages = makeLocalMessages(
+                        from: mergeResult.messages,
+                        chat: mergedChat,
+                        currentUserId: state.userSession!.userId
+                    )
+                    state.chat = mergedChat
                     
-                    switch loadKind {
-                    case .latest:
-                        let messages = state.messages.filter { $0.user.isCurrentUser }
-                        for (index, message) in messages.reversed().enumerated() {
-                            if let messageIndex = state.messages.firstIndex(of: message) {
-                                state.messages[messageIndex].status = index < chat.unreadCount ? .sent : .delivered
-                            }
-                        }
-                    case .older:
-                        let newCurrentUserMessageIds = Set(
-                            newLocalMessages
-                                .filter { $0.user.isCurrentUser }
-                                .map(\.id)
-                        )
-                        for index in state.messages.indices where newCurrentUserMessageIds.contains(state.messages[index].id) {
-                            state.messages[index].status = .delivered
-                        }
+                    if mergeResult.messages.count >= chat.totalCount {
+                        state.hasMoreOlderMessages = false
+                    } else if loadKind == .older, mergeResult.uniqueIncomingCount == 0 {
+                        state.hasMoreOlderMessages = false
+                    } else {
+                        state.hasMoreOlderMessages = true
                     }
                     
                 case let .failure(error):
@@ -272,29 +231,80 @@ public struct QMSFeature: Reducer, Sendable {
     
     // MARK: - Shared Logic
     
+    private struct RemoteMergeResult {
+        let messages: [QMSMessage]
+        let uniqueIncomingCount: Int
+    }
+    
+    private func mergeRemoteMessages(
+        existing: [QMSMessage],
+        incoming: [QMSMessage],
+        loadKind _: LoadKind
+    ) -> RemoteMergeResult {
+        let existingIds = Set(existing.map(\.id))
+        var seenIncomingIds = Set<Int>()
+        var uniqueIncomingCount = 0
+        
+        for message in incoming {
+            if !existingIds.contains(message.id), seenIncomingIds.insert(message.id).inserted {
+                uniqueIncomingCount += 1
+            }
+        }
+        
+        var messagesById = Dictionary(uniqueKeysWithValues: existing.map { ($0.id, $0) })
+        for message in incoming {
+            messagesById[message.id] = message
+        }
+        
+        let mergedMessages = messagesById.values.sorted {
+            if $0.date == $1.date {
+                return $0.id < $1.id
+            }
+            return $0.date < $1.date
+        }
+        
+        return RemoteMergeResult(messages: mergedMessages, uniqueIncomingCount: uniqueIncomingCount)
+    }
+    
+    private func makeLocalMessages(
+        from remoteMessages: [QMSMessage],
+        chat: QMSChat,
+        currentUserId: Int
+    ) -> [Message] {
+        var localMessages = remoteMessages.map { remoteMessage in
+            let isCurrentUser = currentUserId == remoteMessage.senderId
+            let user = User(
+                id: String(remoteMessage.senderId),
+                name: isCurrentUser ? "You" : chat.partnerName,
+                avatarURL: isCurrentUser ? nil : chat.avatarUrl ?? Links.defaultQMSAvatar,
+                isCurrentUser: isCurrentUser
+            )
+            
+            return Message(
+                id: String(remoteMessage.id),
+                user: user,
+                status: .none,
+                createdAt: remoteMessage.date,
+                text: remoteMessage.processedText
+            )
+        }
+        
+        for index in localMessages.indices {
+            guard localMessages[index].user.isCurrentUser else { continue }
+            localMessages[index].status = .read
+        }
+        
+        for index in localMessages.indices.suffix(chat.unreadCount) {
+            guard localMessages[index].user.isCurrentUser else { continue }
+            localMessages[index].status = .sent
+        }
+        
+        return localMessages
+    }
+    
     private func reportFullyDisplayed(_ state: inout State) {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()
         state.didLoadOnce = true
-    }
-    
-    private func mergeChat(_ existing: QMSChat?, with incoming: QMSChat, loadKind: LoadKind) -> QMSChat {
-        guard let existing else { return incoming }
-        
-        var merged = incoming
-        let existingIds = Set(existing.messages.map(\.id))
-        let incomingIds = Set(incoming.messages.map(\.id))
-        
-        switch loadKind {
-        case .latest:
-            let missingOlderMessages = existing.messages.filter { !incomingIds.contains($0.id) }
-            merged.messages = missingOlderMessages + incoming.messages
-            
-        case .older:
-            let missingOlderMessages = incoming.messages.filter { !existingIds.contains($0.id) }
-            merged.messages = missingOlderMessages + existing.messages
-        }
-        
-        return merged
     }
 }

@@ -18,15 +18,18 @@ public struct TopicViewers: Sendable, Equatable {
         public let id: Int
         public let name: String
         public let group: User.Group
+        public let isHidden: Bool
         
         public init(
             id: Int,
             name: String,
-            group: User.Group
+            group: User.Group,
+            isHidden: Bool
         ) {
             self.id = id
             self.name = name
             self.group = group
+            self.isHidden = isHidden
         }
     }
     
@@ -44,11 +47,11 @@ public struct TopicViewers: Sendable, Equatable {
 public extension TopicViewers {
     static let mock = TopicViewers(
         guestsCount: 1,
-        hiddenUsersCount: 2,
+        hiddenUsersCount: 1,
         users: [
-            .init(id: 0, name: "AirFlare", group: .regular),
-            .init(id: 1, name: "subvertd", group: .regular),
-            .init(id: 2, name: "Another", group: .active)
+            .init(id: 0, name: "AirFlare", group: .regular, isHidden: true),
+            .init(id: 1, name: "subvertd", group: .regular, isHidden: false),
+            .init(id: 2, name: "Another", group: .active, isHidden: false)
         ]
     )
 }

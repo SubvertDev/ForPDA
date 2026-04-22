@@ -147,30 +147,31 @@ public struct DeviceSpecificationsScreen: View {
     
     @ViewBuilder
     private func HeaderImages(_ images: [DeviceSpecifications.DeviceImage]) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             ForEach(Array(images.enumerated()), id: \.element) { index, image in
                 LazyImage(url: image.url) { state in
                     Group {
                         if let image = state.image {
-                            image.resizable().scaledToFill()
+                            image.resizable().scaledToFit()
                         } else {
                             Color(.systemBackground)
                         }
                     }
                     .skeleton(with: state.isLoading, shape: .rectangle)
                 }
-                .frame(width: 37, height: 75)
+                .frame(width: 75, height: 75)
                 .clipped()
                 .onTapGesture {
                     send(.headerImageTapped(index))
                 }
             }
         }
+        .padding(.top, 8)
     }
     
     @ViewBuilder
     private func HeaderEditions(_ editions: [DeviceSpecifications.Edition]) -> some View {
-        VStack(spacing: 6) {
+        VStack(alignment: .leading, spacing: 6) {
             ForEach(editions, id: \.name) { edition in
                 Button {
                     send(.editionButtonTapped(edition.subTag))

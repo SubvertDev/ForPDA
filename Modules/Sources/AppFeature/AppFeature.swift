@@ -37,6 +37,7 @@ import Combine
 import SearchResultFeature
 import CacheClient
 import DeviceSpecificationsFeature
+import DeviceTypeFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -85,7 +86,7 @@ public struct AppFeature: Reducer, Sendable {
             return identifiers?.first ?? ""
         }
         
-        public var connectionState: ConnectionState = .disconnected
+        public var connectionState: APIConnectionState = .disconnected
         public var isNetworkOnline = true
         
         public init(
@@ -151,7 +152,7 @@ public struct AppFeature: Reducer, Sendable {
         case didFinishToastAnimation
         case updateBadges(Unread)
         
-        case connectionStateChanged(ConnectionState)
+        case connectionStateChanged(APIConnectionState)
         case networkStateChanged(Bool)
         case receivedNotification(String)
         
@@ -238,7 +239,7 @@ public struct AppFeature: Reducer, Sendable {
                     
                     .run { send in
                         do {
-                            apiClient.setLogResponses(.none)
+                            await apiClient.setLogResponses(.none)
                             try await apiClient.connect(inBackground: false)
                         } catch {
                             await send(._failedToConnect(error))
@@ -481,7 +482,7 @@ public struct AppFeature: Reducer, Sendable {
                         if isLoggedIn {
                             await send(.registerBackgroundTask)
                         }
-                        try await apiClient.disconnect()
+                        await apiClient.disconnect()
                     }
                 }
                 
@@ -638,8 +639,17 @@ public struct AppFeature: Reducer, Sendable {
             screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
-        case let .device(tag, subTag):
-            screen = .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
+        case let .device(goTo):
+            screen = switch goTo {
+            case .index:
+                .devDB(.type(DeviceTypeFeature.State(content: .index)))
+            case .vendorsList(let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type))))
+            case .vendor(let vendorName, let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
+            case .device(let tag, let subTag):
+                .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
+            }
         case let .topic(id, goTo):
             screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
         case let .forum(id, page):
@@ -688,6 +698,17 @@ extension UIApplication.State {
             return "background"
         @unknown default:
             fatalError()
+        }
+    }
+}
+
+extension ScenePhase {
+    var description: String {
+        switch self {
+        case .background: return "background"
+        case .inactive: return "inactive"
+        case .active: return "active"
+        @unknown default: fatalError()
         }
     }
 }

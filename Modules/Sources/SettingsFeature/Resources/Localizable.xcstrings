@@ -51,6 +51,16 @@
         }
       }
     },
+    "Backup connection" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запасное соединение"
+          }
+        }
+      }
+    },
     "Basic" : {
       "localizations" : {
         "ru" : {
@@ -329,6 +339,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фиолетовый"
+          }
+        }
+      }
+    },
+    "Restart required" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Необходим рестарт"
           }
         }
       }

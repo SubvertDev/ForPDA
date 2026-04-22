@@ -13,6 +13,7 @@ import Models
 import AnalyticsClient
 import ToastClient
 import NotificationsClient
+import FormFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -22,6 +23,7 @@ public struct ProfileFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     private enum Localization {
+        static let noteAdded = LocalizedStringResource("Note added", bundle: .module)
         static let profileUpdated = LocalizedStringResource("Profile updated", bundle: .module)
         static let profileUpdateError = LocalizedStringResource("Profile update error", bundle: .module)
     }
@@ -31,6 +33,7 @@ public struct ProfileFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case alert(AlertState<ProfileFeature.Action.Alert>)
+        case note(FormFeature)
         case editProfile(EditFeature)
     }
     
@@ -40,6 +43,8 @@ public struct ProfileFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
         @Shared(.userSession) public var userSession: UserSession?
+        public var userSessionGroup: User.Group?
+        
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
@@ -48,6 +53,14 @@ public struct ProfileFeature: Reducer, Sendable {
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
+        }
+        
+        var isUserSessionHasModerationGroup: Bool {
+            return userSessionGroup == .admin
+                || userSessionGroup == .supermoderator
+                || userSessionGroup == .moderator
+                || userSessionGroup == .moderatorHelper
+                || userSessionGroup == .moderatorSchool
         }
         
         var didLoadOnce = false
@@ -72,7 +85,6 @@ public struct ProfileFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case qmsButtonTapped
-            case editButtonTapped
             case settingsButtonTapped
             case logoutButtonTapped
             case historyButtonTapped
@@ -83,12 +95,15 @@ public struct ProfileFeature: Reducer, Sendable {
             case deviceButtonTapped(String)
             case curatedTopicButtonTapped(Int)
             case deeplinkTapped(URL, ProfileDeeplinkType)
+            
+            case contextMenu(ProfileContextMenuAction)
         }
         
         case `internal`(Internal)
         public enum Internal {
             case userResponse(Result<User, any Error>)
             case updateBadgeCounts(Unread)
+            case updateUserSessionGroup(User.Group)
         }
         
         case destination(PresentationAction<Destination.Action>)
@@ -114,6 +129,7 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.toastClient) private var toastClient
@@ -136,6 +152,11 @@ public struct ProfileFeature: Reducer, Sendable {
                         }
                     } catch: { error, send in
                         await send(.internal(.userResponse(.failure(error))))
+                    },
+                    .run { [session = state.userSession] send in
+                        if let session, let user = cacheClient.getUser(session.userId) {
+                            await send(.internal(.updateUserSessionGroup(user.group)))
+                        }
                     },
                     .run { send in
                         let unread = try await apiClient.getUnread(type: .all)
@@ -185,11 +206,17 @@ public struct ProfileFeature: Reducer, Sendable {
                     sort: .dateDescSort
                 ))))
                 
-            case .view(.editButtonTapped):
-                if let user = state.user {
+            case let .view(.contextMenu(action)):
+                guard let user = state.user else { return .none }
+                switch action {
+                case .edit:
                     state.destination = .editProfile(EditFeature.State(user: user))
+                    return .none
+                    
+                case .addNotice:
+                    state.destination = .note(FormFeature.State(type: .note(userId: user.id)))
+                    return .none
                 }
-                return .none
                 
             case .view(.qmsButtonTapped):
                 return .send(.delegate(.openQms))
@@ -224,6 +251,16 @@ public struct ProfileFeature: Reducer, Sendable {
                 state.qmsBadgeCount = unread.qmsUnreadCount
                 state.mentionsBadgeCount = unread.mentionsUnreadCount
                 return .none
+                
+            case let .internal(.updateUserSessionGroup(group)):
+                state.userSessionGroup = group
+                return .none
+                
+            case .destination(.presented(.note(.delegate(.formSent(.note))))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.noteAdded))
+                    await send(.view(.onAppear))
+                }
                 
             case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):
                 return .concatenate(

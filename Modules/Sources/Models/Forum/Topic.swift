@@ -31,8 +31,20 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         return flag.contains(.canPost) && !flag.contains(.marker)
     }
     
+    public var canDelete: Bool {
+        return flag.contains(.canDelete)
+    }
+    
     public var canModerate: Bool {
         return flag.contains(.canModerate)
+    }
+    
+    public var isPinned: Bool {
+        return flag.contains(.pinned)
+    }
+    
+    public var isHidden: Bool {
+        return flag.contains(.hidden)
     }
     
     public var isClosed: Bool {
@@ -121,7 +133,7 @@ public extension Topic {
         id: 3242552,
         name: "ForPDA",
         description: "Unofficial 4PDA client for iOS.",
-        flag: [.canPost, .canEdit, .canModerate],
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         createdAt: Date(timeIntervalSince1970: 1725706883),
         authorId: 3640948,
         authorName: "4spander",

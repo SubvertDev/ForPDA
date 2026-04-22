@@ -36,7 +36,7 @@ public struct DevDBParser {
         
         return DeviceSpecifications(
             tag: tag,
-            type: DeviceType(rawValue: type) ?? .unknown,
+            type: DeviceType(rawValue: type)!,
             vendorName: vendorName,
             deviceName: deviceName,
             editionName: editionName,
@@ -48,7 +48,120 @@ public struct DevDBParser {
         )
     }
     
-    // MARK: - Images
+    // MARK: - Device Brands Response
+    
+    public static func parseDeviceBrands(from string: String) throws(ParsingError) -> DeviceVendorsList {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let type = array[safe: 2] as? String,
+              let typeName = array[safe: 3] as? String,
+              let brandsRaw = array[safe: 4] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return DeviceVendorsList(
+            type: DeviceType(rawValue: type)!,
+            typeName: typeName,
+            brands: try parseDeviceVendorsList(brandsRaw)
+        )
+    }
+    
+    // MARK: - Device Vendors List
+    
+    private static func parseDeviceVendorsList(_ brandsRaw: [[Any]]) throws(ParsingError) -> [DeviceVendorsList.VendorInfo] {
+        var brands: [DeviceVendorsList.VendorInfo] = []
+        for brand in brandsRaw {
+            guard let tag = brand[safe: 0] as? String,
+                  let name = brand[safe: 1] as? String,
+                  let devicesCount = brand[safe: 2] as? Int,
+                  let isActual = brand[safe: 3] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            brands.append(.init(
+                tag: tag,
+                name: name,
+                devicesCount: devicesCount,
+                isActual: isActual != 0
+            ))
+        }
+        return brands
+    }
+    
+    // MARK: - Device Vendor Response
+    
+    public static func parseDeviceVendor(from string: String) throws(ParsingError) -> DeviceVendor {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let type = array[safe: 2] as? String,
+              let categoryName = array[safe: 3] as? String,
+              let name = array[safe: 5] as? String,
+              let code = array[safe: 4] as? String,
+              let devicesRaw = array[safe: 6] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return DeviceVendor(
+            type: DeviceType(rawValue: type)!,
+            name: name,
+            code: code,
+            categoryName: categoryName,
+            devices: try parseVendorDevices(devicesRaw)
+        )
+    }
+    
+    // MARK: - Vendor Products
+    
+    private static func parseVendorDevices(_ productsRaw: [[Any]]) throws(ParsingError) -> [DeviceVendor.DeviceInfo] {
+        var devices: [DeviceVendor.DeviceInfo] = []
+        for product in productsRaw {
+            guard let tag = product[safe: 0] as? String,
+                  let name = product[safe: 1] as? String,
+                  let url = product[safe: 2] as? String,
+                  let isActual = product[safe: 3] as? Int,
+                  let entriesRaw = product[4] as? [[Any]] else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            devices.append(.init(
+                tag: tag,
+                name: name,
+                imageUrl: URL(string: url)!,
+                entries: try parseVendorDeviceEntry(entriesRaw),
+                isActual: isActual != 0
+            ))
+        }
+        return devices
+    }
+    
+    // MARK: - Vendor Device Entry
+    
+    private static func parseVendorDeviceEntry(_ entriesRaw: [[Any]]) throws(ParsingError) -> [DeviceVendor.DeviceInfo.Entry] {
+        var entries: [DeviceVendor.DeviceInfo.Entry] = []
+        for entry in entriesRaw {
+            guard let name = entry[safe: 2] as? String,
+                  let value = entry[safe: 4] as? String else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            entries.append(.init(name: name, value: value))
+        }
+        return entries
+    }
+    
+    // MARK: - Specification Images
     
     private static func parseDeviceImages(_ imagesRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.DeviceImage] {
         var images: [DeviceSpecifications.DeviceImage] = []
@@ -68,7 +181,7 @@ public struct DevDBParser {
         return images
     }
     
-    // MARK: - Editions
+    // MARK: - Specification Editions
     
     private static func parseDeviceEditions(_ editionsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.Edition] {
         var editions: [DeviceSpecifications.Edition] = []
@@ -83,7 +196,7 @@ public struct DevDBParser {
         return editions
     }
     
-    // MARK: - Specifications
+    // MARK: - Device Specifications
     
     private static func parseDeviceSpecifications(_ specsRaw: [[Any]]) throws(ParsingError) -> [DeviceSpecifications.Specification] {
         var specs: [DeviceSpecifications.Specification] = []

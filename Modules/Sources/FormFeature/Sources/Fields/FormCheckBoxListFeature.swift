@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import Models
+import SharedUI
 
 // MARK: - Feature
 
@@ -113,7 +114,7 @@ struct FormCheckBoxListRow: View {
                                     .font(.subheadline)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
-                            .toggleStyle(CheckBox())
+                            .toggleStyle(CheckBoxToggleStyle())
                             .padding(6)
                         }
                     }

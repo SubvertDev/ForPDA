@@ -146,6 +146,7 @@ public struct FormScreen: View {
             }
         case .topic:  "New topic"
         case .report: "Send report"
+        case .note:   "New note"
         }
     }
 }

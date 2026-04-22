@@ -9,4 +9,5 @@ public enum FormSend: Sendable {
     case post(PostSend)
     case topic(Int)
     case report
+    case note
 }

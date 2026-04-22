@@ -28,9 +28,6 @@ extension ProfileFeature {
                     
                 case .view(.qmsButtonTapped):
                     analyticsClient.log(ProfileEvent.qmsTapped)
-                    
-                case .view(.editButtonTapped):
-                    analyticsClient.log(ProfileEvent.editTapped)
                 
                 case .view(.settingsButtonTapped):
                     analyticsClient.log(ProfileEvent.settingsTapped)
@@ -58,6 +55,15 @@ extension ProfileFeature {
                     
                 case .view(.deviceButtonTapped(let tag)):
                     analyticsClient.log(ProfileEvent.deviceButtonTapped(tag))
+                    
+                case .view(.contextMenu(let action)):
+                    switch action {
+                    case .edit:
+                        analyticsClient.log(ProfileEvent.editTapped)
+                    case .addNotice:
+                        // MARK: Moderator tools are skip analytics
+                        break
+                    }
                     
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {

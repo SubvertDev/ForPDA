@@ -23,6 +23,7 @@ extension TopicFeature {
                         .view(.onNextAppear),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
+                        .view(.karmaHistoryTapped),
                         .view(.topicPollVoteButtonTapped),
                         .view(.searchButtonTapped),
                         .internal(.loadTypes),
@@ -66,8 +67,6 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostEdit(post.id))
                     case .report(let postId):
                         analytics.log(TopicEvent.menuPostReport(postId))
-                    case .delete(let postId):
-                        analytics.log(TopicEvent.menuPostDelete(postId))
                     case .changeReputation(let postId, let userId, _):
                         analytics.log(TopicEvent.menuChangeReputation(postId, userId))
                     case .userPostsInTopic(let userId):
@@ -97,6 +96,10 @@ extension TopicFeature {
                     case .writePostWithTemplate:
                         analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
+                    
+                case .view(.contextToolsMenu), .view(.contextPostToolsMenu):
+                    // MARK: Moderator tools are skip analytics
+                    break
 
                 case let .view(.textQuoted(post, _)):
                     analytics.log(TopicEvent.textQuoted(post.id))

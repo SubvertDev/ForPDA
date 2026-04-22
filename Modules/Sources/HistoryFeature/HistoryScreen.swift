@@ -40,8 +40,8 @@ public struct HistoryScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if !store.history.isEmpty, !store.isLoading {
-                    List {
+                List {
+                    if !store.history.isEmpty, !store.isLoading {
                         Navigation()
                         
                         ForEach(store.history, id: \.self) { history in
@@ -50,10 +50,13 @@ public struct HistoryScreen: View {
                         
                         Navigation()
                     }
-                    .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                } else if !store.isLoading {
-                    EmptyHistory()
+                }
+                .scrollContentBackground(.hidden)
+                ._inScrollContentDetector(state: $navigationMinimized)
+                .overlay(alignment: .center) {
+                    if !store.isLoading, store.history.isEmpty {
+                        EmptyHistory()
+                    }
                 }
             }
             .animation(.default, value: store.history)

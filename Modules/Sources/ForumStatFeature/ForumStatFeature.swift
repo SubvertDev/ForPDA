@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import Models
 import PersistenceKeys
+import CacheClient
 
 @Reducer
 public struct ForumStatFeature: Reducer, Sendable {
@@ -29,6 +30,7 @@ public struct ForumStatFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.userSession) var userSession: UserSession?
+        var userSessionGroup: User.Group?
         
         @Presents public var destination: Destination.State?
         
@@ -41,6 +43,12 @@ public struct ForumStatFeature: Reducer, Sendable {
         
         var isUserAuthorized: Bool {
             return userSession != nil
+        }
+        
+        var isUserHasModerationGroup: Bool {
+            return userSessionGroup == .admin
+                || userSessionGroup == .supermoderator
+                || userSessionGroup == .moderator
         }
         
         var shareLink: String {
@@ -82,6 +90,8 @@ public struct ForumStatFeature: Reducer, Sendable {
             case loadForumStat(id: Int)
             case forumStatResponse(Result<ForumStat, any Error>)
             case topicViewersResponse(Result<TopicViewers, any Error>)
+            
+            case updateUserSessionGroup(User.Group)
         }
         
         case delegate(Delegate)
@@ -93,6 +103,7 @@ public struct ForumStatFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.openURL) private var openURL
     @Dependency(\.dismiss) private var dismiss
     
@@ -106,7 +117,14 @@ public struct ForumStatFeature: Reducer, Sendable {
                 case .forum(let id):
                     return .send(.internal(.loadForumStat(id: id)))
                 case .topic(let topic):
-                    return .send(.internal(.loadTopicStat(topic)))
+                    return .concatenate(
+                        .run { [session = state.userSession] send in
+                            if let session, let user = cacheClient.getUser(session.userId) {
+                                await send(.internal(.updateUserSessionGroup(user.group)))
+                            }
+                        },
+                        .send(.internal(.loadTopicStat(topic)))
+                    )
                 }
                 
             case .view(.closeButtonTapped):
@@ -172,6 +190,10 @@ public struct ForumStatFeature: Reducer, Sendable {
                 
             case let .internal(.forumStatResponse(.failure(error))):
                 print(error)
+                return .none
+                
+            case let .internal(.updateUserSessionGroup(group)):
+                state.userSessionGroup = group
                 return .none
                 
             case .destination, .delegate:

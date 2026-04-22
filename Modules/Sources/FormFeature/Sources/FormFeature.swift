@@ -132,6 +132,7 @@ public struct FormFeature: Reducer, Sendable {
             case loadForm(id: Int, isTopic: Bool)
             case formResponse(Result<[FormFieldType], any Error>)
             case reportResponse(Result<ReportResponseType, any Error>)
+            case noteResponse(Result<UserNoteResponse, any Error>)
             case simplePostResponse(Result<PostSendResponse, any Error>)
             case templateResponse(Result<TemplateSend, any Error>)
             case publishForm(flag: PostSendFlag)
@@ -234,7 +235,7 @@ public struct FormFeature: Reducer, Sendable {
                     state.isFormLoading = true
                     return .send(.internal(.loadForm(id: forumId, isTopic: true)))
                     
-                case .report:
+                case .report, .note:
                     let editorState = FormEditorFeature.State(id: 0, flag: .required, uploadBox: nil)
                     state.rows.append(.editor(editorState))
                     state.focusedField = 0
@@ -265,7 +266,7 @@ public struct FormFeature: Reducer, Sendable {
                         formType: .post(type: type, topicId: topicId, content: content)
                     )
                     
-                case .report:
+                case .report, .note:
                     let content = if case let .string(text) = state.content.first { text } else {
                         fatalError("Report content field should contains only one .string()!")
                     }
@@ -441,9 +442,36 @@ public struct FormFeature: Reducer, Sendable {
                         await send(.internal(.reportResponse(result)))
                     }
                     
+                case let .note(userId: userId):
+                    let content = if case let .string(text) = state.content.first { text } else {
+                        fatalError("Bad note content: \(state.content)")
+                    }
+                    return .run { [content = content] send in
+                        let result = await Result { try await apiClient.addUserNote(
+                            userId: userId,
+                            content: content
+                        ) }
+                        await send(.internal(.noteResponse(result)))
+                    }
+                    
                 default:
                     fatalError()
                 }
+                
+            case let .internal(.noteResponse(.success(result))):
+                switch result {
+                case .error:
+                    state.destination = .alert(.unknownError)
+                case .reasonNotSet:
+                    state.destination = .alert(.noteWithoutReason)
+                case .success:
+                    return .send(.delegate(.formSent(.note)))
+                }
+                
+            case let .internal(.noteResponse(.failure(error))):
+                state.isPublishing = false
+                state.destination = .alert(.unknownError)
+                analyticsClient.capture(error)
                 
             case let .internal(.reportResponse(.success(result))):
                 switch result {
@@ -607,6 +635,16 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     
     nonisolated(unsafe) static let reportIsTooShort = AlertState {
         TextState("Report is too short")
+    } actions: {
+        ButtonState {
+            TextState("OK")
+        }
+    }
+    
+    // Note
+    
+    nonisolated(unsafe) static let noteWithoutReason = AlertState {
+        TextState("Not set reason for note")
     } actions: {
         ButtonState {
             TextState("OK")
