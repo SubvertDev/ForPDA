@@ -156,14 +156,9 @@ public struct TopicEditView: View {
                 placeholder: LocalizedStringResource("Input question", bundle: .module),
                 focusEqual: .pollQuestion(question.wrappedValue.id),
                 action: {
-                    Button {
+                    RemovePollElementButton {
                         send(.removeQuestionButtonTapped(question.wrappedValue.id))
-                    } label: {
-                        Image(systemSymbol: .trash)
-                            .foregroundStyle(.red)
-                            .frame(width: 32, height: 32)
                     }
-                    .buttonStyle(.plain)
                 }
             )
             
@@ -207,14 +202,9 @@ public struct TopicEditView: View {
                     placeholder: LocalizedStringResource("Input answer", bundle: .module),
                     focusEqual: .pollAnswer(questionId: questionId, answer.wrappedValue.id),
                     action: {
-                        Button {
+                        RemovePollElementButton {
                             send(.removeAnswerButtonTapped(questionId: questionId, answer.wrappedValue.id))
-                        } label: {
-                            Image(systemSymbol: .trash)
-                                .foregroundStyle(.red)
-                                .frame(width: 32, height: 32)
                         }
-                        .buttonStyle(.plain)
                     }
                 )
             }
@@ -242,6 +232,20 @@ public struct TopicEditView: View {
         }
         .tint(tintColor)
         .buttonStyle(.bordered)
+    }
+    
+    // MARK: - Remove Poll Element Button
+    
+    @ViewBuilder
+    private func RemovePollElementButton(action: @escaping () -> ()) -> some View {
+        Button {
+            action()
+        } label: {
+            Image(systemSymbol: .trash)
+                .foregroundStyle(.red)
+                .frame(width: 32, height: 32)
+        }
+        .buttonStyle(.plain)
     }
     
     // MARK: - Field
