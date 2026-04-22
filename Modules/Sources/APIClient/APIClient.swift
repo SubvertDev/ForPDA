@@ -384,6 +384,7 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
+            },
             editTopic: { data in
                 let request = PDAPI.TopicEditRequest(
                     id: data.id,
@@ -752,6 +753,7 @@ extension APIClient: DependencyKey {
             },
             moveTopic: { _, _, _ in
                 return true
+            },
             editTopic: { _ in
                 return .success
             },
