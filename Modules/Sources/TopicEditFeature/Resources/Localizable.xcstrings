@@ -31,6 +31,16 @@
         }
       }
     },
+    "Enable multi-selection" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включить мультивыбор"
+          }
+        }
+      }
+    },
     "Enable poll" : {
       "localizations" : {
         "ru" : {
