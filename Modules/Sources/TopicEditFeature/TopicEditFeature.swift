@@ -87,6 +87,12 @@ public struct TopicEditFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
+            case .binding(\.isPollEnabled):
+                if state.isPollEnabled {
+                    state.focus = .pollName
+                }
+                return .none
+                
             case .binding:
                 return .none
                 
@@ -101,12 +107,14 @@ public struct TopicEditFeature: Reducer, Sendable {
                 return .run { _ in await dismiss() }
                 
             case .view(.addQuestionButtonTapped):
+                let id = Int(Date.now.timeIntervalSince1970)
                 state.draftPoll.options.append(.init(
-                    id: Int(Date.now.timeIntervalSince1970),
+                    id: id,
                     name: "",
                     several: false,
                     choices: []
                 ))
+                state.focus = .pollQuestion(id)
                 return .none
                 
             case let .view(.removeQuestionButtonTapped(id)):
@@ -119,6 +127,7 @@ public struct TopicEditFeature: Reducer, Sendable {
                     state.draftPoll.options[index].choices.append(
                         .init(id: id, name: "", votes: 0)
                     )
+                    state.focus = .pollAnswer(questionId: questionId, id)
                 }
                 return .none
                 
