@@ -117,6 +117,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
     
     var isDownloading = false
     
+    @MainActor
     private func startAttachmentDownload(url: URL) async throws {
 //        defer { isDownloading = false }
         guard !isDownloading else { return }
@@ -140,26 +141,18 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
             fatalError("Couldn't create attachment image")
         }
         
-        sendableClosure { [weak self, displaySizeChanged] in
-            guard let self else { return }
-            showPlaceholder = false
-            isDownloading = false
-            
-            // tell layout manager so that it should refresh
-            await MainActor.run {
-                if displaySizeChanged {
-                    textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
-                } else {
-                    textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
-                }
-            
-                // notify the optional delegate
-                delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
-            }
+        showPlaceholder = false
+        isDownloading = false
+        
+        // tell layout manager so that it should refresh
+        if displaySizeChanged {
+            textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
+        } else {
+            textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
         }
         
-//        imageURL = url
-//        startAsyncImageDownload()
+        // notify the optional delegate
+        delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
     }
 	
 //	private func startAsyncImageDownload() {
@@ -242,6 +235,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 		return image
 	}
     
+    @MainActor
     private func startDownload(url: URL) async {
         do {
             try await startAttachmentDownload(url: url)
@@ -259,16 +253,13 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
                 displaySizeChanged = true
             }
             
-            sendableClosure { [weak self, displaySizeChanged] in
-                guard let self else { return }
-                if displaySizeChanged {
-                    textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
-                } else {
-                    textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
-                }
-                
-                delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
+            if displaySizeChanged {
+                textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
+            } else {
+                textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
             }
+            
+            delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
         }
     }
 
