@@ -522,30 +522,35 @@ struct NavigationModifier: ViewModifier {
         
         func body(content: Content) -> some View {
             WithPerceptionTracking {
-                content
-                    .fittedSheet(
-                        item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
-                        embedIntoNavStack: true
-                    ) { store in
-                        ReputationChangeView(store: store)
-                    }
-                    .fittedSheet(
-                        item: $store.scope(state: \.destination?.move, action: \.destination.move),
-                        embedIntoNavStack: true
-                    ) { store in
-                        ForumMoveView(store: store)
-                    }
-                    .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
-                        NavigationStack {
-                            PostKarmaHistoryView(store: store)
-                        }
-                    }
-                    .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
-                        NavigationStack {
-                            ForumStatView(store: store)
-                        }
-                    }
+                Sheets(content: content)
             }
+        }
+        
+        // Fix for compiler struggling with 4 sheets (works without WithPerceptionTracking)
+        private func Sheets(content: Content) -> some View {
+            content
+                .fittedSheet(
+                    item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                    embedIntoNavStack: true
+                ) { store in
+                    ReputationChangeView(store: store)
+                }
+                .fittedSheet(
+                    item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                    embedIntoNavStack: true
+                ) { store in
+                    ForumMoveView(store: store)
+                }
+                .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
+                    NavigationStack {
+                        PostKarmaHistoryView(store: store)
+                    }
+                }
+                .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                    NavigationStack {
+                        ForumStatView(store: store)
+                    }
+                }
         }
     }
 }
