@@ -47,6 +47,10 @@ public struct TopicScreen: View {
         return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
+    }
+    
     private var isPollAvailable: Bool {
         let topicLoaded = store.topic != nil && !store.isLoadingTopic
         return topicLoaded && store.topic!.poll != nil
@@ -90,7 +94,7 @@ public struct TopicScreen: View {
                             }
                             .padding(.bottom, 16)
                         }
-                        ._inScrollContentDetector(state: $navigationMinimized)
+                        ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                         .onAppear {
                             scrollProxy = proxy
                         }
@@ -127,9 +131,7 @@ public struct TopicScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized

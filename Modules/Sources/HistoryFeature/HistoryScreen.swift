@@ -21,9 +21,13 @@ public struct HistoryScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -52,7 +56,7 @@ public struct HistoryScreen: View {
                     }
                 }
                 .scrollContentBackground(.hidden)
-                ._inScrollContentDetector(state: $navigationMinimized)
+                ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                 .overlay(alignment: .center) {
                     if !store.isLoading, store.history.isEmpty {
                         EmptyHistory()
@@ -63,9 +67,7 @@ public struct HistoryScreen: View {
             .navigationTitle(Text("History", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
@@ -90,7 +92,7 @@ public struct HistoryScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        if shouldShowNavigation {
+        if shouldShowInlineNavigation {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color(.Background.primary))
         }

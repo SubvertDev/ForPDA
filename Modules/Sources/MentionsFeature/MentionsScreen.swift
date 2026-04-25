@@ -21,9 +21,13 @@ public struct MentionsScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -61,7 +65,7 @@ public struct MentionsScreen: View {
                         Navigation()
                     }
                     .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
+                    ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                 } else if !store.isLoading {
                     EmptyMentions()
                 }
@@ -70,9 +74,7 @@ public struct MentionsScreen: View {
             .navigationTitle(Text("Mentions", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
@@ -97,7 +99,7 @@ public struct MentionsScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        if shouldShowNavigation {
+        if shouldShowInlineNavigation {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color(.Background.primary))
         }

@@ -29,9 +29,13 @@ public struct ForumScreen: View {
         return store.forumName ?? String(localized: "Loading...", bundle: .module)
     }
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -72,7 +76,7 @@ public struct ForumScreen: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollDismissesKeyboard(.immediately)
-                    ._inScrollContentDetector(state: $navigationMinimized)
+                    ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     .refreshable {
                         await send(.onRefresh).finish()
                     }
@@ -91,9 +95,7 @@ public struct ForumScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
@@ -325,7 +327,7 @@ public struct ForumScreen: View {
     
     @ViewBuilder
     private func Navigation(pinned: Bool) -> some View {
-        if !pinned, shouldShowNavigation {
+        if !pinned, shouldShowInlineNavigation {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
