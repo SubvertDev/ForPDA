@@ -49,12 +49,9 @@ public struct DeviceSpecificationsScreen: View {
             .navigationTitle(Text(navigationTitleText()))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
-            .fullScreenCover(isPresented: Binding($store.destination.gallery)) {
+            .fullScreenCover(item: $store.destination.gallery, id: \.self) { model in
                 WithPerceptionTracking {
-                    TabViewGallery(
-                        gallery: store.specifications?.images.map{ $0.fullUrl } ?? [],
-                        selectedImageID: store.selectedHeaderImageId
-                    )
+                    TabViewGallery(model: model)
                 }
             }
             .sheet(item: $store.destination.longEntry, id: \.self) { entry in

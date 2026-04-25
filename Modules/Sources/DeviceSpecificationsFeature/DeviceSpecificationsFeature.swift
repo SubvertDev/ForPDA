@@ -29,8 +29,9 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     // MARK: - Destination
     
     @Reducer
-    public enum Destination: Hashable {
-        case gallery
+    public enum Destination {
+        @ReducerCaseIgnored
+        case gallery(GalleryModel)
         
         @ReducerCaseIgnored
         case longEntry(DeviceSpecifications.Specification.Entry)
@@ -129,7 +130,9 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
                 
             case let .view(.headerImageTapped(id)):
                 state.selectedHeaderImageId = id
-                state.destination = .gallery
+                let urls = state.specifications?.images.map(\.fullUrl) ?? []
+                let model = GalleryModel(urls: urls, selectedId: state.selectedHeaderImageId)
+                state.destination = .gallery(model)
                 return .none
                 
             case let .view(.editionButtonTapped(subTag)):

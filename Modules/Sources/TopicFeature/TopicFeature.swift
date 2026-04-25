@@ -24,6 +24,7 @@ import ToastClient
 import NotificationsClient
 import ForumStatFeature
 import ForumMoveFeature
+import GalleryFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -51,7 +52,7 @@ public struct TopicFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         @ReducerCaseIgnored
-        case gallery([URL], [Int], Int)
+        case gallery(GalleryModel)
         @ReducerCaseIgnored
         case karmaChange(Int)
         case karmaHistory(PostKarmaHistoryFeature)
@@ -503,7 +504,8 @@ public struct TopicFeature: Reducer, Sendable {
                                 let urls = post.imageAttachmentsOrdered.map { $0.metadata!.url }
                                 let ids = post.imageAttachmentsOrdered.map { $0.id }
                                 let index = ids.firstIndex(of: attachment.id) ?? 0
-                                state.destination = .gallery(urls, ids, index)
+                                let model = GalleryModel(urls: urls, ids: ids, selectedId: index)
+                                state.destination = .gallery(model)
                                 break
                             }
                         }

@@ -506,9 +506,8 @@ struct NavigationModifier: ViewModifier {
                             FormScreen(store: store)
                         }
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                        let state = store.withState { $0 }
-                        TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).gallery) { model in
+                        TabViewGallery(model: model)
                     }
             }
         }
