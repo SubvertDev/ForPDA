@@ -100,11 +100,23 @@ public struct AppView: View {
 @available(iOS 26.0, *)
 struct LiquidTabView: View {
     
-    @Perception.Bindable var store: StoreOf<AppFeature>
+    @SwiftUI.Bindable var store: StoreOf<AppFeature>
+    
+    // Fix for iOS 26.4 broken availability check, revisit later
+    var selectionBinding: Binding<AppTab> {
+        Binding(
+            get: {
+                _PerceptionLocals.$skipPerceptionChecking.withValue(true) { store.selectedTab }
+            },
+            set: {
+                store.send(.didSelectTab($0))
+            }
+        )
+    }
     
     var body: some View {
-        WithPerceptionTracking {
-            TabView(selection: $store.selectedTab.sending(\.didSelectTab)) {
+        _PerceptionLocals.$skipPerceptionChecking.withValue(true) {
+            TabView(selection: selectionBinding) {
                 Tab(
                     AppTab.articles.title,
                     systemSymbol: AppTab.articles.iconSymbol,
