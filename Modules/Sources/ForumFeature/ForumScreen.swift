@@ -25,6 +25,10 @@ public struct ForumScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
+    private var title: String {
+        return store.forumName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
     private var shouldShowNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
@@ -79,7 +83,7 @@ public struct ForumScreen: View {
             }
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
-            .navigationTitle(Text(store.forumName ?? "Загрузка..."))
+            .navigationTitle(Text(title))
             ._toolbarTitleDisplayMode(.large)
             .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
                 NavigationStack {

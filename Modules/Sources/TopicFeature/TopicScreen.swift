@@ -456,6 +456,10 @@ struct NavigationModifier: ViewModifier {
     @Perception.Bindable private var store: StoreOf<TopicFeature>
     @Environment(\.tintColor) private var tintColor
     
+    private var title: String {
+        return store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
     init(store: StoreOf<TopicFeature>) {
         self.store = store
     }
@@ -463,7 +467,7 @@ struct NavigationModifier: ViewModifier {
     func body(content: Content) -> some View {
         WithPerceptionTracking {
             content
-                .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+                .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
                 .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .modifier(FullScreenCoverModifier(store: store))

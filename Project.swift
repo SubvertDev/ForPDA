@@ -74,7 +74,6 @@ let project = Project(
         
             .feature(
                 name: "AnnouncementFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,

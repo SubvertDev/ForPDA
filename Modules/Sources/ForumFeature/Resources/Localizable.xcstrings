@@ -101,6 +101,16 @@
         }
       }
     },
+    "Loading..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загружаем..."
+          }
+        }
+      }
+    },
     "Mark Read" : {
       "localizations" : {
         "ru" : {
