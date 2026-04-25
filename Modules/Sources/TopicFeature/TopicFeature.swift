@@ -532,7 +532,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .view(.finishedPostAnimation):
                 state.postId = nil
-                return .none.animation()
+                return .none
                 
             case .internal(.load):
                 switch state.goTo {

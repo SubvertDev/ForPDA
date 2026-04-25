@@ -235,7 +235,7 @@ public struct AppFeature: Reducer, Sendable {
                                 await send(.userDidLogout)
                             }
                         }
-                    }.animation(),
+                    },
                     
                     .run { send in
                         do {

@@ -86,7 +86,7 @@ public struct AppView: View {
             .tint(store.appSettings.appTintColor.asColor)
             .environment(\.tintColor, store.appSettings.appTintColor.asColor)
             .onAppear {
-                store.send(.onAppear)
+                store.send(.onAppear, animation: .default)
             }
             .onShake {
                 store.send(.onShake)
