@@ -279,7 +279,7 @@ public struct StackTab: Reducer, Sendable {
             
         case .topic(.delegate(.openedLastPage)):
             for (id, element) in zip(state.path.ids, state.path).reversed() where element.is(\.forum.forum) {
-                return reduce(into: &state, action: .path(.element(id: id, action: .forum(.forum(.internal(.refresh))))))
+                return .send(.path(.element(id: id, action: .forum(.forum(.internal(.refresh))))))
             }
             
             // Announcement
@@ -451,7 +451,7 @@ public struct StackTab: Reducer, Sendable {
                                 // Post is on the same page, scrolling to
                                 // TODO: send goTo via action or state?
                                 state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                                return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                                return .send(.path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                             } else {
                                 // Post is NOT on the same page, opening new screen
                                 state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
@@ -468,7 +468,7 @@ public struct StackTab: Reducer, Sendable {
                 } else if let (id, _) = state.path.last(is: \.forum.topic) {
                     // Deeplink in the same topic ONLY (inner-inner deeplink case)
                     state.path[id: id, case: \.forum.topic]?.goTo = goTo
-                    return reduce(into: &state, action: .path(.element(id: id, action: .forum(.topic(.internal(.load))))))
+                    return .send(.path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                 } else {
                     // Deeplink from non-topic screen (e.g. QMS) with no targetId
                     analytics.capture(DeeplinkHandlingError.unknownTopicCase(url))

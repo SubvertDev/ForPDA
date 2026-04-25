@@ -565,18 +565,14 @@ public struct AppFeature: Reducer, Sendable {
     private func handleSameTabSelection(_ state: inout State) -> Effect<Action> {
         if state.selectedTab == .articles, state.articlesTab.path.isEmpty {
             // Scroll to top of articles
-            return StackTab()
-                .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                .map(Action.articlesTab)
+            return .send(.articlesTab(.root(.articles(.articlesList(.scrollToTop)))))
         }
         
         switch state.selectedTab {
         case .articles:
             //
             if state.articlesTab.path.isEmpty {
-                return StackTab()
-                    .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                    .map(Action.articlesTab)
+                return .send(.articlesTab(.root(.articles(.articlesList(.scrollToTop)))))
             } else {
                 // TODO: enum
                 let error = NSError(domain: "Impossible articles tab action", code: 0)
@@ -626,9 +622,7 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
-        return StackTab()
-            .reduce(into: &state.favoritesTab, action: .root(.favorites(.internal(.refresh))))
-            .map(Action.favoritesTab)
+        return .send(.favoritesTab(.root(.favorites(.internal(.refresh)))))
     }
     
     private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {

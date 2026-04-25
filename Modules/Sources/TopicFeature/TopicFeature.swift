@@ -733,7 +733,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     public func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
         if case let .page(page) = jump {
-            return reduce(into: &state, action: .pageNavigation(.goToPage(newPage: page)))
+            return .send(.pageNavigation(.goToPage(newPage: page)))
         }
         
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
@@ -756,15 +756,7 @@ public struct TopicFeature: Reducer, Sendable {
     }
     
     private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
-        return PageNavigationFeature()
-            .reduce(
-                into: &state.pageNavigation,
-                action: .update(
-                    count: state.topic?.postsCount ?? 0,
-                    offset: offset
-                )
-            )
-            .map(Action.pageNavigation)
+        return .send(.pageNavigation(.update(count: state.topic?.postsCount ?? 0, offset: offset)))
     }
     
     private func reportFullyDisplayed(_ state: inout State) {
