@@ -273,7 +273,7 @@ public struct SettingsScreen: View {
                 title: "Backup connection",
                 description: "Restart required",
                 type: .toggle,
-                toggle: $store.appSettings.backupServer
+                toggle: Binding(store.$appSettings.backupServer)
             )
 
             

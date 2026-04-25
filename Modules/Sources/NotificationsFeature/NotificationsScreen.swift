@@ -43,11 +43,12 @@ public struct NotificationsScreen: View {
                             .padding(16)
                         }
                         
-                        Row("QMS", value: $store.appSettings.notifications.isQmsEnabled)
-                        Row("Forum", value: $store.appSettings.notifications.isForumEnabled)
-                        Row("Topics", value: $store.appSettings.notifications.isTopicsEnabled)
-                        Row("Forum mentions", value: $store.appSettings.notifications.isForumMentionsEnabled)
-                        Row("Site mentions", value: $store.appSettings.notifications.isSiteMentionsEnabled)
+                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
+                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
+                        Row("Forum", value: Binding(store.$appSettings.notifications.isForumEnabled))
+                        Row("Topics", value: Binding(store.$appSettings.notifications.isTopicsEnabled))
+                        Row("Forum mentions", value: Binding(store.$appSettings.notifications.isForumMentionsEnabled))
+                        Row("Site mentions", value: Binding(store.$appSettings.notifications.isSiteMentionsEnabled))
                     } header: {
                         Text("General", bundle: .module)
                     }
@@ -56,7 +57,7 @@ public struct NotificationsScreen: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
                     Section {
-                        Row("Background notifications", value: $store.appSettings.backgroundNotifications2)
+                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
                     } header: {
                         Text("Experimental", bundle: .module)
                     }
