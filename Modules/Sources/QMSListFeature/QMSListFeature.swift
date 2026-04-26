@@ -69,15 +69,15 @@ public struct QMSListFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onAppear):
-                return .concatenate(
-                    .send(.internal(.load)),
-                    .run { send in
-                        for await unread in notificationsClient.unreadPublisher().values {
-                            guard unread.qmsUnreadCount > 0 else { continue }
-                            await send(.internal(.load))
-                        }
+                return .run { send in
+                    await send(.internal(.load))
+
+                    // TODO: Does this cancel on feature removal?
+                    for await unread in notificationsClient.unreadPublisher().values {
+                        guard unread.qmsUnreadCount > 0 else { continue }
+                        await send(.internal(.load))
                     }
-                )
+                }
 
             case let .view(.chatRowTapped(id)):
                 return .send(.delegate(.openQMSChat(id)))
