@@ -52,6 +52,8 @@ public struct TopicFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        @ReducerCaseIgnored
         case gallery(GalleryModel)
         @ReducerCaseIgnored
         case karmaChange(Int)
@@ -60,7 +62,16 @@ public struct TopicFeature: Reducer, Sendable {
         case stat(ForumStatFeature)
         case move(ForumMoveFeature)
         case changeReputation(ReputationChangeFeature)
-        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case karmaHistory(PostKarmaHistoryFeature.Action)
+            case form(FormFeature.Action)
+            case stat(ForumStatFeature.Action)
+            case move(ForumMoveFeature.Action)
+            case changeReputation(ReputationChangeFeature.Action)
+        }
         
         @CasePathable
         public enum Alert: Equatable {
