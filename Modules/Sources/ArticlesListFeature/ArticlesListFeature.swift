@@ -50,7 +50,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
     public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
-        case alert(AlertState<Never>)
     }
     
     // MARK: - State
@@ -259,7 +258,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
             return .run { _ in await open(url: article.url) }
             
         case .addToBookmarks:
-            state.destination = .alert(.notImplemented)
+            assertionFailure("Not implemented")
             return .run { _ in await hapticClient.play(.rigid) }
         }
         return .none

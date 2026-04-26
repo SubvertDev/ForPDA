@@ -67,7 +67,6 @@ public struct ArticlesListScreen: View {
             ._toolbarTitleDisplayMode(.large)
             .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
             .toolbar { Toolbar() }
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .sheet(item: $store.destination.share, id: \.self) { url in
                 // FIXME: Perceptible warning despite tracking closure
                 WithPerceptionTracking {
