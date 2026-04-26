@@ -38,7 +38,7 @@ public struct SettingsScreen: View {
             }
             .navigationTitle(Text("Settings", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
             .animation(.default, value: colorScheme)
             .onAppear {
                 store.send(.onAppear)
@@ -199,7 +199,9 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func SchemeButton(scheme: AppColorScheme) -> some View {
         Button {
-            store.send(.schemeButtonTapped(scheme), animation: .default)
+            withAnimation {
+                _ = store.send(.schemeButtonTapped(scheme))
+            }
         } label: {
             VStack(spacing: 0) {
                 scheme.image

@@ -22,7 +22,17 @@ public struct SettingsFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
-        case alert(AlertState<SettingsFeature.Action.Alert>)
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+        }
+        public enum Alert {
+            case openSettings
+            case clearCache
+        }
     }
     
     // MARK: - State
@@ -98,10 +108,6 @@ public struct SettingsFeature: Reducer, Sendable {
         
         // TODO: Different alerts?
         case destination(PresentationAction<Destination.Action>)
-        public enum Alert: Equatable {
-            case openSettings
-            case clearCache
-        }
         
         case delegate(Delegate)
         public enum Delegate {
@@ -253,7 +259,7 @@ extension SettingsFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extensions
 
-private extension AlertState where Action == SettingsFeature.Action.Alert {
+private extension AlertState where Action == SettingsFeature.Destination.Alert {
     
     // Safari Extension
     
