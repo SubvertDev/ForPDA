@@ -48,7 +48,7 @@ public struct BBPanelView: View {
                     .padding(.bottom, 8)
                     .padding(.horizontal, 12)
                 }
-                .sheet(item: $store.scope(state: \.destination?.listTag, action: \.destination.listTag)) { store in
+                .sheet(item: $store.scope(state: \.$destination, action: \.destination).listTag) { store in
                     NavigationStack {
                         ListTagBuilderView(store: store)
                     }
