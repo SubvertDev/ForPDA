@@ -28,8 +28,15 @@ public struct ReputationFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
+        @ReducerCaseIgnored
         case alert(AlertState<Alert>)
         case report(FormFeature)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case report(FormFeature.Action)
+        }
         
         public enum Alert { case ok }
     }
