@@ -43,9 +43,9 @@ public struct ForumStatView: View {
                 }
                 .padding(16)
                 .navigationBarTitleDisplayMode(.inline)
-            }
-            .sheet(item: $store.scope(state: \.destination?.share, action: \.destination.share)) { rawUrl in
-                ShareActivityView(url: rawUrl.withState { $0 }) { _ in
+            } 
+            .sheet(item: $store.scope(state: \.$destination, action: \.destination).share) { value in
+                ShareActivityView(url: value.url) { _ in
                     send(.linkShared)
                 }
                 .presentationDetents([.medium])

@@ -22,7 +22,7 @@ public struct ForumStatFeature: Reducer, Sendable {
     @Reducer
     public enum Destination: Hashable {
         @ReducerCaseIgnored
-        case share(URL)
+        case share(IdentifiedURL)
     }
     
     // MARK: - State
@@ -117,14 +117,12 @@ public struct ForumStatFeature: Reducer, Sendable {
                 case .forum(let id):
                     return .send(.internal(.loadForumStat(id: id)))
                 case .topic(let topic):
-                    return .concatenate(
-                        .run { [session = state.userSession] send in
-                            if let session, let user = cacheClient.getUser(session.userId) {
-                                await send(.internal(.updateUserSessionGroup(user.group)))
-                            }
-                        },
-                        .send(.internal(.loadTopicStat(topic)))
-                    )
+                    return .run { [session = state.userSession] send in
+                        if let session, let user = cacheClient.getUser(session.userId) {
+                            await send(.internal(.updateUserSessionGroup(user.group)))
+                        }
+                        await send(.internal(.loadTopicStat(topic)))
+                    }
                 }
                 
             case .view(.closeButtonTapped):
@@ -141,7 +139,8 @@ public struct ForumStatFeature: Reducer, Sendable {
                 }
                 
             case .view(.shareLinkButtonTapped):
-                state.destination = .share(URL(string: state.shareLink)!)
+                let url = URL(string: state.shareLink)!
+                state.destination = .share(IdentifiedURL(url))
                 return .none
                 
             case .view(.openInBrowserButtonTapped):
