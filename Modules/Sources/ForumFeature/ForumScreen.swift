@@ -89,7 +89,7 @@ public struct ForumScreen: View {
             .animation(.default, value: store.sectionsExpandState)
             .navigationTitle(Text(title))
             ._toolbarTitleDisplayMode(.large)
-            .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).form) { store in
                 NavigationStack {
                     FormScreen(store: store)
                 }
@@ -104,13 +104,13 @@ public struct ForumScreen: View {
                     .padding(.bottom, 8)
                 }
             }
-            .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+            .sheet(item: $store.scope(state: \.$destination, action: \.destination).stat) { store in
                 NavigationStack {
                     ForumStatView(store: store)
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                item: $store.scope(state: \.$destination, action: \.destination).move,
                 embedIntoNavStack: true
             ) { store in
                 ForumMoveView(store: store)
