@@ -174,7 +174,6 @@ public struct AuthFeature: Reducer, Sendable {
                     let result = await Result { try await apiClient.getCaptcha() }
                     await send(.internal(.captchaResponse(result)))
                 }
-                .animation()
                 
                 // MARK: - Internal
                 
@@ -279,18 +278,6 @@ extension AlertState where Action == AuthFeature.Action.Alert {
             }
         } message: {
             TextState("Login or pasword is wrong, try again", bundle: .module)
-        }
-    }
-    
-    nonisolated(unsafe) static var wrongCaptcha: AlertState {
-        AlertState {
-            TextState("Whoops!", bundle: .module)
-        } actions: {
-            ButtonState(role: .cancel) {
-                TextState("OK", bundle: .module)
-            }
-        } message: {
-            TextState("Captcha is wrong, try again", bundle: .module)
         }
     }
 }

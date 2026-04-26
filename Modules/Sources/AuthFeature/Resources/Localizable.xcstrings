@@ -11,16 +11,6 @@
         }
       }
     },
-    "Captcha is wrong, try again" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Неверная капча, попробуйте еще раз"
-          }
-        }
-      }
-    },
     "Close" : {
       "localizations" : {
         "ru" : {
