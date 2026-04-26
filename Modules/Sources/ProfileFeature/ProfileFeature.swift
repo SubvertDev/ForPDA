@@ -32,9 +32,18 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
-        case alert(AlertState<ProfileFeature.Action.Alert>)
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
         case note(FormFeature)
         case editProfile(EditFeature)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case note(FormFeature.Action)
+            case editProfile(EditFeature.Action)
+        }
+        public enum Alert { case logout }
     }
     
     // MARK: - State
@@ -80,6 +89,7 @@ public struct ProfileFeature: Reducer, Sendable {
     
     public enum Action: ViewAction, BindableAction {
         case binding(BindingAction<State>)
+        case destination(PresentationAction<Destination.Action>)
 
         case view(View)
         public enum View {
@@ -104,11 +114,6 @@ public struct ProfileFeature: Reducer, Sendable {
             case userResponse(Result<User, any Error>)
             case updateBadgeCounts(Unread)
             case updateUserSessionGroup(User.Group)
-        }
-        
-        case destination(PresentationAction<Destination.Action>)
-        public enum Alert: Equatable {
-            case logout
         }
         
         case delegate(Delegate)
@@ -263,15 +268,13 @@ public struct ProfileFeature: Reducer, Sendable {
                 }
                 
             case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):
-                return .concatenate(
-                    .run { _ in
-                        await toastClient.showToast(ToastMessage(
-                            text: status ? Localization.profileUpdated : Localization.profileUpdateError,
-                            haptic: status ? .success : .error
-                        ))
-                    },
-                    .send(.view(.onAppear))
-                )
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(
+                        text: status ? Localization.profileUpdated : Localization.profileUpdateError,
+                        haptic: status ? .success : .error
+                    ))
+                    await send(.view(.onAppear))
+                }
             
             case .destination(.presented(.alert(.logout))):
                 state.$userSession.withLock { $0 = nil }
@@ -302,7 +305,7 @@ extension ProfileFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extension
 
-private extension AlertState where Action == ProfileFeature.Action.Alert {
+private extension AlertState where Action == ProfileFeature.Destination.Alert {
     nonisolated(unsafe) static let warning = Self {
         TextState("Are you sure you want to log out of your profile ?", bundle: .module)
     } actions: {
