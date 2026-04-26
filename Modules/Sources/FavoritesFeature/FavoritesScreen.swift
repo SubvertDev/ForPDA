@@ -102,7 +102,7 @@ public struct FavoritesScreen: View {
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.sort, action: \.sort),
+                item: $store.scope(state: \.$sort, action: \.sort),
                 embedIntoNavStack: true
             ) { store in
                 SortView(store: store)
