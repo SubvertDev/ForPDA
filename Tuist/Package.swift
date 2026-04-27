@@ -65,10 +65,7 @@ let package = Package(
         .package(
             url: "https://github.com/pointfreeco/swift-composable-architecture.git",
             from: "1.25.5",
-            traits: [
-                "ComposableArchitecture2Deprecations",
-                "ComposableArchitecture2DeprecationOverloads"
-            ]
+            traits: ["ComposableArchitecture2Deprecations"]
         ),
                 
         // TCA Dependencies
