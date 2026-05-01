@@ -237,7 +237,7 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextToolsMenu(.modify(.hide, !topic.isHidden)))
+                send(.contextToolsMenu(.modify(.hide, topic.isHidden)))
             }
             
             ContextButton(
@@ -246,7 +246,7 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Close Topic", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextToolsMenu(.modify(.close, !topic.isClosed)))
+                send(.contextToolsMenu(.modify(.close, topic.isClosed)))
             }
             
             if topic.canDelete {

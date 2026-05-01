@@ -282,7 +282,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Pin", bundle: .module),
                 symbol: topic.isPinned ? .pinFill : .pin
             ) {
-                send(.contextTopicToolsMenu(.modify(.pin, topic.id, !topic.isPinned)))
+                send(.contextTopicToolsMenu(.modify(.pin, topic.id, topic.isPinned)))
             }
             
             ContextButton(
@@ -291,7 +291,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextTopicToolsMenu(.modify(.hide, topic.id, !topic.isHidden)))
+                send(.contextTopicToolsMenu(.modify(.hide, topic.id, topic.isHidden)))
             }
             
             ContextButton(
@@ -300,7 +300,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Close", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextTopicToolsMenu(.modify(.close, topic.id, !topic.isClosed)))
+                send(.contextTopicToolsMenu(.modify(.close, topic.id, topic.isClosed)))
             }
             
             if topic.canDelete {
