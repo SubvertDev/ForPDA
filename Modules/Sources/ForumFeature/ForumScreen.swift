@@ -25,10 +25,6 @@ public struct ForumScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
-    private var title: String {
-        return store.forumName ?? String(localized: "Loading...", bundle: .module)
-    }
-    
     private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
@@ -87,13 +83,7 @@ public struct ForumScreen: View {
             }
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
-            .navigationTitle(Text(title))
-            ._toolbarTitleDisplayMode(.large)
-            .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
-                NavigationStack {
-                    FormScreen(store: store)
-                }
-            }
+            .navigations(store: store)
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
@@ -103,17 +93,6 @@ public struct ForumScreen: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
                 }
-            }
-            .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
-                NavigationStack {
-                    ForumStatView(store: store)
-                }
-            }
-            .fittedSheet(
-                item: $store.scope(state: \.destination?.move, action: \.destination.move),
-                embedIntoNavStack: true
-            ) { store in
-                ForumMoveView(store: store)
             }
             .toolbar {
                 ToolbarItem {
@@ -451,11 +430,89 @@ public struct ForumScreen: View {
     }
 }
 
+// MARK: - Navigation Modifier
+
+struct NavigationModifier: ViewModifier {
+    
+    @Perception.Bindable private var store: StoreOf<ForumFeature>
+    @Environment(\.tintColor) private var tintColor
+    
+    private var title: String {
+        return store.forumName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
+    init(store: StoreOf<ForumFeature>) {
+        self.store = store
+    }
+    
+    func body(content: Content) -> some View {
+        WithPerceptionTracking {
+            content
+                .navigationTitle(Text(title))
+                ._toolbarTitleDisplayMode(.large)
+                .modifier(FullScreenCoverModifier(store: store))
+                .modifier(SheetModifier(store: store))
+        }
+    }
+    
+    struct FullScreenCoverModifier: ViewModifier {
+        @Perception.Bindable private var store: StoreOf<ForumFeature>
+        @Environment(\.tintColor) private var tintColor
+        
+        init(store: StoreOf<ForumFeature>) {
+            self.store = store
+        }
+        
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+                        NavigationStack {
+                            FormScreen(store: store)
+                        }
+                    }
+            }
+        }
+    }
+    
+    struct SheetModifier: ViewModifier {
+        @Perception.Bindable private var store: StoreOf<ForumFeature>
+        @Environment(\.tintColor) private var tintColor
+        
+        init(store: StoreOf<ForumFeature>) {
+            self.store = store
+        }
+        
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                        NavigationStack {
+                            ForumStatView(store: store)
+                        }
+                    }
+                    .fittedSheet(
+                        item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                        embedIntoNavStack: true
+                    ) { store in
+                        ForumMoveView(store: store)
+                    }
+            }
+        }
+    }
+}
+
 // MARK: - Extensions
 
 extension Bundle {
     static var models: Bundle? {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+    }
+}
+
+extension View {
+    func navigations(store: StoreOf<ForumFeature>) -> some View {
+        self.modifier(NavigationModifier(store: store))
     }
 }
 
