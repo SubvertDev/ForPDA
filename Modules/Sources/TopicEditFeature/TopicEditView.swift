@@ -31,6 +31,7 @@ public struct TopicEditView: View {
                         placeholder: LocalizedStringResource("Input...", bundle: .module),
                         focusEqual: .title
                     )
+                    .disabled(!store.canModerate)
                     
                     Field(
                         title: "Topic description",
@@ -38,8 +39,11 @@ public struct TopicEditView: View {
                         placeholder: LocalizedStringResource("Input...", bundle: .module),
                         focusEqual: .description
                     )
+                    .disabled(!store.canModerate)
                     
-                   Poll()
+                    if store.supportsPoll {
+                        Poll()
+                    }
                 }
                 .padding(.top, 16)
                 .padding(.horizontal, 16)
@@ -206,20 +210,46 @@ public struct TopicEditView: View {
     
     @ViewBuilder
     private func PollAnswers(questionId: Int, _ answers: Binding<[Topic.Poll.Choice]>) -> some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 8) {
             Header(title: "Answers")
             
             ForEach(answers) { answer in
-                Field(
-                    content: answer.name,
-                    placeholder: LocalizedStringResource("Input answer", bundle: .module),
-                    focusEqual: .pollAnswer(questionId: questionId, answer.wrappedValue.id),
-                    action: {
-                        RemovePollElementButton {
-                            send(.removeAnswerButtonTapped(questionId: questionId, answer.wrappedValue.id))
+                WithPerceptionTracking {
+                    HStack(spacing: 8) {
+                        Field(
+                            type: .singleLine(numeric: false),
+                            content: answer.name,
+                            placeholder: LocalizedStringResource("Input answer", bundle: .module),
+                            focusEqual: .pollAnswer(questionId: questionId, answer.wrappedValue.id),
+                            action: {
+                                if !store.canModerate {
+                                    RemovePollElementButton {
+                                        send(.removeAnswerButtonTapped(questionId: questionId, answer.wrappedValue.id))
+                                    }
+                                }
+                            }
+                        )
+                        
+                        if store.canModerate {
+                            Field(
+                                type: .singleLine(numeric: true),
+                                content: Binding(get: { String(answer.votes.wrappedValue) }, set: { newValue in
+                                    send(.updateAnswerVotes(questionId: questionId, answerId: answer.wrappedValue.id, newValue))
+                                }),
+                                placeholder: LocalizedStringResource(stringLiteral: String(answer.votes.wrappedValue)),
+                                focusEqual: .pollAnswerVote(questionId: questionId, answer.wrappedValue.id),
+                                characterLimit: 7,
+                                action: {
+                                    RemovePollElementButton {
+                                        send(.removeAnswerButtonTapped(questionId: questionId, answer.wrappedValue.id))
+                                    }
+                                }
+                            )
+                            .frame(width: 120)
                         }
+                        
                     }
-                )
+                }
             }
         }
     }
@@ -263,7 +293,13 @@ public struct TopicEditView: View {
     
     // MARK: - Field
     
+    enum FieldType {
+        case singleLine(numeric: Bool)
+        case full
+    }
+    
     private func Field<Action: View>(
+        type: FieldType = .full,
         title: LocalizedStringKey? = nil,
         content: Binding<String>,
         placeholder: LocalizedStringResource,
@@ -277,12 +313,25 @@ public struct TopicEditView: View {
             }
             
             HStack {
-                SharedUI.Field(
-                    content: content,
-                    placeholder: placeholder,
-                    focusEqual: focusEqual,
-                    focus: $focus
-                )
+                switch type {
+                case .singleLine(let numeric):
+                    SharedUI.SingleLineField(
+                        content: content,
+                        placeholder: placeholder,
+                        focusEqual: focusEqual,
+                        focus: $focus,
+                        keyboardType: numeric ? .numberPad : .default,
+                        characterLimit: characterLimit
+                    )
+                case .full:
+                    SharedUI.Field(
+                        content: content,
+                        placeholder: placeholder,
+                        focusEqual: focusEqual,
+                        focus: $focus,
+                        characterLimit: characterLimit
+                    )
+                }
                 
                 action()
             }
@@ -304,9 +353,11 @@ public struct TopicEditView: View {
         TopicEditView(store: Store(
             initialState: TopicEditFeature.State(
                 id: 0,
+                flag: .canModerate,
                 title: "Test Title",
                 description: "Description",
-                poll: .mock
+                poll: .mock,
+                supportsPoll: true
             )
         ) {
             TopicEditFeature()

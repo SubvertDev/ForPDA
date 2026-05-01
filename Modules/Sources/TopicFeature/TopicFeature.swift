@@ -340,9 +340,11 @@ public struct TopicFeature: Reducer, Sendable {
                 case .edit:
                     let editState = TopicEditFeature.State(
                         id: topic.id,
+                        flag: topic.flag,
                         title: topic.name,
                         description: topic.description,
-                        poll: topic.poll
+                        poll: topic.poll,
+                        supportsPoll: true
                     )
                     state.destination = .edit(editState)
                     return .none

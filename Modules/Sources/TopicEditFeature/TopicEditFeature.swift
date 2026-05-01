@@ -25,9 +25,17 @@ public struct TopicEditFeature: Reducer, Sendable {
             case pollName
             case pollQuestion(Int)
             case pollAnswer(questionId: Int, Int)
+            case pollAnswerVote(questionId: Int, Int)
         }
         
         public let id: Int
+        public let flag: ForumFlag
+        public let supportsPoll: Bool
+        
+        public var canModerate: Bool {
+            return flag.contains(.canModerate)
+        }
+        
         public var title: String
         public var description: String
         public var poll: Topic.Poll?
@@ -45,14 +53,18 @@ public struct TopicEditFeature: Reducer, Sendable {
         
         public init(
             id: Int,
+            flag: ForumFlag,
             title: String,
             description: String,
-            poll: Topic.Poll? = nil
+            poll: Topic.Poll? = nil,
+            supportsPoll: Bool
         ) {
             self.id = id
+            self.flag = flag
             self.title = title
             self.description = description
             self.poll = poll
+            self.supportsPoll = supportsPoll
         }
     }
     
@@ -68,6 +80,7 @@ public struct TopicEditFeature: Reducer, Sendable {
             case cancelButtonTapped
             
             case updateQuestion(Int, Topic.Poll.Option)
+            case updateAnswerVotes(questionId: Int, answerId: Int, String)
             
             case addQuestionButtonTapped
             case removeQuestionButtonTapped(Int)
@@ -110,6 +123,13 @@ public struct TopicEditFeature: Reducer, Sendable {
                     return .none
                 }
                 state.draftPoll.options[index] = option
+                return .none
+                
+            case let .view(.updateAnswerVotes(questionId, answerId, votes)):
+                if let questionIndex = state.draftPoll.options.firstIndex(where: { $0.id == questionId }),
+                   let answerIndex = state.draftPoll.options[questionIndex].choices.firstIndex(where: { $0.id == answerId }) {
+                    state.draftPoll.options[questionIndex].choices[answerIndex].votes = Int(votes) ?? 0
+                }
                 return .none
                 
             case .view(.cancelButtonTapped):
