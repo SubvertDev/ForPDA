@@ -18,6 +18,7 @@ import ToastClient
 import FormFeature
 import ForumStatFeature
 import ForumMoveFeature
+import TopicEditFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -59,6 +60,7 @@ public struct ForumFeature: Reducer, Sendable {
         case form(FormFeature)
         case move(ForumMoveFeature)
 		case stat(ForumStatFeature)
+        case edit(TopicEditFeature)
     }
     
     // MARK: - State
@@ -245,6 +247,16 @@ public struct ForumFeature: Reducer, Sendable {
                         .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
                         .send(.internal(.refresh))
                     )
+                    
+                case .edit:
+                    state.destination = .edit(TopicEditFeature.State(
+                        id: topic.id,
+                        flag: topic.flag,
+                        title: topic.name,
+                        description: topic.description,
+                        supportsPoll: false
+                    ))
+                    return .none
                 }
                 
             case let .view(.contextTopicToolsMenu(action)):

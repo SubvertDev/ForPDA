@@ -15,6 +15,7 @@ import BBBuilder
 import FormFeature
 import ForumStatFeature
 import ForumMoveFeature
+import TopicEditFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -245,6 +246,12 @@ public struct ForumScreen: View {
             Section {
                 ContextButton(text: LocalizedStringResource("Go To End", bundle: .module), symbol: .chevronRight2) {
                     send(.contextTopicMenu(.goToEnd, topic))
+                }
+                
+                if topic.canEdit {
+                    ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
+                        send(.contextTopicMenu(.edit, topic))
+                    }
                 }
             }
         }
@@ -489,6 +496,11 @@ struct NavigationModifier: ViewModifier {
                     .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
                         NavigationStack {
                             ForumStatView(store: store)
+                        }
+                    }
+                    .sheet(item: $store.scope(state: \.destination?.edit, action: \.destination.edit)) { store in
+                        NavigationStack {
+                            TopicEditView(store: store)
                         }
                     }
                     .fittedSheet(

@@ -275,6 +275,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
+                    .Internal.TopicEditFeature,
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
