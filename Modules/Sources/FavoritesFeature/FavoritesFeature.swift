@@ -340,15 +340,11 @@ public struct FavoritesFeature: Reducer, Sendable {
         state.didLoadOnce = true
     }
     
-    private func updatePageNavigation(_ state: inout State, count: Int = 0, offset: Int? = nil) -> Effect<Action> {
-        return PageNavigationFeature()
-            .reduce(
-                into: &state.pageNavigation,
-                action: .update(
-                    count: count,
-                    offset: offset
-                )
-            )
-            .map(Action.pageNavigation)
+    private func updatePageNavigation(
+        _ state: inout State,
+        count: Int = 0,
+        offset: Int? = nil
+    ) -> Effect<Action> {
+        return .send(.pageNavigation(.update(count: count, offset: offset)))
     }
 }

@@ -7,6 +7,9 @@ let tuist = Tuist(
         swiftVersion: "6.2.3",
         generationOptions: .options(
             optionalAuthentication: true
+        ),
+        cacheOptions: .options(
+            storages: [.local]
         )
     )
 )

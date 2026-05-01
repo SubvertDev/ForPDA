@@ -48,6 +48,10 @@ public struct TopicScreen: View {
         return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
     }
     
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
+    }
+    
     private var isPollAvailable: Bool {
         let topicLoaded = store.topic != nil && !store.isLoadingTopic
         return topicLoaded && store.topic!.poll != nil
@@ -91,7 +95,7 @@ public struct TopicScreen: View {
                             }
                             .padding(.bottom, 16)
                         }
-                        ._inScrollContentDetector(state: $navigationMinimized)
+                        ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                         .onAppear {
                             scrollProxy = proxy
                         }
@@ -128,9 +132,7 @@ public struct TopicScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
@@ -450,7 +452,7 @@ public struct TopicScreen: View {
                 try? await Task.sleep(for: .seconds(duration))
                 withAnimation(animation) { scrollScale = 1 }
                 try? await Task.sleep(for: .seconds(duration))
-                send(.finishedPostAnimation)
+                send(.finishedPostAnimation, animation: .default)
             }
         }
     }
@@ -463,6 +465,10 @@ struct NavigationModifier: ViewModifier {
     @Perception.Bindable private var store: StoreOf<TopicFeature>
     @Environment(\.tintColor) private var tintColor
     
+    private var title: String {
+        return store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
     init(store: StoreOf<TopicFeature>) {
         self.store = store
     }
@@ -470,7 +476,7 @@ struct NavigationModifier: ViewModifier {
     func body(content: Content) -> some View {
         WithPerceptionTracking {
             content
-                .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+                .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
                 .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
                 .modifier(FullScreenCoverModifier(store: store))
@@ -512,9 +518,8 @@ struct NavigationModifier: ViewModifier {
                             TopicEditView(store: store)
                         }
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                        let state = store.withState { $0 }
-                        TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+                    .fullScreenCover(item: $store.scope(state: \.destination, action: \.destination).gallery) { model in
+                        TabViewGallery(model: model)
                     }
             }
         }
@@ -530,30 +535,35 @@ struct NavigationModifier: ViewModifier {
         
         func body(content: Content) -> some View {
             WithPerceptionTracking {
-                content
-                    .fittedSheet(
-                        item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
-                        embedIntoNavStack: true
-                    ) { store in
-                        ReputationChangeView(store: store)
-                    }
-                    .fittedSheet(
-                        item: $store.scope(state: \.destination?.move, action: \.destination.move),
-                        embedIntoNavStack: true
-                    ) { store in
-                        ForumMoveView(store: store)
-                    }
-                    .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
-                        NavigationStack {
-                            PostKarmaHistoryView(store: store)
-                        }
-                    }
-                    .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
-                        NavigationStack {
-                            ForumStatView(store: store)
-                        }
-                    }
+                Sheets(content: content)
             }
+        }
+        
+        // Fix for compiler struggling with 4 sheets (works without WithPerceptionTracking)
+        private func Sheets(content: Content) -> some View {
+            content
+                .fittedSheet(
+                    item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                    embedIntoNavStack: true
+                ) { store in
+                    ReputationChangeView(store: store)
+                }
+                .fittedSheet(
+                    item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                    embedIntoNavStack: true
+                ) { store in
+                    ForumMoveView(store: store)
+                }
+                .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
+                    NavigationStack {
+                        PostKarmaHistoryView(store: store)
+                    }
+                }
+                .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                    NavigationStack {
+                        ForumStatView(store: store)
+                    }
+                }
         }
     }
 }

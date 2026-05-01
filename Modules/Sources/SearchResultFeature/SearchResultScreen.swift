@@ -23,9 +23,13 @@ public struct SearchResultScreen: View {
     
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -45,19 +49,19 @@ public struct SearchResultScreen: View {
                 if !store.isLoading {
                     if !store.content.isEmpty {
                         List {
-                            if shouldShowNavigation {
+                            if shouldShowInlineNavigation {
                                 Navigation()
                             }
                             
                             ContentSection()
                             
-                            if shouldShowNavigation {
+                            if shouldShowInlineNavigation {
                                 Navigation()
                             }
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
-                        ._inScrollContentDetector(state: $navigationMinimized)
+                        ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     } else {
                         NothingFound()
                     }
@@ -73,9 +77,7 @@ public struct SearchResultScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized

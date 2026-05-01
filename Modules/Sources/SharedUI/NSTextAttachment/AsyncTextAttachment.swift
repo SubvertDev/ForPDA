@@ -44,21 +44,6 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
     private var showPlaceholder: Bool
     
     public var link: URL?
-	
-	/// Designated initializer
-//    public init(imageURL: URL, showPlaceholder: Bool = true, delegate: AsyncTextAttachmentDelegate? = nil) {
-//        self.attachmentUrl = imageURL
-//		self.delegate = delegate
-//        self.showPlaceholder = showPlaceholder
-//		
-//		super.init(data: nil, ofType: nil)
-//        
-//        Task {
-//            await MainActor.run {
-//                screenWidth = UIScreen.main.bounds.width
-//            }
-//        }
-//	}
     
     public init(image: UIImage, displaySize: CGSize? = nil) {
         self.showPlaceholder = false
@@ -103,20 +88,9 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
         Task { await closure() }
     }
     
-//    private func loadImage(from url: URL) async -> Data? {
-//        await withCheckedContinuation { continuation in
-//            ImagePipeline.shared.loadImage(with: url) { result in
-//                if case let .success(image) = result {
-//                    continuation.resume(returning: image.image.imageData)
-//                } else {
-//                    continuation.resume(returning: nil)
-//                }
-//            }
-//        }
-//    }
-    
     var isDownloading = false
     
+    @MainActor
     private func startAttachmentDownload(url: URL) async throws {
 //        defer { isDownloading = false }
         guard !isDownloading else { return }
@@ -140,74 +114,19 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
             fatalError("Couldn't create attachment image")
         }
         
-        sendableClosure { [weak self, displaySizeChanged] in
-            guard let self else { return }
-            showPlaceholder = false
-            isDownloading = false
-            
-            // tell layout manager so that it should refresh
-            await MainActor.run {
-                if displaySizeChanged {
-                    textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
-                } else {
-                    textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
-                }
-            
-                // notify the optional delegate
-                delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
-            }
+        showPlaceholder = false
+        isDownloading = false
+        
+        // tell layout manager so that it should refresh
+        if displaySizeChanged {
+            textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
+        } else {
+            textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
         }
         
-//        imageURL = url
-//        startAsyncImageDownload()
+        // notify the optional delegate
+        delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
     }
-	
-//	private func startAsyncImageDownload() {
-//        defer { downloadTask = nil }
-//
-//        guard let imageURL = attachmentUrl, contents == nil, downloadTask == nil else {
-//			return
-//		}
-//		
-//        downloadTask = URLSession.shared.dataTask(with: imageURL) { [unowned self] (data, response, error) in
-//			
-//			guard let data = data, error == nil else {
-//				print(error?.localizedDescription as Any)
-//				return
-//			}
-//			
-//			var displaySizeChanged = false
-//			
-//			self.contents = data
-//            self.fileType = UTType(filenameExtension: imageURL.pathExtension)?.identifier
-//            
-//            if let image = UIImage(data: data) {
-//                let imageSize = image.size
-//                
-//                if displaySize == nil {
-//                    displaySizeChanged = true
-//                }
-//                
-//                self.originalImageSize = imageSize
-//            }
-//            
-//            showPlaceholder = false
-//            
-//            Task { @MainActor in
-//                // tell layout manager so that it should refresh
-//                if displaySizeChanged {
-//                    self.textContainer?.layoutManager?.setNeedsLayout(forAttachment: self)
-//                } else {
-//                    self.textContainer?.layoutManager?.setNeedsDisplay(forAttachment: self)
-//                }
-//                
-//                // notify the optional delegate
-//                self.delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
-//            }
-//        }
-//		
-//		downloadTask.resume()
-//	}
 
     public override func image(
         forBounds imageBounds: CGRect,
@@ -242,6 +161,7 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 		return image
 	}
     
+    @MainActor
     private func startDownload(url: URL) async {
         do {
             try await startAttachmentDownload(url: url)
@@ -259,16 +179,13 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
                 displaySizeChanged = true
             }
             
-            sendableClosure { [weak self, displaySizeChanged] in
-                guard let self else { return }
-                if displaySizeChanged {
-                    textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
-                } else {
-                    textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
-                }
-                
-                delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
+            if displaySizeChanged {
+                textContainer?.layoutManager!.setNeedsLayout(forAttachment: self)
+            } else {
+                textContainer?.layoutManager!.setNeedsDisplay(forAttachment: self)
             }
+            
+            delegate?.textAttachmentDidLoadImage(textAttachment: self, displaySizeChanged: displaySizeChanged)
         }
     }
 

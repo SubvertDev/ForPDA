@@ -25,9 +25,17 @@ public struct ForumScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var title: String {
+        return store.forumName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -68,7 +76,7 @@ public struct ForumScreen: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollDismissesKeyboard(.immediately)
-                    ._inScrollContentDetector(state: $navigationMinimized)
+                    ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     .refreshable {
                         await send(.onRefresh).finish()
                     }
@@ -79,7 +87,7 @@ public struct ForumScreen: View {
             }
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
-            .navigationTitle(Text(store.forumName ?? "Загрузка..."))
+            .navigationTitle(Text(title))
             ._toolbarTitleDisplayMode(.large)
             .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
                 NavigationStack {
@@ -87,9 +95,7 @@ public struct ForumScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
                         store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
@@ -321,7 +327,7 @@ public struct ForumScreen: View {
     
     @ViewBuilder
     private func Navigation(pinned: Bool) -> some View {
-        if !pinned, shouldShowNavigation {
+        if !pinned, shouldShowInlineNavigation {
             PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)

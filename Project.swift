@@ -74,7 +74,6 @@ let project = Project(
         
             .feature(
                 name: "AnnouncementFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
@@ -155,8 +154,6 @@ let project = Project(
             .feature(
                 name: "BBPanelFeature",
                 dependencies: [
-                    .Internal.APIClient,
-                    .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.UploadBoxFeature,
                     .SPM.SFSafeSymbols,
@@ -210,9 +207,11 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.GalleryFeature,
                     .Internal.Models,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
-                    .SPM.TCA
+                    .SPM.NukeUI,
+                    .SPM.TCA,
                 ]
             ),
             
@@ -224,6 +223,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
+                    .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -567,10 +567,7 @@ let project = Project(
             .feature(
                 name: "UploadBoxFeature",
                 dependencies: [
-                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
-                    .Internal.BBBuilder,
-                    .Internal.Models,
                     .SPM.TCA,
                 ]
             ),
@@ -579,10 +576,10 @@ let project = Project(
                 name: "FormFeature",
                 hasTests: true,
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBPanelFeature,
                     .Internal.Models,
-                    .Internal.ParsingClient,
                     .Internal.SharedUI,
                     .Internal.TopicBuilder,
                     .Internal.UploadBoxFeature,

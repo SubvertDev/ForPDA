@@ -24,6 +24,7 @@ import ToastClient
 import NotificationsClient
 import ForumStatFeature
 import ForumMoveFeature
+import GalleryFeature
 import TopicEditFeature
 
 @Reducer
@@ -52,7 +53,7 @@ public struct TopicFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         @ReducerCaseIgnored
-        case gallery([URL], [Int], Int)
+        case gallery(GalleryModel)
         @ReducerCaseIgnored
         case karmaChange(Int)
         case karmaHistory(PostKarmaHistoryFeature)
@@ -515,7 +516,8 @@ public struct TopicFeature: Reducer, Sendable {
                                 let urls = post.imageAttachmentsOrdered.map { $0.metadata!.url }
                                 let ids = post.imageAttachmentsOrdered.map { $0.id }
                                 let index = ids.firstIndex(of: attachment.id) ?? 0
-                                state.destination = .gallery(urls, ids, index)
+                                let model = GalleryModel(urls: urls, ids: ids, selectedId: index)
+                                state.destination = .gallery(model)
                                 break
                             }
                         }
@@ -544,7 +546,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .view(.finishedPostAnimation):
                 state.postId = nil
-                return .none.animation()
+                return .none
                 
             case .internal(.load):
                 switch state.goTo {
@@ -745,7 +747,7 @@ public struct TopicFeature: Reducer, Sendable {
     
     public func jumpTo(_ jump: JumpTo, _ forceRefresh: Bool, _ state: inout State) -> Effect<Action> {
         if case let .page(page) = jump {
-            return reduce(into: &state, action: .pageNavigation(.goToPage(newPage: page)))
+            return .send(.pageNavigation(.goToPage(newPage: page)))
         }
         
         return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
@@ -768,15 +770,7 @@ public struct TopicFeature: Reducer, Sendable {
     }
     
     private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
-        return PageNavigationFeature()
-            .reduce(
-                into: &state.pageNavigation,
-                action: .update(
-                    count: state.topic?.postsCount ?? 0,
-                    offset: offset
-                )
-            )
-            .map(Action.pageNavigation)
+        return .send(.pageNavigation(.update(count: state.topic?.postsCount ?? 0, offset: offset)))
     }
     
     private func reportFullyDisplayed(_ state: inout State) {
