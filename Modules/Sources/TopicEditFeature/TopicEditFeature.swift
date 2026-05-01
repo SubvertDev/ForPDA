@@ -67,6 +67,8 @@ public struct TopicEditFeature: Reducer, Sendable {
             
             case cancelButtonTapped
             
+            case updateQuestion(Int, Topic.Poll.Option)
+            
             case addQuestionButtonTapped
             case removeQuestionButtonTapped(Int)
             
@@ -101,6 +103,13 @@ public struct TopicEditFeature: Reducer, Sendable {
                     state.draftPoll = poll
                     state.isPollEnabled = true
                 }
+                return .none
+                
+            case let .view(.updateQuestion(id, option)):
+                guard let index = state.draftPoll.options.firstIndex(where: { $0.id == id }) else {
+                    return .none
+                }
+                state.draftPoll.options[index] = option
                 return .none
                 
             case .view(.cancelButtonTapped):

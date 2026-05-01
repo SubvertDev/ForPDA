@@ -131,8 +131,21 @@ public struct TopicEditView: View {
                             focusEqual: .pollName
                         )
                         
-                        ForEach($store.draftPoll.options, id: \.id) { question in
-                            PollQuestion(question)
+                        ForEach(store.draftPoll.options) { question in
+                            WithPerceptionTracking {
+                                // We use this solution with binding, because otherwise, on iOS 17+,
+                                // when deleting a question, error "Index out of range" appears
+                                // due to the fact that "multiselection Toggle" calling an already deleted question
+                                let question = store.draftPoll.options.first { $0.id == question.id } ?? question
+                                PollQuestion(
+                                    question: Binding(
+                                        get: { question },
+                                        set: { newValue in
+                                            send(.updateQuestion(question.id, newValue))
+                                        }
+                                    )
+                                )
+                            }
                         }
                         
                         AddPollElementButton(title: "Question") {
@@ -148,7 +161,7 @@ public struct TopicEditView: View {
     // MARK: - Poll Question
     
     @ViewBuilder
-    private func PollQuestion(_ question: Binding<Topic.Poll.Option>) -> some View {
+    private func PollQuestion(question: Binding<Topic.Poll.Option>) -> some View {
         VStack(spacing: 10) {
             Field(
                 title: "Question",
