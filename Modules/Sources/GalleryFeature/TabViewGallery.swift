@@ -112,6 +112,11 @@ public struct TabViewGallery: View {
             ToolbarButton(placement: .topBarLeading, symbol: .xmark) {
                 dismiss()
             }
+            .onTapGesture { // fix unclickable button on iOS 16
+                if #unavailable(iOS 17.0) {
+                    dismiss()
+                }
+            }
 
             Spacer()
             
@@ -234,11 +239,6 @@ public struct TabViewGallery: View {
                             .frame(width: 32, height: 32)
                     }
                 }
-                .highPriorityGesture(
-                    TapGesture().onEnded {
-                        dismiss()
-                    }
-                )
         }
         .frame(
             width: isLiquidGlass ? 44 : 32,
