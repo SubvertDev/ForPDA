@@ -37,18 +37,20 @@ public struct TicketParser {
         }
         
         return Ticket(
-            title: title,
-            status: TicketStatus(rawValue: statusRaw)!,
-            subjectId: subjectId,
-            subjectElementId: subjectElementId,
-            subjectRootId: subjectRootId,
-            subjectRootName: subjectRootName.convertCodes(),
-            authorId: authorId,
-            authorName: authorName.convertCodes(),
-            handlerId: handlerId,
-            handlerName: handlerName.convertCodes(),
-            comments: try parseComments(commentsRaw),
-            createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+            info: TicketInfo(
+                title: title,
+                status: TicketStatus(rawValue: statusRaw)!,
+                subjectId: subjectId,
+                subjectElementId: subjectElementId,
+                subjectRootId: subjectRootId,
+                subjectRootName: subjectRootName.convertCodes(),
+                authorId: authorId,
+                authorName: authorName.convertCodes(),
+                handlerId: handlerId,
+                handlerName: handlerName.convertCodes(),
+                createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+            ),
+            comments: try parseComments(commentsRaw)
         )
     }
     
@@ -92,13 +94,16 @@ public struct TicketParser {
             throw ParsingError.failedToCastFields
         }
         
-        return TicketsList(tickets: try parseTicketsInfo(ticketsRaw), availableCount: availableCount)
+        return TicketsList(
+            tickets: try parseTicketsInfo(ticketsRaw),
+            availableCount: availableCount
+        )
     }
     
     // MARK: - Tickets Info
     
-    private static func parseTicketsInfo(_ infoRaw: [[Any]]) throws(ParsingError) -> [TicketInfo] {
-        var ticketsInfo: [TicketInfo] = []
+    private static func parseTicketsInfo(_ infoRaw: [[Any]]) throws(ParsingError) -> [TicketsList.TicketSimplified] {
+        var ticketsInfo: [TicketsList.TicketSimplified] = []
         for info in infoRaw {
             guard let id = info[safe: 0] as? Int,
                   let title = info[safe: 2] as? String,
@@ -115,19 +120,21 @@ public struct TicketParser {
                 throw ParsingError.failedToCastFields
             }
             
-            ticketsInfo.append(TicketInfo(
+            ticketsInfo.append(.init(
                 id: id,
-                title: title.convertCodes(),
-                status: TicketStatus(rawValue: statusRaw)!,
-                subjectId: subjectId,
-                subjectElementId: subjectElementId,
-                subjectRootId: subjectRootId,
-                subjectRootName: subjectRootName.convertCodes(),
-                authorId: authorId,
-                authorName: authorName.convertCodes(),
-                handlerId: handlerId,
-                handlerName: handlerName.convertCodes(),
-                createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+                info: TicketInfo(
+                    title: title.convertCodes(),
+                    status: TicketStatus(rawValue: statusRaw)!,
+                    subjectId: subjectId,
+                    subjectElementId: subjectElementId,
+                    subjectRootId: subjectRootId,
+                    subjectRootName: subjectRootName.convertCodes(),
+                    authorId: authorId,
+                    authorName: authorName.convertCodes(),
+                    handlerId: handlerId,
+                    handlerName: handlerName.convertCodes(),
+                    createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+                )
             ))
         }
         return ticketsInfo
