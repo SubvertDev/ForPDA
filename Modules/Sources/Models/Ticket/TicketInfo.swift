@@ -12,7 +12,9 @@ public struct TicketInfo: Sendable {
     public let title: String
     public let status: TicketStatus
     public let subjectId: Int
-    public let subjectName: String
+    public let subjectElementId: Int
+    public let subjectRootId: Int
+    public let subjectRootName: String
     public let authorId: Int
     public let authorName: String
     public let handlerId: Int
@@ -24,7 +26,9 @@ public struct TicketInfo: Sendable {
         title: String,
         status: TicketStatus,
         subjectId: Int,
-        subjectName: String,
+        subjectElementId: Int,
+        subjectRootId: Int,
+        subjectRootName: String,
         authorId: Int,
         authorName: String,
         handlerId: Int,
@@ -35,7 +39,9 @@ public struct TicketInfo: Sendable {
         self.title = title
         self.status = status
         self.subjectId = subjectId
-        self.subjectName = subjectName
+        self.subjectElementId = subjectElementId
+        self.subjectRootId = subjectRootId
+        self.subjectRootName = subjectRootName
         self.authorId = authorId
         self.authorName = authorName
         self.handlerId = handlerId
@@ -49,8 +55,10 @@ public extension TicketInfo {
         id: 0,
         title: "New topic: ForPDA [iOS]",
         status: .processing,
-        subjectId: 12,
-        subjectName: "ForPDA [iOS]",
+        subjectId: 1104159,
+        subjectElementId: 136063497,
+        subjectRootId: 140,
+        subjectRootName: "iOS - Programs",
         authorId: 6176341,
         authorName: "AirFlare",
         handlerId: 3640948,
