@@ -66,6 +66,9 @@ public struct ParsingClient: Sendable {
     public var parseDeviceBrands: @Sendable (_ response: String) async throws -> DeviceVendorsList
     public var parseDeviceVendor: @Sendable (_ response: String) async throws -> DeviceVendor
     public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
+    
+    // Ticket
+    public var parseTicketsList: @Sendable (_ response: String) async throws -> TicketsList
 }
 
 // MARK: - Dependency Key
@@ -176,6 +179,9 @@ extension ParsingClient: DependencyKey {
         },
         parseDeviceSpecifications: { response in
             return try DevDBParser.parse(from: response)
+        },
+        parseTicketsList: { response in
+            return try TicketParser.parseTicketsList(from: response)
         }
     )
 }

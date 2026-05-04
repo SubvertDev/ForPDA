@@ -1,0 +1,60 @@
+//
+//  TicketInfo.swift
+//  ForPDA
+//
+//  Created by Xialtal on 3.05.26.
+//
+
+import Foundation
+
+public struct TicketInfo: Sendable {
+    public let id: Int
+    public let title: String
+    public let status: TicketStatus
+    public let subjectId: Int
+    public let subjectName: String
+    public let authorId: Int
+    public let authorName: String
+    public let handlerId: Int
+    public let handlerName: String
+    public let createdAt: Date
+    
+    public init(
+        id: Int,
+        title: String,
+        status: TicketStatus,
+        subjectId: Int,
+        subjectName: String,
+        authorId: Int,
+        authorName: String,
+        handlerId: Int,
+        handlerName: String,
+        createdAt: Date
+    ) {
+        self.id = id
+        self.title = title
+        self.status = status
+        self.subjectId = subjectId
+        self.subjectName = subjectName
+        self.authorId = authorId
+        self.authorName = authorName
+        self.handlerId = handlerId
+        self.handlerName = handlerName
+        self.createdAt = createdAt
+    }
+}
+
+public extension TicketInfo {
+    static let mock = TicketInfo(
+        id: 0,
+        title: "New topic: ForPDA [iOS]",
+        status: .processing,
+        subjectId: 12,
+        subjectName: "ForPDA [iOS]",
+        authorId: 6176341,
+        authorName: "AirFlare",
+        handlerId: 3640948,
+        handlerName: "subvertd",
+        createdAt: Date.now
+    )
+}

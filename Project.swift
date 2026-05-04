@@ -615,6 +615,17 @@ let project = Project(
                     .SPM.ZMarkupParser,
                 ]
             ),
+
+            .feature(
+                name: "TicketClient",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .SPM.PDAPI,
+                    .SPM.TCA
+                ]
+            ),
         
             .feature(
                 name: "ToastClient",
