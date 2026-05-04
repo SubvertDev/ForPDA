@@ -8,7 +8,6 @@
 import Foundation
 
 public struct TicketInfo: Sendable {
-    public let id: Int
     public let title: String
     public let status: TicketStatus
     public let subjectId: Int
@@ -22,7 +21,6 @@ public struct TicketInfo: Sendable {
     public let createdAt: Date
     
     public init(
-        id: Int,
         title: String,
         status: TicketStatus,
         subjectId: Int,
@@ -35,7 +33,6 @@ public struct TicketInfo: Sendable {
         handlerName: String,
         createdAt: Date
     ) {
-        self.id = id
         self.title = title
         self.status = status
         self.subjectId = subjectId
@@ -52,7 +49,6 @@ public struct TicketInfo: Sendable {
 
 public extension TicketInfo {
     static let mock = TicketInfo(
-        id: 0,
         title: "New topic: ForPDA [iOS]",
         status: .processing,
         subjectId: 1104159,
