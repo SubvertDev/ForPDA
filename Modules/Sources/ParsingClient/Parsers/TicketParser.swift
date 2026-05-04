@@ -10,6 +10,72 @@ import Models
 
 public struct TicketParser {
     
+    // MARK: - Ticket Response
+    
+    public static func parse(from string: String) throws(ParsingError) -> Ticket {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let title = array[safe: 3] as? String,
+              let subjectId = array[safe: 14] as? Int,
+              let subjectElementId = array[safe: 15] as? Int,
+              let subjectRootId = array[safe: 4] as? Int,
+              let subjectRootName = array[safe: 5] as? String,
+              let createdAt = array[safe: 6] as? Int,
+              let authorId = array[safe: 8] as? Int,
+              let authorName = array[safe: 9] as? String,
+              let handlerId = array[safe: 10] as? Int,
+              let handlerName = array[safe: 11] as? String,
+              let commentsRaw = array[safe: 13] as? [[Any]],
+              let statusRaw = array[safe: 16] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return Ticket(
+            title: title,
+            status: TicketStatus(rawValue: statusRaw)!,
+            subjectId: subjectId,
+            subjectElementId: subjectElementId,
+            subjectRootId: subjectRootId,
+            subjectRootName: subjectRootName.convertCodes(),
+            authorId: authorId,
+            authorName: authorName.convertCodes(),
+            handlerId: handlerId,
+            handlerName: handlerName.convertCodes(),
+            comments: try parseComments(commentsRaw),
+            createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+        )
+    }
+    
+    // MARK: - Ticket Comments
+    
+    private static func parseComments(_ commentsRaw: [[Any]]) throws(ParsingError) -> [Ticket.Comment] {
+        var comments: [Ticket.Comment] = []
+        for comment in commentsRaw {
+            guard let id = comment[safe: 0] as? Int,
+                  let content = comment[safe: 4] as? String,
+                  let authorId = comment[safe: 2] as? Int,
+                  let authorName = comment[safe: 3] as? String,
+                  let createdAt = comment[1] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            comments.append(.init(
+                id: id,
+                content: content,
+                authorId: authorId,
+                authorName: authorName.convertCodes(),
+                createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+            ))
+        }
+        return comments
+    }
+    
     // MARK: - Tickets List
     
     public static func parseTicketsList(from string: String) throws(ParsingError) -> TicketsList {

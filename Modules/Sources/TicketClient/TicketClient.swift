@@ -16,6 +16,7 @@ import ParsingClient
 @DependencyClient
 public struct TicketClient: Sendable {
     public var getTicketsList: @Sendable (_ data: TicketsListRequest) async throws -> TicketsList
+    public var getTicket: @Sendable (_ id: Int) async throws -> Ticket
 }
 
 extension TicketClient: DependencyKey {
@@ -38,6 +39,10 @@ extension TicketClient: DependencyKey {
                     limit: data.amount
                 ))
                 return try await parser.parseTicketsList(response)
+            },
+            getTicket: { id in
+                let response = try await api.send(TicketCommand.view(id: id))
+                return try await parser.parseTicket(response)
             }
         )
     }
@@ -47,6 +52,9 @@ extension TicketClient: DependencyKey {
     public static var previewValue: TicketClient {
         return TicketClient(
             getTicketsList: { _ in
+                return .mock
+            },
+            getTicket: { _ in
                 return .mock
             }
         )
