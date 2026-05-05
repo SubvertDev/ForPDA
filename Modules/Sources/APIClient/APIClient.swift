@@ -65,6 +65,7 @@ public struct APIClient: Sendable {
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var modifyForum: @Sendable (_ ids: [Int], _ type: ForumModifyType, _ isUndo: Bool) async throws -> Bool
     public var moveTopic: @Sendable (_ id: Int, _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
+    public var editTopic: @Sendable (_ data: TopicEditRequest) async throws -> TopicEditResponse
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var setTopicCurator: @Sendable (_ topicId: Int, _ userId: Int, _ reason: String) async throws -> Bool
     public var getTemplate: @Sendable (_ request: ForumTemplateRequest, _ isTopic: Bool) async throws -> [FormFieldType]
@@ -383,6 +384,17 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
+            },
+            editTopic: { data in
+                let request = PDAPI.TopicEditRequest(
+                    id: data.id,
+                    title: data.title,
+                    description: data.description,
+                    poll: data.poll
+                )
+                let response = try await api.send(ForumCommand.Topic.edit(data: request))
+                let status = Int(response.getResponseStatus())!
+                return TopicEditResponse(rawValue: status)
             },
             getTopicViewers: { topicId in
                 let command = MemberCommand.sessions(
@@ -741,6 +753,9 @@ extension APIClient: DependencyKey {
             },
             moveTopic: { _, _, _ in
                 return true
+            },
+            editTopic: { _ in
+                return .success
             },
             getTopicViewers: { _ in
                 return .mock

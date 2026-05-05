@@ -121,6 +121,16 @@
         }
       }
     },
+    "Edit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Редактировать"
+          }
+        }
+      }
+    },
     "Except deleted" : {
       "localizations" : {
         "ru" : {
@@ -357,6 +367,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пост был удален, показываю ближайший"
+          }
+        }
+      }
+    },
+    "The topic has been edited" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема отредактирована"
           }
         }
       }

@@ -25,6 +25,7 @@ import NotificationsClient
 import ForumStatFeature
 import ForumMoveFeature
 import GalleryFeature
+import TopicEditFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -36,6 +37,7 @@ public struct TopicFeature: Reducer, Sendable {
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+        static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let topicDeleted = LocalizedStringResource("Topic deleted", bundle: .module)
@@ -61,6 +63,7 @@ public struct TopicFeature: Reducer, Sendable {
         case form(FormFeature)
         case stat(ForumStatFeature)
         case move(ForumMoveFeature)
+        case edit(TopicEditFeature)
         case changeReputation(ReputationChangeFeature)
         
         @CasePathable
@@ -237,6 +240,11 @@ public struct TopicFeature: Reducer, Sendable {
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
                 
+            case .destination(.presented(.edit(.delegate(.topicEdited)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
+                }
+                
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
@@ -343,6 +351,18 @@ public struct TopicFeature: Reducer, Sendable {
                         )
                     )
                     state.destination = .form(formState)
+                    return .none
+                    
+                case .edit:
+                    let editState = TopicEditFeature.State(
+                        id: topic.id,
+                        flag: topic.flag,
+                        title: topic.name,
+                        description: topic.description,
+                        poll: topic.poll,
+                        supportsPoll: true
+                    )
+                    state.destination = .edit(editState)
                     return .none
                     
                 case .about:

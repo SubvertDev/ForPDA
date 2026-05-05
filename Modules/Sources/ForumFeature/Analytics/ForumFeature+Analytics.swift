@@ -66,6 +66,8 @@ extension ForumFeature {
                         analytics.log(ForumEvent.menuOpen(topic.id))
                     case .goToEnd:
                         analytics.log(ForumEvent.menuGoToEnd(topic.id))
+                    case .edit:
+                        analytics.log(ForumEvent.menuEdit(topic.id))
                     }
                     
                 case let .view(.contextCommonMenu(option, id, isForum)):

@@ -36,6 +36,10 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
         return flag.contains(.favorite)
     }
     
+    public var canEdit: Bool {
+        return flag.contains(.canEdit)
+    }
+    
     public var canDelete: Bool {
         return flag.contains(.canDelete)
     }

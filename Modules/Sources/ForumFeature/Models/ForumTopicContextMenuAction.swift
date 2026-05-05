@@ -8,4 +8,5 @@
 public enum ForumTopicContextMenuAction {
     case open
     case goToEnd
+    case edit
 }
