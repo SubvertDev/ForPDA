@@ -127,6 +127,11 @@ public struct TopicEditFeature: Reducer, Sendable {
         public enum Internal {
             case editResponse(Result<TopicEditResponse, any Error>)
         }
+        
+        case delegate(Delegate)
+        public enum Delegate {
+            case topicEdited
+        }
     }
     
     // MARK: - Dependencies
@@ -147,10 +152,10 @@ public struct TopicEditFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .alert(.dismiss):
+            case .alert(.dismiss), .delegate(.topicEdited):
                 return .run { _ in await dismiss() }
                 
-            case .binding, .alert:
+            case .binding, .alert, .delegate:
                 return .none
                 
             case .view(.onAppear):
@@ -232,7 +237,7 @@ public struct TopicEditFeature: Reducer, Sendable {
             case let .internal(.editResponse(.success(status))):
                 switch status {
                 case .success:
-                    break
+                    return .send(.delegate(.topicEdited))
                 case .tooManyQuestionsInPoll:
                     state.alert = .tooManyQuestionsInPoll
                 case .tooManyAnswersInPoll:

@@ -37,6 +37,7 @@ public struct TopicFeature: Reducer, Sendable {
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+        static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let topicDeleted = LocalizedStringResource("Topic deleted", bundle: .module)
@@ -227,6 +228,11 @@ public struct TopicFeature: Reducer, Sendable {
             case .destination(.presented(.form(.delegate(.formSent(.report))))):
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
+                }
+                
+            case .destination(.presented(.edit(.delegate(.topicEdited)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
                 }
                 
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
