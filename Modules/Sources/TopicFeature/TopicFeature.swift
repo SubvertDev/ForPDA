@@ -485,7 +485,7 @@ public struct TopicFeature: Reducer, Sendable {
                 case .modify(let action, let postId, let isUndo):
                     switch action {
                     case .pin, .hide, .protect:
-                        return .run { [id = state.topicId] send in
+                        return .run { [id = postId] send in
                             let status = try await apiClient.modifyForum(ids: [id], type: .post(action), isUndo: isUndo)
                             
                             await send(.internal(.refresh))
