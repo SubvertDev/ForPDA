@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import SharedUI
 import Models
+import SFSafeSymbols
 
 @ViewAction(for: TopicEditFeature.self)
 public struct TopicEditView: View {
