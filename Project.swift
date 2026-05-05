@@ -510,6 +510,17 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+
+            .feature(
+                name: "TicketFeature",
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.TicketClient,
+                    .Internal.ToastClient,
+                    .SPM.TCA
+                ]
+            ),
         
             .feature(
                 name: "TopicBuilder",
@@ -1102,6 +1113,7 @@ extension TargetDependency.Internal {
     static let SearchFeature =          TargetDependency.target(name: "SearchFeature")
     static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
+    static let TicketFeature =          TargetDependency.target(name: "TicketFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
@@ -1116,6 +1128,7 @@ extension TargetDependency.Internal {
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
     static let QMSClient =           TargetDependency.target(name: "QMSClient")
+    static let TicketClient =        TargetDependency.target(name: "TicketClient")
     static let ToastClient =         TargetDependency.target(name: "ToastClient")
     
     // Shared
