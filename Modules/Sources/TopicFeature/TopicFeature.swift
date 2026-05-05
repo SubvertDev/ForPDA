@@ -54,6 +54,8 @@ public struct TopicFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        @ReducerCaseIgnored
         case gallery(GalleryModel)
         @ReducerCaseIgnored
         case karmaChange(Int)
@@ -63,7 +65,16 @@ public struct TopicFeature: Reducer, Sendable {
         case move(ForumMoveFeature)
         case edit(TopicEditFeature)
         case changeReputation(ReputationChangeFeature)
-        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case karmaHistory(PostKarmaHistoryFeature.Action)
+            case form(FormFeature.Action)
+            case stat(ForumStatFeature.Action)
+            case move(ForumMoveFeature.Action)
+            case changeReputation(ReputationChangeFeature.Action)
+        }
         
         @CasePathable
         public enum Alert: Equatable {
@@ -163,6 +174,7 @@ public struct TopicFeature: Reducer, Sendable {
             case refresh
             case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
             case changeKarma(postId: Int, isUp: Bool)
+            case jumpToPostAfterKarma(postId: Int)
             case voteInPoll(selections: [[Int]])
             case loadTopic(Int)
             case loadTypes([[UITopicType]])
@@ -212,15 +224,13 @@ public struct TopicFeature: Reducer, Sendable {
                 state.isRefreshing = false
                 state.postId = nil
                 state.posts.removeAll()
-                return .concatenate([
-                    .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] _ in
+                return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
                         if isLastPage {
                             await cacheClient.deleteTopicIdOfUnreadItem(topicId)
                         }
-                    },
-                    .cancel(id: CancelID.loading),
-                    .send(.internal(.loadTopic(newOffset)))
-                ])
+                        Task.cancel(id: CancelID.loading)
+                        await send(.internal(.loadTopic(newOffset)))
+                }
                 
             case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
                 return jumpTo(.post(id: post.id), true, &state)
@@ -572,29 +582,28 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 
             case .internal(.changeKarma(let postId, let isUp)):
-                return .concatenate(
-                    .run { _ in
+                return .run { send in
                         let status = try await apiClient.postKarma(postId: postId, isUp: isUp)
                         let postKarmaChangedToast = ToastMessage(text: Localization.postKarmaChanged, haptic: .success)
                         await toastClient.showToast(status ? postKarmaChangedToast : .whoopsSomethingWentWrong)
-                    }.cancellable(id: CancelID.loading),
-                
-                    jumpTo(.post(id: postId), true, &state)
-                )
+                        await send(.internal(.jumpToPostAfterKarma(postId: postId)))
+                }
+                .cancellable(id: CancelID.loading)
+
+            case let .internal(.jumpToPostAfterKarma(postId)):
+                return jumpTo(.post(id: postId), true, &state)
                 
             case let .internal(.voteInPoll(selections)):
-                return .concatenate(
-                    .run { [topicId = state.topicId] _ in
+                return .run { [topicId = state.topicId] send in
                         let status = try await apiClient.voteInTopicPoll(
                             topicId: topicId,
                             selections: selections
                         )
                         let voteApproved = ToastMessage(text: Localization.topicVoteApproved, haptic: .success)
                         await toastClient.showToast(status ? voteApproved : .whoopsSomethingWentWrong)
-                    }.cancellable(id: CancelID.loading),
-                    
-                    .send(.internal(.refresh))
-                )
+                        await send(.internal(.refresh))
+                }
+                .cancellable(id: CancelID.loading)
                 
             case let .internal(.loadTopic(offset)):
                 if !state.isRefreshing {
@@ -619,14 +628,14 @@ public struct TopicFeature: Reducer, Sendable {
                 //customDump(topic)
                 state.topic = topic
 
-                return .concatenate(
-                    updatePageNavigation(&state),
-                    
-                    .run { [
-                        isFirstPage = state.pageNavigation.isFirstPage,
-                        topicPerPage = state.appSettings.topicPerPage,
-                        shouldShowTopicHatButton = state.shouldShowTopicHatButton
-                    ] send in
+                return .run { [
+                    isFirstPage = state.pageNavigation.isFirstPage,
+                    topicPerPage = state.appSettings.topicPerPage,
+                    shouldShowTopicHatButton = state.shouldShowTopicHatButton,
+                    isLastPage = state.pageNavigation.isLastPage
+                ] send in
+                        await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
+
                         var topicTypes: [[UITopicType]] = []
                         
                         topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
@@ -649,9 +658,7 @@ public struct TopicFeature: Reducer, Sendable {
                             return types.map { $0 ?? [] }
                         }
                         await send(.internal(.loadTypes(topicTypes)))
-                    }.cancellable(id: CancelID.loading),
-                    
-                    .run { [isLastPage = state.pageNavigation.isLastPage] send in
+
                         if isLastPage {
                             notificationCenter.post(name: .favoritesUpdated, object: nil)
                             
@@ -664,8 +671,8 @@ public struct TopicFeature: Reducer, Sendable {
                         // Include topic.id so opening a topic clears mentions tied to this topic
                         let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970) + [TimeInterval(topic.id)]
                         await notificationsClient.removeNotifications(timestamps: timestamps)
-                    }
-                )
+                }
+                .cancellable(id: CancelID.loading)
                 
             case let .internal(.loadTypes(types)):
                 if state.posts.isEmpty {
@@ -722,11 +729,13 @@ public struct TopicFeature: Reducer, Sendable {
     
     /// If offset is set to nil, then initialOffset property will be used
     private func loadPage(offset: Int? = nil, _ state: inout State) -> Effect<Action> {
-        return .concatenate(
-            updatePageNavigation(&state, offset: offset ?? state.initialOffset),
-            .cancel(id: CancelID.loading),
-            .send(.internal(.loadTopic(offset ?? state.initialOffset)))
-        )
+        let targetOffset = offset ?? state.initialOffset
+        let postsCount = state.topic?.postsCount ?? 0
+        return .run { send in
+            await send(.pageNavigation(.update(count: postsCount, offset: targetOffset)))
+            Task.cancel(id: CancelID.loading)
+            await send(.internal(.loadTopic(targetOffset)))
+        }
     }
     
     private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[UITopicType]]) -> [UIPost] {

@@ -62,7 +62,11 @@ let package = Package(
     name: "ForPDA",
     dependencies: [
         // TCA
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", from: "1.25.5"),
+        .package(
+            url: "https://github.com/pointfreeco/swift-composable-architecture.git",
+            from: "1.25.5",
+            traits: ["ComposableArchitecture2Deprecations"]
+        ),
                 
         // TCA Dependencies
         .package(url: "https://github.com/apple/swift-async-algorithms", exact: "1.1.3"),

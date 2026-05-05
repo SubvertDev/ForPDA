@@ -121,14 +121,11 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.loadFavorites(offset: newOffset)))
                 
             case .sort(.presented(.saveButtonTapped)):
-                return .concatenate(
-                    .run { _ in
-                        await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
-                    },
-                    
-                    .send(.internal(.refresh)),
-                    .send(.sort(.presented(.cancelButtonTapped)))
-                )
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
+                    await send(.internal(.refresh))
+                    await send(.sort(.presented(.cancelButtonTapped)))
+                }
                 
             case .sort(.presented(.cancelButtonTapped)):
                 state.sort = nil

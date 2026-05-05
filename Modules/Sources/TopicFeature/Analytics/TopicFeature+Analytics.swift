@@ -29,6 +29,7 @@ extension TopicFeature {
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
+                        .internal(.jumpToPostAfterKarma),
                         .internal(.changeKarma),
                         .internal(.voteInPoll),
                         .internal(.load),

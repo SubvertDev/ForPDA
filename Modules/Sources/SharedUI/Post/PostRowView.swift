@@ -316,7 +316,7 @@ public struct PostRowView: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: state.post.post.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                toolsMenuAction(.modify(.hide, state.post.id, !state.post.post.isHidden))
+                toolsMenuAction(.modify(.hide, state.post.id, state.post.post.isHidden))
             }
             
             ContextButton(
@@ -325,7 +325,7 @@ public struct PostRowView: View {
                 : LocalizedStringResource("Pin", bundle: .module),
                 symbol: state.post.post.isPinned ? .pinFill : .pin
             ) {
-                toolsMenuAction(.modify(.pin, state.post.id, !state.post.post.isPinned))
+                toolsMenuAction(.modify(.pin, state.post.id, state.post.post.isPinned))
             }
             
             ContextButton(
@@ -334,7 +334,7 @@ public struct PostRowView: View {
                 : LocalizedStringResource("Protect", bundle: .module),
                 symbol: state.post.post.isProtected ? .shieldFill : .shield
             ) {
-                toolsMenuAction(.modify(.protect, state.post.id, !state.post.post.isProtected))
+                toolsMenuAction(.modify(.protect, state.post.id, state.post.post.isProtected))
             }
             
             ContextButton(

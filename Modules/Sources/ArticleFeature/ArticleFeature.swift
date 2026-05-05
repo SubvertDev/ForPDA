@@ -41,8 +41,12 @@ public struct ArticleFeature: Reducer, Sendable {
     public enum Destination: Hashable {
         @ReducerCaseIgnored
         case share(URL)
-        case alert(AlertState<Alert>)
         
+        // Alert
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        @CasePathable
+        public enum Action { case alert(Alert) }
         public enum Alert { case ok }
     }
     
@@ -350,16 +354,19 @@ public struct ArticleFeature: Reducer, Sendable {
                 }
                 
                 // TODO: Cache articles parsing result
-                return .run { send in
-                    let result = await Result { try await parsingClient.parseArticleElements(article) }
-                    await send(._parseArticleElements(result))
-                }
+                return .merge(
+                    .run { send in
+                        let result = await Result { try await parsingClient.parseArticleElements(article) }
+                        await send(._parseArticleElements(result))
+                    },
+                    .cancel(id: CancelID.loading)
+                )
                 
             case ._articleResponse(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
                 reportFullyDisplayed(&state)
-                return .none
+                return .cancel(id: CancelID.loading)
                 
             case let ._commentResponse(.success(type)):
                 state.isUploadingComment = false
@@ -367,10 +374,10 @@ public struct ArticleFeature: Reducer, Sendable {
                 guard !type.isError else { return showToast(type: type) }
                 state.commentText.removeAll()
                 state.replyComment = nil
-                return .concatenate([
+                return .merge(
                     getArticle(id: state.articlePreview.id, useCache: false),
                     showToast(type: type)
-                ])
+                )
                 
             case let ._commentResponse(.failure(error)):
                 print(error) // TODO: Catch to Issue
@@ -438,18 +445,15 @@ public struct ArticleFeature: Reducer, Sendable {
     }
     
     private func getArticle(id: Int, useCache: Bool = true) -> EffectOf<Self> {
-        return .concatenate([
-            .run { send in
-                do {
-                    for try await article in try await apiClient.getArticle(id, .cacheAndLoad) {
-                        await send(._articleResponse(.success(article)))
-                    }
-                } catch {
-                    await send(._articleResponse(.failure(error)))
+        return .run { send in
+            do {
+                for try await article in try await apiClient.getArticle(id: id, policy: useCache ? .cacheAndLoad : .skipCache) {
+                    await send(._articleResponse(.success(article)))
                 }
-            },
-            .cancel(id: CancelID.loading)
-        ])
+            } catch {
+                await send(._articleResponse(.failure(error)))
+            }
+        }
     }
     
     private func handleMenuOptions(action: ArticleMenuAction, state: inout State) -> Effect<Action> {

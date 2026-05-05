@@ -249,10 +249,10 @@ public struct ForumFeature: Reducer, Sendable {
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
                     
                 case .goToEnd:
-                    return .concatenate(
-                        .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
-                        .send(.internal(.refresh))
-                    )
+                    return .run { send in
+                        await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                        await send(.internal(.refresh))
+                    }
                     
                 case .edit:
                     state.destination = .edit(TopicEditFeature.State(

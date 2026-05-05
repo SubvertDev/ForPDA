@@ -73,20 +73,22 @@ public struct AppView: View {
             .animation(.default, value: store.toastMessage)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
-            .sheet(item: $store.scope(state: \.logStore, action: \.logStore)) { store in
+            .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
                 LogStoreScreen(store: store)
             }
-            .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
+            .fullScreenCover(item: $store.scope(state: \.$auth, action: \.auth)) { store in
                 NavigationStack {
                     AuthScreen(store: store)
                 }
             }
-            .alert($store.scope(state: \.alert, action: \.alert))
+            .alert($store.scope(state: \.$alert, action: \.alert))
             // Tint and environment should be after sheets/covers
             .tint(store.appSettings.appTintColor.asColor)
             .environment(\.tintColor, store.appSettings.appTintColor.asColor)
             .onAppear {
-                store.send(.onAppear, animation: .default)
+                withAnimation {
+                    _ = store.send(.onAppear)
+                }
             }
             .onShake {
                 store.send(.onShake)

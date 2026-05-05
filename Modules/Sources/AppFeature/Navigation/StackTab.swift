@@ -115,21 +115,19 @@ public struct StackTab: Reducer, Sendable {
             }
         }
         .forEach(\.path, action: \.path)
-        .onChange(of: \.path) { _, path in
-            Reduce<State, Action> { state, action in
-                notificationsClient.setNotificationContext(context: state.notificationsContext)
-                
-                let hasArticle = path.contains(where: { $0.is(\.articles.article) })
-                let hasSettings = path.contains(where: { $0.is(\.settings) })
-                let hasQms = path.contains(where: { $0.is(\.qms) })
-                let hasSearch = path.last(is: \.search.search) != nil
-                let showTabBar = !hasArticle && !hasSettings && !hasQms && !hasSearch
-                if state.showTabBar != showTabBar {
-                    state.showTabBar = showTabBar
-                    return .send(.delegate(.showTabBar(state.showTabBar)))
-                }
-                return .none
+        .onChange(of: \.path) { _, state in
+            notificationsClient.setNotificationContext(context: state.notificationsContext)
+            
+            let hasArticle = state.path.contains(where: { $0.is(\.articles.article) })
+            let hasSettings = state.path.contains(where: { $0.is(\.settings) })
+            let hasQms = state.path.contains(where: { $0.is(\.qms) })
+            let hasSearch = state.path.last(is: \.search.search) != nil
+            let showTabBar = !hasArticle && !hasSettings && !hasQms && !hasSearch
+            if state.showTabBar != showTabBar {
+                state.showTabBar = showTabBar
+                return .send(.delegate(.showTabBar(state.showTabBar)))
             }
+            return .none
         }
     }
     

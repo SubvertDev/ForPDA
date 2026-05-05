@@ -244,7 +244,7 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextToolsMenu(.modify(.hide, !topic.isHidden)))
+                send(.contextToolsMenu(.modify(.hide, topic.isHidden)))
             }
             
             ContextButton(
@@ -253,7 +253,7 @@ public struct TopicScreen: View {
                 : LocalizedStringResource("Close Topic", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextToolsMenu(.modify(.close, !topic.isClosed)))
+                send(.contextToolsMenu(.modify(.close, topic.isClosed)))
             }
             
             if topic.canDelete {
@@ -478,7 +478,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
-                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .alert($store.scope(state: \.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
@@ -508,7 +508,7 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).form) { store in
                         NavigationStack {
                             FormScreen(store: store)
                         }
@@ -543,23 +543,23 @@ struct NavigationModifier: ViewModifier {
         private func Sheets(content: Content) -> some View {
             content
                 .fittedSheet(
-                    item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
+                    item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
                     embedIntoNavStack: true
                 ) { store in
                     ReputationChangeView(store: store)
                 }
                 .fittedSheet(
-                    item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                    item: $store.scope(state: \.$destination, action: \.destination).move,
                     embedIntoNavStack: true
                 ) { store in
                     ForumMoveView(store: store)
                 }
-                .sheet(item: $store.scope(state: \.destination?.karmaHistory, action: \.destination.karmaHistory)) { store in
+                .sheet(item: $store.scope(state: \.$destination, action: \.destination).karmaHistory) { store in
                     NavigationStack {
                         PostKarmaHistoryView(store: store)
                     }
                 }
-                .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                .sheet(item: $store.scope(state: \.$destination, action: \.destination).stat) { store in
                     NavigationStack {
                         ForumStatView(store: store)
                     }

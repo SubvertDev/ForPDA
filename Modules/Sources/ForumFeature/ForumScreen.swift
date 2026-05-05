@@ -268,7 +268,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Pin", bundle: .module),
                 symbol: topic.isPinned ? .pinFill : .pin
             ) {
-                send(.contextTopicToolsMenu(.modify(.pin, topic.id, !topic.isPinned)))
+                send(.contextTopicToolsMenu(.modify(.pin, topic.id, topic.isPinned)))
             }
             
             ContextButton(
@@ -277,7 +277,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Hide", bundle: .module),
                 symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextTopicToolsMenu(.modify(.hide, topic.id, !topic.isHidden)))
+                send(.contextTopicToolsMenu(.modify(.hide, topic.id, topic.isHidden)))
             }
             
             ContextButton(
@@ -286,7 +286,7 @@ public struct ForumScreen: View {
                 : LocalizedStringResource("Close", bundle: .module),
                 symbol: topic.isClosed ? .lockFill : .lock
             ) {
-                send(.contextTopicToolsMenu(.modify(.close, topic.id, !topic.isClosed)))
+                send(.contextTopicToolsMenu(.modify(.close, topic.id, topic.isClosed)))
             }
             
             if topic.canDelete {
@@ -473,7 +473,7 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.destination?.form, action: \.destination.form)) { store in
+                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).form) { store in
                         NavigationStack {
                             FormScreen(store: store)
                         }
@@ -493,18 +493,18 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .sheet(item: $store.scope(state: \.destination?.stat, action: \.destination.stat)) { store in
+                    .sheet(item: $store.scope(state: \.$destination, action: \.destination).stat) { store in
                         NavigationStack {
                             ForumStatView(store: store)
                         }
                     }
-                    .sheet(item: $store.scope(state: \.destination?.edit, action: \.destination.edit)) { store in
+                    .sheet(item: $store.scope(state: \.$destination, action: \.destination).edit) { store in
                         NavigationStack {
                             TopicEditView(store: store)
                         }
                     }
                     .fittedSheet(
-                        item: $store.scope(state: \.destination?.move, action: \.destination.move),
+                        item: $store.scope(state: \.$destination, action: \.destination).move,
                         embedIntoNavStack: true
                     ) { store in
                         ForumMoveView(store: store)
