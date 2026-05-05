@@ -29,7 +29,8 @@ public struct TopicEditView: View {
                         title: "Topic header",
                         content: $store.title,
                         placeholder: LocalizedStringResource("Input...", bundle: .module),
-                        focusEqual: .title
+                        focusEqual: .title,
+                        characterLimit: 255
                     )
                     .disabled(!store.canModerate)
                     
@@ -37,7 +38,8 @@ public struct TopicEditView: View {
                         title: "Topic description",
                         content: $store.description,
                         placeholder: LocalizedStringResource("Input...", bundle: .module),
-                        focusEqual: .description
+                        focusEqual: .description,
+                        characterLimit: 255
                     )
                     .disabled(!store.canModerate)
                     
