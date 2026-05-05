@@ -32,7 +32,7 @@ public struct TicketParser {
               let handlerId = array[safe: 10] as? Int,
               let handlerName = array[safe: 11] as? String,
               let commentsRaw = array[safe: 13] as? [[Any]],
-              let statusRaw = array[safe: 16] as? Int else {
+              let statusRaw = array[safe: 0] as? Int else {
             throw ParsingError.failedToCastFields
         }
         
@@ -63,7 +63,7 @@ public struct TicketParser {
                   let content = comment[safe: 4] as? String,
                   let authorId = comment[safe: 2] as? Int,
                   let authorName = comment[safe: 3] as? String,
-                  let createdAt = comment[1] as? Int else {
+                  let createdAt = comment[safe: 1] as? Int else {
                 throw ParsingError.failedToCastFields
             }
             
@@ -116,7 +116,7 @@ public struct TicketParser {
                   let authorName = info[safe: 8] as? String,
                   let handlerId = info[safe: 9] as? Int,
                   let handlerName = info[safe: 10] as? String,
-                  let statusRaw = info[safe: 14] as? Int else {
+                  let statusRaw = info[safe: 1] as? Int else {
                 throw ParsingError.failedToCastFields
             }
             
