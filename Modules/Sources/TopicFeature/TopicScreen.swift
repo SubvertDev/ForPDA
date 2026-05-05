@@ -353,6 +353,25 @@ public struct TopicScreen: View {
                         
                         PostSeparator()
                     }
+                    .overlay {
+                        GeometryReader { proxy in
+                            let maskColor = if post.post.isDeleted {
+                                Color(.Background.quaternary)
+                            } else if post.post.isHidden {
+                                Color(.Main.redAlpha)
+                            } else {
+                                Color.clear
+                            }
+                            Rectangle()
+                                .fill(maskColor)
+                                .frame(
+                                    // + LazyVStack spacing - Separator height
+                                    height: proxy.size.height + 16 - 10
+                                )
+                                .padding(.top, -16) // LazyVStack spacing
+                                .allowsHitTesting(false)
+                        }
+                    }
                 }
             }
         }
