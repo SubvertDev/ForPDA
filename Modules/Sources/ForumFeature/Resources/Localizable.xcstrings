@@ -221,6 +221,16 @@
         }
       }
     },
+    "The topic has been edited" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема отредактирована"
+          }
+        }
+      }
+    },
     "Tools" : {
       "localizations" : {
         "ru" : {
