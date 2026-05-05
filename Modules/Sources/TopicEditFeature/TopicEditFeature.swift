@@ -15,10 +15,18 @@ public struct TopicEditFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Alert
+    
+    public enum Alert {
+        case dismiss, ok
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var alert: AlertState<Alert>?
+        
         public enum Field: Hashable {
             case title
             case description
@@ -51,6 +59,30 @@ public struct TopicEditFeature: Reducer, Sendable {
         var isSending = false
         var isPollEnabled = false
         
+        var isSaveButtonDisabled: Bool {
+            if !canModerate && !supportsPoll {
+                return true
+            }
+            return title.isEmpty || (isPollEnabled && !isPollValid)
+        }
+        
+        var isPollValid: Bool {
+            guard !draftPoll.name.isEmpty, !draftPoll.options.isEmpty else {
+                return false
+            }
+            for option in draftPoll.options {
+                guard !option.name.isEmpty, !option.choices.isEmpty else {
+                    return false
+                }
+                for choice in option.choices {
+                    guard !choice.name.isEmpty else {
+                        return false
+                    }
+                }
+            }
+            return true
+        }
+        
         public init(
             id: Int,
             flag: ForumFlag,
@@ -72,11 +104,13 @@ public struct TopicEditFeature: Reducer, Sendable {
     
     public enum Action: ViewAction, BindableAction {
         case binding(BindingAction<State>)
+        case alert(PresentationAction<Alert>)
         
         case view(View)
         public enum View {
             case onAppear
             
+            case saveButtonTapped
             case cancelButtonTapped
             
             case updateQuestion(Int, Topic.Poll.Option)
@@ -87,6 +121,11 @@ public struct TopicEditFeature: Reducer, Sendable {
             
             case addAnswerButtonTapped(questionId: Int)
             case removeAnswerButtonTapped(questionId: Int, Int)
+        }
+        
+        case `internal`(Internal)
+        public enum Internal {
+            case editResponse(Result<TopicEditResponse, any Error>)
         }
     }
     
@@ -108,7 +147,10 @@ public struct TopicEditFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .binding:
+            case .alert(.dismiss):
+                return .run { _ in await dismiss() }
+                
+            case .binding, .alert:
                 return .none
                 
             case .view(.onAppear):
@@ -117,6 +159,26 @@ public struct TopicEditFeature: Reducer, Sendable {
                     state.isPollEnabled = true
                 }
                 return .none
+                
+            case .view(.saveButtonTapped):
+                let poll = state.isPollEnabled ? state.draftPoll : nil
+                return .run { [
+                    id = state.id,
+                    title = state.title,
+                    description = state.description,
+                    poll = poll
+                ] send in
+                    let request = TopicEditRequest(
+                        id: id,
+                        title: title,
+                        description: description,
+                        poll: poll?.asDocument
+                    )
+                    let result = try await apiClient.editTopic(data: request)
+                    await send(.internal(.editResponse(.success(result))))
+                } catch: { error, send in
+                    await send(.internal(.editResponse(.failure(error))))
+                }
                 
             case let .view(.updateQuestion(id, option)):
                 guard let index = state.draftPoll.options.firstIndex(where: { $0.id == id }) else {
@@ -166,7 +228,83 @@ public struct TopicEditFeature: Reducer, Sendable {
                     state.draftPoll.options[questionIndex].choices.remove(at: answerIndex)
                 }
                 return .none
+                
+            case let .internal(.editResponse(.success(status))):
+                switch status {
+                case .success:
+                    break
+                case .tooManyQuestionsInPoll:
+                    state.alert = .tooManyQuestionsInPoll
+                case .tooManyAnswersInPoll:
+                    state.alert = .tooManyAnswersInPoll
+                case .inappropriateContent:
+                    state.alert = .inappropriateContent
+                case .sentToPremod:
+                    state.alert = .topicIsSentToPremoderation
+                case .noAccess:
+                    state.alert = .noAccess
+                }
+                return .none
+                
+            case let .internal(.editResponse(.failure(error))):
+                print(error)
+                state.alert = .unknownError
+                return .none
             }
+        }
+        .ifLet(\.$alert, action: \.alert)
+    }
+}
+
+// MARK: - Alerts
+
+public extension AlertState where Action == TopicEditFeature.Alert {
+    
+    nonisolated(unsafe) static let topicIsSentToPremoderation = AlertState {
+        TextState("Topic is sent to premoderation")
+    } actions: {
+        ButtonState(action: .dismiss) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let tooManyQuestionsInPoll = AlertState {
+        TextState("Too many questions in poll", bundle: .module)
+    } actions: {
+        ButtonState(action: .ok) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let tooManyAnswersInPoll = AlertState {
+        TextState("Too many answers in poll", bundle: .module)
+    } actions: {
+        ButtonState(action: .ok) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let inappropriateContent = AlertState {
+        TextState("Inappropriate content", bundle: .module)
+    } actions: {
+        ButtonState(action: .ok) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let noAccess = AlertState {
+        TextState("No access", bundle: .module)
+    } actions: {
+        ButtonState(action: .ok) {
+            TextState("OK")
+        }
+    }
+    
+    nonisolated(unsafe) static let unknownError = AlertState {
+        TextState("Unknown error", bundle: .module)
+    } actions: {
+        ButtonState(action: .ok) {
+            TextState("OK")
         }
     }
 }

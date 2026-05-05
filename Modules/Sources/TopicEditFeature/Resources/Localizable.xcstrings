@@ -51,6 +51,16 @@
         }
       }
     },
+    "Inappropriate content" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недопустимое содержание"
+          }
+        }
+      }
+    },
     "Input answer" : {
       "localizations" : {
         "ru" : {
@@ -91,6 +101,26 @@
         }
       }
     },
+    "No access" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет доступа"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ОК"
+          }
+        }
+      }
+    },
     "Question" : {
       "localizations" : {
         "ru" : {
@@ -107,6 +137,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сохранить"
+          }
+        }
+      }
+    },
+    "Too many answers in poll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком много ответов в опросе"
+          }
+        }
+      }
+    },
+    "Too many questions in poll" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком много вопросов в опросе"
           }
         }
       }
@@ -137,6 +187,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Заголовок темы"
+          }
+        }
+      }
+    },
+    "Topic is sent to premoderation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема отправлена на премодерацию"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
           }
         }
       }

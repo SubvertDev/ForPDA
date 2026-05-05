@@ -53,6 +53,7 @@ public struct TopicEditView: View {
             .scrollIndicators(.hidden)
             .navigationTitle(Text("Topic Edit", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
+            .alert($store.scope(state: \.alert, action: \.alert))
             .safeAreaInset(edge: .bottom) {
                 SaveButton()
             }
@@ -88,27 +89,29 @@ public struct TopicEditView: View {
     
     @ViewBuilder
     private func SaveButton() -> some View {
-        Button {
-           // send(.publishButtonTapped)
-        } label: {
-            if store.isSending {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
-            } else {
-                Text("Save", bundle: .module)
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
+        WithPerceptionTracking {
+            Button {
+                send(.saveButtonTapped)
+            } label: {
+                if store.isSending {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
+                } else {
+                    Text("Save", bundle: .module)
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
+                }
             }
+            .buttonStyle(.borderedProminent)
+            .tint(tintColor)
+            .disabled(store.isSaveButtonDisabled)
+            .frame(height: 48)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 16)
+            .background(Color(.Background.primary))
         }
-        .buttonStyle(.borderedProminent)
-        .tint(tintColor)
-        //.disabled(store.isSaveButtonDisabled)
-        .frame(height: 48)
-        .padding(.vertical, 8)
-        .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
     }
     
     // MARK: - Poll
