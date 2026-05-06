@@ -65,7 +65,7 @@ public struct HistoryScreen: View {
             }
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(

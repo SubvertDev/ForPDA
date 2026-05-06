@@ -53,27 +53,6 @@ extension SettingsFeature {
                 case .clearCacheButtonTapped:
                     analyticsClient.log(SettingsEvent.clearCacheTapped)
                     
-                case .supportOnBoostyButtonTapped:
-                    analyticsClient.log(SettingsEvent.supportOnBoostyTapped)
-                    
-                case .appDiscussionButtonTapped:
-                    analyticsClient.log(SettingsEvent.appDiscussion4pdaTapped)
-
-                case .telegramChangelogButtonTapped:
-                    analyticsClient.log(SettingsEvent.changelogTelegramTapped)
-
-                case .telegramChatButtonTapped:
-                    analyticsClient.log(SettingsEvent.chatTelegramTapped)
-
-                case .githubButtonTapped:
-                    analyticsClient.log(SettingsEvent.githubTapped)
-                    
-                case .checkVersionsButtonTapped:
-                    analyticsClient.log(SettingsEvent.checkVersionsTapped)
-                    
-                case .notImplementedFeatureTapped:
-                    analyticsClient.log(SettingsEvent.checkVersionsTapped)
-                    
                 case let ._somethingWentWrong(error):
                     analyticsClient.log(SettingsEvent.somethingWentWrong(error))
                 }

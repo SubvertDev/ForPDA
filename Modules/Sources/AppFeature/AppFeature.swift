@@ -38,6 +38,7 @@ import SearchResultFeature
 import CacheClient
 import DeviceSpecificationsFeature
 import DeviceTypeFeature
+import MoreFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -60,7 +61,7 @@ public struct AppFeature: Reducer, Sendable {
         public var articlesTab:  StackTab.State
         public var favoritesTab: StackTab.State
         public var forumTab:     StackTab.State
-        public var profileFlow:  ProfileFlow.State
+        public var moreTab:      StackTab.State
         
         @Presents public var auth: AuthFeature.State?
         @Presents public var logStore: LogStoreFeature.State?
@@ -94,6 +95,7 @@ public struct AppFeature: Reducer, Sendable {
             articlesTab: StackTab.State = StackTab.State(root: .articles(.articlesList(ArticlesListFeature.State()))),
             favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
+            moreTab: StackTab.State = StackTab.State(root: .more(.more(MoreFeature.State()))),
             auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articles,
@@ -106,12 +108,7 @@ public struct AppFeature: Reducer, Sendable {
             self.articlesTab = articlesTab
             self.favoritesTab = favoritesTab
             self.forumTab = forumTab
-
-            if let session = _userSession.wrappedValue {
-                self.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: session.userId)))))
-            } else {
-                self.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
-            }
+            self.moreTab = moreTab
             
             self.auth = auth
             self.alert = alert
@@ -137,7 +134,7 @@ public struct AppFeature: Reducer, Sendable {
         case articlesTab(StackTab.Action)
         case favoritesTab(StackTab.Action)
         case forumTab(StackTab.Action)
-        case profileFlow(ProfileFlow.Action)
+        case moreTab(StackTab.Action)
         
         case auth(PresentationAction<AuthFeature.Action>)
         case logStore(PresentationAction<LogStoreFeature.Action>)
@@ -202,8 +199,8 @@ public struct AppFeature: Reducer, Sendable {
             StackTab()
         }
         
-        Scope(state: \.profileFlow, action: \.profileFlow) {
-            ProfileFlow.body
+        Scope(state: \.moreTab, action: \.moreTab) {
+            StackTab()
         }
         
         // Authorization actions interceptor
@@ -413,7 +410,6 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case let .userDidLogin(userId: userId):
-                state.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: userId)))))
                 return .run { _ in
                     do {
                         let unread = try await apiClient.getUnread(type: .all)
@@ -424,7 +420,6 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 
             case .userDidLogout:
-                state.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
                 state.favoritesBadges = 0
                 state.profileBadges = 0
                 return .run { _ in
@@ -529,21 +524,19 @@ public struct AppFeature: Reducer, Sendable {
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
                 let .forumTab(.delegate(.showTabBar(show))),
-                let .profileFlow(.loggedIn(.delegate(.showTabBar(show)))),
-                let .profileFlow(.loggedOut(.delegate(.showTabBar(show)))):
+                let .moreTab(.delegate(.showTabBar(show))):
                 state.showTabBar = show
                 return .none
                 
             case let .articlesTab(.delegate(.switchTab(to: tab))),
                 let .favoritesTab(.delegate(.switchTab(to: tab))),
                 let .forumTab(.delegate(.switchTab(to: tab))),
-                let .profileFlow(.loggedIn(.delegate(.switchTab(to: tab)))),
-                let .profileFlow(.loggedOut(.delegate(.switchTab(to: tab)))):
+                let .moreTab(.delegate(.switchTab(to: tab))):
                 state.previousTab = state.selectedTab
                 state.selectedTab = tab
                 return .none
                 
-            case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
+            case .articlesTab, .favoritesTab, .forumTab, .moreTab:
                 return .none
                 
             case .appDelegate:
@@ -584,20 +577,9 @@ public struct AppFeature: Reducer, Sendable {
             
         case .forum:
             state.forumTab.path.removeAll()
-
-        case .profile:
-            switch state.profileFlow {
-            case var .loggedIn(flow):
-                if !flow.path.isEmpty {
-                    flow.path.removeAll()
-                    state.profileFlow[case: \.loggedIn] = flow
-                }
-            case var .loggedOut(flow):
-                if !flow.path.isEmpty {
-                    flow.path.removeAll()
-                    state.profileFlow[case: \.loggedOut] = flow
-                }
-            }
+            
+        case .more:
+            state.moreTab.path.removeAll()
         }
         
         return removeNotifications(&state)
@@ -609,10 +591,11 @@ public struct AppFeature: Reducer, Sendable {
         return removeNotifications(&state)
     }
     
+    #warning("does nothing, inspect it")
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
-            case .articles, .forum, .profile:
+            case .articles, .forum, .more:
                 break
             case .favorites:
                 break
@@ -649,7 +632,7 @@ public struct AppFeature: Reducer, Sendable {
         case let .forum(id, page):
             screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
         case let .user(id):
-            screen = .profile(.profile(ProfileFeature.State(userId: id)))
+            screen = .more(.profile(ProfileFeature.State(userId: id)))
         case let .qms(id: id):
             screen = .qms(.qms(QMSFeature.State(chatId: id)))
         case let .search(options: options):
@@ -666,15 +649,7 @@ public struct AppFeature: Reducer, Sendable {
         case .articles:  state.articlesTab.path.append(element)
         case .favorites: state.favoritesTab.path.append(element)
         case .forum:     state.forumTab.path.append(element)
-        case .profile:
-            switch state.profileFlow {
-            case var .loggedIn(flow):
-                flow.path.append(element)
-                state.profileFlow[case: \.loggedIn] = flow
-            case var .loggedOut(flow):
-                flow.path.append(element)
-                state.profileFlow[case: \.loggedOut] = flow
-            }
+        case .more:      state.moreTab.path.append(element)
         }
     }
 }

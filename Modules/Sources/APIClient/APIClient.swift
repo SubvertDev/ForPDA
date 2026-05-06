@@ -687,7 +687,7 @@ extension APIClient: DependencyKey {
                 return .success(userId: -1, token: "preview_token")
             },
             logout: {
-                
+                try await Task.sleep(for: .seconds(1))
             },
             getUser: { _, _ in
                 AsyncThrowingStream { $0.yield(.mock) }

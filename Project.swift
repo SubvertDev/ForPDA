@@ -51,6 +51,7 @@ let project = Project(
                     .Internal.LoggerClient,
                     .Internal.MentionsFeature,
                     .Internal.Models,
+                    .Internal.MoreFeature,
                     .Internal.NotificationsClient,
                     .Internal.NotificationsFeature,
                     .Internal.PageNavigationFeature,
@@ -361,6 +362,21 @@ let project = Project(
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA,
+                ]
+            ),
+        
+            .feature(
+                name: "MoreFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                    .Internal.SharedUI,
+                    .Internal.TCAExtensions,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
                 ]
             ),
         
@@ -1081,6 +1097,7 @@ extension TargetDependency.Internal {
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
     static let MentionsFeature =        TargetDependency.target(name: "MentionsFeature")
+    static let MoreFeature =            TargetDependency.target(name: "MoreFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")
     static let PageNavigationFeature =  TargetDependency.target(name: "PageNavigationFeature")
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
