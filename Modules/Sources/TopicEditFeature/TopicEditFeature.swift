@@ -166,7 +166,11 @@ public struct TopicEditFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.saveButtonTapped):
-                let poll = state.isPollEnabled ? state.draftPoll : nil
+                let poll: PDAPIDocument? = if state.supportsPoll {
+                    state.isPollEnabled ? state.draftPoll.asDocument : PDAPIDocument()
+                } else {
+                    nil
+                }
                 return .run { [
                     id = state.id,
                     title = state.title,
@@ -177,9 +181,9 @@ public struct TopicEditFeature: Reducer, Sendable {
                         id: id,
                         title: title,
                         description: description,
-                        poll: poll?.asDocument
+                        poll: poll
                     )
-                    let result = try await apiClient.editTopic(data: request)
+                    let result = try await apiClient.editTopic(request)
                     await send(.internal(.editResponse(.success(result))))
                 } catch: { error, send in
                     await send(.internal(.editResponse(.failure(error))))
