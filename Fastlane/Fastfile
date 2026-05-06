@@ -123,7 +123,7 @@ platform :ios do
         Dir.chdir("..") do
             sh("tuist install")
             sh("tuist generate --no-open")
-            sh("tuist xcodebuild build")
+            sh("tuist xcodebuild -workspace ForPDA.xcworkspace build -scheme ForPDA")
             sh("tuist test")
             telegram(
                 token: ENV['TG_BOT_TOKEN'],
