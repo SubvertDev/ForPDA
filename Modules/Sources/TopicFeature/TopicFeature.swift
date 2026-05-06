@@ -73,6 +73,7 @@ public struct TopicFeature: Reducer, Sendable {
             case form(FormFeature.Action)
             case stat(ForumStatFeature.Action)
             case move(ForumMoveFeature.Action)
+            case edit(TopicEditFeature.Action)
             case changeReputation(ReputationChangeFeature.Action)
         }
         
