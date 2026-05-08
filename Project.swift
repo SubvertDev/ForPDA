@@ -64,6 +64,8 @@ let project = Project(
                     .Internal.SettingsFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.TicketFeature,
+                    .Internal.TicketsListFeature,
                     .Internal.ToastClient,
                     .Internal.TopicFeature,
                     .SPM.AlertToast,

@@ -147,6 +147,9 @@ public struct StackTab: Reducer, Sendable {
         case let .forum(action):
             return handleForumPathNavigation(action: action, state: &state)
             
+        case let .tickets(action):
+            return handleTicketsPathNavigation(action: action, state: &state)
+            
         case let .profile(action):
             return handleProfilePathNavigation(action: action, state: &state)
             
@@ -285,6 +288,16 @@ public struct StackTab: Reducer, Sendable {
         case let .announcement(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
             
+        default:
+            break
+        }
+        return .none
+    }
+    
+    // MARK: - Tickets
+    
+    private func handleTicketsPathNavigation(action: Path.Tickets.Action, state: inout State) -> Effect<Action> {
+        switch action {
         default:
             break
         }
