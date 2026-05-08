@@ -34,6 +34,7 @@ import SearchFeature
 import SearchResultFeature
 import DeviceSpecificationsFeature
 import DeviceTypeFeature
+import TicketsListFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -271,6 +272,9 @@ public struct StackTab: Reducer, Sendable {
             
         case let .topic(.delegate(.openUser(id: id))):
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
+        case let .topic(.delegate(.openTickets(id))):
+            state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .only(forId: id)))))
             
         case let .topic(.delegate(.openSearch(on, navigation))):
             state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))

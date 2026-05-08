@@ -184,6 +184,7 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
+            case openTickets(Int)
             case openSearch(SearchOn, ForumInfo?)
             case openSearchResult(SearchResult)
             case openedLastPage
@@ -385,6 +386,9 @@ public struct TopicFeature: Reducer, Sendable {
                 case .move:
                     state.destination = .move(ForumMoveFeature.State(type: .topic(topic.id)))
                     return .none
+                    
+                case .tickets:
+                    return .send(.delegate(.openTickets(topic.id)))
                     
                 case .modify(let action, let isUndo):
                     switch action {

@@ -9,5 +9,6 @@ import Models
 
 public enum TopicToolsContextMenuAction {
     case move
+    case tickets
     case modify(TopicModifyAction, Bool)
 }

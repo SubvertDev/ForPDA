@@ -217,6 +217,10 @@ public struct TopicScreen: View {
                                 Image(systemSymbol: .line3HorizontalDecrease)
                             }
                         }
+                        
+                        ContextButton(text: LocalizedStringResource("Topic Tickets", bundle: .module), symbol: .exclamationmarkBubble) {
+                            send(.contextToolsMenu(.tickets))
+                        }
                     }
                 }
             }

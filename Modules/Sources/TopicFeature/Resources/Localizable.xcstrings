@@ -401,6 +401,16 @@
         }
       }
     },
+    "Topic Tickets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тикеты темы"
+          }
+        }
+      }
+    },
     "Unable to delete topic" : {
       "localizations" : {
         "ru" : {
