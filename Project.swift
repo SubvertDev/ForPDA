@@ -526,6 +526,8 @@ let project = Project(
                 name: "TicketsListFeature",
                 dependencies: [
                     .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TicketClient,
                     .Internal.ToastClient,

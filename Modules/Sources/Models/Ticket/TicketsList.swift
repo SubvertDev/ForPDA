@@ -5,11 +5,11 @@
 //  Created by Xialtal on 3.05.26.
 //
 
-public struct TicketsList: Sendable {
+public struct TicketsList: Sendable, Equatable {
     public let tickets: [TicketSimplified]
     public let availableCount: Int
     
-    public struct TicketSimplified: Sendable, Identifiable {
+    public struct TicketSimplified: Sendable, Identifiable, Equatable {
         public let id: Int
         public let info: TicketInfo
         

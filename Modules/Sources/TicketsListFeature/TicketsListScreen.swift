@@ -9,6 +9,8 @@ import SwiftUI
 import ComposableArchitecture
 import Models
 import SharedUI
+import PageNavigationFeature
+import SFSafeSymbols
 
 @ViewAction(for: TicketsListFeature.self)
 public struct TicketsListScreen: View {
@@ -17,6 +19,17 @@ public struct TicketsListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<TicketsListFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    @State private var navigationMinimized = false
+    
+    private var shouldShowInlineNavigation: Bool {
+        let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
+        return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
+    }
     
     // MARK: - Init
     
@@ -28,13 +41,180 @@ public struct TicketsListScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            ScrollView {
-                Text("Tickets List")
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                if !store.isLoading {
+                    if !store.tickets.isEmpty {
+                        List {
+                            if shouldShowInlineNavigation {
+                                Navigation()
+                            }
+                            
+                            ContentSection()
+                            
+                            if shouldShowInlineNavigation {
+                                Navigation()
+                            }
+                        }
+                        .listStyle(.plain)
+                        .scrollContentBackground(.hidden)
+                        ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
+                    } else {
+                        NothingFound()
+                    }
+                }
             }
+            .overlay {
+                if store.isLoading {
+                    PDALoader()
+                        .frame(width: 24, height: 24)
+                }
+            }
+            .navigationTitle(Text("Tickets", bundle: .module))
+            .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
-            .onAppear {
-                send(.onAppear)
+            .safeAreaInset(edge: .bottom) {
+                if shouldShowFloatingNavigation {
+                    PageNavigation(
+                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        minimized: $navigationMinimized
+                    )
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
             }
+            .refreshable {
+                await send(.onRefresh).finish()
+            }
+            .onFirstAppear {
+                send(.onFirstAppear)
+            }
+        }
+    }
+    
+    // MARK: - Content Section
+    
+    @ViewBuilder
+    private func ContentSection() -> some View {
+        Section {
+            ForEach(store.tickets) { ticket in
+                VStack(alignment: .leading, spacing: 8) {
+                    TicketStatusBadge(info: ticket.info)
+                    
+                    Text(verbatim: ticket.info.title)
+                        .font(.subheadline)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    HStack(spacing: 6) {
+                        Image(systemSymbol: .textBubble)
+                        
+                        Text(verbatim: ticket.info.subjectRootName)
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Color(.Labels.teritary))
+                    
+                    HStack {
+                        HStack(spacing: 0) {
+                            Text(verbatim: "\(ticket.info.createdAt.formatted()) · ")
+                            
+                            HStack(spacing: 4) {
+                                Image(systemSymbol: .personCropCircle)
+                                
+                                Text(verbatim: ticket.info.authorName)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        
+                    }
+                    .font(.caption)
+                    .foregroundStyle(Color(.Labels.quaternary))
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func TicketStatusBadge(info: TicketInfo) -> some View {
+        let text: LocalizedStringKey = switch info.status {
+        case .notProcessed: "New"
+        case .processing:   "Processing · "
+        case .processed:    "Processed · "
+        }
+        HStack(spacing: 0) {
+            Text(text, bundle: .module)
+            
+            if info.handlerId > 0 {
+                HStack(spacing: 4) {
+                    Image(systemSymbol: .personCropCircle)
+                    
+                    Text(verbatim: info.handlerName)
+                }
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(info.status.textColor)
+        .padding(.vertical, 2)
+        .padding(.horizontal, 6)
+        .background(
+            info.status.maskColor
+                .clipShape(RoundedRectangle(cornerRadius: isLiquidGlass ? 10 : 6))
+        )
+    }
+    
+    // MARK: - Navigation
+    
+    @ViewBuilder
+    private func Navigation() -> some View {
+        PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            .listRowBackground(Color(.Background.primary))
+    }
+    
+    // MARK: - Nothing Found
+    
+    private func NothingFound() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .exclamationmarkBubble)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .frame(width: 48, height: 48)
+                .padding(.bottom, 8)
+            
+            Text("No Tickets", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundStyle(Color(.Labels.primary))
+                .padding(.bottom, 6)
+            
+            Text("When requests come in, they will appear here", bundle: .module)
+                .font(.footnote)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.Labels.teritary))
+                .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
+                .padding(.horizontal, 55)
+        }
+    }
+}
+
+// MARK: - Extensions
+
+extension TicketStatus {
+    var maskColor: Color {
+        switch self {
+        case .notProcessed: Color(.Main.redAlpha)
+        case .processing:   Color(.Main.yellowAlpha)
+        case .processed:    Color(.Background.teritary)
+        }
+    }
+    
+    var textColor: Color {
+        switch self {
+        case .notProcessed: Color(.Main.red)
+        case .processing:   Color(.Main.yellow)
+        case .processed:    Color(.Labels.teritary)
         }
     }
 }
@@ -46,11 +226,12 @@ public struct TicketsListScreen: View {
         TicketsListScreen(
             store: Store(
                 initialState: TicketsListFeature.State(
-                    forId: 0
+                    type: .list
                 )
             ) {
                 TicketsListFeature()
             }
         )
     }
+    .tint(Color(.Theme.primary))
 }

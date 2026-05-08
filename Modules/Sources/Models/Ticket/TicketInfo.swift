@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct TicketInfo: Sendable {
+public struct TicketInfo: Sendable, Equatable {
     public let title: String
     public let status: TicketStatus
     public let subjectId: Int
