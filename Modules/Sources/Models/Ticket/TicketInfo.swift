@@ -19,6 +19,7 @@ public struct TicketInfo: Sendable, Equatable {
     public let handlerId: Int
     public let handlerName: String
     public let createdAt: Date
+    public let processedAt: Date?
     
     public init(
         title: String,
@@ -31,7 +32,8 @@ public struct TicketInfo: Sendable, Equatable {
         authorName: String,
         handlerId: Int,
         handlerName: String,
-        createdAt: Date
+        createdAt: Date,
+        processedAt: Date?
     ) {
         self.title = title
         self.status = status
@@ -44,6 +46,7 @@ public struct TicketInfo: Sendable, Equatable {
         self.handlerId = handlerId
         self.handlerName = handlerName
         self.createdAt = createdAt
+        self.processedAt = processedAt
     }
 }
 
@@ -59,6 +62,7 @@ public extension TicketInfo {
         authorName: "AirFlare",
         handlerId: 3640948,
         handlerName: "subvertd",
-        createdAt: Date.now
+        createdAt: Date.now,
+        processedAt: nil
     )
 }

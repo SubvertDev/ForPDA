@@ -27,6 +27,7 @@ public struct TicketParser {
               let subjectRootId = array[safe: 4] as? Int,
               let subjectRootName = array[safe: 5] as? String,
               let createdAt = array[safe: 6] as? Int,
+              let processedAt = array[safe: 7] as? Int,
               let authorId = array[safe: 8] as? Int,
               let authorName = array[safe: 9] as? String,
               let handlerId = array[safe: 10] as? Int,
@@ -48,7 +49,8 @@ public struct TicketParser {
                 authorName: authorName.convertCodes(),
                 handlerId: handlerId,
                 handlerName: handlerName.convertCodes(),
-                createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+                createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt)),
+                processedAt: processedAt != 0 ? Date(timeIntervalSince1970: TimeInterval(processedAt)) : nil
             ),
             comments: try parseComments(commentsRaw)
         )
@@ -112,6 +114,7 @@ public struct TicketParser {
                   let subjectRootId = info[safe: 3] as? Int,
                   let subjectRootName = info[safe: 4] as? String,
                   let createdAt = info[safe: 5] as? Int,
+                  let processedAt = info[safe: 6] as? Int,
                   let authorId = info[safe: 7] as? Int,
                   let authorName = info[safe: 8] as? String,
                   let handlerId = info[safe: 9] as? Int,
@@ -133,7 +136,8 @@ public struct TicketParser {
                     authorName: authorName.convertCodes(),
                     handlerId: handlerId,
                     handlerName: handlerName.convertCodes(),
-                    createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt))
+                    createdAt: Date(timeIntervalSince1970: TimeInterval(createdAt)),
+                    processedAt: processedAt != 0 ? Date(timeIntervalSince1970: TimeInterval(processedAt)) : nil
                 )
             ))
         }
