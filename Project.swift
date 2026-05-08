@@ -521,6 +521,18 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+
+            .feature(
+                name: "TicketsListFeature",
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.TicketClient,
+                    .Internal.ToastClient,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
         
             .feature(
                 name: "TopicBuilder",
@@ -1114,6 +1126,7 @@ extension TargetDependency.Internal {
     static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TicketFeature =          TargetDependency.target(name: "TicketFeature")
+    static let TicketsListFeature =     TargetDependency.target(name: "TicketsListFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
