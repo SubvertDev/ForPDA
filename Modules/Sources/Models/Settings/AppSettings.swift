@@ -33,6 +33,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var topicPerPage: Int
     public var historyPerPage: Int
     public var mentionsPerPage: Int
+    public var ticketsPerPage: Int
     public var hideTabBarOnScroll: Bool
     public var floatingNavigation: Bool
     public var experimentalFloatingNavigation: Bool
@@ -56,6 +57,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         topicPerPage: Int,
         historyPerPage: Int,
         mentionsPerPage: Int,
+        ticketsPerPage: Int,
         hideTabBarOnScroll: Bool,
         floatingNavigation: Bool,
         experimentalFloatingNavigation: Bool,
@@ -78,6 +80,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.topicPerPage = topicPerPage
         self.historyPerPage = historyPerPage
         self.mentionsPerPage = mentionsPerPage
+        self.ticketsPerPage = ticketsPerPage
         self.hideTabBarOnScroll = hideTabBarOnScroll
         self.floatingNavigation = floatingNavigation
         self.experimentalFloatingNavigation = experimentalFloatingNavigation
@@ -103,6 +106,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.topicPerPage = try container.decodeIfPresent(Int.self, forKey: .topicPerPage) ?? AppSettings.default.topicPerPage
         self.historyPerPage = try container.decodeIfPresent(Int.self, forKey: .historyPerPage) ?? AppSettings.default.historyPerPage
         self.mentionsPerPage = try container.decodeIfPresent(Int.self, forKey: .mentionsPerPage) ?? AppSettings.default.mentionsPerPage
+        self.ticketsPerPage = try container.decodeIfPresent(Int.self, forKey: .ticketsPerPage) ?? AppSettings.default.ticketsPerPage
         self.hideTabBarOnScroll = try container.decodeIfPresent(Bool.self, forKey: .hideTabBarOnScroll) ?? AppSettings.default.hideTabBarOnScroll
         self.floatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .floatingNavigation) ?? AppSettings.default.floatingNavigation
         self.experimentalFloatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .experimentalFloatingNavigation) ?? AppSettings.default.experimentalFloatingNavigation
@@ -152,6 +156,7 @@ public extension AppSettings {
         topicPerPage: 20,
         historyPerPage: 20,
         mentionsPerPage: 20,
+        ticketsPerPage: 20,
         hideTabBarOnScroll: true,
         floatingNavigation: true,
         experimentalFloatingNavigation: false,
