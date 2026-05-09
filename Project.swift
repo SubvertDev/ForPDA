@@ -529,6 +529,7 @@ let project = Project(
                 dependencies: [
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
+                    .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TicketClient,
