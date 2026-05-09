@@ -143,4 +143,35 @@ public struct TicketParser {
         }
         return ticketsInfo
     }
+    
+    // MARK: - Ticket Status Change Response
+    
+    public static func parseChangeTicketStatus(from string: String) throws(ParsingError) -> TicketStatusChangeResponse {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let status = array[safe: 0] as? Int else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        switch status {
+        case 0:
+            return .success
+            
+        case 4:
+            guard let handlerId = array[safe: 1] as? Int,
+                  let handlerName = array[safe: 2] as? String else {
+                throw ParsingError.failedToCastFields
+            }
+            return .failure(.handlerChanged(id: handlerId, name: handlerName))
+            
+        default:
+            return .failure(.other)
+        }
+    }
 }
