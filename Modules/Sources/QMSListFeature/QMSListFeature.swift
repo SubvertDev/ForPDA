@@ -144,6 +144,9 @@ public struct QMSListFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        // Disabled until redesign
+        // Analytics()
     }
     
     // MARK: - Shared Logic

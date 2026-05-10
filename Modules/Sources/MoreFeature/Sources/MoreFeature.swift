@@ -224,6 +224,8 @@ public struct MoreFeature: Reducer, Sendable {
         .ifLet(\.$auth, action: \.auth) {
             AuthFeature()
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic

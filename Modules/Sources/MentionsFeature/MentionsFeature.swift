@@ -126,6 +126,8 @@ public struct MentionsFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic

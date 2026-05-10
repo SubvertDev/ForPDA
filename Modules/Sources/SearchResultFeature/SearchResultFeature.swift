@@ -153,5 +153,7 @@ public struct SearchResultFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
 }
