@@ -71,16 +71,6 @@
         }
       }
     },
-    "Not processed" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не обработан"
-          }
-        }
-      }
-    },
     "Only My" : {
       "localizations" : {
         "ru" : {
@@ -91,32 +81,12 @@
         }
       }
     },
-    "Processed" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обработан"
-          }
-        }
-      }
-    },
     "Processed · " : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Обработан · "
-          }
-        }
-      }
-    },
-    "Processing" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В работе"
           }
         }
       }

@@ -315,17 +315,6 @@ extension TicketStatus {
         case .processed:    Color(.Labels.teritary)
         }
     }
-    
-    var title: LocalizedStringKey {
-        switch self {
-        case .notProcessed:
-            return "Not processed"
-        case .processing:
-            return "Processing"
-        case .processed:
-            return "Processed"
-        }
-    }
 }
 
 // MARK: - Previews
