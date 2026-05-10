@@ -71,6 +71,7 @@ public struct ParsingClient: Sendable {
     public var parseTicketsList: @Sendable (_ response: String) async throws -> TicketsList
     public var parseTicket: @Sendable (_ response: String) async throws -> Ticket
     public var parseChangeTicketStatus: @Sendable (_ response: String) async throws -> TicketStatusChangeResponse
+    public var parseTicketStatusHistory: @Sendable (_ response: String) async throws -> [TicketStatusHistory]
 }
 
 // MARK: - Dependency Key
@@ -190,6 +191,9 @@ extension ParsingClient: DependencyKey {
         },
         parseChangeTicketStatus: { response in
             return try TicketParser.parseChangeTicketStatus(from: response)
+        },
+        parseTicketStatusHistory: { response in
+            return try TicketParser.parseTicketStatusHistory(from: response)
         }
     )
 }

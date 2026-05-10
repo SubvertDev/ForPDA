@@ -174,4 +174,36 @@ public struct TicketParser {
             return .failure(.other)
         }
     }
+    
+    // MARK: - Ticket Status History Response
+    
+    public static func parseTicketStatusHistory(from string: String) throws(ParsingError) -> [TicketStatusHistory] {
+        guard let data = string.data(using: .utf8) else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+        
+        guard let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [Any] else {
+            throw ParsingError.failedToCastDataToAny
+        }
+        
+        guard let statusRaw = array[safe: 0] as? [[Any]] else {
+            throw ParsingError.failedToCastFields
+        }
+        
+        return try! statusRaw.map { status in
+            guard let status = array[safe: 0] as? Int,
+                  let handlerId = array[safe: 2] as? Int,
+                  let handlerName = array[safe: 3] as? String,
+                  let changedAt = array[safe: 1] as? Int else {
+                throw ParsingError.failedToCastFields
+            }
+            
+            return TicketStatusHistory(
+                status: TicketStatus(rawValue: status)!,
+                handlerId: handlerId,
+                handlerName: handlerName.convertCodes(),
+                changedAt: Date(timeIntervalSince1970: TimeInterval(changedAt))
+            )
+        }
+    }
 }

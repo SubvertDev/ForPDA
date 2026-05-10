@@ -17,6 +17,7 @@ import ParsingClient
 public struct TicketClient: Sendable {
     public var getTicketsList: @Sendable (_ data: TicketsListRequest) async throws -> TicketsList
     public var getTicket: @Sendable (_ id: Int) async throws -> Ticket
+    public var getTicketStatusHistory: @Sendable (_ ticketId: Int) async throws -> [TicketStatusHistory]
     public var changeTicketStatus: @Sendable (_ id: Int, _ handlerId: Int, _ status: TicketStatus) async throws -> TicketStatusChangeResponse
     
     public var modifyComment: @Sendable (_ id: Int, _ ticketId: Int, _ text: String) async throws -> Bool
@@ -46,6 +47,10 @@ extension TicketClient: DependencyKey {
             getTicket: { id in
                 let response = try await api.send(TicketCommand.view(id: id))
                 return try await parser.parseTicket(response)
+            },
+            getTicketStatusHistory: { ticketId in
+                let response = try await api.send(TicketCommand.history(id: ticketId))
+                return try await parser.parseTicketStatusHistory(response)
             },
             changeTicketStatus: { ticketId, handlerId, status in
                 let response = try await api.send(TicketCommand.modify(
@@ -77,6 +82,9 @@ extension TicketClient: DependencyKey {
             },
             getTicket: { _ in
                 return .mock
+            },
+            getTicketStatusHistory: { _ in
+                return [.mockNotProcessed, .mockProcessing, .mockProcessed]
             },
             changeTicketStatus: { _, _, _ in
                 return .success
