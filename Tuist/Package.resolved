@@ -1,5 +1,5 @@
 {
-  "originHash" : "535f4e2bce52ea18cfea287c9fea9fadee9e199ae263148fd5578ddc96b652c0",
+  "originHash" : "fb8b5563a09730e1b427a82c15a7013e695b2305d2f502815e3d028a09c43032",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -110,21 +110,12 @@
       }
     },
     {
-      "identity" : "plcrashreporter",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/microsoft/plcrashreporter.git",
-      "state" : {
-        "revision" : "0254f941c646b1ed17b243654723d0f071e990d0",
-        "version" : "1.12.2"
-      }
-    },
-    {
       "identity" : "posthog-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "1d9e0c237040970f44615b56d2dc039ab7a288fc",
-        "version" : "3.57.0"
+        "revision" : "39e527bd41124ab907bfa31e4b3384b124c36e07",
+        "version" : "3.58.1"
       }
     },
     {
@@ -141,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/getsentry/sentry-cocoa.git",
       "state" : {
-        "revision" : "a49e7c2148ac9e38bd35ef4f13bc9d6ea3ff0b81",
-        "version" : "9.11.0"
+        "revision" : "54d5fbcdea46c37a5de01bab5fef48dc78baec84",
+        "version" : "9.12.1"
       }
     },
     {
