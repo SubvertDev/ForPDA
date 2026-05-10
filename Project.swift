@@ -277,6 +277,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
+                    .Internal.TopicEditFeature,
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
@@ -540,6 +541,17 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+            
+            .feature(
+                name: "TopicEditFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
         
             .feature(
                 name: "TopicFeature",
@@ -559,6 +571,7 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
+                    .Internal.TopicEditFeature,
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
@@ -1111,6 +1124,7 @@ extension TargetDependency.Internal {
     static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
+    static let TopicEditFeature =       TargetDependency.target(name: "TopicEditFeature")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
     

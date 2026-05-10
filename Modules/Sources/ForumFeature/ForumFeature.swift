@@ -18,6 +18,7 @@ import ToastClient
 import FormFeature
 import ForumStatFeature
 import ForumMoveFeature
+import TopicEditFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -28,6 +29,7 @@ public struct ForumFeature: Reducer, Sendable {
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
     }
 
@@ -59,6 +61,7 @@ public struct ForumFeature: Reducer, Sendable {
         case form(FormFeature)
         case move(ForumMoveFeature)
 		case stat(ForumStatFeature)
+        case edit(TopicEditFeature)
     }
     
     // MARK: - State
@@ -170,6 +173,11 @@ public struct ForumFeature: Reducer, Sendable {
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
                 
+            case .destination(.presented(.edit(.delegate(.topicEdited)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
+                }
+                
             case .destination, .pageNavigation:
                 return .none
                 
@@ -245,6 +253,16 @@ public struct ForumFeature: Reducer, Sendable {
                         await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
                         await send(.internal(.refresh))
                     }
+                    
+                case .edit:
+                    state.destination = .edit(TopicEditFeature.State(
+                        id: topic.id,
+                        flag: topic.flag,
+                        title: topic.name,
+                        description: topic.description,
+                        supportsPoll: false
+                    ))
+                    return .none
                 }
                 
             case let .view(.contextTopicToolsMenu(action)):

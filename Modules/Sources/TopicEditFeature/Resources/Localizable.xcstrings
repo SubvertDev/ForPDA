@@ -1,266 +1,216 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "About Forum" : {
+    "Answer" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "О форуме"
+            "value" : "Ответ"
           }
         }
       }
     },
-    "Add to favorites" : {
+    "Answers" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "В избранное"
+            "value" : "Ответы"
           }
         }
       }
     },
-    "Announcements" : {
+    "Cancel" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Объявления"
+            "value" : "Отмена"
           }
         }
       }
     },
-    "Close" : {
+    "Enable multi-selection" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрыть"
+            "value" : "Включить мультивыбор"
           }
         }
       }
     },
-    "Copy Link" : {
+    "Enable poll" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Копировать ссылку"
+            "value" : "Включить опрос"
           }
         }
       }
     },
-    "Create Topic" : {
+    "Inappropriate content" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Создать тему"
+            "value" : "Недопустимое содержание"
           }
         }
       }
     },
-    "Delete" : {
+    "Input answer" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Удалить"
+            "value" : "Введите ответ"
           }
         }
       }
     },
-    "Edit" : {
+    "Input poll name" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактировать"
+            "value" : "Введите название опроса"
           }
         }
       }
     },
-    "Go To End" : {
+    "Input question" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перейти в конец"
+            "value" : "Введите вопрос"
           }
         }
       }
     },
-    "Hide" : {
+    "Input..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Скрыть"
+            "value" : "Введите…"
           }
         }
       }
     },
-    "Link copied" : {
+    "No access" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ссылка скопирована"
+            "value" : "Нет доступа"
           }
         }
       }
     },
-    "Loading..." : {
+    "OK" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Загружаем..."
+            "value" : "ОК"
           }
         }
       }
     },
-    "Mark Read" : {
+    "Question" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Прочитано"
+            "value" : "Вопрос"
           }
         }
       }
     },
-    "Marked as read" : {
+    "Save" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отмечено прочитанным"
+            "value" : "Сохранить"
           }
         }
       }
     },
-    "Move" : {
+    "Too many answers in poll" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Переместить"
+            "value" : "Слишком много ответов в опросе"
           }
         }
       }
     },
-    "Open" : {
+    "Too many questions in poll" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть"
+            "value" : "Слишком много вопросов в опросе"
           }
         }
       }
     },
-    "Open In Browser" : {
+    "Topic description" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Открыть в браузере"
+            "value" : "Описание темы"
           }
         }
       }
     },
-    "Pin" : {
+    "Topic Edit" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрепить"
+            "value" : "Редактирование темы"
           }
         }
       }
     },
-    "Pinned topics" : {
+    "Topic header" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Закрепленные темы"
+            "value" : "Заголовок темы"
           }
         }
       }
     },
-    "Remove from favorites" : {
+    "Topic is sent to premoderation" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Удалить из избранного"
+            "value" : "Тема отправлена на премодерацию"
           }
         }
       }
     },
-    "Remove Hide" : {
+    "Unknown error" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Показать"
-          }
-        }
-      }
-    },
-    "Subforums" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подфорумы"
-          }
-        }
-      }
-    },
-    "The topic has been edited" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тема отредактирована"
-          }
-        }
-      }
-    },
-    "Tools" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Инструменты"
-          }
-        }
-      }
-    },
-    "Topics" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Темы"
-          }
-        }
-      }
-    },
-    "Unpin" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открепить"
+            "value" : "Неизвестная ошибка"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

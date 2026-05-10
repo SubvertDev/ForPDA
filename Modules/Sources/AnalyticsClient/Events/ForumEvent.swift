@@ -21,6 +21,7 @@ public enum ForumEvent: Event {
     
     case menuOpen(Int)
     case menuGoToEnd(Int)
+    case menuEdit(Int)
     
     case menuStat(Int, Bool)
     case menuMarkRead(Int, Bool)
@@ -58,6 +59,9 @@ public enum ForumEvent: Event {
             return ["id": String(id)]
             
         case let .menuGoToEnd(id):
+            return ["id": String(id)]
+            
+        case let .menuEdit(id):
             return ["id": String(id)]
             
         case let .menuStat(id, isForum):
