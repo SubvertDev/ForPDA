@@ -53,7 +53,7 @@ public struct MoreScreen: View {
             }
             .navigationBarHidden(true)
             .alert($store.scope(state: \.alert, action: \.alert))
-            .sheet(item: $store.scope(state: \.auth, action: \.auth)) { store in
+            .fullScreenCover(item: $store.scope(state: \.auth, action: \.auth)) { store in
                 NavigationStack {
                     AuthScreen(store: store)
                 }

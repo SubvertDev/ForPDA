@@ -76,11 +76,6 @@ public struct AppView: View {
             .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
                 LogStoreScreen(store: store)
             }
-            .fullScreenCover(item: $store.scope(state: \.$auth, action: \.auth)) { store in
-                NavigationStack {
-                    AuthScreen(store: store)
-                }
-            }
             .alert($store.scope(state: \.$alert, action: \.alert))
             // Tint and environment should be after sheets/covers
             .tint(store.appSettings.appTintColor.asColor)

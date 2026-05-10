@@ -14,6 +14,7 @@ import Models
 import ToastClient
 import ReputationChangeFeature
 import FormFeature
+import AuthFeature
 
 public enum CommentContextMenuOptions {
     case report
@@ -31,13 +32,21 @@ public struct CommentFeature: Reducer, Sendable {
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
     }
     
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case changeReputation(ReputationChangeFeature)
+        case report(FormFeature)
+        case auth(AuthFeature)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable, Identifiable {
         @Presents public var alert: AlertState<Never>?
-        @Presents var changeReputation: ReputationChangeFeature.State?
-        @Presents var report: FormFeature.State?
+        @Presents var destination: Destination.State?
         @Shared(.userSession) public var userSession: UserSession?
         public var id: Int { return comment.id }
         public var comment: Comment
@@ -86,8 +95,7 @@ public struct CommentFeature: Reducer, Sendable {
         case likeButtonTapped
         case changeReputationButtonTapped
         
-        case changeReputation(PresentationAction<ReputationChangeFeature.Action>)
-        case report(PresentationAction<FormFeature.Action>)
+        case destination(PresentationAction<Destination.Action>)
         
         case _likeResult(Bool)
         case _timerTicked
@@ -95,7 +103,6 @@ public struct CommentFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case commentHeaderTapped(Int)
-            case unauthorizedAction
         }
     }
     
@@ -127,14 +134,11 @@ public struct CommentFeature: Reducer, Sendable {
                 
             case let .profileTapped(id):
                 return .send(.delegate(.commentHeaderTapped(id)))
-
-            case .report(.presented(.delegate(.formSent(.report)))):
+                
+            case .destination(.presented(.report(.delegate(.formSent(.report))))):
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
-                
-            case .report, .changeReputation:
-                return .none
                 
             case .hiddenLabelTapped:
                 state.comment.isHidden = false
@@ -142,32 +146,38 @@ public struct CommentFeature: Reducer, Sendable {
                 
             case .reportButtonTapped:
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
-                state.report = FormFeature.State(
-                    type: .report(
-                        id: state.comment.id,
-                        type: .comment
-                    )
+                
+                state.destination = .report(
+                    FormFeature.State(type: .report(id: state.comment.id, type: .comment))
                 )
                 return .none
                 
             case .changeReputationButtonTapped:
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
-                state.changeReputation = ReputationChangeFeature.State(
-                    userId: state.comment.authorId,
-                    username: state.comment.authorName,
-                    content: .comment(id: state.comment.id)
+                
+                state.destination = .changeReputation(
+                    ReputationChangeFeature.State(
+                        userId: state.comment.authorId,
+                        username: state.comment.authorName,
+                        content: .comment(id: state.comment.id)
+                    )
                 )
                 return .none
                 
             case .hideButtonTapped:
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
+                
                 state.comment.isHidden.toggle()
+                
                 return .run { [articleId = state.articleId, commentId = state.comment.id] _ in
                     await hapticClient.play(.selection)
                     let _ = try await apiClient.hideComment(articleId: articleId, commentId: commentId)
@@ -175,17 +185,21 @@ public struct CommentFeature: Reducer, Sendable {
                 
             case .replyButtonTapped:
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
                 return .none
                 
             case .likeButtonTapped:
                 guard !state.isLiked else { return .none }
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
+                
                 state.comment.likesAmount += 1
                 state.isLiked = true
+                
                 return .run { [articleId = state.articleId, commentId = state.comment.id] send in
                     let success = try await apiClient.likeComment(articleId: articleId, commentId: commentId)
                     await send(._likeResult(success))
@@ -200,16 +214,19 @@ public struct CommentFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .delegate:
+            case .destination(.presented(.auth(.delegate(.loginSuccess(userId: _))))):
+                state.destination = nil
+                return .none
+                
+            case .delegate, .destination:
                 return .none
             }
         }
-        .ifLet(\.$report, action: \.report) {
-            FormFeature()
-        }
-        .ifLet(\.$changeReputation, action: \.changeReputation) {
-            ReputationChangeFeature()
-        }
-        .ifLet(\.alert, action: \.alert)
+        .ifLet(\.$destination, action: \.destination)
+        .ifLet(\.$alert, action: \.alert)
     }
 }
+
+// MARK: - Extensions
+
+extension CommentFeature.Destination.State: Equatable {}

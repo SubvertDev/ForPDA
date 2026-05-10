@@ -97,6 +97,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.AuthFeature,
                     .Internal.CacheClient,
                     .Internal.GalleryFeature,
                     .Internal.HapticClient,

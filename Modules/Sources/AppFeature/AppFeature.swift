@@ -63,7 +63,6 @@ public struct AppFeature: Reducer, Sendable {
         public var forumTab:     StackTab.State
         public var moreTab:      StackTab.State
         
-        @Presents public var auth: AuthFeature.State?
         @Presents public var logStore: LogStoreFeature.State?
         @Presents public var alert: AlertState<Never>?
         
@@ -96,7 +95,6 @@ public struct AppFeature: Reducer, Sendable {
             favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
             moreTab: StackTab.State = StackTab.State(root: .more(.more(MoreFeature.State()))),
-            auth: AuthFeature.State? = nil,
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articles,
             previousTab: AppTab = .articles,
@@ -110,7 +108,6 @@ public struct AppFeature: Reducer, Sendable {
             self.forumTab = forumTab
             self.moreTab = moreTab
             
-            self.auth = auth
             self.alert = alert
             
             self.selectedTab = selectedTab
@@ -136,7 +133,6 @@ public struct AppFeature: Reducer, Sendable {
         case forumTab(StackTab.Action)
         case moreTab(StackTab.Action)
         
-        case auth(PresentationAction<AuthFeature.Action>)
         case logStore(PresentationAction<LogStoreFeature.Action>)
         case alert(PresentationAction<Never>)
         
@@ -201,22 +197,6 @@ public struct AppFeature: Reducer, Sendable {
         
         Scope(state: \.moreTab, action: \.moreTab) {
             StackTab()
-        }
-        
-        // Authorization actions interceptor
-        Reduce<State, Action> { state, action in
-            switch action {
-            case .articlesTab(.path(.element(id: _, action: .articles(.article(.comments(.element(id: _, action: .delegate(.unauthorizedAction)))))))):
-                state.auth = AuthFeature.State()
-                
-            case .articlesTab(.path(.element(id: _, action: .articles(.article(.delegate(.unauthorizedAction)))))):
-                state.auth = AuthFeature.State()
-                
-            default:
-                break
-            }
-            
-            return .none
         }
         
         Reduce<State, Action> { state, action in
@@ -393,23 +373,6 @@ public struct AppFeature: Reducer, Sendable {
                     return handleOtherTabSelection(newTab: tab, &state)
                 }
                 
-            case .auth(.presented(.delegate(.loginSuccess(_)))):
-                // Also make necessary changes to delegate actions in StackTab
-                state.auth = nil
-//                switch reason {
-//                case .commentAction, .sendComment:
-//                    state.auth = nil
-//                case .profile:
-//                    let error = NSError(domain: "Profile login success is caught in AppFeature", code: 0)
-//                    analyticsClient.capture(error)
-//                }
-                return .run { _ in
-                    notificationCenter.post(name: .favoritesUpdated, object: nil)
-                }
-                
-            case .auth:
-                return .none
-                
             case let .userDidLogin(userId: userId):
                 return .run { _ in
                     do {
@@ -545,9 +508,6 @@ public struct AppFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$alert, action: \.alert)
-        .ifLet(\.$auth, action: \.auth) {
-            AuthFeature()
-        }
         .ifLet(\.$logStore, action: \.logStore) {
             LogStoreFeature()
         }
