@@ -80,6 +80,8 @@ public struct TicketsListFeature: Reducer, Sendable {
             case onFirstAppear
             case onRefresh
             
+            case ticketButtonTapped(Int)
+            
             case contextMenu(TicketsListContextMenuAction)
             case contextTicketMenu(TicketContextMenuAction, Int)
         }
@@ -143,6 +145,9 @@ public struct TicketsListFeature: Reducer, Sendable {
             case .view(.onRefresh):
                 guard !state.isLoading else { return .none }
                 return .send(.internal(.refresh))
+                
+            case let .view(.ticketButtonTapped(id)):
+                return .send(.delegate(.openTicket(id)))
                 
             case let .view(.contextMenu(action)):
                 switch action {

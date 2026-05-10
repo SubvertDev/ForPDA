@@ -53,7 +53,7 @@ public struct TicketsListScreen: View {
                                 Navigation()
                             }
                             
-                            ContentSection()
+                            Content()
                             
                             if shouldShowInlineNavigation {
                                 Navigation()
@@ -174,55 +174,65 @@ public struct TicketsListScreen: View {
         .frame(width: 8, height: 22)
     }
     
-    // MARK: - Content Section
+    // MARK: - Content
     
     @ViewBuilder
-    private func ContentSection() -> some View {
-        Section {
-            ForEach(store.tickets) { ticket in
-                VStack(alignment: .leading, spacing: 8) {
-                    Menu {
-                        TIcketStatusPicker(id: ticket.id)
-                    } label: {
-                        TicketStatusBadge(info: ticket.info)
-                    }
-                    
-                    Text(verbatim: ticket.info.title)
-                        .font(.subheadline)
-                        .foregroundStyle(Color(.Labels.primary))
-                    
-                    HStack(spacing: 6) {
-                        Image(systemSymbol: .textBubble)
-                        
-                        Text(verbatim: ticket.info.subjectRootName)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(Color(.Labels.teritary))
-                    
-                    HStack {
-                        HStack(spacing: 0) {
-                            let date = if ticket.info.status == .processed {
-                                ticket.info.processedAt ?? Date.unknown
-                            } else {
-                                ticket.info.createdAt
-                            }
-                            Text(verbatim: "\(date.formatted()) · ")
-                            
-                            HStack(spacing: 4) {
-                                Image(systemSymbol: .personCropCircle)
-                                
-                                Text(verbatim: ticket.info.authorName)
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        TicketContextMenu(id: ticket.id, ticket.info)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(Color(.Labels.quaternary))
-                }
+    private func Content() -> some View {
+        ForEach(store.tickets) { ticket in
+            Button {
+                send(.ticketButtonTapped(ticket.id))
+            } label: {
+                TicketRow(ticket)
             }
+            .buttonStyle(.plain)
+        }
+    }
+    
+    // MARK: - Ticket Row
+    
+    @ViewBuilder
+    private func TicketRow(_ ticket: TicketsList.TicketSimplified) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Menu {
+                TIcketStatusPicker(id: ticket.id)
+            } label: {
+                TicketStatusBadge(info: ticket.info)
+            }
+            
+            Text(verbatim: ticket.info.title)
+                .font(.subheadline)
+                .foregroundStyle(Color(.Labels.primary))
+            
+            HStack(spacing: 6) {
+                Image(systemSymbol: .textBubble)
+                
+                Text(verbatim: ticket.info.subjectRootName)
+            }
+            .font(.caption)
+            .foregroundStyle(Color(.Labels.teritary))
+            
+            HStack {
+                HStack(spacing: 0) {
+                    let date = if ticket.info.status == .processed {
+                        ticket.info.processedAt ?? Date.unknown
+                    } else {
+                        ticket.info.createdAt
+                    }
+                    Text(verbatim: "\(date.formatted()) · ")
+                    
+                    HStack(spacing: 4) {
+                        Image(systemSymbol: .personCropCircle)
+                        
+                        Text(verbatim: ticket.info.authorName)
+                    }
+                }
+                
+                Spacer()
+                
+                TicketContextMenu(id: ticket.id, ticket.info)
+            }
+            .font(.caption)
+            .foregroundStyle(Color(.Labels.quaternary))
         }
     }
     
