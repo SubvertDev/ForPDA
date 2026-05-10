@@ -14,6 +14,7 @@ import PageNavigationFeature
 import ToastClient
 import PasteboardClient
 import CacheClient
+import TicketStatusHistoryFeature
 
 @Reducer
 public struct TicketsListFeature: Reducer, Sendable {
@@ -29,12 +30,27 @@ public struct TicketsListFeature: Reducer, Sendable {
         static let statusChanged = LocalizedStringResource("Ticket status changed", bundle: .module)
     }
     
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case statusHistory(TicketStatusHistoryFeature)
+        
+        @CasePathable
+        public enum Action {
+            case statusHistory(TicketStatusHistoryFeature.Action)
+        }
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        
+        @Presents public var destination: Destination.State?
+        
         var userSessionNickname: String?
         var pageNavigation = PageNavigationFeature.State(type: .tickets)
         
@@ -55,6 +71,7 @@ public struct TicketsListFeature: Reducer, Sendable {
     
     public enum Action: ViewAction, BindableAction {
         case binding(BindingAction<State>)
+        case destination(PresentationAction<Destination.Action>)
         case pageNavigation(PageNavigationFeature.Action)
         
         case view(View)
@@ -108,7 +125,10 @@ public struct TicketsListFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(.internal(.loadTickets(offset: newOffset)))
                 
-            case .pageNavigation, .binding, .delegate:
+            case let .destination(.presented(.statusHistory(.delegate(.openUser(id))))):
+                return .send(.delegate(.openUser(id)))
+                
+            case .pageNavigation, .binding, .delegate, .destination:
                 return .none
                 
             case .view(.onFirstAppear):
@@ -153,7 +173,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 case .sendComment:
                     break
                 case .statusHistory:
-                    break
+                    state.destination = .statusHistory(TicketStatusHistoryFeature.State(ticketId: ticketId))
                 case .openAuthor(let authorId):
                     return .send(.delegate(.openUser(authorId)))
                 case .copyLink:
@@ -245,5 +265,8 @@ public struct TicketsListFeature: Reducer, Sendable {
                 }
             }
         }
+        .ifLet(\.$destination, action: \.destination)
     }
 }
+
+extension TicketsListFeature.Destination.State: Equatable {}

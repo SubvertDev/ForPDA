@@ -11,6 +11,7 @@ import Models
 import SharedUI
 import PageNavigationFeature
 import SFSafeSymbols
+import TicketStatusHistoryFeature
 
 @ViewAction(for: TicketsListFeature.self)
 public struct TicketsListScreen: View {
@@ -88,6 +89,11 @@ public struct TicketsListScreen: View {
                     )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
+                }
+            }
+            .sheet(item: $store.scope(state: \.$destination, action: \.destination).statusHistory) { store in
+                NavigationStack {
+                    TicketStatusHistoryView(store: store)
                 }
             }
             .refreshable {
