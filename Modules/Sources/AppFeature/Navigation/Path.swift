@@ -31,6 +31,7 @@ import TicketFeature
 import TicketsListFeature
 import TopicFeature
 import AuthFeature
+import MoreFeature
 
 @Reducer
 public enum Path {
@@ -39,7 +40,7 @@ public enum Path {
     case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
     case tickets(Tickets.Body = Tickets.body)
-    case profile(Profile.Body = Profile.body)
+    case more(More.Body = More.body)
     case settings(Settings.Body = Settings.body)
     case search(Search.Body = Search.body)
     case qms(QMS.Body = QMS.body)
@@ -58,7 +59,8 @@ public enum Path {
     }
     
     @Reducer
-    public enum Profile {
+    public enum More {
+        case more(MoreFeature)
         case profile(ProfileFeature)
         case history(HistoryFeature)
         case mentions(MentionsFeature)
@@ -103,7 +105,7 @@ public enum Path {
 extension Path.State: Equatable {}
 extension Path.Articles.State: Equatable {}
 extension Path.DevDB.State: Equatable {}
-extension Path.Profile.State: Equatable {}
+extension Path.More.State: Equatable {}
 extension Path.Forum.State: Equatable {}
 extension Path.Tickets.State: Equatable {}
 extension Path.Settings.State: Equatable {}
@@ -124,8 +126,8 @@ extension Path {
             FavoritesScreen(store: store)
                 .tracking(for: FavoritesScreen.self)
             
-        case let .profile(path):
-            ProfileViews(path)
+        case let .more(path):
+            MoreViews(path)
             
         case let .forum(path):
             ForumViews(path)
@@ -175,8 +177,12 @@ extension Path {
     }
     
     @MainActor @ViewBuilder
-    private static func ProfileViews(_ store: Store<Path.Profile.State, Path.Profile.Action>) -> some View {
+    private static func MoreViews(_ store: Store<Path.More.State, Path.More.Action>) -> some View {
         switch store.case {
+        case let .more(store):
+            MoreScreen(store: store)
+                .tracking(for: MoreScreen.self)
+            
         case let .profile(store):
             ProfileScreen(store: store)
                 .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])

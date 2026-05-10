@@ -72,7 +72,7 @@ public struct PostKarmaHistoryFeature: Reducer, Sendable {
                 return .send(.delegate(.openUser(id)))
                 
             case .internal(.loadKarmaHistory):
-                state.isLoading = false
+                state.isLoading = true
                 return .run { [postId = state.postId] send in
                     let response = try await apiClient.postKarmaHistory(postId: postId)
                     await send(.internal(.karmaHistoryResponse(.success(response))))

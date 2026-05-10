@@ -148,8 +148,8 @@ public struct SearchResultScreen: View {
         }
         .padding(.vertical, 12)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(post.isDeleted ? Color(.Background.quaternary) : Color(.Background.primary))
-        .disabled(post.topicName.isEmpty && post.isDeleted)
+        .listRowBackground(post.colorMask)
+        .disabled(post.topicName.isEmpty && post.isDisabled)
     }
     
     // MARK: - Topic Row
@@ -255,11 +255,29 @@ public struct SearchResultScreen: View {
     }
 }
 
+// MARK: - Extensions
+
 extension SearchResultScreen {
     func makeAttributed(_ text: String, _ font: UIFont.TextStyle) -> NSAttributedString? {
         guard !text.isEmpty else { return nil }
         return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: font)])
             .render(text: text)
+    }
+}
+
+extension UIContent.UIHybridPost {
+    var isDisabled: Bool {
+        return !post.post.canModerate && (post.post.isDeleted || post.post.isHidden)
+    }
+    
+    var colorMask: Color {
+        return if post.post.isDeleted {
+            Color(.Background.quaternary)
+        } else if post.post.isHidden {
+            Color(.Main.redAlpha)
+        } else {
+            Color(.Background.primary)
+        }
     }
 }
 

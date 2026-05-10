@@ -72,7 +72,7 @@ public struct MentionsScreen: View {
             }
             .animation(.default, value: store.mentions)
             .navigationTitle(Text("Mentions", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(

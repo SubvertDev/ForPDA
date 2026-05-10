@@ -25,6 +25,7 @@ import NotificationsClient
 import ForumStatFeature
 import ForumMoveFeature
 import GalleryFeature
+import TopicEditFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -36,6 +37,7 @@ public struct TopicFeature: Reducer, Sendable {
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+        static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
         static let topicDeleted = LocalizedStringResource("Topic deleted", bundle: .module)
@@ -61,6 +63,7 @@ public struct TopicFeature: Reducer, Sendable {
         case form(FormFeature)
         case stat(ForumStatFeature)
         case move(ForumMoveFeature)
+        case edit(TopicEditFeature)
         case changeReputation(ReputationChangeFeature)
         
         @CasePathable
@@ -70,6 +73,7 @@ public struct TopicFeature: Reducer, Sendable {
             case form(FormFeature.Action)
             case stat(ForumStatFeature.Action)
             case move(ForumMoveFeature.Action)
+            case edit(TopicEditFeature.Action)
             case changeReputation(ReputationChangeFeature.Action)
         }
         
@@ -194,6 +198,7 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.logger) var logger
+    @Dependency(\.analyticsClient) private var analytics
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.continuousClock) private var clock
     @Dependency(\.cacheClient) private var cacheClient
@@ -223,11 +228,11 @@ public struct TopicFeature: Reducer, Sendable {
                 state.postId = nil
                 state.posts.removeAll()
                 return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
-                        if isLastPage {
-                            await cacheClient.deleteTopicIdOfUnreadItem(topicId)
-                        }
-                        Task.cancel(id: CancelID.loading)
-                        await send(.internal(.loadTopic(newOffset)))
+                    if isLastPage {
+                        await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                    }
+                    Task.cancel(id: CancelID.loading)
+                    await send(.internal(.loadTopic(newOffset)))
                 }
                 
             case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
@@ -236,6 +241,11 @@ public struct TopicFeature: Reducer, Sendable {
             case .destination(.presented(.form(.delegate(.formSent(.report))))):
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
+                }
+                
+            case .destination(.presented(.edit(.delegate(.topicEdited)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
                 }
                 
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
@@ -344,6 +354,18 @@ public struct TopicFeature: Reducer, Sendable {
                         )
                     )
                     state.destination = .form(formState)
+                    return .none
+                    
+                case .edit:
+                    let editState = TopicEditFeature.State(
+                        id: topic.id,
+                        flag: topic.flag,
+                        title: topic.name,
+                        description: topic.description,
+                        poll: topic.poll,
+                        supportsPoll: true
+                    )
+                    state.destination = .edit(editState)
                     return .none
                     
                 case .about:
@@ -489,7 +511,7 @@ public struct TopicFeature: Reducer, Sendable {
                 case .modify(let action, let postId, let isUndo):
                     switch action {
                     case .pin, .hide, .protect:
-                        return .run { [id = state.topicId] send in
+                        return .run { [id = postId] send in
                             let status = try await apiClient.modifyForum(ids: [id], type: .post(action), isUndo: isUndo)
                             
                             await send(.internal(.refresh))

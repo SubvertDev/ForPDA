@@ -51,16 +51,6 @@
         }
       }
     },
-    "Are you sure you want to log out of your profile ?" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы уверены, что хотите выйти из своего профиля?"
-          }
-        }
-      }
-    },
     "Are you sure, that you want to delete an avatar?" : {
       "localizations" : {
         "ru" : {
@@ -281,16 +271,6 @@
         }
       }
     },
-    "History" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "История"
-          }
-        }
-      }
-    },
     "Input..." : {
       "localizations" : {
         "ru" : {
@@ -361,32 +341,12 @@
         }
       }
     },
-    "Logout" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выйти"
-          }
-        }
-      }
-    },
     "Male" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Мужской"
-          }
-        }
-      }
-    },
-    "Mentions" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Упоминания"
           }
         }
       }
@@ -517,16 +477,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль обновлен"
-          }
-        }
-      }
-    },
-    "QMS" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "QMS"
           }
         }
       }

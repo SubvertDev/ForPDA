@@ -23,24 +23,6 @@ extension ProfileFeature {
                 case .view(.onAppear), .delegate, .binding:
                     break
                     
-                case .destination(.presented(.alert(.logout))):
-                    analyticsClient.logout()
-                    
-                case .view(.qmsButtonTapped):
-                    analyticsClient.log(ProfileEvent.qmsTapped)
-                
-                case .view(.settingsButtonTapped):
-                    analyticsClient.log(ProfileEvent.settingsTapped)
-                    
-                case .view(.logoutButtonTapped):
-                    analyticsClient.log(ProfileEvent.logoutTapped)
-                    
-                case .view(.historyButtonTapped):
-                    analyticsClient.log(ProfileEvent.historyTapped)
-                    
-                case .view(.mentionsButtonTapped):
-                    analyticsClient.log(ProfileEvent.mentionsTapped)
-                    
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     

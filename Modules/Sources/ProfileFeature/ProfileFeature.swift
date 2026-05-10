@@ -32,18 +32,8 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
-        @ReducerCaseIgnored
-        case alert(AlertState<Alert>)
         case note(FormFeature)
         case editProfile(EditFeature)
-        
-        @CasePathable
-        public enum Action {
-            case alert(Alert)
-            case note(FormFeature.Action)
-            case editProfile(EditFeature.Action)
-        }
-        public enum Alert { case logout }
     }
     
     // MARK: - State
@@ -57,8 +47,6 @@ public struct ProfileFeature: Reducer, Sendable {
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
-        var qmsBadgeCount = 0
-        var mentionsBadgeCount = 0
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
@@ -94,11 +82,6 @@ public struct ProfileFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
-            case qmsButtonTapped
-            case settingsButtonTapped
-            case logoutButtonTapped
-            case historyButtonTapped
-            case mentionsButtonTapped
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
@@ -112,16 +95,11 @@ public struct ProfileFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case userResponse(Result<User, any Error>)
-            case updateBadgeCounts(Unread)
             case updateUserSessionGroup(User.Group)
         }
         
         case delegate(Delegate)
         public enum Delegate {
-            case openQms
-            case openSettings
-            case openHistory
-            case openMentions
             case openDevice(String)
             case openTopic(Int)
             case openReputation(Int)
@@ -164,24 +142,14 @@ public struct ProfileFeature: Reducer, Sendable {
                         }
                     },
                     .run { send in
+                        // TODO: Нужно ли теперь это здесь?
                         let unread = try await apiClient.getUnread(type: .all)
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     },
-                    .run { send in
-                        for await unread in notificationsClient.unreadPublisher().values {
-                            await send(.internal(.updateBadgeCounts(unread)))
-                        }
-                    }
                 )
                 
             case let .view(.deviceButtonTapped(tag)):
                 return .send(.delegate(.openDevice(tag)))
-                
-            case .view(.historyButtonTapped):
-                return .send(.delegate(.openHistory))
-                
-            case .view(.mentionsButtonTapped):
-                return .send(.delegate(.openMentions))
                 
             case .view(.reputationButtonTapped):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
@@ -223,18 +191,8 @@ public struct ProfileFeature: Reducer, Sendable {
                     return .none
                 }
                 
-            case .view(.qmsButtonTapped):
-                return .send(.delegate(.openQms))
-                
-            case .view(.settingsButtonTapped):
-                return .send(.delegate(.openSettings))
-                
             case .view(.deeplinkTapped(let url, _)):
                 return .send(.delegate(.handleUrl(url)))
-                
-            case .view(.logoutButtonTapped):
-                state.destination = .alert(.warning)
-                return .none
                 
             case .internal(.userResponse(.success(let user))):
                 var user = user
@@ -252,10 +210,10 @@ public struct ProfileFeature: Reducer, Sendable {
                 reportFullyDisplayed(&state)
                 return .none
                 
-            case let .internal(.updateBadgeCounts(unread)):
-                state.qmsBadgeCount = unread.qmsUnreadCount
-                state.mentionsBadgeCount = unread.mentionsUnreadCount
-                return .none
+//            case let .internal(.updateBadgeCounts(unread)):
+//                state.qmsBadgeCount = unread.qmsUnreadCount
+//                state.mentionsBadgeCount = unread.mentionsUnreadCount
+//                return .none
                 
             case let .internal(.updateUserSessionGroup(group)):
                 state.userSessionGroup = group
@@ -274,13 +232,6 @@ public struct ProfileFeature: Reducer, Sendable {
                         haptic: status ? .success : .error
                     ))
                     await send(.view(.onAppear))
-                }
-            
-            case .destination(.presented(.alert(.logout))):
-                state.$userSession.withLock { $0 = nil }
-                state.isLoading = true
-                return .run { send in
-                    try await apiClient.logout()
                 }
                 
             case .delegate, .binding, .destination:
@@ -302,18 +253,3 @@ public struct ProfileFeature: Reducer, Sendable {
 }
 
 extension ProfileFeature.Destination.State: Equatable {}
-
-// MARK: - Alert Extension
-
-private extension AlertState where Action == ProfileFeature.Destination.Alert {
-    nonisolated(unsafe) static let warning = Self {
-        TextState("Are you sure you want to log out of your profile ?", bundle: .module)
-    } actions: {
-        ButtonState(role: .destructive, action: .logout) {
-            TextState("Logout", bundle: .module)
-        }
-        ButtonState(role: .cancel) {
-            TextState("Cancel", bundle: .module)
-        }
-    }
-}

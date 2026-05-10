@@ -12,7 +12,7 @@ public enum AuthEvent: Event {
     case wrongPassword
     case wrongCaptcha
     case somethingWentWrong(id: Int)
-    case loginSuccess(reason: String, userId: Int)
+    case loginSuccess(userId: Int)
     
     public var name: String {
         return "Authorization " + eventName(for: self).inProperCase
@@ -22,8 +22,8 @@ public enum AuthEvent: Event {
         switch self {
         case let .somethingWentWrong(id: id):
             return ["id": String(id)]
-        case let .loginSuccess(reason, userId):
-            return ["reason": reason, "userId": String(userId)]
+        case let .loginSuccess(userId):
+            return ["userId": String(userId)]
         default:
             return nil
         }

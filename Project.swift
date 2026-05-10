@@ -51,6 +51,7 @@ let project = Project(
                     .Internal.LoggerClient,
                     .Internal.MentionsFeature,
                     .Internal.Models,
+                    .Internal.MoreFeature,
                     .Internal.NotificationsClient,
                     .Internal.NotificationsFeature,
                     .Internal.PageNavigationFeature,
@@ -98,6 +99,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.AuthFeature,
                     .Internal.CacheClient,
                     .Internal.GalleryFeature,
                     .Internal.HapticClient,
@@ -277,6 +279,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
+                    .Internal.TopicEditFeature,
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
@@ -363,6 +366,22 @@ let project = Project(
                     .SPM.NukeUI,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA,
+                ]
+            ),
+        
+            .feature(
+                name: "MoreFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.AuthFeature,
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                    .Internal.SharedUI,
+                    .Internal.TCAExtensions,
+                    .SPM.NukeUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
                 ]
             ),
         
@@ -563,6 +582,17 @@ let project = Project(
                     .SPM.TCA
                 ]
             ),
+            
+            .feature(
+                name: "TopicEditFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
         
             .feature(
                 name: "TopicFeature",
@@ -582,6 +612,7 @@ let project = Project(
                     .Internal.TCAExtensions,
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
+                    .Internal.TopicEditFeature,
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
@@ -1133,6 +1164,7 @@ extension TargetDependency.Internal {
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
     static let MentionsFeature =        TargetDependency.target(name: "MentionsFeature")
+    static let MoreFeature =            TargetDependency.target(name: "MoreFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")
     static let PageNavigationFeature =  TargetDependency.target(name: "PageNavigationFeature")
     static let ProfileFeature =         TargetDependency.target(name: "ProfileFeature")
@@ -1147,6 +1179,7 @@ extension TargetDependency.Internal {
     static let TicketsListFeature =     TargetDependency.target(name: "TicketsListFeature")
     static let TicketStatusHistoryFeature = TargetDependency.target(name: "TicketStatusHistoryFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
+    static let TopicEditFeature =       TargetDependency.target(name: "TopicEditFeature")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
     

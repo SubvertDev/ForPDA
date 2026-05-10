@@ -19,6 +19,7 @@ import TopicBuilder
 import GalleryFeature
 import ForumStatFeature
 import ForumMoveFeature
+import TopicEditFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -198,6 +199,12 @@ public struct TopicScreen: View {
                     ContextButton(text: LocalizedStringResource("About Topic", bundle: .module), symbol: .infoCircle) {
                         send(.contextMenu(.about))
                     }
+                    
+                    if topic.canEdit {
+                        ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
+                            send(.contextMenu(.edit))
+                        }
+                    }
                 }
                 
                 if topic.canModerate {
@@ -357,6 +364,25 @@ public struct TopicScreen: View {
                         
                         PostSeparator()
                     }
+                    .overlay {
+                        GeometryReader { proxy in
+                            let maskColor = if post.post.isDeleted {
+                                Color(.Background.quaternary)
+                            } else if post.post.isHidden {
+                                Color(.Main.redAlpha)
+                            } else {
+                                Color.clear
+                            }
+                            Rectangle()
+                                .fill(maskColor)
+                                .frame(
+                                    // + LazyVStack spacing - Separator height
+                                    height: proxy.size.height + 16 - 10
+                                )
+                                .padding(.top, -16) // LazyVStack spacing
+                                .allowsHitTesting(false)
+                        }
+                    }
                 }
             }
         }
@@ -510,7 +536,12 @@ struct NavigationModifier: ViewModifier {
                             FormScreen(store: store)
                         }
                     }
-                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).gallery) { model in
+                    .fullScreenCover(item: $store.scope(state: \.destination?.edit, action: \.destination.edit)) { store in
+                        NavigationStack {
+                            TopicEditView(store: store)
+                        }
+                    }
+                    .fullScreenCover(item: $store.scope(state: \.destination, action: \.destination).gallery) { model in
                         TabViewGallery(model: model)
                     }
             }

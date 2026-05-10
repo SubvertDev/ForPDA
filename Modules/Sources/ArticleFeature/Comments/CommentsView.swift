@@ -14,6 +14,7 @@ import SkeletonUI
 import SFSafeSymbols
 import ReputationChangeFeature
 import FormFeature
+import AuthFeature
 
 // MARK: - Comments View
 
@@ -118,13 +119,18 @@ struct CommentView: View {
                 }
                 .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
-            .fullScreenCover(item: $store.scope(state: \.$report, action: \.report)) { store in
+            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).auth) { store in
+                NavigationStack {
+                    AuthScreen(store: store)
+                }
+            }
+            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).report) { store in
                 NavigationStack {
                     FormScreen(store: store)
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.$changeReputation, action: \.changeReputation),
+                item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
                 embedIntoNavStack: true
             ) { store in
                 ReputationChangeView(store: store)

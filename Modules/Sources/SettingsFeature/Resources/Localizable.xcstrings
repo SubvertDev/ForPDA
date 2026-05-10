@@ -31,26 +31,6 @@
         }
       }
     },
-    "App discussion in Telegram" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обсуждение приложения в Telegram"
-          }
-        }
-      }
-    },
-    "App discussion on the forum" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обсуждение приложения на форуме"
-          }
-        }
-      }
-    },
     "Backup connection" : {
       "localizations" : {
         "ru" : {
@@ -87,16 +67,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
-          }
-        }
-      }
-    },
-    "Check new versions on GitHub" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проверить новые версии на Github"
           }
         }
       }
@@ -183,16 +153,6 @@
         }
       }
     },
-    "GitHub repository" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub репозиторий"
-          }
-        }
-      }
-    },
     "Hide tabbar on scroll" : {
       "localizations" : {
         "ru" : {
@@ -239,26 +199,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Светлая"
-          }
-        }
-      }
-    },
-    "Links" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ссылки"
-          }
-        }
-      }
-    },
-    "List of changes in Telegram" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Список изменений в Telegram"
           }
         }
       }
@@ -399,16 +339,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Стартовый экран"
-          }
-        }
-      }
-    },
-    "Support on Boosty" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поддержать на Boosty"
           }
         }
       }

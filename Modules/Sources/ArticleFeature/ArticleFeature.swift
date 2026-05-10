@@ -16,6 +16,7 @@ import HapticClient
 import AnalyticsClient
 import ToastClient
 import NotificationsClient
+import AuthFeature
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {
@@ -38,16 +39,22 @@ public struct ArticleFeature: Reducer, Sendable {
     // MARK: - Destinations
     
     @Reducer
-    public enum Destination: Hashable {
+    public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
+        
+        case auth(AuthFeature)
         
         // Alert
         @ReducerCaseIgnored
         case alert(AlertState<Alert>)
-        @CasePathable
-        public enum Action { case alert(Alert) }
         public enum Alert { case ok }
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case auth(AuthFeature.Action)
+        }
     }
     
     // MARK: - State
@@ -148,7 +155,6 @@ public struct ArticleFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case handleDeeplink(Int)
-            case unauthorizedAction
         }
     }
     
@@ -188,6 +194,10 @@ public struct ArticleFeature: Reducer, Sendable {
                         state.focus = .comment
                     }
                 }
+                return .none
+                
+            case .destination(.presented(.auth(.delegate(.loginSuccess(userId: _))))):
+                state.destination = nil
                 return .none
                 
             case .comments:
@@ -288,9 +298,12 @@ public struct ArticleFeature: Reducer, Sendable {
                 
             case .sendCommentButtonTapped:
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
+                
                 state.isUploadingComment = true
+                
                 return .run { [articleId = state.articlePreview.id,
                                replyComment = state.replyComment,
                                message = state.commentText] send in

@@ -206,6 +206,8 @@ public struct ReputationFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$destination, action: \.destination)
+        
+        Analytics()
     }
     
     private func reportFullyDisplayed(_ state: inout State) {

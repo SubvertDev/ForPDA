@@ -24,6 +24,7 @@ public struct AnalyticsClient: Sendable {
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
     public var capture: @Sendable (any Error) -> Void
+    public var addBreadcrumb: @Sendable (_ category: String, _ message: String?, _ data: [String: Any]?, _ type: String?) -> Void
     public var reportFullyDisplayed: @Sendable () -> Void
 }
 
@@ -71,6 +72,15 @@ extension AnalyticsClient: DependencyKey {
                 logger.critical("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
             },
+            addBreadcrumb: { category, message, data, type in
+                let crumb = Breadcrumb()
+                crumb.level = .info
+                crumb.category = category
+                crumb.message = message
+                crumb.data = data
+                crumb.type = type
+                SentrySDK.addBreadcrumb(crumb)
+            },
             reportFullyDisplayed: {
                 // logger.info("Did report fully displayed")
                 SentrySDK.reportFullyDisplayed()
@@ -93,6 +103,7 @@ extension AnalyticsClient: DependencyKey {
         capture: { error in
             print("[Sentry] \(error)")
         },
+        addBreadcrumb: { _, _, _, _ in },
         reportFullyDisplayed: { }
     )
     
@@ -103,6 +114,7 @@ extension AnalyticsClient: DependencyKey {
         logout: { },
         log: { _ in },
         capture: { _ in },
+        addBreadcrumb: { _, _, _, _ in },
         reportFullyDisplayed: { }
     )
 }
@@ -177,13 +189,23 @@ extension AnalyticsClient {
             options.enableUserInteractionTracing = false // Doesn't work with SwiftUI
             options.enableUIViewControllerTracing = false // I don't have UIViewControllers
             options.enableTimeToFullDisplayTracing = true
-            options.tracePropagationTargets = ["4pda"] // Dismiss analytics requests
+            options.tracePropagationTargets = ["https://4pda.to"] // Dismiss analytics requests
             options.swiftAsyncStacktraces = true
             options.attachScreenshot = true
             options.tracesSampleRate = 1.0
             options.diagnosticLevel = .warning
             
             options.experimental.enableWatchdogTerminationsV2 = true
+            
+            // Filter out posthog http crumbs
+            options.beforeBreadcrumb = {
+                if $0.category == "http",
+                   let urlString = $0.data?["url"] as? String,
+                   urlString.contains("posthog") {
+                    return nil
+                }
+                return $0
+            }
         }
         SentrySDK.setUser(User(userId: id))
         

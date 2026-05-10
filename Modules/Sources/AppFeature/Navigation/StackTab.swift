@@ -54,7 +54,7 @@ public struct StackTab: Reducer, Sendable {
             }
             
             switch path.last {
-            case .profile(.mentions):
+            case .more(.mentions):
                 return .mentions
             case let .qms(.qms(state)):
                 return .chat(id: state.chatId)
@@ -121,10 +121,9 @@ public struct StackTab: Reducer, Sendable {
             notificationsClient.setNotificationContext(context: state.notificationsContext)
             
             let hasArticle = state.path.contains(where: { $0.is(\.articles.article) })
-            let hasSettings = state.path.contains(where: { $0.is(\.settings) })
             let hasQms = state.path.contains(where: { $0.is(\.qms) })
             let hasSearch = state.path.last(is: \.search.search) != nil
-            let showTabBar = !hasArticle && !hasSettings && !hasQms && !hasSearch
+            let showTabBar = !hasArticle && !hasQms && !hasSearch
             if state.showTabBar != showTabBar {
                 state.showTabBar = showTabBar
                 return .send(.delegate(.showTabBar(state.showTabBar)))
@@ -152,8 +151,8 @@ public struct StackTab: Reducer, Sendable {
         case let .tickets(action):
             return handleTicketsPathNavigation(action: action, state: &state)
             
-        case let .profile(action):
-            return handleProfilePathNavigation(action: action, state: &state)
+        case let .more(action):
+            return handleMorePathNavigation(action: action, state: &state)
             
         case let .settings(action):
             return handleSettingsPathNavigation(action: action, state: &state)
@@ -184,7 +183,7 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview))))
             
         case let .article(.comments(.element(id: _, action: .profileTapped(id)))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
         default:
             break
@@ -261,7 +260,7 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))
             
         case let .forum(.delegate(.openUser(id))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
         case let .forum(.delegate(.handleRedirect(url))):
             return handleDeeplink(url: url, state: &state)
@@ -272,7 +271,7 @@ public struct StackTab: Reducer, Sendable {
             return handleDeeplink(url: url, state: &state)
             
         case let .topic(.delegate(.openUser(id: id))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
         case let .topic(.delegate(.openTickets(id))):
             state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .topic(id)))))
@@ -307,7 +306,7 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.tickets(.ticket(TicketFeature.State(id: id))))
             
         case let .ticketsList(.delegate(.openUser(id))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
         default:
             break
@@ -317,26 +316,32 @@ public struct StackTab: Reducer, Sendable {
     
     // MARK: - Profile
     
-    private func handleProfilePathNavigation(action: Path.Profile.Action, state: inout State) -> Effect<Action> {
+    private func handleMorePathNavigation(action: Path.More.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .profile(.delegate(.openHistory)):
-            state.path.append(.profile(.history(HistoryFeature.State())))
+        case let .more(.delegate(.openProfile(userId, user))):
+            state.path.append(.more(.profile(ProfileFeature.State(userId: userId, user: user))))
             
-        case .profile(.delegate(.openMentions)):
-            state.path.append(.profile(.mentions(MentionsFeature.State())))
+        case .more(.delegate(.openQms)):
+            state.path.append(.qms(.qmsList(QMSListFeature.State())))
+            
+        case .more(.delegate(.openMentions)):
+            state.path.append(.more(.mentions(MentionsFeature.State())))
+            
+        case .more(.delegate(.openHistory)):
+            state.path.append(.more(.history(HistoryFeature.State())))
+            
+        case .more(.delegate(.openSettings)):
+            state.path.append(.settings(.settings(SettingsFeature.State())))
+            
+        case let .more(.delegate(.openDeeplink(url))):
+            return handleDeeplink(url: url, state: &state)
             
         case let .profile(.delegate(.openSearch(options))):
             state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
             
         case let .profile(.delegate(.openReputation(id))):
-            state.path.append(.profile(.reputation(ReputationFeature.State(userId: id))))
-            
-        case .profile(.delegate(.openQms)):
-            state.path.append(.qms(.qmsList(QMSListFeature.State())))
-            
-        case .profile(.delegate(.openSettings)):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
-            
+            state.path.append(.more(.reputation(ReputationFeature.State(userId: id))))
+                        
         case let .profile(.delegate(.openDevice(tag))):
             state.path.append(.devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: ""))))
         case let .profile(.delegate(.openTopic(id))):
@@ -356,7 +361,7 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: name, goTo: goTo))))
             
         case let .reputation(.delegate(.openProfile(id))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
         case let .reputation(.delegate(.openTopic(topicId: topicId, name: name, goTo: goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: topicId, topicName: name, goTo: goTo))))
@@ -401,7 +406,7 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
             
         case let .search(.delegate(.userProfileTapped(userId))):
-            state.path.append(.profile(.profile(ProfileFeature.State(userId: userId))))
+            state.path.append(.more(.profile(ProfileFeature.State(userId: userId))))
             
         case let .searchResult(.delegate(.openTopic(id, goTo))):
             state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: goTo))))
@@ -436,11 +441,8 @@ public struct StackTab: Reducer, Sendable {
     private func handleAuthNavigation(action: AuthFeature.Action, state: inout State) -> Effect<Action> {
         // Also make necessary changes to delegate actions in AppFeature
         switch action {
-        case .delegate(.loginSuccess(_, _)):
+        case .delegate(.loginSuccess(_)):
             fatalError("Auth navigation must be handled in ProfileFlow enum reducer")
-            
-        case .delegate(.showSettings):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
             
         default:
             break
@@ -504,7 +506,7 @@ public struct StackTab: Reducer, Sendable {
                 state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id))))
                 
             case let .user(id: id):
-                state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+                state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
                 
             case let .qms(id: id):
                 state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
@@ -542,7 +544,13 @@ public struct StackTab: Reducer, Sendable {
                 analytics.capture(error)
             }
             
-            return .run { [url] _ in await open(url: url) }
+            if let encodedUrl = url.absoluteString.removingPercentEncoding,
+               let url = URL(string: encodedUrl) {
+                return .run { _ in await open(url: url) }
+            } else {
+                analytics.capture(error)
+                return .none
+            }
         }
     }
 }

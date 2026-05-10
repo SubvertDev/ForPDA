@@ -24,6 +24,10 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
 
 	/// To specify an absolute display size.
 	public var displaySize: CGSize?
+
+    /// Optional Dynamic Type text style used to scale `displaySize`.
+    /// When set, `displaySize` is treated as the base size for `.large` content size.
+    public var displaySizeTextStyle: UIFont.TextStyle?
 	
 	/// if determining the display size automatically this can be used to specify a maximum width. If it is not set then the text container's width will be used
 	public var maximumDisplayWidth: CGFloat?
@@ -196,6 +200,15 @@ public class AsyncTextAttachment: NSTextAttachment, @unchecked Sendable {
         characterIndex charIndex: Int
     ) -> CGRect {
 		if let displaySize {
+            if let displaySizeTextStyle {
+                let metrics = UIFontMetrics(forTextStyle: displaySizeTextStyle)
+                let size = CGSize(
+                    width: metrics.scaledValue(for: displaySize.width),
+                    height: metrics.scaledValue(for: displaySize.height)
+                )
+                return CGRect(origin: .zero, size: size)
+            }
+
 			return CGRect(origin: .zero, size: displaySize)
 		}
         

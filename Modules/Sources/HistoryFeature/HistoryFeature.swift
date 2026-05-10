@@ -144,6 +144,8 @@ public struct HistoryFeature: Reducer, Sendable {
                 return .none
             }
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic

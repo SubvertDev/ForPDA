@@ -48,7 +48,7 @@ public struct Field<T: Hashable, BBPanel: View>: View {
     // MARK: - Body
     
     public var body: some View {
-        VStack {
+        FieldContainer(focus: $focus, focusEqual: focusEqual) {
             SelectableTextView(
                 content: content,
                 selection: selection,
@@ -62,11 +62,92 @@ public struct Field<T: Hashable, BBPanel: View>: View {
             
             bbPanel()
         }
+        .frame(minHeight: minHeight, alignment: .top)
+    }
+}
+
+// MARK: - Single Line Field
+
+public struct SingleLineField<F: Hashable>: View {
+    
+    // MARK: - Properties
+    
+    @FocusState.Binding var focus: F?
+    
+    var content: Binding<String>
+    let placeholder: LocalizedStringResource
+    let focusEqual: F
+    let keyboardType: UIKeyboardType
+    let characterLimit: Int?
+    
+    // MARK: - Init
+    
+    public init(
+        content: Binding<String>,
+        placeholder: LocalizedStringResource,
+        focusEqual: F,
+        focus: FocusState<F?>.Binding,
+        keyboardType: UIKeyboardType,
+        characterLimit: Int?
+    ) {
+        self.content = content
+        self.placeholder = placeholder
+        self.focusEqual = focusEqual
+        self.keyboardType = keyboardType
+        self.characterLimit = characterLimit
+        
+        self._focus = focus
+    }
+    
+    // MARK: - Body
+    
+    public var body: some View {
+        FieldContainer(focus: $focus, focusEqual: focusEqual) {
+            TextField(text: content, axis: .horizontal) {
+                Text(placeholder)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.quaternary))
+            }
+            .onChange(of: content.wrappedValue) { newValue in
+                if let limit = characterLimit, newValue.count > limit {
+                    content.wrappedValue = String(newValue.prefix(limit))
+                }
+            }
+            .keyboardType(keyboardType)
+            .frame(minHeight: nil, alignment: .top)
+        }
+    }
+}
+
+// MARK: - Field Container
+
+public struct FieldContainer<F: Hashable, Content: View>: View {
+    
+    @Environment(\.tintColor) private var tintColor
+    @FocusState.Binding public var focus: F?
+    
+    let focusEqual: F
+    let content: () -> Content
+    
+    public init(
+        focus: FocusState<F?>.Binding,
+        focusEqual: F,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.focusEqual = focusEqual
+        self.content = content
+        
+        self._focus = focus
+    }
+    
+    public var body: some View {
+        VStack {
+            content()
+        }
         .padding(.vertical, 15)
         .padding(.horizontal, 12)
         .focused($focus, equals: focusEqual)
         .foregroundStyle(Color(.Labels.primary))
-        .frame(minHeight: minHeight, alignment: .top)
         .background {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                 .fill(Color(.Background.teritary))
@@ -75,6 +156,7 @@ public struct Field<T: Hashable, BBPanel: View>: View {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                 .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 1)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onTapGesture {
             focus = focusEqual
         }
