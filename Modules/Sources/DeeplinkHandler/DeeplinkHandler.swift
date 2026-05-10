@@ -91,10 +91,14 @@ public struct DeeplinkHandler {
             
         case "topic":
             guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
-            if let offset = components.queryItems?.first?.value.flatMap({Int($0)}) {
-                @Shared(.appSettings) var appSettings: AppSettings
-                let page = getPage(forOffset: offset, userPerPage: appSettings.topicPerPage)
-                return .topic(id: id, goTo: .page(page))
+            if let offset = components.queryItems?.first(where: { $0.name == "st" })?.value.flatMap(Int.init) {
+                if let entry = components.queryItems?.first(where: { $0.name == "entry" })?.value.flatMap(Int.init) {
+                    return .topic(id: id, goTo: .post(id: entry))
+                } else {
+                    @Shared(.appSettings) var appSettings: AppSettings
+                    let page = getPage(forOffset: offset, userPerPage: appSettings.topicPerPage)
+                    return .topic(id: id, goTo: .page(page))
+                }
             } else {
                 return .topic(id: id, goTo: .first)
             }
