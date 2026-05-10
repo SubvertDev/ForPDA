@@ -35,6 +35,7 @@ import SearchResultFeature
 import DeviceSpecificationsFeature
 import DeviceTypeFeature
 import TicketsListFeature
+import TicketFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -302,6 +303,12 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleTicketsPathNavigation(action: Path.Tickets.Action, state: inout State) -> Effect<Action> {
         switch action {
+        case let .ticketsList(.delegate(.openTicket(id))):
+            state.path.append(.tickets(.ticket(TicketFeature.State(id: id))))
+            
+        case let .ticketsList(.delegate(.openUser(id))):
+            state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
+            
         default:
             break
         }
