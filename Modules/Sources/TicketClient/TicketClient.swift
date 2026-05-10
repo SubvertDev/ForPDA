@@ -37,7 +37,7 @@ extension TicketClient: DependencyKey {
             getTicketsList: { data in
                 let response = try await api.send(TicketCommand.list(
                     forId: data.forId,
-                    sortType: data.sort.rawValue,
+                    sortType: data.transferSort,
                     offset: data.offset,
                     limit: data.amount
                 ))
