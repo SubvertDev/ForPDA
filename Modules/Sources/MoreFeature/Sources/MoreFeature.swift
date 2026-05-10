@@ -109,19 +109,12 @@ public struct MoreFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                guard let userId = state.userSession?.userId else {
+                guard state.userSession?.userId != nil else {
                     reportFullyDisplayed(&state)
                     return .none
                 }
                 return .merge(
                     getUser(&state),
-//                    .run { send in
-//                        for try await user in try await apiClient.getUser(userId: userId, policy: .cacheAndLoad) {
-//                            await send(.internal(.userResponse(.success(user))))
-//                        }
-//                    } catch: { error, send in
-//                        await send(.internal(.userResponse(.failure(error))))
-//                    },
                     
                     .run { send in
                         let unread = try await apiClient.getUnread(type: .all)
