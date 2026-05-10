@@ -59,6 +59,7 @@ public struct TicketsListFeature: Reducer, Sendable {
         var tickets: IdentifiedArrayOf<TicketsList.TicketSimplified> = []
         
         var isLoading = false
+        var isRefreshing = false
         
         public init(
             type: TicketsListType
@@ -189,10 +190,13 @@ public struct TicketsListFeature: Reducer, Sendable {
                 return .none
                 
             case .internal(.refresh):
+                state.isRefreshing = true
                 return .send(.internal(.loadTickets(offset: state.pageNavigation.offset)))
                 
             case let .internal(.loadTickets(offset)):
-                state.isLoading = true
+                if !state.isRefreshing {
+                    state.isLoading = true
+                }
                 let forId = switch state.type {
                 case .list: 0
                 case .topic(let id): id
@@ -218,11 +222,13 @@ public struct TicketsListFeature: Reducer, Sendable {
                 state.tickets = .init(uniqueElements: response.tickets)
                 state.pageNavigation.count = response.availableCount
                 state.isLoading = false
+                state.isRefreshing = false
                 return .none
                 
             case let .internal(.ticketsResponse(.failure(error))):
                 print(error)
                 state.isLoading = false
+                state.isRefreshing = false
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
