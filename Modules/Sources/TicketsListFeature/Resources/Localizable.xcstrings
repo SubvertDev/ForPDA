@@ -11,16 +11,6 @@
         }
       }
     },
-    "Comment" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Комментировать"
-          }
-        }
-      }
-    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {

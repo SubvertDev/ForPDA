@@ -176,12 +176,13 @@ public struct TicketsListFeature: Reducer, Sendable {
                     } catch: { error, send in
                         await send(.internal(.changeTicketStatusResponse(.failure(error))))
                     }
-                case .sendComment:
-                    break
+                    
                 case .statusHistory:
                     state.destination = .statusHistory(TicketStatusHistoryFeature.State(ticketId: ticketId))
+                    
                 case .openAuthor(let authorId):
                     return .send(.delegate(.openUser(authorId)))
+                    
                 case .copyLink:
                     pasteboardClient.copy("https://4pda.to/forum/index.php?act=ticket&s=thread&t_id=\(ticketId)")
                     return .run { _ in

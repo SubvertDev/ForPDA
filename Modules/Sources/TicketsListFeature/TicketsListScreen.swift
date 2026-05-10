@@ -146,10 +146,6 @@ public struct TicketsListScreen: View {
                 ContextButton(text: LocalizedStringResource("Status History", bundle: .module), symbol: .clockArrowCirclepath) {
                     send(.contextTicketMenu(.statusHistory, id))
                 }
-                
-                ContextButton(text: LocalizedStringResource("Comment", bundle: .module), symbol: .bubbleLeft) {
-                    send(.contextTicketMenu(.sendComment, id))
-                }
             }
             
             Section {
