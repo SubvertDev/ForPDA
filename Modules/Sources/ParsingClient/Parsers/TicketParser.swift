@@ -168,7 +168,7 @@ public struct TicketParser {
                   let handlerName = array[safe: 2] as? String else {
                 throw ParsingError.failedToCastFields
             }
-            return .failure(.handlerChanged(id: handlerId, name: handlerName))
+            return .failure(.handlerChanged(id: handlerId, name: handlerName.convertCodes()))
             
         default:
             return .failure(.other)
