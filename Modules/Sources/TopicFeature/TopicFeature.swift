@@ -197,6 +197,7 @@ public struct TopicFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.logger) var logger
+    @Dependency(\.analyticsClient) private var analytics
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.continuousClock) private var clock
     @Dependency(\.cacheClient) private var cacheClient
@@ -226,11 +227,11 @@ public struct TopicFeature: Reducer, Sendable {
                 state.postId = nil
                 state.posts.removeAll()
                 return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
-                        if isLastPage {
-                            await cacheClient.deleteTopicIdOfUnreadItem(topicId)
-                        }
-                        Task.cancel(id: CancelID.loading)
-                        await send(.internal(.loadTopic(newOffset)))
+                    if isLastPage {
+                        await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                    }
+                    Task.cancel(id: CancelID.loading)
+                    await send(.internal(.loadTopic(newOffset)))
                 }
                 
             case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):

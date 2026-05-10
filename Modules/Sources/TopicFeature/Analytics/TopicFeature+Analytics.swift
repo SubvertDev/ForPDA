@@ -34,11 +34,21 @@ extension TopicFeature {
                         .internal(.voteInPoll),
                         .internal(.load),
                         .internal(.refresh),
-                        .pageNavigation,
                         .destination,
                         .delegate,
                         .binding:
                     break
+                    
+                case .pageNavigation(.offsetChanged(to: _)):
+                    analytics.addBreadcrumb(
+                        category: "TopicPageNavigation",
+                        message: nil,
+                        data: [
+                            "id": state.topicId,
+                            "page": state.pageNavigation.page
+                        ],
+                        type: "ui"
+                    )
                     
                 case .view(.onRefresh):
                     analytics.log(TopicEvent.onRefresh)
@@ -112,6 +122,9 @@ extension TopicFeature {
                     break
                     
                 case .internal(.setFavoriteResponse):
+                    break
+                    
+                case .pageNavigation:
                     break
                 }
                 

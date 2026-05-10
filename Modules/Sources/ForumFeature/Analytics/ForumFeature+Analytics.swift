@@ -19,7 +19,21 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .destination, .pageNavigation:
+                case .destination:
+                    break
+                    
+                case .pageNavigation(.offsetChanged(to: _)):
+                    analytics.addBreadcrumb(
+                        category: "ForumPageNavigation",
+                        message: nil,
+                        data: [
+                            "id": state.forumId,
+                            "page": state.pageNavigation.page
+                        ],
+                        type: "ui"
+                    )
+                    
+                case .pageNavigation:
                     break
                     
                 case .view(.onFirstAppear), .view(.onNextAppear), .view(.searchButtonTapped):

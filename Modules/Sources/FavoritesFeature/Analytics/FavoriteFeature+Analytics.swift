@@ -25,6 +25,16 @@ extension FavoritesFeature {
                         .delegate:
                     break
                     
+                case .pageNavigation(.offsetChanged(to: _)):
+                    analytics.addBreadcrumb(
+                        category: "FavoritesPageNavigation",
+                        message: nil,
+                        data: [
+                            "page": state.pageNavigation.page
+                        ],
+                        type: "ui"
+                    )
+                    
                 case .view(.onRefresh):
                     analytics.log(FavoritesEvent.onRefresh)
                     
