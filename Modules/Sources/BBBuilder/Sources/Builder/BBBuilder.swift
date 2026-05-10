@@ -497,8 +497,12 @@ public struct BBBuilder {
             
         case .smile(let smile):
             let smile = BBSmile.list.first(where: { $0.resourceName == smile.string })!
-            let image = UIImage(assetName: "Smiles/" + smile.resourceName)!.scaled(to: CGFloat(smile.width))
-            let attachment = NSTextAttachment(image: image)
+            let image = UIImage(assetName: "Smiles/" + smile.resourceName)!
+            let attachment = AsyncTextAttachment(
+                image: image,
+                displaySize: CGSize(width: CGFloat(smile.width), height: CGFloat(smile.height))
+            )
+            attachment.displaySizeTextStyle = .callout
             let textWithSmile = NSMutableAttributedString(attachment: attachment)
             if isFirst {
                 return .text(textWithSmile)
