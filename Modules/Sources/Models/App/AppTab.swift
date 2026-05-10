@@ -12,7 +12,7 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
     case articles = 0
     case favorites
     case forum
-    case profile
+    case more
     
     public var iconSymbol: SFSymbol {
         switch self {
@@ -22,8 +22,8 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
             return .starBubble
         case .forum:
             return .bubbleLeftAndBubbleRight
-        case .profile:
-            return .personCropCircle
+        case .more:
+            return .squareGrid2x2Fill
         }
     }
     
@@ -35,8 +35,8 @@ public enum AppTab: Int, CaseIterable, Sendable, Codable {
             return LocalizedStringResource("Favorites", bundle: .module)
         case .forum:
             return LocalizedStringResource("Forum", bundle: .module)
-        case .profile:
-            return LocalizedStringResource("Profile", bundle: .module)
+        case .more:
+            return LocalizedStringResource("More", bundle: .module)
         }
     }
 }

@@ -76,11 +76,6 @@ public struct AppView: View {
             .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
                 LogStoreScreen(store: store)
             }
-            .fullScreenCover(item: $store.scope(state: \.$auth, action: \.auth)) { store in
-                NavigationStack {
-                    AuthScreen(store: store)
-                }
-            }
             .alert($store.scope(state: \.$alert, action: \.alert))
             // Tint and environment should be after sheets/covers
             .tint(store.appSettings.appTintColor.asColor)
@@ -145,11 +140,11 @@ struct LiquidTabView: View {
                 }
                 
                 Tab(
-                    AppTab.profile.title,
-                    systemSymbol: AppTab.profile.iconSymbol,
-                    value: .profile
+                    AppTab.more.title,
+                    systemSymbol: AppTab.more.iconSymbol,
+                    value: .more
                 ) {
-                    ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
+                    StackTabView(store: store.scope(state: \.moreTab, action: \.moreTab))
                 }
                 .badge(store.profileBadges)
             }
@@ -196,8 +191,8 @@ struct OldTabView: View {
                 StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
                     .tag(AppTab.forum)
                 
-                ProfileTab(store: store.scope(state: \.profileFlow, action: \.profileFlow))
-                    .tag(AppTab.profile)
+                StackTabView(store: store.scope(state: \.moreTab, action: \.moreTab))
+                    .tag(AppTab.more)
             }
             
             Group {
@@ -392,11 +387,8 @@ extension LiquidTabView {
             return getPage(for: store.scope(state: \.favoritesTab, action: \.favoritesTab))
         case .forum:
             return getPage(for: store.scope(state: \.forumTab, action: \.forumTab))
-        case .profile:
-            switch store.scope(state: \.profileFlow, action: \.profileFlow).case {
-            case let .loggedIn(store), let .loggedOut(store):
-                return getPage(for: store)
-            }
+        case .more:
+            return getPage(for: store.scope(state: \.moreTab, action: \.moreTab))
         }
     }
     
@@ -429,7 +421,7 @@ extension LiquidTabView {
                 return nil
             }
             
-        case let .profile(path):
+        case let .more(path):
             switch path.case {
             case let .history(store):
                 return store.scope(state: \.pageNavigation, action: \.pageNavigation)

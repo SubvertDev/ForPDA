@@ -36,7 +36,6 @@ public struct AuthFeature: Reducer, Sendable {
         public enum Field { case login, password, captcha }
         
         @Presents public var alert: AlertState<Action.Alert>?
-        public var openReason: AuthOpenReason
         public var isLoading: Bool
         public var login: String
         public var password: String
@@ -53,7 +52,6 @@ public struct AuthFeature: Reducer, Sendable {
         var didLoadOnce = false
         
         public init(
-            openReason: AuthOpenReason,
             isLoading: Bool = true,
             login: String = "",
             password: String = "",
@@ -63,7 +61,6 @@ public struct AuthFeature: Reducer, Sendable {
             focus: Field? = nil,
             loginErrorReason: LoginErrorReason? = nil
         ) {
-            self.openReason = openReason
             self.isLoading = isLoading
             self.login = login
             self.password = password
@@ -85,7 +82,6 @@ public struct AuthFeature: Reducer, Sendable {
             case onAppear
             case onSubmit(State.Field)
             case closeButtonTapped
-            case settingsButtonTapped
             case loginButtonTapped
         }
         
@@ -105,8 +101,7 @@ public struct AuthFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
-            case loginSuccess(reason: AuthOpenReason, userId: Int)
-            case showSettings
+            case loginSuccess(userId: Int)
         }
     }
     
@@ -147,9 +142,6 @@ public struct AuthFeature: Reducer, Sendable {
                 
             case .view(.closeButtonTapped):
                 return .run { _ in await dismiss() }
-                
-            case .view(.settingsButtonTapped):
-                return .send(.delegate(.showSettings))
                 
             case .view(.loginButtonTapped):
                 state.isLoading = true
@@ -196,16 +188,14 @@ public struct AuthFeature: Reducer, Sendable {
                     state.isLoading = false
                 }
                 
-                return .run { [isHidden = state.isHiddenEntry, reason = state.openReason] send in
+                return .run { [isHidden = state.isHiddenEntry] send in
                     switch loginState {
                     case .success(userId: let userId, token: let token):
                         @Shared(.userSession) var userSession
                         $userSession.withLock { $0 = UserSession(userId: userId, token: token, isHidden: isHidden) }
                         // Action should not be called if we've opened this screen as root
                         // since it will be sent after this feature is already nil-ed out
-                        if reason != .profile {
-                            await send(.delegate(.loginSuccess(reason: reason, userId: userId)))
-                        }
+                        await send(.delegate(.loginSuccess(userId: userId)))
                         
                     case .wrongPassword:
                         await send(.internal(.wrongPassword))

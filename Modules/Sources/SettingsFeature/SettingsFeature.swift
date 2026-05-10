@@ -96,13 +96,6 @@ public struct SettingsFeature: Reducer, Sendable {
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
         case clearCacheButtonTapped
-        case supportOnBoostyButtonTapped
-        case appDiscussionButtonTapped
-        case telegramChangelogButtonTapped
-        case telegramChatButtonTapped
-        case githubButtonTapped
-        case checkVersionsButtonTapped
-        case notImplementedFeatureTapped
         
         case _somethingWentWrong(any Error)
         
@@ -169,39 +162,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 
             case .clearCacheButtonTapped:
                 state.destination = .alert(.clearCache)
-                return .none
-                
-            case .supportOnBoostyButtonTapped:
-                return .run { _ in
-                    await open(url: Links.boosty)
-                }
-                
-            case .appDiscussionButtonTapped:
-                return .send(.delegate(.openDeeplink(Links.appDiscussion)))
-                
-            case .telegramChangelogButtonTapped:
-                return .run { _ in
-                    await open(url: Links.telegramChangelog)
-                }
-                
-            case .telegramChatButtonTapped:
-                return .run { _ in
-                    await open(url: Links.telegramChat)
-                }
-                
-            case .githubButtonTapped:
-                return .run { _ in
-                    await open(url: Links.github)
-                }
-                
-            case .checkVersionsButtonTapped:
-                return .run { _ in
-                    // TODO: Move URL to models
-                    await open(url: Links.githubReleases)
-                }
-                
-            case .notImplementedFeatureTapped:
-                state.destination = .alert(.notImplemented)
                 return .none
                 
             case .destination(.presented(.alert(.openSettings))):

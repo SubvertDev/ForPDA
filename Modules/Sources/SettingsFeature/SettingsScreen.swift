@@ -30,7 +30,6 @@ public struct SettingsScreen: View {
                 List {
                     ThemeSection()
                     BasicSection()
-                    LinksSection()
                     AdvancedSection()
                     AboutAppSection()
                 }
@@ -301,46 +300,12 @@ public struct SettingsScreen: View {
         .listRowBackground(Color(.Background.teritary))
     }
     
-    // MARK: - Advanced Section
-    
-    @ViewBuilder
-    private func LinksSection() -> some View {
-        Section {
-            Row(symbol: .boltHeart, title: "Support on Boosty", type: .navigation, isBold: true) {
-                store.send(.supportOnBoostyButtonTapped)
-            }
-            
-            Row(symbol: .paperplane, title: "App discussion in Telegram", type: .navigation) {
-                store.send(.telegramChatButtonTapped)
-            }
-            
-            Row(symbol: .paperplane, title: "List of changes in Telegram", type: .navigation) {
-                store.send(.telegramChangelogButtonTapped)
-            }
-            
-            Row(symbol: .infoBubble, title: "App discussion on the forum", type: .navigation) {
-                store.send(.appDiscussionButtonTapped)
-            }
-            
-            Row(symbol: .folderBadgeGearshape, title: "GitHub repository", type: .navigation) {
-                store.send(.githubButtonTapped)
-            }
-        } header: {
-            Header(title: "Links")
-        }
-        .listRowBackground(Color(.Background.teritary))
-    }
-    
     // MARK: - About App Section
     
     @ViewBuilder
     private func AboutAppSection() -> some View {
         Section {
             Row(symbol: .infoBubble, title: "Version \(store.appVersionAndBuild) [\(store.releaseChannel)]", type: .basic) {}
-            
-            Row(symbol: .folderBadgeGearshape, title: "Check new versions on GitHub", type: .navigation) {
-                store.send(.checkVersionsButtonTapped)
-            }
         } header: {
             Header(title: "About app")
         }

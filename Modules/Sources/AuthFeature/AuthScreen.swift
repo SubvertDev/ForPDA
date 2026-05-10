@@ -159,31 +159,17 @@ public struct AuthScreen: View {
             }
             ._toolbarTitleDisplayMode(.inline)
             .toolbar {
-                // Profile is used as root in this case so we don't need close button
-                if store.openReason != .profile {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        if #available(iOS 26, *) {
-                            Button(role: .close) {
-                                send(.closeButtonTapped)
-                            }
-                        } else {
-                            Button {
-                                send(.closeButtonTapped)
-                            } label: {
-                                Text("Close", bundle: .module)
-                                    .foregroundStyle(tintColor)
-                            }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if #available(iOS 26, *) {
+                        Button(role: .close) {
+                            send(.closeButtonTapped)
                         }
-                    }
-                }
-                
-                // We're showing app settings only if it's opened from profile tab
-                if store.openReason == .profile {
-                    ToolbarItem(placement: .topBarTrailing) {
+                    } else {
                         Button {
-                            send(.settingsButtonTapped)
+                            send(.closeButtonTapped)
                         } label: {
-                            Image(systemSymbol: .gearshape)
+                            Text("Close", bundle: .module)
+                                .foregroundStyle(tintColor)
                         }
                     }
                 }
@@ -279,7 +265,7 @@ public struct AuthScreen: View {
     ScreenWrapper {
         AuthScreen(
             store: Store(
-                initialState: AuthFeature.State(openReason: .profile)
+                initialState: AuthFeature.State()
             ) {
                 AuthFeature()
             } withDependencies: {
@@ -296,7 +282,6 @@ public struct AuthScreen: View {
         AuthScreen(
             store: Store(
                 initialState: AuthFeature.State.init(
-                    openReason: .profile,
                     login: "TestLogin",
                     password: "TestPassword",
                     captcha: "1234"
@@ -320,7 +305,6 @@ public struct AuthScreen: View {
         AuthScreen(
             store: Store(
                 initialState: AuthFeature.State.init(
-                    openReason: .profile,
                     login: "TestLogin",
                     password: "TestPassword",
                     captcha: "1234"

@@ -47,7 +47,6 @@ public struct ProfileScreen: View {
                 if let user = store.user {
                     List {
                         Header(user: user)
-                        NavigationSection()
                         SegmentPicker()
                         
                         switch pickerSelection {
@@ -74,9 +73,8 @@ public struct ProfileScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
             .navigationTitle(Text("Profile", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.inline)
             .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).editProfile) { store in
                 NavigationStack {
                     EditScreen(store: store)
@@ -88,7 +86,11 @@ public struct ProfileScreen: View {
                 }
             }
             .toolbar {
-                ToolbarButtons()
+                if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
+                    ToolbarItem {
+                        OptionsMenu()
+                    }
+                }
             }
             .onAppear {
                 send(.onAppear)
@@ -96,40 +98,7 @@ public struct ProfileScreen: View {
         }
     }
     
-    // MARK: - Toolbar Items
-    
-    @ToolbarContentBuilder
-    private func ToolbarButtons() -> some ToolbarContent {
-        if store.shouldShowToolbarButtons {
-            ToolbarItem {
-                Button {
-                    send(.logoutButtonTapped)
-                } label: {
-                    Image(systemSymbol: .rectanglePortraitAndArrowForward)
-                }
-            }
-            
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed)
-            }
-        }
-        
-        if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
-            ToolbarItem {
-                OptionsMenu()
-            }
-        }
-        
-        if store.shouldShowToolbarButtons {
-            ToolbarItem {
-                Button {
-                    send(.settingsButtonTapped)
-                } label: {
-                    Image(systemSymbol: .gearshape)
-                }
-            }
-        }
-    }
+    // MARK: - Toolbar Options Menu
     
     @ViewBuilder
     private func OptionsMenu() -> some View {
@@ -140,7 +109,7 @@ public struct ProfileScreen: View {
             if store.shouldShowToolbarButtons || canEditProfile {
                 ContextButton(
                     text: LocalizedStringResource("Edit profile", bundle: .module),
-                    symbol: .pencil
+                    symbol: .squareAndPencil
                 ) {
                     send(.contextMenu(.edit))
                 }
@@ -212,29 +181,6 @@ public struct ProfileScreen: View {
         .frame(maxWidth: .infinity)
         .listRowBackground(Color.clear)
         .listRowSeparator(.hidden)
-    }
-    
-    // MARK: - Navigation Section
-    
-    @ViewBuilder
-    private func NavigationSection() -> some View {
-        if store.shouldShowToolbarButtons {
-            Section {
-                Row(symbol: .person2, title: "QMS", type: .navigation(.badge(store.qmsBadgeCount))) {
-                    send(.qmsButtonTapped)
-                }
-                
-                Row(symbol: .at, title: "Mentions", type: .navigation(.badge(store.mentionsBadgeCount))) {
-                    send(.mentionsButtonTapped)
-                }
-                
-                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation(.badge(0))) {
-                    send(.historyButtonTapped)
-                }
-            }
-            .listRowBackground(Color(.Background.teritary))
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-        }
     }
     
     // MARK: - Segment Picker
