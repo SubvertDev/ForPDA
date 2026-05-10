@@ -44,6 +44,12 @@ public struct MoreScreen: View {
                 }
                 .scrollContentBackground(.hidden)
             }
+            .overlay {
+                if store.isLoading {
+                    PDALoader()
+                        .frame(width: 24, height: 24)
+                }
+            }
             .navigationBarHidden(true)
             .alert($store.scope(state: \.alert, action: \.alert))
             .disabled(store.isLoading)
@@ -231,7 +237,7 @@ public struct MoreScreen: View {
     private func LogoutSection() -> some View {
         Section {
             if store.isLoggedIn {
-                Row(symbol: .iphoneAndArrowForward, title: "Logout") {
+                Row(symbol: .iphoneAndArrowForward, title: "Logout", hideChevron: true) {
                     send(.logoutButtonTapped)
                 }
             }
@@ -247,6 +253,7 @@ public struct MoreScreen: View {
         title: LocalizedStringKey,
         isBold: Bool = false,
         badgeCount: Int = 0,
+        hideChevron: Bool = false,
         action: @escaping () -> Void = {}
     ) -> some View {
         HStack(spacing: 0) { // Hacky HStack to enable tap animations
@@ -271,7 +278,7 @@ public struct MoreScreen: View {
                         EmptyView()
                             .badge(badgeCount)
                             ._badgeProminence(.increased)
-                    } else {
+                    } else if !hideChevron {
                         Image(systemSymbol: .chevronRight)
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundStyle(Color(.Labels.quintuple))
@@ -299,6 +306,10 @@ public struct MoreScreen: View {
         )
     }
     .environment(\.tintColor, Color(.Theme.primary))
+    .onAppear {
+        @Shared(.userSession) var userSession: UserSession?
+        $userSession.withLock { $0 = nil }
+    }
 }
 
 @available(iOS 17, *)
@@ -313,11 +324,12 @@ public struct MoreScreen: View {
         }
     }
     
-    @Shared(.userSession) var userSession: UserSession?
-    $userSession.withLock { $0 = .mock }
-    
     return NavigationStack {
         MoreScreen(store: store)
     }
     .environment(\.tintColor, Color(.Theme.primary))
+    .onAppear {
+        @Shared(.userSession) var userSession: UserSession?
+        $userSession.withLock { $0 = .mock }
+    }
 }

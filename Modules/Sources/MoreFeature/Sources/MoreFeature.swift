@@ -172,15 +172,13 @@ public struct MoreFeature: Reducer, Sendable {
                 state.alert = .logoutWarning
                 return .none
                 
-            case .internal(.logoutResponse(.success)):
+            case let .internal(.logoutResponse(response)):
+                state.isLoading = false
                 state.$userSession.withLock { $0 = nil }
-                state.isLoading = false
-                return .none
-                
-            case let .internal(.logoutResponse(.failure(error))):
-                print(error)
-                state.isLoading = false
-                state.alert = .somethingWentWrong
+                analyticsClient.logout()
+                if case let .failure(error) = response {
+                    analyticsClient.capture(error)
+                }
                 return .none
                 
             case let .internal(.userResponse(.success(user))):

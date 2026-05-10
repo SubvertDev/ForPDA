@@ -109,7 +109,7 @@ public struct ProfileScreen: View {
             if store.shouldShowToolbarButtons || canEditProfile {
                 ContextButton(
                     text: LocalizedStringResource("Edit profile", bundle: .module),
-                    symbol: .pencil
+                    symbol: .squareAndPencil
                 ) {
                     send(.contextMenu(.edit))
                 }
