@@ -527,6 +527,7 @@ let project = Project(
             .feature(
                 name: "TicketsListFeature",
                 dependencies: [
+                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.PasteboardClient,
