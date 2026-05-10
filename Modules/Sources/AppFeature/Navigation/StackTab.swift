@@ -274,7 +274,7 @@ public struct StackTab: Reducer, Sendable {
             state.path.append(.profile(.profile(ProfileFeature.State(userId: id))))
             
         case let .topic(.delegate(.openTickets(id))):
-            state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .only(forId: id)))))
+            state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .topic(id)))))
             
         case let .topic(.delegate(.openSearch(on, navigation))):
             state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))

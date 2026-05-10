@@ -11,7 +11,7 @@ public struct TicketsList: Sendable, Equatable {
     
     public struct TicketSimplified: Sendable, Identifiable, Equatable {
         public let id: Int
-        public let info: TicketInfo
+        public var info: TicketInfo
         
         public init(id: Int, info: TicketInfo) {
             self.id = id

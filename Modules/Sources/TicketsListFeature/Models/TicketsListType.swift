@@ -7,5 +7,5 @@
 
 public enum TicketsListType: Sendable, Equatable {
     case list
-    case only(forId: Int)
+    case topic(Int)
 }

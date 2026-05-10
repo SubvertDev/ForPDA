@@ -9,17 +9,17 @@ import Foundation
 
 public struct TicketInfo: Sendable, Equatable {
     public let title: String
-    public let status: TicketStatus
+    public var status: TicketStatus
     public let subjectId: Int
     public let subjectElementId: Int
     public let subjectRootId: Int
     public let subjectRootName: String
     public let authorId: Int
     public let authorName: String
-    public let handlerId: Int
-    public let handlerName: String
+    public var handlerId: Int
+    public var handlerName: String
     public let createdAt: Date
-    public let processedAt: Date?
+    public var processedAt: Date?
     
     public init(
         title: String,

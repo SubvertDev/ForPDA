@@ -72,9 +72,14 @@ public struct TicketsListScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text("Tickets", bundle: .module))
+            .navigationTitle(Text(navigationTitleText(), bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
+            .toolbar {
+                ToolbarItem {
+                    OptionsMenu()
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
@@ -92,6 +97,85 @@ public struct TicketsListScreen: View {
                 send(.onFirstAppear)
             }
         }
+    }
+    
+    // MARK: - Options Menu
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            Section {
+                Toggle("Only My", isOn: Binding(store.$appSettings.tickets.isShowOnlyMine))
+                
+                if case .list = store.type {
+                    Toggle("Sort by Forums", isOn: Binding(store.$appSettings.tickets.isSortByForums))
+                }
+            } header: {
+                Text("Sort", bundle: .module)
+            }
+           
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                send(.contextMenu(.copyLink))
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
+        }
+    }
+    
+    // MARK: - Ticket Context Menu
+    
+    @ViewBuilder
+    private func TicketContextMenu(id: Int, _ ticket: TicketInfo) -> some View {
+        Menu {
+            Section {
+                Menu {
+                    Picker(String(), selection: Binding(
+                        get: { store.tickets[id].info.status },
+                        set: { newValue in
+                            send(.contextTicketMenu(.changeStatus(newValue), id))
+                        }
+                    )) {
+                        ForEach(TicketStatus.allCases) { status in
+                            Text(status.title, bundle: .module)
+                                .tag(status)
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text("Change Status", bundle: .module)
+                        Image(systemSymbol: .checklist)
+                    }
+                }
+                
+                ContextButton(text: LocalizedStringResource("Status History", bundle: .module), symbol: .clockArrowCirclepath) {
+                    send(.contextTicketMenu(.statusHistory, id))
+                }
+                
+                ContextButton(text: LocalizedStringResource("Comment", bundle: .module), symbol: .bubbleLeft) {
+                    send(.contextTicketMenu(.sendComment, id))
+                }
+            }
+            
+            Section {
+                ContextButton(text: LocalizedStringResource("Go to Author", bundle: .module), symbol: .personCropCircle) {
+                    send(.contextTicketMenu(.openAuthor(ticket.authorId), id))
+                }
+            }
+            
+            Section {
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                    send(.contextTicketMenu(.copyLink, id))
+                }
+            }
+        } label: {
+            Image(systemSymbol: .ellipsis)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.teritary))
+                .padding(.horizontal, 8) // Padding for tap area
+                .padding(.vertical, 16)
+        }
+        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
+        .frame(width: 8, height: 22)
     }
     
     // MARK: - Content Section
@@ -117,7 +201,12 @@ public struct TicketsListScreen: View {
                     
                     HStack {
                         HStack(spacing: 0) {
-                            Text(verbatim: "\(ticket.info.createdAt.formatted()) · ")
+                            let date = if ticket.info.status == .processed {
+                                ticket.info.processedAt ?? Date.unknown
+                            } else {
+                                ticket.info.createdAt
+                            }
+                            Text(verbatim: "\(date.formatted()) · ")
                             
                             HStack(spacing: 4) {
                                 Image(systemSymbol: .personCropCircle)
@@ -128,7 +217,7 @@ public struct TicketsListScreen: View {
                         
                         Spacer()
                         
-                        
+                        TicketContextMenu(id: ticket.id, ticket.info)
                     }
                     .font(.caption)
                     .foregroundStyle(Color(.Labels.quaternary))
@@ -197,6 +286,15 @@ public struct TicketsListScreen: View {
                 .padding(.horizontal, 55)
         }
     }
+    
+    // MARK: - Helpers
+    
+    private func navigationTitleText() -> LocalizedStringKey {
+        return switch store.type {
+        case .list:  "Tickets"
+        case .topic: "Topic Tickets"
+        }
+    }
 }
 
 // MARK: - Extensions
@@ -215,6 +313,17 @@ extension TicketStatus {
         case .notProcessed: Color(.Main.red)
         case .processing:   Color(.Main.yellow)
         case .processed:    Color(.Labels.teritary)
+        }
+    }
+    
+    var title: LocalizedStringKey {
+        switch self {
+        case .notProcessed:
+            return "Not processed"
+        case .processing:
+            return "Processing"
+        case .processed:
+            return "Processed"
         }
     }
 }
