@@ -135,17 +135,7 @@ public struct TicketsListScreen: View {
         Menu {
             Section {
                 Menu {
-                    Picker(String(), selection: Binding(
-                        get: { store.tickets[id].info.status },
-                        set: { newValue in
-                            send(.contextTicketMenu(.changeStatus(newValue), id))
-                        }
-                    )) {
-                        ForEach(TicketStatus.allCases) { status in
-                            Text(status.title, bundle: .module)
-                                .tag(status)
-                        }
-                    }
+                    TIcketStatusPicker(id: id)
                 } label: {
                     HStack {
                         Text("Change Status", bundle: .module)
@@ -191,7 +181,11 @@ public struct TicketsListScreen: View {
         Section {
             ForEach(store.tickets) { ticket in
                 VStack(alignment: .leading, spacing: 8) {
-                    TicketStatusBadge(info: ticket.info)
+                    Menu {
+                        TIcketStatusPicker(id: ticket.id)
+                    } label: {
+                        TicketStatusBadge(info: ticket.info)
+                    }
                     
                     Text(verbatim: ticket.info.title)
                         .font(.subheadline)
@@ -232,6 +226,8 @@ public struct TicketsListScreen: View {
         }
     }
     
+    // MARK: - Ticket Status Badge
+    
     @ViewBuilder
     private func TicketStatusBadge(info: TicketInfo) -> some View {
         let text: LocalizedStringKey = switch info.status {
@@ -258,6 +254,22 @@ public struct TicketsListScreen: View {
             info.status.maskColor
                 .clipShape(RoundedRectangle(cornerRadius: isLiquidGlass ? 10 : 6))
         )
+    }
+    
+    // MARK: - Ticket Status Picker
+    
+    private func TIcketStatusPicker(id: Int) -> some View {
+        Picker(String(), selection: Binding(
+            get: { store.tickets[id].info.status },
+            set: { newValue in
+                send(.contextTicketMenu(.changeStatus(newValue), id))
+            }
+        )) {
+            ForEach(TicketStatus.allCases) { status in
+                Text(status.title, bundle: .module)
+                    .tag(status)
+            }
+        }
     }
     
     // MARK: - Navigation
