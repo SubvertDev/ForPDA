@@ -684,13 +684,20 @@ extension APIClient: DependencyKey {
                 return URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!
             },
             authorize: { _, _, _, _ in
+                try await Task.sleep(for: .seconds(2))
                 return .success(userId: -1, token: "preview_token")
             },
             logout: {
                 try await Task.sleep(for: .seconds(1))
             },
             getUser: { _, _ in
-                AsyncThrowingStream { $0.yield(.mock) }
+                AsyncThrowingStream { cont in
+                    Task {
+                        try await Task.sleep(for: .seconds(2))
+                        cont.yield(.mock)
+                        cont.finish()
+                    }
+                }
             },
             editUserProfile: { _ in
                 return true

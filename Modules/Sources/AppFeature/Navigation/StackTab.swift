@@ -294,9 +294,6 @@ public struct StackTab: Reducer, Sendable {
     
     private func handleMorePathNavigation(action: Path.More.Action, state: inout State) -> Effect<Action> {
         switch action {
-        case .more(.delegate(.openAuth)):
-            state.path.append(.auth(AuthFeature.State(openReason: .profile)))
-            
         case let .more(.delegate(.openProfile(userId, user))):
             state.path.append(.more(.profile(ProfileFeature.State(userId: userId, user: user))))
             
@@ -420,11 +417,8 @@ public struct StackTab: Reducer, Sendable {
     private func handleAuthNavigation(action: AuthFeature.Action, state: inout State) -> Effect<Action> {
         // Also make necessary changes to delegate actions in AppFeature
         switch action {
-        case .delegate(.loginSuccess(_, _)):
+        case .delegate(.loginSuccess(_)):
             fatalError("Auth navigation must be handled in ProfileFlow enum reducer")
-            
-        case .delegate(.showSettings):
-            state.path.append(.settings(.settings(SettingsFeature.State())))
             
         default:
             break

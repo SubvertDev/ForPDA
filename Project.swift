@@ -370,6 +370,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.AuthFeature,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.SharedUI,

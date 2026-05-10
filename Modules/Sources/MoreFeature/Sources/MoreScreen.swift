@@ -5,6 +5,7 @@
 //  Created by Ilia Lubianoi on 02.05.2026.
 //
 
+import AuthFeature
 import ComposableArchitecture
 import Models
 import NukeUI
@@ -52,8 +53,14 @@ public struct MoreScreen: View {
             }
             .navigationBarHidden(true)
             .alert($store.scope(state: \.alert, action: \.alert))
+            .sheet(item: $store.scope(state: \.auth, action: \.auth)) { store in
+                NavigationStack {
+                    AuthScreen(store: store)
+                }
+            }
             .disabled(store.isLoading)
             .animation(.default, value: store.isLoggedIn)
+            .animation(.default, value: store.isLoadingUser)
             .onAppear {
                 send(.onAppear)
             }
@@ -81,11 +88,13 @@ public struct MoreScreen: View {
                 HStack(spacing: 0) {
                     ProfileAvatar()
                         .padding(.trailing, 12)
+                        .redacted(if: store.isLoadingUser)
 
                     VStack(alignment: .leading, spacing: 4) {
                         ProfileTitle()
                         ProfileDescription()
                     }
+                    .redacted(if: store.isLoadingUser)
                     
                     Spacer(minLength: 8)
                     

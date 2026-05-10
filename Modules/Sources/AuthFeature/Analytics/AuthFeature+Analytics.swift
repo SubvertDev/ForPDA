@@ -25,7 +25,6 @@ extension AuthFeature {
                         .view(.onAppear),
                         .view(.onSubmit),
                         .view(.closeButtonTapped),
-                        .view(.settingsButtonTapped),
                         .internal(.captchaResponse),
                         .internal(.loginResponse):
                     break
@@ -43,15 +42,12 @@ extension AuthFeature {
                     analyticsClient.log(AuthEvent.somethingWentWrong(id: id))
                     analyticsClient.capture(NSError(domain: "Auth unknown response", code: id))
                     
-                case let .delegate(.loginSuccess(reason, userId)):
-                    analyticsClient.log(AuthEvent.loginSuccess(reason: reason.rawValue, userId: userId))
+                case let .delegate(.loginSuccess(userId)):
+                    analyticsClient.log(AuthEvent.loginSuccess(userId: userId))
                     return .run { _ in
                         let properties = await AccessibilityAnalytics.current(for: .current).asDictionary()
                         analyticsClient.identify(id: String(userId), userProperties: properties)
                     }
-                    
-                case .delegate(.showSettings):
-                    break
                 }
                 return .none
             }

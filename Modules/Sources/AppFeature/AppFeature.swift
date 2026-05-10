@@ -207,10 +207,10 @@ public struct AppFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .articlesTab(.path(.element(id: _, action: .articles(.article(.comments(.element(id: _, action: .delegate(.unauthorizedAction)))))))):
-                state.auth = AuthFeature.State(openReason: .commentAction)
+                state.auth = AuthFeature.State()
                 
             case .articlesTab(.path(.element(id: _, action: .articles(.article(.delegate(.unauthorizedAction)))))):
-                state.auth = AuthFeature.State(openReason: .sendComment)
+                state.auth = AuthFeature.State()
                 
             default:
                 break
@@ -393,15 +393,16 @@ public struct AppFeature: Reducer, Sendable {
                     return handleOtherTabSelection(newTab: tab, &state)
                 }
                 
-            case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
+            case .auth(.presented(.delegate(.loginSuccess(_)))):
                 // Also make necessary changes to delegate actions in StackTab
-                switch reason {
-                case .commentAction, .sendComment:
-                    state.auth = nil
-                case .profile:
-                    let error = NSError(domain: "Profile login success is caught in AppFeature", code: 0)
-                    analyticsClient.capture(error)
-                }
+                state.auth = nil
+//                switch reason {
+//                case .commentAction, .sendComment:
+//                    state.auth = nil
+//                case .profile:
+//                    let error = NSError(domain: "Profile login success is caught in AppFeature", code: 0)
+//                    analyticsClient.capture(error)
+//                }
                 return .run { _ in
                     notificationCenter.post(name: .favoritesUpdated, object: nil)
                 }

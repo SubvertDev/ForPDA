@@ -7,6 +7,7 @@
 
 import AnalyticsClient
 import APIClient
+import AuthFeature
 import ComposableArchitecture
 import Foundation
 import Models
@@ -23,6 +24,7 @@ public struct MoreFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Presents var alert: AlertState<Action.Alert>?
+        @Presents var auth: AuthFeature.State?
         @Shared(.userSession) var userSession: UserSession?
         
         var user: User?
@@ -31,6 +33,7 @@ public struct MoreFeature: Reducer, Sendable {
         var mentionsBadgeCount = 0
         
         var isLoading = false
+        var isLoadingUser = false
         var didLoadOnce = false
         
         var isLoggedIn: Bool {
@@ -78,9 +81,9 @@ public struct MoreFeature: Reducer, Sendable {
             case confirmLogout
         }
         case alert(PresentationAction<Alert>)
+        case auth(PresentationAction<AuthFeature.Action>)
         
         public enum Delegate {
-            case openAuth
             case openProfile(Int, User)
 //            case openArticles
 //            case openFavorites
@@ -111,13 +114,14 @@ public struct MoreFeature: Reducer, Sendable {
                     return .none
                 }
                 return .merge(
-                    .run { send in
-                        for try await user in try await apiClient.getUser(userId: userId, policy: .cacheAndLoad) {
-                            await send(.internal(.userResponse(.success(user))))
-                        }
-                    } catch: { error, send in
-                        await send(.internal(.userResponse(.failure(error))))
-                    },
+                    getUser(&state),
+//                    .run { send in
+//                        for try await user in try await apiClient.getUser(userId: userId, policy: .cacheAndLoad) {
+//                            await send(.internal(.userResponse(.success(user))))
+//                        }
+//                    } catch: { error, send in
+//                        await send(.internal(.userResponse(.failure(error))))
+//                    },
                     
                     .run { send in
                         let unread = try await apiClient.getUnread(type: .all)
@@ -135,7 +139,8 @@ public struct MoreFeature: Reducer, Sendable {
                 if state.isLoggedIn {
                     return .send(.delegate(.openProfile(state.userSession!.userId, state.user!)))
                 } else {
-                    return .send(.delegate(.openAuth))
+                    state.auth = AuthFeature.State()
+                    return .none
                 }
                 
             case .view(.qmsButtonTapped):
@@ -182,12 +187,14 @@ public struct MoreFeature: Reducer, Sendable {
                 return .none
                 
             case let .internal(.userResponse(.success(user))):
+                state.isLoadingUser = false
                 state.user = user
                 reportFullyDisplayed(&state)
                 return .none
                 
             case let .internal(.userResponse(.failure(error))):
                 print(error)
+                state.isLoadingUser = false
                 reportFullyDisplayed(&state)
                 return .none
                 
@@ -205,11 +212,18 @@ public struct MoreFeature: Reducer, Sendable {
                     await send(.internal(.logoutResponse(.failure(error))))
                 }
                 
-            case .alert, .delegate:
+            case .auth(.presented(.delegate(.loginSuccess(userId: _)))):
+                state.auth = nil
+                return getUser(&state)
+                
+            case .alert, .auth, .delegate:
                 return .none
             }
         }
-        .ifLet(\.alert, action: \.alert)
+        .ifLet(\.$alert, action: \.alert)
+        .ifLet(\.$auth, action: \.auth) {
+            AuthFeature()
+        }
     }
     
     // MARK: - Shared Logic
@@ -218,6 +232,19 @@ public struct MoreFeature: Reducer, Sendable {
         guard !state.didLoadOnce else { return }
         analyticsClient.reportFullyDisplayed()
         state.didLoadOnce = true
+    }
+    
+    private func getUser(_ state: inout State) -> Effect<Action> {
+        if state.user == nil {
+            state.isLoadingUser = true
+        }
+        return .run { [userId = state.userSession!.userId] send in
+            for try await user in try await apiClient.getUser(userId: userId, policy: .cacheAndLoad) {
+                await send(.internal(.userResponse(.success(user))))
+            }
+        } catch: { error, send in
+            await send(.internal(.userResponse(.failure(error))))
+        }
     }
 }
 
