@@ -534,7 +534,19 @@ let project = Project(
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TicketClient,
+                    .Internal.TicketStatusHistoryFeature,
                     .Internal.ToastClient,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+
+            .feature(
+                name: "TicketStatusHistoryFeature",
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.TicketClient,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -1133,6 +1145,7 @@ extension TargetDependency.Internal {
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
     static let TicketFeature =          TargetDependency.target(name: "TicketFeature")
     static let TicketsListFeature =     TargetDependency.target(name: "TicketsListFeature")
+    static let TicketStatusHistoryFeature = TargetDependency.target(name: "TicketStatusHistoryFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
