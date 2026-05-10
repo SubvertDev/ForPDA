@@ -408,6 +408,7 @@ public struct BBBuilder {
         case .snapback(let postId):
             let image = UIImage(resource: .snapback)
             let attachment = AsyncTextAttachment(image: image, displaySize: CGSize(width: 16, height: 16))
+            attachment.displaySizeTextStyle = .callout
             
             let postId = Int(postId.string)!
             attachment.link = URL(string: "https://4pda.to/forum/index.php?act=findpost&pid=\(postId)")!
