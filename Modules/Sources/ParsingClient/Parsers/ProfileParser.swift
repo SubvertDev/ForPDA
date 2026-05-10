@@ -63,7 +63,7 @@ public struct ProfileParser {
                 
                 return User(
                     id: array[2] as! Int,
-                    nickname: (array[3] as! String).convertHtmlCodes(),
+                    nickname: try (array[3] as! String).convertHtmlCodes(),
                     imageUrl: URL(string: array[4] as! String),
                     group: User.Group(rawValue: array[5] as! Int)!,
                     status: (array[6] as? String).flatMap { $0.isEmpty ? nil : $0 }?.convertCodes(),
