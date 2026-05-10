@@ -118,7 +118,6 @@ public struct DeeplinkHandler {
     public func handleInnerToInnerURL(_ url: URL) throws(DeeplinkError) -> Deeplink {
         let url = URL(string: url.absoluteString.replacingOccurrences(of: "&amp;", with: "&"))!
         
-        guard let host = url.host, host == "4pda.to" else { throw .externalURL }
         guard let host = url.host, host == "4pda.to" else { throw .externalURL(url) }
         
         // File download link type
@@ -150,7 +149,15 @@ public struct DeeplinkHandler {
             }
         }
         
-        guard let queryItems = components.queryItems else { throw .noQueryItems(in: url) }
+        guard let queryItems = components.queryItems else {
+            // Possibly site article (e.g. "https://4pda.to/2026/04/17/455416/apple_zablokirovala_rabotu_telega_na_iphone/")
+            let pathItems = components.path.split(separator: "/")
+            if pathItems.count == 5, let id = Int(pathItems[3]) {
+                return .article(id: id, title: "", imageUrl: URL(string: "/")!, scrollToId: nil)
+            } else {
+                throw .noQueryItems(in: url)
+            }
+        }
         
         // site search
         
