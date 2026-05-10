@@ -520,7 +520,13 @@ public struct StackTab: Reducer, Sendable {
                 analytics.capture(error)
             }
             
-            return .run { [url] _ in await open(url: url) }
+            if let encodedUrl = url.absoluteString.removingPercentEncoding,
+               let url = URL(string: encodedUrl) {
+                return .run { _ in await open(url: url) }
+            } else {
+                analytics.capture(error)
+                return .none
+            }
         }
     }
 }

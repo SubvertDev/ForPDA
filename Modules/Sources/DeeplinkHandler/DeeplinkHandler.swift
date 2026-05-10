@@ -40,7 +40,7 @@ public struct DeeplinkHandler {
         case noType(of: String, for: String)
         case noDeeplinkAvailable(for: URL)
         case fileDownload(url: URL)
-        case externalURL
+        case externalURL(URL)
     }
     
     @Dependency(\.logger[.deeplink]) private var logger
@@ -119,6 +119,7 @@ public struct DeeplinkHandler {
         let url = URL(string: url.absoluteString.replacingOccurrences(of: "&amp;", with: "&"))!
         
         guard let host = url.host, host == "4pda.to" else { throw .externalURL }
+        guard let host = url.host, host == "4pda.to" else { throw .externalURL(url) }
         
         // File download link type
         guard !url.pathComponents.contains("dl") else { throw .fileDownload(url: url) }
