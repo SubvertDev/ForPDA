@@ -48,7 +48,6 @@ public struct SettingsFeature: Reducer, Sendable {
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
         
-        var didLoadOnce = false
         
         public var appVersionAndBuild: String {
             let info = Bundle.main.infoDictionary
@@ -126,7 +125,7 @@ public struct SettingsFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .languageButtonTapped:
@@ -207,13 +206,7 @@ public struct SettingsFeature: Reducer, Sendable {
     
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension SettingsFeature.Destination.State: Equatable {}
 

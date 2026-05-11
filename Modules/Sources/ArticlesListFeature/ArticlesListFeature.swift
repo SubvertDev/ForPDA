@@ -78,7 +78,6 @@ public struct ArticlesListFeature: Reducer, Sendable {
             shouldScrollToTop.toggle()
         }
         
-        var didLoadOnce = false
         
         public var isAuthorized: Bool {
             return userSession != nil
@@ -214,7 +213,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 }
                 state.offset += state.loadAmount
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 state.viewState = .loaded(state.articles)
                 return .none
                 
@@ -222,7 +221,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
                 state.isLoading = false
                 // state.destination = .alert(.failedToConnect)
                 state.viewState = .networkError
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .delegate, .binding, .destination:
@@ -235,13 +234,7 @@ public struct ArticlesListFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
+        
     private func handleMenuOptions(article: ArticlePreview, action: ContextMenuOptions, state: inout State) -> Effect<Action> {
         switch action {
         case .shareLink:

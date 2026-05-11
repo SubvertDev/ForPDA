@@ -44,7 +44,6 @@ public struct QMSFeature: Reducer, Sendable {
         
         var hasMoreOlderMessages = true
         var isLoadingMore = false
-        var didLoadOnce = false
         var isSending = false
         
         var draftText = ""
@@ -217,7 +216,7 @@ public struct QMSFeature: Reducer, Sendable {
                     state.alert = .somethingWentWrong
                 }
                 
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     let ids = (try? result.get().id).map { [$0] } ?? []
                     await notificationsClient.removeNotifications(ids: ids)
@@ -304,10 +303,4 @@ public struct QMSFeature: Reducer, Sendable {
         
         return localMessages
     }
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

@@ -34,7 +34,6 @@ public struct MoreFeature: Reducer, Sendable {
         
         var isLoading = false
         var isLoadingUser = false
-        var didLoadOnce = false
         
         var isLoggedIn: Bool {
             return userSession != nil
@@ -112,7 +111,7 @@ public struct MoreFeature: Reducer, Sendable {
             switch action {
             case .view(.onAppear):
                 guard state.userSession?.userId != nil else {
-                    reportFullyDisplayed(&state)
+                    analyticsClient.reportFullyDisplayed()
                     return .none
                 }
                 return .merge(
@@ -187,13 +186,13 @@ public struct MoreFeature: Reducer, Sendable {
             case let .internal(.userResponse(.success(user))):
                 state.isLoadingUser = false
                 state.user = user
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.userResponse(.failure(error))):
                 print(error)
                 state.isLoadingUser = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.updateBadgeCounts(unread)):
@@ -227,13 +226,7 @@ public struct MoreFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
+        
     private func getUser(_ state: inout State) -> Effect<Action> {
         if state.user == nil {
             state.isLoadingUser = true

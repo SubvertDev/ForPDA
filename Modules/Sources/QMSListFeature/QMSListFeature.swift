@@ -22,7 +22,6 @@ public struct QMSListFeature: Reducer, Sendable {
     public struct State: Equatable {
         public var qms: QMSList?
         public var expandedGroups: [Bool] = []
-        var didLoadOnce = false
         public init() {}
     }
     
@@ -143,7 +142,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case let .failure(error):
                     print(error)
                 }
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.userLoaded(result)):
@@ -168,10 +167,4 @@ public struct QMSListFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

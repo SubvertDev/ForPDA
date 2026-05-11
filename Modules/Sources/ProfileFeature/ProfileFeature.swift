@@ -60,7 +60,6 @@ public struct ProfileFeature: Reducer, Sendable {
                 || userSessionGroup == .moderatorSchool
         }
         
-        var didLoadOnce = false
         
         public init(
             userId: Int? = nil,
@@ -201,13 +200,13 @@ public struct ProfileFeature: Reducer, Sendable {
                 
                 state.user = user
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .internal(.userResponse(.failure(let error))):
                 state.isLoading = false
                 print(error, #line)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
 //            case let .internal(.updateBadgeCounts(unread)):
@@ -244,12 +243,6 @@ public struct ProfileFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension ProfileFeature.Destination.State: Equatable {}

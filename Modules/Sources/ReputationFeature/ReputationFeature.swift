@@ -57,7 +57,6 @@ public struct ReputationFeature: Reducer, Sendable {
         
         public let userId: Int
         public var isLoading = true
-        public var didLoadOnce = false
         public var historyData: [ReputationVote] = []
         var pickerSection: PickerSection = .history
         
@@ -191,14 +190,14 @@ public struct ReputationFeature: Reducer, Sendable {
                 state.historyData.append(contentsOf: votes.votes)
                 state.offset += state.loadAmount
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.historyResponse(.failure(error))):
                 print(error)
                 state.isLoading = false
                 state.destination = .alert(.error)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .delegate, .binding, .destination:
@@ -209,13 +208,7 @@ public struct ReputationFeature: Reducer, Sendable {
         
         Analytics()
     }
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension ReputationFeature.Destination.State: Equatable {}
 

@@ -94,7 +94,6 @@ public struct ArticleFeature: Reducer, Sendable {
         var refreshRequestFinished = false
         var refreshTimePassed = false
         
-        var didLoadOnce = false
         
         public init(
             destination: Destination.State? = nil,
@@ -378,7 +377,7 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._articleResponse(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .cancel(id: CancelID.loading)
                 
             case let ._commentResponse(.success(type)):
@@ -405,7 +404,7 @@ public struct ArticleFeature: Reducer, Sendable {
                     state.scrollToId = pendingScrollToId
                     state.pendingScrollToId = nil
                 }
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     var urls: [URL] = []
                     for case let .image(image) in elements {
@@ -417,7 +416,7 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._parseArticleElements(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case ._pollVoteResponse(.success):
@@ -442,13 +441,7 @@ public struct ArticleFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
+        
     private func loadingIndicator() -> EffectOf<Self> {
         return .run { send in
             try await clock.sleep(for: .seconds(0.5))
