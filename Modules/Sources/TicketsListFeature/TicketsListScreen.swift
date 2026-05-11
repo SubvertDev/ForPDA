@@ -181,6 +181,7 @@ public struct TicketsListScreen: View {
                 TicketRow(ticket)
             }
             .buttonStyle(.plain)
+            .listRowBackground(Color.clear)
         }
     }
     
