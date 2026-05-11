@@ -10,6 +10,7 @@ import Foundation
 public enum QMSListEvent: Event {
     case chatTapped(Int)
     case userTapped(Int, isExpandable: Bool)
+    case createChatTapped
     
     public var name: String {
         return "QMS List " + eventName(for: self).inProperCase
@@ -25,6 +26,9 @@ public enum QMSListEvent: Event {
                 "userId": String(userId),
                 "isExpandable": String(isExpandable)
             ]
+            
+        case .createChatTapped:
+            return nil
         }
     }
 }

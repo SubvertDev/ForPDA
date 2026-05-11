@@ -33,38 +33,122 @@ public struct QMSListScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if let qms = store.qms {
-                    List {
-                        ForEach(Array(qms.users.enumerated()), id: \.0) { index, user in
-                            WithPerceptionTracking {
-                                if user.chats.isEmpty {
-                                    UserRow(user)
-                                        .listRowBackground(Color(.Background.teritary))
-                                } else {
-                                    DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
-                                        ChatList(user.chats)
-                                    } label: {
+                    switch store.viewState {
+                    case let .loaded(qms):
+                        QMSList {
+                            ForEach(Array(qms.users.enumerated()), id: \.1) { index, user in
+                                WithPerceptionTracking {
+                                    if user.chats.isEmpty {
                                         UserRow(user)
+                                            .listRowBackground(Color(.Background.teritary))
+                                    } else {
+                                        DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
+                                            ChatList(user.chats)
+                                        } label: {
+                                            UserRow(user)
+                                        }
+                                        .listRowBackground(Color(.Background.teritary))
                                     }
-                                    .listRowBackground(Color(.Background.teritary))
                                 }
                             }
                         }
+                        
+                    case .loading:
+                        QMSList {
+                            ForEach(0..<8) { _ in
+                                UserRow(.placeholder)
+                                    .listRowBackground(Color(.Background.teritary))
+                                    .redacted(if: true)
+                            }
+                        }
+                        
+                    case .empty:
+                        EmptyList()
+                        
+                    case .error:
+                        Text(verbatim: "Error")
                     }
-                    .scrollContentBackground(.hidden)
-                    ._contentMargins(.top, 16)
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
+
+            }
+            .toolbar {
+                ToolbarItems()
             }
             .navigationTitle("QMS")
             ._toolbarTitleDisplayMode(.inline)
             .animation(.default, value: store.expandedGroups)
+            .animation(.default, value: store.viewState)
             .onAppear {
                 send(.onAppear)
             }
         }
+    }
+    
+    // MARK: - Toolbar Items
+    
+    @ToolbarContentBuilder
+    private func ToolbarItems() -> some ToolbarContent {
+        ToolbarItem {
+            Button {
+                
+            } label: {
+                Image(systemSymbol: .magnifyingglass)
+            }
+        }
+        
+        if #available(iOS 26, *) {
+            ToolbarSpacer()
+        }
+        
+        ToolbarItem {
+            Menu {
+                Section {
+                    Button {
+                        
+                    } label: {
+                        Label {
+                            Text("Blacklist", bundle: .module)
+                        } icon: {
+                            Image(systemSymbol: .personCropCircleBadgeXmark)
+                        }
+                    }
+                }
+                Section {
+                    Button {
+                        
+                    } label: {
+                        Label {
+                            Text("Add to bookmarks", bundle: .module)
+                        } icon: {
+                            Image(systemSymbol: .bookmark)
+                        }
+                    }
+                    
+                    Button {
+                        
+                    } label: {
+                        Label {
+                            Text("Create chat", bundle: .module)
+                        } icon: {
+                            Image(systemSymbol: .plus)
+                        }
+                    }
+                }
+            } label: {
+                Image(systemSymbol: .ellipsis)
+            }
+        }
+    }
+    
+    // MARK: - QMS List
+    
+    private func QMSList<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        List {
+            content()
+        }
+        .scrollContentBackground(.hidden)
+        ._contentMargins(.top, 16)
     }
     
     // MARK: - User Row
@@ -72,7 +156,9 @@ public struct QMSListScreen: View {
     @ViewBuilder
     private func UserRow(_ user: QMSUser) -> some View {
         Button {
-            send(.userRowTapped(user.id))
+            if case .loaded = store.viewState {
+                send(.userRowTapped(user.id))
+            }
         } label: {
             HStack(spacing: 8) {
                 LazyImage(url: user.avatarUrl ?? Links.defaultQMSAvatar) { state in
@@ -128,14 +214,79 @@ public struct QMSListScreen: View {
             ChatRow(chat)
         }
     }
+    
+    // MARK: - Empty List
+    
+    @ViewBuilder
+    private func EmptyList() -> some View {
+        VStack(spacing: 0) {
+            Image(systemSymbol: .person2)
+                .font(.title)
+                .foregroundStyle(tintColor)
+                .padding(.bottom, 8)
+            
+            Text("No chats", bundle: .module)
+                .font(.title3)
+                .bold()
+                .foregroundStyle(Color(.Labels.primary))
+                .padding(.bottom, 6)
+            
+            Text("Start chatting with other 4PDA users", bundle: .module)
+                .font(.footnote)
+                .foregroundStyle(Color(.Labels.teritary))
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 24)
+            
+            Button {
+                send(.createChatButtonTapped)
+            } label: {
+                Label {
+                    Text("Create chat", bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(tintColor)
+                } icon: {
+                    Image(systemSymbol: .plus)
+                        .font(.body)
+                        .foregroundStyle(tintColor)
+                }
+                .padding(.vertical, 4)
+                .padding(.horizontal, 12)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(tintColor.opacity(0.12))
+        }
+        .frame(maxWidth: .infinity)
+    }
 }
 
 // MARK: - Previews
 
-#Preview {
-    NavigationStack {
-        QMSListScreen(store: Store(initialState: QMSListFeature.State()) {
-            QMSListFeature()
-        })
+@available(iOS 17, *)
+#Preview("QMS List") {
+    @Previewable @State var store = Store(
+        initialState: QMSListFeature.State()
+    ) {
+        QMSListFeature()
     }
+    
+    return NavigationStack {
+        QMSListScreen(store: store)
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+}
+
+@available(iOS 17, *)
+#Preview("QMS List Empty") {
+    @Previewable @State var store = Store(
+        initialState: QMSListFeature.State(viewState: .empty)
+    ) {
+        QMSListFeature()
+    } withDependencies: {
+        $0.qmsClient.loadQMSList = { try await Task.never() }
+    }
+    
+    return NavigationStack {
+        QMSListScreen(store: store)
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
 }

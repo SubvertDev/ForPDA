@@ -28,6 +28,9 @@ extension QMSListFeature {
                 case let .view(.userRowTapped(userId)):
                     let isExpanded = state.qms?.users.first(where: { $0.id == userId }).map { !$0.chats.isEmpty } ?? false
                     analytics.log(QMSListEvent.userTapped(userId, isExpandable: isExpanded))
+                    
+                case .view(.createChatButtonTapped):
+                    analytics.log(QMSListEvent.createChatTapped)
                 }
                 
                 return .none

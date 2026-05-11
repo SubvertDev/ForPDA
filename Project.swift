@@ -433,7 +433,6 @@ let project = Project(
         
             .feature(
                 name: "QMSListFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.CacheClient,
                     .Internal.Models,

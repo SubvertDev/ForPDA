@@ -63,9 +63,11 @@ extension QMSClient: DependencyKey {
         
         return QMSClient(
             loadQMSList: {
+                try await Task.sleep(for: .seconds(2))
                 return .mock
             },
             loadQMSUser: { _ in
+                try await Task.sleep(for: .seconds(2))
                 return .mock
             },
             loadQMSChat: { id, lastMessageId, offset in

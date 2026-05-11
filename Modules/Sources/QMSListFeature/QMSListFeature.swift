@@ -16,13 +16,28 @@ public struct QMSListFeature: Reducer, Sendable {
     
     public init() {}
     
+    // MARK: - Enums
+    
+    public enum ViewState: Equatable {
+        case loaded(QMSList)
+        case loading
+        case empty
+        case error
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
-        public var qms: QMSList?
-        public var expandedGroups: [Bool] = []
-        public init() {}
+        var viewState: ViewState
+        var qms: QMSList?
+        var expandedGroups: [Bool] = []
+        
+        public init(
+            viewState: ViewState = .loading
+        ) {
+            self.viewState = viewState
+        }
     }
     
     // MARK: - Action
@@ -35,6 +50,7 @@ public struct QMSListFeature: Reducer, Sendable {
             case onAppear
             case chatRowTapped(Int)
             case userRowTapped(Int)
+            case createChatButtonTapped
         }
         
         case `internal`(Internal)
@@ -91,7 +107,7 @@ public struct QMSListFeature: Reducer, Sendable {
                     await send(.internal(.load))
 
                     // TODO: Does this cancel on feature removal?
-                    for await unread in notificationsClient.unreadPublisher().values {
+                    for await unread in notificationsClient.unreadPublisher().values.dropFirst() {
                         guard unread.qmsUnreadCount > 0 else { continue }
                         await send(.internal(.load))
                     }
@@ -113,6 +129,9 @@ public struct QMSListFeature: Reducer, Sendable {
                     let result = await Result { try await qmsClient.loadQMSUser(id) }
                     await send(.internal(.userLoaded(result)))
                 }
+                
+            case .view(.createChatButtonTapped):
+                return .none
                 
             case .internal(.load):
                 return .run { send in
@@ -138,9 +157,11 @@ public struct QMSListFeature: Reducer, Sendable {
                     }
                     
                     state.qms = qms
+                    state.viewState = qms.users.isEmpty ? .empty : .loaded(qms)
                     
                 case let .failure(error):
                     print(error)
+                    state.viewState = .error
                 }
                 analyticsClient.reportFullyDisplayed()
                 return .none

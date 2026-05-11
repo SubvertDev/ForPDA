@@ -1,0 +1,66 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add to bookmarks" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить в закладки"
+          }
+        }
+      }
+    },
+    "Blacklist" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Черный список"
+          }
+        }
+      }
+    },
+    "Create chat" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать диалог"
+          }
+        }
+      }
+    },
+    "No chats" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет диалогов"
+          }
+        }
+      }
+    },
+    "QMS" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QMS"
+          }
+        }
+      }
+    },
+    "Start chatting with other 4PDA users" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начните общаться с другими пользователями 4PDA"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.2"
+}
