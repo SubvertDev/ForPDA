@@ -7,11 +7,11 @@
 
 import Foundation
 
-public struct Ticket: Sendable {
+public struct Ticket: Sendable, Equatable {
     public let info: TicketInfo
     public let comments: [Comment]
     
-    public struct Comment: Sendable {
+    public struct Comment: Sendable, Equatable, Identifiable {
         public let id: Int
         public let content: String
         public let authorId: Int

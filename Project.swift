@@ -535,10 +535,13 @@ let project = Project(
             .feature(
                 name: "TicketFeature",
                 dependencies: [
+                    .Internal.BBBuilder,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.TicketClient,
                     .Internal.ToastClient,
+                    .SPM.RichTextKit,
+                    .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
             ),
