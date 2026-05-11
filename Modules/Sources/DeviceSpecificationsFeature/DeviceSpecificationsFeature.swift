@@ -12,6 +12,7 @@ import Models
 import ToastClient
 import PasteboardClient
 import GalleryFeature
+import AnalyticsClient
 
 @Reducer
 public struct DeviceSpecificationsFeature: Reducer, Sendable {
@@ -55,6 +56,8 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
         var isDevicesLimit = false
         
         var selectedHeaderImageId = 0
+        
+        var didLoadOnce = false
         
         var isUserAuthorized: Bool {
             return userSession != nil
@@ -104,6 +107,7 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
     
     // MARK: - Dependencies
     
+    @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.toastClient) private var toastClient
@@ -196,11 +200,13 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
             case let .internal(.specificationsResponse(.success(response))):
                 state.specifications = response
                 state.isLoading = false
+                reportFullyDisplayed(&state)
                 return .none
                 
             case let .internal(.specificationsResponse(.failure(error))):
                 print(error)
                 state.isLoading = false
+                reportFullyDisplayed(&state)
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -210,6 +216,16 @@ public struct DeviceSpecificationsFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$destination, action: \.destination)
+        
+        Analytics()
+    }
+    
+    // MARK: - Shared Logic
+    
+    private func reportFullyDisplayed(_ state: inout State) {
+        guard !state.didLoadOnce else { return }
+        analyticsClient.reportFullyDisplayed()
+        state.didLoadOnce = true
     }
 }
 
