@@ -199,6 +199,10 @@ public struct MoreScreen: View {
                  Row(symbol: .clockArrowCirclepath, title: "History") {
                      send(.historyButtonTapped)
                  }
+                 
+                 Row(symbol: ._smartphone, title: "DevDB") {
+                     send(.devDBButtonTapped)
+                 }
              }
          }
          .listRowBackground(Color(.Background.teritary))
@@ -299,6 +303,16 @@ public struct MoreScreen: View {
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
         .frame(minHeight: 60)
+    }
+}
+
+extension SFSymbol {
+    static var _smartphone: SFSymbol {
+        if #available(iOS 17, *) {
+            return .smartphone
+        } else {
+            return .phone
+        }
     }
 }
 

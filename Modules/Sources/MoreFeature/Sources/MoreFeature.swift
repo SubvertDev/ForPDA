@@ -57,6 +57,7 @@ public struct MoreFeature: Reducer, Sendable {
             case qmsButtonTapped
             case mentionsButtonTapped
             case historyButtonTapped
+            case devDBButtonTapped
             
             case settingsButtonTapped
             
@@ -91,6 +92,7 @@ public struct MoreFeature: Reducer, Sendable {
             case openQms
             case openMentions
             case openHistory
+            case openDevDB
             case openSettings
             case openDeeplink(URL)
         }
@@ -144,6 +146,9 @@ public struct MoreFeature: Reducer, Sendable {
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
+                
+            case .view(.devDBButtonTapped):
+                return .send(.delegate(.openDevDB))
                 
             case .view(.settingsButtonTapped):
                 return .send(.delegate(.openSettings))
