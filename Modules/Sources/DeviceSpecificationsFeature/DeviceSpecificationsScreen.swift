@@ -63,7 +63,7 @@ public struct DeviceSpecificationsScreen: View {
                     .presentationDragIndicator(.visible)
                 }
             }
-            .safeAreaInset(edge: .bottom) {
+            ._safeAreaBar(edge: .bottom) {
                 if let specifications = store.specifications, store.isUserAuthorized {
                     MyDeviceButton(specifications.isMyDevice)
                 }
@@ -110,10 +110,10 @@ public struct DeviceSpecificationsScreen: View {
         ._buttonStyle(myDevice ? .borderedProminent : .bordered)
         .tint(tintColor)
         .disabled(store.isMyDeviceLoading || store.isDevicesLimit)
+        .background(Color(.Background.primary), in: Capsule())
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
         .animation(.default, value: store.isMyDeviceLoading)
     }
     
