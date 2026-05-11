@@ -110,7 +110,6 @@ public struct TopicFeature: Reducer, Sendable {
         public var pageNavigation = PageNavigationFeature.State(type: .topic)
         var floatingNavigation: Bool
         
-        var didLoadOnce = false
         
         public var isUserAuthorized: Bool {
             return userSession != nil
@@ -694,12 +693,12 @@ public struct TopicFeature: Reducer, Sendable {
                 state.shouldShowTopicPollButton = true
                 state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .internal(.topicResponse(.failure)):
                 state.isRefreshing = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -795,13 +794,7 @@ public struct TopicFeature: Reducer, Sendable {
     private func updatePageNavigation(_ state: inout TopicFeature.State, offset: Int? = nil) -> Effect<Action> {
         return .send(.pageNavigation(.update(count: state.topic?.postsCount ?? 0, offset: offset)))
     }
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension TopicFeature.Destination.State: Equatable {}
 

@@ -22,7 +22,6 @@ public struct QMSListFeature: Reducer, Sendable {
     public struct State: Equatable {
         public var qms: QMSList?
         public var expandedGroups: [Bool] = []
-        var didLoadOnce = false
         public init() {}
     }
     
@@ -62,6 +61,25 @@ public struct QMSListFeature: Reducer, Sendable {
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
+            .onChange(of: \.expandedGroups) { oldState, state in
+                    .run { [after = state.expandedGroups, qms = state.qms] send in
+                        func changedIndex(before: [Bool], after: [Bool]) -> Int? {
+                            guard before.count == after.count else { return nil }
+                            for index in before.indices {
+                                if before[index] == false && after[index] == true {
+                                    return index
+                                }
+                            }
+                            return nil
+                        }
+                        if let index = changedIndex(before: oldState, after: after),
+                           let userId = qms?.users[index].userId,
+                           userId != 0 {
+                                let result = await Result { try await qmsClient.loadQMSUser(id: userId) }
+                                await send(.internal(.userLoaded(result)))
+                        }
+                    }
+            }
         
         Reduce<State, Action> { state, action in
             switch action {
@@ -83,19 +101,18 @@ public struct QMSListFeature: Reducer, Sendable {
                 return .send(.delegate(.openQMSChat(id)))
                 
             case let .view(.userRowTapped(id)):
-                // Refactor later
-                if let qms = state.qms,
-                   let user = qms.users.first(where: { $0.id == id }) {
-                    if user.chats.isEmpty {
-                        return .run { send in
-                            let result = await Result { try await qmsClient.loadQMSUser(id) }
-                            await send(.internal(.userLoaded(result)))
-                        }
-                    } else if let index = qms.users.firstIndex(of: user) {
-                        state.expandedGroups[index].toggle()
-                    }
+                guard let qms = state.qms else { return .none }
+                guard let index = qms.users.firstIndex(where: { $0.id == id }) else { return .none }
+                
+                state.expandedGroups[index].toggle()
+                
+                guard state.expandedGroups[index] else { return .none }
+                
+                return .run { send in
+                    guard id != 0 else { return }
+                    let result = await Result { try await qmsClient.loadQMSUser(id) }
+                    await send(.internal(.userLoaded(result)))
                 }
-                return .none
                 
             case .internal(.load):
                 return .run { send in
@@ -125,7 +142,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case let .failure(error):
                     print(error)
                 }
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.userLoaded(result)):
@@ -133,7 +150,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case let .success(user):
                     if var qms = state.qms,
                        let index = qms.users.firstIndex(where: { $0.id == user.id }) {
-                        qms.users[index].chats = user.chats
+                        qms.users[index].chats = user.chats.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
                         state.qms = qms
                         cacheClient.setQMSChats(qms.users[index].id, user.chats)
                     }
@@ -150,10 +167,4 @@ public struct QMSListFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

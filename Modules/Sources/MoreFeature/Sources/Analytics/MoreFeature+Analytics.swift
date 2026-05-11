@@ -34,6 +34,9 @@ extension MoreFeature {
                 case .view(.historyButtonTapped):
                     analytics.log(MoreEvent.historyTapped)
                     
+                case .view(.devDBButtonTapped):
+                    analytics.log(MoreEvent.devDBTapped)
+                    
                 case .view(.settingsButtonTapped):
                     analytics.log(MoreEvent.settingsTapped)
                     

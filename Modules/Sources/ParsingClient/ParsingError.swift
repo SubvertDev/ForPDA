@@ -14,6 +14,7 @@ public enum ParsingError: Error {
     case failedToCastDataToAny
 //    case notEnoughDataToParse
     case failedToCastFields
+    case failedToConvertHtmlCodes(String)
     
     // Post send
     case unknownStatus(Int)

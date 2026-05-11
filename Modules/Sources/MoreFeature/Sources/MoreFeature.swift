@@ -34,7 +34,6 @@ public struct MoreFeature: Reducer, Sendable {
         
         var isLoading = false
         var isLoadingUser = false
-        var didLoadOnce = false
         
         var isLoggedIn: Bool {
             return userSession != nil
@@ -57,6 +56,7 @@ public struct MoreFeature: Reducer, Sendable {
             case qmsButtonTapped
             case mentionsButtonTapped
             case historyButtonTapped
+            case devDBButtonTapped
             
             case settingsButtonTapped
             
@@ -91,6 +91,7 @@ public struct MoreFeature: Reducer, Sendable {
             case openQms
             case openMentions
             case openHistory
+            case openDevDB
             case openSettings
             case openDeeplink(URL)
         }
@@ -109,19 +110,12 @@ public struct MoreFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                guard let userId = state.userSession?.userId else {
-                    reportFullyDisplayed(&state)
+                guard state.userSession?.userId != nil else {
+                    analyticsClient.reportFullyDisplayed()
                     return .none
                 }
                 return .merge(
                     getUser(&state),
-//                    .run { send in
-//                        for try await user in try await apiClient.getUser(userId: userId, policy: .cacheAndLoad) {
-//                            await send(.internal(.userResponse(.success(user))))
-//                        }
-//                    } catch: { error, send in
-//                        await send(.internal(.userResponse(.failure(error))))
-//                    },
                     
                     .run { send in
                         let unread = try await apiClient.getUnread(type: .all)
@@ -151,6 +145,9 @@ public struct MoreFeature: Reducer, Sendable {
                 
             case .view(.historyButtonTapped):
                 return .send(.delegate(.openHistory))
+                
+            case .view(.devDBButtonTapped):
+                return .send(.delegate(.openDevDB))
                 
             case .view(.settingsButtonTapped):
                 return .send(.delegate(.openSettings))
@@ -189,13 +186,13 @@ public struct MoreFeature: Reducer, Sendable {
             case let .internal(.userResponse(.success(user))):
                 state.isLoadingUser = false
                 state.user = user
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.userResponse(.failure(error))):
                 print(error)
                 state.isLoadingUser = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.updateBadgeCounts(unread)):
@@ -229,13 +226,7 @@ public struct MoreFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
+        
     private func getUser(_ state: inout State) -> Effect<Action> {
         if state.user == nil {
             state.isLoadingUser = true

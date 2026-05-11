@@ -31,6 +31,16 @@
         }
       }
     },
+    "DevDB" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DevDB"
+          }
+        }
+      }
+    },
     "GitHub repository" : {
       "localizations" : {
         "ru" : {

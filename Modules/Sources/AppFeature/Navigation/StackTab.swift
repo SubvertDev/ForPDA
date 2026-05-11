@@ -330,6 +330,9 @@ public struct StackTab: Reducer, Sendable {
         case .more(.delegate(.openHistory)):
             state.path.append(.more(.history(HistoryFeature.State())))
             
+        case .more(.delegate(.openDevDB)):
+            state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .index))))
+            
         case .more(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
             

@@ -91,7 +91,6 @@ public struct ForumFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var didLoadOnce = false
         
         public init(
             forumId: Int,
@@ -373,11 +372,11 @@ public struct ForumFeature: Reducer, Sendable {
                 
                 state.isLoadingTopics = false
                 state.isRefreshing = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .internal(.forumResponse(.failure)):
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
             case .delegate:
@@ -390,12 +389,6 @@ public struct ForumFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension ForumFeature.Destination.State: Equatable {}

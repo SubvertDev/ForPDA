@@ -53,7 +53,6 @@ public struct FavoritesFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var didLoadOnce = false
         
         public init(
             favorites: [FavoriteInfo] = [],
@@ -307,13 +306,13 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.isLoading = false
                 state.isRefreshing = false
                 
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 
                 return updatePageNavigation(&state, count: response.favoritesCount)
                 
             case let .internal(.favoritesResponse(.failure(error))):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -330,13 +329,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
+        
     private func updatePageNavigation(
         _ state: inout State,
         count: Int = 0,

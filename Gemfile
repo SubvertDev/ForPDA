@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem "fastlane", "2.232.2"
+gem "fastlane"
 
 # warnings fix
 gem "ostruct"

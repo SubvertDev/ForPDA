@@ -44,14 +44,14 @@ public struct ArticleParser {
                     date: Date(timeIntervalSince1970: fields[3] as! TimeInterval),
                     flag: fields[6] as! Int,
                     authorId: fields[7] as! Int,
-                    authorName: (fields[8] as! String).convertHtmlCodes(),
+                    authorName: try (fields[8] as! String).convertHtmlCodes(),
                     commentsAmount: fields[9] as! Int,
                     imageUrl: URL(string: (fields[10] as! String))!,
-                    title: (fields[11] as! String).convertHtmlCodes(),
-                    description: (fields[12] as! String).convertHtmlCodes(),
+                    title: try (fields[11] as! String).convertHtmlCodes(),
+                    description: try (fields[12] as! String).convertHtmlCodes(),
                     attachments: try AttachmentParser.parseArticleAttachment(from: fields[13] as! [[Any]]),
                     tags: extractTags(from: fields[14] as! [[Any]]),
-                    comments: extractComments(from: fields[15] as! [[Any]]),
+                    comments: try extractComments(from: fields[15] as! [[Any]]),
                     poll: extractPoll(from: pollFields)
                 )
             } catch {
@@ -88,8 +88,8 @@ public struct ArticleParser {
     7. 0 - likes amount
     8. "https..." - (optional) avatar url
     */
-    private static func extractComments(from array: [[Any]]) -> [Comment] {
-        var comments: [Comment] = array.compactMap { fields in
+    private static func extractComments(from array: [[Any]]) throws -> [Comment] {
+        var comments: [Comment] = try array.compactMap { fields in
             // Fix for some "[0]" aka empty comments
             if fields.count < 9 {
                 // TODO: Add oslog
@@ -101,10 +101,10 @@ public struct ArticleParser {
                 date: Date(timeIntervalSince1970: fields[1] as! TimeInterval),
                 flag: fields[2] as! Int,
                 authorId: fields[3] as! Int,
-                authorName: (fields[4] as! String).convertHtmlCodes(),
+                authorName: try (fields[4] as! String).convertHtmlCodes(),
                 parentId: fields[5] as! Int,
                 childIds: [],
-                text: (fields[6] as! String).convertHtmlCodes(),
+                text: try (fields[6] as! String).convertHtmlCodes(),
                 likesAmount: fields[7] as! Int,
                 avatarUrl: URL(string: fields[8] as! String)
             )

@@ -12,6 +12,7 @@ public enum MoreEvent: Event {
     case qmsTapped
     case mentionsTapped
     case historyTapped
+    case devDBTapped
     case settingsTapped
     case supportOnBoostyTapped
     case appDiscussionTapped

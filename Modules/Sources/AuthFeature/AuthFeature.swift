@@ -49,7 +49,6 @@ public struct AuthFeature: Reducer, Sendable {
             return login.isEmpty || password.isEmpty || captcha.count < 4 || isLoading
         }
         
-        var didLoadOnce = false
         
         public init(
             isLoading: Bool = true,
@@ -178,7 +177,7 @@ public struct AuthFeature: Reducer, Sendable {
                     // TODO: Send error
                     state.alert = .failedToConnect
                 }
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.loginResponse(.success(loginState))):
@@ -247,13 +246,7 @@ public struct AuthFeature: Reducer, Sendable {
     
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 // MARK: - AlertState extension
 

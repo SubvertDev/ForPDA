@@ -373,7 +373,7 @@ public struct AppFeature: Reducer, Sendable {
                     return handleOtherTabSelection(newTab: tab, &state)
                 }
                 
-            case let .userDidLogin(userId: userId):
+            case .userDidLogin(userId: _):
                 return .run { _ in
                     do {
                         let unread = try await apiClient.getUnread(type: .all)
