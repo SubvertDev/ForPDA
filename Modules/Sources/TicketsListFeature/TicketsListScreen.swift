@@ -273,7 +273,7 @@ public struct TicketsListScreen: View {
     
     private func TicketStatusPicker(id: Int) -> some View {
         WithPerceptionTracking {
-            let status = store.tickets[id].info.status
+            let status = store.tickets.first(where: { $0.id == id })!.info.status
             Picker(String(), selection: Binding(
                 get: { status },
                 set: { newValue in
