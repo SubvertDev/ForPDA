@@ -111,10 +111,16 @@ public struct TicketsListScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             Section {
-                Toggle("Only My", isOn: Binding(store.$appSettings.tickets.isShowOnlyMine))
+                Toggle(
+                    LocalizedStringResource("Only My", bundle: .module),
+                    isOn: Binding(store.$appSettings.tickets.isShowOnlyMine)
+                )
                 
                 if case .list = store.type {
-                    Toggle("Sort by Forums", isOn: Binding(store.$appSettings.tickets.isSortByForums))
+                    Toggle(
+                        LocalizedStringResource("Sort by Forums", bundle: .module),
+                        isOn: Binding(store.$appSettings.tickets.isSortByForums)
+                    )
                 }
             } header: {
                 Text("Sort", bundle: .module)
