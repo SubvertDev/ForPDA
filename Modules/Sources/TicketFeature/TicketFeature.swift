@@ -85,6 +85,8 @@ public struct TicketFeature: Reducer, Sendable {
             case loadTicket
             case ticketResponse(Result<Ticket, any Error>)
             case changeTicketStatusResponse(Result<(TicketStatus, TicketStatusChangeResponse), any Error>)
+            
+            case initUserSessionNickname(String)
         }
         
         case delegate(Delegate)
@@ -114,7 +116,12 @@ public struct TicketFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onAppear):
-                return .send(.internal(.loadTicket))
+                return .run { [session = state.userSession] send in
+                    if let session, let user = cacheClient.getUser(session.userId) {
+                        await send(.internal(.initUserSessionNickname(user.nickname)))
+                    }
+                    await send(.internal(.loadTicket))
+                }
                 
             case let .view(.urlTapped(url)):
                 return .send(.delegate(.handleUrl(url)))
@@ -212,6 +219,10 @@ public struct TicketFeature: Reducer, Sendable {
             case let .internal(.ticketResponse(.failure(error))):
                 print(error)
                 state.isLoading = false
+                return .none
+                
+            case let .internal(.initUserSessionNickname(name)):
+                state.userSessionNickname = name
                 return .none
             }
         }
