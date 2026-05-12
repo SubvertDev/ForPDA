@@ -109,28 +109,30 @@ public struct TicketsListScreen: View {
     
     @ViewBuilder
     private func OptionsMenu() -> some View {
-        Menu {
-            Section {
-                Toggle(
-                    LocalizedStringResource("Only My", bundle: .module),
-                    isOn: Binding(store.$appSettings.tickets.isShowOnlyMine)
-                )
-                
-                if case .list = store.type {
+        WithPerceptionTracking {
+            Menu {
+                Section {
                     Toggle(
-                        LocalizedStringResource("Sort by Forums", bundle: .module),
-                        isOn: Binding(store.$appSettings.tickets.isSortByForums)
+                        LocalizedStringResource("Only My", bundle: .module),
+                        isOn: Binding(store.$appSettings.tickets.isShowOnlyMine)
                     )
+                    
+                    if case .list = store.type {
+                        Toggle(
+                            LocalizedStringResource("Sort by Forums", bundle: .module),
+                            isOn: Binding(store.$appSettings.tickets.isSortByForums)
+                        )
+                    }
+                } header: {
+                    Text("Sort", bundle: .module)
                 }
-            } header: {
-                Text("Sort", bundle: .module)
+                
+                ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                    send(.contextMenu(.copyLink))
+                }
+            } label: {
+                Image(systemSymbol: .ellipsisCircle)
             }
-           
-            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
-                send(.contextMenu(.copyLink))
-            }
-        } label: {
-            Image(systemSymbol: .ellipsisCircle)
         }
     }
     
@@ -180,14 +182,16 @@ public struct TicketsListScreen: View {
     
     @ViewBuilder
     private func Content() -> some View {
-        ForEach(store.tickets) { ticket in
-            Button {
-                send(.ticketButtonTapped(ticket.id))
-            } label: {
-                TicketRow(ticket)
+        WithPerceptionTracking {
+            ForEach(store.tickets) { ticket in
+                Button {
+                    send(.ticketButtonTapped(ticket.id))
+                } label: {
+                    TicketRow(ticket)
+                }
+                .buttonStyle(.plain)
+                .listRowBackground(Color.clear)
             }
-            .buttonStyle(.plain)
-            .listRowBackground(Color.clear)
         }
     }
     
