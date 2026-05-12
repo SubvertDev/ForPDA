@@ -1,5 +1,5 @@
 {
-  "originHash" : "fb8b5563a09730e1b427a82c15a7013e695b2305d2f502815e3d028a09c43032",
+  "originHash" : "95e8204f2cfe7f2089c0100e8891e11d5168254f8f404703e6a64dd79237ddab",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -105,8 +105,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SubvertDev/PDAPI_SPM.git",
       "state" : {
-        "revision" : "c1d783c1fab5a54a994d5fa68f02c631405573a9",
-        "version" : "0.8.0"
+        "revision" : "e1c5ddfaf6c98d9b60960ab0d984b98fc61f1c7f",
+        "version" : "0.8.1"
       }
     },
     {
