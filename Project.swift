@@ -537,9 +537,13 @@ let project = Project(
                 name: "TicketFeature",
                 dependencies: [
                     .Internal.BBBuilder,
+                    .Internal.CacheClient,
                     .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TicketClient,
+                    .Internal.TicketStatusHistoryFeature,
                     .Internal.ToastClient,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,

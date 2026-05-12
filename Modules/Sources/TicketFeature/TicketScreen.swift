@@ -12,6 +12,7 @@ import SharedUI
 import SFSafeSymbols
 import BBBuilder
 import RichTextKit
+import TicketStatusHistoryFeature
 
 @ViewAction(for: TicketFeature.self)
 public struct TicketScreen: View {
@@ -31,57 +32,139 @@ public struct TicketScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            ScrollView {
-                if let ticket = store.ticket {
-                    VStack(alignment: .leading, spacing: 12) {
-                        VStack(spacing: 8) {
-                            Divider()
-                            
-                            TicketHeader(ticket.info)
-                            
-                            Divider()
-                        }
-                        
-                        if let content = ticket.comments.first {
-                            AttributedContent(content)
-                        }
-                        
-                        Section {
-                            VStack(alignment: .leading, spacing: 8) {
-                                if ticket.comments.count > 1 {
-                                    Divider()
-                                    
-                                    ForEach(ticket.comments.suffix(from: 1)) { comment in
-                                        Comment(comment)
-                                        
-                                        Divider()
-                                    }
-                                } else {
-                                    NoComments()
-                                        .padding(.top, 84)
-                                }
+            ZStack {
+                Color(.Background.primary)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    if let ticket = store.ticket {
+                        VStack(alignment: .leading, spacing: 12) {
+                            VStack(spacing: 8) {
+                                Divider()
+                                
+                                TicketHeader(ticket.info)
+                                
+                                Divider()
                             }
-                        } header: {
-                            Text("Comments", bundle: .module)
-                                .font(.body)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(Color(.Labels.primary))
-                                .padding(.top, 28)
+                            
+                            if let content = ticket.comments.first {
+                                AttributedContent(content)
+                            }
+                            
+                            Section {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    if ticket.comments.count > 1 {
+                                        Divider()
+                                        
+                                        ForEach(ticket.comments.suffix(from: 1)) { comment in
+                                            Comment(comment)
+                                            
+                                            Divider()
+                                        }
+                                    } else {
+                                        NoComments()
+                                            .padding(.top, 84)
+                                    }
+                                }
+                            } header: {
+                                Text("Comments", bundle: .module)
+                                    .font(.body)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(Color(.Labels.primary))
+                                    .padding(.top, 28)
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, 16)
             }
-            .padding(.horizontal, 16)
             .navigationTitle(Text(store.ticket != nil ? "Ticket \(store.id)" : "Loading...", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color(.Background.primary))
+            .sheet(item: $store.scope(state: \.$destination, action: \.destination).statusHistory) { store in
+                NavigationStack {
+                    TicketStatusHistoryView(store: store)
+                }
+            }
+            ._safeAreaBar(edge: .bottom) {
+                if store.ticket != nil {
+                    ActionButtons()
+                }
+            }
             .toolbar {
-                
+                ToolbarItem {
+                    OptionsMenu()
+                }
             }
             .onAppear {
                 send(.onAppear)
             }
         }
+    }
+    
+    // MARK: - Options Menu
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            Section {
+                ContextButton(text: LocalizedStringResource("Status History", bundle: .module), symbol: .clockArrowCirclepath) {
+                    send(.contextMenu(.statusHistory))
+                }
+            }
+            
+            Section {
+                ContextButton(text: LocalizedStringResource("Go to Author", bundle: .module), symbol: .personCropCircle) {
+                    send(.contextMenu(.openAuthor))
+                }
+            }
+           
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                send(.contextMenu(.copyLink))
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
+        }
+    }
+    
+    // MARK: - Action Buttons
+    
+    @ViewBuilder
+    private func ActionButtons() -> some View {
+        HStack {
+            Menu {
+                Picker(String(), selection: Binding(
+                    get: { store.ticket!.info.status },
+                    set: { newValue in
+                        send(.changeStatusButtonTapped(newValue))
+                    }
+                )) {
+                    ForEach(TicketStatus.allCases) { status in
+                        Text(status.title, bundle: .module)
+                            .tag(status)
+                    }
+                }
+            } label: {
+                Text("Change status", bundle: .module)
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            }
+            .tint(tintColor)
+            .buttonStyle(.bordered)
+            .frame(height: 48)
+
+            Button {
+                send(.commentButtonTapped)
+            } label: {
+                Text("Comment", bundle: .module)
+                    .frame(maxWidth: .infinity)
+                    .padding(8)
+            }
+            .buttonStyle(.borderedProminent)
+            .frame(height: 48)
+            .disabled(true)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
     }
     
     // MARK: - Comment
@@ -114,7 +197,9 @@ public struct TicketScreen: View {
                     
                     Spacer()
                     
-                    // TODO: ContextMenu
+                    if let session = store.userSession, session.userId == comment.authorId {
+                        // TODO: ContextMenu
+                    }
                 }
             }
         }
