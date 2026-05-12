@@ -141,12 +141,12 @@
         }
       }
     },
-    "Ticket %lld" : {
+    "Ticket %@" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Тикет %lld"
+            "value" : "Тикет %@"
           }
         }
       }
