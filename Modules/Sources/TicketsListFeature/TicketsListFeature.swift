@@ -126,6 +126,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 return .send(.internal(.refresh))
                 
             case let .pageNavigation(.offsetChanged(to: newOffset)):
+                state.isRefreshing = false
                 return .send(.internal(.loadTickets(offset: newOffset)))
                 
             case let .destination(.presented(.statusHistory(.delegate(.openUser(id))))):
