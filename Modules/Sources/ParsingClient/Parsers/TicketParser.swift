@@ -33,7 +33,7 @@ public struct TicketParser {
               let handlerId = array[safe: 10] as? Int,
               let handlerName = array[safe: 11] as? String,
               let commentsRaw = array[safe: 13] as? [[Any]],
-              let statusRaw = array[safe: 0] as? Int else {
+              let statusRaw = array[safe: 2] as? Int else {
             throw ParsingError.failedToCastFields
         }
         
