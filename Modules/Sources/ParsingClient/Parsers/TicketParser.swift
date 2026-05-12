@@ -186,7 +186,7 @@ public struct TicketParser {
             throw ParsingError.failedToCastDataToAny
         }
         
-        guard let statusRaw = array[safe: 0] as? [[Any]] else {
+        guard let statusRaw = array[safe: 2] as? [[Any]] else {
             throw ParsingError.failedToCastFields
         }
         
