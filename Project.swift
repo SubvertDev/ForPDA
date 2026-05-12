@@ -437,6 +437,7 @@ let project = Project(
                 name: "QMSListFeature",
                 hasResources: false,
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.QMSClient,
@@ -506,6 +507,7 @@ let project = Project(
             .feature(
                 name: "SearchResultFeature",
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
