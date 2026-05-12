@@ -141,7 +141,7 @@ public struct TicketsListScreen: View {
         Menu {
             Section {
                 Menu {
-                    TIcketStatusPicker(id: id)
+                    TicketStatusPicker(id: id)
                 } label: {
                     HStack {
                         Text("Change Status", bundle: .module)
@@ -197,7 +197,7 @@ public struct TicketsListScreen: View {
     private func TicketRow(_ ticket: TicketsList.TicketSimplified) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Menu {
-                TIcketStatusPicker(id: ticket.id)
+                TicketStatusPicker(id: ticket.id)
             } label: {
                 TicketStatusBadge(info: ticket.info)
             }
@@ -271,16 +271,19 @@ public struct TicketsListScreen: View {
     
     // MARK: - Ticket Status Picker
     
-    private func TIcketStatusPicker(id: Int) -> some View {
-        Picker(String(), selection: Binding(
-            get: { store.tickets[id].info.status },
-            set: { newValue in
-                send(.contextTicketMenu(.changeStatus(newValue), id))
-            }
-        )) {
-            ForEach(TicketStatus.allCases) { status in
-                Text(status.title, bundle: .module)
-                    .tag(status)
+    private func TicketStatusPicker(id: Int) -> some View {
+        WithPerceptionTracking {
+            let status = store.tickets[id].info.status
+            Picker(String(), selection: Binding(
+                get: { status },
+                set: { newValue in
+                    send(.contextTicketMenu(.changeStatus(newValue), id))
+                }
+            )) {
+                ForEach(TicketStatus.allCases) { status in
+                    Text(status.title, bundle: .module)
+                        .tag(status)
+                }
             }
         }
     }
