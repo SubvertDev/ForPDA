@@ -102,6 +102,7 @@ public struct TicketStatusHistoryView: View {
                 .font(.caption)
                 .foregroundStyle(Color(.Labels.quaternary))
         }
+        .listRowBackground(Color.clear)
     }
     
     // MARK: - Handler Badge
