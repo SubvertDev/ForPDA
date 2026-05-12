@@ -308,6 +308,12 @@ public struct StackTab: Reducer, Sendable {
         case let .ticketsList(.delegate(.openUser(id))):
             state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
+        case let .ticket(.delegate(.handleUrl(url))):
+            return handleDeeplink(url: url, state: &state)
+            
+        case let .ticket(.delegate(.openUser(id))):
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
+            
         default:
             break
         }
