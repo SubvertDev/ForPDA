@@ -439,6 +439,14 @@ extension LiquidTabView {
                 return nil
             }
             
+        case let .tickets(path):
+            switch path.case {
+            case let .ticketsList(store):
+                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+            default:
+                return nil
+            }
+            
         default:
             return nil
         }

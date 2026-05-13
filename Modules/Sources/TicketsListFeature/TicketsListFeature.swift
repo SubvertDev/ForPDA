@@ -52,7 +52,7 @@ public struct TicketsListFeature: Reducer, Sendable {
         @Presents public var destination: Destination.State?
         
         var userSessionNickname: String?
-        var pageNavigation = PageNavigationFeature.State(type: .tickets)
+        public var pageNavigation = PageNavigationFeature.State(type: .tickets)
         
         public let type: TicketsListType
         
