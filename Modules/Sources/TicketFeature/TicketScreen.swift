@@ -131,27 +131,30 @@ public struct TicketScreen: View {
     @ViewBuilder
     private func ActionButtons() -> some View {
         HStack {
-            Menu {
-                Picker(String(), selection: Binding(
-                    get: { store.ticket!.info.status },
-                    set: { newValue in
-                        send(.changeStatusButtonTapped(newValue))
+            WithPerceptionTracking {
+                Menu {
+                    let status = store.ticket!.info.status
+                    Picker(String(), selection: Binding(
+                        get: { status },
+                        set: { newValue in
+                            send(.changeStatusButtonTapped(newValue))
+                        }
+                    )) {
+                        ForEach(TicketStatus.allCases) { status in
+                            Text(status.title)
+                                .tag(status)
+                        }
                     }
-                )) {
-                    ForEach(TicketStatus.allCases) { status in
-                        Text(status.title)
-                            .tag(status)
-                    }
+                } label: {
+                    Text("Change status", bundle: .module)
+                        .frame(maxWidth: .infinity)
+                        .padding(8)
                 }
-            } label: {
-                Text("Change status", bundle: .module)
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
+                .tint(tintColor)
+                .buttonStyle(.bordered)
+                .frame(height: 48)
             }
-            .tint(tintColor)
-            .buttonStyle(.bordered)
-            .frame(height: 48)
-
+            
             Button {
                 send(.commentButtonTapped)
             } label: {
@@ -197,8 +200,10 @@ public struct TicketScreen: View {
                     
                     Spacer()
                     
-                    if let session = store.userSession, session.userId == comment.authorId {
-                        // TODO: ContextMenu
+                    WithPerceptionTracking {
+                        if let session = store.userSession, session.userId == comment.authorId {
+                            // TODO: ContextMenu
+                        }
                     }
                 }
             }
