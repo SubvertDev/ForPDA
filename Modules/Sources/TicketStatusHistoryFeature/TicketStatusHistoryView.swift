@@ -83,7 +83,7 @@ public struct TicketStatusHistoryView: View {
     private func Status(_ status: TicketStatusHistory) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Text(status.status.title, bundle: .module)
+                Text(status.status.title)
                     .font(.subheadline)
              
                 Spacer()

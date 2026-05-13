@@ -5,7 +5,7 @@
 //  Created by Xialtal on 3.05.26.
 //
 
-import SwiftUI
+import Foundation
 
 public enum TicketStatus: Int, Sendable, CaseIterable, Identifiable {
     case notProcessed = 0
@@ -16,14 +16,14 @@ public enum TicketStatus: Int, Sendable, CaseIterable, Identifiable {
         return self.rawValue
     }
     
-    public var title: LocalizedStringKey {
+    public var title: LocalizedStringResource {
         switch self {
         case .notProcessed:
-            return "Not processed"
+            return .init("Not processed", bundle: .module)
         case .processing:
-            return "Processing"
+            return .init("Processing", bundle: .module)
         case .processed:
-            return "Processed"
+            return .init("Processed", bundle: .module)
         }
     }
 }

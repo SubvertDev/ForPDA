@@ -285,7 +285,7 @@ public struct TicketsListScreen: View {
                 }
             )) {
                 ForEach(TicketStatus.allCases) { status in
-                    Text(status.title, bundle: .module)
+                    Text(status.title)
                         .tag(status)
                 }
             }
