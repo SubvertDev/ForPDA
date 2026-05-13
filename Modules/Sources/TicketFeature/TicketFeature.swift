@@ -110,6 +110,7 @@ public struct TicketFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case let .destination(.presented(.statusHistory(.delegate(.openUser(id))))):
+                state.destination = nil
                 return .send(.delegate(.openUser(id)))
                 
             case .delegate, .destination:

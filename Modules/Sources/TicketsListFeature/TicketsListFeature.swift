@@ -130,6 +130,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 return .send(.internal(.loadTickets(offset: newOffset)))
                 
             case let .destination(.presented(.statusHistory(.delegate(.openUser(id))))):
+                state.destination = nil
                 return .send(.delegate(.openUser(id)))
                 
             case .pageNavigation, .binding, .delegate, .destination:
