@@ -21,6 +21,7 @@ public struct TicketClient: Sendable {
     public var changeTicketStatus: @Sendable (_ id: Int, _ handlerId: Int, _ status: TicketStatus) async throws -> TicketStatusChangeResponse
     
     public var modifyComment: @Sendable (_ id: Int, _ ticketId: Int, _ text: String) async throws -> Bool
+    public var deleteComment: @Sendable (_ id: Int, _ ticketId: Int) async throws -> Bool
 }
 
 extension TicketClient: DependencyKey {
@@ -69,6 +70,14 @@ extension TicketClient: DependencyKey {
                 ))
                 let status = Int(response.getResponseStatus())
                 return status == 0
+            },
+            deleteComment: { id, ticketId in
+                let response = try await api.send(TicketCommand.Comment.delete(
+                    id: id,
+                    ticketId: ticketId
+                ))
+                let status = Int(response.getResponseStatus())
+                return status == 0
             }
         )
     }
@@ -90,6 +99,9 @@ extension TicketClient: DependencyKey {
                 return .success
             },
             modifyComment: { _, _, _ in
+                return true
+            },
+            deleteComment: { _, _ in
                 return true
             }
         )
