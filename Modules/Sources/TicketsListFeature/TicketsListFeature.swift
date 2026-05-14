@@ -168,10 +168,10 @@ public struct TicketsListFeature: Reducer, Sendable {
             case let .view(.contextTicketMenu(action, ticketId)):
                 switch action {
                 case .changeStatus(let status):
-                    return .run { [handlerId = state.userSession?.userId] send in
+                    return .run { [handlerId = state.tickets[ticketId].info.handlerId] send in
                         let response = try await ticketClient.changeTicketStatus(
                             id: ticketId,
-                            handlerId: handlerId ?? 0,
+                            handlerId: handlerId,
                             status: status
                         )
                         await send(.internal(.changeTicketStatusResponse(.success((ticketId, status, response)))))
