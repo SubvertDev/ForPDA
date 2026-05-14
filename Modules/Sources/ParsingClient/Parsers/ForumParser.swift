@@ -74,6 +74,28 @@ public struct ForumParser {
         }
     }
     
+    public static func parseForumEventLog(from string: String) throws -> [ForumEventLog] {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                return (array[2] as! [[Any]]).map { event in
+                    return ForumEventLog(
+                        userId: event[1] as! Int,
+                        userName: (event[2] as! String).convertCodes(),
+                        userGroup: User.Group(rawValue: event[3] as! Int)!,
+                        content: event[4] as! String,
+                        createdAt: Date(timeIntervalSince1970: TimeInterval(event[0] as! Int))
+                    )
+                }
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
     internal static func parseForumStatModerators(_ array: [[Any]]) -> [ForumStat.ForumModerator] {
         return array.map { moderator in
             return ForumStat.ForumModerator(

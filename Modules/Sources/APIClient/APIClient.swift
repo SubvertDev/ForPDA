@@ -59,6 +59,7 @@ public struct APIClient: Sendable {
     public var getForumsList: @Sendable (_ policy: CachePolicy) async throws -> AsyncThrowingStream<[ForumInfo], any Error>
     public var getForum: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ policy: CachePolicy) async throws -> AsyncThrowingStream<Forum, any Error>
     public var getForumStat: @Sendable (_ id: Int) async throws -> ForumStat
+    public var getForumEventLog: @Sendable (_ id: Int, _ type: ForumEventLogType) async throws -> [ForumEventLog]
     public var jumpForum: @Sendable (_ request: JumpForumRequest) async throws -> ForumJump
     public var markRead: @Sendable (_ id: Int, _ isTopic: Bool) async throws -> Bool
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
@@ -330,6 +331,12 @@ extension APIClient: DependencyKey {
                 let command = ForumCommand.info(id: id)
                 let response = try await api.send(command)
                 return try await parser.parseForumStat(response)
+            },
+            
+            getForumEventLog: { id, type in
+                let command = ForumCommand.eventLog(type: type.rawValue, id: id)
+                let response = try await api.send(command)
+                return try await parser.parseForumEventLog(response)
             },
             
             jumpForum: { request in
@@ -742,6 +749,12 @@ extension APIClient: DependencyKey {
             },
             getForumStat: { _ in
                 return .mock
+            },
+            getForumEventLog: { _, type in
+                switch type {
+                case .post:  return .mockPost
+                case .topic: return .mockTopic
+                }
             },
             jumpForum: { _ in
                 return .mock
