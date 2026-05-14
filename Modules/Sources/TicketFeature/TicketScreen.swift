@@ -96,6 +96,9 @@ public struct TicketScreen: View {
                     OptionsMenu()
                 }
             }
+            .refreshable {
+                await send(.onRefresh).finish()
+            }
             .onAppear {
                 send(.onAppear)
             }

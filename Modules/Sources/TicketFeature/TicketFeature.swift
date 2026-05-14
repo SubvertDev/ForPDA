@@ -80,6 +80,7 @@ public struct TicketFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
+            case onRefresh
             
             case commentButtonTapped
             case changeStatusButtonTapped(TicketStatus)
@@ -146,6 +147,9 @@ public struct TicketFeature: Reducer, Sendable {
                     }
                     await send(.internal(.loadTicket))
                 }
+                
+            case .view(.onRefresh):
+                return .send(.internal(.refresh))
                 
             case let .view(.urlTapped(url)):
                 return .send(.delegate(.handleUrl(url)))
