@@ -21,12 +21,32 @@
         }
       }
     },
+    "Cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
     "Change status" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изм. статус"
+          }
+        }
+      }
+    },
+    "Change ticket comment" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить комментарий тикета"
           }
         }
       }
@@ -41,12 +61,32 @@
         }
       }
     },
+    "Comment added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий добавлен"
+          }
+        }
+      }
+    },
     "Comment deleted" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментарий удален"
+          }
+        }
+      }
+    },
+    "Comment edited" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Комментарий отредактирован"
           }
         }
       }
@@ -81,12 +121,32 @@
         }
       }
     },
+    "Edit" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить"
+          }
+        }
+      }
+    },
     "Go to Author" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перейти к автору"
+          }
+        }
+      }
+    },
+    "Input comment..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите комментарий…"
           }
         }
       }
@@ -157,6 +217,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "В работе · "
+          }
+        }
+      }
+    },
+    "Send" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить"
           }
         }
       }

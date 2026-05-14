@@ -86,6 +86,14 @@ public struct TicketScreen: View {
                     TicketStatusHistoryView(store: store)
                 }
             }
+            .alert(
+                item: $store.destination.editComment,
+                title: { _ in Text("Change ticket comment", bundle: .module) }
+            ) { commentId in
+                AlertInput({
+                    send(.commentButtonTapped(commentId, isAdd: false))
+                })
+            }
             ._safeAreaBar(edge: .bottom) {
                 if store.ticket != nil {
                     ActionButtons()
@@ -160,7 +168,7 @@ public struct TicketScreen: View {
             }
             
             Button {
-                send(.commentButtonTapped)
+                send(.commentButtonTapped(0, isAdd: true))
             } label: {
                 Text("Comment", bundle: .module)
                     .frame(maxWidth: .infinity)
@@ -205,7 +213,7 @@ public struct TicketScreen: View {
                     Spacer()
                     
                     WithPerceptionTracking {
-                        if let session = store.userSession {
+                        if let session = store.userSession, session.userId == comment.authorId {
                             CommentContextMenu(id: comment.id)
                         }
                     }
@@ -219,6 +227,10 @@ public struct TicketScreen: View {
     @ViewBuilder
     private func CommentContextMenu(id: Int) -> some View {
         Menu {
+            ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
+                send(.contextCommentMenu(.edit(id)))
+            }
+            
             Button(role: .destructive) {
                 send(.contextCommentMenu(.delete(id)))
             } label: {
@@ -236,7 +248,7 @@ public struct TicketScreen: View {
                 .padding(.vertical, 16)
         }
         .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
-        .frame(width: 8, height: 22)
+        .frame(width: 18, height: 22)
     }
     
     // MARK: - Attributed Content
@@ -323,6 +335,22 @@ public struct TicketScreen: View {
             info.status.maskColor
                 .clipShape(RoundedRectangle(cornerRadius: isLiquidGlass ? 10 : 6))
         )
+    }
+    
+    // MARK: - Alert Input
+    
+    @ViewBuilder
+    private func AlertInput(_ action: @escaping () -> Void) -> some View {
+        WithPerceptionTracking {
+            TextField(LocalizedStringKey("Input comment..."), text: $store.alertInput)
+            
+            Button(LocalizedStringResource("Cancel", bundle: .module)) { }
+            
+            Button(LocalizedStringResource("Send", bundle: .module)) {
+                action()
+            }
+            .disabled(store.alertInput.isEmpty)
+        }
     }
     
     // MARK: - No Comments

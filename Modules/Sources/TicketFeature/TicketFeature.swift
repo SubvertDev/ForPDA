@@ -24,6 +24,8 @@ public struct TicketFeature: Reducer, Sendable {
     
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let commentAdded = LocalizedStringResource("Comment added", bundle: .module)
+        static let commentEdited = LocalizedStringResource("Comment edited", bundle: .module)
         static let commentDeleted = LocalizedStringResource("Comment deleted", bundle: .module)
         static let handlerChanged = LocalizedStringResource("The ticket's handler has changed, please try again", bundle: .module)
         static let unableChangeStatus = LocalizedStringResource("Unable to change ticket status", bundle: .module)
@@ -37,6 +39,10 @@ public struct TicketFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case alert(AlertState<Alert>)
         case statusHistory(TicketStatusHistoryFeature)
+        
+        case addComment
+        @ReducerCaseIgnored
+        case editComment(Int)
         
         @CasePathable
         public enum Action {
@@ -65,6 +71,8 @@ public struct TicketFeature: Reducer, Sendable {
         var isLoading = false
         var isRefreshing = false
         
+        var alertInput = ""
+        
         public init(
             id: Int
         ) {
@@ -74,7 +82,8 @@ public struct TicketFeature: Reducer, Sendable {
     
     // MARK: - Action
     
-    public enum Action: ViewAction {
+    public enum Action: ViewAction, BindableAction {
+        case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
         
         case view(View)
@@ -82,8 +91,9 @@ public struct TicketFeature: Reducer, Sendable {
             case onAppear
             case onRefresh
             
-            case commentButtonTapped
+            case commentButtonTapped(Int, isAdd: Bool)
             case changeStatusButtonTapped(TicketStatus)
+            case showAddCommentAlertButtonTapped
             
             case urlTapped(URL)
             case commentAuthorButtonTapped(Int)
@@ -120,6 +130,8 @@ public struct TicketFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce<State, Action> { state, action in
             switch action {
             case let .destination(.presented(.statusHistory(.delegate(.openUser(id))))):
@@ -137,7 +149,7 @@ public struct TicketFeature: Reducer, Sendable {
                     await send(.internal(.refresh))
                 }
                 
-            case .delegate, .destination:
+            case .delegate, .destination, .binding:
                 return .none
                 
             case .view(.onAppear):
@@ -179,16 +191,29 @@ public struct TicketFeature: Reducer, Sendable {
             case let .view(.contextCommentMenu(action)):
                 switch action {
                 case .edit(let commentId):
-                    break
+                    if let comment = state.ticket?.comments.first(where: { $0.id == commentId }) {
+                        state.alertInput = comment.content
+                    }
+                    state.destination = .editComment(commentId)
                     
                 case .delete(let commentId):
                     state.destination = .alert(.deleteCommentConfirmation(commentId: commentId))
                 }
                 return .none
                 
-            case .view(.commentButtonTapped):
-                return .run { [ticketId = state.id] send in
-                    let response = try await ticketClient.modifyComment(id: 0, ticketId: ticketId, text: "Xx")
+            case .view(.showAddCommentAlertButtonTapped):
+                state.destination = .addComment
+                return .none
+                
+            case let .view(.commentButtonTapped(commentId, isAdd)):
+                return .run { [ticketId = state.id, text = state.alertInput] send in
+                    let status = try await ticketClient.modifyComment(commentId, ticketId, text)
+                    let commentToast = ToastMessage(
+                        text: isAdd ? Localization.commentAdded : Localization.commentEdited,
+                        haptic: .success
+                    )
+                    await toastClient.showToast(status ? commentToast : .whoopsSomethingWentWrong)
+                    await send(.internal(.refresh))
                 }
                 
             case let .view(.changeStatusButtonTapped(status)):
