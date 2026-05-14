@@ -504,7 +504,7 @@ extension APIClient: DependencyKey {
                 return status == 0
             },
             postKarmaHistory: { postId in
-                let command = ForumCommand.Post.history(id: postId)
+                let command = ForumCommand.Post.karma(postId: postId, action: .history)
                 let response = try await api.send(command)
                 return try await parser.parsePostKarmaHistory(response)
             },
