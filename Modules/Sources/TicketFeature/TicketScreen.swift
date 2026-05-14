@@ -80,6 +80,7 @@ public struct TicketScreen: View {
             }
             .navigationTitle(Text(store.ticket != nil ? "Ticket \(String(store.id))" : "Loading...", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
+            .alert($store.scope(state: \.$destination, action: \.destination).alert)
             .sheet(item: $store.scope(state: \.$destination, action: \.destination).statusHistory) { store in
                 NavigationStack {
                     TicketStatusHistoryView(store: store)
@@ -201,13 +202,38 @@ public struct TicketScreen: View {
                     Spacer()
                     
                     WithPerceptionTracking {
-                        if let session = store.userSession, session.userId == comment.authorId {
-                            // TODO: ContextMenu
+                        if let session = store.userSession {
+                            CommentContextMenu(id: comment.id)
                         }
                     }
                 }
             }
         }
+    }
+    
+    // MARK: - Comment Context Menu
+    
+    @ViewBuilder
+    private func CommentContextMenu(id: Int) -> some View {
+        Menu {
+            Button(role: .destructive) {
+                send(.contextCommentMenu(.delete(id)))
+            } label: {
+                HStack {
+                    Text("Delete", bundle: .module)
+                    Image(systemSymbol: .trash)
+                }
+            }
+            .tint(.red)
+        } label: {
+            Image(systemSymbol: .ellipsis)
+                .font(.body)
+                .foregroundStyle(Color(.Labels.teritary))
+                .padding(.horizontal, 8) // Padding for tap area
+                .padding(.vertical, 16)
+        }
+        .onTapGesture {} // DO NOT DELETE, FIX FOR IOS 17
+        .frame(width: 8, height: 22)
     }
     
     // MARK: - Attributed Content

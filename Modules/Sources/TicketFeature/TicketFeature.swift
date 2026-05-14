@@ -24,6 +24,7 @@ public struct TicketFeature: Reducer, Sendable {
     
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let commentDeleted = LocalizedStringResource("Comment deleted", bundle: .module)
         static let handlerChanged = LocalizedStringResource("The ticket's handler has changed, please try again", bundle: .module)
         static let unableChangeStatus = LocalizedStringResource("Unable to change ticket status", bundle: .module)
         static let statusChanged = LocalizedStringResource("Ticket status changed", bundle: .module)
@@ -33,11 +34,19 @@ public struct TicketFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
         case statusHistory(TicketStatusHistoryFeature)
         
         @CasePathable
         public enum Action {
+            case alert(Alert)
             case statusHistory(TicketStatusHistoryFeature.Action)
+        }
+        
+        @CasePathable
+        public enum Alert: Equatable {
+            case deleteComment(Int)
         }
     }
     
@@ -54,6 +63,7 @@ public struct TicketFeature: Reducer, Sendable {
         
         var ticket: Ticket?
         var isLoading = false
+        var isRefreshing = false
         
         public init(
             id: Int
@@ -78,10 +88,12 @@ public struct TicketFeature: Reducer, Sendable {
             case commentAuthorButtonTapped(Int)
             
             case contextMenu(TicketContextMenuAction)
+            case contextCommentMenu(TicketCommentContextMenuAction)
         }
         
         case `internal`(Internal)
         public enum Internal {
+            case refresh
             case loadTicket
             case ticketResponse(Result<Ticket, any Error>)
             case changeTicketStatusResponse(Result<(TicketStatus, TicketStatusChangeResponse), any Error>)
@@ -112,6 +124,17 @@ public struct TicketFeature: Reducer, Sendable {
             case let .destination(.presented(.statusHistory(.delegate(.openUser(id))))):
                 state.destination = nil
                 return .send(.delegate(.openUser(id)))
+                
+            case let .destination(.presented(.alert(.deleteComment(id)))):
+                return .run { [ticketId = state.id] send in
+                    let status = try await ticketClient.deleteComment(id, ticketId)
+                    let postDeletedToast = ToastMessage(
+                        text: Localization.commentDeleted,
+                        haptic: .success
+                    )
+                    await toastClient.showToast(status ? postDeletedToast : .whoopsSomethingWentWrong)
+                    await send(.internal(.refresh))
+                }
                 
             case .delegate, .destination:
                 return .none
@@ -149,6 +172,16 @@ public struct TicketFeature: Reducer, Sendable {
                 }
                 return .none
                 
+            case let .view(.contextCommentMenu(action)):
+                switch action {
+                case .edit(let commentId):
+                    break
+                    
+                case .delete(let commentId):
+                    state.destination = .alert(.deleteCommentConfirmation(commentId: commentId))
+                }
+                return .none
+                
             case .view(.commentButtonTapped):
                 return .run { [ticketId = state.id] send in
                     let response = try await ticketClient.modifyComment(id: 0, ticketId: ticketId, text: "Xx")
@@ -165,6 +198,10 @@ public struct TicketFeature: Reducer, Sendable {
                 } catch: { error, send in
                     await send(.internal(.changeTicketStatusResponse(.failure(error))))
                 }
+                
+            case .internal(.refresh):
+                state.isRefreshing = true
+                return .send(.internal(.loadTicket))
                 
             case let .internal(.changeTicketStatusResponse(.success((status, .success)))):
                 if let session = state.userSession, let handlerName = state.userSessionNickname {
@@ -204,7 +241,9 @@ public struct TicketFeature: Reducer, Sendable {
                 }
                 
             case .internal(.loadTicket):
-                state.isLoading = true
+                if !state.isRefreshing {
+                    state.isLoading = true
+                }
                 return .run { [id = state.id] send in
                     let response = try await ticketClient.getTicket(id)
                     await send(.internal(.ticketResponse(.success(response))))
@@ -215,11 +254,13 @@ public struct TicketFeature: Reducer, Sendable {
             case let .internal(.ticketResponse(.success(response))):
                 state.ticket = response
                 state.isLoading = false
+                state.isRefreshing = false
                 return .none
                 
             case let .internal(.ticketResponse(.failure(error))):
                 print(error)
                 state.isLoading = false
+                state.isRefreshing = false
                 return .none
                 
             case let .internal(.initUserSessionNickname(name)):
@@ -232,3 +273,24 @@ public struct TicketFeature: Reducer, Sendable {
 }
 
 extension TicketFeature.Destination.State: Equatable {}
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == TicketFeature.Destination.Alert {
+    
+    nonisolated static func deleteCommentConfirmation(commentId: Int) -> AlertState {
+        return AlertState(
+            title: {
+                TextState("Are you sure, that you want to delete this comment?", bundle: .module)
+            },
+            actions: {
+                ButtonState(role: .destructive, action: .deleteComment(commentId)) {
+                    TextState("Yes", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("No", bundle: .module)
+                }
+            }
+        )
+    }
+}
