@@ -94,6 +94,14 @@ public struct TicketScreen: View {
                     send(.commentButtonTapped(commentId, isAdd: false))
                 })
             }
+            .alert(
+                item: $store.destination.addComment,
+                title: { _ in Text("Add ticket comment", bundle: .module) }
+            ) {
+                AlertInput({
+                    send(.commentButtonTapped(0, isAdd: true))
+                })
+            }
             ._safeAreaBar(edge: .bottom) {
                 if store.ticket != nil {
                     ActionButtons()
@@ -168,7 +176,7 @@ public struct TicketScreen: View {
             }
             
             Button {
-                send(.commentButtonTapped(0, isAdd: true))
+                send(.showAddCommentAlertButtonTapped)
             } label: {
                 Text("Comment", bundle: .module)
                     .frame(maxWidth: .infinity)
@@ -176,7 +184,6 @@ public struct TicketScreen: View {
             }
             .buttonStyle(.borderedProminent)
             .frame(height: 48)
-            .disabled(true)
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
