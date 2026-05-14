@@ -101,6 +101,8 @@ public struct TicketsListScreen: View {
             }
             .onFirstAppear {
                 send(.onFirstAppear)
+            } onNextAppear: {
+                send(.onNextAppear)
             }
         }
     }

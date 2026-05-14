@@ -78,6 +78,7 @@ public struct TicketsListFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onFirstAppear
+            case onNextAppear
             case onRefresh
             
             case ticketButtonTapped(Int)
@@ -143,6 +144,9 @@ public struct TicketsListFeature: Reducer, Sendable {
                     }
                     await send(.internal(.loadTickets(offset: 0)))
                 }
+                
+            case .view(.onNextAppear):
+                return .send(.internal(.refresh))
                 
             case .view(.onRefresh):
                 guard !state.isLoading else { return .none }
