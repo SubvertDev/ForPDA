@@ -108,6 +108,7 @@ public struct TicketFeature: Reducer, Sendable {
             case loadTicket
             case ticketResponse(Result<Ticket, any Error>)
             case changeTicketStatusResponse(Result<(TicketStatus, TicketStatusChangeResponse), any Error>)
+            case commentTicketResponse(Result<(Bool, Bool), any Error>)
             
             case initUserSessionNickname(String)
         }
@@ -208,12 +209,9 @@ public struct TicketFeature: Reducer, Sendable {
             case let .view(.commentButtonTapped(commentId, isAdd)):
                 return .run { [ticketId = state.id, text = state.alertInput] send in
                     let status = try await ticketClient.modifyComment(commentId, ticketId, text)
-                    let commentToast = ToastMessage(
-                        text: isAdd ? Localization.commentAdded : Localization.commentEdited,
-                        haptic: .success
-                    )
-                    await toastClient.showToast(status ? commentToast : .whoopsSomethingWentWrong)
-                    await send(.internal(.refresh))
+                    await send(.internal(.commentTicketResponse(.success((isAdd, status)))))
+                } catch: { error, send in
+                    await send(.internal(.commentTicketResponse(.failure(error))))
                 }
                 
             case let .view(.changeStatusButtonTapped(status)):
@@ -261,6 +259,24 @@ public struct TicketFeature: Reducer, Sendable {
                 
             case let .internal(.changeTicketStatusResponse(.failure(error))):
                 print(error)
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
+                
+            case let .internal(.commentTicketResponse(.success((isAdd, status)))):
+                state.alertInput = ""
+                return .run { send in
+                    let commentToast = ToastMessage(
+                        text: isAdd ? Localization.commentAdded : Localization.commentEdited,
+                        haptic: .success
+                    )
+                    await toastClient.showToast(status ? commentToast : .whoopsSomethingWentWrong)
+                    await send(.internal(.refresh))
+                }
+                
+            case let .internal(.commentTicketResponse(.failure(error))):
+                print(error)
+                state.alertInput = ""
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
