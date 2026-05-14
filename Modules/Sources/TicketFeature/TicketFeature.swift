@@ -218,11 +218,7 @@ public struct TicketFeature: Reducer, Sendable {
                 
             case let .view(.changeStatusButtonTapped(status)):
                 return .run { [ticketId = state.id, handlerId = state.userSession?.userId] send in
-                    let response = try await ticketClient.changeTicketStatus(
-                        id: ticketId,
-                        handlerId: handlerId ?? 0,
-                        status: status
-                    )
+                    let response = try await ticketClient.changeTicketStatus(ticketId, handlerId ?? 0, status)
                     await send(.internal(.changeTicketStatusResponse(.success((status, response)))))
                 } catch: { error, send in
                     await send(.internal(.changeTicketStatusResponse(.failure(error))))
