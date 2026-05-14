@@ -235,14 +235,14 @@ public struct ReputationScreen: View {
         ContextButton(
             text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
-            action: { send(.profileTapped(authorId)) }
+            action: { send(.contextVoteMenu(.goToAuthor(authorId))) }
         )
         
         if store.pickerSection == .history {
             ContextButton(
                 text: LocalizedStringResource("Complain", bundle: .module),
                 symbol: .exclamationmarkTriangle,
-                action: { send(.complainButtonTapped(voteId)) }
+                action: { send(.contextVoteMenu(.report(voteId))) }
             )
         }
     }

@@ -84,8 +84,9 @@ public struct ReputationFeature: Reducer, Sendable {
             case loadMore
             case refresh
             case profileTapped(Int)
-            case complainButtonTapped(Int)
             case sourceTapped(ReputationVote)
+            
+            case contextVoteMenu(ReputationVoteContextMenuAction)
         }
         
         case `internal`(Internal)
@@ -148,13 +149,6 @@ public struct ReputationFeature: Reducer, Sendable {
             case let .view(.profileTapped(profileId)):
                 return .send(.delegate(.openProfile(profileId: profileId)))
                 
-            case let .view(.complainButtonTapped(voteId)):
-                let feature = FormFeature.State(
-                    type: .report(id: voteId, type: .reputation)
-                )
-                state.destination = .report(feature)
-                return .none
-                
             case let .view(.sourceTapped(vote)):
                 switch vote.createdIn {
                 case .profile:
@@ -166,6 +160,24 @@ public struct ReputationFeature: Reducer, Sendable {
                 case let .site(id: articleId, _, _):
                     return .send(.delegate(.openArticle(articleId: articleId)))
                 }
+                
+            case let .view(.contextVoteMenu(action)):
+                switch action {
+                case .report(let voteId):
+                    let feature = FormFeature.State(
+                        type: .report(id: voteId, type: .reputation)
+                    )
+                    state.destination = .report(feature)
+                    
+                case .delete(let voteId):
+                    break
+                case .restore(let voteId):
+                    break
+                    
+                case .goToAuthor(let profileId):
+                    return .send(.delegate(.openProfile(profileId: profileId)))
+                }
+                return .none
                 
             case .internal(.loadData):
                 let isHistory = state.pickerSection == .history
