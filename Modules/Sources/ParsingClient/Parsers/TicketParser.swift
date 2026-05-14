@@ -39,7 +39,7 @@ public struct TicketParser {
         
         return Ticket(
             info: TicketInfo(
-                title: title,
+                title: title.convertCodes(),
                 status: TicketStatus(rawValue: statusRaw)!,
                 subjectId: subjectId,
                 subjectElementId: subjectElementId,
