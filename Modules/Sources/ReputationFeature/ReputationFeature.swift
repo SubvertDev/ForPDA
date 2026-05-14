@@ -67,6 +67,10 @@ public struct ReputationFeature: Reducer, Sendable {
             return userSession?.userId == userId
         }
         
+        public var isUserAuthorized: Bool {
+            return userSession != nil
+        }
+        
         public init(userId: Int) {
             self.userId = userId
         }

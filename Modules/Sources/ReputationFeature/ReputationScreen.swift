@@ -172,15 +172,17 @@ public struct ReputationScreen: View {
                 
                 Spacer()
                 
-                Menu {
-                    MenuButtons(voteId: vote.id, authorId: authorId)
-                } label: {
-                    Image(systemSymbol: .ellipsis)
-                        .foregroundStyle(Color(.Labels.teritary))
-                        .font(.body)
+                if store.isUserAuthorized {
+                    Menu {
+                        MenuButtons(voteId: vote.id, authorId: authorId)
+                    } label: {
+                        Image(systemSymbol: .ellipsis)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .font(.body)
+                    }
+                    .menuStyle(.button)
+                    .buttonStyle(.plain)
                 }
-                .menuStyle(.button)
-                .buttonStyle(.plain)
             }
         }
         .padding(.leading, 12)
@@ -188,7 +190,9 @@ public struct ReputationScreen: View {
         .contentShape(Rectangle())
         .background(Color(.Background.primary))
         .contextMenu {
-            MenuButtons(voteId: vote.id, authorId: authorId)
+            if store.isUserAuthorized {
+                MenuButtons(voteId: vote.id, authorId: authorId)
+            }
         }
     }
     // MARK: - Empty Reputation
