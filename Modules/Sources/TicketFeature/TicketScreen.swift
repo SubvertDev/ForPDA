@@ -342,7 +342,7 @@ public struct TicketScreen: View {
     @ViewBuilder
     private func AlertInput(_ action: @escaping () -> Void) -> some View {
         WithPerceptionTracking {
-            TextField(LocalizedStringKey("Input comment..."), text: $store.alertInput)
+            TextField(String(localized: "Input comment...", bundle: .module), text: $store.alertInput)
             
             Button(LocalizedStringResource("Cancel", bundle: .module)) { }
             
