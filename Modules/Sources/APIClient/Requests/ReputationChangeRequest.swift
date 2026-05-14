@@ -23,16 +23,15 @@ public struct ReputationChangeRequest: Sendable {
         case up
         case down
         case delete
-        case recover
+        case restore
     }
     
     nonisolated var transferVoteType: MemberReputationRequest.ActionType {
         switch action {
-        case .up:   .plus
-        case .down: .minus
-            
-        // TODO: Implement.
-        case .delete, .recover: .plus
+        case .up:      .plus
+        case .down:    .minus
+        case .delete:  .delete
+        case .restore: .restore
         }
     }
     
