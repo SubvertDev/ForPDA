@@ -61,6 +61,7 @@ public struct TicketsListFeature: Reducer, Sendable {
         
         var isLoading = false
         var isRefreshing = false
+        var isFirstAppear = false
         
         public init(
             type: TicketsListType,
@@ -141,11 +142,12 @@ public struct TicketsListFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onFirstAppear):
-                return .run { [offset = state.initialOffset, session = state.userSession] send in
+                state.isFirstAppear = true
+                return .run { [initialOffset = state.initialOffset, session = state.userSession] send in
                     if let session, let user = cacheClient.getUser(session.userId) {
                         await send(.internal(.initUserSessionNickname(user.nickname)))
                     }
-                    await send(.internal(.loadTickets(offset: offset)))
+                    await send(.internal(.loadTickets(offset: initialOffset)))
                 }
                 
             case .view(.onNextAppear):
@@ -236,6 +238,12 @@ public struct TicketsListFeature: Reducer, Sendable {
             case let .internal(.ticketsResponse(.success(response))):
                 state.tickets = .init(uniqueElements: response.tickets)
                 state.pageNavigation.count = response.availableCount
+                if state.isFirstAppear {
+                    state.isFirstAppear = false
+                    state.isLoading = false
+                    state.isRefreshing = false
+                    return .send(.pageNavigation(.update(count: response.availableCount, offset: state.initialOffset)))
+                }
                 state.isLoading = false
                 state.isRefreshing = false
                 return .none
