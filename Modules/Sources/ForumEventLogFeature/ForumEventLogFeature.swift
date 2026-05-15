@@ -96,7 +96,7 @@ public struct ForumEventLogFeature: Reducer, Sendable {
                     
                 case .copyLink:
                     let type = state.type == .post ? "p" : "t"
-                    pasteboardClient.copy("forum/index.php?act=mod&code=90&\(type)=\(state.id)")
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?act=mod&code=90&\(type)=\(state.id)")
                     return .run { _ in
                         let message = ToastMessage(text: LocalizedStringResource("Link copied", bundle: .module), haptic: .success)
                         await toastClient.showToast(message)
