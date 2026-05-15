@@ -21,6 +21,16 @@
         }
       }
     },
+    "Denied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменено"
+          }
+        }
+      }
+    },
     "Help other users on the forum and get reputation" : {
       "localizations" : {
         "ru" : {
@@ -129,6 +139,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Репутация"
+          }
+        }
+      }
+    },
+    "Restored" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановлено"
           }
         }
       }
