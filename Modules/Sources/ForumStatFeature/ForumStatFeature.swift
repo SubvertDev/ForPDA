@@ -145,7 +145,10 @@ public struct ForumStatFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.loadTopicHistoryButtonTapped):
-                return .send(.delegate(.topicHistoryTapped))
+                return .run { send in
+                    await send(.delegate(.topicHistoryTapped))
+                    await dismiss()
+                }
                 
             case let .internal(.loadTopicStat(topic)):
                 if state.isUserAuthorized {
