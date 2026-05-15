@@ -55,6 +55,7 @@ public struct TicketsListFeature: Reducer, Sendable {
         public var pageNavigation = PageNavigationFeature.State(type: .tickets)
         
         public let type: TicketsListType
+        public let initialOffset: Int
         
         var tickets: IdentifiedArrayOf<TicketsList.TicketSimplified> = []
         
@@ -62,9 +63,11 @@ public struct TicketsListFeature: Reducer, Sendable {
         var isRefreshing = false
         
         public init(
-            type: TicketsListType
+            type: TicketsListType,
+            initialOffset: Int = 0
         ) {
             self.type = type
+            self.initialOffset = initialOffset
         }
     }
     
@@ -138,11 +141,11 @@ public struct TicketsListFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onFirstAppear):
-                return .run { [session = state.userSession] send in
+                return .run { [offset = state.initialOffset, session = state.userSession] send in
                     if let session, let user = cacheClient.getUser(session.userId) {
                         await send(.internal(.initUserSessionNickname(user.nickname)))
                     }
-                    await send(.internal(.loadTickets(offset: 0)))
+                    await send(.internal(.loadTickets(offset: offset)))
                 }
                 
             case .view(.onNextAppear):

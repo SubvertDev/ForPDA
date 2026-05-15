@@ -39,6 +39,8 @@ import CacheClient
 import DeviceSpecificationsFeature
 import DeviceTypeFeature
 import MoreFeature
+import TicketsListFeature
+import TicketFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -588,6 +590,10 @@ public struct AppFeature: Reducer, Sendable {
             case .device(let tag, let subTag):
                 .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
             }
+        case let .ticketsList(offset):
+            screen = .tickets(.ticketsList(TicketsListFeature.State(type: .list, initialOffset: offset)))
+        case let .ticket(id):
+            screen = .tickets(.ticket(TicketFeature.State(id: id)))
         case let .topic(id, goTo):
             screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
         case let .forum(id, page):

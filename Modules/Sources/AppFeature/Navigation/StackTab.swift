@@ -538,6 +538,12 @@ public struct StackTab: Reducer, Sendable {
             case let .qms(id: id):
                 state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
                 
+            case let .ticketsList(offset: offset):
+                state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .list, initialOffset: offset))))
+                
+            case let .ticket(id: id):
+                state.path.append(.tickets(.ticket(TicketFeature.State(id: id))))
+                
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))
                 

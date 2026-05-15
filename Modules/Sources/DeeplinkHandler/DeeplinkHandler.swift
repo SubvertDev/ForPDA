@@ -20,6 +20,8 @@ public enum Deeplink {
     case qms(id: Int)
     case search(SearchResult)
     case device(DeviceGoTo)
+    case ticketsList(offset: Int)
+    case ticket(Int)
 }
 
 public struct DeeplinkHandler {
@@ -235,6 +237,19 @@ public struct DeeplinkHandler {
                     return .topic(id: nil, goTo: .post(id: postId))
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "pid", for: url.absoluteString))
+                }
+                
+            case "ticket":
+                if let ticketItem = queryItems.first(where: { $0.name == "t_id" }), let value = ticketItem.value, let ticketId = Int(value) {
+                    // https://4pda.to/forum/index.php?act=ticket&s=thread&t_id=123456
+                    return .ticket(ticketId)
+                } else {
+                    // https://4pda.to/forum/index.php?act=ticket&st=20
+                    let offset = if let ticketItem = queryItems.first(where: { $0.name == "st" }),
+                                    let value = ticketItem.value, let offset = Int(value) {
+                        offset
+                    } else { 0 }
+                    return .ticketsList(offset: offset)
                 }
                 
             case "search":
