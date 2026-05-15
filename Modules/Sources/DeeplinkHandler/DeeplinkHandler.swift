@@ -22,6 +22,7 @@ public enum Deeplink {
     case device(DeviceGoTo)
     case ticketsList(offset: Int)
     case ticket(Int)
+    case eventLog(Int, ForumEventLogType)
 }
 
 public struct DeeplinkHandler {
@@ -250,6 +251,24 @@ public struct DeeplinkHandler {
                         offset
                     } else { 0 }
                     return .ticketsList(offset: offset)
+                }
+                
+            case "mod":
+                // https://4pda.to/forum/index.php?act=mod&code=90&p=2121425241
+                if let modItem = queryItems.first(where: { $0.name == "code" }), let value = modItem.value, let code = Int(value) {
+                    switch code {
+                    case 90: // topic/post event log
+                        if let postIdItem = queryItems.first(where: { $0.name == "p" }), let value = postIdItem.value, let postId = Int(value) {
+                            return .eventLog(postId, .post)
+                        } else if let topicIdItem = queryItems.first(where: { $0.name == "t" }), let value = topicIdItem.value, let topicId = Int(value) {
+                            return .eventLog(topicId, .topic)
+                        }
+                        
+                    default:
+                        analytics.capture(DeeplinkError.unknownType(type: "code:\(code)", for: url.absoluteString))
+                    }
+                } else {
+                    analytics.capture(DeeplinkError.noType(of: "code", for: url.absoluteString))
                 }
                 
             case "search":

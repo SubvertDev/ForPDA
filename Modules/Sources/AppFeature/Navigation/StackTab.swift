@@ -529,6 +529,9 @@ public struct StackTab: Reducer, Sendable {
             case let .forum(id: id, page: page):
                 state.path.append(.forum(.forum(ForumFeature.State(forumId: id, initialPage: page))))
                 
+            case let .eventLog(id, type):
+                state.path.append(.forum(.eventLog(ForumEventLogFeature.State(id: id, type: type))))
+                
             case let .announcement(id: id):
                 state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id))))
                 

@@ -41,6 +41,7 @@ import DeviceTypeFeature
 import MoreFeature
 import TicketsListFeature
 import TicketFeature
+import ForumEventLogFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -598,6 +599,8 @@ public struct AppFeature: Reducer, Sendable {
             screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
         case let .forum(id, page):
             screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
+        case let .eventLog(id, type):
+            screen = .forum(.eventLog(ForumEventLogFeature.State(id: id, type: type)))
         case let .user(id):
             screen = .more(.profile(ProfileFeature.State(userId: id)))
         case let .qms(id: id):
