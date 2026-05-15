@@ -165,6 +165,16 @@ public struct ReputationScreen: View {
                 .multilineTextAlignment(.leading)
                 .padding(.vertical, 8)
             
+            if let modified = vote.modified {
+                Button {
+                    send(.profileTapped(modified.userId))
+                } label: {
+                    ReputationModifiedBadge(modified)
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 8)
+            }
+            
             HStack {
                 Text(formatDate(vote.createdAt))
                     .foregroundStyle(Color(.Labels.teritary))
@@ -195,6 +205,31 @@ public struct ReputationScreen: View {
             }
         }
     }
+    
+    // MARK: - Reputation Modified Badge
+    
+    @ViewBuilder
+    private func ReputationModifiedBadge(_ modified: ReputationVote.VoteModified) -> some View {
+        let text: LocalizedStringKey = modified.isDenied ? "Denied" : "Restored"
+        HStack(spacing: 4) {
+            Text(text, bundle: .module)
+            
+            HStack(spacing: 4) {
+                Text(formatDate(modified.modifiedAt))
+                
+                Text(verbatim: "· \(modified.userName)")
+            }
+        }
+        .font(.caption)
+        .foregroundStyle((modified.isDenied ? Color(.Main.yellow) : tintColor))
+        .padding(.vertical, 2)
+        .padding(.horizontal, 6)
+        .background(
+            Color(modified.isDenied ? .Main.yellowAlpha : .Main.primaryAlpha)
+                .clipShape(RoundedRectangle(cornerRadius: isLiquidGlass ? 10 : 6))
+        )
+    }
+    
     // MARK: - Empty Reputation
     
     @ViewBuilder

@@ -73,7 +73,8 @@ public struct ReputationParser {
             return nil
         }
         
-        guard let userId = vote[safe: 12] as? Int,
+        guard let modifiedAt = vote[safe: 11] as? Int,
+              let userId = vote[safe: 12] as? Int,
               let userName = vote[safe: 13] as? String else {
             throw ParsingError.failedToCastFields
         }
@@ -81,6 +82,7 @@ public struct ReputationParser {
         return ReputationVote.VoteModified(
             userId: userId,
             userName: userName,
+            modifiedAt: Date(timeIntervalSince1970: TimeInterval(modifiedAt)),
             isDenied: flag & 2 != 0
         )
     }

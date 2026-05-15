@@ -20,7 +20,7 @@ public struct ReputationVotes: Decodable, Hashable, Sendable {
 
 public extension ReputationVotes {
     static let mock = ReputationVotes(
-        votes: [.mock],
-        votesCount: 1
+        votes: [.mock, .mockModified(isDenied: true), .mockModified(isDenied: false)],
+        votesCount: 3
     )
 }
