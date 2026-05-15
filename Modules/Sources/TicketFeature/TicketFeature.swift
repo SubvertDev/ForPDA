@@ -193,7 +193,11 @@ public struct TicketFeature: Reducer, Sendable {
                 switch action {
                 case .edit(let commentId):
                     if let comment = state.ticket?.comments.first(where: { $0.id == commentId }) {
-                        state.alertInput = comment.content
+                        if let range = comment.content.range(of: "[na]") {
+                            state.alertInput = String(comment.content[range.upperBound...])
+                        } else {
+                            state.alertInput = comment.content
+                        }
                     }
                     state.destination = .editComment(commentId)
                     
