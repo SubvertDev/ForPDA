@@ -168,7 +168,8 @@ public struct DeeplinkHandler {
         
         // site search
         
-        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value, !value.isEmpty {
+        if let siteSearchItem = queryItems.first(where: { $0.name == "s" }), let value = siteSearchItem.value, !value.isEmpty,
+           (url.pathComponents.count == 0 || url.pathComponents.count == 1) {
             // https://4pda.to/?s=4pda
             let searchText = if let decodedSearchText = value.removingPercentEncoding {
                 decodedSearchText
