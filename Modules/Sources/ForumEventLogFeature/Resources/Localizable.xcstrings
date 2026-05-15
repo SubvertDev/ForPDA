@@ -2,13 +2,34 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Copy Link" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скопировать ссылку"
+          }
+        }
+      }
     },
     "Go to Post" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти к посту"
+          }
+        }
+      }
     },
     "Go to Topic" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перейти в тему"
+          }
+        }
+      }
     },
     "Link copied" : {
       "localizations" : {
