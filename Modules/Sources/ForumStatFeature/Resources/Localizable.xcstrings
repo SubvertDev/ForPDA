@@ -71,6 +71,16 @@
         }
       }
     },
+    "Load History" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузить историю"
+          }
+        }
+      }
+    },
     "Moderators" : {
       "localizations" : {
         "ru" : {

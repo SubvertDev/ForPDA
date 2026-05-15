@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ForumEventLog: Sendable {
+public struct ForumEventLog: Sendable, Equatable, Hashable {
     public let userId: Int
     public let userName: String
     public let userGroup: User.Group

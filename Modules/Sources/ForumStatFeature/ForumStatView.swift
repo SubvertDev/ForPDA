@@ -52,7 +52,9 @@ public struct ForumStatView: View {
             }
             .background(Color(.Background.primary))
             .safeAreaInset(edge: .bottom) {
-                OpenInBrowserButton()
+                if case let .topic(topic) = store.type, topic.canModerate {
+                    OpenTopicHistoryButton()
+                }
             }
             .toolbar {
                 Toolbar()
@@ -154,24 +156,22 @@ public struct ForumStatView: View {
         .padding(.top, 18)
     }
     
-    // MARK: - Open In Browser Button
+    // MARK: - Open Topic History Button
     
-    private func OpenInBrowserButton() -> some View {
+    private func OpenTopicHistoryButton() -> some View {
         Button {
-            send(.openInBrowserButtonTapped)
+            send(.loadTopicHistoryButtonTapped)
         } label: {
-            HStack {
-                Text(verbatim: store.shareLink)
-                    .font(.footnote)
-                    .foregroundStyle(Color(.Labels.teritary))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Image(systemSymbol: .arrowUpRight)
-                    .font(.callout)
-                    .foregroundStyle(tintColor)
-            }
+            Text("Load History", bundle: .module)
+                .padding(8)
+                .frame(maxWidth: .infinity)
         }
-        .padding(16)
+        .buttonStyle(.bordered)
+        .tint(tintColor)
+        .frame(height: 48)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 16)
+        .background(Color(.Background.primary))
     }
     
     // MARK: - Header
