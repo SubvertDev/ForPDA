@@ -45,6 +45,7 @@ let project = Project(
                     .Internal.DeviceTypeFeature,
                     .Internal.FavoritesFeature,
                     .Internal.FavoritesRootFeature,
+                    .Internal.ForumEventLogFeature,
                     .Internal.ForumFeature,
                     .Internal.ForumsListFeature,
                     .Internal.HistoryFeature,
@@ -262,6 +263,21 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA,
+                ]
+            ),
+
+            .feature(
+                name: "ForumEventLogFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.BBBuilder,
+                    .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA,
                 ]
@@ -1167,6 +1183,7 @@ extension TargetDependency.Internal {
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let FormFeature =            TargetDependency.target(name: "FormFeature")
+    static let ForumEventLogFeature =   TargetDependency.target(name: "ForumEventLogFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
     static let ForumMoveFeature =       TargetDependency.target(name: "ForumMoveFeature")

@@ -15,6 +15,7 @@ import DeviceSpecificationsFeature
 import DeviceTypeFeature
 import FavoritesRootFeature
 import FavoritesFeature
+import ForumEventLogFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
@@ -73,6 +74,7 @@ public enum Path {
         case forum(ForumFeature)
         case announcement(AnnouncementFeature)
         case topic(TopicFeature)
+        case eventLog(ForumEventLogFeature)
     }
     
     @Reducer
@@ -215,6 +217,9 @@ extension Path {
         case let .topic(store):
             TopicScreen(store: store)
                 .tracking(for: TopicScreen.self, ["id": store.topicId])
+            
+        case let .eventLog(store):
+            ForumEventLogScreen(store: store)
             
         case let .announcement(store):
             AnnouncementScreen(store: store)
