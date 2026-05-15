@@ -410,7 +410,7 @@ extension Ticket.Comment {
     var contentAttributed: NSAttributedString? {
         guard !content.isEmpty else { return nil }
         return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .subheadline)])
-            .render(text: content)
+            .render(text: content.replacingOccurrences(of: "[na]", with: ""))
     }
 }
 
