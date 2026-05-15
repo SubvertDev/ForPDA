@@ -343,6 +343,13 @@ public struct PostRowView: View {
             ) {
                 toolsMenuAction(.move(state.post.id))
             }
+            
+            ContextButton(
+                text: LocalizedStringResource("History", bundle: .module),
+                symbol: .clockArrowCirclepath
+            ) {
+                toolsMenuAction(.eventLog(state.post.id))
+            }
         } label: {
             HStack {
                 Text("Tools", bundle: .module)

@@ -7,5 +7,6 @@
 
 public enum PostToolsMenuAction {
     case move(Int)
+    case eventLog(Int)
     case modify(PostModifyAction, Int, Bool)
 }

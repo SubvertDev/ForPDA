@@ -188,6 +188,7 @@ public struct TopicFeature: Reducer, Sendable {
             case handleUrl(URL)
             case openUser(id: Int)
             case openTickets(Int)
+            case openEventLog(Int, ForumEventLogType)
             case openSearch(SearchOn, ForumInfo?)
             case openSearchResult(SearchResult)
             case openedLastPage
@@ -249,6 +250,9 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
+                
+            case .destination(.presented(.stat(.delegate(.topicHistoryTapped)))):
+                return .send(.delegate(.openEventLog(state.topicId, .topic)))
                 
             case let .destination(.presented(.karmaHistory(.delegate(.openUser(id))))):
                 return .send(.delegate(.openUser(id: id)))
@@ -506,6 +510,9 @@ public struct TopicFeature: Reducer, Sendable {
                 case .move(let postId):
                     state.destination = .move(ForumMoveFeature.State(type: .posts([postId])))
                     return .none
+                    
+                case .eventLog(let postId):
+                    return .send(.delegate(.openEventLog(postId, .post)))
                     
                 case .modify(let action, let postId, let isUndo):
                     switch action {
