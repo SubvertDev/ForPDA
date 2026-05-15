@@ -296,11 +296,8 @@ public struct StackTab: Reducer, Sendable {
         case let .eventLog(.delegate(.openUser(id))):
             state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
-        case let .eventLog(.delegate(.openPost(id))):
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: 0, goTo: .post(id: id)))))
-            
         case let .eventLog(.delegate(.openTopic(id))):
-            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, topicName: "", goTo: .first))))
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: .first))))
             
         case let .eventLog(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)

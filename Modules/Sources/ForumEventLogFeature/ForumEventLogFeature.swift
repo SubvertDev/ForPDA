@@ -58,7 +58,6 @@ public struct ForumEventLogFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case openUser(Int)
-            case openPost(Int)
             case openTopic(Int)
             case handleUrl(URL)
         }
@@ -89,7 +88,8 @@ public struct ForumEventLogFeature: Reducer, Sendable {
                 case .goToSubject:
                     switch state.type {
                     case .post:
-                        return .send(.delegate(.openPost(state.id)))
+                        let link = "https://4pda.to/forum/index.php?act=findpost&pid=\(state.id)"
+                        return .send(.delegate(.handleUrl(URL(string: link)!)))
                     case .topic:
                         return .send(.delegate(.openTopic(state.id)))
                     }
