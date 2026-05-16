@@ -85,7 +85,8 @@ public struct ForumMoveFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
-            case openDeeplink(Deeplink)
+            case openTopic(Int)
+            case openForum(Int)
         }
     }
     
@@ -166,7 +167,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
                 
             case let .internal(.movePostsResponse(.success((status, toTopicId)))):
                 if status {
-                    return .send(.delegate(.openDeeplink(.topic(id: toTopicId, goTo: .last))))
+                    return .send(.delegate(.openTopic(toTopicId)))
                 }
                 return .send(.internal(.movePostsResponse(.failure(NSError(domain: "MP", code: -1)))))
                 
@@ -182,7 +183,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
                 
             case let .internal(.moveTopicResponse(.success((status, toForumId)))):
                 if status {
-                    return .send(.delegate(.openDeeplink(.forum(id: toForumId, page: 0))))
+                    return .send(.delegate(.openForum(toForumId)))
                 }
                 return .send(.internal(.moveTopicResponse(.failure(NSError(domain: "MT", code: -1)))))
                 
