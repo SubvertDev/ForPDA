@@ -17,7 +17,7 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     public let authorId: Int
     public let authorName: String
     public let reason: String
-    public let modified: VoteModified?
+    public var modified: VoteModified?
     public let createdIn: VoteCreatedIn
     public let createdAt: Date
     public let isDown: Bool

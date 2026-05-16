@@ -184,7 +184,7 @@ public struct ReputationScreen: View {
                 
                 if store.isUserAuthorized {
                     Menu {
-                        MenuButtons(voteId: vote.id, authorId: authorId)
+                        MenuButtons(voteId: vote.id, authorId: authorId, modified: vote.modified)
                     } label: {
                         Image(systemSymbol: .ellipsis)
                             .foregroundStyle(Color(.Labels.teritary))
@@ -201,7 +201,7 @@ public struct ReputationScreen: View {
         .background(Color(.Background.primary))
         .contextMenu {
             if store.isUserAuthorized {
-                MenuButtons(voteId: vote.id, authorId: authorId)
+                MenuButtons(voteId: vote.id, authorId: authorId, modified: vote.modified)
             }
         }
     }
@@ -270,7 +270,7 @@ public struct ReputationScreen: View {
     // MARK: - Menu Buttons
     
     @ViewBuilder
-    private func MenuButtons(voteId: Int, authorId: Int) -> some View {
+    private func MenuButtons(voteId: Int, authorId: Int, modified: ReputationVote.VoteModified?) -> some View {
         ContextButton(
             text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
@@ -283,6 +283,23 @@ public struct ReputationScreen: View {
                 symbol: .exclamationmarkTriangle,
                 action: { send(.contextVoteMenu(.report(voteId))) }
             )
+        }
+        
+        WithPerceptionTracking {
+            if store.isUserSessionHasModerationGroup {
+                Section {
+                    let isDenied = if let modified = modified { modified.isDenied } else { false }
+                    Button(role: isDenied ? .cancel : .destructive) {
+                        send(.contextVoteMenu(.modify(voteId, isDenied ? .restore : .delete)))
+                    } label: {
+                        HStack {
+                            Text(isDenied ? "Restore" : "Delete", bundle: .module)
+                            Image(systemSymbol: isDenied ? .clockArrowCirclepath : .trash)
+                        }
+                    }
+                    .tint(isDenied ? .primary : .red)
+                }
+            }
         }
     }
     

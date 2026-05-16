@@ -1,6 +1,26 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Are you sure, that you want to delete this vote?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите отменить данный голос?"
+          }
+        }
+      }
+    },
+    "Are you sure, that you want to restore this vote?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите восстановить данный голос?"
+          }
+        }
+      }
+    },
     "Change the reputation of users on the forum for their actions" : {
       "localizations" : {
         "ru" : {
@@ -17,6 +37,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Пожаловаться"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить"
           }
         }
       }
@@ -82,6 +112,16 @@
         }
       }
     },
+    "No" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
     "No reputation history" : {
       "localizations" : {
         "ru" : {
@@ -143,6 +183,36 @@
         }
       }
     },
+    "Reputation deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация отменена"
+          }
+        }
+      }
+    },
+    "Reputation restored" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Репутация восстановлена"
+          }
+        }
+      }
+    },
+    "Restore" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Восстановить"
+          }
+        }
+      }
+    },
     "Restored" : {
       "localizations" : {
         "ru" : {
@@ -179,6 +249,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Упс!"
+          }
+        }
+      }
+    },
+    "Yes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
           }
         }
       }
