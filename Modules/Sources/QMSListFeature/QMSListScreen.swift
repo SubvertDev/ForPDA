@@ -43,7 +43,7 @@ public struct QMSListScreen: View {
                                     } label: {
                                         UserRow(user)
                                             .contextMenu {
-                                                UserContextMenu(id: user.id)
+                                                UserContextMenu(user: user)
                                             }
                                     }
                                     .listRowBackground(Color(.Background.teritary))
@@ -61,20 +61,33 @@ public struct QMSListScreen: View {
                         }
                         
                     case .empty:
-                        EmptyList()
+                        GenericView(
+                            systemSymbol: .person2,
+                            title: LocalizedStringResource("No chats", bundle: .module),
+                            description: LocalizedStringResource("Start chatting with other 4PDA users", bundle: .module),
+                            actionTitle: LocalizedStringResource("Create chat", bundle: .module)
+                        ) {
+                            send(.createChatButtonTapped(user: nil))
+                        }
                         
                     case .error:
-                        Text(verbatim: "Error")
+                        GenericView.GenericError {
+                            send(.tryAgainButtonTapped)
+                        }
                     }
 
             }
+            .animation(.default, value: store.viewState)
+            .navigationTitle("QMS")
+            ._toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItems()
             }
-            .navigationTitle("QMS")
-            ._toolbarTitleDisplayMode(.inline)
-            .animation(.default, value: store.expandedGroups)
-            .animation(.default, value: store.viewState)
+            .sheet(item: $store.scope(state: \.$createChat, action: \.createChat)) { store in
+                NavigationStack {
+                    CreateChatScreen(store: store)
+                }
+            }
             .onAppear {
                 send(.onAppear)
             }
@@ -85,11 +98,13 @@ public struct QMSListScreen: View {
     
     @ToolbarContentBuilder
     private func ToolbarItems() -> some ToolbarContent {
-        ToolbarItem {
-            Button {
-                
-            } label: {
-                Image(systemSymbol: .magnifyingglass)
+        if let qms = store.qms, !qms.users.isEmpty {
+            ToolbarItem {
+                Button {
+                    
+                } label: {
+                    Image(systemSymbol: .magnifyingglass)
+                }
             }
         }
         
@@ -100,35 +115,26 @@ public struct QMSListScreen: View {
         ToolbarItem {
             Menu {
                 Section {
-                    Button {
+                    ContextButton(
+                        text: LocalizedStringResource("Blacklist", bundle: .module),
+                        symbol: .personCropCircleBadgeXmark
+                    ) {
                         
-                    } label: {
-                        Label {
-                            Text("Blacklist", bundle: .module)
-                        } icon: {
-                            Image(systemSymbol: .personCropCircleBadgeXmark)
-                        }
                     }
                 }
                 Section {
-                    Button {
+                    ContextButton(
+                        text: LocalizedStringResource("Add to bookmarks", bundle: .module),
+                        symbol: .bookmark
+                    ) {
                         
-                    } label: {
-                        Label {
-                            Text("Add to bookmarks", bundle: .module)
-                        } icon: {
-                            Image(systemSymbol: .bookmark)
-                        }
                     }
                     
-                    Button {
-                        send(.createChatButtonTapped(userId: nil))
-                    } label: {
-                        Label {
-                            Text("Create chat", bundle: .module)
-                        } icon: {
-                            Image(systemSymbol: .plus)
-                        }
+                    ContextButton(
+                        text: LocalizedStringResource("Create chat", bundle: .module),
+                        symbol: .plus
+                    ) {
+                        send(.createChatButtonTapped(user: nil))
                     }
                 }
             } label: {
@@ -188,13 +194,13 @@ public struct QMSListScreen: View {
     // MARK: - User Context Menu
     
     @ViewBuilder
-    private func UserContextMenu(id: Int) -> some View {
+    private func UserContextMenu(user: QMSUser) -> some View {
         Section {
             ContextButton(
                 text: LocalizedStringResource("Create chat", bundle: .module),
                 symbol: .plus
             ) {
-                send(.userContextMenu(.createChatButtonTapped, id))
+                send(.userContextMenu(.createChatButtonTapped, user))
             }
         }
          
@@ -203,7 +209,7 @@ public struct QMSListScreen: View {
                 text: LocalizedStringResource("User profile", bundle: .module),
                 symbol: .personCropCircle
             ) {
-                    
+                
             }
             
             ContextButton(
@@ -233,19 +239,28 @@ public struct QMSListScreen: View {
         }
     }
     
+    // MARK: - Expanded User Content
+    
+    @ViewBuilder
+    private func ExpandedUserContent(_ user: QMSUser) -> some View {
+        ChatList(user)
+        CreateChatRow(user)
+    }
+    
+    
     // MARK: - Chat List
     
     @ViewBuilder
-    private func ChatList(_ chats: [QMSChatInfo]) -> some View {
-        ForEach(chats) { chat in
-            ChatRow(chat)
+    private func ChatList(_ user: QMSUser) -> some View {
+        ForEach(user.chats) { chat in
+            ChatRow(chat: chat, user: user)
         }
     }
     
     // MARK: - Chat Row
     
     @ViewBuilder
-    private func ChatRow(_ chat: QMSChatInfo) -> some View {
+    private func ChatRow(chat: QMSChatInfo, user: QMSUser) -> some View {
         Button {
             send(.chatRowTapped(chat.id))
         } label: {
@@ -261,19 +276,19 @@ public struct QMSListScreen: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .contextMenu {
-            ChatContextMenu(id: chat.id)
-        }
         .buttonStyle(.borderless)
         .listRowBackground(Color(.Background.teritary))
         .badge(chat.unreadCount)
         ._badgeProminence(.increased)
+        .contextMenu {
+            ChatContextMenu(chatId: chat.id, userId: user.id)
+        }
     }
     
     // MARK: - Chat Context Menu
     
     @ViewBuilder
-    private func ChatContextMenu(id: Int) -> some View {
+    private func ChatContextMenu(chatId: Int, userId: Int) -> some View {
         Section {
             ContextButton(
                 text: LocalizedStringResource("Mark as read", bundle: .module),
@@ -289,17 +304,9 @@ public struct QMSListScreen: View {
                 symbol: .trash,
                 role: .destructive
             ) {
-                
+                send(.chatContextMenu(.deleteChatButtonTapped, chatId, userId))
             }
         }
-    }
-    
-    // MARK: - Expanded User Content
-    
-    @ViewBuilder
-    private func ExpandedUserContent(_ user: QMSUser) -> some View {
-        ChatList(user.chats)
-        CreateChatRow(user)
     }
     
     // MARK: - Create Chat Row
@@ -307,7 +314,7 @@ public struct QMSListScreen: View {
     @ViewBuilder
     private func CreateChatRow(_ user: QMSUser) -> some View {
         Button {
-            send(.createChatButtonTapped(userId: user.id))
+            send(.createChatButtonTapped(user: user))
         } label: {
             HStack {
                 Text("Create chat", bundle: .module)
@@ -321,49 +328,6 @@ public struct QMSListScreen: View {
         }
         .buttonStyle(.borderless)
         .listRowBackground(Color(.Background.teritary))
-    }
-    
-    // MARK: - Empty List
-    
-    @ViewBuilder
-    private func EmptyList() -> some View {
-        VStack(spacing: 0) {
-            Image(systemSymbol: .person2)
-                .font(.title)
-                .foregroundStyle(tintColor)
-                .padding(.bottom, 8)
-            
-            Text("No chats", bundle: .module)
-                .font(.title3)
-                .bold()
-                .foregroundStyle(Color(.Labels.primary))
-                .padding(.bottom, 6)
-            
-            Text("Start chatting with other 4PDA users", bundle: .module)
-                .font(.footnote)
-                .foregroundStyle(Color(.Labels.teritary))
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 24)
-            
-            Button {
-                send(.createChatButtonTapped(userId: nil))
-            } label: {
-                Label {
-                    Text("Create chat", bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(tintColor)
-                } icon: {
-                    Image(systemSymbol: .plus)
-                        .font(.body)
-                        .foregroundStyle(tintColor)
-                }
-                .padding(.vertical, 4)
-                .padding(.horizontal, 12)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(tintColor.opacity(0.12))
-        }
-        .frame(maxWidth: .infinity)
     }
 }
 
@@ -387,6 +351,22 @@ public struct QMSListScreen: View {
 #Preview("QMS List Empty") {
     @Previewable @State var store = Store(
         initialState: QMSListFeature.State(viewState: .empty)
+    ) {
+        QMSListFeature()
+    } withDependencies: {
+        $0.qmsClient.loadChatList = { try await Task.never() }
+    }
+    
+    return NavigationStack {
+        QMSListScreen(store: store)
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+}
+
+@available(iOS 17, *)
+#Preview("QMS List Error") {
+    @Previewable @State var store = Store(
+        initialState: QMSListFeature.State(viewState: .error)
     ) {
         QMSListFeature()
     } withDependencies: {

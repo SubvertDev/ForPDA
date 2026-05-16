@@ -132,7 +132,7 @@ public struct QMSFeature: Reducer, Sendable {
                 state.isSending = true
                 
                 return .run { [chatId = state.chatId, message = draftMessage.text] send in
-                    try await qmsClient.sendQMSMessage(chatId: chatId, message: message)
+                    try await qmsClient.sendMessage(chatId: chatId, message: message)
                 } catch: { error, send in
                     await send(.internal(.messageSendError(error)))
                 }
@@ -144,7 +144,7 @@ public struct QMSFeature: Reducer, Sendable {
                 state.isLoadingMore = true
                 return .run { [id = state.chatId, chat = state.chat] send in
                     let lastMessageId = chat?.messages.first?.id ?? 0
-                    let result = await Result { try await qmsClient.loadQMSChat(id, lastMessageId, defaultOffset) }
+                    let result = await Result { try await qmsClient.loadChat(id, lastMessageId, defaultOffset) }
                     await send(.internal(.chatLoaded(result, .older)))
                 }
                 
@@ -175,7 +175,7 @@ public struct QMSFeature: Reducer, Sendable {
                 
             case .internal(.loadChat):
                 return .run { [id = state.chatId] send in
-                    let result = await Result { try await qmsClient.loadQMSChat(id, 0, defaultOffset) }
+                    let result = await Result { try await qmsClient.loadChat(id, 0, defaultOffset) }
                     await send(.internal(.chatLoaded(result, .latest)))
                 }
                 

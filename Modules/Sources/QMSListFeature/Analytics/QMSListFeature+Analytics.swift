@@ -19,13 +19,21 @@ extension QMSListFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .internal, .delegate, .binding:
+                    
+                    // MARK: - Binding
+                    
+                case .binding:
+                    break
+                    
+                    // MARK: - View
+                    
+                case .view(.onAppear):
                     break
                     
                 case let .view(.chatRowTapped(chatId)):
                     analytics.log(QMSListEvent.chatTapped(chatId))
                     
-                case let .view(.chatContextMenu(chatContextAction, _)):
+                case let .view(.chatContextMenu(chatContextAction, _, _)):
                     switch chatContextAction {
                     case .markAsReadButtonTapped:
                         break
@@ -50,8 +58,26 @@ extension QMSListFeature {
                         break
                     }
                     
-                case let .view(.createChatButtonTapped(userId)):
-                    analytics.log(QMSListEvent.createChatTapped(userId: userId))
+                case .view(.createChatButtonTapped):
+                    analytics.log(QMSListEvent.createChatTapped)
+                    
+                case .view(.tryAgainButtonTapped):
+                    analytics.log(QMSListEvent.tryAgainTapped)
+                    
+                    // MARK: - Destinations
+                    
+                case .createChat:
+                    break
+                    
+                    // MARK: - Internal
+                    
+                case .internal:
+                    break
+                    
+                    // MARK: - Delegate
+                    
+                case .delegate:
+                    break
                 }
                 
                 return .none

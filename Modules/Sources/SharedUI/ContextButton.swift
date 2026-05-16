@@ -12,10 +12,16 @@ import SFSafeSymbols
 
 public struct ContextButton: View {
     
+    // MARK: - Properties
+    
+    @Environment(\.tintColor) private var tintColor
+    
     public let text: LocalizedStringResource
     public let symbol: SFSymbol
     public let role: ButtonRole?
     public let action: (() -> Void)
+    
+    // MARK: - Init
     
     public init(
         text: LocalizedStringResource,
@@ -29,13 +35,19 @@ public struct ContextButton: View {
         self.action = action
     }
     
+    // MARK: - Body
+    
     public var body: some View {
         Button(role: role) {
             action()
         } label: {
-            HStack {
+            Label {
                 Text(text)
+            } icon: {
                 Image(systemSymbol: symbol)
+                    .if(role == .destructive) { view in
+                        view.tint(.red)
+                    }
             }
         }
     }

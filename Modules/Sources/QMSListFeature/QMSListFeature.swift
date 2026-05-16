@@ -29,6 +29,7 @@ public struct QMSListFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Presents var createChat: CreateChatFeature.State?
         var viewState: ViewState
         var qms: QMSList?
         var expandedGroups: [Bool] = []
@@ -62,11 +63,14 @@ public struct QMSListFeature: Reducer, Sendable {
             
             case onAppear
             case userRowTapped(Int)
-            case userContextMenu(UserContextMenu, Int)
+            case userContextMenu(UserContextMenu, QMSUser)
             case chatRowTapped(Int)
-            case chatContextMenu(ChatContextMenu, Int)
-            case createChatButtonTapped(userId: Int?)
+            case chatContextMenu(ChatContextMenu, Int, Int) // ChatID, UserID
+            case createChatButtonTapped(user: QMSUser?)
+            case tryAgainButtonTapped
         }
+        
+        case createChat(PresentationAction<CreateChatFeature.Action>)
         
         case `internal`(Internal)
         public enum Internal {
@@ -132,12 +136,19 @@ public struct QMSListFeature: Reducer, Sendable {
                         await send(.internal(.load))
                     }
                 }
-            case let .view(.userRowTapped(id)):
+            case let .view(.userRowTapped(userId)):
                 guard let qms = state.qms else { return .none }
-                guard let index = qms.users.firstIndex(where: { $0.id == id }) else { return .none }
+                guard let index = qms.users.firstIndex(where: { $0.id == userId }) else { return .none }
                 
                 state.expandedGroups[index].toggle()
-                return .none
+                
+                return .run { send in
+                    guard userId != 0 else { return }
+                    let result = try await qmsClient.loadUser(id: userId)
+                    await send(.internal(.userLoaded(.success(result))))
+                } catch: { error, send in
+                    await send(.internal(.userLoaded(.failure(error))))
+                }
                 
             case let .view(.userContextMenu(userContextAction, id)):
                 switch userContextAction {
@@ -157,16 +168,41 @@ public struct QMSListFeature: Reducer, Sendable {
             case let .view(.chatRowTapped(id)):
                 return .send(.delegate(.openQMSChat(id)))
                 
-            case let .view(.chatContextMenu(chatContextAction, id)):
+            case let .view(.chatContextMenu(chatContextAction, chatId, userId)):
                 switch chatContextAction {
                 case .markAsReadButtonTapped:
                     break
                 case .deleteChatButtonTapped:
-                    break
+                    return .run { send in
+                        let _ = try await qmsClient.deleteChat(id: chatId)
+                        let result = await Result { try await qmsClient.loadUser(id: userId) }
+                        await send(.internal(.userLoaded(result)))
+                    }
                 }
                 return .none
                 
-            case .view(.createChatButtonTapped(userId: _)):
+            case let .view(.createChatButtonTapped(user)):
+                state.createChat = CreateChatFeature.State(user: user)
+                return .none
+                
+            case .view(.tryAgainButtonTapped):
+                state.viewState = .loading
+                return .send(.internal(.load))
+                
+                // MARK: - Destinations
+                
+            case let .createChat(.presented(.delegate(.chatCreated(userId: userId)))):
+                guard let qms = state.qms else { return .none }
+                if qms.users.contains(where: { $0.userId == userId }) {
+                    return .run { send in
+                        let result = await Result { try await qmsClient.loadUser(id: userId) }
+                        await send(.internal(.userLoaded(result)))
+                    }
+                } else {
+                    return .send(.internal(.load))
+                }
+                
+            case .createChat:
                 return .none
                 
                 // MARK: - Internal
@@ -214,10 +250,12 @@ public struct QMSListFeature: Reducer, Sendable {
                         qms.users[index].chats = user.chats.sorted(by: { $0.lastMessageDate > $1.lastMessageDate })
                         state.qms = qms
                         cacheClient.setQMSChats(qms.users[index].id, user.chats)
+                        state.viewState = .loaded(qms)
                     }
                     
                 case let .failure(error):
                     print(error)
+                    state.viewState = .error
                 }
                 return .none
                 
@@ -226,6 +264,9 @@ public struct QMSListFeature: Reducer, Sendable {
             case .delegate:
                 return .none
             }
+        }
+        .ifLet(\.$createChat, action: \.createChat) {
+            CreateChatFeature()
         }
         
         // Disabled until redesign

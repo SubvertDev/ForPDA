@@ -31,6 +31,26 @@
         }
       }
     },
+    "Chat title" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема диалога"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть"
+          }
+        }
+      }
+    },
     "Create chat" : {
       "localizations" : {
         "ru" : {
@@ -61,6 +81,16 @@
         }
       }
     },
+    "Enter..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Введите..."
+          }
+        }
+      }
+    },
     "Mark as read" : {
       "localizations" : {
         "ru" : {
@@ -71,12 +101,32 @@
         }
       }
     },
+    "Message" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщение"
+          }
+        }
+      }
+    },
     "No chats" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет диалогов"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль"
           }
         }
       }
@@ -101,6 +151,16 @@
         }
       }
     },
+    "Send" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправить"
+          }
+        }
+      }
+    },
     "Start chatting with other 4PDA users" : {
       "localizations" : {
         "ru" : {
@@ -117,6 +177,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль пользователя"
+          }
+        }
+      }
+    },
+    "Username" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Собеседник"
           }
         }
       }
