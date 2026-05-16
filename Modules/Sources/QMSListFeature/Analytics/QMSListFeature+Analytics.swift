@@ -25,12 +25,33 @@ extension QMSListFeature {
                 case let .view(.chatRowTapped(chatId)):
                     analytics.log(QMSListEvent.chatTapped(chatId))
                     
-                case let .view(.userRowTapped(userId)):
-                    let isExpanded = state.qms?.users.first(where: { $0.id == userId }).map { !$0.chats.isEmpty } ?? false
-                    analytics.log(QMSListEvent.userTapped(userId, isExpandable: isExpanded))
+                case let .view(.chatContextMenu(chatContextAction, _)):
+                    switch chatContextAction {
+                    case .markAsReadButtonTapped:
+                        break
+                    case .deleteChatButtonTapped:
+                        break
+                    }
                     
-                case .view(.createChatButtonTapped):
-                    analytics.log(QMSListEvent.createChatTapped)
+                case let .view(.userRowTapped(userId)):
+                    analytics.log(QMSListEvent.userTapped(userId, isExpandable: true))
+                    
+                case let .view(.userContextMenu(userContextAction, _)):
+                    switch userContextAction {
+                    case .createChatButtonTapped:
+                        break
+                    case .userProfileButtonTapped:
+                        break
+                    case .profileLinkButtonTapped:
+                        break
+                    case .addToBlacklistButtonTapped:
+                        break
+                    case .deleteAllChatsButtonTapped:
+                        break
+                    }
+                    
+                case let .view(.createChatButtonTapped(userId)):
+                    analytics.log(QMSListEvent.createChatTapped(userId: userId))
                 }
                 
                 return .none

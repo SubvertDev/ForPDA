@@ -38,17 +38,15 @@ public struct QMSListScreen: View {
                         QMSList {
                             ForEach(Array(qms.users.enumerated()), id: \.1) { index, user in
                                 WithPerceptionTracking {
-                                    if user.chats.isEmpty {
+                                    DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
+                                        ExpandedUserContent(user)
+                                    } label: {
                                         UserRow(user)
-                                            .listRowBackground(Color(.Background.teritary))
-                                    } else {
-                                        DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
-                                            ChatList(user.chats)
-                                        } label: {
-                                            UserRow(user)
-                                        }
-                                        .listRowBackground(Color(.Background.teritary))
+                                            .contextMenu {
+                                                UserContextMenu(id: user.id)
+                                            }
                                     }
+                                    .listRowBackground(Color(.Background.teritary))
                                 }
                             }
                         }
@@ -124,7 +122,7 @@ public struct QMSListScreen: View {
                     }
                     
                     Button {
-                        
+                        send(.createChatButtonTapped(userId: nil))
                     } label: {
                         Label {
                             Text("Create chat", bundle: .module)
@@ -160,7 +158,7 @@ public struct QMSListScreen: View {
                 send(.userRowTapped(user.id))
             }
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 LazyImage(url: user.avatarUrl ?? Links.defaultQMSAvatar) { state in
                     Group {
                         if let image = state.image {
@@ -171,9 +169,12 @@ public struct QMSListScreen: View {
                     }
                     .skeleton(with: state.isLoading, shape: .rectangle)
                 }
-                .frame(width: 50, height: 50)
+                .frame(width: 52, height: 52)
+                .clipShape(Circle())
                 
                 Text(user.name)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(.rect)
@@ -184,26 +185,52 @@ public struct QMSListScreen: View {
         ._badgeProminence(.increased)
     }
     
-    // MARK: - Chat Row
+    // MARK: - User Context Menu
     
     @ViewBuilder
-    private func ChatRow(_ chat: QMSChatInfo) -> some View {
-        HStack(spacing: 0) { // Hacky HStack to enable tap animations
-            Button {
-                send(.chatRowTapped(chat.id))
-            } label: {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(chat.name)
-                    Text(chat.lastMessageDate.formatted())
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
+    private func UserContextMenu(id: Int) -> some View {
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("Create chat", bundle: .module),
+                symbol: .plus
+            ) {
+                send(.userContextMenu(.createChatButtonTapped, id))
             }
         }
-        .buttonStyle(.plain)
-        .listRowBackground(Color(.Background.teritary))
-        .badge(chat.unreadCount)
-        ._badgeProminence(.increased)
+         
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("User profile", bundle: .module),
+                symbol: .personCropCircle
+            ) {
+                    
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Profile link", bundle: .module),
+                symbol: .docOnDoc
+            ) {
+                
+            }
+        }
+        
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("Add to blacklist", bundle: .module),
+                symbol: .personCropCircleBadgeXmark,
+                role: .destructive
+            ) {
+                    
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Delete all chats", bundle: .module),
+                symbol: .trash,
+                role: .destructive
+            ) {
+                
+            }
+        }
     }
     
     // MARK: - Chat List
@@ -213,6 +240,87 @@ public struct QMSListScreen: View {
         ForEach(chats) { chat in
             ChatRow(chat)
         }
+    }
+    
+    // MARK: - Chat Row
+    
+    @ViewBuilder
+    private func ChatRow(_ chat: QMSChatInfo) -> some View {
+        Button {
+            send(.chatRowTapped(chat.id))
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chat.name)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
+                
+                Text(chat.lastMessageDate.formatted())
+                    .font(.subheadline)
+                    .foregroundStyle(Color(.Labels.secondary))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .contextMenu {
+            ChatContextMenu(id: chat.id)
+        }
+        .buttonStyle(.borderless)
+        .listRowBackground(Color(.Background.teritary))
+        .badge(chat.unreadCount)
+        ._badgeProminence(.increased)
+    }
+    
+    // MARK: - Chat Context Menu
+    
+    @ViewBuilder
+    private func ChatContextMenu(id: Int) -> some View {
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("Mark as read", bundle: .module),
+                symbol: .checkmark
+            ) {
+                
+            }
+        }
+        
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("Delete chat", bundle: .module),
+                symbol: .trash,
+                role: .destructive
+            ) {
+                
+            }
+        }
+    }
+    
+    // MARK: - Expanded User Content
+    
+    @ViewBuilder
+    private func ExpandedUserContent(_ user: QMSUser) -> some View {
+        ChatList(user.chats)
+        CreateChatRow(user)
+    }
+    
+    // MARK: - Create Chat Row
+    
+    @ViewBuilder
+    private func CreateChatRow(_ user: QMSUser) -> some View {
+        Button {
+            send(.createChatButtonTapped(userId: user.id))
+        } label: {
+            HStack {
+                Text("Create chat", bundle: .module)
+                Spacer()
+                Image(systemSymbol: .plus)
+            }
+            .font(.body)
+            .tint(tintColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.borderless)
+        .listRowBackground(Color(.Background.teritary))
     }
     
     // MARK: - Empty List
@@ -238,7 +346,7 @@ public struct QMSListScreen: View {
                 .padding(.bottom, 24)
             
             Button {
-                send(.createChatButtonTapped)
+                send(.createChatButtonTapped(userId: nil))
             } label: {
                 Label {
                     Text("Create chat", bundle: .module)
@@ -282,7 +390,7 @@ public struct QMSListScreen: View {
     ) {
         QMSListFeature()
     } withDependencies: {
-        $0.qmsClient.loadQMSList = { try await Task.never() }
+        $0.qmsClient.loadChatList = { try await Task.never() }
     }
     
     return NavigationStack {

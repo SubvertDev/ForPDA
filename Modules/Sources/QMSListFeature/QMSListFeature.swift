@@ -47,10 +47,25 @@ public struct QMSListFeature: Reducer, Sendable {
         
         case view(View)
         public enum View {
+            public enum UserContextMenu {
+                case createChatButtonTapped
+                case userProfileButtonTapped
+                case profileLinkButtonTapped
+                case addToBlacklistButtonTapped
+                case deleteAllChatsButtonTapped
+            }
+            
+            public enum ChatContextMenu {
+                case markAsReadButtonTapped
+                case deleteChatButtonTapped
+            }
+            
             case onAppear
-            case chatRowTapped(Int)
             case userRowTapped(Int)
-            case createChatButtonTapped
+            case userContextMenu(UserContextMenu, Int)
+            case chatRowTapped(Int)
+            case chatContextMenu(ChatContextMenu, Int)
+            case createChatButtonTapped(userId: Int?)
         }
         
         case `internal`(Internal)
@@ -91,51 +106,74 @@ public struct QMSListFeature: Reducer, Sendable {
                         if let index = changedIndex(before: oldState, after: after),
                            let userId = qms?.users[index].userId,
                            userId != 0 {
-                                let result = await Result { try await qmsClient.loadQMSUser(id: userId) }
-                                await send(.internal(.userLoaded(result)))
+                            let result = await Result { try await qmsClient.loadUser(id: userId) }
+                            await send(.internal(.userLoaded(result)))
                         }
                     }
             }
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .binding, .delegate:
+                
+                // MARK: - Binding
+                
+            case .binding:
                 return .none
+                
+                // MARK: - View
                 
             case .view(.onAppear):
                 return .run { send in
                     await send(.internal(.load))
-
+                    
                     // TODO: Does this cancel on feature removal?
                     for await unread in notificationsClient.unreadPublisher().values.dropFirst() {
                         guard unread.qmsUnreadCount > 0 else { continue }
                         await send(.internal(.load))
                     }
                 }
-
-            case let .view(.chatRowTapped(id)):
-                return .send(.delegate(.openQMSChat(id)))
-                
             case let .view(.userRowTapped(id)):
                 guard let qms = state.qms else { return .none }
                 guard let index = qms.users.firstIndex(where: { $0.id == id }) else { return .none }
                 
                 state.expandedGroups[index].toggle()
-                
-                guard state.expandedGroups[index] else { return .none }
-                
-                return .run { send in
-                    guard id != 0 else { return }
-                    let result = await Result { try await qmsClient.loadQMSUser(id) }
-                    await send(.internal(.userLoaded(result)))
-                }
-                
-            case .view(.createChatButtonTapped):
                 return .none
+                
+            case let .view(.userContextMenu(userContextAction, id)):
+                switch userContextAction {
+                case .createChatButtonTapped:
+                    break
+                case .userProfileButtonTapped:
+                    break
+                case .profileLinkButtonTapped:
+                    break
+                case .addToBlacklistButtonTapped:
+                    break
+                case .deleteAllChatsButtonTapped:
+                    break
+                }
+                return .none
+                
+            case let .view(.chatRowTapped(id)):
+                return .send(.delegate(.openQMSChat(id)))
+                
+            case let .view(.chatContextMenu(chatContextAction, id)):
+                switch chatContextAction {
+                case .markAsReadButtonTapped:
+                    break
+                case .deleteChatButtonTapped:
+                    break
+                }
+                return .none
+                
+            case .view(.createChatButtonTapped(userId: _)):
+                return .none
+                
+                // MARK: - Internal
                 
             case .internal(.load):
                 return .run { send in
-                    let result = await Result { try await qmsClient.loadQMSList() }
+                    let result = await Result { try await qmsClient.loadChatList() }
                     await send(.internal(.qmsLoaded(result)))
                 }
                 
@@ -145,9 +183,11 @@ public struct QMSListFeature: Reducer, Sendable {
                     var qms = qms
                     // customDump(qms)
                     
-                    if qms.users.count > state.qms?.users.count ?? 0 {
-                        state.expandedGroups.removeAll()
-                        qms.users.forEach { _ in state.expandedGroups.append(false) }
+                    if state.expandedGroups.count != qms.users.count {
+                        let previousExpandedGroups = state.expandedGroups
+                        state.expandedGroups = qms.users.indices.map { index in
+                            previousExpandedGroups.indices.contains(index) ? previousExpandedGroups[index] : false
+                        }
                     }
                     
                     for (index, user) in qms.users.enumerated() where user.chats.isEmpty {
@@ -180,12 +220,15 @@ public struct QMSListFeature: Reducer, Sendable {
                     print(error)
                 }
                 return .none
+                
+                // MARK: - Delegate
+                
+            case .delegate:
+                return .none
             }
         }
         
         // Disabled until redesign
         // Analytics()
     }
-    
-    // MARK: - Shared Logic
-    }
+}

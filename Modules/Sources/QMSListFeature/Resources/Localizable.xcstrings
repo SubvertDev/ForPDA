@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add to blacklist" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить в чёрный список"
+          }
+        }
+      }
+    },
     "Add to bookmarks" : {
       "localizations" : {
         "ru" : {
@@ -31,12 +41,52 @@
         }
       }
     },
+    "Delete all chats" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все диалоги"
+          }
+        }
+      }
+    },
+    "Delete chat" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить диалог"
+          }
+        }
+      }
+    },
+    "Mark as read" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отметить прочитанным"
+          }
+        }
+      }
+    },
     "No chats" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет диалогов"
+          }
+        }
+      }
+    },
+    "Profile link" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ссылка на профиль"
           }
         }
       }
@@ -57,6 +107,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Начните общаться с другими пользователями 4PDA"
+          }
+        }
+      }
+    },
+    "User profile" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Профиль пользователя"
           }
         }
       }
