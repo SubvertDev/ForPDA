@@ -63,14 +63,14 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     }
     
     public var markLabel: String {
-        flag == 1 ? "Raised" : "Lowered"
+        !isDown ? "Raised" : "Lowered"
     }
     
     public var arrowSymbol: SFSymbol {
         if #available(iOS 17.0, *) {
-            return flag == 1 ? .arrowshapeUpFill : .arrowshapeDownFill
+            return !isDown ? .arrowshapeUpFill : .arrowshapeDownFill
         } else {
-            return flag == 1 ? .arrowUp : .arrowDown
+            return !isDown ? .arrowUp : .arrowDown
         }
     }
     
