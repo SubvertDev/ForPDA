@@ -862,7 +862,7 @@ extension APIClient: DependencyKey {
     
     // MARK: - Helper methods
     
-    private static func fetch<T>(
+    private static func fetch<T: Equatable & Sendable>(
         getCache: @Sendable @escaping () async -> T?,
         setCache: @Sendable @escaping (T) async -> Void,
         remote: @Sendable @escaping () async throws -> T,
@@ -871,41 +871,57 @@ extension APIClient: DependencyKey {
         return AsyncThrowingStream { continuation in
             let task = Task {
                 do {
+                    defer {
+                        continuation.finish()
+                    }
+                    
+                    func loadRemote() async throws -> T {
+                        try Task.checkCancellation()
+                        let value = try await remote()
+                        try Task.checkCancellation()
+                        await setCache(value)
+                        return value
+                    }
+                    
                     switch policy {
                     case .skipCache:
-                        let remote = try await remote()
-                        await setCache(remote)
-                        continuation.yield(remote)
+                        let remoteValue = try await loadRemote()
+                        continuation.yield(remoteValue)
                         
                     case .cacheOrLoad:
-                        if let cache = await getCache() {
-                            continuation.yield(cache)
+                        if let cachedValue = await getCache() {
+                            continuation.yield(cachedValue)
                         } else {
-                            let remote = try await remote()
-                            await setCache(remote)
-                            continuation.yield(remote)
+                            let remoteValue = try await loadRemote()
+                            continuation.yield(remoteValue)
                         }
                         
                     case .cacheAndLoad:
-                        if let cache = await getCache() {
-                            continuation.yield(cache)
+                        let cachedValue = await getCache()
+                        if let cachedValue {
+                            continuation.yield(cachedValue)
                         }
-                        let remote = try await remote()
-                        await setCache(remote)
-                        continuation.yield(remote)
+
+                        let remoteValue = try await loadRemote()
+                        
+                        if cachedValue == remoteValue {
+                            break
+                        }
+                        
+                        continuation.yield(remoteValue)
                         
                     case .cacheNoLoad:
-                        if let cache = await getCache() {
-                            continuation.yield(cache)
+                        if let cachedValue = await getCache() {
+                            continuation.yield(cachedValue)
                         }
                     }
+                } catch is CancellationError {
+                    continuation.finish()
                 } catch {
                     continuation.finish(throwing: error)
-                    return
                 }
-                
-                continuation.finish()
             }
+            
             continuation.onTermination = { _ in
                 task.cancel()
             }
