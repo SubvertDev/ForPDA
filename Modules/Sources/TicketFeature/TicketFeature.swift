@@ -14,6 +14,7 @@ import PersistenceKeys
 import ToastClient
 import CacheClient
 import TicketStatusHistoryFeature
+import TopicBuilder
 
 @Reducer
 public struct TicketFeature: Reducer, Sendable {
@@ -67,7 +68,7 @@ public struct TicketFeature: Reducer, Sendable {
         
         public let id: Int
         
-        var ticket: Ticket?
+        var ticket: UITicket?
         var isLoading = false
         var isRefreshing = false
         
@@ -193,10 +194,10 @@ public struct TicketFeature: Reducer, Sendable {
                 switch action {
                 case .edit(let commentId):
                     if let comment = state.ticket?.comments.first(where: { $0.id == commentId }) {
-                        if let range = comment.content.range(of: "[na]") {
-                            state.alertInput = String(comment.content[range.upperBound...])
+                        if let range = comment.comment.content.range(of: "[na]") {
+                            state.alertInput = String(comment.comment.content[range.upperBound...])
                         } else {
-                            state.alertInput = comment.content
+                            state.alertInput = comment.comment.content
                         }
                     }
                     state.destination = .editComment(commentId)
@@ -297,7 +298,14 @@ public struct TicketFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.ticketResponse(.success(response))):
-                state.ticket = response
+                let comments = response.comments.map { comment in
+                    let uiContent = TopicNodeBuilder(
+                        text: comment.content.replacingOccurrences(of: "[na]", with: ""),
+                        attachments: []
+                    ).build()
+                    return UITicket.HybridComment(comment: comment, uiContent: uiContent)
+                }
+                state.ticket = UITicket(info: response.info, comments: comments)
                 state.isLoading = false
                 state.isRefreshing = false
                 return .none

@@ -8,7 +8,7 @@
 import Foundation
 
 public struct Ticket: Sendable, Equatable {
-    public var info: TicketInfo
+    public let info: TicketInfo
     public let comments: [Comment]
     
     public struct Comment: Sendable, Equatable, Identifiable {

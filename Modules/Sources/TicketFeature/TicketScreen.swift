@@ -10,9 +10,9 @@ import ComposableArchitecture
 import Models
 import SharedUI
 import SFSafeSymbols
-import BBBuilder
 import RichTextKit
 import TicketStatusHistoryFeature
+import TopicBuilder
 
 @ViewAction(for: TicketFeature.self)
 public struct TicketScreen: View {
@@ -192,7 +192,7 @@ public struct TicketScreen: View {
     // MARK: - Comment
     
     @ViewBuilder
-    private func Comment(_ comment: Ticket.Comment) -> some View {
+    private func Comment(_ comment: UITicket.HybridComment) -> some View {
         HStack(alignment: .top) {
             Image(systemSymbol: .bubbleLeft)
                 .frame(width: 32, height: 32)
@@ -200,9 +200,9 @@ public struct TicketScreen: View {
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 8) {
                     Button {
-                        send(.commentAuthorButtonTapped(comment.authorId))
+                        send(.commentAuthorButtonTapped(comment.comment.authorId))
                     } label: {
-                        Text(verbatim: comment.authorName)
+                        Text(verbatim: comment.comment.authorName)
                             .foregroundStyle(tintColor)
                             .underline()
                     }
@@ -213,14 +213,14 @@ public struct TicketScreen: View {
                 .font(.subheadline)
                 
                 HStack {
-                    Text(verbatim: comment.createdAt.formatted())
+                    Text(verbatim: comment.comment.createdAt.formatted())
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.quaternary))
                     
                     Spacer()
                     
                     WithPerceptionTracking {
-                        if let session = store.userSession, session.userId == comment.authorId {
+                        if let session = store.userSession, session.userId == comment.comment.authorId {
                             CommentContextMenu(id: comment.id)
                         }
                     }
@@ -261,13 +261,17 @@ public struct TicketScreen: View {
     // MARK: - Attributed Content
     
     @ViewBuilder
-    private func AttributedContent(_ comment: Ticket.Comment) -> some View {
-        if let content = comment.contentAttributed {
-            RichText(text: content, isSelectable: false, onUrlTap: { url in
-                send(.urlTapped(url))
-            })
+    private func AttributedContent(_ comment: UITicket.HybridComment) -> some View {
+        if !comment.uiContent.isEmpty {
+            ForEach(comment.uiContent, id: \.self) { type in
+                WithPerceptionTracking {
+                    TopicView(type: type, attachments: []) { url in
+                        send(.urlTapped(url))
+                    }
+                }
+            }
         } else {
-            Text(verbatim: comment.content)
+            Text(verbatim: comment.comment.content)
                 .font(.subheadline)
         }
     }
@@ -406,13 +410,6 @@ extension TicketStatus {
     }
 }
 
-extension Ticket.Comment {
-    var contentAttributed: NSAttributedString? {
-        guard !content.isEmpty else { return nil }
-        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .subheadline)])
-            .render(text: content.replacingOccurrences(of: "[na]", with: ""))
-    }
-}
 
 // MARK: - Previews
 
