@@ -427,6 +427,7 @@ let project = Project(
                     .Internal.NotificationsClient,
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.FormFeature,
