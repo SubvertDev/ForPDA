@@ -130,12 +130,12 @@ public struct ReputationScreen: View {
                 Spacer()
                 
                 Text(LocalizedStringKey(vote.markLabel), bundle: .module)
-                    .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                    .foregroundStyle(!vote.isDown ? tintColor : Color(.Labels.teritary))
                     .font(.caption)
                     .fontWeight(.medium)
                 
                 Image(systemSymbol: vote.arrowSymbol)
-                    .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                    .foregroundStyle(!vote.isDown ? tintColor : Color(.Labels.teritary))
                     .font(.body)
             }
             
