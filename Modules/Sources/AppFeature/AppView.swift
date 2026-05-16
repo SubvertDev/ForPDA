@@ -74,7 +74,9 @@ public struct AppView: View {
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
             .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
-                LogStoreScreen(store: store)
+                NavigationStack {
+                    LogStoreScreen(store: store)
+                }
             }
             .alert($store.scope(state: \.$alert, action: \.alert))
             // Tint and environment should be after sheets/covers

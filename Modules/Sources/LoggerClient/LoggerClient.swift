@@ -14,6 +14,7 @@ public enum LoggerCategory: String, Sendable {
     case analytics
     case notifications
     case bbbuilder
+    case favorites
 }
 
 extension Logger: @retroactive DependencyKey {
