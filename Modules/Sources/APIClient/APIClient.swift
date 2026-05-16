@@ -48,6 +48,7 @@ public struct APIClient: Sendable {
     public var editUserProfile: @Sendable (_ request: UserProfileEditRequest) async throws -> Bool
     public var addUserNote: @Sendable (_ userId: Int, _ content: String) async throws -> UserNoteResponse
     public var getReputationVotes: @Sendable (_ data: ReputationVotesRequest) async throws -> ReputationVotes
+    public var modifyReputation: @Sendable (_ id: Int, _ type: ReputationModifyActionType) async throws -> Bool
     public var changeReputation: @Sendable (_ data: ReputationChangeRequest) async throws -> ReputationChangeResponseType
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
     public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
@@ -260,6 +261,17 @@ extension APIClient: DependencyKey {
                 return try await parser.parseReputationVotes(response)
             },
             
+            modifyReputation: { id, type in
+                let command = MemberCommand.reputation(data: MemberReputationRequest(
+                    memberId: 0,
+                    action: type.transferType,
+                    postId: id,
+                    reason: ""
+                ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
             changeReputation: { request in
                 let command = MemberCommand.reputation(data: MemberReputationRequest(
                     memberId: request.userId,
@@ -726,6 +738,9 @@ extension APIClient: DependencyKey {
             },
             getReputationVotes: { _ in
                 return .mock
+            },
+            modifyReputation: { _, _ in
+                return true
             },
             changeReputation: { _ in
                 return .success
