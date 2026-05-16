@@ -277,6 +277,9 @@ public struct StackTab: Reducer, Sendable {
         case let .topic(.delegate(.openTickets(id))):
             state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .topic(id)))))
             
+        case let .topic(.delegate(.openTopic(id: id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: .last))))
+            
         case let .topic(.delegate(.openEventLog(id, type))):
             state.path.append(.forum(.eventLog(ForumEventLogFeature.State(id: id, type: type))))
             

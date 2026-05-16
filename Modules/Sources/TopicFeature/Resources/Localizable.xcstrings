@@ -311,6 +311,16 @@
         }
       }
     },
+    "Posts moved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посты перемещены"
+          }
+        }
+      }
+    },
     "Remove from favorites" : {
       "localizations" : {
         "ru" : {
