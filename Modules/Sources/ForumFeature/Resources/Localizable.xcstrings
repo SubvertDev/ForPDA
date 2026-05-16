@@ -241,6 +241,16 @@
         }
       }
     },
+    "Topic moved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема перемещена"
+          }
+        }
+      }
+    },
     "Topics" : {
       "localizations" : {
         "ru" : {
