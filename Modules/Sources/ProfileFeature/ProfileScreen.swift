@@ -16,6 +16,7 @@ import RichTextKit
 import ParsingClient
 import BBBuilder
 import FormFeature
+import ReputationChangeFeature
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -85,6 +86,12 @@ public struct ProfileScreen: View {
                     FormScreen(store: store)
                 }
             }
+            .fittedSheet(
+                item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
+                embedIntoNavStack: true
+            ) { store in
+                ReputationChangeView(store: store)
+            }
             .toolbar {
                 if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
                     ToolbarItem {
@@ -102,32 +109,38 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func OptionsMenu() -> some View {
-        Menu {
-            let canEditProfile = store.userSessionGroup == .admin
+        WithPerceptionTracking {
+            Menu {
+                let canEditProfile = store.userSessionGroup == .admin
                 || store.userSessionGroup == .supermoderator
                 || store.userSessionGroup == .moderator
-            if store.shouldShowToolbarButtons || canEditProfile {
-                ContextButton(
-                    text: LocalizedStringResource("Edit profile", bundle: .module),
-                    symbol: .squareAndPencil
-                ) {
-                    send(.contextMenu(.edit))
+                if store.shouldShowToolbarButtons || canEditProfile {
+                    ContextButton(
+                        text: LocalizedStringResource("Edit profile", bundle: .module),
+                        symbol: .squareAndPencil
+                    ) {
+                        send(.contextMenu(.edit))
+                    }
                 }
-            }
-            
-            let canAddNotice = canEditProfile
-                || store.userSessionGroup == .moderatorHelper
-                || store.userSessionGroup == .moderatorSchool
-            if canAddNotice, !store.shouldShowToolbarButtons {
-                ContextButton(
-                    text: LocalizedStringResource("Add notice", bundle: .module),
-                    symbol: .scribble
-                ) {
-                    send(.contextMenu(.addNotice))
+                
+                if store.isUserSessionHasModerationGroup, !store.shouldShowToolbarButtons {
+                    ContextButton(
+                        text: LocalizedStringResource("Add notice", bundle: .module),
+                        symbol: .noteTextBadgePlus
+                    ) {
+                        send(.contextMenu(.addNotice))
+                    }
+                    
+                    ContextButton(
+                        text: LocalizedStringResource("Change reputation", bundle: .module),
+                        symbol: .arrowUpArrowDown
+                    ) {
+                        send(.contextMenu(.changeReputation))
+                    }
                 }
+            } label: {
+                Image(systemSymbol: .ellipsisCircle)
             }
-        } label: {
-            Image(systemSymbol: .ellipsisCircle)
         }
     }
     

@@ -323,6 +323,16 @@
         }
       }
     },
+    "Show all posts in topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать все посты"
+          }
+        }
+      }
+    },
     "Sky" : {
       "localizations" : {
         "ru" : {
@@ -373,6 +383,17 @@
         }
       }
     },
+    "Topic" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема"
+          }
+        }
+      }
+    },
     "Topic opening" : {
       "localizations" : {
         "ru" : {
@@ -395,6 +416,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Версия %1$@ [%2$@]"
+          }
+        }
+      }
+    },
+    "When you enter a topic, the 'All posts' filter will be selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При заходе в тему будет выбран фильтр ‘Все посты'"
           }
         }
       }

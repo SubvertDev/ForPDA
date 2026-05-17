@@ -131,6 +131,16 @@
         }
       }
     },
+    "Change reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить репутацию"
+          }
+        }
+      }
+    },
     "City" : {
       "localizations" : {
         "ru" : {

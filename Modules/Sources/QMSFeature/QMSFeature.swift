@@ -36,6 +36,7 @@ public struct QMSFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents var alert: AlertState<Action.Alert>?
         
+        @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
         
         public let chatId: Int
@@ -165,9 +166,14 @@ public struct QMSFeature: Reducer, Sendable {
                     return .send(.delegate(.handleUrl(url)))
                 }
                 
-                return .run { send in
+                return .run { [topicShowAllPosts = state.appSettings.topicShowAllPostsFilter] send in
                     @Dependency(\.apiClient) var api
-                    let request = JumpForumRequest(postId: pid, topicId: 0, allPosts: true, type: .post)
+                    let request = JumpForumRequest(
+                        postId: pid,
+                        topicId: 0,
+                        postsFilter: topicShowAllPosts ? .all : .exceptDeleted,
+                        type: .post
+                    )
                     let response = try await api.jumpForum(request: request)
                     let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
                     await send(.delegate(.handleUrl(url)))

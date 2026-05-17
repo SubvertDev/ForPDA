@@ -17,6 +17,9 @@ public enum ReputationEvent: Event {
     case sourceTopicTapped(Int)
     case sourceArticleTapped(Int)
     
+    case voteMenuGoToAuthorTapped(Int)
+    case voteMenuComplainTapped(Int)
+    
     public var name: String {
         return "Reputation " + eventName(for: self).inProperCase
     }
@@ -26,8 +29,11 @@ public enum ReputationEvent: Event {
         case let .profileTapped(profileId):
             return ["profileId": String(profileId)]
             
-        case let .complainTapped(voteId):
+        case let .voteMenuComplainTapped(voteId):
             return ["voteId": String(voteId)]
+            
+        case let .voteMenuGoToAuthorTapped(profileId):
+            return ["profileId": String(profileId)]
             
         case let .sourceProfileTapped(profileId):
             return ["profileId": String(profileId)]

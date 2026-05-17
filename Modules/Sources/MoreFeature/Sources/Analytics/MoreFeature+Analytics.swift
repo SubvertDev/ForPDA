@@ -37,6 +37,10 @@ extension MoreFeature {
                 case .view(.devDBButtonTapped):
                     analytics.log(MoreEvent.devDBTapped)
                     
+                case .view(.ticketsButtonTapped):
+                    // MARK: Moderator tools are skip analytics
+                    break
+                    
                 case .view(.settingsButtonTapped):
                     analytics.log(MoreEvent.settingsTapped)
                     

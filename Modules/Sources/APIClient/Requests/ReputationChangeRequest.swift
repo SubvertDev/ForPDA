@@ -22,17 +22,12 @@ public struct ReputationChangeRequest: Sendable {
     public enum ChangeActionType: Sendable {
         case up
         case down
-        case delete
-        case recover
     }
     
     nonisolated var transferVoteType: MemberReputationRequest.ActionType {
         switch action {
         case .up:   .plus
         case .down: .minus
-            
-        // TODO: Implement.
-        case .delete, .recover: .plus
         }
     }
     

@@ -39,6 +39,16 @@ public struct MoreFeature: Reducer, Sendable {
             return userSession != nil
         }
         
+        var isTicketsAvailable: Bool {
+            guard let user else { return false }
+            return user.group == .admin
+                || user.group == .supermoderator
+                || user.group == .moderator
+                || user.group == .moderatorHelper
+                || user.group == .moderatorSchool
+                || user.group == .curator
+        }
+        
         public init() {}
     }
     
@@ -57,6 +67,7 @@ public struct MoreFeature: Reducer, Sendable {
             case mentionsButtonTapped
             case historyButtonTapped
             case devDBButtonTapped
+            case ticketsButtonTapped
             
             case settingsButtonTapped
             
@@ -92,6 +103,7 @@ public struct MoreFeature: Reducer, Sendable {
             case openMentions
             case openHistory
             case openDevDB
+            case openTickets
             case openSettings
             case openDeeplink(URL)
         }
@@ -148,6 +160,9 @@ public struct MoreFeature: Reducer, Sendable {
                 
             case .view(.devDBButtonTapped):
                 return .send(.delegate(.openDevDB))
+                
+            case .view(.ticketsButtonTapped):
+                return .send(.delegate(.openTickets))
                 
             case .view(.settingsButtonTapped):
                 return .send(.delegate(.openSettings))

@@ -14,6 +14,7 @@ import AnalyticsClient
 import ToastClient
 import NotificationsClient
 import FormFeature
+import ReputationChangeFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -34,6 +35,7 @@ public struct ProfileFeature: Reducer, Sendable {
     public enum Destination {
         case note(FormFeature)
         case editProfile(EditFeature)
+        case changeReputation(ReputationChangeFeature)
     }
     
     // MARK: - State
@@ -183,12 +185,18 @@ public struct ProfileFeature: Reducer, Sendable {
                 switch action {
                 case .edit:
                     state.destination = .editProfile(EditFeature.State(user: user))
-                    return .none
                     
                 case .addNotice:
                     state.destination = .note(FormFeature.State(type: .note(userId: user.id)))
-                    return .none
+                    
+                case .changeReputation:
+                    state.destination = .changeReputation(ReputationChangeFeature.State(
+                        userId: user.id,
+                        username: user.nickname,
+                        content: .profile
+                    ))
                 }
+                return .none
                 
             case .view(.deeplinkTapped(let url, _)):
                 return .send(.delegate(.handleUrl(url)))

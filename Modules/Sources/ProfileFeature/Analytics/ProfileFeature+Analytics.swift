@@ -42,7 +42,7 @@ extension ProfileFeature {
                     switch action {
                     case .edit:
                         analyticsClient.log(ProfileEvent.editTapped)
-                    case .addNotice:
+                    case .addNotice, .changeReputation:
                         // MARK: Moderator tools are skip analytics
                         break
                     }

@@ -97,6 +97,16 @@
         }
       }
     },
+    "History" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "История"
+          }
+        }
+      }
+    },
     "IN DEVELOPMENT" : {
       "localizations" : {
         "ru" : {

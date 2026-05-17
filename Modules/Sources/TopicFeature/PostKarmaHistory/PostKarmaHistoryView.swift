@@ -114,6 +114,7 @@ public struct PostKarmaHistoryView: View {
                 .font(.caption)
                 .foregroundStyle(Color(.Labels.quaternary))
         }
+        .listRowBackground(Color.clear)
     }
 }
 

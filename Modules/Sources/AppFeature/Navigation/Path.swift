@@ -15,6 +15,7 @@ import DeviceSpecificationsFeature
 import DeviceTypeFeature
 import FavoritesRootFeature
 import FavoritesFeature
+import ForumEventLogFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
@@ -27,6 +28,8 @@ import ReputationFeature
 import SearchFeature
 import SearchResultFeature
 import SettingsFeature
+import TicketFeature
+import TicketsListFeature
 import TopicFeature
 import AuthFeature
 import MoreFeature
@@ -37,6 +40,7 @@ public enum Path {
     case devDB(DevDB.Body = DevDB.body)
     case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
+    case tickets(Tickets.Body = Tickets.body)
     case more(More.Body = More.body)
     case settings(Settings.Body = Settings.body)
     case search(Search.Body = Search.body)
@@ -70,6 +74,13 @@ public enum Path {
         case forum(ForumFeature)
         case announcement(AnnouncementFeature)
         case topic(TopicFeature)
+        case eventLog(ForumEventLogFeature)
+    }
+    
+    @Reducer
+    public enum Tickets {
+        case ticketsList(TicketsListFeature)
+        case ticket(TicketFeature)
     }
     
     @Reducer
@@ -98,6 +109,7 @@ extension Path.Articles.State: Equatable {}
 extension Path.DevDB.State: Equatable {}
 extension Path.More.State: Equatable {}
 extension Path.Forum.State: Equatable {}
+extension Path.Tickets.State: Equatable {}
 extension Path.Settings.State: Equatable {}
 extension Path.Search.State: Equatable {}
 extension Path.QMS.State: Equatable {}
@@ -121,6 +133,9 @@ extension Path {
             
         case let .forum(path):
             ForumViews(path)
+            
+        case let .tickets(path):
+            TicketsViews(path)
             
         case let .settings(path):
             SettingsViews(path)
@@ -203,9 +218,23 @@ extension Path {
             TopicScreen(store: store)
                 .tracking(for: TopicScreen.self, ["id": store.topicId])
             
+        case let .eventLog(store):
+            ForumEventLogScreen(store: store)
+            
         case let .announcement(store):
             AnnouncementScreen(store: store)
                 .tracking(for: AnnouncementScreen.self, ["id": store.announcementId])
+        }
+    }
+    
+    @MainActor @ViewBuilder
+    private static func TicketsViews(_ store: Store<Path.Tickets.State, Path.Tickets.Action>) -> some View {
+        switch store.case {
+        case let .ticketsList(store):
+            TicketsListScreen(store: store)
+            
+        case let .ticket(store):
+            TicketScreen(store: store)
         }
     }
     

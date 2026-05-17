@@ -311,6 +311,16 @@
         }
       }
     },
+    "Posts moved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посты перемещены"
+          }
+        }
+      }
+    },
     "Remove from favorites" : {
       "localizations" : {
         "ru" : {
@@ -417,6 +427,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Шапка темы"
+          }
+        }
+      }
+    },
+    "Topic Tickets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тикеты темы"
           }
         }
       }

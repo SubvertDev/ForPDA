@@ -34,6 +34,9 @@ import SearchFeature
 import SearchResultFeature
 import DeviceSpecificationsFeature
 import DeviceTypeFeature
+import TicketsListFeature
+import TicketFeature
+import ForumEventLogFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
@@ -145,6 +148,9 @@ public struct StackTab: Reducer, Sendable {
             
         case let .forum(action):
             return handleForumPathNavigation(action: action, state: &state)
+            
+        case let .tickets(action):
+            return handleTicketsPathNavigation(action: action, state: &state)
             
         case let .more(action):
             return handleMorePathNavigation(action: action, state: &state)
@@ -268,6 +274,15 @@ public struct StackTab: Reducer, Sendable {
         case let .topic(.delegate(.openUser(id: id))):
             state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
             
+        case let .topic(.delegate(.openTickets(id))):
+            state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .topic(id)))))
+            
+        case let .topic(.delegate(.openTopic(id: id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: .last))))
+            
+        case let .topic(.delegate(.openEventLog(id, type))):
+            state.path.append(.forum(.eventLog(ForumEventLogFeature.State(id: id, type: type))))
+            
         case let .topic(.delegate(.openSearch(on, navigation))):
             state.path.append(.search(.search(SearchFeature.State(on: on, navigation: navigation))))
             
@@ -278,6 +293,17 @@ public struct StackTab: Reducer, Sendable {
             for (id, element) in zip(state.path.ids, state.path).reversed() where element.is(\.forum.forum) {
                 return .send(.path(.element(id: id, action: .forum(.forum(.internal(.refresh))))))
             }
+            
+            // Event Log
+            
+        case let .eventLog(.delegate(.openUser(id))):
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
+            
+        case let .eventLog(.delegate(.openTopic(id))):
+            state.path.append(.forum(.topic(TopicFeature.State(topicId: id, goTo: .first))))
+            
+        case let .eventLog(.delegate(.handleUrl(url))):
+            return handleDeeplink(url: url, state: &state)
             
             // Announcement
             
@@ -290,7 +316,29 @@ public struct StackTab: Reducer, Sendable {
         return .none
     }
     
-    // MARK: - More
+    // MARK: - Tickets
+    
+    private func handleTicketsPathNavigation(action: Path.Tickets.Action, state: inout State) -> Effect<Action> {
+        switch action {
+        case let .ticketsList(.delegate(.openTicket(id))):
+            state.path.append(.tickets(.ticket(TicketFeature.State(id: id))))
+            
+        case let .ticketsList(.delegate(.openUser(id))):
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
+            
+        case let .ticket(.delegate(.handleUrl(url))):
+            return handleDeeplink(url: url, state: &state)
+            
+        case let .ticket(.delegate(.openUser(id))):
+            state.path.append(.more(.profile(ProfileFeature.State(userId: id))))
+            
+        default:
+            break
+        }
+        return .none
+    }
+    
+    // MARK: - Profile
     
     private func handleMorePathNavigation(action: Path.More.Action, state: inout State) -> Effect<Action> {
         switch action {
@@ -308,6 +356,9 @@ public struct StackTab: Reducer, Sendable {
             
         case .more(.delegate(.openDevDB)):
             state.path.append(.devDB(.type(DeviceTypeFeature.State(content: .index))))
+            
+        case .more(.delegate(.openTickets)):
+            state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .list))))
             
         case .more(.delegate(.openSettings)):
             state.path.append(.settings(.settings(SettingsFeature.State())))
@@ -441,7 +492,7 @@ public struct StackTab: Reducer, Sendable {
         do {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
-            case let .topic(id: targetId, goTo: goTo):
+            case let .topic(id: targetId, goTo: goTo, filter: filter):
                 if let targetId {
                     // Deeplink in the same OR other topic
                     if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
@@ -457,7 +508,7 @@ public struct StackTab: Reducer, Sendable {
                                 return .send(.path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                             } else {
                                 // Post is NOT on the same page, opening new screen
-                                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo, postsFilter: filter))))
                                 return .none
                             }
                         } else {
@@ -467,7 +518,7 @@ public struct StackTab: Reducer, Sendable {
                     }
                     
                     // Different topic id or non-topic screen, pushing new screen instead
-                    state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                    state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo, postsFilter: filter))))
                 } else if let (id, _) = state.path.last(is: \.forum.topic) {
                     // Deeplink in the same topic ONLY (inner-inner deeplink case)
                     state.path[id: id, case: \.forum.topic]?.goTo = goTo
@@ -481,6 +532,9 @@ public struct StackTab: Reducer, Sendable {
             case let .forum(id: id, page: page):
                 state.path.append(.forum(.forum(ForumFeature.State(forumId: id, initialPage: page))))
                 
+            case let .eventLog(id, type):
+                state.path.append(.forum(.eventLog(ForumEventLogFeature.State(id: id, type: type))))
+                
             case let .announcement(id: id):
                 state.path.append(.forum(.announcement(AnnouncementFeature.State(id: id))))
                 
@@ -489,6 +543,12 @@ public struct StackTab: Reducer, Sendable {
                 
             case let .qms(id: id):
                 state.path.append(.qms(.qms(QMSFeature.State(chatId: id))))
+                
+            case let .ticketsList(offset: offset):
+                state.path.append(.tickets(.ticketsList(TicketsListFeature.State(type: .list, initialOffset: offset))))
+                
+            case let .ticket(id: id):
+                state.path.append(.tickets(.ticket(TicketFeature.State(id: id))))
                 
             case let .search(options: options):
                 state.path.append(.search(.searchResult(SearchResultFeature.State(search: options))))

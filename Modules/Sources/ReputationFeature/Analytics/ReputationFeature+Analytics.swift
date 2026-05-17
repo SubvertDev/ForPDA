@@ -37,13 +37,21 @@ extension ReputationFeature {
                 case let .view(.profileTapped(profileId)):
                     analytics.log(ReputationEvent.profileTapped(profileId))
                     
-                case let .view(.complainButtonTapped(voteId)):
-                    analytics.log(ReputationEvent.complainTapped(voteId))
+                case let .view(.contextVoteMenu(action)):
+                    switch action {
+                    case .report(let voteId):
+                        analytics.log(ReputationEvent.voteMenuComplainTapped(voteId))
+                    case .goToAuthor(let profileId):
+                        analytics.log(ReputationEvent.voteMenuGoToAuthorTapped(profileId))
+                    case .modify:
+                        // MARK: Moderator tools are skip analytics
+                        break
+                    }
                     
                 case let .view(.sourceTapped(vote)):
                     switch vote.createdIn {
                     case .profile:
-                        analytics.log(ReputationEvent.sourceProfileTapped(vote.authorId))
+                        analytics.log(ReputationEvent.profileTapped(vote.authorId))
                     case let .topic(id: topicId, topicName: _, postId: _):
                         analytics.log(ReputationEvent.sourceTopicTapped(topicId))
                     case let .site(id: articleId, _, _):

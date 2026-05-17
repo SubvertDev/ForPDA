@@ -130,12 +130,12 @@ public struct ReputationScreen: View {
                 Spacer()
                 
                 Text(LocalizedStringKey(vote.markLabel), bundle: .module)
-                    .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                    .foregroundStyle(!vote.isDown ? tintColor : Color(.Labels.teritary))
                     .font(.caption)
                     .fontWeight(.medium)
                 
                 Image(systemSymbol: vote.arrowSymbol)
-                    .foregroundStyle(vote.flag == 1 ? tintColor : Color(.Labels.teritary))
+                    .foregroundStyle(!vote.isDown ? tintColor : Color(.Labels.teritary))
                     .font(.body)
             }
             
@@ -165,6 +165,16 @@ public struct ReputationScreen: View {
                 .multilineTextAlignment(.leading)
                 .padding(.vertical, 8)
             
+            if let modified = vote.modified {
+                Button {
+                    send(.profileTapped(modified.userId))
+                } label: {
+                    ReputationModifiedBadge(modified)
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 8)
+            }
+            
             HStack {
                 Text(formatDate(vote.createdAt))
                     .foregroundStyle(Color(.Labels.teritary))
@@ -172,15 +182,17 @@ public struct ReputationScreen: View {
                 
                 Spacer()
                 
-                Menu {
-                    MenuButtons(voteId: vote.id, authorId: authorId)
-                } label: {
-                    Image(systemSymbol: .ellipsis)
-                        .foregroundStyle(Color(.Labels.teritary))
-                        .font(.body)
+                if store.isUserAuthorized {
+                    Menu {
+                        MenuButtons(voteId: vote.id, authorId: authorId, modified: vote.modified)
+                    } label: {
+                        Image(systemSymbol: .ellipsis)
+                            .foregroundStyle(Color(.Labels.teritary))
+                            .font(.body)
+                    }
+                    .menuStyle(.button)
+                    .buttonStyle(.plain)
                 }
-                .menuStyle(.button)
-                .buttonStyle(.plain)
             }
         }
         .padding(.leading, 12)
@@ -188,9 +200,36 @@ public struct ReputationScreen: View {
         .contentShape(Rectangle())
         .background(Color(.Background.primary))
         .contextMenu {
-            MenuButtons(voteId: vote.id, authorId: authorId)
+            if store.isUserAuthorized {
+                MenuButtons(voteId: vote.id, authorId: authorId, modified: vote.modified)
+            }
         }
     }
+    
+    // MARK: - Reputation Modified Badge
+    
+    @ViewBuilder
+    private func ReputationModifiedBadge(_ modified: ReputationVote.VoteModified) -> some View {
+        let text: LocalizedStringKey = modified.isDenied ? "Denied" : "Restored"
+        HStack(spacing: 4) {
+            Text(text, bundle: .module)
+            
+            HStack(spacing: 4) {
+                Text(formatDate(modified.modifiedAt))
+                
+                Text(verbatim: "· \(modified.userName)")
+            }
+        }
+        .font(.caption)
+        .foregroundStyle((modified.isDenied ? Color(.Main.yellow) : tintColor))
+        .padding(.vertical, 2)
+        .padding(.horizontal, 6)
+        .background(
+            Color(modified.isDenied ? .Main.yellowAlpha : .Main.primaryAlpha)
+                .clipShape(RoundedRectangle(cornerRadius: isLiquidGlass ? 10 : 6))
+        )
+    }
+    
     // MARK: - Empty Reputation
     
     @ViewBuilder
@@ -231,19 +270,36 @@ public struct ReputationScreen: View {
     // MARK: - Menu Buttons
     
     @ViewBuilder
-    private func MenuButtons(voteId: Int, authorId: Int) -> some View {
+    private func MenuButtons(voteId: Int, authorId: Int, modified: ReputationVote.VoteModified?) -> some View {
         ContextButton(
             text: LocalizedStringResource("Profile", bundle: .module),
             symbol: .personCropCircle,
-            action: { send(.profileTapped(authorId)) }
+            action: { send(.contextVoteMenu(.goToAuthor(authorId))) }
         )
         
         if store.pickerSection == .history {
             ContextButton(
                 text: LocalizedStringResource("Complain", bundle: .module),
                 symbol: .exclamationmarkTriangle,
-                action: { send(.complainButtonTapped(voteId)) }
+                action: { send(.contextVoteMenu(.report(voteId))) }
             )
+        }
+        
+        WithPerceptionTracking {
+            if store.isUserSessionHasModerationGroup {
+                Section {
+                    let isDenied = if let modified = modified { modified.isDenied } else { false }
+                    Button(role: isDenied ? .cancel : .destructive) {
+                        send(.contextVoteMenu(.modify(voteId, isDenied ? .restore : .delete)))
+                    } label: {
+                        HStack {
+                            Text(isDenied ? "Restore" : "Delete", bundle: .module)
+                            Image(systemSymbol: isDenied ? .clockArrowCirclepath : .trash)
+                        }
+                    }
+                    .tint(isDenied ? .primary : .red)
+                }
+            }
         }
     }
     

@@ -46,6 +46,16 @@ public struct NavigationSettingsScreen: View {
                             }
                         }
                         
+                        if store.isUserSessionHasModerationGroup {
+                            Row(
+                                LocalizedStringResource("Show all posts in topic", bundle: .module),
+                                description: LocalizedStringResource("When you enter a topic, the 'All posts' filter will be selected", bundle: .module)
+                            ) {
+                                Toggle(String(""), isOn: $store.topicShowAllPosts)
+                                    .labelsHidden()
+                            }
+                        }
+                        
                         if isLiquidGlass {
                             Row(LocalizedStringResource("Hide tabbar on scroll", bundle: .module)) {
                                 Toggle(String(""), isOn: $store.hideTabBarOnScroll)
@@ -84,16 +94,30 @@ public struct NavigationSettingsScreen: View {
     // MARK: - Row
     
     @ViewBuilder
-    private func Row<Content: View>(_ text: LocalizedStringResource, content: () -> Content) -> some View {
+    private func Row<Content: View>(
+            _ text: LocalizedStringResource,
+            description: LocalizedStringResource? = nil,
+            content: () -> Content
+    ) -> some View {
         HStack(spacing: 0) {
-            Text(text)
-                .font(.body)
-                .foregroundStyle(Color(.Labels.primary))
+            VStack(alignment: .leading) {
+                Text(text)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
+                
+                if let description {
+                    Text(description)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.vertical, 12)
             
             Spacer(minLength: 8)
             
             content()
         }
+        .frame(maxWidth: .infinity)
     }
 }
 

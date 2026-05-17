@@ -131,6 +131,16 @@
         }
       }
     },
+    "Tickets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тикеты"
+          }
+        }
+      }
+    },
     "Topic on 4PDA" : {
       "localizations" : {
         "ru" : {
