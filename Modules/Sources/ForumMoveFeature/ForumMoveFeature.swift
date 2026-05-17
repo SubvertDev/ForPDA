@@ -117,7 +117,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
                 if let url = URL(string: state.inputUrl.trimmingCharacters(in: .whitespacesAndNewlines)),
                    let artefact = try? DeeplinkHandler().handleInnerToInnerURL(url) {
                     switch artefact {
-                    case .topic(let topicId, _):
+                    case .topic(let topicId, _, _):
                         guard case .posts(let ids) = state.type else {
                             state.error = .needForumUrl
                             break

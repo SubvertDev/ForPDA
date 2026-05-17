@@ -14,7 +14,7 @@ import Models
 public enum Deeplink {
     case article(id: Int, title: String, imageUrl: URL, scrollToId: Int?)
     case announcement(id: Int)
-    case topic(id: Int?, goTo: GoTo)
+    case topic(id: Int?, goTo: GoTo, filter: TopicPostsFilter?)
     case forum(id: Int, page: Int)
     case user(id: Int)
     case qms(id: Int)
@@ -96,14 +96,14 @@ public struct DeeplinkHandler {
             guard let id = Int(url.lastPathComponent) else { throw .badIdOnMatch(in: url) }
             if let offset = components.queryItems?.first(where: { $0.name == "st" })?.value.flatMap(Int.init) {
                 if let entry = components.queryItems?.first(where: { $0.name == "entry" })?.value.flatMap(Int.init) {
-                    return .topic(id: id, goTo: .post(id: entry))
+                    return .topic(id: id, goTo: .post(id: entry), filter: nil)
                 } else {
                     @Shared(.appSettings) var appSettings: AppSettings
                     let page = getPage(forOffset: offset, userPerPage: appSettings.topicPerPage)
-                    return .topic(id: id, goTo: .page(page))
+                    return .topic(id: id, goTo: .page(page), filter: nil)
                 }
             } else {
-                return .topic(id: id, goTo: .first)
+                return .topic(id: id, goTo: .first, filter: nil)
             }
             
         case "user":
@@ -185,31 +185,35 @@ public struct DeeplinkHandler {
         // showtopic
         
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
+            let postsFilter: TopicPostsFilter? = if let modfilterItem = queryItems.first(where: { $0.name == "modfilter" }),
+                                                      let postsFilter = TopicPostsFilter(rawValue: modfilterItem.value) {
+                postsFilter
+            } else { nil }
             if let viewType = queryItems.first(where: { $0.name == "view" })?.value {
                 switch viewType {
                 case "findpost":
                     if let postItem = queryItems.first(where: { $0.name == "p" }), let value = postItem.value, let postId = Int(value) {
                         // https://4pda.to/forum/index.php?showtopic=123456&view=findpost&p=123456789
-                        return .topic(id: topicId, goTo: .post(id: postId))
+                        return .topic(id: topicId, goTo: .post(id: postId), filter: postsFilter)
                     } else {
                         analytics.capture(DeeplinkError.noType(of: "p", for: url.absoluteString))
                     }
                     
                 case "getnewpost":
                     // https://4pda.to/forum/index.php?showtopic=123456&view=getnewpost
-                    return .topic(id: topicId, goTo: .unread)
+                    return .topic(id: topicId, goTo: .unread, filter: postsFilter)
                     
                 case "getlastpost":
                     // https://4pda.to/forum/index.php?showtopic=673755&view=getlastpost
-                    return .topic(id: topicId, goTo: .last)
+                    return .topic(id: topicId, goTo: .last, filter: postsFilter)
                     
                 default:
                     analytics.capture(DeeplinkError.unknownType(type: viewType, for: url.absoluteString))
                 }
             }
             
-            // https://4pda.to/forum/index.php?showtopic=123456
-            return .topic(id: topicId, goTo: .first)
+            // https://4pda.to/forum/index.php?showtopic=123456&modfilter=all-posts
+            return .topic(id: topicId, goTo: .first, filter: postsFilter)
         }
         
         // showforum
@@ -236,7 +240,7 @@ public struct DeeplinkHandler {
             case "findpost":
                 // https://4pda.to/forum/index.php?act=findpost&pid=136063497
                 if let postItem = queryItems.first(where: { $0.name == "pid" }), let value = postItem.value, let postId = Int(value) {
-                    return .topic(id: nil, goTo: .post(id: postId))
+                    return .topic(id: nil, goTo: .post(id: postId), filter: nil)
                 } else {
                     analytics.capture(DeeplinkError.noType(of: "pid", for: url.absoluteString))
                 }
@@ -379,10 +383,10 @@ public struct DeeplinkHandler {
             return Deeplink.forum(id: id, page: 1)
         case .topic:
             // Currently we don't have id of a post to jump due to limited api
-            return Deeplink.topic(id: id, goTo: .unread)
+            return Deeplink.topic(id: id, goTo: .unread, filter: nil)
         case .forumMention:
             // Forum mention has topic id in timestamp place
-            return Deeplink.topic(id: timestamp, goTo: .post(id: id))
+            return Deeplink.topic(id: timestamp, goTo: .post(id: id), filter: nil)
         case .siteMention:
             return Deeplink.article(id: id, title: "", imageUrl: URL(string: "/")!, scrollToId: timestamp)
         }

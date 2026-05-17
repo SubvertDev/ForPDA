@@ -103,7 +103,7 @@ public struct TopicFeature: Reducer, Sendable {
         public var goTo: GoTo
         
         var posts: [UIPost] = []
-        var postsFilter: TopicPostsFilter = .exceptDeleted
+        var postsFilter: TopicPostsFilter
         
         var isLoadingTopic = true
         var isRefreshing = false
@@ -124,11 +124,13 @@ public struct TopicFeature: Reducer, Sendable {
             topicName: String? = nil,
             initialOffset: Int = 0, // TODO: Not needed anymore?
             goTo: GoTo = .first,
+            postsFilter: TopicPostsFilter? = nil,
             destination: Destination.State? = nil
         ) {
             self.topicId = topicId
             self.topicName = topicName
             self.goTo = goTo
+            self.postsFilter = postsFilter ?? .exceptDeleted // TODO: Get from settings
             self.destination = destination
             self.floatingNavigation = _appSettings.floatingNavigation.wrappedValue
             
@@ -173,7 +175,7 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Internal {
             case load
             case refresh
-            case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
+            case goToPost(postId: Int, offset: Int, filter: TopicPostsFilter, forceRefresh: Bool)
             case changeKarma(postId: Int, isUp: Bool)
             case jumpToPostAfterKarma(postId: Int)
             case voteInPoll(selections: [[Int]])
@@ -728,8 +730,9 @@ public struct TopicFeature: Reducer, Sendable {
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
-            case let .internal(.goToPost(postId: postId, offset: offset, forceRefresh)):
+            case let .internal(.goToPost(postId, offset, filter, forceRefresh)):
                 state.postId = postId
+                state.postsFilter = filter
                 if !forceRefresh && offset == state.pageNavigation.offset && state.topic != nil {
                     // If we have this post on the same page without force refresh, don't reload
                     return .none
@@ -792,11 +795,14 @@ public struct TopicFeature: Reducer, Sendable {
             let response = try await apiClient.jumpForum(request)
             if response.id != topicId {
                 // Handling case where post is in another topic
-                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
+                let modfilter = if let modfilter = response.postsFilter.modfilter {
+                    "&modfilter=\(modfilter)"
+                } else { "" }
+                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)\(modfilter)")!
                 return await send(.delegate(.handleUrl(url)))
             }
             let offset = response.offset - (response.offset % topicPerPage)
-            await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
+            await send(.internal(.goToPost(postId: response.postId, offset: offset, filter: response.postsFilter, forceRefresh: forceRefresh)))
             
             if jump.type == .post && jump.postId != response.postId {
                 await toastClient.showToast(ToastMessage(text: Localization.showingNearestPost))

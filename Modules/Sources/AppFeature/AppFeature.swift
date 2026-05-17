@@ -595,8 +595,8 @@ public struct AppFeature: Reducer, Sendable {
             screen = .tickets(.ticketsList(TicketsListFeature.State(type: .list, initialOffset: offset)))
         case let .ticket(id):
             screen = .tickets(.ticket(TicketFeature.State(id: id)))
-        case let .topic(id, goTo):
-            screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
+        case let .topic(id, goTo, filter):
+            screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo, postsFilter: filter)))
         case let .forum(id, page):
             screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
         case let .eventLog(id, type):

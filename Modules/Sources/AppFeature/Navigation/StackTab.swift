@@ -492,7 +492,7 @@ public struct StackTab: Reducer, Sendable {
         do {
             let deeplink = try DeeplinkHandler().handleInnerToInnerURL(url)
             switch deeplink {
-            case let .topic(id: targetId, goTo: goTo):
+            case let .topic(id: targetId, goTo: goTo, filter: filter):
                 if let targetId {
                     // Deeplink in the same OR other topic
                     if let (id, element) = state.path.last(is: \.forum.topic), let topicId = element.forum?.topic?.topicId, topicId == targetId {
@@ -508,7 +508,7 @@ public struct StackTab: Reducer, Sendable {
                                 return .send(.path(.element(id: id, action: .forum(.topic(.internal(.load))))))
                             } else {
                                 // Post is NOT on the same page, opening new screen
-                                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                                state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo, postsFilter: filter))))
                                 return .none
                             }
                         } else {
@@ -518,7 +518,7 @@ public struct StackTab: Reducer, Sendable {
                     }
                     
                     // Different topic id or non-topic screen, pushing new screen instead
-                    state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo))))
+                    state.path.append(.forum(.topic(TopicFeature.State(topicId: targetId, goTo: goTo, postsFilter: filter))))
                 } else if let (id, _) = state.path.last(is: \.forum.topic) {
                     // Deeplink in the same topic ONLY (inner-inner deeplink case)
                     state.path[id: id, case: \.forum.topic]?.goTo = goTo
