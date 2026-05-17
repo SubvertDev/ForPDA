@@ -119,7 +119,7 @@ public struct ForumParser {
                     id: array[2] as! Int,
                     offset: array[3] as! Int,
                     postId: array[4] as! Int,
-                    allPosts: array[5] as! Int == 1 ? true : false
+                    postsFilter: TopicPostsFilter(rawValue: array[5] as! Int)!
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)

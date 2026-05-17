@@ -5,7 +5,7 @@
 //  Created by Xialtal on 28.12.25.
 //
 
-public enum TopicPostsFilter: Int, Sendable, Identifiable, CaseIterable {
+public enum TopicPostsFilter: Int, Sendable, Codable, Hashable, Identifiable, CaseIterable {
     case all = 3
     case onlyHidden = 1
     case onlyDefault = 4
