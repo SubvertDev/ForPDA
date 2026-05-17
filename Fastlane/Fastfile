@@ -141,7 +141,7 @@ platform :ios do
         Dir.chdir("..") do
             sh("tuist install")
             sh("tuist generate --no-open")
-            sh("tuist cache --external-only")
+            sh("tuist cache --cache-profile only-external")
             sh("tuist test")
 	    commit_sha = sh("git rev-parse --short=7 HEAD").strip
             telegram(
@@ -231,12 +231,6 @@ platform :ios do
             configuration: "Release",
 	        skip_package_pkg: true,
 	        export_method: "app-store",
-	        export_options: {
-	            provisioningProfiles: {
-	                "com.subvert.forpda" => "match AppStore com.subvert.forpda",
-	                "com.subvert.forpda.safariextension" => "match AppStore com.subvert.forpda.safariextension"
-	            }
-	        },
 	        export_team_id: "7353CQCGQC"
         )
     end
