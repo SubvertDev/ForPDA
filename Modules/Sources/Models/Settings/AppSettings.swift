@@ -20,6 +20,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var articlesListRowType: ArticleListRowType
     public var bookmarksListRowType: ArticleListRowType
     public var startPage: AppTab
+    public var topicShowAllPostsFilter: Bool
     public var topicOpeningStrategy: TopicOpeningStrategy
     public var appColorScheme: AppColorScheme
     public var backgroundTheme: BackgroundTheme
@@ -45,6 +46,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         articlesListRowType: ArticleListRowType,
         bookmarksListRowType: ArticleListRowType,
         startPage: AppTab,
+        topicShowAllPostsFilter: Bool,
         topicOpeningStrategy: TopicOpeningStrategy,
         appColorScheme: AppColorScheme,
         backgroundTheme: BackgroundTheme,
@@ -69,6 +71,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.articlesListRowType = articlesListRowType
         self.bookmarksListRowType = bookmarksListRowType
         self.startPage = startPage
+        self.topicShowAllPostsFilter = topicShowAllPostsFilter
         self.topicOpeningStrategy = topicOpeningStrategy
         self.appColorScheme = appColorScheme
         self.backgroundTheme = backgroundTheme
@@ -96,6 +99,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.articlesListRowType = try container.decodeIfPresent(ArticleListRowType.self, forKey: .articlesListRowType) ?? AppSettings.default.articlesListRowType
         self.bookmarksListRowType = try container.decodeIfPresent(ArticleListRowType.self, forKey: .bookmarksListRowType) ?? AppSettings.default.bookmarksListRowType
         self.startPage = try container.decodeIfPresent(AppTab.self, forKey: .startPage) ?? AppSettings.default.startPage
+        self.topicShowAllPostsFilter = try container.decodeIfPresent(Bool.self, forKey: .topicShowAllPostsFilter) ?? AppSettings.default.topicShowAllPostsFilter
         self.topicOpeningStrategy = try container.decodeIfPresent(TopicOpeningStrategy.self, forKey: .topicOpeningStrategy) ?? AppSettings.default.topicOpeningStrategy
         self.appColorScheme = try container.decodeIfPresent(AppColorScheme.self, forKey: .appColorScheme) ?? AppSettings.default.appColorScheme
         self.backgroundTheme = try container.decodeIfPresent(BackgroundTheme.self, forKey: .backgroundTheme) ?? AppSettings.default.backgroundTheme
@@ -125,6 +129,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
             "articlesListRowType": articlesListRowType.rawValue,
             "bookmarksListRowType": bookmarksListRowType.rawValue,
             "startPage": startPage.rawValue,
+            "topicShowAllPostsFilter": topicShowAllPostsFilter,
             "topicOpeningStrategy": topicOpeningStrategy._rawValue,
             "appColorScheme": appColorScheme._rawValue,
             "backgroundTheme": backgroundTheme._rawValue,
@@ -148,6 +153,7 @@ public extension AppSettings {
         articlesListRowType: .short,
         bookmarksListRowType: .short,
         startPage: .articles,
+        topicShowAllPostsFilter: false,
         topicOpeningStrategy: .first,
         appColorScheme: .system,
         backgroundTheme: .blue,

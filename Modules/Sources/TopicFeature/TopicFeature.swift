@@ -130,9 +130,9 @@ public struct TopicFeature: Reducer, Sendable {
             self.topicId = topicId
             self.topicName = topicName
             self.goTo = goTo
-            self.postsFilter = postsFilter ?? .exceptDeleted // TODO: Get from settings
             self.destination = destination
             self.floatingNavigation = _appSettings.floatingNavigation.wrappedValue
+            self.postsFilter = postsFilter ?? (_appSettings.topicShowAllPostsFilter.wrappedValue ? .all : .exceptDeleted)
             
             // If we open this screen with Go To End usage then we can get offset like 99
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
