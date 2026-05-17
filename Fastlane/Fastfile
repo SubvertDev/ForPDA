@@ -133,7 +133,7 @@ platform :ios do
         end
     end
     
-    desc "CI cache warmup & tests"
+    desc "CI build & tests"
     lane :ci_push do
         setup_ci if ENV['CI']
         prepare_certificates
@@ -141,13 +141,15 @@ platform :ios do
         Dir.chdir("..") do
             sh("tuist install")
             sh("tuist generate --no-open")
-            sh("tuist cache --cache-profile only-external")
+            # Temp disabled due to local only caching
+            # sh("tuist cache --cache-profile only-external")
+            sh("tuist xcodebuild -workspace ForPDA.xcworkspace build -scheme ForPDA")
             sh("tuist test")
 	    commit_sha = sh("git rev-parse --short=7 HEAD").strip
             telegram(
                 token: ENV['TG_BOT_TOKEN'],
                 chat_id: ENV['TG_CHAT_ID'],
-                text: "[CI] (#{commit_sha}) Прогрев кэша и тестирование успешно завершены"
+                text: "[CI] (#{commit_sha}) Сборка и тестирование успешно завершены"
             )
         end
     end
