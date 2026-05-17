@@ -1,5 +1,5 @@
 [tools]
-ruby = "3.4.8"
+ruby = "4.0.4"
 tuist = "4.194.4"
 swiftlint = "0.63.2"
 [settings]
