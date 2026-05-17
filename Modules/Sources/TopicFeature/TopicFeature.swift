@@ -37,6 +37,7 @@ public struct TopicFeature: Reducer, Sendable {
     private enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+        static let postsMoved = LocalizedStringResource("Posts moved", bundle: .module)
         static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let favoriteAdded = LocalizedStringResource("Added to favorites", bundle: .module)
         static let favoriteRemoved = LocalizedStringResource("Removed from favorites", bundle: .module)
@@ -102,7 +103,7 @@ public struct TopicFeature: Reducer, Sendable {
         public var goTo: GoTo
         
         var posts: [UIPost] = []
-        var postsFilter: TopicPostsFilter = .exceptDeleted
+        var postsFilter: TopicPostsFilter
         
         var isLoadingTopic = true
         var isRefreshing = false
@@ -123,6 +124,7 @@ public struct TopicFeature: Reducer, Sendable {
             topicName: String? = nil,
             initialOffset: Int = 0, // TODO: Not needed anymore?
             goTo: GoTo = .first,
+            postsFilter: TopicPostsFilter? = nil,
             destination: Destination.State? = nil
         ) {
             self.topicId = topicId
@@ -130,6 +132,7 @@ public struct TopicFeature: Reducer, Sendable {
             self.goTo = goTo
             self.destination = destination
             self.floatingNavigation = _appSettings.floatingNavigation.wrappedValue
+            self.postsFilter = postsFilter ?? (_appSettings.topicShowAllPostsFilter.wrappedValue ? .all : .exceptDeleted)
             
             // If we open this screen with Go To End usage then we can get offset like 99
             // which means that we need to lower it to 80 (if topicPerPage is 20) with remainder
@@ -172,7 +175,7 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Internal {
             case load
             case refresh
-            case goToPost(postId: Int, offset: Int, forceRefresh: Bool)
+            case goToPost(postId: Int, offset: Int, filter: TopicPostsFilter, forceRefresh: Bool)
             case changeKarma(postId: Int, isUp: Bool)
             case jumpToPostAfterKarma(postId: Int)
             case voteInPoll(selections: [[Int]])
@@ -187,6 +190,9 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Delegate {
             case handleUrl(URL)
             case openUser(id: Int)
+            case openTopic(Int)
+            case openTickets(Int)
+            case openEventLog(Int, ForumEventLogType)
             case openSearch(SearchOn, ForumInfo?)
             case openSearchResult(SearchResult)
             case openedLastPage
@@ -246,8 +252,17 @@ public struct TopicFeature: Reducer, Sendable {
                     await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
                 }
                 
+            case let .destination(.presented(.move(.delegate(.openTopic(id))))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.postsMoved, haptic: .success))
+                    await send(.delegate(.openTopic(id)))
+                }
+                
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
+                
+            case .destination(.presented(.stat(.delegate(.topicHistoryTapped)))):
+                return .send(.delegate(.openEventLog(state.topicId, .topic)))
                 
             case let .destination(.presented(.karmaHistory(.delegate(.openUser(id))))):
                 return .send(.delegate(.openUser(id: id)))
@@ -407,6 +422,9 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .move(ForumMoveFeature.State(type: .topic(topic.id)))
                     return .none
                     
+                case .tickets:
+                    return .send(.delegate(.openTickets(topic.id)))
+                    
                 case .modify(let action, let isUndo):
                     switch action {
                     case .hide, .close:
@@ -502,6 +520,9 @@ public struct TopicFeature: Reducer, Sendable {
                 case .move(let postId):
                     state.destination = .move(ForumMoveFeature.State(type: .posts([postId])))
                     return .none
+                    
+                case .eventLog(let postId):
+                    return .send(.delegate(.openEventLog(postId, .post)))
                     
                 case .modify(let action, let postId, let isUndo):
                     switch action {
@@ -709,8 +730,9 @@ public struct TopicFeature: Reducer, Sendable {
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
                 
-            case let .internal(.goToPost(postId: postId, offset: offset, forceRefresh)):
+            case let .internal(.goToPost(postId, offset, filter, forceRefresh)):
                 state.postId = postId
+                state.postsFilter = filter
                 if !forceRefresh && offset == state.pageNavigation.offset && state.topic != nil {
                     // If we have this post on the same page without force refresh, don't reload
                     return .none
@@ -768,16 +790,19 @@ public struct TopicFeature: Reducer, Sendable {
             return .send(.pageNavigation(.goToPage(newPage: page)))
         }
         
-        return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
-            let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
+        return .run { [topicId = state.topicId, filter = state.postsFilter, topicPerPage = state.appSettings.topicPerPage] send in
+            let request = JumpForumRequest(postId: jump.postId, topicId: topicId, postsFilter: filter, type: jump.type)
             let response = try await apiClient.jumpForum(request)
             if response.id != topicId {
                 // Handling case where post is in another topic
-                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)")!
+                let modfilter = if let modfilter = response.postsFilter.modfilter {
+                    "&modfilter=\(modfilter)"
+                } else { "" }
+                let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(response.id)&view=findpost&p=\(response.postId)\(modfilter)")!
                 return await send(.delegate(.handleUrl(url)))
             }
             let offset = response.offset - (response.offset % topicPerPage)
-            await send(.internal(.goToPost(postId: response.postId, offset: offset, forceRefresh: forceRefresh)))
+            await send(.internal(.goToPost(postId: response.postId, offset: offset, filter: response.postsFilter, forceRefresh: forceRefresh)))
             
             if jump.type == .post && jump.postId != response.postId {
                 await toastClient.showToast(ToastMessage(text: Localization.showingNearestPost))

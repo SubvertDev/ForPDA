@@ -224,6 +224,10 @@ public struct TopicScreen: View {
                                 Image(systemSymbol: .line3HorizontalDecrease)
                             }
                         }
+                        
+                        ContextButton(text: LocalizedStringResource("Topic Tickets", bundle: .module), symbol: .exclamationmarkBubble) {
+                            send(.contextToolsMenu(.tickets))
+                        }
                     }
                 }
             }
@@ -441,6 +445,8 @@ public struct TopicScreen: View {
                 switch action {
                 case .move(let postId):
                     send(.contextPostToolsMenu(.move(postId)))
+                case .eventLog(let postId):
+                    send(.contextPostToolsMenu(.eventLog(postId)))
                 case .modify(let action, let postId, let isUndo):
                     send(.contextPostToolsMenu(.modify(action, postId, isUndo)))
                 }

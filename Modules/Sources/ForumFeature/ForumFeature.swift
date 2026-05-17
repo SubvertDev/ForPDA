@@ -29,6 +29,7 @@ public struct ForumFeature: Reducer, Sendable {
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let topicMoved = LocalizedStringResource("Topic moved", bundle: .module)
         static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
     }
@@ -139,7 +140,7 @@ public struct ForumFeature: Reducer, Sendable {
         public enum Delegate {
             case openUser(id: Int)
             case openTopic(id: Int, name: String, goTo: GoTo)
-            case openForum(id: Int, name: String)
+            case openForum(id: Int, name: String?)
             case openAnnouncement(id: Int, name: String)
             case openSearch(on: SearchOn, navigation: ForumInfo?)
             case handleRedirect(URL)
@@ -171,6 +172,12 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
                 return .send(.delegate(.openUser(id: id)))
+                
+            case let .destination(.presented(.move(.delegate(.openForum(id))))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicMoved, haptic: .success))
+                    await send(.delegate(.openForum(id: id, name: nil)))
+                }
                 
             case .destination(.presented(.edit(.delegate(.topicEdited)))):
                 return .run { _ in

@@ -45,6 +45,7 @@ let project = Project(
                     .Internal.DeviceTypeFeature,
                     .Internal.FavoritesFeature,
                     .Internal.FavoritesRootFeature,
+                    .Internal.ForumEventLogFeature,
                     .Internal.ForumFeature,
                     .Internal.ForumsListFeature,
                     .Internal.HistoryFeature,
@@ -65,6 +66,8 @@ let project = Project(
                     .Internal.SettingsFeature,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .Internal.TicketFeature,
+                    .Internal.TicketsListFeature,
                     .Internal.ToastClient,
                     .Internal.TopicFeature,
                     .SPM.AlertToast,
@@ -264,6 +267,21 @@ let project = Project(
                     .SPM.TCA,
                 ]
             ),
+
+            .feature(
+                name: "ForumEventLogFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.BBBuilder,
+                    .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.SharedUI,
+                    .Internal.ToastClient,
+                    .SPM.RichTextKit,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA,
+                ]
+            ),
         
             .feature(
                 name: "ForumFeature",
@@ -409,6 +427,7 @@ let project = Project(
                     .Internal.NotificationsClient,
                     .Internal.ParsingClient,
                     .Internal.PersistenceKeys,
+                    .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.FormFeature,
@@ -435,6 +454,7 @@ let project = Project(
                 name: "QMSListFeature",
                 hasResources: false,
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.QMSClient,
@@ -483,6 +503,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.FormFeature,
@@ -504,6 +525,7 @@ let project = Project(
             .feature(
                 name: "SearchResultFeature",
                 dependencies: [
+                    .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
@@ -526,6 +548,52 @@ let project = Project(
                     .Internal.PersistenceKeys,
                     .Internal.SharedUI,
                     .Internal.TCAExtensions,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+
+            .feature(
+                name: "TicketFeature",
+                dependencies: [
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.PasteboardClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TicketClient,
+                    .Internal.TicketStatusHistoryFeature,
+                    .Internal.ToastClient,
+                    .Internal.TopicBuilder,
+                    .SPM.RichTextKit,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+
+            .feature(
+                name: "TicketsListFeature",
+                dependencies: [
+                    .Internal.CacheClient,
+                    .Internal.Models,
+                    .Internal.PageNavigationFeature,
+                    .Internal.PasteboardClient,
+                    .Internal.PersistenceKeys,
+                    .Internal.SharedUI,
+                    .Internal.TicketClient,
+                    .Internal.TicketStatusHistoryFeature,
+                    .Internal.ToastClient,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA
+                ]
+            ),
+
+            .feature(
+                name: "TicketStatusHistoryFeature",
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.TicketClient,
                     .SPM.SFSafeSymbols,
                     .SPM.TCA
                 ]
@@ -645,6 +713,17 @@ let project = Project(
                     .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
+                ]
+            ),
+
+            .feature(
+                name: "TicketClient",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.ParsingClient,
+                    .SPM.PDAPI,
+                    .SPM.TCA
                 ]
             ),
         
@@ -1106,6 +1185,7 @@ extension TargetDependency.Internal {
     static let FavoritesFeature =       TargetDependency.target(name: "FavoritesFeature")
     static let FavoritesRootFeature =   TargetDependency.target(name: "FavoritesRootFeature")
     static let FormFeature =            TargetDependency.target(name: "FormFeature")
+    static let ForumEventLogFeature =   TargetDependency.target(name: "ForumEventLogFeature")
     static let ForumFeature =           TargetDependency.target(name: "ForumFeature")
     static let ForumsListFeature =      TargetDependency.target(name: "ForumsListFeature")
     static let ForumMoveFeature =       TargetDependency.target(name: "ForumMoveFeature")
@@ -1124,6 +1204,9 @@ extension TargetDependency.Internal {
     static let SearchFeature =          TargetDependency.target(name: "SearchFeature")
     static let SearchResultFeature =    TargetDependency.target(name: "SearchResultFeature")
     static let SettingsFeature =        TargetDependency.target(name: "SettingsFeature")
+    static let TicketFeature =          TargetDependency.target(name: "TicketFeature")
+    static let TicketsListFeature =     TargetDependency.target(name: "TicketsListFeature")
+    static let TicketStatusHistoryFeature = TargetDependency.target(name: "TicketStatusHistoryFeature")
     static let TopicBuilder =           TargetDependency.target(name: "TopicBuilder")
     static let TopicEditFeature =       TargetDependency.target(name: "TopicEditFeature")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
@@ -1139,6 +1222,7 @@ extension TargetDependency.Internal {
     static let ParsingClient =       TargetDependency.target(name: "ParsingClient")
     static let PasteboardClient =    TargetDependency.target(name: "PasteboardClient")
     static let QMSClient =           TargetDependency.target(name: "QMSClient")
+    static let TicketClient =        TargetDependency.target(name: "TicketClient")
     static let ToastClient =         TargetDependency.target(name: "ToastClient")
     
     // Shared

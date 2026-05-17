@@ -35,6 +35,7 @@ public struct ParsingClient: Sendable {
     public var parseForumJump: @Sendable (_ response: String) async throws -> ForumJump
     public var parseForum: @Sendable (_ response: String) async throws -> Forum
     public var parseForumStat: @Sendable (_ response: String) async throws -> ForumStat
+    public var parseForumEventLog: @Sendable (_ response: String) async throws -> [ForumEventLog]
     public var parseTopic: @Sendable (_ response: String) async throws -> Topic
     public var parseTopicViewers: @Sendable (_ response: String) async throws -> TopicViewers
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
@@ -66,6 +67,12 @@ public struct ParsingClient: Sendable {
     public var parseDeviceBrands: @Sendable (_ response: String) async throws -> DeviceVendorsList
     public var parseDeviceVendor: @Sendable (_ response: String) async throws -> DeviceVendor
     public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
+    
+    // Ticket
+    public var parseTicketsList: @Sendable (_ response: String) async throws -> TicketsList
+    public var parseTicket: @Sendable (_ response: String) async throws -> Ticket
+    public var parseChangeTicketStatus: @Sendable (_ response: String) async throws -> TicketStatusChangeResponse
+    public var parseTicketStatusHistory: @Sendable (_ response: String) async throws -> [TicketStatusHistory]
 }
 
 // MARK: - Dependency Key
@@ -113,6 +120,9 @@ extension ParsingClient: DependencyKey {
         },
         parseForumStat: { response in
             return try ForumParser.parseForumStat(from: response)
+        },
+        parseForumEventLog: { response in
+            return try ForumParser.parseForumEventLog(from: response)
         },
         parseTopic: { response in
             return try TopicParser.parse(from: response)
@@ -176,6 +186,18 @@ extension ParsingClient: DependencyKey {
         },
         parseDeviceSpecifications: { response in
             return try DevDBParser.parse(from: response)
+        },
+        parseTicketsList: { response in
+            return try TicketParser.parseTicketsList(from: response)
+        },
+        parseTicket: { response in
+            return try TicketParser.parse(from: response)
+        },
+        parseChangeTicketStatus: { response in
+            return try TicketParser.parseChangeTicketStatus(from: response)
+        },
+        parseTicketStatusHistory: { response in
+            return try TicketParser.parseTicketStatusHistory(from: response)
         }
     )
 }

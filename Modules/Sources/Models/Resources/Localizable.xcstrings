@@ -101,6 +101,36 @@
         }
       }
     },
+    "Not processed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не обработан"
+          }
+        }
+      }
+    },
+    "Processed" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обработан"
+          }
+        }
+      }
+    },
+    "Processing" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В работе"
+          }
+        }
+      }
+    },
     "Repeated comment" : {
       "localizations" : {
         "ru" : {

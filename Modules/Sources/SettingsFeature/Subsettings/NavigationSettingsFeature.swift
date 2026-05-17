@@ -9,6 +9,7 @@ import Foundation
 import ComposableArchitecture
 import PersistenceKeys
 import Models
+import CacheClient
 
 @Reducer
 public struct NavigationSettingsFeature: Reducer, Sendable {
@@ -20,17 +21,29 @@ public struct NavigationSettingsFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
+        var userSessionGroup: User.Group?
         
         public var topicOpening: TopicOpeningStrategy
+        public var topicShowAllPosts: Bool
         public var hideTabBarOnScroll: Bool
         public var floatingNavigation: Bool
         public var experimentalFloatingNavigation: Bool
+        
+        var isUserSessionHasModerationGroup: Bool {
+            return userSessionGroup == .admin
+                || userSessionGroup == .supermoderator
+                || userSessionGroup == .moderator
+                || userSessionGroup == .moderatorHelper
+                || userSessionGroup == .moderatorSchool
+        }
 
         public init() {
             self.topicOpening = _appSettings.topicOpeningStrategy.wrappedValue
             self.hideTabBarOnScroll = _appSettings.hideTabBarOnScroll.wrappedValue
             self.floatingNavigation = _appSettings.floatingNavigation.wrappedValue
             self.experimentalFloatingNavigation = _appSettings.experimentalFloatingNavigation.wrappedValue
+            self.topicShowAllPosts = _appSettings.topicShowAllPostsFilter.wrappedValue
         }
     }
     
@@ -46,13 +59,13 @@ public struct NavigationSettingsFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            
+            case initUserSessionGroup(User.Group)
         }
     }
     
     // MARK: - Dependency
     
-    
+    @Dependency(\.cacheClient) private var cacheClient
     
     // MARK: - Body
     
@@ -62,10 +75,17 @@ public struct NavigationSettingsFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .view(.onAppear):
-                break
+                return .run { [session = state.userSession] send in
+                    if let session, let user = cacheClient.getUser(session.userId) {
+                        await send(.internal(.initUserSessionGroup(user.group)))
+                    }
+                }
                 
             case .binding(\.topicOpening):
                 state.$appSettings.topicOpeningStrategy.withLock { $0 = state.topicOpening }
+                
+            case .binding(\.topicShowAllPosts):
+                state.$appSettings.topicShowAllPostsFilter.withLock { $0 = state.topicShowAllPosts }
                 
             case .binding(\.hideTabBarOnScroll):
                 state.$appSettings.hideTabBarOnScroll.withLock { $0 = state.hideTabBarOnScroll }
@@ -83,6 +103,10 @@ public struct NavigationSettingsFeature: Reducer, Sendable {
                 
             case .binding:
                 break
+                
+            case let .internal(.initUserSessionGroup(group)):
+                state.userSessionGroup = group
+                return .none
             }
             
             return .none

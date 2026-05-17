@@ -203,6 +203,10 @@ public struct MoreScreen: View {
                  Row(symbol: ._smartphone, title: "DevDB") {
                      send(.devDBButtonTapped)
                  }
+                 
+                 Row(symbol: .exclamationmarkBubble, title: "Tickets") {
+                     send(.ticketsButtonTapped)
+                 }
              }
          }
          .listRowBackground(Color(.Background.teritary))

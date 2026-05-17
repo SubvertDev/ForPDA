@@ -78,7 +78,7 @@ public struct ForumStatFeature: Reducer, Sendable {
             
             case closeButtonTapped
             case shareLinkButtonTapped
-            case openInBrowserButtonTapped
+            case loadTopicHistoryButtonTapped
         }
         
         case destination(PresentationAction<Destination.Action>)
@@ -97,6 +97,7 @@ public struct ForumStatFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case userTapped(Int)
+            case topicHistoryTapped
         }
     }
     
@@ -143,9 +144,10 @@ public struct ForumStatFeature: Reducer, Sendable {
                 state.destination = .share(IdentifiedURL(url))
                 return .none
                 
-            case .view(.openInBrowserButtonTapped):
-                return .run { [shareLink = state.shareLink] _ in
-                    await openURL(URL(string: shareLink)!)
+            case .view(.loadTopicHistoryButtonTapped):
+                return .run { send in
+                    await send(.delegate(.topicHistoryTapped))
+                    await dismiss()
                 }
                 
             case let .internal(.loadTopicStat(topic)):
