@@ -355,7 +355,7 @@ extension APIClient: DependencyKey {
                 let command = ForumCommand.jump(data: ForumJumpRequest(
                     type: request.transferType,
                     postId: request.postId,
-                    allPosts: request.allPosts,
+                    postsFilter: request.postsFilter.rawValue,
                     topicId: request.topicId
                 ))
                 let response = try await api.send(command)

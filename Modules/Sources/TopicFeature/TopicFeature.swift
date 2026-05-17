@@ -790,8 +790,8 @@ public struct TopicFeature: Reducer, Sendable {
             return .send(.pageNavigation(.goToPage(newPage: page)))
         }
         
-        return .run { [topicId = state.topicId, topicPerPage = state.appSettings.topicPerPage] send in
-            let request = JumpForumRequest(postId: jump.postId, topicId: topicId, allPosts: true, type: jump.type)
+        return .run { [topicId = state.topicId, filter = state.postsFilter, topicPerPage = state.appSettings.topicPerPage] send in
+            let request = JumpForumRequest(postId: jump.postId, topicId: topicId, postsFilter: filter, type: jump.type)
             let response = try await apiClient.jumpForum(request)
             if response.id != topicId {
                 // Handling case where post is in another topic

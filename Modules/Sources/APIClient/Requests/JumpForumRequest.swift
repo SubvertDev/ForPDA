@@ -7,11 +7,12 @@
 
 import Foundation
 import PDAPI
+import Models
 
 public struct JumpForumRequest {
     public let postId: Int
     public let topicId: Int
-    public let allPosts: Bool
+    public let postsFilter: TopicPostsFilter
     public let type: ForumJumpType
     
     nonisolated public var transferType: ForumJumpRequest.JumpType {
@@ -25,12 +26,12 @@ public struct JumpForumRequest {
     public init(
         postId: Int,
         topicId: Int,
-        allPosts: Bool,
+        postsFilter: TopicPostsFilter,
         type: ForumJumpType
     ) {
         self.postId = postId
         self.topicId = topicId
-        self.allPosts = allPosts
+        self.postsFilter = postsFilter
         self.type = type
     }
     
