@@ -52,10 +52,10 @@ public struct ReputationParser {
                 id: id,
                 flag: flag,
                 toId: toId,
-                toName: try toName.convertHtmlCodes(),
+                toName: toName.convertCodes(),
                 authorId: authorId,
-                authorName: try authorName.convertHtmlCodes(),
-                reason: try reason.convertHtmlCodes(),
+                authorName: authorName.convertCodes(),
+                reason: reason.convertCodes(),
                 modified: try parseVoteModified(vote, flag),
                 createdIn: try parseVoteCreatedIn(vote),
                 createdAt: Date(timeIntervalSince1970: createdAt),
@@ -81,7 +81,7 @@ public struct ReputationParser {
        
         return ReputationVote.VoteModified(
             userId: userId,
-            userName: userName,
+            userName: userName.convertCodes(),
             modifiedAt: Date(timeIntervalSince1970: TimeInterval(modifiedAt)),
             isDenied: flag & 2 != 0
         )
@@ -98,9 +98,9 @@ public struct ReputationParser {
         
         return if mainId == 0 { .profile } else {
             if id > 0 {
-                .topic(id: mainId, topicName: mainName, postId: id)
+                .topic(id: mainId, topicName: mainName.convertCodes(), postId: id)
             } else {
-                .site(id: mainId, articleName: mainName, commentId: abs(id))
+                .site(id: mainId, articleName: mainName.convertCodes(), commentId: abs(id))
             }
         }
     }
