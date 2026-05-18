@@ -156,7 +156,6 @@ public struct FieldContainer<F: Hashable, Content: View>: View {
             RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
                 .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 1)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onTapGesture {
             focus = focusEqual
         }
