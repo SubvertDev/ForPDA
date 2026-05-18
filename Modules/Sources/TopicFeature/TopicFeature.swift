@@ -91,6 +91,7 @@ public struct TopicFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        var userSessionInfo: User?
         
         @Presents public var destination: Destination.State?
 
@@ -184,6 +185,8 @@ public struct TopicFeature: Reducer, Sendable {
             case topicResponse(Result<Topic, any Error>)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
+            
+            case initUserSessionInfo(User)
         }
         
         case delegate(Delegate)
@@ -306,6 +309,11 @@ public struct TopicFeature: Reducer, Sendable {
                     .run { send in
                         for await _ in notificationCenter.notifications(named: .sceneBecomeActive) {
                             await send(.internal(.refresh))
+                        }
+                    },
+                    .run { [session = state.userSession] send in
+                        if let session, let user = cacheClient.getUser(session.userId) {
+                            await send(.internal(.initUserSessionInfo(user)))
                         }
                     },
                     .send(.internal(.load))
@@ -738,6 +746,10 @@ public struct TopicFeature: Reducer, Sendable {
                     return .none
                 }
                 return loadPage(offset: offset, &state)
+                
+            case let .internal(.initUserSessionInfo(user)):
+                state.userSessionInfo = user
+                return .none
                 
             case .delegate:
                 return .none

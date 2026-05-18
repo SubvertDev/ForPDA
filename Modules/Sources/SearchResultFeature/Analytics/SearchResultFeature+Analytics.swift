@@ -46,7 +46,8 @@ extension SearchResultFeature {
                     
                 case .internal(.buildContent(_)),
                         .internal(.loadContent(offset: _)),
-                        .internal(.searchResponse(_)):
+                        .internal(.searchResponse(_)),
+                        .internal(.initUserSessionInfo):
                     break
                 }
                 

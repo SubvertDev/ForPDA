@@ -133,18 +133,26 @@ public struct SearchResultScreen: View {
             .padding(.bottom, 4)
             .padding(.top, 8)
             
-            PostRowView(
-                state: .init(post: post.post),
-                action: { _ in },
-                menuAction: { _ in },
-                toolsMenuAction: { _ in }
-            )
-            .highPriorityGesture(
-                TapGesture()
-                    .onEnded {
-                        send(.postTapped(post.topicId, post.id))
-                    }
-            )
+            WithPerceptionTracking {
+                let userSessionInfo: UserSessionInfo? = if let user = store.userSessionInfo {
+                    UserSessionInfo(postsCount: user.replies, group: user.group)
+                } else { nil }
+                PostRowView(
+                    state: .init(
+                        post: post.post,
+                        userSessionInfo: userSessionInfo
+                    ),
+                    action: { _ in },
+                    menuAction: { _ in },
+                    toolsMenuAction: { _ in }
+                )
+                .highPriorityGesture(
+                    TapGesture()
+                        .onEnded {
+                            send(.postTapped(post.topicId, post.id))
+                        }
+                )
+            }
         }
         .padding(.vertical, 12)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))

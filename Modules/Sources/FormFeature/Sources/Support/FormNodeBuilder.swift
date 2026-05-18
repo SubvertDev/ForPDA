@@ -40,6 +40,7 @@ struct FormNodeView: View {
         TopicView(
             type: node,
             attachments: [],
+            userSession: .init(postsCount: 1000000, group: .moderator),
             onUrlTap: { _ in
                 // We don't process taps on links.
                 // If you open them, the form's sheet will close.

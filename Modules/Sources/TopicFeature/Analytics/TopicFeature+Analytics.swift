@@ -26,6 +26,7 @@ extension TopicFeature {
                         .view(.karmaHistoryTapped),
                         .view(.topicPollVoteButtonTapped),
                         .view(.searchButtonTapped),
+                        .internal(.initUserSessionInfo),
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
