@@ -304,7 +304,8 @@ public struct ForumFeature: Reducer, Sendable {
                     
                 case .openInBrowser:
                     let show = isForum ? "showforum" : "showtopic"
-                    let url = URL(string: "https://4pda.to/forum/index.php?\(show)=\(id)")!
+                    let offset = (state.forumId == id && state.pageNavigation.offset > 0) ? "&st=\(state.pageNavigation.offset)" : ""
+                    let url = URL(string: "https://4pda.to/forum/index.php?\(show)=\(id)\(offset)")!
                     return .run { _ in await open(url: url) }
                     
                 case .markRead:
