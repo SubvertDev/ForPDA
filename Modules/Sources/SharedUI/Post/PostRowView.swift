@@ -112,7 +112,7 @@ public struct PostRowView: View {
                 }
                 
                 HStack(spacing: 8) {
-                    Text(User.Group(rawValue: state.post.post.author.groupId)!.title)
+                    Text(User.Group(rawValue: state.post.post.author.groupId)?.title ?? String(""))
                         .font(.caption)
                         .foregroundStyle(Color(.Labels.teritary))
                     
