@@ -91,6 +91,7 @@ public struct QMSListScreen: View {
                     CreateChatScreen(store: store)
                 }
             }
+            .alert($store.scope(state: \.$alert, action: \.alert))
             .onAppear {
                 send(.onAppear)
             }

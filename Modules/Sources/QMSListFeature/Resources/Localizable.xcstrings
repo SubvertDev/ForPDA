@@ -31,6 +31,16 @@
         }
       }
     },
+    "Cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
     "Chat title" : {
       "localizations" : {
         "ru" : {
@@ -61,6 +71,16 @@
         }
       }
     },
+    "Delete" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить"
+          }
+        }
+      }
+    },
     "Delete all chats" : {
       "localizations" : {
         "ru" : {
@@ -77,6 +97,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалить диалог"
+          }
+        }
+      }
+    },
+    "Delete chat?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить диалог?"
           }
         }
       }
@@ -167,6 +197,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Начните общаться с другими пользователями 4PDA"
+          }
+        }
+      }
+    },
+    "This action cannot be undone" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это действие необратимо"
           }
         }
       }

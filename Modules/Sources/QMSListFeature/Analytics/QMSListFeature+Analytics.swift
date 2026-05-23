@@ -73,6 +73,9 @@ extension QMSListFeature {
                 case .createChat:
                     break
                     
+                case .alert:
+                    break
+                    
                     // MARK: - Internal
                     
                 case .internal:

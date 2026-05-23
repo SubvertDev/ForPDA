@@ -29,6 +29,7 @@ public struct QMSListFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Presents var alert: AlertState<Action.Alert>?
         @Presents var createChat: CreateChatFeature.State?
         var viewState: ViewState
         public var qms: QMSList?
@@ -72,6 +73,11 @@ public struct QMSListFeature: Reducer, Sendable {
         }
         
         case createChat(PresentationAction<CreateChatFeature.Action>)
+        case alert(PresentationAction<Alert>)
+        public enum Alert: Equatable {
+            case confirmDeleteChat(chatId: Int, userId: Int)
+            case cancel
+        }
         
         case `internal`(Internal)
         public enum Internal {
@@ -123,6 +129,15 @@ public struct QMSListFeature: Reducer, Sendable {
                 // MARK: - Binding
                 
             case .binding:
+                return .none
+
+            case let .alert(.presented(.confirmDeleteChat(chatId: chatId, userId: userId))):
+                return .run { send in
+                    let _ = try await qmsClient.deleteChat(id: chatId)
+                    await send(.internal(.loadUser(userId)))
+                }
+
+            case .alert:
                 return .none
                 
                 // MARK: - View
@@ -177,10 +192,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case .markAsReadButtonTapped:
                     break
                 case .deleteChatButtonTapped:
-                    return .run { send in
-                        let _ = try await qmsClient.deleteChat(id: chatId)
-                        await send(.internal(.loadUser(userId)))
-                    }
+                    state.alert = .deleteChatConfirmation(chatId: chatId, userId: userId)
                 }
                 return .none
                 
@@ -276,8 +288,27 @@ public struct QMSListFeature: Reducer, Sendable {
         .ifLet(\.$createChat, action: \.createChat) {
             CreateChatFeature()
         }
+        .ifLet(\.$alert, action: \.alert)
         
-        // Disabled until redesign
-        // Analytics()
+        Analytics()
+    }
+}
+
+// MARK: - Alert Extensions
+
+private extension AlertState where Action == QMSListFeature.Action.Alert {
+    static func deleteChatConfirmation(chatId: Int, userId: Int) -> Self {
+        AlertState {
+            TextState("Delete chat?")
+        } actions: {
+            ButtonState(role: .destructive, action: .confirmDeleteChat(chatId: chatId, userId: userId)) {
+                TextState("Delete", bundle: .module)
+            }
+            ButtonState(role: .cancel, action: .cancel) {
+                TextState("Cancel", bundle: .module)
+            }
+        } message: {
+            TextState("This action cannot be undone", bundle: .module)
+        }
     }
 }
