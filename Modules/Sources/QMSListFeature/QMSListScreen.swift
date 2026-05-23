@@ -216,22 +216,22 @@ public struct QMSListScreen: View {
                 
             }
             
-            ContextButton(
-                text: LocalizedStringResource("Profile link", bundle: .module),
-                symbol: .docOnDoc
-            ) {
-                
-            }
+            // ContextButton(
+            //     text: LocalizedStringResource("Profile link", bundle: .module),
+            //     symbol: .docOnDoc
+            // ) {
+            //
+            // }
         }
         
         Section {
-            ContextButton(
-                text: LocalizedStringResource("Add to blacklist", bundle: .module),
-                symbol: .personCropCircleBadgeXmark,
-                role: .destructive
-            ) {
-                    
-            }
+            // ContextButton(
+            //     text: LocalizedStringResource("Add to blacklist", bundle: .module),
+            //     symbol: .personCropCircleBadgeXmark,
+            //     role: .destructive
+            // ) {
+            //
+            // }
             
             ContextButton(
                 text: LocalizedStringResource("Delete all chats", bundle: .module),
@@ -293,14 +293,14 @@ public struct QMSListScreen: View {
     
     @ViewBuilder
     private func ChatContextMenu(chatId: Int, userId: Int) -> some View {
-        Section {
-            ContextButton(
-                text: LocalizedStringResource("Mark as read", bundle: .module),
-                symbol: .checkmark
-            ) {
-                
-            }
-        }
+        // Section {
+        //     ContextButton(
+        //         text: LocalizedStringResource("Mark as read", bundle: .module),
+        //         symbol: .checkmark
+        //     ) {
+        //
+        //     }
+        // }
         
         Section {
             ContextButton(
