@@ -13,6 +13,10 @@ public enum QMSListEvent: Event {
     case userTapped(isExpandable: Bool)
     case createChatTapped
     case tryAgainTapped
+    case deleteChatTapped
+    case deleteChatConfirmed
+    case deleteAllChatsTapped
+    case deleteAllChatsConfirmed
     
     public var name: String {
         return "QMS List " + eventName(for: self).inProperCase

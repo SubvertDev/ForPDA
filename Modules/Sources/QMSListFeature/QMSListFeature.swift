@@ -76,6 +76,7 @@ public struct QMSListFeature: Reducer, Sendable {
         case alert(PresentationAction<Alert>)
         public enum Alert: Equatable {
             case confirmDeleteChat(chatId: Int, userId: Int)
+            case confirmDeleteAllChats(userId: Int)
             case cancel
         }
         
@@ -136,6 +137,12 @@ public struct QMSListFeature: Reducer, Sendable {
                     let _ = try await qmsClient.deleteChat(id: chatId)
                     await send(.internal(.loadUser(userId)))
                 }
+                
+            case let .alert(.presented(.confirmDeleteAllChats(userId: userId))):
+                return .run { send in
+                    let _ = try await qmsClient.deleteChat(id: userId)
+                    await send(.internal(.loadUser(userId)))
+                }
 
             case .alert:
                 return .none
@@ -169,7 +176,7 @@ public struct QMSListFeature: Reducer, Sendable {
                     await send(.internal(.loadUser(userId)))
                 }
                 
-            case let .view(.userContextMenu(userContextAction, id)):
+            case let .view(.userContextMenu(userContextAction, user)):
                 switch userContextAction {
                 case .createChatButtonTapped:
                     break
@@ -180,7 +187,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case .addToBlacklistButtonTapped:
                     break
                 case .deleteAllChatsButtonTapped:
-                    break
+                    state.alert = .deleteAllChatsConfirmation(userId: user.id)
                 }
                 return .none
                 
@@ -302,6 +309,21 @@ private extension AlertState where Action == QMSListFeature.Action.Alert {
             TextState("Delete chat?")
         } actions: {
             ButtonState(role: .destructive, action: .confirmDeleteChat(chatId: chatId, userId: userId)) {
+                TextState("Delete", bundle: .module)
+            }
+            ButtonState(role: .cancel, action: .cancel) {
+                TextState("Cancel", bundle: .module)
+            }
+        } message: {
+            TextState("This action cannot be undone", bundle: .module)
+        }
+    }
+    
+    static func deleteAllChatsConfirmation(userId: Int) -> Self {
+        AlertState {
+            TextState("Delete all chats?")
+        } actions: {
+            ButtonState(role: .destructive, action: .confirmDeleteAllChats(userId: userId)) {
                 TextState("Delete", bundle: .module)
             }
             ButtonState(role: .cancel, action: .cancel) {

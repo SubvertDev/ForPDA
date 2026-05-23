@@ -41,8 +41,7 @@ extension QMSListFeature {
                     case .markAsReadButtonTapped:
                         break
                     case .deleteChatButtonTapped:
-//                        analytics.log(QMSListEvent.deleteChatTapped)
-                        break
+                        analytics.log(QMSListEvent.deleteChatTapped)
                     }
                     
                 case .view(.userRowTapped):
@@ -59,7 +58,7 @@ extension QMSListFeature {
                     case .addToBlacklistButtonTapped:
                         break
                     case .deleteAllChatsButtonTapped:
-                        break
+                        analytics.log(QMSListEvent.deleteAllChatsTapped)
                     }
                     
                 case .view(.createChatButtonTapped):
@@ -72,6 +71,12 @@ extension QMSListFeature {
                     
                 case .createChat:
                     break
+                    
+                case .alert(.presented(.confirmDeleteChat)):
+                    analytics.log(QMSListEvent.deleteChatConfirmed)
+                    
+                case .alert(.presented(.confirmDeleteAllChats)):
+                    analytics.log(QMSListEvent.deleteAllChatsConfirmed)
                     
                 case .alert:
                     break

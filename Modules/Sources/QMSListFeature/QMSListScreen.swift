@@ -238,7 +238,7 @@ public struct QMSListScreen: View {
                 symbol: .trash,
                 role: .destructive
             ) {
-                
+                send(.userContextMenu(.deleteAllChatsButtonTapped, user))
             }
         }
     }

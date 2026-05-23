@@ -91,6 +91,16 @@
         }
       }
     },
+    "Delete all chats?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все диалоги?"
+          }
+        }
+      }
+    },
     "Delete chat" : {
       "localizations" : {
         "ru" : {
