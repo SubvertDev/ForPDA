@@ -302,17 +302,17 @@ extension NotificationsClient: DependencyKey {
                         content.body = String(localized: "\(item.name.convertCodes()): \(item.unreadCount) новое сообщение")
                     case .forum:
                         content.title = "Новое на форуме"
-                        content.body = item.name
+                        content.body = item.name.convertCodes()
                     case .topic:
                         content.title = item.unreadCount & 4 != 0
                         ? "Обновилась шапка"
                         : "\(item.authorName.convertCodes()) в теме"
-                        content.body = item.name
+                        content.body = item.name.convertCodes()
                     case .forumMention:
-                        content.title = "Упоминание в теме \(item.name)"
+                        content.title = "Упоминание в теме \(item.name.convertCodes())"
                         content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     case .siteMention:
-                        content.title = "Упоминание в новости \(item.name)"
+                        content.title = "Упоминание в новости \(item.name.convertCodes())"
                         content.body = "\(item.authorName.convertCodes()) ссылается на вас"
                     }
                     

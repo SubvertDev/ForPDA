@@ -50,8 +50,8 @@ public struct ProfileParser {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
                 
-                guard let readOnlyUntil = array[30] as? Int,
-                      let premoderationRaw = array[29] as? Int else {
+                guard let readOnlyUntil = array[safe: 30] as? Int,
+                      let premoderationRaw = array[safe: 29] as? Int else {
                     throw ParsingError.failedToCastFields
                 }
                 let readOnlyDate: Date? = readOnlyUntil != 0 ? Date(timeIntervalSince1970: TimeInterval(readOnlyUntil)) : nil

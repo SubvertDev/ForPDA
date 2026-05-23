@@ -184,7 +184,7 @@ public struct ReputationScreen: View {
                 
                 if store.isUserAuthorized {
                     Menu {
-                        MenuButtons(voteId: vote.id, authorId: authorId, modified: vote.modified)
+                        MenuButtons(vote: vote)
                     } label: {
                         Image(systemSymbol: .ellipsis)
                             .foregroundStyle(Color(.Labels.teritary))
@@ -201,7 +201,7 @@ public struct ReputationScreen: View {
         .background(Color(.Background.primary))
         .contextMenu {
             if store.isUserAuthorized {
-                MenuButtons(voteId: vote.id, authorId: authorId, modified: vote.modified)
+                MenuButtons(vote: vote)
             }
         }
     }
@@ -270,27 +270,30 @@ public struct ReputationScreen: View {
     // MARK: - Menu Buttons
     
     @ViewBuilder
-    private func MenuButtons(voteId: Int, authorId: Int, modified: ReputationVote.VoteModified?) -> some View {
-        ContextButton(
-            text: LocalizedStringResource("Profile", bundle: .module),
-            symbol: .personCropCircle,
-            action: { send(.contextVoteMenu(.goToAuthor(authorId))) }
-        )
-        
-        if store.pickerSection == .history {
-            ContextButton(
-                text: LocalizedStringResource("Complain", bundle: .module),
-                symbol: .exclamationmarkTriangle,
-                action: { send(.contextVoteMenu(.report(voteId))) }
-            )
-        }
-        
+    private func MenuButtons(vote: ReputationVote) -> some View {
         WithPerceptionTracking {
+            ContextButton(
+                text: LocalizedStringResource("Profile", bundle: .module),
+                symbol: .personCropCircle,
+                action: { send(.contextVoteMenu(.goToAuthor(vote.authorId))) }
+            )
+        
+            let hasFullModerationPermissions = store.userSessionInfo?.group == .admin
+                || store.userSessionInfo?.group == .supermoderator
+                || store.userSessionInfo?.group == .moderator
+            if vote.toId == store.userSession?.userId || hasFullModerationPermissions {
+                ContextButton(
+                    text: LocalizedStringResource("Complain", bundle: .module),
+                    symbol: .exclamationmarkTriangle,
+                    action: { send(.contextVoteMenu(.report(vote.id))) }
+                )
+            }
+            
             if store.isUserSessionHasModerationGroup {
                 Section {
-                    let isDenied = if let modified = modified { modified.isDenied } else { false }
+                    let isDenied = if let modified = vote.modified { modified.isDenied } else { false }
                     Button(role: isDenied ? .cancel : .destructive) {
-                        send(.contextVoteMenu(.modify(voteId, isDenied ? .restore : .delete)))
+                        send(.contextVoteMenu(.modify(vote.id, isDenied ? .restore : .delete)))
                     } label: {
                         HStack {
                             Text(isDenied ? "Restore" : "Delete", bundle: .module)

@@ -215,7 +215,9 @@ public struct ProfileFeature: Reducer, Sendable {
                 state.isLoading = false
                 print(error, #line)
                 analyticsClient.reportFullyDisplayed()
-                return .none
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
                 
 //            case let .internal(.updateBadgeCounts(unread)):
 //                state.qmsBadgeCount = unread.qmsUnreadCount

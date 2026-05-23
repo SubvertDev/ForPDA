@@ -204,8 +204,10 @@ public struct MoreScreen: View {
                      send(.devDBButtonTapped)
                  }
                  
-                 Row(symbol: .exclamationmarkBubble, title: "Tickets") {
-                     send(.ticketsButtonTapped)
+                 if store.isTicketsAvailable {
+                     Row(symbol: .exclamationmarkBubble, title: "Tickets") {
+                         send(.ticketsButtonTapped)
+                     }
                  }
              }
          }

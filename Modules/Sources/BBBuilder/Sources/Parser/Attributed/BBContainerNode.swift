@@ -139,7 +139,8 @@ public enum BBContainerNode: Equatable {
             if case let .text(text) = children.first {
                 self = .mergetime(text)
             } else {
-                fatalError("BBContainerNode НЕ ПОЛУЧИЛОСЬ СОЗДАТЬ MERGETIME")
+                print("BBContainerNode COULDN'T CREATE MERGETIME, DEFAULTING TO 0")
+                self = .mergetime(NSAttributedString(string: "0"))
             }
         case .img:
             if case let .text(text) = children.first {
