@@ -179,7 +179,7 @@ public struct QMSListFeature: Reducer, Sendable {
             case let .view(.userContextMenu(userContextAction, user)):
                 switch userContextAction {
                 case .createChatButtonTapped:
-                    break
+                    state.createChat = CreateChatFeature.State(user: user)
                 case .userProfileButtonTapped:
                     break
                 case .profileLinkButtonTapped:

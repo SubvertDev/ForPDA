@@ -50,7 +50,7 @@ extension QMSListFeature {
                 case let .view(.userContextMenu(userContextAction, _)):
                     switch userContextAction {
                     case .createChatButtonTapped:
-                        break
+                        analytics.log(QMSListEvent.createChatInUserTapped)
                     case .userProfileButtonTapped:
                         break
                     case .profileLinkButtonTapped:
@@ -62,7 +62,7 @@ extension QMSListFeature {
                     }
                     
                 case .view(.createChatButtonTapped):
-                    analytics.log(QMSListEvent.createChatTapped)
+                    analytics.log(QMSListEvent.createChatInRowTapped)
                     
                 case .view(.tryAgainButtonTapped):
                     analytics.log(QMSListEvent.tryAgainTapped)

@@ -11,7 +11,8 @@ public enum QMSListEvent: Event {
     case onRefresh
     case chatTapped
     case userTapped(isExpandable: Bool)
-    case createChatTapped
+    case createChatInUserTapped
+    case createChatInRowTapped
     case tryAgainTapped
     case deleteChatTapped
     case deleteChatConfirmed
