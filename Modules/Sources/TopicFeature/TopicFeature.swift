@@ -389,11 +389,15 @@ public struct TopicFeature: Reducer, Sendable {
                     return .none
                     
                 case .openInBrowser:
-                    let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)")!
+                    let offset = state.pageNavigation.offset > 0 ? "&st=\(state.pageNavigation.offset)" : ""
+                    let modfilter = state.postsFilter != .exceptDeleted ? "&modfilter=\(state.postsFilter.modfilter!)" : ""
+                    let url = URL(string: "https://4pda.to/forum/index.php?showtopic=\(topic.id)\(offset)\(modfilter)")!
                     return .run { _ in await open(url: url) }
                     
                 case .copyLink:
-                    pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)")
+                    let offset = state.pageNavigation.offset > 0 ? "&st=\(state.pageNavigation.offset)" : ""
+                    let modfilter = state.postsFilter != .exceptDeleted ? "&modfilter=\(state.postsFilter.modfilter!)" : ""
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?showtopic=\(topic.id)\(offset)\(modfilter)")
                     return .run { _ in
                         await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
