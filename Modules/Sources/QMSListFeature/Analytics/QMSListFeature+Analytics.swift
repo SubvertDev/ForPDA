@@ -52,7 +52,7 @@ extension QMSListFeature {
                     case .createChatButtonTapped:
                         analytics.log(QMSListEvent.createChatInUserTapped)
                     case .userProfileButtonTapped:
-                        break
+                        analytics.log(QMSListEvent.userProfileTapped)
                     case .profileLinkButtonTapped:
                         break
                     case .addToBlacklistButtonTapped:

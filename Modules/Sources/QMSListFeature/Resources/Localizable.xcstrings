@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Add to blacklist" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -132,6 +133,7 @@
       }
     },
     "Mark as read" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -172,6 +174,7 @@
       }
     },
     "Profile link" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

@@ -14,6 +14,7 @@ public enum QMSListEvent: Event {
     case createChatInUserTapped
     case createChatInRowTapped
     case tryAgainTapped
+    case userProfileTapped
     case deleteChatTapped
     case deleteChatConfirmed
     case deleteAllChatsTapped

@@ -91,6 +91,7 @@ public struct QMSListFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case openQMSChat(Int)
+            case openProfile(Int)
         }
     }
     
@@ -181,7 +182,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case .createChatButtonTapped:
                     state.createChat = CreateChatFeature.State(user: user)
                 case .userProfileButtonTapped:
-                    break
+                    return .send(.delegate(.openProfile(user.id)))
                 case .profileLinkButtonTapped:
                     break
                 case .addToBlacklistButtonTapped:

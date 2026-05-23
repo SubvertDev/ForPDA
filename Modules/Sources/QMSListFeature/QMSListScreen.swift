@@ -213,7 +213,7 @@ public struct QMSListScreen: View {
                 text: LocalizedStringResource("User profile", bundle: .module),
                 symbol: .personCropCircle
             ) {
-                
+                send(.userContextMenu(.userProfileButtonTapped, user))
             }
             
             // ContextButton(
