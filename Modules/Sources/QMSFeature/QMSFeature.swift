@@ -48,6 +48,7 @@ public struct QMSFeature: Reducer, Sendable {
         var isSending = false
         
         var draftText = ""
+        var draftSnapshot = ""
         
         public var title: String {
             if let chat {
@@ -130,6 +131,8 @@ public struct QMSFeature: Reducer, Sendable {
             case let .view(.sendMessageButtonTapped(draftMessage)):
                 guard !state.isSending, !draftMessage.text.isEmpty else { return .none }
                 
+                state.draftText = ""
+                state.draftSnapshot = draftMessage.text
                 state.isSending = true
                 
                 return .run { [chatId = state.chatId, message = draftMessage.text] send in
@@ -151,6 +154,7 @@ public struct QMSFeature: Reducer, Sendable {
                 
             case let .internal(.messageSendError(error)):
                 state.isSending = false
+                state.draftText = state.draftSnapshot
                 state.alert = .somethingWentWrong
                 analyticsClient.capture(error)
                 return .none
@@ -186,7 +190,7 @@ public struct QMSFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.chatLoaded(result, loadKind)):
-                state.draftText = ""
+                state.draftSnapshot = ""
                 state.isSending = false
                 state.isLoadingMore = false
                 
@@ -232,6 +236,7 @@ public struct QMSFeature: Reducer, Sendable {
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         
         // Disabled until redesign
         // Analytics()
