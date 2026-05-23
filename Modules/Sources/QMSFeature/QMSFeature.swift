@@ -91,6 +91,7 @@ public struct QMSFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case handleUrl(URL)
+            case fullyRead(_ userId: Int)
         }
     }
     
@@ -227,9 +228,10 @@ public struct QMSFeature: Reducer, Sendable {
                 }
                 
                 analyticsClient.reportFullyDisplayed()
-                return .run { _ in
+                return .run { [userId = state.chat!.partnerId] send in
                     let ids = (try? result.get().id).map { [$0] } ?? []
                     await notificationsClient.removeNotifications(ids: ids)
+                    await send(.delegate(.fullyRead(userId)))
                 }
                 
             case .binding:

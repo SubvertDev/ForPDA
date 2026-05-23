@@ -8,6 +8,7 @@
 import Foundation
 
 public enum QMSListEvent: Event {
+    case onRefresh
     case chatTapped(Int)
     case userTapped(Int, isExpandable: Bool)
     case createChatTapped
@@ -29,7 +30,8 @@ public enum QMSListEvent: Event {
             ]
             
         case .createChatTapped,
-                .tryAgainTapped:
+                .tryAgainTapped,
+                .onRefresh:
             return nil
         }
     }

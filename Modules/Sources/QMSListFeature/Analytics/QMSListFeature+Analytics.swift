@@ -30,6 +30,9 @@ extension QMSListFeature {
                 case .view(.onAppear):
                     break
                     
+                case .view(.onRefresh):
+                    analytics.log(QMSListEvent.onRefresh)
+                    
                 case let .view(.chatRowTapped(chatId)):
                     analytics.log(QMSListEvent.chatTapped(chatId))
                     

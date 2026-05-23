@@ -460,6 +460,11 @@ public struct StackTab: Reducer, Sendable {
         case let .qms(.delegate(.handleUrl(url))):
             return handleDeeplink(url: url, state: &state)
             
+        case let .qms(.delegate(.fullyRead(userId))):
+            for (id, element) in zip(state.path.ids, state.path).reversed() where element.is(\.qms.qmsList) {
+                return .send(.path(.element(id: id, action: .qms(.qmsList(.internal(.loadUser(userId)))))))
+            }
+            
         default:
             break
         }

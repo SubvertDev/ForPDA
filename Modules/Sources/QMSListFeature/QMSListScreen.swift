@@ -50,6 +50,9 @@ public struct QMSListScreen: View {
                                 }
                             }
                         }
+                        .refreshable {
+                            await send(.onRefresh).finish()
+                        }
                         
                     case .loading:
                         QMSList {

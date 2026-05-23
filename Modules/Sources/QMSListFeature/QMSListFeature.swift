@@ -31,7 +31,7 @@ public struct QMSListFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents var createChat: CreateChatFeature.State?
         var viewState: ViewState
-        var qms: QMSList?
+        public var qms: QMSList?
         var expandedGroups: [Bool] = []
         
         public init(
@@ -62,6 +62,7 @@ public struct QMSListFeature: Reducer, Sendable {
             }
             
             case onAppear
+            case onRefresh
             case userRowTapped(Int)
             case userContextMenu(UserContextMenu, QMSUser)
             case chatRowTapped(Int)
@@ -74,8 +75,9 @@ public struct QMSListFeature: Reducer, Sendable {
         
         case `internal`(Internal)
         public enum Internal {
-            case load
+            case loadQMS
             case qmsLoaded(Result<QMSList, any Error>)
+            case loadUser(_ id: Int)
             case userLoaded(Result<QMSUser, any Error>)
         }
         
@@ -110,8 +112,7 @@ public struct QMSListFeature: Reducer, Sendable {
                         if let index = changedIndex(before: oldState, after: after),
                            let userId = qms?.users[index].userId,
                            userId != 0 {
-                            let result = await Result { try await qmsClient.loadUser(id: userId) }
-                            await send(.internal(.userLoaded(result)))
+                            await send(.internal(.loadUser(userId)))
                         }
                     }
             }
@@ -128,14 +129,20 @@ public struct QMSListFeature: Reducer, Sendable {
                 
             case .view(.onAppear):
                 return .run { send in
-                    await send(.internal(.load))
+                    await send(.internal(.loadQMS))
                     
                     // TODO: Does this cancel on feature removal?
                     for await unread in notificationsClient.unreadPublisher().values.dropFirst() {
                         guard unread.qmsUnreadCount > 0 else { continue }
-                        await send(.internal(.load))
+                        await send(.internal(.loadQMS))
                     }
                 }
+                
+            case .view(.onRefresh):
+                return .run { send in
+                    await send(.internal(.loadQMS))
+                }
+                
             case let .view(.userRowTapped(userId)):
                 guard let qms = state.qms else { return .none }
                 guard let index = qms.users.firstIndex(where: { $0.id == userId }) else { return .none }
@@ -144,10 +151,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 
                 return .run { send in
                     guard userId != 0 else { return }
-                    let result = try await qmsClient.loadUser(id: userId)
-                    await send(.internal(.userLoaded(.success(result))))
-                } catch: { error, send in
-                    await send(.internal(.userLoaded(.failure(error))))
+                    await send(.internal(.loadUser(userId)))
                 }
                 
             case let .view(.userContextMenu(userContextAction, id)):
@@ -175,8 +179,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 case .deleteChatButtonTapped:
                     return .run { send in
                         let _ = try await qmsClient.deleteChat(id: chatId)
-                        let result = await Result { try await qmsClient.loadUser(id: userId) }
-                        await send(.internal(.userLoaded(result)))
+                        await send(.internal(.loadUser(userId)))
                     }
                 }
                 return .none
@@ -187,7 +190,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 
             case .view(.tryAgainButtonTapped):
                 state.viewState = .loading
-                return .send(.internal(.load))
+                return .send(.internal(.loadQMS))
                 
                 // MARK: - Destinations
                 
@@ -195,11 +198,10 @@ public struct QMSListFeature: Reducer, Sendable {
                 guard let qms = state.qms else { return .none }
                 if qms.users.contains(where: { $0.userId == userId }) {
                     return .run { send in
-                        let result = await Result { try await qmsClient.loadUser(id: userId) }
-                        await send(.internal(.userLoaded(result)))
+                        await send(.internal(.loadUser(userId)))
                     }
                 } else {
-                    return .send(.internal(.load))
+                    return .send(.internal(.loadQMS))
                 }
                 
             case .createChat:
@@ -207,7 +209,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 
                 // MARK: - Internal
                 
-            case .internal(.load):
+            case .internal(.loadQMS):
                 return .run { send in
                     let result = await Result { try await qmsClient.loadChatList() }
                     await send(.internal(.qmsLoaded(result)))
@@ -241,6 +243,12 @@ public struct QMSListFeature: Reducer, Sendable {
                 }
                 analyticsClient.reportFullyDisplayed()
                 return .none
+                
+            case let .internal(.loadUser(userId)):
+                return .run { send in
+                    let result = await Result { try await qmsClient.loadUser(id: userId) }
+                    await send(.internal(.userLoaded(result)))
+                }
                 
             case let .internal(.userLoaded(result)):
                 switch result {
