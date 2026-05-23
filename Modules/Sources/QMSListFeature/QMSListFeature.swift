@@ -135,13 +135,13 @@ public struct QMSListFeature: Reducer, Sendable {
 
             case let .alert(.presented(.confirmDeleteChat(chatId: chatId, userId: userId))):
                 return .run { send in
-                    let _ = try await qmsClient.deleteChat(id: chatId)
+                    let _ = try await qmsClient.deleteChat(chatId: chatId)
                     await send(.internal(.loadUser(userId)))
                 }
                 
             case let .alert(.presented(.confirmDeleteAllChats(userId: userId))):
                 return .run { send in
-                    let _ = try await qmsClient.deleteChat(id: userId)
+                    let _ = try await qmsClient.deleteAllChats(userId: userId)
                     await send(.internal(.loadUser(userId)))
                 }
 

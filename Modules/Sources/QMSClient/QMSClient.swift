@@ -19,7 +19,8 @@ public struct QMSClient: Sendable {
     public var loadUser: @Sendable (_ id: Int) async throws -> QMSUser
     public var loadChat: @Sendable (_ id: Int, _ lastMessageId: Int, _ offset: Int) async throws -> QMSChat
     public var createChat: @Sendable (_ opponentId: Int, _ title: String, _ message: String) async throws -> String
-    public var deleteChat: @Sendable (_ id: Int) async throws -> String
+    public var deleteAllChats: @Sendable (_ userId: Int) async throws -> String
+    public var deleteChat: @Sendable (_ chatId: Int) async throws -> String
     public var sendMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
     public var deleteMessage: @Sendable (_ chatId: Int, _ messageId: Int, _ forAll: Bool) async throws -> String
     public var blacklist: @Sendable () async throws -> String
@@ -49,29 +50,31 @@ extension QMSClient: DependencyKey {
             },
             
             loadChat: { id, lastMessageId, offset in
-                let request = QMSViewDialogRequest(dialogId: id, messageId: lastMessageId, limit: offset)
-                let response = try await api.send(QMSCommand.Dialog.view(data: request))
+                let response = try await api.send(QMSCommand.Dialog.view(id: id, messageId: lastMessageId, offset: offset))
                 return try await parser.parseQmsChat(response)
             },
             
             createChat: { opponentId, title, message in
-                let request = QMSAddDialogRequest(opponentId: opponentId, dialogTitle: title, message: message)
-                let response = try await api.send(QMSCommand.Dialog.create(data: request))
+                let response = try await api.send(QMSCommand.Dialog.create(title: title, message: message, opponentId: opponentId))
                 return response
             },
             
-            deleteChat: { id in
-                let response = try await api.send(QMSCommand.Dialog.delete(id: id))
+            deleteAllChats: { userId in
+                let response = try await api.send(QMSCommand.delete(dialogId: 0, messageId: userId, forAll: false))
+                return response
+            },
+            
+            deleteChat: { chatId in
+                let response = try await api.send(QMSCommand.delete(dialogId: chatId, messageId: 0, forAll: false))
                 return response
             },
             
             sendMessage: { chatId, message in
-                let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
-                let _ = try await api.send(QMSCommand.Message.send(data: request))
+                let _ = try await api.send(QMSCommand.Message.send(message: message, dialogId: chatId, attaches: []))
             },
             
             deleteMessage: { chatId, messageId, forAll in
-                let response = try await api.send(QMSCommand.Message.delete(dialogId: chatId, messageId: messageId, forAll: forAll))
+                let response = try await api.send(QMSCommand.delete(dialogId: chatId, messageId: messageId, forAll: forAll))
                 return response
             },
             
@@ -108,6 +111,9 @@ extension QMSClient: DependencyKey {
             createChat: { _, _, _ in
                 return ""
             },
+            deleteAllChats: { _ in
+                return ""
+            },
             deleteChat: { _ in
                 return ""
             },
@@ -138,6 +144,7 @@ extension QMSClient: DependencyKey {
                 return await mock.loadQMSChat()
             },
             createChat: unimplemented(),
+            deleteAllChats: unimplemented(),
             deleteChat: unimplemented(),
             sendMessage: { chatId, message in
                 return try await mock.sendQMSMessage(chatId: chatId, message: message)
