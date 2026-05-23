@@ -43,7 +43,9 @@ public struct QMSListScreen: View {
                                     } label: {
                                         UserRow(user)
                                             .contextMenu {
-                                                UserContextMenu(user: user)
+                                                if user.id != 0 { // 0 is service account
+                                                    UserContextMenu(user: user)
+                                                }
                                             }
                                     }
                                     .listRowBackground(Color(.Background.teritary))
@@ -248,7 +250,9 @@ public struct QMSListScreen: View {
     @ViewBuilder
     private func ExpandedUserContent(_ user: QMSUser) -> some View {
         ChatList(user)
-        CreateChatRow(user)
+        if user.id != 0 { // 0 is service account
+            CreateChatRow(user)
+        }
     }
     
     
