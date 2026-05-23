@@ -33,19 +33,20 @@ extension QMSListFeature {
                 case .view(.onRefresh):
                     analytics.log(QMSListEvent.onRefresh)
                     
-                case let .view(.chatRowTapped(chatId)):
-                    analytics.log(QMSListEvent.chatTapped(chatId))
+                case .view(.chatRowTapped):
+                    analytics.log(QMSListEvent.chatTapped)
                     
                 case let .view(.chatContextMenu(chatContextAction, _, _)):
                     switch chatContextAction {
                     case .markAsReadButtonTapped:
                         break
                     case .deleteChatButtonTapped:
+//                        analytics.log(QMSListEvent.deleteChatTapped)
                         break
                     }
                     
-                case let .view(.userRowTapped(userId)):
-                    analytics.log(QMSListEvent.userTapped(userId, isExpandable: true))
+                case .view(.userRowTapped):
+                    analytics.log(QMSListEvent.userTapped(isExpandable: true))
                     
                 case let .view(.userContextMenu(userContextAction, _)):
                     switch userContextAction {
