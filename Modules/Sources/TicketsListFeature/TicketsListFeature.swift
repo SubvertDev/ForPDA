@@ -119,6 +119,12 @@ public struct TicketsListFeature: Reducer, Sendable {
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
+            .onChange(of: \.appSettings.tickets.isSortByForums) { _, _ in
+                return .send(.internal(.refresh))
+            }
+            .onChange(of: \.appSettings.tickets.isShowOnlyMine) { _, _ in
+                return .send(.internal(.refresh))
+            }
         
         Scope(state: \.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
@@ -126,10 +132,6 @@ public struct TicketsListFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .binding(\.appSettings.tickets.isSortByForums),
-                 .binding(\.appSettings.tickets.isShowOnlyMine):
-                return .send(.internal(.refresh))
-                
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
                 return .send(.internal(.loadTickets(offset: newOffset)))
