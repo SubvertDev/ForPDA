@@ -72,6 +72,7 @@ public struct AppFeature: Reducer, Sendable {
         
         @Shared(.userSession) public var userSession: UserSession?
         @Shared(.appSettings) public var appSettings: AppSettings
+        @Shared(.appStorage("showConnectionState")) var showConnectionState = false
         
         public var selectedTab: AppTab
         public var previousTab: AppTab

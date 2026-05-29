@@ -25,6 +25,9 @@ public struct LogStoreFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        @Shared(.appStorage("showConnectionState"))
+        var showConnectionState = false
+        
         var logs: [Log] = []
         var isLoading = true
         public init() {}
@@ -35,6 +38,7 @@ public struct LogStoreFeature: Reducer, Sendable {
             case onAppear
             case closeButtonTapped
             case sendTopicNotificationButtonTapped
+            case showConnectionStateButtonTapped
         }
         case view(View)
         
@@ -66,7 +70,7 @@ public struct LogStoreFeature: Reducer, Sendable {
                             // .filter { $0.subsystem == "pdapi" || $0.category == "App" }
                             .filter { $0.subsystem == "com.subvert.forpda" }
                             .sorted(by: { $0.date < $1.date })
-//                            .map { "[\(formatter.string(from: $0.date))] \($0.composedMessage)" }
+                            // .map { "[\(formatter.string(from: $0.date))] \($0.composedMessage)" }
                             .map { Log(message: $0.composedMessage, date: $0.date, category: $0.category) }
                         
                         await send(.internal(.loaded(logs)))
@@ -102,6 +106,10 @@ public struct LogStoreFeature: Reducer, Sendable {
                     await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                 }
                 
+            case .view(.showConnectionStateButtonTapped):
+                state.$showConnectionState.withLock { $0 = !$0 }
+                return .none
+                
             case let .internal(.loaded(logs)):
                 state.logs = logs
                 state.isLoading = false
@@ -122,23 +130,32 @@ public struct LogStoreScreen: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            ScrollView(.vertical) {
-                Button(String("Notify 1104159")) { send(.sendTopicNotificationButtonTapped) }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.bottom, 8)
-
-                ForEach(store.logs) { log in
-                    VStack(spacing: 2) {
-                        Text(verbatim: "[\(log.date.formatted())] \(log.category)")
-                            .font(.subheadline)
-                            .foregroundStyle(.black.opacity(0.5))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        Text(log.message)
-                            .font(.subheadline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+            VStack {
+                Button(String("Notify 1104159")) {
+                    send(.sendTopicNotificationButtonTapped)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 16)
+                
+                Button(String("Show connection state (\(store.showConnectionState))")) {
+                    send(.showConnectionStateButtonTapped)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                
+                ScrollView(.vertical) {
+                    ForEach(store.logs) { log in
+                        VStack(spacing: 2) {
+                            Text(verbatim: "[\(log.date.formatted())] \(log.category)")
+                                .font(.subheadline)
+                                .foregroundStyle(.black.opacity(0.5))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            Text(log.message)
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.bottom, 4)
                     }
-                    .padding(.bottom, 4)
                 }
             }
             .navigationTitle(Text(verbatim: "Logs"))
@@ -158,5 +175,11 @@ public struct LogStoreScreen: View {
                 send(.onAppear)
             }
         }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        LogStoreScreen(store: .init(initialState: LogStoreFeature.State()) { LogStoreFeature() })
     }
 }
