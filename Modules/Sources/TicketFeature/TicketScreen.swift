@@ -265,7 +265,7 @@ public struct TicketScreen: View {
         if !comment.uiContent.isEmpty {
             ForEach(comment.uiContent, id: \.self) { type in
                 WithPerceptionTracking {
-                    TopicView(type: type, attachments: []) { url in
+                    TopicView(type: type, attachments: [], userSession: .init(postsCount: 1000000, group: .moderator)) { url in
                         send(.urlTapped(url))
                     }
                 }
