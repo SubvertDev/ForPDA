@@ -191,7 +191,6 @@ struct DestinationModifier: ViewModifier {
 }
 
 #Preview("Form (Simple, Edit)") {
-    let id = 0
     @Shared(.userSession) var userSession = UserSession.mock(userId: 0)
     NavigationStack {
         FormScreen(
