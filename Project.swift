@@ -50,6 +50,7 @@ let project = Project(
                     .Internal.ForumsListFeature,
                     .Internal.HistoryFeature,
                     .Internal.LoggerClient,
+                    .Internal.LogStoreFeature,
                     .Internal.MentionsFeature,
                     .Internal.Models,
                     .Internal.MoreFeature,
@@ -370,6 +371,16 @@ let project = Project(
                     .SPM.TCA,
                 ]
             ),
+
+            .feature(
+                name: "LogStoreFeature",
+                hasResources: false,
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                    .SPM.TCA,
+                ]
+            ),
         
             .feature(
                 name: "MentionsFeature",
@@ -452,7 +463,6 @@ let project = Project(
         
             .feature(
                 name: "QMSListFeature",
-                hasResources: false,
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.CacheClient,
@@ -1193,6 +1203,7 @@ extension TargetDependency.Internal {
     static let ForumStatFeature =       TargetDependency.target(name: "ForumStatFeature")
     static let GalleryFeature =         TargetDependency.target(name: "GalleryFeature")
     static let HistoryFeature =         TargetDependency.target(name: "HistoryFeature")
+    static let LogStoreFeature =        TargetDependency.target(name: "LogStoreFeature")
     static let MentionsFeature =        TargetDependency.target(name: "MentionsFeature")
     static let MoreFeature =            TargetDependency.target(name: "MoreFeature")
     static let NotificationsFeature =   TargetDependency.target(name: "NotificationsFeature")

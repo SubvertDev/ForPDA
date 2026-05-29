@@ -48,6 +48,7 @@ public struct QMSFeature: Reducer, Sendable {
         var isSending = false
         
         var draftText = ""
+        var draftSnapshot = ""
         
         public var title: String {
             if let chat {
@@ -90,6 +91,7 @@ public struct QMSFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case handleUrl(URL)
+            case fullyRead(_ userId: Int)
         }
     }
     
@@ -130,10 +132,12 @@ public struct QMSFeature: Reducer, Sendable {
             case let .view(.sendMessageButtonTapped(draftMessage)):
                 guard !state.isSending, !draftMessage.text.isEmpty else { return .none }
                 
+                state.draftText = ""
+                state.draftSnapshot = draftMessage.text
                 state.isSending = true
                 
                 return .run { [chatId = state.chatId, message = draftMessage.text] send in
-                    try await qmsClient.sendQMSMessage(chatId: chatId, message: message)
+                    try await qmsClient.sendMessage(chatId: chatId, message: message)
                 } catch: { error, send in
                     await send(.internal(.messageSendError(error)))
                 }
@@ -145,12 +149,13 @@ public struct QMSFeature: Reducer, Sendable {
                 state.isLoadingMore = true
                 return .run { [id = state.chatId, chat = state.chat] send in
                     let lastMessageId = chat?.messages.first?.id ?? 0
-                    let result = await Result { try await qmsClient.loadQMSChat(id, lastMessageId, defaultOffset) }
+                    let result = await Result { try await qmsClient.loadChat(id, lastMessageId, defaultOffset) }
                     await send(.internal(.chatLoaded(result, .older)))
                 }
                 
             case let .internal(.messageSendError(error)):
                 state.isSending = false
+                state.draftText = state.draftSnapshot
                 state.alert = .somethingWentWrong
                 analyticsClient.capture(error)
                 return .none
@@ -181,12 +186,12 @@ public struct QMSFeature: Reducer, Sendable {
                 
             case .internal(.loadChat):
                 return .run { [id = state.chatId] send in
-                    let result = await Result { try await qmsClient.loadQMSChat(id, 0, defaultOffset) }
+                    let result = await Result { try await qmsClient.loadChat(id, 0, defaultOffset) }
                     await send(.internal(.chatLoaded(result, .latest)))
                 }
                 
             case let .internal(.chatLoaded(result, loadKind)):
-                state.draftText = ""
+                state.draftSnapshot = ""
                 state.isSending = false
                 state.isLoadingMore = false
                 
@@ -223,15 +228,17 @@ public struct QMSFeature: Reducer, Sendable {
                 }
                 
                 analyticsClient.reportFullyDisplayed()
-                return .run { _ in
+                return .run { [userId = state.chat!.partnerId] send in
                     let ids = (try? result.get().id).map { [$0] } ?? []
                     await notificationsClient.removeNotifications(ids: ids)
+                    await send(.delegate(.fullyRead(userId)))
                 }
                 
             case .binding:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         
         // Disabled until redesign
         // Analytics()

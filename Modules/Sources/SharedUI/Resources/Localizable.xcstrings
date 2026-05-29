@@ -267,6 +267,16 @@
         }
       }
     },
+    "Something went wrong..." : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что-то пошло не так..."
+          }
+        }
+      }
+    },
     "This post deleted" : {
       "localizations" : {
         "ru" : {
@@ -307,6 +317,16 @@
         }
       }
     },
+    "Try again" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попробовать снова"
+          }
+        }
+      }
+    },
     "Understood" : {
       "localizations" : {
         "ru" : {
@@ -323,6 +343,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открепить пост"
+          }
+        }
+      }
+    },
+    "Whoops!" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упс!"
           }
         }
       }

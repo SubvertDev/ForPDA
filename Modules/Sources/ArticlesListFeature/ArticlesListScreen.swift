@@ -51,16 +51,9 @@ public struct ArticlesListScreen: View {
                     }
                     
                 case .networkError:
-                    UnavailableView(
-                        symbol: .exclamationmarkTriangleFill,
-                        title: "Failed to load",
-                        description: "Try again later",
-                        actionTitle: "Try again",
-                        action: {
-                            store.send(.tryAgainButtonTapped)
-                        },
-                        bundle: .module
-                    )
+                    GenericView.GenericError {
+                        store.send(.tryAgainButtonTapped)
+                    }
                 }
             }
             .navigationTitle(Text("Articles", bundle: .module))

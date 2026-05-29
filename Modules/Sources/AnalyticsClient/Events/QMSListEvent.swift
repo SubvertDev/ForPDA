@@ -8,8 +8,17 @@
 import Foundation
 
 public enum QMSListEvent: Event {
-    case chatTapped(Int)
-    case userTapped(Int, isExpandable: Bool)
+    case onRefresh
+    case chatTapped
+    case userTapped(isExpandable: Bool)
+    case createChatInUserTapped
+    case createChatInRowTapped
+    case tryAgainTapped
+    case userProfileTapped
+    case deleteChatTapped
+    case deleteChatConfirmed
+    case deleteAllChatsTapped
+    case deleteAllChatsConfirmed
     
     public var name: String {
         return "QMS List " + eventName(for: self).inProperCase
@@ -17,14 +26,11 @@ public enum QMSListEvent: Event {
     
     public var properties: [String: String]? {
         switch self {
-        case let .chatTapped(chatId):
-            return ["chatId": String(chatId)]
+        case let .userTapped(isExpandable):
+            return ["isExpandable": String(isExpandable)]
             
-        case let .userTapped(userId, isExpandable):
-            return [
-                "userId": String(userId),
-                "isExpandable": String(isExpandable)
-            ]
+        default:
+            return nil
         }
     }
 }

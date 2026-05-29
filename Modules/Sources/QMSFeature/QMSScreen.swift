@@ -88,6 +88,7 @@ public struct QMSScreen: View {
             }
             .navigationTitle(store.title)
             ._toolbarTitleDisplayMode(.inline)
+            .alert($store.scope(state: \.$alert, action: \.alert))
             .onAppear {
                 send(.onAppear)
             }

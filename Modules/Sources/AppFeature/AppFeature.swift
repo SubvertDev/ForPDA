@@ -42,6 +42,7 @@ import MoreFeature
 import TicketsListFeature
 import TicketFeature
 import ForumEventLogFeature
+import LogStoreFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -71,6 +72,7 @@ public struct AppFeature: Reducer, Sendable {
         
         @Shared(.userSession) public var userSession: UserSession?
         @Shared(.appSettings) public var appSettings: AppSettings
+        @Shared(.appStorage("showConnectionState")) var showConnectionState = false
         
         public var selectedTab: AppTab
         public var previousTab: AppTab
@@ -89,7 +91,7 @@ public struct AppFeature: Reducer, Sendable {
             return identifiers?.first ?? ""
         }
         
-        public var connectionState: APIConnectionState = .disconnected
+        public var connectionState: APIConnectionState?
         public var isNetworkOnline = true
         
         public init(
@@ -555,7 +557,7 @@ public struct AppFeature: Reducer, Sendable {
         return removeNotifications(&state)
     }
     
-    #warning("does nothing, inspect it")
+    // TODO: does nothing, inspect it
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {

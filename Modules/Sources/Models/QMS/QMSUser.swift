@@ -62,4 +62,15 @@ public extension QMSUser {
         unreadCount: 0,
         chats: []
     )
+    
+    static let placeholder = QMSUser(
+        userId: 0,
+        name: "Placeholder Name",
+        flag: 0,
+        avatarUrl: nil,
+        lastSeenOnline: .now,
+        lastMessageDate: .now,
+        unreadCount: 0,
+        chats: []
+    )
 }

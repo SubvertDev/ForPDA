@@ -7,6 +7,7 @@
 
 import AlertToast
 import AnnouncementFeature
+import APIClient
 import ArticleFeature
 import ArticlesListFeature
 import AuthFeature
@@ -21,6 +22,8 @@ import HistoryFeature
 import MentionsFeature
 import Models
 import NotificationsFeature
+import LogStoreFeature
+import PageNavigationFeature
 import ProfileFeature
 import QMSFeature
 import QMSListFeature
@@ -30,8 +33,6 @@ import SharedUI
 import SwiftUI
 import ToastClient
 import TopicFeature
-
-import PageNavigationFeature
 
 public struct AppView: View {
     
@@ -69,12 +70,27 @@ public struct AppView: View {
                 
                 ToastView(toast: store.toastMessage)
                     .ignoresSafeArea(.keyboard, edges: .bottom)
+                
+            }
+            .overlay(alignment: .top) {
+                #if DEBUG
+                if store.showConnectionState {
+                    let text = store.connectionState?.description ?? "unknown"
+                    let color = store.connectionState?.color ?? .gray
+                    Text(text)
+                        .padding(4)
+                        .background(color, in: RoundedRectangle(cornerRadius: 8))
+                        .offset(y: -12)
+                }
+                #endif
             }
             .animation(.default, value: store.toastMessage)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
             .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
-                LogStoreScreen(store: store)
+                NavigationStack {
+                    LogStoreScreen(store: store)
+                }
             }
             .alert($store.scope(state: \.$alert, action: \.alert))
             // Tint and environment should be after sheets/covers
@@ -361,6 +377,23 @@ extension AppTintColor {
         case .scarlet:  Color(.Theme.scarlet)
         case .sky:      Color(.Theme.sky)
         case .yellow:   Color(.Theme.yellow)
+        }
+    }
+}
+
+extension APIConnectionState {
+    var description: String {
+        return rawValue
+    }
+    
+    var color: Color {
+        switch self {
+        case .disconnected: .red
+        case .connecting:   .yellow
+        case .ready:        .green
+        case .uploadLock:   .cyan
+        case .uploading:    .blue
+        @unknown default:   fatalError()
         }
     }
 }
