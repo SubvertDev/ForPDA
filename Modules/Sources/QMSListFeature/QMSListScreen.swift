@@ -104,15 +104,15 @@ public struct QMSListScreen: View {
     
     @ToolbarContentBuilder
     private func ToolbarItems() -> some ToolbarContent {
-        if let qms = store.qms, !qms.users.isEmpty {
-            ToolbarItem {
-                Button {
-                    
-                } label: {
-                    Image(systemSymbol: .magnifyingglass)
-                }
-            }
-        }
+        // if let qms = store.qms, !qms.users.isEmpty {
+        //     ToolbarItem {
+        //         Button {
+        //
+        //         } label: {
+        //             Image(systemSymbol: .magnifyingglass)
+        //         }
+        //     }
+        // }
         
         if #available(iOS 26, *) {
             ToolbarSpacer()
@@ -120,21 +120,21 @@ public struct QMSListScreen: View {
         
         ToolbarItem {
             Menu {
+                // Section {
+                //     ContextButton(
+                //         text: LocalizedStringResource("Blacklist", bundle: .module),
+                //         symbol: .personCropCircleBadgeXmark
+                //     ) {
+                //
+                //     }
+                // }
                 Section {
-                    ContextButton(
-                        text: LocalizedStringResource("Blacklist", bundle: .module),
-                        symbol: .personCropCircleBadgeXmark
-                    ) {
-                        
-                    }
-                }
-                Section {
-                    ContextButton(
-                        text: LocalizedStringResource("Add to bookmarks", bundle: .module),
-                        symbol: .bookmark
-                    ) {
-                        
-                    }
+                    // ContextButton(
+                    //     text: LocalizedStringResource("Add to bookmarks", bundle: .module),
+                    //     symbol: .bookmark
+                    // ) {
+                    //
+                    // }
                     
                     ContextButton(
                         text: LocalizedStringResource("Create chat", bundle: .module),
