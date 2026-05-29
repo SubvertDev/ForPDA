@@ -104,15 +104,15 @@ public struct FormEditorFeature: Reducer {
                     state.textRange = NSMakeRange(state.text.count, 0)
                 }
                 if let uploadBox = state.uploadBox {
-                    return .concatenate(
-                        .send(.binding(.set(\.bbPanel.allowedExtensions, uploadBox.allowedExtensions))),
+                    return .merge(
                         .send(.binding(.set(\.bbPanel.existsFiles, uploadBox.existsAttachments.map {
                             .init(
                                 name: $0.name,
                                 type: $0.type == .image ? .image : .file,
                                 serverId: $0.id
                             )
-                        })))
+                        }))),
+                        .send(.binding(.set(\.bbPanel.allowedExtensions, uploadBox.allowedExtensions)))
                     )
                 }
                 
