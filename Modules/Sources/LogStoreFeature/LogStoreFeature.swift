@@ -8,6 +8,8 @@
 import SwiftUI
 import ComposableArchitecture
 import OSLog
+import NotificationsClient
+import Models
 
 @Reducer
 public struct LogStoreFeature: Reducer, Sendable {
@@ -32,6 +34,7 @@ public struct LogStoreFeature: Reducer, Sendable {
         public enum View {
             case onAppear
             case closeButtonTapped
+            case sendTopicNotificationButtonTapped
         }
         case view(View)
         
@@ -42,6 +45,7 @@ public struct LogStoreFeature: Reducer, Sendable {
     }
     
     @Dependency(\.dismiss) private var dismiss
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     public var body: some Reducer<State, Action> {
         Reduce<State, Action> { state, action in
@@ -73,6 +77,30 @@ public struct LogStoreFeature: Reducer, Sendable {
                 
             case .view(.closeButtonTapped):
                 return .run { _ in await dismiss() }
+
+            case .view(.sendTopicNotificationButtonTapped):
+                return .run { _ in
+                    let topicId = 1_104_159
+                    let timestamp = Int(Date().timeIntervalSince1970 * 1_000)
+                    let unread = Unread(
+                        date: .now,
+                        qmsUnreadCount: 0,
+                        favoritesUnreadCount: 1,
+                        mentionsUnreadCount: 0,
+                        items: [
+                            Unread.Item(
+                                id: topicId,
+                                name: "Test topic \(topicId)",
+                                authorId: 0,
+                                authorName: "ForPDA",
+                                timestamp: timestamp,
+                                unreadCount: 0,
+                                category: .topic
+                            )
+                        ]
+                    )
+                    await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                }
                 
             case let .internal(.loaded(logs)):
                 state.logs = logs
@@ -95,6 +123,10 @@ public struct LogStoreScreen: View {
     public var body: some View {
         WithPerceptionTracking {
             ScrollView(.vertical) {
+                Button(String("Notify 1104159")) { send(.sendTopicNotificationButtonTapped) }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 8)
+
                 ForEach(store.logs) { log in
                     VStack(spacing: 2) {
                         Text(verbatim: "[\(log.date.formatted())] \(log.category)")

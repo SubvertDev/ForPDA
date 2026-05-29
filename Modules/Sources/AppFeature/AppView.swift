@@ -21,6 +21,7 @@ import HistoryFeature
 import MentionsFeature
 import Models
 import NotificationsFeature
+import LogStoreFeature
 import ProfileFeature
 import QMSFeature
 import QMSListFeature
