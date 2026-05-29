@@ -12,12 +12,23 @@ import Models
 
 public typealias ImageTapHandler = (URL) -> Void
 
+public struct UserSessionInfo: Equatable {
+    public let postsCount: Int
+    public let group: User.Group
+    
+    public init(postsCount: Int, group: User.Group) {
+        self.postsCount = postsCount
+        self.group = group
+    }
+}
+
 public struct TopicView: View {
     
     let type: UITopicType
     let nestLevel: Int
     let attachments: [Attachment]
     let textAlignment: NSTextAlignment?
+    let userSession: UserSessionInfo?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     let onQuote: QuoteHandler?
@@ -27,6 +38,7 @@ public struct TopicView: View {
         nestLevel: Int = 1,
         attachments: [Attachment] = [],
         alignment: NSTextAlignment? = nil,
+        userSession: UserSessionInfo?,
         lineLimit: Int? = nil,
         onUrlTap: URLTapHandler? = nil,
         onImageTap: ImageTapHandler? = nil,
@@ -35,6 +47,7 @@ public struct TopicView: View {
         self.type = type
         self.nestLevel = nestLevel
         self.attachments = attachments
+        self.userSession = userSession
         self.textAlignment = alignment
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
@@ -107,6 +120,7 @@ public struct TopicView: View {
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
                         alignment: .left,
+                        userSession: userSession,
                         onUrlTap: onUrlTap,
                         onImageTap: onImageTap,
                         onQuote: onQuote
@@ -122,6 +136,7 @@ public struct TopicView: View {
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
                         alignment: .center,
+                        userSession: userSession,
                         onUrlTap: onUrlTap,
                         onImageTap: onImageTap,
                         onQuote: onQuote
@@ -138,6 +153,7 @@ public struct TopicView: View {
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
                         alignment: .right,
+                        userSession: userSession,
                         onUrlTap: onUrlTap,
                         onImageTap: onImageTap,
                         onQuote: onQuote
@@ -151,6 +167,7 @@ public struct TopicView: View {
                 nestLevel: nestLevel,
                 info: info,
                 attachments: attachments,
+                userSession: userSession,
                 onUrlTap: onUrlTap,
                 onImageTap: onImageTap,
                 onQuote: onQuote
@@ -162,6 +179,7 @@ public struct TopicView: View {
                 nestLevel: nestLevel,
                 info: info,
                 attachments: attachments,
+                userSession: userSession,
                 onUrlTap: onUrlTap,
                 onImageTap: onImageTap,
                 onQuote: onQuote
@@ -183,6 +201,7 @@ public struct TopicView: View {
                 nestLevel: nestLevel,
                 info: info,
                 attachments: attachments,
+                userSession: userSession,
                 onUrlTap: onUrlTap,
                 onImageTap: onImageTap,
                 onQuote: onQuote
@@ -195,6 +214,7 @@ public struct TopicView: View {
                         type: type,
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
+                        userSession: userSession,
                         onUrlTap: onUrlTap,
                         onImageTap: onImageTap,
                         onQuote: onQuote
@@ -209,6 +229,7 @@ public struct TopicView: View {
                 nestLevel: nestLevel + 1,
                 info: info,
                 attachments: attachments,
+                userSession: userSession,
                 onUrlTap: onUrlTap,
                 onImageTap: onImageTap,
                 onQuote: onQuote
@@ -228,6 +249,7 @@ public struct TopicView: View {
                         TopicView(
                             type: type,
                             attachments: attachments,
+                            userSession: userSession,
                             onUrlTap: onUrlTap,
                             onImageTap: onImageTap,
                             onQuote: onQuote
@@ -249,6 +271,7 @@ struct SpoilerView: View {
     let nestLevel: Int
     let info: AttributedString?
     let attachments: [Attachment]
+    let userSession: UserSessionInfo?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     let onQuote: QuoteHandler?
@@ -266,6 +289,7 @@ struct SpoilerView: View {
         nestLevel: Int,
         info: AttributedString?,
         attachments: [Attachment],
+        userSession: UserSessionInfo?,
         onUrlTap: URLTapHandler?,
         onImageTap: ImageTapHandler?,
         onQuote: QuoteHandler?
@@ -274,6 +298,7 @@ struct SpoilerView: View {
         self.nestLevel = nestLevel
         self.info = info
         self.attachments = attachments
+        self.userSession = userSession
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
         self.onQuote = onQuote
@@ -321,6 +346,7 @@ struct SpoilerView: View {
                             type: type,
                             nestLevel: nestLevel + 1,
                             attachments: attachments,
+                            userSession: userSession,
                             onUrlTap: onUrlTap,
                             onImageTap: onImageTap,
                             onQuote: onQuote
@@ -346,6 +372,7 @@ struct QuoteView: View {
     let nestLevel: Int
     let info: QuoteType?
     let attachments: [Attachment]
+    let userSession: UserSessionInfo?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     let onQuote: QuoteHandler?
@@ -365,6 +392,7 @@ struct QuoteView: View {
         nestLevel: Int,
         info: QuoteType?,
         attachments: [Attachment],
+        userSession: UserSessionInfo?,
         onUrlTap: URLTapHandler?,
         onImageTap: ImageTapHandler?,
         onQuote: QuoteHandler?
@@ -373,6 +401,7 @@ struct QuoteView: View {
         self.nestLevel = nestLevel
         self.info = info
         self.attachments = attachments
+        self.userSession = userSession
         self.onUrlTap = onUrlTap
         self.date = nil
         self.onImageTap = onImageTap
@@ -441,6 +470,7 @@ struct QuoteView: View {
                         type: type,
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
+                        userSession: userSession,
                         onUrlTap: onUrlTap,
                         onImageTap: onImageTap,
                         onQuote: onQuote
@@ -570,6 +600,7 @@ struct HideView: View {
     let nestLevel: Int
     let info: Int?
     let attachments: [Attachment]
+    let userSession: UserSessionInfo?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     let onQuote: QuoteHandler?
@@ -582,6 +613,7 @@ struct HideView: View {
         nestLevel: Int,
         info: Int?,
         attachments: [Attachment],
+        userSession: UserSessionInfo?,
         onUrlTap: URLTapHandler?,
         onImageTap: ImageTapHandler?,
         onQuote: QuoteHandler?
@@ -590,23 +622,24 @@ struct HideView: View {
         self.nestLevel = nestLevel
         self.info = info
         self.attachments = attachments
+        self.userSession = userSession
         self.onUrlTap = onUrlTap
         self.onImageTap = onImageTap
         self.onQuote = onQuote
         
-        self.isShown = false
-        
-//        @Shared(.userSession) var userSession: UserSession?
-//        if let userSession = userSession.wrapped {
-//            if info != nil {
-//                self._isShown = State(initialValue: false)
-//                self._shouldLoadUser = State(initialValue: userSession.userId)  //userSession.userId
-//            } else {
-//                self._isShown = State(initialValue: true)
-//            }
-//        } else {
-//            self._isShown = State(initialValue: false)
-//        }
+        self.isShown = if let userSession {
+            if userSession.group == .admin
+                || userSession.group == .supermoderator
+                || userSession.group == .moderator {
+                true
+            } else if let info {
+                userSession.postsCount >= info
+            } else {
+                true
+            }
+        } else {
+            false
+        }
     }
     
     var body: some View {
@@ -621,22 +654,25 @@ struct HideView: View {
                     }
                     .padding(12)
                     .overlay(alignment: .bottom) {
-                        if isShown {
-                            Rectangle()
-                                .fill(Color(.Separator.secondary))
-                                .frame(height: 1)
-                                .padding(.horizontal, 12)
-                        }
+                        Rectangle()
+                            .fill(Color(.Separator.secondary))
+                            .frame(height: 1)
+                            .padding(.horizontal, 12)
                     }
                     
-                    if isShown {
-                        VStack(spacing: 8) {
-                            ForEach(types, id: \.self) { type in
-                                TopicView(type: type, nestLevel: nestLevel + 1, attachments: attachments, onUrlTap: onUrlTap, onQuote: onQuote)
-                            }
+                    VStack(spacing: 8) {
+                        ForEach(types, id: \.self) { type in
+                            TopicView(
+                                type: type,
+                                nestLevel: nestLevel + 1,
+                                attachments: attachments,
+                                userSession: userSession,
+                                onUrlTap: onUrlTap,
+                                onQuote: onQuote
+                            )
                         }
-                        .padding(12)
                     }
+                    .padding(12)
                 }
                 .background(
                     RoundedRectangle(cornerRadius: 12)
@@ -645,17 +681,6 @@ struct HideView: View {
             }
         }
         .animation(.default, value: isShown)
-        .task {
-//            #warning("What is happening here?")
-//            @Dependency(\.cacheClient) var cache
-//            if let userId = shouldLoadUser, let info {
-//                if let currentUser = await cache.getUser(userId) {
-//                    if currentUser.replies >= info {
-//                        isShown = true
-//                    }
-//                }
-//            }
-        }
     }
 }
 
@@ -667,6 +692,7 @@ struct NoticeView: View {
     let nestLevel: Int
     let info: NoticeType
     let attachments: [Attachment]
+    let userSession: UserSessionInfo?
     let onUrlTap: URLTapHandler?
     let onImageTap: ImageTapHandler?
     let onQuote: QuoteHandler?
@@ -694,6 +720,7 @@ struct NoticeView: View {
                         type: type,
                         nestLevel: nestLevel + 1,
                         attachments: attachments,
+                        userSession: userSession,
                         onUrlTap: onUrlTap,
                         onImageTap: onImageTap,
                         onQuote: onQuote
@@ -753,6 +780,7 @@ public extension NoticeType {
             nestLevel: 1,
             info: .moderator,
             attachments: [],
+            userSession: nil,
             onUrlTap: nil,
             onImageTap: nil,
             onQuote: nil

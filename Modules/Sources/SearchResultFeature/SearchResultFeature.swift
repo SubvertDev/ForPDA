@@ -14,6 +14,7 @@ import SharedUI
 import TopicBuilder
 import PageNavigationFeature
 import ToastClient
+import CacheClient
 
 @Reducer
 public struct SearchResultFeature: Reducer, Sendable {
@@ -25,6 +26,8 @@ public struct SearchResultFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
+        var userSessionInfo: User?
         
         public let search: SearchResult
         
@@ -61,6 +64,8 @@ public struct SearchResultFeature: Reducer, Sendable {
             case loadContent(offset: Int)
             case buildContent([SearchContent])
             case searchResponse(Result<SearchResponse, any Error>)
+            
+            case initUserSessionInfo(User)
         }
         
         case delegate(Delegate)
@@ -73,6 +78,7 @@ public struct SearchResultFeature: Reducer, Sendable {
     // MARK: - Dependencies
     
     @Dependency(\.apiClient) private var apiClient
+    @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.toastClient) private var toastClient
     
     // MARK: - Body
@@ -91,7 +97,12 @@ public struct SearchResultFeature: Reducer, Sendable {
                 return .none
                 
             case .view(.onFirstAppear):
-                return .send(.internal(.loadContent(offset: 0)))
+                return .run { [session = state.userSession] send in
+                    if let session, let user = cacheClient.getUser(session.userId) {
+                        await send(.internal(.initUserSessionInfo(user)))
+                    }
+                    await send(.internal(.loadContent(offset: 0)))
+                }
                 
             case let .view(.postTapped(topicId, postId)):
                 return .send(.delegate(.openTopic(id: topicId, goTo: .post(id: postId))))
@@ -148,6 +159,10 @@ public struct SearchResultFeature: Reducer, Sendable {
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
+                
+            case let .internal(.initUserSessionInfo(user)):
+                state.userSessionInfo = user
+                return .none
                 
             case .delegate:
                 return .none

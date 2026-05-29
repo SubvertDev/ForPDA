@@ -33,7 +33,11 @@ struct FormPreviewView: View {
                         if !store.contentTypes.isEmpty {
                             ForEach(store.contentTypes, id: \.self) { type in
                                 WithPerceptionTracking {
-                                    TopicView(type: type, attachments: store.attachments) { _ in
+                                    TopicView(
+                                        type: type,
+                                        attachments: store.attachments,
+                                        userSession: .init(postsCount: 1000000, group: .moderator)
+                                    ) { _ in
                                         // Not handling URLs. Do not remove, cause else
                                         // links will be opening in browser.
                                     }

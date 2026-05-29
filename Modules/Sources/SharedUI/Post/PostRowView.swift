@@ -146,6 +146,7 @@ public struct PostRowView: View {
                 TopicView(
                     type: type.value,
                     attachments: post.post.attachments,
+                    userSession: state.userSessionInfo,
                     onUrlTap: { url in
                         action(.urlTapped(url))
                     },
@@ -378,7 +379,7 @@ public extension PostRowView {
     struct State: Equatable {
         public let post: UIPost
         public let sessionUserId: Int
-        
+        public let userSessionInfo: UserSessionInfo?
         public let canPostInTopic: Bool
         
         public let isUserAuthorized: Bool
@@ -387,12 +388,14 @@ public extension PostRowView {
         public init(
             post: UIPost,
             sessionUserId: Int = 0,
+            userSessionInfo: UserSessionInfo?,
             canPostInTopic: Bool = false,
             isUserAuthorized: Bool = false,
             isContextMenuAvailable: Bool = false
         ) {
             self.post = post
             self.sessionUserId = sessionUserId
+            self.userSessionInfo = userSessionInfo
             self.canPostInTopic = canPostInTopic
             self.isUserAuthorized = isUserAuthorized
             self.isContextMenuAvailable = isContextMenuAvailable

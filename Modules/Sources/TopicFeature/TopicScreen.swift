@@ -399,10 +399,14 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func Post(_ post: UIPost) -> some View {
+        let userSessionInfo: UserSessionInfo? = if let user = store.userSessionInfo {
+            UserSessionInfo(postsCount: user.replies, group: user.group)
+        } else { nil }
         PostRowView(
             state: PostRowView.State(
                 post: post,
                 sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
+                userSessionInfo: userSessionInfo,
                 canPostInTopic: store.topic?.canPost ?? false,
                 isUserAuthorized: store.isUserAuthorized,
                 isContextMenuAvailable: true

@@ -70,9 +70,9 @@ public struct AnnouncementScreen: View {
         VStack(spacing: 0) {
             ForEach(store.types, id: \.self) { main in
                 ForEach(main, id: \.self) { type in
-                    TopicView(type: type, attachments: []) { url in
+                    TopicView(type: type, attachments: [], userSession: nil) { url in
                         send(.urlTapped(url))
-                    } // TODO: attachments
+                    }
                 }
             }
         }
