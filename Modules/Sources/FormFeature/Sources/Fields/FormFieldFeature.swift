@@ -84,26 +84,26 @@ public struct FormFieldFeature: Reducer {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.checkBoxList, action: \.checkBoxList) {
-            FormCheckBoxListFeature()
-        }
-        Scope(state: \.dropdown, action: \.dropdown) {
-            FormDropdownFeature()
-        }
-        Scope(state: \.editor, action: \.editor) {
-            FormEditorFeature()
-        }
-        Scope(state: \.textField, action: \.textField) {
-            FormTextFieldFeature()
-        }
-        Scope(state: \.title, action: \.title) {
-            FormTitleFeature()
-        }
-        Scope(state: \.uploadBox, action: \.uploadBox) {
-            FormUploadBoxFeature()
-        }
         Reduce<State, Action> { state, action in
             return .none
+        }
+        .ifCaseLet(\.checkBoxList, action: \.checkBoxList) {
+            FormCheckBoxListFeature()
+        }
+        .ifCaseLet(\.dropdown, action: \.dropdown) {
+            FormDropdownFeature()
+        }
+        .ifCaseLet(\.editor, action: \.editor) {
+            FormEditorFeature()
+        }
+        .ifCaseLet(\.textField, action: \.textField) {
+            FormTextFieldFeature()
+        }
+        .ifCaseLet(\.title, action: \.title) {
+            FormTitleFeature()
+        }
+        .ifCaseLet(\.uploadBox, action: \.uploadBox) {
+            FormUploadBoxFeature()
         }
     }
 }
