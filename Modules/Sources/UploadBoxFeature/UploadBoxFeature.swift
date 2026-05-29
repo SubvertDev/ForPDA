@@ -224,12 +224,12 @@ public struct UploadBoxFeature: Reducer, Sendable {
             case let .view(.removeFileButtonTapped(file)):
                 state.files.removeAll(where: { $0.id == file.id })
                 if file.isUploading {
-                    return .concatenate(
-                        .cancel(id: CancelID.uploading),
-                        .send(.internal(.startNextUpload))
+                    return .run { send in
+                        await send(.internal(.startNextUpload))
                         // no need to send delegate .fileHasBeenRemoved,
                         // cause file at level upper not exists (cause not uploaded)
-                    )
+                    }
+                    .cancellable(id: CancelID.uploading, cancelInFlight: true)
                 }
                 if let serverId = file.serverId { // file already uploaded
                     return .send(.delegate(.fileHasBeenRemoved(serverId)))
