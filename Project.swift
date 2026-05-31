@@ -184,6 +184,18 @@ let project = Project(
             ),
         
             .feature(
+                name: "CreateChatFeature",
+                dependencies: [
+                    .Internal.AnalyticsClient,
+                    .Internal.APIClient,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .Internal.QMSClient,
+                    .SPM.TCA
+                ]
+            ),
+        
+            .feature(
                 name: "DeeplinkHandler",
                 hasResources: false,
                 dependencies: [
@@ -466,6 +478,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.CacheClient,
+                    .Internal.CreateChatFeature,
                     .Internal.Models,
                     .Internal.QMSClient,
                     .Internal.SharedUI,
@@ -1189,6 +1202,7 @@ extension TargetDependency.Internal {
     static let AuthFeature =            TargetDependency.target(name: "AuthFeature")
     static let BBPanelFeature =         TargetDependency.target(name: "BBPanelFeature")
     static let BookmarksFeature =       TargetDependency.target(name: "BookmarksFeature")
+    static let CreateChatFeature =      TargetDependency.target(name: "CreateChatFeature")
     static let DeeplinkHandler =        TargetDependency.target(name: "DeeplinkHandler")
     static let DeveloperFeature =       TargetDependency.target(name: "DeveloperFeature")
     static let DeviceSpecificationsFeature = TargetDependency.target(name: "DeviceSpecificationsFeature")

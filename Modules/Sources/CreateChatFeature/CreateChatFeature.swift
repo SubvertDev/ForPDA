@@ -17,7 +17,7 @@ public struct CreateChatFeature: Reducer, Sendable {
     
     // MARK: - Enums
     
-    enum Field {
+    public enum Field {
         case username
         case chatTitle
         case message
@@ -39,16 +39,16 @@ public struct CreateChatFeature: Reducer, Sendable {
             return !searchUsers.isEmpty
         }
         
-        public init(user: QMSUser? = nil) {
-            self.username = user?.name ?? ""
-            self.selectedSearchUser = user.map {
-                SearchUsersResponse.SimplifiedUser(
-                    id: $0.id,
-                    name: $0.name,
-                    groupId: 0,
-                    avatarUrl: $0.avatarUrl?.absoluteString ?? ""
-                )
-            }
+        public init(userId: Int? = nil, username: String? = nil) {
+            guard let userId else { return }
+            guard let username else { return }
+            self.username = username
+            self.selectedSearchUser = SearchUsersResponse.SimplifiedUser(
+                id: userId,
+                name: username,
+                groupId: 0,
+                avatarUrl: ""
+            )
         }
     }
     

@@ -44,26 +44,6 @@
         }
       }
     },
-    "Chat title" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тема диалога"
-          }
-        }
-      }
-    },
-    "Close" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Закрыть"
-          }
-        }
-      }
-    },
     "Create chat" : {
       "localizations" : {
         "ru" : {
@@ -124,16 +104,6 @@
         }
       }
     },
-    "Enter..." : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введите..."
-          }
-        }
-      }
-    },
     "Mark as read" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -145,32 +115,12 @@
         }
       }
     },
-    "Message" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сообщение"
-          }
-        }
-      }
-    },
     "No chats" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нет диалогов"
-          }
-        }
-      }
-    },
-    "Profile" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
           }
         }
       }
@@ -192,16 +142,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QMS"
-          }
-        }
-      }
-    },
-    "Send" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отправить"
           }
         }
       }
@@ -232,16 +172,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Профиль пользователя"
-          }
-        }
-      }
-    },
-    "Username" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Собеседник"
           }
         }
       }

@@ -10,7 +10,7 @@ import SharedUI
 import SwiftUI
 
 @ViewAction(for: CreateChatFeature.self)
-struct CreateChatScreen: View {
+public struct CreateChatScreen: View {
     
     // MARK: - Properties
     
@@ -19,10 +19,16 @@ struct CreateChatScreen: View {
     @Environment(\.tintColor) private var tintColor
     
     @FocusState public var focus: CreateChatFeature.Field?
+    
+    // MARK: - Init
+    
+    public init(store: StoreOf<CreateChatFeature>) {
+        self.store = store
+    }
         
     // MARK: - Body
     
-    var body: some View {
+    public var body: some View {
         WithPerceptionTracking {
             ZStack {
                 Color(.Background.primary)

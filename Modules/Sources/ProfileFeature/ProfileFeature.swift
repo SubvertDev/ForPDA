@@ -15,6 +15,7 @@ import ToastClient
 import NotificationsClient
 import FormFeature
 import ReputationChangeFeature
+import CreateChatFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -35,6 +36,7 @@ public struct ProfileFeature: Reducer, Sendable {
     public enum Destination {
         case note(FormFeature)
         case editProfile(EditFeature)
+        case createChat(CreateChatFeature)
         case changeReputation(ReputationChangeFeature)
     }
     
@@ -49,9 +51,14 @@ public struct ProfileFeature: Reducer, Sendable {
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
+        var messageBadgeCount = 0
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
+        }
+        
+        public var shouldShowOpenChatButton: Bool {
+            return userSession != nil && user?.id != userSession?.userId
         }
         
         var isUserSessionHasModerationGroup: Bool {
@@ -83,6 +90,7 @@ public struct ProfileFeature: Reducer, Sendable {
         case view(View)
         public enum View {
             case onAppear
+            case chatButtonTapped
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
@@ -101,6 +109,7 @@ public struct ProfileFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openChat(Int)
             case openDevice(String)
             case openTopic(Int)
             case openReputation(Int)
@@ -148,6 +157,15 @@ public struct ProfileFeature: Reducer, Sendable {
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     },
                 )
+                
+            case .view(.chatButtonTapped):
+                guard let user = state.user else { return .none }
+                if let chatCount = user.qmsMessages, chatCount > 0 {
+                    return .send(.delegate(.openChat(user.id)))
+                } else {
+                    state.destination = .createChat(CreateChatFeature.State(userId: user.id, username: user.nickname))
+                    return .none
+                }
                 
             case let .view(.deviceButtonTapped(tag)):
                 return .send(.delegate(.openDevice(tag)))

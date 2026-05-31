@@ -6,6 +6,7 @@
 //
 
 import CacheClient
+import CreateChatFeature
 import ComposableArchitecture
 import Foundation
 import Models
@@ -33,12 +34,15 @@ public struct QMSListFeature: Reducer, Sendable {
         @Presents var createChat: CreateChatFeature.State?
         var viewState: ViewState
         public var qms: QMSList?
+        var goTo: Int?
         var expandedGroups: [Bool] = []
         
         public init(
-            viewState: ViewState = .loading
+            viewState: ViewState = .loading,
+            goTo: Int? = nil
         ) {
             self.viewState = viewState
+            self.goTo = goTo
         }
     }
     
@@ -180,7 +184,7 @@ public struct QMSListFeature: Reducer, Sendable {
             case let .view(.userContextMenu(userContextAction, user)):
                 switch userContextAction {
                 case .createChatButtonTapped:
-                    state.createChat = CreateChatFeature.State(user: user)
+                    state.createChat = CreateChatFeature.State(userId: user.id, username: user.name)
                 case .userProfileButtonTapped:
                     return .send(.delegate(.openProfile(user.id)))
                 case .profileLinkButtonTapped:
@@ -205,7 +209,7 @@ public struct QMSListFeature: Reducer, Sendable {
                 return .none
                 
             case let .view(.createChatButtonTapped(user)):
-                state.createChat = CreateChatFeature.State(user: user)
+                state.createChat = CreateChatFeature.State(userId: user?.id, username: user?.name)
                 return .none
                 
             case .view(.tryAgainButtonTapped):
@@ -256,6 +260,11 @@ public struct QMSListFeature: Reducer, Sendable {
                     
                     state.qms = qms
                     state.viewState = qms.users.isEmpty ? .empty : .loaded(qms)
+                    
+                    if let goTo = state.goTo, let index = qms.users.firstIndex(where: { $0.id == goTo }) {
+                        state.expandedGroups[index] = true
+                        return .send(.internal(.loadUser(goTo)))
+                    }
                     
                 case let .failure(error):
                     print(error)

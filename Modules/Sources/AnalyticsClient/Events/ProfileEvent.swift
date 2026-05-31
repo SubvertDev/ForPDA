@@ -9,6 +9,7 @@ import Foundation
 
 public enum ProfileEvent: Event {
     case editTapped
+    case chatTapped
     case reputationTapped
     case searchTopicsTapped
     case searchRepliesTapped

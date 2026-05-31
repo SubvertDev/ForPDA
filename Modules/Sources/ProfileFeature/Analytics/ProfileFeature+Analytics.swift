@@ -23,6 +23,9 @@ extension ProfileFeature {
                 case .view(.onAppear), .delegate, .binding:
                     break
                     
+                case .view(.chatButtonTapped):
+                    analyticsClient.log(ProfileEvent.chatTapped)
+                    
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
                     

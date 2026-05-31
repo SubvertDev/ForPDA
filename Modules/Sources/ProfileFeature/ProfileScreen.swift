@@ -17,6 +17,7 @@ import ParsingClient
 import BBBuilder
 import FormFeature
 import ReputationChangeFeature
+import CreateChatFeature
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -92,7 +93,29 @@ public struct ProfileScreen: View {
             ) { store in
                 ReputationChangeView(store: store)
             }
+            .sheet(item: $store.scope(state: \.$destination, action: \.destination).createChat) { store in
+                NavigationStack {
+                    CreateChatScreen(store: store)
+                }
+            }
             .toolbar {
+                if store.shouldShowOpenChatButton {
+                    ToolbarItem {
+                        ContextButton(
+                            text: LocalizedStringResource("Show chats", bundle: .module),
+                            symbol: .bubbleLeft
+                        ) {
+                            send(.chatButtonTapped)
+                        }
+                        .tint(tintColor)
+                        ._glassProminentButtonStyle()
+                    }
+                }
+                
+                if #available(iOS 26, *) {
+                    ToolbarSpacer()
+                }
+                
                 if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
                     ToolbarItem {
                         OptionsMenu()

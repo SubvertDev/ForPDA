@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CreateChatFeature
 import ComposableArchitecture
 import SharedUI
 import NukeUI
@@ -18,6 +19,8 @@ public struct QMSListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<QMSListFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    @State private var scrollScale: CGFloat = 1
     
     // MARK: - Init
     
@@ -35,25 +38,42 @@ public struct QMSListScreen: View {
                 
                     switch store.viewState {
                     case let .loaded(qms):
-                        QMSList {
-                            ForEach(Array(qms.users.enumerated()), id: \.1) { index, user in
-                                WithPerceptionTracking {
-                                    DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
-                                        ExpandedUserContent(user)
-                                    } label: {
-                                        UserRow(user)
-                                            .contextMenu {
-                                                if user.id != 0 { // 0 is service account
-                                                    UserContextMenu(user: user)
+                        ScrollViewReader { proxy in
+                            QMSList {
+                                ForEach(Array(qms.users.enumerated()), id: \.1) { index, user in
+                                    WithPerceptionTracking {
+                                        DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
+                                            ExpandedUserContent(user)
+                                        } label: {
+                                            UserRow(user)
+                                                .contextMenu {
+                                                    if user.id != 0 { // 0 is service account
+                                                        UserContextMenu(user: user)
+                                                    }
                                                 }
-                                            }
+                                        }
+                                        .listRowBackground(Color(.Background.teritary))
+                                        .scaleEffect(store.goTo == user.id ? scrollScale : 1)
+                                        .id(user.id)
                                     }
-                                    .listRowBackground(Color(.Background.teritary))
                                 }
                             }
-                        }
-                        .refreshable {
-                            await send(.onRefresh).finish()
+                            .refreshable {
+                                await send(.onRefresh).finish()
+                            }
+                            .onAppear {
+                                if let goTo = store.goTo {
+                                    if #available(iOS 17, *) {
+                                        withAnimation {
+                                            proxy.scrollTo(goTo, anchor: .top)
+                                        } completion: {
+                                            Task { await animateScrollPulse() }
+                                        }
+                                    } else {
+                                        withAnimation { proxy.scrollTo(goTo, anchor: .top) }
+                                    }
+                                }
+                            }
                         }
                         
                     case .loading:
@@ -336,6 +356,29 @@ public struct QMSListScreen: View {
         }
         .buttonStyle(.borderless)
         .listRowBackground(Color(.Background.teritary))
+    }
+    
+    // MARK: - Helpers
+    
+    private func animateScrollPulse(
+        duration: TimeInterval = 0.25,
+        scale: CGFloat = 0.95
+    ) async {
+        let animation = Animation.easeInOut(duration: duration)
+
+        try? await Task.sleep(for: .seconds(duration))
+
+        withAnimation(animation) {
+            scrollScale = scale
+        }
+
+        try? await Task.sleep(for: .seconds(duration))
+
+        withAnimation(animation) {
+            scrollScale = 1
+        }
+        
+        store.goTo = nil
     }
 }
 

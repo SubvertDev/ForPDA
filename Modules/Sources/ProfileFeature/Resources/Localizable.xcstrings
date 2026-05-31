@@ -591,6 +591,16 @@
         }
       }
     },
+    "Show chats" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать диалоги"
+          }
+        }
+      }
+    },
     "Signature" : {
       "localizations" : {
         "ru" : {
