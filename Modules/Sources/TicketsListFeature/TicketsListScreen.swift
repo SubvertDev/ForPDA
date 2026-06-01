@@ -333,6 +333,7 @@ public struct TicketsListScreen: View {
         return switch store.type {
         case .list:  "Tickets"
         case .topic: "Topic Tickets"
+        case .forum: "Forum Tickets"
         }
     }
 }
