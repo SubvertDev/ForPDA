@@ -9,6 +9,7 @@ public struct TicketsListRequest: Sendable {
     public let forId: Int
     public let offset: Int
     public let amount: Int
+    public let isForumTickets: Bool
     public let isSortByForums: Bool
     public let isShowOnlyMine: Bool
     
@@ -16,12 +17,14 @@ public struct TicketsListRequest: Sendable {
         forId: Int,
         offset: Int,
         amount: Int,
+        isForumTickets: Bool,
         isSortByForums: Bool,
         isShowOnlyMine: Bool
     ) {
         self.forId = forId
         self.offset = offset
         self.amount = amount
+        self.isForumTickets = isForumTickets
         self.isSortByForums = isSortByForums
         self.isShowOnlyMine = isShowOnlyMine
     }
@@ -35,6 +38,9 @@ extension TicketsListRequest {
         }
         if isSortByForums {
             type |= 4
+        }
+        if isForumTickets {
+            type |= 8
         }
         return type
     }
