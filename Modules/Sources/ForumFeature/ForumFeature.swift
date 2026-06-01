@@ -143,6 +143,7 @@ public struct ForumFeature: Reducer, Sendable {
             case openForum(id: Int, name: String?)
             case openAnnouncement(id: Int, name: String)
             case openSearch(on: SearchOn, navigation: ForumInfo?)
+            case openTickets(forumId: Int)
             case handleRedirect(URL)
         }
     }
@@ -243,6 +244,9 @@ public struct ForumFeature: Reducer, Sendable {
                     )
                     state.destination = .form(formState)
                     return .none
+                    
+                case .tickets:
+                    return .send(.delegate(.openTickets(forumId: state.forumId)))
                     
                 // TODO: sort, to bookmarks
                 // TODO: Add analytics

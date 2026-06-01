@@ -141,6 +141,14 @@ public struct ForumScreen: View {
                     isUnread: false,
                     isForum: true
                 )
+                
+                if forum.canModerate {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Forum Tickets", bundle: .module), symbol: .exclamationmarkBubble) {
+                            send(.contextOptionMenu(.tickets))
+                        }
+                    }
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
