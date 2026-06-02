@@ -181,11 +181,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 switch action {
                 case .changeStatus(let status):
                     return .run { [handlerId = state.tickets[ticketId].info.handlerId] send in
-                        let response = try await ticketClient.changeTicketStatus(
-                            id: ticketId,
-                            handlerId: handlerId,
-                            status: status
-                        )
+                        let response = try await ticketClient.changeTicketStatus(ticketId, handlerId, status)
                         await send(.internal(.changeTicketStatusResponse(.success((ticketId, status, response)))))
                     } catch: { error, send in
                         await send(.internal(.changeTicketStatusResponse(.failure(error))))
