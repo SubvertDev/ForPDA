@@ -222,7 +222,8 @@ public struct ForumFeature: Reducer, Sendable {
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
                 }
                 let goTo = state.appSettings.topicOpeningStrategy.asGoTo
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
+                let topicId = topic.isMoved ? topic.postsCount : topic.id
+                return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: goTo)))
                 
             case let .view(.subforumTapped(forum)):
                 return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
