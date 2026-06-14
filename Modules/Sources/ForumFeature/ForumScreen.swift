@@ -203,6 +203,7 @@ public struct ForumScreen: View {
                             title: .plain(topic.name),
                             date: topic.lastPost.date,
                             username: topic.lastPost.username,
+                            isMoved: topic.isMoved,
                             isClosed: topic.isClosed,
                             isUnread: topic.isUnread
                         ) { unreadTapped in
