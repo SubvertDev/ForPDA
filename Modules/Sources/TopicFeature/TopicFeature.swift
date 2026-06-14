@@ -584,8 +584,10 @@ public struct TopicFeature: Reducer, Sendable {
             case let .view(.textQuoted(post, quotedText)):
                 guard state.topic != nil else { return .none }
                 
-                let currentDate = Date().formatted(date: .numeric, time: .shortened)
-                let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\n\(quotedText)\n[/quote]\n"
+                let formatter = DateFormatter()
+                formatter.dateFormat = "dd.MM.yy, HH:mm"
+                let currentDate = formatter.string(from: Date())
+                let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\(quotedText)[/quote]\n"
                 let feature = FormFeature.State(
                     type: .post(
                         type: .new,
