@@ -18,6 +18,10 @@ public struct Forum: Codable, Sendable, Hashable {
     public var topics: [TopicInfo]
     public let navigation: [ForumInfo]
     
+    public var canModerate: Bool {
+        return flag.contains(.canModerate)
+    }
+    
     public var canCreateTopic: Bool {
         return flag.contains(.canPost)
     }
@@ -53,7 +57,7 @@ public extension Forum {
     static let mock = Forum(
         id: 1,
         name: "Test Forum",
-        flag: .canPost,
+        flag: [.canPost, .canModerate],
         globalAnnouncement: "Wow, [b]this is[/b] SPARTA (global announcement)...",
         announcements: [
             .mock

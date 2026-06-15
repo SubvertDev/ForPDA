@@ -116,13 +116,13 @@ public struct TicketsListScreen: View {
                 Section {
                     Toggle(
                         LocalizedStringResource("Only My", bundle: .module),
-                        isOn: Binding(store.$appSettings.tickets.isShowOnlyMine)
+                        isOn: Binding(projectedValue: $store.appSettings.tickets.isShowOnlyMine)
                     )
                     
                     if case .list = store.type {
                         Toggle(
                             LocalizedStringResource("Sort by Forums", bundle: .module),
-                            isOn: Binding(store.$appSettings.tickets.isSortByForums)
+                            isOn: Binding(projectedValue: $store.appSettings.tickets.isSortByForums)
                         )
                     }
                 } header: {
@@ -333,6 +333,7 @@ public struct TicketsListScreen: View {
         return switch store.type {
         case .list:  "Tickets"
         case .topic: "Topic Tickets"
+        case .forum: "Forum Tickets"
         }
     }
 }

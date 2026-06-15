@@ -167,6 +167,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 case .copyLink:
                     let type = switch state.type {
                     case .list: ""
+                    case .forum(let id): "&filter=\(id)"
                     case .topic(let id): "&only-topic=\(id)"
                     }
                     let offset = state.pageNavigation.offset > 0 ? "&st=\(state.pageNavigation.offset)" : ""
@@ -180,11 +181,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 switch action {
                 case .changeStatus(let status):
                     return .run { [handlerId = state.tickets[ticketId].info.handlerId] send in
-                        let response = try await ticketClient.changeTicketStatus(
-                            id: ticketId,
-                            handlerId: handlerId,
-                            status: status
-                        )
+                        let response = try await ticketClient.changeTicketStatus(ticketId, handlerId, status)
                         await send(.internal(.changeTicketStatusResponse(.success((ticketId, status, response)))))
                     } catch: { error, send in
                         await send(.internal(.changeTicketStatusResponse(.failure(error))))
@@ -218,16 +215,18 @@ public struct TicketsListFeature: Reducer, Sendable {
                 }
                 let forId = switch state.type {
                 case .list: 0
-                case .topic(let id): id
+                case .topic(let id), .forum(let id): id
                 }
                 return .run { [
                     amount = state.appSettings.ticketsPerPage,
+                    isForumTickets = state.type.isForumTickets,
                     ticketsSettings = state.appSettings.tickets
                 ] send in
                     let request = TicketsListRequest(
                         forId: forId,
                         offset: offset,
                         amount: amount,
+                        isForumTickets: isForumTickets,
                         isSortByForums: ticketsSettings.isSortByForums,
                         isShowOnlyMine: ticketsSettings.isShowOnlyMine
                     )

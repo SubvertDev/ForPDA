@@ -68,6 +68,9 @@ extension ForumFeature {
                         break // TODO: Add
                     case .createTopic:
                         break // TODO: Add
+                    case .tickets:
+                        // MARK: Moderator tools are skip analytics
+                        break
                     }
                     
                 case .view(.contextTopicToolsMenu):

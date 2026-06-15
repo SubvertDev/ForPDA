@@ -81,6 +81,16 @@
         }
       }
     },
+    "Forum Tickets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тикеты форума"
+          }
+        }
+      }
+    },
     "Go To End" : {
       "localizations" : {
         "ru" : {

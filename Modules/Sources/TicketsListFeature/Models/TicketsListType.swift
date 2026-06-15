@@ -8,4 +8,14 @@
 public enum TicketsListType: Sendable, Equatable {
     case list
     case topic(Int)
+    case forum(Int)
+}
+
+extension TicketsListType {
+    var isForumTickets: Bool {
+        if case .forum = self {
+            return true
+        }
+        return false
+    }
 }

@@ -16,6 +16,7 @@ public struct TopicRow: View {
     public let title: UITitleType
     public let date: Date
     public let username: String
+    public let isMoved: Bool
     public let isClosed: Bool
     public let isUnread: Bool
     public let isHatUpdated: Bool
@@ -26,6 +27,7 @@ public struct TopicRow: View {
         title: UITitleType,
         date: Date,
         username: String,
+        isMoved: Bool = false,
         isClosed: Bool,
         isUnread: Bool,
         isHatUpdated: Bool = false,
@@ -35,6 +37,7 @@ public struct TopicRow: View {
         self.title = title
         self.date = date
         self.username = username
+        self.isMoved = isMoved
         self.isClosed = isClosed
         self.isUnread = isUnread
         self.isHatUpdated = isHatUpdated
@@ -96,6 +99,15 @@ public struct TopicRow: View {
                             .padding(.trailing, isUnread ? -2 : 12)
                     }
                     
+                    if isMoved {
+                        Image(systemSymbol: .arrowRightCircle)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.trailing, isUnread ? -2 : 12)
+                    }
+                    
                     if isUnread {
                         Button {
                             onAction(true)
@@ -140,6 +152,16 @@ public struct TopicRow: View {
             isClosed: false,
             isUnread: false,
             onAction: { print($0 ? "Unread tapped" : "Row tapped") }
+        )
+        
+        TopicRow(
+            title: .plain("Moved topic example"),
+            date: .now,
+            username: "qwerty",
+            isMoved: true,
+            isClosed: false,
+            isUnread: false,
+            onAction: { print($0 ? "Unread badge is unsupported in this case" : "Moved tapped") }
         )
         
         TopicRow(

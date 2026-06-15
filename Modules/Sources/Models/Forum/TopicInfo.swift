@@ -16,6 +16,10 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public let postsCount: Int
     public let lastPost: LastPost
     
+    public var isMoved: Bool {
+        return flag.contains(.marker)
+    }
+    
     public var isUnread: Bool {
         return flag.contains(.updated)
     }

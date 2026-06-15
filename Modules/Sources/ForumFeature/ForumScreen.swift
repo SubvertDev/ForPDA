@@ -141,6 +141,14 @@ public struct ForumScreen: View {
                     isUnread: false,
                     isForum: true
                 )
+                
+                if forum.canModerate {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Forum Tickets", bundle: .module), symbol: .exclamationmarkBubble) {
+                            send(.contextOptionMenu(.tickets))
+                        }
+                    }
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
@@ -195,6 +203,7 @@ public struct ForumScreen: View {
                             title: .plain(topic.name),
                             date: topic.lastPost.date,
                             username: topic.lastPost.username,
+                            isMoved: topic.isMoved,
                             isClosed: topic.isClosed,
                             isUnread: topic.isUnread
                         ) { unreadTapped in

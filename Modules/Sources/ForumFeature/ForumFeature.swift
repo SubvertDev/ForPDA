@@ -143,6 +143,7 @@ public struct ForumFeature: Reducer, Sendable {
             case openForum(id: Int, name: String?)
             case openAnnouncement(id: Int, name: String)
             case openSearch(on: SearchOn, navigation: ForumInfo?)
+            case openTickets(forumId: Int)
             case handleRedirect(URL)
         }
     }
@@ -221,7 +222,8 @@ public struct ForumFeature: Reducer, Sendable {
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
                 }
                 let goTo = state.appSettings.topicOpeningStrategy.asGoTo
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
+                let topicId = topic.isMoved ? topic.postsCount : topic.id
+                return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: goTo)))
                 
             case let .view(.subforumTapped(forum)):
                 return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
@@ -243,6 +245,9 @@ public struct ForumFeature: Reducer, Sendable {
                     )
                     state.destination = .form(formState)
                     return .none
+                    
+                case .tickets:
+                    return .send(.delegate(.openTickets(forumId: state.forumId)))
                     
                 // TODO: sort, to bookmarks
                 // TODO: Add analytics

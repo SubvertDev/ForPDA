@@ -21,6 +21,16 @@
         }
       }
     },
+    "Forum Tickets" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тикеты форума"
+          }
+        }
+      }
+    },
     "Go to Author" : {
       "localizations" : {
         "ru" : {
