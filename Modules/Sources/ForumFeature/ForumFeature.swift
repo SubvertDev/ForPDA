@@ -255,19 +255,20 @@ public struct ForumFeature: Reducer, Sendable {
                 }
                 
             case let .view(.contextTopicMenu(action, topic)):
+                let topicId = topic.isMoved ? topic.postsCount : topic.id
                 switch action {
                 case .open:
-                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
+                    return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .first)))
                     
                 case .goToEnd:
                     return .run { send in
-                        await send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
+                        await send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .unread)))
                         await send(.internal(.refresh))
                     }
                     
                 case .edit:
                     state.destination = .edit(TopicEditFeature.State(
-                        id: topic.id,
+                        id: topic.id, // use only original id
                         flag: topic.flag,
                         title: topic.name,
                         description: topic.description,

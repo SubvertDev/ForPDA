@@ -213,7 +213,9 @@ public struct ForumScreen: View {
                             TopicContextMenu(topic: topic)
                             
                             Section {
-                                CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                                if !topic.isMoved {
+                                    CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                                }
                                 
                                 if topic.canModerate {
                                     TopicToolsContextMenu(topic: topic)
