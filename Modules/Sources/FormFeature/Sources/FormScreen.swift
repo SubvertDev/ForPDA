@@ -33,7 +33,7 @@ public struct FormScreen: View {
         WithPerceptionTracking {
             ScrollView(.vertical) {
                 VStack(spacing: 28) {
-                    ForEach(store.scope(state: \.rows, action: \.rows)) { fieldStore in
+                    ForEach(store.scope(\.rows, action: \.rows)) { fieldStore in
                         FormFieldRow(store: fieldStore, focusedField: $focusedField)
                     }
                     
@@ -163,8 +163,8 @@ struct DestinationModifier: ViewModifier {
     func body(content: Content) -> some View {
         WithPerceptionTracking {
             content
-                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
-                .sheet(item: $store.scope(state: \.destination?.preview, action: \.destination.preview)) { store in
+                .alert($store.scope(\.destination?.alert, action: \.destination.alert))
+                .sheet(item: $store.scope(\.destination?.preview, action: \.destination.preview)) { store in
                     NavigationStack {
                         FormPreviewView(store: store)
                     }

@@ -108,12 +108,12 @@ public struct QMSListScreen: View {
             .toolbar {
                 ToolbarItems()
             }
-            .sheet(item: $store.scope(state: \.$createChat, action: \.createChat)) { store in
+            .sheet(item: $store.scope(\.$createChat, action: \.createChat)) { store in
                 NavigationStack {
                     CreateChatScreen(store: store)
                 }
             }
-            .alert($store.scope(state: \.$alert, action: \.alert))
+            .alert($store.scope(\.$alert, action: \.alert))
             .onAppear {
                 send(.onAppear)
             }

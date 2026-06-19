@@ -42,10 +42,10 @@ public struct FavoritesRootScreen: View {
                     
                     switch store.pickerSelection {
                     case .favorites:
-                        FavoritesScreen(store: store.scope(state: \.favorites, action: \.favorites))
+                        FavoritesScreen(store: store.scope(\.favorites, action: \.favorites))
                         
                     case .bookmarks:
-                        BookmarksScreen(store: store.scope(state: \.bookmarks, action: \.bookmarks))
+                        BookmarksScreen(store: store.scope(\.bookmarks, action: \.bookmarks))
                     }
                 }
             }

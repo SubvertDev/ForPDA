@@ -119,32 +119,32 @@ struct FormFieldRow: View {
         WithPerceptionTracking {
             switch store.state {
             case .checkBoxList:
-                if let store = store.scope(state: \.checkBoxList, action: \.checkBoxList) {
+                if let store = store.scope(\.checkBoxList, action: \.checkBoxList) {
                     FormCheckBoxListRow(store: store)
                 }
                 
             case .dropdown:
-                if let store = store.scope(state: \.dropdown, action: \.dropdown) {
+                if let store = store.scope(\.dropdown, action: \.dropdown) {
                     FormDropdownRow(store: store)
                 }
                 
             case .editor:
-                if let store = store.scope(state: \.editor, action: \.editor) {
+                if let store = store.scope(\.editor, action: \.editor) {
                     FormEditorRow(store: store, focusedField: $focusedField)
                 }
                 
             case .textField:
-                if let store = store.scope(state: \.textField, action: \.textField) {
+                if let store = store.scope(\.textField, action: \.textField) {
                     FormTextFieldRow(store: store, focusedField: $focusedField)
                 }
                 
             case .title:
-                if let store = store.scope(state: \.title, action: \.title) {
+                if let store = store.scope(\.title, action: \.title) {
                     FormTitleRow(store: store)
                 }
                 
             case .uploadBox:
-                if let store = store.scope(state: \.uploadBox, action: \.uploadBox) {
+                if let store = store.scope(\.uploadBox, action: \.uploadBox) {
                     FormUploadBoxRow(store: store)
                 }
             }

@@ -168,7 +168,7 @@ struct FormEditorRow: View {
                         minHeight: 144,
                         selection: $store.textRange,
                         bbPanel: {
-                            BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                            BBPanelView(store: store.scope(\.bbPanel, action: \.bbPanel))
                                 .onTapGesture {
                                     focusedField = store.id
                                 }

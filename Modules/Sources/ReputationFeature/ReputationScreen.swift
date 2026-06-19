@@ -46,10 +46,10 @@ public struct ReputationScreen: View {
                     }
                 }
             }
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
+            .alert($store.scope(\.$destination, action: \.destination).alert)
             .navigationTitle(Text("Reputation", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).report) { store in
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).report) { store in
                 NavigationStack {
                     FormScreen(store: store)
                 }

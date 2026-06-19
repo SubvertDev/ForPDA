@@ -45,7 +45,7 @@ public struct ArticleScreen: View {
         WithPerceptionTracking {
             ArticleScrollView()
                 .bind($store.focus, to: $focus)
-                .alert($store.scope(state: \.$destination, action: \.destination).alert)
+                .alert($store.scope(\.$destination, action: \.destination).alert)
                 .sheet(item: $store.destination.share, id: \.self) { url in
                     // FIXME: Perceptible warning despite tracking closure
                     WithPerceptionTracking {

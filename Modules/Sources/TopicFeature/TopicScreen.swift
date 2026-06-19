@@ -134,7 +134,7 @@ public struct TopicScreen: View {
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -294,7 +294,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func Navigation() -> some View {
         if store.pageNavigation.shouldShow {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .padding(.horizontal, 16)
         }
     }
@@ -507,7 +507,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
-                .alert($store.scope(state: \.$destination, action: \.destination).alert)
+                .alert($store.scope(\.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
@@ -537,17 +537,17 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).form) { store in
+                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
                         NavigationStack {
                             FormScreen(store: store)
                         }
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination?.edit, action: \.destination.edit)) { store in
+                    .fullScreenCover(item: $store.scope(\.destination?.edit, action: \.destination.edit)) { store in
                         NavigationStack {
                             TopicEditView(store: store)
                         }
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination, action: \.destination).gallery) { model in
+                    .fullScreenCover(item: $store.scope(\.destination, action: \.destination).gallery) { model in
                         TabViewGallery(model: model)
                     }
             }
@@ -572,23 +572,23 @@ struct NavigationModifier: ViewModifier {
         private func Sheets(content: Content) -> some View {
             content
                 .fittedSheet(
-                    item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
+                    item: $store.scope(\.$destination, action: \.destination).changeReputation,
                     embedIntoNavStack: true
                 ) { store in
                     ReputationChangeView(store: store)
                 }
                 .fittedSheet(
-                    item: $store.scope(state: \.$destination, action: \.destination).move,
+                    item: $store.scope(\.$destination, action: \.destination).move,
                     embedIntoNavStack: true
                 ) { store in
                     ForumMoveView(store: store)
                 }
-                .sheet(item: $store.scope(state: \.$destination, action: \.destination).karmaHistory) { store in
+                .sheet(item: $store.scope(\.$destination, action: \.destination).karmaHistory) { store in
                     NavigationStack {
                         PostKarmaHistoryView(store: store)
                     }
                 }
-                .sheet(item: $store.scope(state: \.$destination, action: \.destination).stat) { store in
+                .sheet(item: $store.scope(\.$destination, action: \.destination).stat) { store in
                     NavigationStack {
                         ForumStatView(store: store)
                     }

@@ -84,14 +84,14 @@ public struct TicketsListScreen: View {
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
                 }
             }
-            .sheet(item: $store.scope(state: \.$destination, action: \.destination).statusHistory) { store in
+            .sheet(item: $store.scope(\.$destination, action: \.destination).statusHistory) { store in
                 NavigationStack {
                     TicketStatusHistoryView(store: store)
                 }
@@ -298,7 +298,7 @@ public struct TicketsListScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+        PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
             .listRowBackground(Color(.Background.primary))
     }
     

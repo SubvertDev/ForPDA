@@ -132,7 +132,7 @@ struct FormUploadBoxRow: View {
                         required: store.isRequired
                     ) {
                         WithPerceptionTracking {
-                            UploadBoxView(store: store.scope(state: \.upload, action: \.upload))
+                            UploadBoxView(store: store.scope(\.upload, action: \.upload))
                         }
                     }
                 }

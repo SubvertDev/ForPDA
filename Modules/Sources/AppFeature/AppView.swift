@@ -87,12 +87,12 @@ public struct AppView: View {
             .animation(.default, value: store.toastMessage)
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .preferredColorScheme(store.appSettings.appColorScheme.asColorScheme)
-            .sheet(item: $store.scope(state: \.$logStore, action: \.logStore)) { store in
+            .sheet(item: $store.scope(\.$logStore, action: \.logStore)) { store in
                 NavigationStack {
                     LogStoreScreen(store: store)
                 }
             }
-            .alert($store.scope(state: \.$alert, action: \.alert))
+            .alert($store.scope(\.$alert, action: \.alert))
             // Tint and environment should be after sheets/covers
             .tint(store.appSettings.appTintColor.asColor)
             .environment(\.tintColor, store.appSettings.appTintColor.asColor)
@@ -135,7 +135,7 @@ struct LiquidTabView: View {
                     systemSymbol: AppTab.articles.iconSymbol,
                     value: .articles
                 ) {
-                    StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
+                    StackTabView(store: store.scope(\.articlesTab, action: \.articlesTab))
                 }
                 
                 Tab(
@@ -143,7 +143,7 @@ struct LiquidTabView: View {
                     systemSymbol: AppTab.favorites.iconSymbol,
                     value: .favorites
                 ) {
-                    StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+                    StackTabView(store: store.scope(\.favoritesTab, action: \.favoritesTab))
                 }
                 .badge(store.favoritesBadges)
                 
@@ -152,7 +152,7 @@ struct LiquidTabView: View {
                     systemSymbol: AppTab.forum.iconSymbol,
                     value: .forum
                 ) {
-                    StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
+                    StackTabView(store: store.scope(\.forumTab, action: \.forumTab))
                 }
                 
                 Tab(
@@ -160,7 +160,7 @@ struct LiquidTabView: View {
                     systemSymbol: AppTab.more.iconSymbol,
                     value: .more
                 ) {
-                    StackTabView(store: store.scope(state: \.moreTab, action: \.moreTab))
+                    StackTabView(store: store.scope(\.moreTab, action: \.moreTab))
                 }
                 .badge(store.profileBadges)
             }
@@ -198,16 +198,16 @@ struct OldTabView: View {
     var body: some View {
         WithPerceptionTracking {
             TabView(selection: $store.selectedTab) {
-                StackTabView(store: store.scope(state: \.articlesTab, action: \.articlesTab))
+                StackTabView(store: store.scope(\.articlesTab, action: \.articlesTab))
                     .tag(AppTab.articles)
                 
-                StackTabView(store: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+                StackTabView(store: store.scope(\.favoritesTab, action: \.favoritesTab))
                     .tag(AppTab.favorites)
                 
-                StackTabView(store: store.scope(state: \.forumTab, action: \.forumTab))
+                StackTabView(store: store.scope(\.forumTab, action: \.forumTab))
                     .tag(AppTab.forum)
                 
-                StackTabView(store: store.scope(state: \.moreTab, action: \.moreTab))
+                StackTabView(store: store.scope(\.moreTab, action: \.moreTab))
                     .tag(AppTab.more)
             }
             
@@ -415,13 +415,13 @@ extension LiquidTabView {
     private func getNavigation() -> Store<PageNavigationFeature.State, PageNavigationFeature.Action>? {
         switch store.selectedTab {
         case .articles:
-            return getPage(for: store.scope(state: \.articlesTab, action: \.articlesTab))
+            return getPage(for: store.scope(\.articlesTab, action: \.articlesTab))
         case .favorites:
-            return getPage(for: store.scope(state: \.favoritesTab, action: \.favoritesTab))
+            return getPage(for: store.scope(\.favoritesTab, action: \.favoritesTab))
         case .forum:
-            return getPage(for: store.scope(state: \.forumTab, action: \.forumTab))
+            return getPage(for: store.scope(\.forumTab, action: \.forumTab))
         case .more:
-            return getPage(for: store.scope(state: \.moreTab, action: \.moreTab))
+            return getPage(for: store.scope(\.moreTab, action: \.moreTab))
         }
     }
     
@@ -429,8 +429,8 @@ extension LiquidTabView {
         for tab: Store<StackTab.State, StackTab.Action>
     ) -> Store<PageNavigationFeature.State, PageNavigationFeature.Action>? {
         if tab.path.isEmpty {
-            return getFeature(for: tab.scope(state: \.root, action: \.root))
-        } else if let id = tab.path.ids.last, let path = tab.scope(state: \.path[id: id], action: \.path[id: id]) {
+            return getFeature(for: tab.scope(\.root, action: \.root))
+        } else if let id = tab.path.ids.last, let path = tab.scope(\.path[id: id], action: \.path[id: id]) {
             return getFeature(for: path)
         } else {
             return nil
@@ -442,14 +442,14 @@ extension LiquidTabView {
     ) -> Store<PageNavigationFeature.State, PageNavigationFeature.Action>? {
         switch store.case {
         case let .favorites(store):
-            return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+            return store.scope(\.pageNavigation, action: \.pageNavigation)
             
         case let .forum(path):
             switch path.case {
             case let .forum(store):
-                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+                return store.scope(\.pageNavigation, action: \.pageNavigation)
             case let .topic(store):
-                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+                return store.scope(\.pageNavigation, action: \.pageNavigation)
             default:
                 return nil
             }
@@ -457,9 +457,9 @@ extension LiquidTabView {
         case let .more(path):
             switch path.case {
             case let .history(store):
-                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+                return store.scope(\.pageNavigation, action: \.pageNavigation)
             case let .mentions(store):
-                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+                return store.scope(\.pageNavigation, action: \.pageNavigation)
             default:
                 return nil
             }
@@ -467,7 +467,7 @@ extension LiquidTabView {
         case let .search(path):
             switch path.case {
             case let .searchResult(store):
-                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+                return store.scope(\.pageNavigation, action: \.pageNavigation)
             default:
                 return nil
             }
@@ -475,7 +475,7 @@ extension LiquidTabView {
         case let .tickets(path):
             switch path.case {
             case let .ticketsList(store):
-                return store.scope(state: \.pageNavigation, action: \.pageNavigation)
+                return store.scope(\.pageNavigation, action: \.pageNavigation)
             default:
                 return nil
             }

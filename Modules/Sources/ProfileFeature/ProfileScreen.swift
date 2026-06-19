@@ -77,23 +77,23 @@ public struct ProfileScreen: View {
             }
             .navigationTitle(Text("Profile", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
-            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).editProfile) { store in
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).editProfile) { store in
                 NavigationStack {
                     EditScreen(store: store)
                 }
             }
-            .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).note) { store in
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).note) { store in
                 NavigationStack {
                     FormScreen(store: store)
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.$destination, action: \.destination).changeReputation,
+                item: $store.scope(\.$destination, action: \.destination).changeReputation,
                 embedIntoNavStack: true
             ) { store in
                 ReputationChangeView(store: store)
             }
-            .sheet(item: $store.scope(state: \.$destination, action: \.destination).createChat) { store in
+            .sheet(item: $store.scope(\.$destination, action: \.destination).createChat) { store in
                 NavigationStack {
                     CreateChatScreen(store: store)
                 }

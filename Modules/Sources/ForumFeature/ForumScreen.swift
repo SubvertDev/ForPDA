@@ -88,7 +88,7 @@ public struct ForumScreen: View {
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -325,7 +325,7 @@ public struct ForumScreen: View {
     @ViewBuilder
     private func Navigation(pinned: Bool) -> some View {
         if !pinned, shouldShowInlineNavigation {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
         }
@@ -484,7 +484,7 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.$destination, action: \.destination).form) { store in
+                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
                         NavigationStack {
                             FormScreen(store: store)
                         }
@@ -504,18 +504,18 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .sheet(item: $store.scope(state: \.$destination, action: \.destination).stat) { store in
+                    .sheet(item: $store.scope(\.$destination, action: \.destination).stat) { store in
                         NavigationStack {
                             ForumStatView(store: store)
                         }
                     }
-                    .sheet(item: $store.scope(state: \.$destination, action: \.destination).edit) { store in
+                    .sheet(item: $store.scope(\.$destination, action: \.destination).edit) { store in
                         NavigationStack {
                             TopicEditView(store: store)
                         }
                     }
                     .fittedSheet(
-                        item: $store.scope(state: \.$destination, action: \.destination).move,
+                        item: $store.scope(\.$destination, action: \.destination).move,
                         embedIntoNavStack: true
                     ) { store in
                         ForumMoveView(store: store)

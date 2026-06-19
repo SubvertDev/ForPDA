@@ -54,7 +54,7 @@ public struct TopicEditView: View {
             .scrollIndicators(.hidden)
             .navigationTitle(Text("Topic Edit", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            .alert($store.scope(state: \.alert, action: \.alert))
+            .alert($store.scope(\.alert, action: \.alert))
             .safeAreaInset(edge: .bottom) {
                 SaveButton()
             }

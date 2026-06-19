@@ -79,7 +79,7 @@ public struct SearchResultScreen: View {
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -233,7 +233,7 @@ public struct SearchResultScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+        PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
             .listRowBackground(Color(.Background.primary))
     }
     

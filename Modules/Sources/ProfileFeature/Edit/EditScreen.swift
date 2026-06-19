@@ -53,7 +53,7 @@ public struct EditScreen: View {
                         characterLimit: 300,
                         selection: $store.fieldRange,
                         bbPanel: {
-                            BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                            BBPanelView(store: store.scope(\.bbPanel, action: \.bbPanel))
                                 .disabled(focus != .signature)
                         }
                     )
@@ -65,7 +65,7 @@ public struct EditScreen: View {
                         characterLimit: 500,
                         selection: $store.fieldRange,
                         bbPanel: {
-                            BBPanelView(store: store.scope(state: \.bbPanel, action: \.bbPanel))
+                            BBPanelView(store: store.scope(\.bbPanel, action: \.bbPanel))
                                 .disabled(focus != .about)
                         }
                     )
@@ -86,7 +86,7 @@ public struct EditScreen: View {
                 }
                 .scrollContentBackground(.hidden)
             }
-            .alert($store.scope(state: \.$alert, action: \.alert))
+            .alert($store.scope(\.$alert, action: \.alert))
             .navigationTitle(Text("Edit profile", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             ._safeAreaBar(edge: .bottom) {

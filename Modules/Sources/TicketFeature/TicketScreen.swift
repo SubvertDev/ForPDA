@@ -80,8 +80,8 @@ public struct TicketScreen: View {
             }
             .navigationTitle(Text(store.ticket != nil ? "Ticket \(String(store.id))" : "Loading...", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
-            .alert($store.scope(state: \.$destination, action: \.destination).alert)
-            .sheet(item: $store.scope(state: \.$destination, action: \.destination).statusHistory) { store in
+            .alert($store.scope(\.$destination, action: \.destination).alert)
+            .sheet(item: $store.scope(\.$destination, action: \.destination).statusHistory) { store in
                 NavigationStack {
                     TicketStatusHistoryView(store: store)
                 }

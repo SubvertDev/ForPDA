@@ -48,7 +48,7 @@ public struct BBPanelView: View {
                     .padding(.bottom, 8)
                     .padding(.horizontal, 12)
                 }
-                .sheet(item: $store.scope(state: \.$destination, action: \.destination).listTag) { store in
+                .sheet(item: $store.scope(\.$destination, action: \.destination).listTag) { store in
                     NavigationStack {
                         ListTagBuilderView(store: store)
                     }
@@ -241,7 +241,7 @@ public struct BBPanelView: View {
             }
             
             WithPerceptionTracking {
-                UploadBoxView(store: store.scope(state: \.upload, action: \.upload))
+                UploadBoxView(store: store.scope(\.upload, action: \.upload))
                     .padding(.bottom, 32)
             }
         }

@@ -69,7 +69,7 @@ public struct FavoritesScreen: View {
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -102,7 +102,7 @@ public struct FavoritesScreen: View {
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.$sort, action: \.sort),
+                item: $store.scope(\.$sort, action: \.sort),
                 embedIntoNavStack: true
             ) { store in
                 SortView(store: store)
@@ -280,7 +280,7 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func Navigation(isShown: Bool) -> some View {
         if isShown, store.pageNavigation.shouldShow {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
         }
