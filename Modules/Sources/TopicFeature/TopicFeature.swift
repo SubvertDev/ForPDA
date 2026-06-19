@@ -224,7 +224,7 @@ public struct TopicFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+        Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         

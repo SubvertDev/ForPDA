@@ -126,7 +126,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                 return .send(.internal(.refresh))
             }
         
-        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+        Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         

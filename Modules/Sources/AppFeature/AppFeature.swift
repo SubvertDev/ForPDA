@@ -184,23 +184,23 @@ public struct AppFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.appDelegate, action: \.appDelegate) {
+        Scope(\.appDelegate, action: \.appDelegate) {
             AppDelegateFeature()
         }
         
-        Scope(state: \.articlesTab, action: \.articlesTab) {
+        Scope(\.articlesTab, action: \.articlesTab) {
             StackTab()
         }
         
-        Scope(state: \.favoritesTab, action: \.favoritesTab) {
+        Scope(\.favoritesTab, action: \.favoritesTab) {
             StackTab()
         }
         
-        Scope(state: \.forumTab, action: \.forumTab) {
+        Scope(\.forumTab, action: \.forumTab) {
             StackTab()
         }
         
-        Scope(state: \.moreTab, action: \.moreTab) {
+        Scope(\.moreTab, action: \.moreTab) {
             StackTab()
         }
         

@@ -93,7 +93,7 @@ public struct FormEditorFeature: Reducer {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.bbPanel, action: \.bbPanel) {
+        Scope(\.bbPanel, action: \.bbPanel) {
             BBPanelFeature()
         }
         

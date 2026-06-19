@@ -134,7 +134,7 @@ public struct EditFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.bbPanel, action: \.bbPanel) {
+        Scope(\.bbPanel, action: \.bbPanel) {
             BBPanelFeature()
         }
         

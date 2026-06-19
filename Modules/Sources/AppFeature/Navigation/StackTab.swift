@@ -100,7 +100,7 @@ public struct StackTab: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.root, action: \.root) {
+        Scope(\.root, action: \.root) {
             Path.body
         }
         

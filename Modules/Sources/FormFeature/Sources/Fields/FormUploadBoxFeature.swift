@@ -81,7 +81,7 @@ public struct FormUploadBoxFeature: Reducer {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.upload, action: \.upload) {
+        Scope(\.upload, action: \.upload) {
             UploadBoxFeature()
         }
         
