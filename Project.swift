@@ -446,6 +446,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.BBPanelFeature,
+                    .Internal.CreateChatFeature,
                     .Internal.Models,
                     .Internal.NotificationsClient,
                     .Internal.ParsingClient,
