@@ -38,6 +38,11 @@ public struct CreateChatFeature: Reducer, Sendable {
         var shouldShowSearchUsers: Bool {
             return !searchUsers.isEmpty
         }
+        var canSend: Bool {
+            return !username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            !chatTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
+            !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
         
         public init(userId: Int? = nil, username: String? = nil) {
             guard let userId else { return }

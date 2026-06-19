@@ -51,7 +51,7 @@ public struct CreateChatScreen: View {
                                             .frame(width: 22, height: 22)
                                             .padding(.horizontal, 12)
                                     } else if store.selectedSearchUser != nil {
-                                        ShowProfileButton()
+                                        EmptyView() // ShowProfileButton()
                                     }
                                 }
                                 
@@ -120,6 +120,7 @@ public struct CreateChatScreen: View {
                     .buttonStyle(.borderedProminent)
                     .tint(tintColor)
                     .padding(.horizontal, 16)
+                    .disabled(!store.canSend)
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
