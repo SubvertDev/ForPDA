@@ -586,7 +586,7 @@ public struct TopicFeature: Reducer, Sendable {
                 
                 let formatter = DateFormatter()
                 formatter.dateFormat = "dd.MM.yy, HH:mm"
-                let currentDate = formatter.string(from: Date())
+                let currentDate = formatter.string(from: post.post.createdAt)
                 let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\(quotedText)[/quote]\n"
                 let feature = FormFeature.State(
                     type: .post(
