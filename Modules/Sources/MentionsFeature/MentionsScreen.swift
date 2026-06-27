@@ -124,8 +124,8 @@ public struct MentionsScreen: View {
             
             Text("When someone mentions you in forum topics, it will appear here.", bundle: .module)
                 .font(.footnote)
-                .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
+                .foregroundStyle(Color(.Labels.teritary))
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.7)
         }
     }
