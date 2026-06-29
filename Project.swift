@@ -684,6 +684,18 @@ let project = Project(
                     .SPM.TCA,
                 ]
             ),
+
+            .feature(
+                name: "UserPunishmentFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.BBPanelFeature,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
+                    .SPM.TCA,
+                ]
+            ),
         
             .feature(
                 name: "FormFeature",
@@ -1238,6 +1250,7 @@ extension TargetDependency.Internal {
     static let TopicEditFeature =       TargetDependency.target(name: "TopicEditFeature")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
+    static let UserPunishmentFeature =  TargetDependency.target(name: "UserPunishmentFeature")
     
     // Clients
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")
