@@ -53,6 +53,8 @@ public struct APIClient: Sendable {
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
     public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
     
+    public var getUserPunishmentTemplates: @Sendable (_ forId: Int, _ userId: Int) async throws -> [UserPunishmentCategory]
+    
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
     
@@ -303,6 +305,12 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
+            },
+            
+            getUserPunishmentTemplates: { forId, userId in
+                let command = MemberCommand.Punishment.templates(forId: forId, memberId: userId)
+                let response = try await api.send(command)
+                return try await parser.parseUserPunishmentTemplates(response)
             },
             
             // MARK: - Bookmarks
@@ -750,6 +758,9 @@ extension APIClient: DependencyKey {
             },
             updateUserDevice: { _, _, _, _ in
                 return true
+            },
+            getUserPunishmentTemplates: { _, _ in
+                return [.mockLight, .mockHigh]
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
