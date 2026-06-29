@@ -455,6 +455,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.FormFeature,
+                    .Internal.UserPunishmentFeature,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,

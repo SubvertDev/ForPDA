@@ -18,6 +18,7 @@ import BBBuilder
 import FormFeature
 import ReputationChangeFeature
 import CreateChatFeature
+import UserPunishmentFeature
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -85,6 +86,11 @@ public struct ProfileScreen: View {
             .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).note) { store in
                 NavigationStack {
                     FormScreen(store: store)
+                }
+            }
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).punish) { store in
+                NavigationStack {
+                    UserPunishmentScreen(store: store)
                 }
             }
             .fittedSheet(
@@ -159,6 +165,20 @@ public struct ProfileScreen: View {
                         symbol: .arrowUpArrowDown
                     ) {
                         send(.contextMenu(.changeReputation))
+                    }
+                    
+                    if !store.shouldShowToolbarButtons {
+                        Section {
+                            Button(role: .destructive) {
+                                send(.contextMenu(.punish))
+                            } label: {
+                                HStack {
+                                    Text("Punish", bundle: .module)
+                                    Image(systemSymbol: .personCropCircleBadgeExclamationmark)
+                                }
+                            }
+                            .tint(.red)
+                        }
                     }
                 }
             } label: {

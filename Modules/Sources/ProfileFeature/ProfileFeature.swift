@@ -16,6 +16,7 @@ import NotificationsClient
 import FormFeature
 import ReputationChangeFeature
 import CreateChatFeature
+import UserPunishmentFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -35,6 +36,7 @@ public struct ProfileFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case note(FormFeature)
+        case punish(UserPunishmentFeature)
         case editProfile(EditFeature)
         case createChat(CreateChatFeature)
         case changeReputation(ReputationChangeFeature)
@@ -203,6 +205,9 @@ public struct ProfileFeature: Reducer, Sendable {
                 switch action {
                 case .edit:
                     state.destination = .editProfile(EditFeature.State(user: user))
+                    
+                case .punish:
+                    state.destination = .punish(UserPunishmentFeature.State(userId: user.id, target: .profile))
                     
                 case .addNotice:
                     state.destination = .note(FormFeature.State(type: .note(userId: user.id)))
