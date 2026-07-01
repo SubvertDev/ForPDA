@@ -112,10 +112,17 @@ public struct PostRowView: View {
                 }
                 
                 HStack(spacing: 8) {
-                    let text = User.Group(rawValue: state.post.post.author.groupId)?.title ?? ""
-                    Text(text)
-                        .font(.caption)
-                        .foregroundStyle(Color(.Labels.teritary))
+                    HStack(spacing: 4) {
+                        if state.topicCuratorId == state.post.post.author.id {
+                            Text(verbatim: "[K]")
+                                .foregroundStyle(Color(.tintColor))
+                        }
+                        
+                        let text = User.Group(rawValue: state.post.post.author.groupId)?.title ?? ""
+                        Text(text)
+                            .foregroundStyle(Color(.Labels.teritary))
+                    }
+                    .font(.caption)
                     
                     Spacer()
                     
@@ -380,6 +387,7 @@ public extension PostRowView {
     struct State: Equatable {
         public let post: UIPost
         public let sessionUserId: Int
+        public let topicCuratorId: Int
         public let userSessionInfo: UserSessionInfo?
         public let canPostInTopic: Bool
         
@@ -389,6 +397,7 @@ public extension PostRowView {
         public init(
             post: UIPost,
             sessionUserId: Int = 0,
+            topicCuratorId: Int = 0,
             userSessionInfo: UserSessionInfo?,
             canPostInTopic: Bool = false,
             isUserAuthorized: Bool = false,
@@ -396,6 +405,7 @@ public extension PostRowView {
         ) {
             self.post = post
             self.sessionUserId = sessionUserId
+            self.topicCuratorId = topicCuratorId
             self.userSessionInfo = userSessionInfo
             self.canPostInTopic = canPostInTopic
             self.isUserAuthorized = isUserAuthorized

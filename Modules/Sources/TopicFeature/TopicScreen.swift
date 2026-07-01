@@ -406,6 +406,7 @@ public struct TopicScreen: View {
             state: PostRowView.State(
                 post: post,
                 sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
+                topicCuratorId: store.topic?.curatorId ?? 0,
                 userSessionInfo: userSessionInfo,
                 canPostInTopic: store.topic?.canPost ?? false,
                 isUserAuthorized: store.isUserAuthorized,
