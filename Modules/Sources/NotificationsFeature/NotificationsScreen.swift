@@ -44,7 +44,6 @@ public struct NotificationsScreen: View {
                         }
                         
                         Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
-                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
                         Row("Forum", value: Binding(store.$appSettings.notifications.isForumEnabled))
                         Row("Topics", value: Binding(store.$appSettings.notifications.isTopicsEnabled))
                         Row("Forum mentions", value: Binding(store.$appSettings.notifications.isForumMentionsEnabled))
