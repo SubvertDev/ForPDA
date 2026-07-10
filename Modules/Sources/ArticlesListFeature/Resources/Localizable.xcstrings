@@ -11,42 +11,12 @@
         }
       }
     },
-    "Failed to load" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось загрузить"
-          }
-        }
-      }
-    },
     "Link copied" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ссылка скопирована"
-          }
-        }
-      }
-    },
-    "Try again" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Повторить"
-          }
-        }
-      }
-    },
-    "Try again later" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Повторите попытку позже"
           }
         }
       }

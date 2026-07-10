@@ -5,6 +5,7 @@
 //  Created by Ilia Lubianoi on 18.03.2025.
 //
 
+import Dependencies
 import SwiftUI
 
 // MARK: - Modifier
@@ -27,6 +28,10 @@ struct TrackingModifier<V: View>: ViewModifier {
         content
             .tracePerformance(viewName: viewName)
             .trackAnalytics(screenName: viewName, properties: properties)
+            .onAppear {
+                @Dependency(\.analyticsClient) var analytics
+                analytics.addBreadcrumb(category: "Screen", message: viewName, data: properties, type: "navigation")
+            }
     }
     
     private static func getScreenName(from type: V.Type) -> String {

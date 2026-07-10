@@ -8,8 +8,10 @@
 import Foundation
 import ComposableArchitecture
 import APIClient
+import PersistenceKeys
 import Models
 import ToastClient
+import BBPanelFeature
 
 @Reducer
 public struct EditFeature: Reducer, Sendable {
@@ -29,12 +31,17 @@ public struct EditFeature: Reducer, Sendable {
     public struct State: Equatable {
         public enum Field: CaseIterable { case status, signature, about, city }
         
+        @Shared(.userSession) public var userSession: UserSession?
+        
         @Presents public var destination: Destination.State?
         @Presents public var alert: AlertState<Action.Alert>?
+        
+        public var bbPanel = BBPanelFeature.State(for: .profile)
         
         let user: User
         var draftUser: User
         var focus: Field?
+        var fieldRange: NSRange?
         
         var isSending = false
         var isAvatarUploading = false
@@ -78,6 +85,7 @@ public struct EditFeature: Reducer, Sendable {
     public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
         case destination(PresentationAction<Destination.Action>)
+        case bbPanel(BBPanelFeature.Action)
         
         case view(View)
         public enum View {
@@ -126,9 +134,52 @@ public struct EditFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
+        Scope(\.bbPanel, action: \.bbPanel) {
+            BBPanelFeature()
+        }
+        
         Reduce<State, Action> { state, action in
             switch action {
-            case .binding:
+            case let .bbPanel(.delegate(.tagTapped(tag))):
+                var content: String
+                switch state.focus {
+                case .about:
+                    content = state.draftUser.aboutMe ?? ""
+                case .signature:
+                    content = state.draftUser.signature ?? ""
+                default:
+                    fatalError("BBPanel available only for about and aignature field")
+                }
+                var fieldRange = state.fieldRange
+                if let range = fieldRange, !content.isEmpty {
+                    // если мы вставляем в текст БЕЗ выделенной области бб код
+                    if range.lowerBound == range.upperBound {
+                        let index = content.index(content.startIndex, offsetBy: range.lowerBound)
+                        content.insert(contentsOf: "\(tag.0)\(tag.1)", at: index)
+                        fieldRange = NSMakeRange(range.lowerBound + tag.0.count, 0)
+                    } else {
+                        let ubIndex = content.index(content.startIndex, offsetBy: range.upperBound)
+                        let lbIndex = content.index(content.startIndex, offsetBy: range.lowerBound)
+                        content.insert(contentsOf: tag.1, at: ubIndex)
+                        content.insert(contentsOf: tag.0, at: lbIndex)
+                        fieldRange = NSMakeRange(range.lowerBound + tag.0.count, range.upperBound - range.lowerBound)
+                    }
+                } else {
+                    content = "\(tag.0)\(tag.1)"
+                    fieldRange = NSMakeRange(tag.0.count, 0)
+                }
+                switch state.focus {
+                case .about:
+                    state.draftUser.aboutMe = content
+                case .signature:
+                    state.draftUser.signature = content
+                default:
+                    fatalError("BBPanel available only for about and aignature field")
+                }
+                state.fieldRange = fieldRange
+                return .none
+                
+            case .binding, .bbPanel:
                 return .none
                 
             case .alert(.presented(.deleteAvatar)):

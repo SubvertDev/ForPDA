@@ -69,7 +69,7 @@ CI pull requests checks
 [bundle exec] fastlane ios ci_push
 ```
 
-CI cache warmup & tests
+CI build & tests
 
 ### ios prepare_certificates
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CreateChatFeature
 import ComposableArchitecture
 import SharedUI
 import NukeUI
@@ -18,6 +19,8 @@ public struct QMSListScreen: View {
     
     @Perception.Bindable public var store: StoreOf<QMSListFeature>
     @Environment(\.tintColor) private var tintColor
+    
+    @State private var scrollScale: CGFloat = 1
     
     // MARK: - Init
     
@@ -33,38 +36,149 @@ public struct QMSListScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if let qms = store.qms {
-                    List {
-                        ForEach(Array(qms.users.enumerated()), id: \.0) { index, user in
-                            WithPerceptionTracking {
-                                if user.chats.isEmpty {
-                                    UserRow(user)
+                    switch store.viewState {
+                    case let .loaded(qms):
+                        ScrollViewReader { proxy in
+                            QMSList {
+                                ForEach(Array(qms.users.enumerated()), id: \.1) { index, user in
+                                    WithPerceptionTracking {
+                                        DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
+                                            ExpandedUserContent(user)
+                                        } label: {
+                                            UserRow(user)
+                                                .contextMenu {
+                                                    if user.id != 0 { // 0 is service account
+                                                        UserContextMenu(user: user)
+                                                    }
+                                                }
+                                        }
                                         .listRowBackground(Color(.Background.teritary))
-                                } else {
-                                    DisclosureGroup(isExpanded: $store.expandedGroups[index]) {
-                                        ChatList(user.chats)
-                                    } label: {
-                                        UserRow(user)
+                                        .scaleEffect(store.goTo == user.id ? scrollScale : 1)
+                                        .id(user.id)
                                     }
-                                    .listRowBackground(Color(.Background.teritary))
+                                }
+                            }
+                            .refreshable {
+                                await send(.onRefresh).finish()
+                            }
+                            .onAppear {
+                                if let goTo = store.goTo {
+                                    if #available(iOS 17, *) {
+                                        withAnimation {
+                                            proxy.scrollTo(goTo, anchor: .top)
+                                        } completion: {
+                                            Task { await animateScrollPulse() }
+                                        }
+                                    } else {
+                                        withAnimation { proxy.scrollTo(goTo, anchor: .top) }
+                                    }
                                 }
                             }
                         }
+                        
+                    case .loading:
+                        QMSList {
+                            ForEach(0..<8) { _ in
+                                UserRow(.placeholder)
+                                    .listRowBackground(Color(.Background.teritary))
+                                    .redacted(if: true)
+                            }
+                        }
+                        
+                    case .empty:
+                        GenericView(
+                            systemSymbol: .person2,
+                            title: LocalizedStringResource("No chats", bundle: .module),
+                            description: LocalizedStringResource("Start chatting with other 4PDA users", bundle: .module),
+                            actionTitle: LocalizedStringResource("Create chat", bundle: .module)
+                        ) {
+                            send(.createChatButtonTapped(user: nil))
+                        }
+                        
+                    case .error:
+                        GenericView.GenericError {
+                            send(.tryAgainButtonTapped)
+                        }
                     }
-                    .scrollContentBackground(.hidden)
-                    ._contentMargins(.top, 16)
-                } else {
-                    PDALoader()
-                        .frame(width: 24, height: 24)
-                }
+
             }
+            .animation(.default, value: store.viewState)
             .navigationTitle("QMS")
             ._toolbarTitleDisplayMode(.inline)
-            .animation(.default, value: store.expandedGroups)
+            .toolbar {
+                ToolbarItems()
+            }
+            .sheet(item: $store.scope(\.$createChat, action: \.createChat)) { store in
+                NavigationStack {
+                    CreateChatScreen(store: store)
+                }
+            }
+            .alert($store.scope(\.$alert, action: \.alert))
             .onAppear {
                 send(.onAppear)
             }
         }
+    }
+    
+    // MARK: - Toolbar Items
+    
+    @ToolbarContentBuilder
+    private func ToolbarItems() -> some ToolbarContent {
+        // if let qms = store.qms, !qms.users.isEmpty {
+        //     ToolbarItem {
+        //         Button {
+        //
+        //         } label: {
+        //             Image(systemSymbol: .magnifyingglass)
+        //         }
+        //     }
+        // }
+        
+        if #available(iOS 26, *) {
+            ToolbarSpacer()
+        }
+        
+        ToolbarItem {
+            Menu {
+                // Section {
+                //     ContextButton(
+                //         text: LocalizedStringResource("Blacklist", bundle: .module),
+                //         symbol: .personCropCircleBadgeXmark
+                //     ) {
+                //
+                //     }
+                // }
+                Section {
+                    // ContextButton(
+                    //     text: LocalizedStringResource("Add to bookmarks", bundle: .module),
+                    //     symbol: .bookmark
+                    // ) {
+                    //
+                    // }
+                    
+                    ContextButton(
+                        text: LocalizedStringResource("Create chat", bundle: .module),
+                        symbol: .plus
+                    ) {
+                        send(.createChatButtonTapped(user: nil))
+                    }
+                }
+            } label: {
+                Image(systemSymbol: .ellipsis)
+            }
+        }
+    }
+    
+    // MARK: - QMS List
+    
+    private func QMSList<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        List {
+            content()
+        }
+        .scrollContentBackground(.hidden)
+        ._contentMargins(.top, 16)
     }
     
     // MARK: - User Row
@@ -72,9 +186,11 @@ public struct QMSListScreen: View {
     @ViewBuilder
     private func UserRow(_ user: QMSUser) -> some View {
         Button {
-            send(.userRowTapped(user.id))
+            if case .loaded = store.viewState {
+                send(.userRowTapped(user.id))
+            }
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 LazyImage(url: user.avatarUrl ?? Links.defaultQMSAvatar) { state in
                     Group {
                         if let image = state.image {
@@ -85,9 +201,12 @@ public struct QMSListScreen: View {
                     }
                     .skeleton(with: state.isLoading, shape: .rectangle)
                 }
-                .frame(width: 50, height: 50)
+                .frame(width: 52, height: 52)
+                .clipShape(Circle())
                 
                 Text(user.name)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(.rect)
@@ -98,44 +217,215 @@ public struct QMSListScreen: View {
         ._badgeProminence(.increased)
     }
     
-    // MARK: - Chat Row
+    // MARK: - User Context Menu
     
     @ViewBuilder
-    private func ChatRow(_ chat: QMSChatInfo) -> some View {
-        HStack(spacing: 0) { // Hacky HStack to enable tap animations
-            Button {
-                send(.chatRowTapped(chat.id))
-            } label: {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(chat.name)
-                    Text(chat.lastMessageDate.formatted())
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
+    private func UserContextMenu(user: QMSUser) -> some View {
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("Create chat", bundle: .module),
+                symbol: .plus
+            ) {
+                send(.userContextMenu(.createChatButtonTapped, user))
             }
         }
-        .buttonStyle(.plain)
-        .listRowBackground(Color(.Background.teritary))
-        .badge(chat.unreadCount)
-        ._badgeProminence(.increased)
+         
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("User profile", bundle: .module),
+                symbol: .personCropCircle
+            ) {
+                send(.userContextMenu(.userProfileButtonTapped, user))
+            }
+            
+            // ContextButton(
+            //     text: LocalizedStringResource("Profile link", bundle: .module),
+            //     symbol: .docOnDoc
+            // ) {
+            //
+            // }
+        }
+        
+        Section {
+            // ContextButton(
+            //     text: LocalizedStringResource("Add to blacklist", bundle: .module),
+            //     symbol: .personCropCircleBadgeXmark,
+            //     role: .destructive
+            // ) {
+            //
+            // }
+            
+            ContextButton(
+                text: LocalizedStringResource("Delete all chats", bundle: .module),
+                symbol: .trash,
+                role: .destructive
+            ) {
+                send(.userContextMenu(.deleteAllChatsButtonTapped, user))
+            }
+        }
     }
+    
+    // MARK: - Expanded User Content
+    
+    @ViewBuilder
+    private func ExpandedUserContent(_ user: QMSUser) -> some View {
+        ChatList(user)
+        if user.id != 0 { // 0 is service account
+            CreateChatRow(user)
+        }
+    }
+    
     
     // MARK: - Chat List
     
     @ViewBuilder
-    private func ChatList(_ chats: [QMSChatInfo]) -> some View {
-        ForEach(chats) { chat in
-            ChatRow(chat)
+    private func ChatList(_ user: QMSUser) -> some View {
+        ForEach(user.chats) { chat in
+            ChatRow(chat: chat, user: user)
         }
+    }
+    
+    // MARK: - Chat Row
+    
+    @ViewBuilder
+    private func ChatRow(chat: QMSChatInfo, user: QMSUser) -> some View {
+        Button {
+            send(.chatRowTapped(chat.id))
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chat.name)
+                    .font(.body)
+                    .foregroundStyle(Color(.Labels.primary))
+                
+                Text(chat.lastMessageDate.formatted())
+                    .font(.subheadline)
+                    .foregroundStyle(Color(.Labels.secondary))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.borderless)
+        .listRowBackground(Color(.Background.teritary))
+        .badge(chat.unreadCount)
+        ._badgeProminence(.increased)
+        .contextMenu {
+            ChatContextMenu(chatId: chat.id, userId: user.id)
+        }
+    }
+    
+    // MARK: - Chat Context Menu
+    
+    @ViewBuilder
+    private func ChatContextMenu(chatId: Int, userId: Int) -> some View {
+        // Section {
+        //     ContextButton(
+        //         text: LocalizedStringResource("Mark as read", bundle: .module),
+        //         symbol: .checkmark
+        //     ) {
+        //
+        //     }
+        // }
+        
+        Section {
+            ContextButton(
+                text: LocalizedStringResource("Delete chat", bundle: .module),
+                symbol: .trash,
+                role: .destructive
+            ) {
+                send(.chatContextMenu(.deleteChatButtonTapped, chatId, userId))
+            }
+        }
+    }
+    
+    // MARK: - Create Chat Row
+    
+    @ViewBuilder
+    private func CreateChatRow(_ user: QMSUser) -> some View {
+        Button {
+            send(.createChatButtonTapped(user: user))
+        } label: {
+            HStack {
+                Text("Create chat", bundle: .module)
+                Spacer()
+                Image(systemSymbol: .plus)
+            }
+            .font(.body)
+            .tint(tintColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.borderless)
+        .listRowBackground(Color(.Background.teritary))
+    }
+    
+    // MARK: - Helpers
+    
+    private func animateScrollPulse(
+        duration: TimeInterval = 0.25,
+        scale: CGFloat = 0.95
+    ) async {
+        let animation = Animation.easeInOut(duration: duration)
+
+        try? await Task.sleep(for: .seconds(duration))
+
+        withAnimation(animation) {
+            scrollScale = scale
+        }
+
+        try? await Task.sleep(for: .seconds(duration))
+
+        withAnimation(animation) {
+            scrollScale = 1
+        }
+        
+        store.goTo = nil
     }
 }
 
 // MARK: - Previews
 
-#Preview {
-    NavigationStack {
-        QMSListScreen(store: Store(initialState: QMSListFeature.State()) {
-            QMSListFeature()
-        })
+@available(iOS 17, *)
+#Preview("QMS List") {
+    @Previewable @State var store = Store(
+        initialState: QMSListFeature.State()
+    ) {
+        QMSListFeature()
     }
+    
+    return NavigationStack {
+        QMSListScreen(store: store)
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+}
+
+@available(iOS 17, *)
+#Preview("QMS List Empty") {
+    @Previewable @State var store = Store(
+        initialState: QMSListFeature.State(viewState: .empty)
+    ) {
+        QMSListFeature()
+    } withDependencies: {
+        $0.qmsClient.loadChatList = { try await Task.never() }
+    }
+    
+    return NavigationStack {
+        QMSListScreen(store: store)
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
+}
+
+@available(iOS 17, *)
+#Preview("QMS List Error") {
+    @Previewable @State var store = Store(
+        initialState: QMSListFeature.State(viewState: .error)
+    ) {
+        QMSListFeature()
+    } withDependencies: {
+        $0.qmsClient.loadChatList = { try await Task.never() }
+    }
+    
+    return NavigationStack {
+        QMSListScreen(store: store)
+    }
+    .environment(\.tintColor, Color(.Theme.primary))
 }

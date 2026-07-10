@@ -136,7 +136,7 @@ struct ArticleElementView: View {
             showFullScreenGallery.toggle()
         }
         .fullScreenCover(isPresented: $showFullScreenGallery) {
-            TabViewGallery(gallery: [element.url], selectedImageID: selectedImageID)
+            TabViewGallery(model: GalleryModel(urls: [element.url], selectedId: selectedImageID))
         }
     }
     
@@ -172,7 +172,7 @@ struct ArticleElementView: View {
         .indexViewStyle(.page(backgroundDisplayMode: .always))
         .padding(.bottom, -16)
         .fullScreenCover(isPresented: $showFullScreenGallery) {
-            TabViewGallery(gallery: element.map{ $0.url }, selectedImageID: selectedImageID)
+            TabViewGallery(model: GalleryModel(urls: element.map(\.url), selectedId: selectedImageID))
         }
     }
     

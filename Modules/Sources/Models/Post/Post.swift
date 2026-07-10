@@ -12,7 +12,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     // MARK: - Properties
     
     public let id: Int
-    public let flag: Int
+    public let flag: ForumFlag
     public let content: String
     public let author: Author
     public let attachments: [Attachment]
@@ -20,20 +20,51 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     public let lastEdit: LastEdit?
     private let rawKarma: Int
     
+    public var isPinned: Bool {
+        return flag.contains(.pinned)
+    }
+    
+    public var isHidden: Bool {
+        return flag.contains(.hidden)
+    }
+    
     public var isDeleted: Bool {
-        return flag & 4 > 0
+        return flag.contains(.closed)
+    }
+    
+    public var isProtected: Bool {
+        return flag.contains(.protected)
+    }
+    
+    public var isLastEditHidden: Bool {
+        return !flag.contains(.marker)
+    }
+    
+    public var canModerate: Bool {
+        return flag.contains(.canModerate)
     }
     
     public var canEdit: Bool {
-        return flag & 128 > 0
+        return flag.contains(.canEdit)
     }
     
     public var canDelete: Bool {
-        return flag & 256 > 0
+        return flag.contains(.canDelete)
     }
     
-    public var karma: Int {
-        return rawKarma >> 3
+    public var karma: Int? {
+        let karma = rawKarma >> 3
+        let hasVotes = rawKarma & 2 > 0
+        let canBeChanged = rawKarma & 1 > 0
+        if canBeChanged {
+            if karma != 0 {
+                return karma
+            }
+            if hasVotes && karma == 0 {
+                return 0
+            }
+        }
+        return nil
     }
     
     public var canChangeKarma: Bool {
@@ -64,7 +95,7 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
     
     public init(
         id: Int,
-        flag: Int,
+        flag: ForumFlag,
         content: String,
         author: Author,
         karma: Int,
@@ -107,6 +138,10 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
         public let signature: String
         public let reputationCount: Int
         
+        public var isOnline: Bool {
+            (Date().timeIntervalSince1970 - lastSeenDate.timeIntervalSince1970) < 900
+        }
+        
         public init(
             id: Int,
             name: String,
@@ -135,11 +170,11 @@ public struct Post: Sendable, Hashable, Identifiable, Codable {
 
 // MARK: - Mocks
 
-extension Post {
+public extension Post {
     static func mock(id: Int = 0) -> Post {
         return Post(
             id: id,
-            flag: 384,
+            flag: [.closed, .hidden, .marker, .protected, .canDelete, .canEdit, .canModerate],
             content: "[snapback]123[/snapback], Lorem ipsum...\n[font=fontello]4[/font]",
             author: Author(
                 id: 6176341,
@@ -150,7 +185,7 @@ extension Post {
                 signature: "",
                 reputationCount: 312
             ),
-            karma: 1,
+            karma: 15,
             attachments: [
                 Attachment(
                     id: 14308454,

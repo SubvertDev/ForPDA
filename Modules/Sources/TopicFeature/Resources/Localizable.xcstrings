@@ -11,6 +11,16 @@
         }
       }
     },
+    "About Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "О теме"
+          }
+        }
+      }
+    },
     "Add to favorites" : {
       "localizations" : {
         "ru" : {
@@ -51,12 +61,52 @@
         }
       }
     },
+    "Are you sure, that you want to delete this topic?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить эту тему?"
+          }
+        }
+      }
+    },
+    "Are you sure, that you want to restore this post?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите восстановить этот пост?"
+          }
+        }
+      }
+    },
+    "Close Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Закрыть тему"
+          }
+        }
+      }
+    },
     "Copy Link" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Скопировать ссылку"
+          }
+        }
+      }
+    },
+    "Delete Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить тему"
           }
         }
       }
@@ -71,12 +121,12 @@
         }
       }
     },
-    "Editing posts with attachments is not yet supported" : {
+    "Edit" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Редактирование постов с вложениями пока что не поддерживается"
+            "value" : "Редактировать"
           }
         }
       }
@@ -101,12 +151,22 @@
         }
       }
     },
-    "IN DEVELOPMENT" : {
+    "Hide" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "В РАЗРАБОТКЕ"
+            "value" : "Скрыть тему"
+          }
+        }
+      }
+    },
+    "Karma History" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "История кармы"
           }
         }
       }
@@ -127,6 +187,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Загружаем..."
+          }
+        }
+      }
+    },
+    "Move" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Переместить"
           }
         }
       }
@@ -181,6 +251,16 @@
         }
       }
     },
+    "Open Topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть тему"
+          }
+        }
+      }
+    },
     "Poll" : {
       "localizations" : {
         "ru" : {
@@ -211,12 +291,32 @@
         }
       }
     },
+    "Post restored" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пост восстановлен"
+          }
+        }
+      }
+    },
     "Posts Filter" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Фильтр постов"
+          }
+        }
+      }
+    },
+    "Posts moved" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посты перемещены"
           }
         }
       }
@@ -231,12 +331,32 @@
         }
       }
     },
+    "Remove Hide" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Убрать скрытие темы"
+          }
+        }
+      }
+    },
     "Removed from favorites" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Удалено из избранного"
+          }
+        }
+      }
+    },
+    "Report sent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жалоба отправлена"
           }
         }
       }
@@ -261,12 +381,42 @@
         }
       }
     },
+    "The topic has been edited" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема отредактирована"
+          }
+        }
+      }
+    },
     "Today, %@" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Сегодня, %@"
+          }
+        }
+      }
+    },
+    "Tools" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инструменты"
+          }
+        }
+      }
+    },
+    "Topic deleted" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема удалена"
           }
         }
       }
@@ -281,12 +431,22 @@
         }
       }
     },
-    "Understood" : {
+    "Topic Tickets" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Понятно"
+            "value" : "Тикеты темы"
+          }
+        }
+      }
+    },
+    "Unable to delete topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось удалить тему"
           }
         }
       }

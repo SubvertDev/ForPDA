@@ -17,7 +17,7 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     public let authorId: Int
     public let authorName: String
     public let reason: String
-    public let modified: VoteModified?
+    public var modified: VoteModified?
     public let createdIn: VoteCreatedIn
     public let createdAt: Date
     public let isDown: Bool
@@ -63,14 +63,14 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     }
     
     public var markLabel: String {
-        flag == 1 ? "Raised" : "Lowered"
+        !isDown ? "Raised" : "Lowered"
     }
     
     public var arrowSymbol: SFSymbol {
         if #available(iOS 17.0, *) {
-            return flag == 1 ? .arrowshapeUpFill : .arrowshapeDownFill
+            return !isDown ? .arrowshapeUpFill : .arrowshapeDownFill
         } else {
-            return flag == 1 ? .arrowUp : .arrowDown
+            return !isDown ? .arrowUp : .arrowDown
         }
     }
     
@@ -109,11 +109,13 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
     public struct VoteModified: Codable, Hashable, Sendable {
         public let userId: Int
         public let userName: String
+        public let modifiedAt: Date
         public let isDenied: Bool
         
-        public init(userId: Int, userName: String, isDenied: Bool) {
+        public init(userId: Int, userName: String, modifiedAt: Date, isDenied: Bool) {
             self.userId = userId
             self.userName = userName
+            self.modifiedAt = modifiedAt
             self.isDenied = isDenied
         }
     }
@@ -123,7 +125,7 @@ public struct ReputationVote: Decodable, Hashable, Sendable, Identifiable {
 
 public extension ReputationVote {
     static let mock = ReputationVote(
-        id: 1,
+        id: Int.random(in: 1..<1000000),
         flag: 1,
         toId: 23232,
         toName: "AirFlare",
@@ -135,4 +137,25 @@ public extension ReputationVote {
         createdAt: .now,
         isDown: false
     )
+    
+    static func mockModified(isDenied: Bool) -> Self {
+        return ReputationVote(
+            id: Int.random(in: 1..<1000000),
+            flag: 1,
+            toId: 25266252,
+            toName: "Test",
+            authorId: 12345678,
+            authorName: "Author",
+            reason: "Noooooo",
+            modified: .init(
+                userId: 1709,
+                userName: "AirFlare",
+                modifiedAt: Date.now,
+                isDenied: isDenied
+            ),
+            createdIn: .profile,
+            createdAt: Date.now,
+            isDown: true
+        )
+    }
 }

@@ -16,23 +16,32 @@ public struct TopicRow: View {
     public let title: UITitleType
     public let date: Date
     public let username: String
+    public let isMoved: Bool
     public let isClosed: Bool
     public let isUnread: Bool
+    public let isHatUpdated: Bool
+    public let hasHatUpdateTracking: Bool
     public let onAction: (_ unreadTapped: Bool) -> Void
     
     public init(
         title: UITitleType,
         date: Date,
         username: String,
+        isMoved: Bool = false,
         isClosed: Bool,
         isUnread: Bool,
+        isHatUpdated: Bool = false,
+        hasHatUpdateTracking: Bool = false,
         onAction: @escaping (_ unreadTapped: Bool) -> Void
     ) {
         self.title = title
         self.date = date
         self.username = username
+        self.isMoved = isMoved
         self.isClosed = isClosed
         self.isUnread = isUnread
+        self.isHatUpdated = isHatUpdated
+        self.hasHatUpdateTracking = hasHatUpdateTracking
         self.onAction = onAction
     }
     
@@ -72,8 +81,26 @@ public struct TopicRow: View {
                 Spacer(minLength: 0)
                 
                 HStack(spacing: 0) {
+                    if hasHatUpdateTracking {
+                        Image(systemSymbol: .bellFill)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(isHatUpdated ? .green : Color(.Main.greyAlpha))
+                            .padding(.trailing, isUnread ? -2 : 12)
+                    }
+                    
                     if isClosed {
                         Image(systemSymbol: .lock)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundStyle(Color(.Labels.secondary))
+                            .padding(.trailing, isUnread ? -2 : 12)
+                    }
+                    
+                    if isMoved {
+                        Image(systemSymbol: .arrowRightCircle)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 16, height: 16)
@@ -125,6 +152,16 @@ public struct TopicRow: View {
             isClosed: false,
             isUnread: false,
             onAction: { print($0 ? "Unread tapped" : "Row tapped") }
+        )
+        
+        TopicRow(
+            title: .plain("Moved topic example"),
+            date: .now,
+            username: "qwerty",
+            isMoved: true,
+            isClosed: false,
+            isUnread: false,
+            onAction: { print($0 ? "Unread badge is unsupported in this case" : "Moved tapped") }
         )
         
         TopicRow(

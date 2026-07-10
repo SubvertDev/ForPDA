@@ -12,27 +12,47 @@ public struct TopicInfo: Sendable, Hashable, Codable, Identifiable {
     public let id: Int
     public let name: String
     public let description: String
-    public let flag: Int
+    public let flag: ForumFlag
     public let postsCount: Int
     public let lastPost: LastPost
     
+    public var isMoved: Bool {
+        return flag.contains(.marker)
+    }
+    
     public var isUnread: Bool {
-        return (flag & 32) != 0
+        return flag.contains(.updated)
     }
     
     public var isClosed: Bool {
-        return (flag & 4) != 0
+        return flag.contains(.closed)
     }
     
     public var isPinned: Bool {
-        return (flag & 1) != 0
+        return flag.contains(.pinned)
+    }
+    
+    public var isHidden: Bool {
+        return flag.contains(.hidden)
     }
     
     public var isFavorite: Bool {
-        return (flag & 8) != 0
+        return flag.contains(.favorite)
+    }
+    
+    public var canEdit: Bool {
+        return flag.contains(.canEdit)
+    }
+    
+    public var canDelete: Bool {
+        return flag.contains(.canDelete)
+    }
+    
+    public var canModerate: Bool {
+        return flag.contains(.canModerate)
     }
         
-    public init(id: Int, name: String, description: String, flag: Int, postsCount: Int, lastPost: LastPost) {
+    public init(id: Int, name: String, description: String, flag: ForumFlag, postsCount: Int, lastPost: LastPost) {
         self.id = id
         self.name = name
         self.description = description
@@ -73,7 +93,7 @@ public extension TopicInfo {
         id: 21,
         name: "Example of pinned topic",
         description: "",
-        flag: 37,
+        flag: [.pinned, .canEdit, .canPost, .canDelete, .canModerate],
         postsCount: 1,
         lastPost: TopicInfo.LastPost(
             date: Date(timeIntervalSince1970: 1768475013),
@@ -86,7 +106,7 @@ public extension TopicInfo {
         id: Int.random(in: 1..<1000000),
         name: "Topic example. Topic example. Topic example. Topic example. Topic example. Topic example.",
         description: "",
-        flag: 64,
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         postsCount: 10,
         lastPost: TopicInfo.LastPost(
             date: .now,
@@ -99,7 +119,7 @@ public extension TopicInfo {
         id: Int.random(in: 1..<1000000),
         name: "Topic example",
         description: "",
-        flag: 64,
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         postsCount: 10,
         lastPost: TopicInfo.LastPost(
             date: .now,
@@ -112,7 +132,7 @@ public extension TopicInfo {
         id: Int.random(in: 1..<1000000),
         name: "Topic example",
         description: "",
-        flag: 96,
+        flag: [.updated, .canEdit, .canPost, .canDelete, .canModerate],
         postsCount: 10,
         lastPost: TopicInfo.LastPost(
             date: .now,
@@ -125,7 +145,7 @@ public extension TopicInfo {
         id: Int.random(in: 1..<1000000),
         name: "Topic example",
         description: "",
-        flag: 64,
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         postsCount: 10,
         lastPost: TopicInfo.LastPost(
             date: .now.addingTimeInterval(-86400),
@@ -138,7 +158,7 @@ public extension TopicInfo {
         id: Int.random(in: 1..<1000000),
         name: "Topic example",
         description: "",
-        flag: 64,
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         postsCount: 10,
         lastPost: TopicInfo.LastPost(
             date: .now.addingTimeInterval(-86400 * 7),

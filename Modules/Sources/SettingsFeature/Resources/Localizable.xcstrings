@@ -31,22 +31,12 @@
         }
       }
     },
-    "App discussion in Telegram" : {
+    "Backup connection" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Обсуждение приложения в Telegram"
-          }
-        }
-      }
-    },
-    "App discussion on the forum" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обсуждение приложения на форуме"
+            "value" : "Запасное соединение"
           }
         }
       }
@@ -77,16 +67,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Отмена"
-          }
-        }
-      }
-    },
-    "Check new versions on GitHub" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Проверить новые версии на Github"
           }
         }
       }
@@ -173,16 +153,6 @@
         }
       }
     },
-    "GitHub repository" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub репозиторий"
-          }
-        }
-      }
-    },
     "Hide tabbar on scroll" : {
       "localizations" : {
         "ru" : {
@@ -229,26 +199,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Светлая"
-          }
-        }
-      }
-    },
-    "Links" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ссылки"
-          }
-        }
-      }
-    },
-    "List of changes in Telegram" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Список изменений в Telegram"
           }
         }
       }
@@ -333,6 +283,16 @@
         }
       }
     },
+    "Restart required" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Необходим рестарт"
+          }
+        }
+      }
+    },
     "Safari extension" : {
       "localizations" : {
         "ru" : {
@@ -363,6 +323,16 @@
         }
       }
     },
+    "Show all posts in topic" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показывать все посты"
+          }
+        }
+      }
+    },
     "Sky" : {
       "localizations" : {
         "ru" : {
@@ -379,16 +349,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Стартовый экран"
-          }
-        }
-      }
-    },
-    "Support on Boosty" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Поддержать на Boosty"
           }
         }
       }
@@ -423,6 +383,17 @@
         }
       }
     },
+    "Topic" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Тема"
+          }
+        }
+      }
+    },
     "Topic opening" : {
       "localizations" : {
         "ru" : {
@@ -445,6 +416,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Версия %1$@ [%2$@]"
+          }
+        }
+      }
+    },
+    "When you enter a topic, the 'All posts' filter will be selected" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "При заходе в тему будет выбран фильтр ‘Все посты'"
           }
         }
       }

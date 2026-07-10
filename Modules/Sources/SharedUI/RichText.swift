@@ -84,6 +84,7 @@ public struct RichText: View {
             textView?.isSelectable = isSelectable
             textView?.isScrollEnabled = false
             textView?.textDragInteraction?.isEnabled = false
+            textView?.adjustsFontForContentSizeCategory = true
             
             if let font {
                 textView?.font = UIFont.preferredFont(from: font)

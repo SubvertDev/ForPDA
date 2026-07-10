@@ -29,7 +29,6 @@ public struct HistoryFeature: Reducer, Sendable {
         public var pageNavigation = PageNavigationFeature.State(type: .history)
         
         var offset = 0
-        var didLoadOnce = false
         
         public init(
             history: [HistoryRow] = []
@@ -69,7 +68,7 @@ public struct HistoryFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+        Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         
@@ -131,26 +130,22 @@ public struct HistoryFeature: Reducer, Sendable {
                 state.pageNavigation.count = response.historiesCount
                 
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case let .internal(.historyResponse(.failure(error))):
                 // TODO: Handle error
                 print(error)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .delegate:
                 return .none
             }
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

@@ -13,8 +13,8 @@ public struct ForumTemplateRequest {
     
     public enum TemplateAction {
         case get
-        case send([Any])
-        case preview([Any])
+        case send(PDAPIDocument)
+        case preview(PDAPIDocument)
     }
     
     public init(id: Int, action: TemplateAction) {
@@ -27,8 +27,8 @@ extension ForumTemplateRequest.TemplateAction {
     var transferType: ForumCommand.TemplateAction {
         switch self {
         case .get: return .get
-        case .preview: return .preview(Document())
-        case .send: return .send(Document())
+        case .preview(let data): return .preview(data)
+        case .send(let data): return .send(data)
         }
     }
 }

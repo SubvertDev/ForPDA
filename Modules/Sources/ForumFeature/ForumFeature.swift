@@ -15,19 +15,25 @@ import PasteboardClient
 import PersistenceKeys
 import TCAExtensions
 import ToastClient
+import FormFeature
+import ForumStatFeature
+import ForumMoveFeature
+import TopicEditFeature
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
     
     public init() {}
     
-    // MARK: - Localizations
+	// MARK: - Localizations
     
     public enum Localization {
         static let linkCopied = LocalizedStringResource("Link copied", bundle: .module)
+        static let topicMoved = LocalizedStringResource("Topic moved", bundle: .module)
+        static let topicEdited = LocalizedStringResource("The topic has been edited", bundle: .module)
         static let markAsReadSuccess = LocalizedStringResource("Marked as read", bundle: .module)
     }
-    
+
     // MARK: - Enums
     
     public struct SectionExpand: Equatable {
@@ -49,12 +55,24 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
+    // MARK: - Destinations
+    
+    @Reducer
+    public enum Destination {
+        case form(FormFeature)
+        case move(ForumMoveFeature)
+		case stat(ForumStatFeature)
+        case edit(TopicEditFeature)
+    }
+    
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
         @Shared(.userSession) var userSession: UserSession?
+        
+        @Presents public var destination: Destination.State?
 
         public var forumId: Int
         public var forumName: String?
@@ -74,7 +92,6 @@ public struct ForumFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var didLoadOnce = false
         
         public init(
             forumId: Int,
@@ -90,6 +107,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action: ViewAction {
+        case destination(PresentationAction<Destination.Action>)
         case pageNavigation(PageNavigationFeature.Action)
 
         case view(View)
@@ -107,9 +125,10 @@ public struct ForumFeature: Reducer, Sendable {
             
             case contextOptionMenu(ForumOptionContextMenuAction)
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
+            case contextTopicToolsMenu(ForumTopicToolsContextMenuAction)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
-                
+        
         case `internal`(Internal)
         public enum Internal {
             case refresh
@@ -119,10 +138,12 @@ public struct ForumFeature: Reducer, Sendable {
         
         case delegate(Delegate)
         public enum Delegate {
+            case openUser(id: Int)
             case openTopic(id: Int, name: String, goTo: GoTo)
-            case openForum(id: Int, name: String)
+            case openForum(id: Int, name: String?)
             case openAnnouncement(id: Int, name: String)
             case openSearch(on: SearchOn, navigation: ForumInfo?)
+            case openTickets(forumId: Int)
             case handleRedirect(URL)
         }
     }
@@ -138,7 +159,7 @@ public struct ForumFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+        Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         
@@ -147,7 +168,24 @@ public struct ForumFeature: Reducer, Sendable {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 return .send(.internal(.loadForum(offset: newOffset)))
                 
-            case .pageNavigation:
+            case let .destination(.presented(.form(.delegate(.formSent(.topic(id)))))):
+                return .send(.delegate(.openTopic(id: id, name: "", goTo: .first)))
+                
+            case let .destination(.presented(.stat(.delegate(.userTapped(id))))):
+                return .send(.delegate(.openUser(id: id)))
+                
+            case let .destination(.presented(.move(.delegate(.openForum(id))))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicMoved, haptic: .success))
+                    await send(.delegate(.openForum(id: id, name: nil)))
+                }
+                
+            case .destination(.presented(.edit(.delegate(.topicEdited)))):
+                return .run { _ in
+                    await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
+                }
+                
+            case .destination, .pageNavigation:
                 return .none
                 
             case .view(.onFirstAppear):
@@ -184,7 +222,8 @@ public struct ForumFeature: Reducer, Sendable {
                     return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread)))
                 }
                 let goTo = state.appSettings.topicOpeningStrategy.asGoTo
-                return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: goTo)))
+                let topicId = topic.isMoved ? topic.postsCount : topic.id
+                return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: goTo)))
                 
             case let .view(.subforumTapped(forum)):
                 return .send(.delegate(.openForum(id: forum.id, name: forum.name)))
@@ -197,35 +236,82 @@ public struct ForumFeature: Reducer, Sendable {
                 
             case .view(.contextOptionMenu(let action)):
                 switch action {
-                    // TODO: sort, to bookmarks
-                    // TODO: Add analytics
+                case .createTopic:
+                    let formState = FormFeature.State(
+                        type: .topic(
+                            forumId: state.forumId,
+                            content: []
+                        )
+                    )
+                    state.destination = .form(formState)
+                    return .none
+                    
+                case .tickets:
+                    return .send(.delegate(.openTickets(forumId: state.forumId)))
+                    
+                // TODO: sort, to bookmarks
+                // TODO: Add analytics
                 default: return .none
                 }
                 
             case let .view(.contextTopicMenu(action, topic)):
+                let topicId = topic.isMoved ? topic.postsCount : topic.id
                 switch action {
                 case .open:
-                    return .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .first)))
+                    return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .first)))
                     
                 case .goToEnd:
-                    return .concatenate(
-                        .send(.delegate(.openTopic(id: topic.id, name: topic.name, goTo: .unread))),
-                        .send(.internal(.refresh))
-                    )
+                    return .run { send in
+                        await send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .unread)))
+                        await send(.internal(.refresh))
+                    }
+                    
+                case .edit:
+                    state.destination = .edit(TopicEditFeature.State(
+                        id: topic.id, // use only original id
+                        flag: topic.flag,
+                        title: topic.name,
+                        description: topic.description,
+                        supportsPoll: false
+                    ))
+                    return .none
+                }
+                
+            case let .view(.contextTopicToolsMenu(action)):
+                switch action {
+                case .move(let topicId):
+                    state.destination = .move(ForumMoveFeature.State(type: .topic(topicId)))
+                    return .none
+                    
+                case .modify(let action, let topicId, let isUndo):
+                    return .run { send in
+                        let status = try await apiClient.modifyForum(
+                            ids: [topicId],
+                            type: .topic(action),
+                            isUndo: isUndo
+                        )
+                        await send(.internal(.refresh))
+                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                    } catch: { error, send in
+                        analyticsClient.capture(error)
+                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    }
                 }
                 
             case .view(.contextCommonMenu(let action, let id, let isForum)):
                 switch action {
                 case .copyLink:
                     let show = isForum ? "showforum" : "showtopic"
-                    pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)")
+                    let offset = (state.forumId == id && state.pageNavigation.offset > 0) ? "&st=\(state.pageNavigation.offset)" : ""
+                    pasteboardClient.copy("https://4pda.to/forum/index.php?\(show)=\(id)\(offset)")
                     return .run { _ in
                         await toastClient.showToast(ToastMessage(text: Localization.linkCopied, haptic: .success))
                     }
                     
                 case .openInBrowser:
                     let show = isForum ? "showforum" : "showtopic"
-                    let url = URL(string: "https://4pda.to/forum/index.php?\(show)=\(id)")!
+                    let offset = (state.forumId == id && state.pageNavigation.offset > 0) ? "&st=\(state.pageNavigation.offset)" : ""
+                    let url = URL(string: "https://4pda.to/forum/index.php?\(show)=\(id)\(offset)")!
                     return .run { _ in await open(url: url) }
                     
                 case .markRead:
@@ -235,6 +321,10 @@ public struct ForumFeature: Reducer, Sendable {
                         await toastClient.showToast(status ? markedAsRead : .whoopsSomethingWentWrong)
                         await send(.internal(.refresh))
                     }
+                    
+                case .stat:
+                    state.destination = .stat(ForumStatFeature.State(type: .forum(id: state.forumId)))
+                    return .none
                     
                 case .setFavorite(let isFavorite):
                     return .run { [id = id, isFavorite = isFavorite, isForum = isForum] send in
@@ -297,26 +387,23 @@ public struct ForumFeature: Reducer, Sendable {
                 
                 state.isLoadingTopics = false
                 state.isRefreshing = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .internal(.forumResponse(.failure)):
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
             case .delegate:
                 return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
         
         Analytics()
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
+
+extension ForumFeature.Destination.State: Equatable {}

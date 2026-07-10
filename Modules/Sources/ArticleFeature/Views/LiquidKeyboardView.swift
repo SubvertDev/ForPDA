@@ -16,7 +16,7 @@ struct LiquidKeyboardView: View {
     
     // MARK: - Properties
     
-    @Perception.Bindable var store: StoreOf<ArticleFeature>
+    @SwiftUI.Bindable var store: StoreOf<ArticleFeature>
     @FocusState.Binding var focus: ArticleFeature.State.Field?
     @Binding var isExpanded: Bool
     @Binding var isScrollDownVisible: Bool
@@ -48,7 +48,7 @@ struct LiquidKeyboardView: View {
     // MARK: - Body
     
     var body: some View {
-        WithPerceptionTracking {
+        _PerceptionLocals.$skipPerceptionChecking.withValue(true) {
             GlassEffectContainer(spacing: 16) {
                 VStack(spacing: 10) {
                     if let comment = store.replyComment {

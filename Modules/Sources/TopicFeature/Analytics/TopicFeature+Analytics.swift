@@ -23,20 +23,33 @@ extension TopicFeature {
                         .view(.onNextAppear),
                         .view(.finishedPostAnimation),
                         .view(.changeKarmaTapped),
+                        .view(.karmaHistoryTapped),
                         .view(.topicPollVoteButtonTapped),
                         .view(.searchButtonTapped),
+                        .internal(.initUserSessionInfo),
                         .internal(.loadTypes),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
+                        .internal(.jumpToPostAfterKarma),
                         .internal(.changeKarma),
                         .internal(.voteInPoll),
                         .internal(.load),
                         .internal(.refresh),
-                        .pageNavigation,
                         .destination,
                         .delegate,
                         .binding:
                     break
+                    
+                case .pageNavigation(.offsetChanged(to: _)):
+                    analytics.addBreadcrumb(
+                        category: "TopicPageNavigation",
+                        message: nil,
+                        data: [
+                            "id": state.topicId,
+                            "page": state.pageNavigation.page
+                        ],
+                        type: "ui"
+                    )
                     
                 case .view(.onRefresh):
                     analytics.log(TopicEvent.onRefresh)
@@ -66,8 +79,6 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuPostEdit(post.id))
                     case .report(let postId):
                         analytics.log(TopicEvent.menuPostReport(postId))
-                    case .delete(let postId):
-                        analytics.log(TopicEvent.menuPostDelete(postId))
                     case .changeReputation(let postId, let userId, _):
                         analytics.log(TopicEvent.menuChangeReputation(postId, userId))
                     case .userPostsInTopic(let userId):
@@ -88,15 +99,22 @@ extension TopicFeature {
                         analytics.log(TopicEvent.menuGoToEnd)
                     case .setFavorite:
                         analytics.log(TopicEvent.menuSetFavorite)
+                    case .about:
+                        analytics.log(TopicEvent.menuAboutTopic)
+                    case .edit:
+                        analytics.log(TopicEvent.menuEditTopic)
                     case .writePost:
                         analytics.log(TopicEvent.menuWritePost)
+                    case .writePostWithTemplate:
+                        analytics.log(TopicEvent.menuWritePostWithTemplate)
                     }
+                    
+                case .view(.contextToolsMenu), .view(.contextPostToolsMenu):
+                    // MARK: Moderator tools are skip analytics
+                    break
 
                 case let .view(.textQuoted(post, _)):
                     analytics.log(TopicEvent.textQuoted(post.id))
-
-                case .view(.editWarningSheetCloseButtonTapped):
-                    analytics.log(TopicEvent.editWarningSheetClosed)
                     
                 case .internal(.loadTopic):
                     break
@@ -105,6 +123,9 @@ extension TopicFeature {
                     break
                     
                 case .internal(.setFavoriteResponse):
+                    break
+                    
+                case .pageNavigation:
                     break
                 }
                 

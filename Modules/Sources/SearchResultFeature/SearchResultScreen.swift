@@ -23,9 +23,13 @@ public struct SearchResultScreen: View {
     
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -45,19 +49,19 @@ public struct SearchResultScreen: View {
                 if !store.isLoading {
                     if !store.content.isEmpty {
                         List {
-                            if shouldShowNavigation {
+                            if shouldShowInlineNavigation {
                                 Navigation()
                             }
                             
                             ContentSection()
                             
-                            if shouldShowNavigation {
+                            if shouldShowInlineNavigation {
                                 Navigation()
                             }
                         }
                         .listStyle(.plain)
                         .scrollContentBackground(.hidden)
-                        ._inScrollContentDetector(state: $navigationMinimized)
+                        ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     } else {
                         NothingFound()
                     }
@@ -73,11 +77,9 @@ public struct SearchResultScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -131,22 +133,31 @@ public struct SearchResultScreen: View {
             .padding(.bottom, 4)
             .padding(.top, 8)
             
-            PostRowView(
-                state: .init(post: post.post),
-                action: { _ in },
-                menuAction: { _ in }
-            )
-            .highPriorityGesture(
-                TapGesture()
-                    .onEnded {
-                        send(.postTapped(post.topicId, post.id))
-                    }
-            )
+            WithPerceptionTracking {
+                let userSessionInfo: UserSessionInfo? = if let user = store.userSessionInfo {
+                    UserSessionInfo(postsCount: user.replies, group: user.group)
+                } else { nil }
+                PostRowView(
+                    state: .init(
+                        post: post.post,
+                        userSessionInfo: userSessionInfo
+                    ),
+                    action: { _ in },
+                    menuAction: { _ in },
+                    toolsMenuAction: { _ in }
+                )
+                .highPriorityGesture(
+                    TapGesture()
+                        .onEnded {
+                            send(.postTapped(post.topicId, post.id))
+                        }
+                )
+            }
         }
         .padding(.vertical, 12)
         .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(post.isDeleted ? Color(.Background.quaternary) : Color(.Background.primary))
-        .disabled(post.topicName.isEmpty && post.isDeleted)
+        .listRowBackground(post.colorMask)
+        .disabled(post.topicName.isEmpty && post.isDisabled)
     }
     
     // MARK: - Topic Row
@@ -222,7 +233,7 @@ public struct SearchResultScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+        PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
             .listRowBackground(Color(.Background.primary))
     }
     
@@ -252,11 +263,29 @@ public struct SearchResultScreen: View {
     }
 }
 
+// MARK: - Extensions
+
 extension SearchResultScreen {
     func makeAttributed(_ text: String, _ font: UIFont.TextStyle) -> NSAttributedString? {
         guard !text.isEmpty else { return nil }
         return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: font)])
             .render(text: text)
+    }
+}
+
+extension UIContent.UIHybridPost {
+    var isDisabled: Bool {
+        return !post.post.canModerate && (post.post.isDeleted || post.post.isHidden)
+    }
+    
+    var colorMask: Color {
+        return if post.post.isDeleted {
+            Color(.Background.quaternary)
+        } else if post.post.isHidden {
+            Color(.Main.redAlpha)
+        } else {
+            Color(.Background.primary)
+        }
     }
 }
 

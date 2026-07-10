@@ -21,6 +21,10 @@ public struct AnnouncementScreen: View {
     @Perception.Bindable public var store: StoreOf<AnnouncementFeature>
     @Environment(\.tintColor) private var tintColor
     
+    private var title: String {
+        return store.name ?? String(localized: "Loading...", bundle: .module)
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<AnnouncementFeature>) {
@@ -48,7 +52,7 @@ public struct AnnouncementScreen: View {
                         .frame(width: 24, height: 24)
                 }
             }
-            .navigationTitle(Text(store.name ?? "Загружаем..."))
+            .navigationTitle(Text(title))
             ._toolbarTitleDisplayMode(.inline)
             .toolbar {
                 // TODO: Announcement Info?
@@ -66,9 +70,9 @@ public struct AnnouncementScreen: View {
         VStack(spacing: 0) {
             ForEach(store.types, id: \.self) { main in
                 ForEach(main, id: \.self) { type in
-                    TopicView(type: type, attachments: []) { url in
+                    TopicView(type: type, attachments: [], userSession: nil) { url in
                         send(.urlTapped(url))
-                    } // TODO: attachments
+                    }
                 }
             }
         }

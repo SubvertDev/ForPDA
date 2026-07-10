@@ -12,6 +12,10 @@ import SFSafeSymbols
 import SharedUI
 import Models
 import BBBuilder
+import FormFeature
+import ForumStatFeature
+import ForumMoveFeature
+import TopicEditFeature
 
 @ViewAction(for: ForumFeature.self)
 public struct ForumScreen: View {
@@ -22,9 +26,13 @@ public struct ForumScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -65,7 +73,7 @@ public struct ForumScreen: View {
                     }
                     .scrollContentBackground(.hidden)
                     .scrollDismissesKeyboard(.immediately)
-                    ._inScrollContentDetector(state: $navigationMinimized)
+                    ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     .refreshable {
                         await send(.onRefresh).finish()
                     }
@@ -76,14 +84,11 @@ public struct ForumScreen: View {
             }
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
-            .navigationTitle(Text(store.forumName ?? "Загрузка..."))
-            ._toolbarTitleDisplayMode(.large)
+            .navigations(store: store)
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -122,12 +127,28 @@ public struct ForumScreen: View {
     private func OptionsMenu() -> some View {
         Menu {
             if let forum = store.forum {
+                if forum.canCreateTopic {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Create Topic", bundle: .module), symbol: .plusCircle) {
+                            send(.contextOptionMenu(.createTopic))
+                        }
+                    }
+                }
+                
                 CommonContextMenu(
                     id: forum.id,
                     isFavorite: forum.isFavorite,
                     isUnread: false,
                     isForum: true
                 )
+                
+                if forum.canModerate {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Forum Tickets", bundle: .module), symbol: .exclamationmarkBubble) {
+                            send(.contextOptionMenu(.tickets))
+                        }
+                    }
+                }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
@@ -182,6 +203,7 @@ public struct ForumScreen: View {
                             title: .plain(topic.name),
                             date: topic.lastPost.date,
                             username: topic.lastPost.username,
+                            isMoved: topic.isMoved,
                             isClosed: topic.isClosed,
                             isUnread: topic.isUnread
                         ) { unreadTapped in
@@ -191,7 +213,13 @@ public struct ForumScreen: View {
                             TopicContextMenu(topic: topic)
                             
                             Section {
-                                CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                                if !topic.isMoved {
+                                    CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                                }
+                                
+                                if topic.canModerate {
+                                    TopicToolsContextMenu(topic: topic)
+                                }
                             }
                         }
                         .listRowBackground(
@@ -230,6 +258,64 @@ public struct ForumScreen: View {
                 ContextButton(text: LocalizedStringResource("Go To End", bundle: .module), symbol: .chevronRight2) {
                     send(.contextTopicMenu(.goToEnd, topic))
                 }
+                
+                if topic.canEdit {
+                    ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
+                        send(.contextTopicMenu(.edit, topic))
+                    }
+                }
+            }
+        }
+    }
+    
+    // MARK: - Topic Tools Context Menu
+    
+    @ViewBuilder
+    private func TopicToolsContextMenu(topic: TopicInfo) -> some View {
+        Menu {
+            ContextButton(
+                text: topic.isPinned
+                ? LocalizedStringResource("Unpin", bundle: .module)
+                : LocalizedStringResource("Pin", bundle: .module),
+                symbol: topic.isPinned ? .pinFill : .pin
+            ) {
+                send(.contextTopicToolsMenu(.modify(.pin, topic.id, topic.isPinned)))
+            }
+            
+            ContextButton(
+                text: topic.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                send(.contextTopicToolsMenu(.modify(.hide, topic.id, topic.isHidden)))
+            }
+            
+            ContextButton(
+                text: topic.isClosed
+                ? LocalizedStringResource("Open", bundle: .module)
+                : LocalizedStringResource("Close", bundle: .module),
+                symbol: topic.isClosed ? .lockFill : .lock
+            ) {
+                send(.contextTopicToolsMenu(.modify(.close, topic.id, topic.isClosed)))
+            }
+            
+            if topic.canDelete {
+                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
+                    send(.contextTopicToolsMenu(.modify(.delete, topic.id, false)))
+                }
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                send(.contextTopicToolsMenu(.move(topic.id)))
+            }
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
             }
         }
     }
@@ -238,8 +324,8 @@ public struct ForumScreen: View {
     
     @ViewBuilder
     private func Navigation(pinned: Bool) -> some View {
-        if !pinned, shouldShowNavigation {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+        if !pinned, shouldShowInlineNavigation {
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
         }
@@ -309,14 +395,14 @@ public struct ForumScreen: View {
             send(.contextCommonMenu(.openInBrowser, id, isForum))
         }
         
-        if store.isUserAuthorized {
-            if isUnread {
-                ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
-                    send(.contextCommonMenu(.markRead, id, isForum))
-                }
+        if store.isUserAuthorized, isUnread {
+            ContextButton(text: LocalizedStringResource("Mark Read", bundle: .module), symbol: .checkmarkCircle) {
+                send(.contextCommonMenu(.markRead, id, isForum))
             }
-            
-            Section {
+        }
+        
+        Section {
+            if store.isUserAuthorized {
                 ContextButton(
                     text: isFavorite
                     ? LocalizedStringResource("Remove from favorites", bundle: .module)
@@ -324,6 +410,12 @@ public struct ForumScreen: View {
                     symbol: isFavorite ? .starFill : .star
                 ) {
                     send(.contextCommonMenu(.setFavorite(isFavorite), id, isForum))
+                }
+            }
+            
+            if isForum {
+                ContextButton(text: LocalizedStringResource("About Forum", bundle: .module), symbol: .infoCircle) {
+                    send(.contextCommonMenu(.stat, id, isForum))
                 }
             }
         }
@@ -356,11 +448,94 @@ public struct ForumScreen: View {
     }
 }
 
+// MARK: - Navigation Modifier
+
+struct NavigationModifier: ViewModifier {
+    
+    @Perception.Bindable private var store: StoreOf<ForumFeature>
+    @Environment(\.tintColor) private var tintColor
+    
+    private var title: String {
+        return store.forumName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
+    init(store: StoreOf<ForumFeature>) {
+        self.store = store
+    }
+    
+    func body(content: Content) -> some View {
+        WithPerceptionTracking {
+            content
+                .navigationTitle(Text(title))
+                ._toolbarTitleDisplayMode(.large)
+                .modifier(FullScreenCoverModifier(store: store))
+                .modifier(SheetModifier(store: store))
+        }
+    }
+    
+    struct FullScreenCoverModifier: ViewModifier {
+        @Perception.Bindable private var store: StoreOf<ForumFeature>
+        @Environment(\.tintColor) private var tintColor
+        
+        init(store: StoreOf<ForumFeature>) {
+            self.store = store
+        }
+        
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
+                        NavigationStack {
+                            FormScreen(store: store)
+                        }
+                    }
+            }
+        }
+    }
+    
+    struct SheetModifier: ViewModifier {
+        @Perception.Bindable private var store: StoreOf<ForumFeature>
+        @Environment(\.tintColor) private var tintColor
+        
+        init(store: StoreOf<ForumFeature>) {
+            self.store = store
+        }
+        
+        func body(content: Content) -> some View {
+            WithPerceptionTracking {
+                content
+                    .sheet(item: $store.scope(\.$destination, action: \.destination).stat) { store in
+                        NavigationStack {
+                            ForumStatView(store: store)
+                        }
+                    }
+                    .sheet(item: $store.scope(\.$destination, action: \.destination).edit) { store in
+                        NavigationStack {
+                            TopicEditView(store: store)
+                        }
+                    }
+                    .fittedSheet(
+                        item: $store.scope(\.$destination, action: \.destination).move,
+                        embedIntoNavStack: true
+                    ) { store in
+                        ForumMoveView(store: store)
+                    }
+            }
+        }
+    }
+}
+
 // MARK: - Extensions
 
 extension Bundle {
     static var models: Bundle? {
         return Bundle.allBundles.first(where: { $0.bundlePath.contains("Models") })
+    }
+}
+
+extension View {
+    func navigations(store: StoreOf<ForumFeature>) -> some View {
+        self.modifier(NavigationModifier(store: store))
     }
 }
 
@@ -383,10 +558,6 @@ extension Forum {
                 )
             ) {
                 ForumFeature()
-            } withDependencies: {
-                $0.apiClient.getForum = { @Sendable _, _, _, _ in
-                    return .finished()
-                }
             }
         )
     }

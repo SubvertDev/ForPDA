@@ -16,6 +16,7 @@ import HapticClient
 import AnalyticsClient
 import ToastClient
 import NotificationsClient
+import AuthFeature
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {
@@ -38,12 +39,22 @@ public struct ArticleFeature: Reducer, Sendable {
     // MARK: - Destinations
     
     @Reducer
-    public enum Destination: Hashable {
+    public enum Destination {
         @ReducerCaseIgnored
         case share(URL)
-        case alert(AlertState<Alert>)
         
+        case auth(AuthFeature)
+        
+        // Alert
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
         public enum Alert { case ok }
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case auth(AuthFeature.Action)
+        }
     }
     
     // MARK: - State
@@ -83,7 +94,6 @@ public struct ArticleFeature: Reducer, Sendable {
         var refreshRequestFinished = false
         var refreshTimePassed = false
         
-        var didLoadOnce = false
         
         public init(
             destination: Destination.State? = nil,
@@ -144,7 +154,6 @@ public struct ArticleFeature: Reducer, Sendable {
         case delegate(Delegate)
         public enum Delegate {
             case handleDeeplink(Int)
-            case unauthorizedAction
         }
     }
     
@@ -184,6 +193,10 @@ public struct ArticleFeature: Reducer, Sendable {
                         state.focus = .comment
                     }
                 }
+                return .none
+                
+            case .destination(.presented(.auth(.delegate(.loginSuccess(userId: _))))):
+                state.destination = nil
                 return .none
                 
             case .comments:
@@ -284,9 +297,12 @@ public struct ArticleFeature: Reducer, Sendable {
                 
             case .sendCommentButtonTapped:
                 guard state.isAuthorized else {
-                    return .send(.delegate(.unauthorizedAction))
+                    state.destination = .auth(AuthFeature.State())
+                    return .none
                 }
+                
                 state.isUploadingComment = true
+                
                 return .run { [articleId = state.articlePreview.id,
                                replyComment = state.replyComment,
                                message = state.commentText] send in
@@ -350,16 +366,19 @@ public struct ArticleFeature: Reducer, Sendable {
                 }
                 
                 // TODO: Cache articles parsing result
-                return .run { send in
-                    let result = await Result { try await parsingClient.parseArticleElements(article) }
-                    await send(._parseArticleElements(result))
-                }
+                return .merge(
+                    .run { send in
+                        let result = await Result { try await parsingClient.parseArticleElements(article) }
+                        await send(._parseArticleElements(result))
+                    },
+                    .cancel(id: CancelID.loading)
+                )
                 
             case ._articleResponse(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
-                reportFullyDisplayed(&state)
-                return .none
+                analyticsClient.reportFullyDisplayed()
+                return .cancel(id: CancelID.loading)
                 
             case let ._commentResponse(.success(type)):
                 state.isUploadingComment = false
@@ -367,10 +386,10 @@ public struct ArticleFeature: Reducer, Sendable {
                 guard !type.isError else { return showToast(type: type) }
                 state.commentText.removeAll()
                 state.replyComment = nil
-                return .concatenate([
+                return .merge(
                     getArticle(id: state.articlePreview.id, useCache: false),
                     showToast(type: type)
-                ])
+                )
                 
             case let ._commentResponse(.failure(error)):
                 print(error) // TODO: Catch to Issue
@@ -385,7 +404,7 @@ public struct ArticleFeature: Reducer, Sendable {
                     state.scrollToId = pendingScrollToId
                     state.pendingScrollToId = nil
                 }
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     var urls: [URL] = []
                     for case let .image(image) in elements {
@@ -397,7 +416,7 @@ public struct ArticleFeature: Reducer, Sendable {
             case ._parseArticleElements(.failure):
                 state.isLoading = false
                 state.destination = .alert(.error)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case ._pollVoteResponse(.success):
@@ -422,13 +441,7 @@ public struct ArticleFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
+        
     private func loadingIndicator() -> EffectOf<Self> {
         return .run { send in
             try await clock.sleep(for: .seconds(0.5))
@@ -438,18 +451,15 @@ public struct ArticleFeature: Reducer, Sendable {
     }
     
     private func getArticle(id: Int, useCache: Bool = true) -> EffectOf<Self> {
-        return .concatenate([
-            .run { send in
-                do {
-                    for try await article in try await apiClient.getArticle(id, .cacheAndLoad) {
-                        await send(._articleResponse(.success(article)))
-                    }
-                } catch {
-                    await send(._articleResponse(.failure(error)))
+        return .run { send in
+            do {
+                for try await article in try await apiClient.getArticle(id: id, policy: useCache ? .cacheAndLoad : .skipCache) {
+                    await send(._articleResponse(.success(article)))
                 }
-            },
-            .cancel(id: CancelID.loading)
-        ])
+            } catch {
+                await send(._articleResponse(.failure(error)))
+            }
+        }
     }
     
     private func handleMenuOptions(action: ArticleMenuAction, state: inout State) -> Effect<Action> {

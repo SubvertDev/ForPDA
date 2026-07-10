@@ -14,8 +14,8 @@ public struct StackTabView: View {
     
     public var body: some View {
         WithPerceptionTracking {
-            NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                Path.view(store.scope(state: \.root, action: \.root))
+            NavigationStack(path: $store.scope(\.path, action: \.path)) {
+                Path.view(store.scope(\.root, action: \.root))
             } destination: { store in
                 WithPerceptionTracking {
                     Path.view(store)

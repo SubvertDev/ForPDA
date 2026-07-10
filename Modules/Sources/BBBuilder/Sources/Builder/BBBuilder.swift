@@ -408,6 +408,7 @@ public struct BBBuilder {
         case .snapback(let postId):
             let image = UIImage(resource: .snapback)
             let attachment = AsyncTextAttachment(image: image, displaySize: CGSize(width: 16, height: 16))
+            attachment.displaySizeTextStyle = .callout
             
             let postId = Int(postId.string)!
             attachment.link = URL(string: "https://4pda.to/forum/index.php?act=findpost&pid=\(postId)")!
@@ -456,7 +457,8 @@ public struct BBBuilder {
                 asyncAttachment.image = UIImage.placeholder(color: .gray, size: CGSize(width: 32, height: 32)) // TODO: Skeleton loader
                 attachmentString = NSAttributedString(attachment: asyncAttachment)
             } else {
-                let downloadUrl = URL(string: "https://4pda.to/forum/dl/post/\(id)/\(name)")!
+                let downloadLink = "https://4pda.to/forum/dl/post/\(id)/\(name)"
+                let downloadUrl = URL(string: downloadLink.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!)!
                 let image = UIImage(systemSymbol: .arrowDownDoc).withTintColor(.tintColor)//, withConfiguration: config)
                 let textAttachment = AsyncTextAttachment(image: image)//, displaySize: CGSize(width: 16, height: 16))
                 textAttachment.link = downloadUrl
@@ -495,8 +497,12 @@ public struct BBBuilder {
             
         case .smile(let smile):
             let smile = BBSmile.list.first(where: { $0.resourceName == smile.string })!
-            let image = UIImage(assetName: "Smiles/" + smile.resourceName)!.scaled(to: CGFloat(smile.width))
-            let attachment = NSTextAttachment(image: image)
+            let image = UIImage(assetName: "Smiles/" + smile.resourceName)!
+            let attachment = AsyncTextAttachment(
+                image: image,
+                displaySize: CGSize(width: CGFloat(smile.width), height: CGFloat(smile.height))
+            )
+            attachment.displaySizeTextStyle = .callout
             let textWithSmile = NSMutableAttributedString(attachment: attachment)
             if isFirst {
                 return .text(textWithSmile)

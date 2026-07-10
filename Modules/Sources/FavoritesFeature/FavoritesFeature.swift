@@ -53,7 +53,6 @@ public struct FavoritesFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var didLoadOnce = false
         
         public init(
             favorites: [FavoriteInfo] = [],
@@ -111,7 +110,7 @@ public struct FavoritesFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+        Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         
@@ -121,14 +120,11 @@ public struct FavoritesFeature: Reducer, Sendable {
                 return .send(.internal(.loadFavorites(offset: newOffset)))
                 
             case .sort(.presented(.saveButtonTapped)):
-                return .concatenate(
-                    .run { _ in
-                        await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
-                    },
-                    
-                    .send(.internal(.refresh)),
-                    .send(.sort(.presented(.cancelButtonTapped)))
-                )
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.sortFiltersChanged, haptic: .success))
+                    await send(.internal(.refresh))
+                    await send(.sort(.presented(.cancelButtonTapped)))
+                }
                 
             case .sort(.presented(.cancelButtonTapped)):
                 state.sort = nil
@@ -310,13 +306,13 @@ public struct FavoritesFeature: Reducer, Sendable {
                 state.isLoading = false
                 state.isRefreshing = false
                 
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 
                 return updatePageNavigation(&state, count: response.favoritesCount)
                 
             case let .internal(.favoritesResponse(.failure(error))):
                 print("FAVORITES RESPONSE FAILURE: \(error)")
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     await toastClient.showToast(.whoopsSomethingWentWrong)
                 }
@@ -333,22 +329,12 @@ public struct FavoritesFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
-    }
-    
-    private func updatePageNavigation(_ state: inout State, count: Int = 0, offset: Int? = nil) -> Effect<Action> {
-        return PageNavigationFeature()
-            .reduce(
-                into: &state.pageNavigation,
-                action: .update(
-                    count: count,
-                    offset: offset
-                )
-            )
-            .map(Action.pageNavigation)
+        
+    private func updatePageNavigation(
+        _ state: inout State,
+        count: Int = 0,
+        offset: Int? = nil
+    ) -> Effect<Action> {
+        return .send(.pageNavigation(.update(count: count, offset: offset)))
     }
 }

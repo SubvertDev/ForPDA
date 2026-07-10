@@ -13,6 +13,9 @@ import Models
 import AnalyticsClient
 import ToastClient
 import NotificationsClient
+import FormFeature
+import ReputationChangeFeature
+import CreateChatFeature
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -22,6 +25,7 @@ public struct ProfileFeature: Reducer, Sendable {
     // MARK: - Localizations
     
     private enum Localization {
+        static let noteAdded = LocalizedStringResource("Note added", bundle: .module)
         static let profileUpdated = LocalizedStringResource("Profile updated", bundle: .module)
         static let profileUpdateError = LocalizedStringResource("Profile update error", bundle: .module)
     }
@@ -30,8 +34,10 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
-        case alert(AlertState<ProfileFeature.Action.Alert>)
+        case note(FormFeature)
         case editProfile(EditFeature)
+        case createChat(CreateChatFeature)
+        case changeReputation(ReputationChangeFeature)
     }
     
     // MARK: - State
@@ -40,17 +46,29 @@ public struct ProfileFeature: Reducer, Sendable {
     public struct State: Equatable {
         @Presents public var destination: Destination.State?
         @Shared(.userSession) public var userSession: UserSession?
+        public var userSessionGroup: User.Group?
+        
         public let userId: Int?
         public var isLoading: Bool
         public var user: User?
-        var qmsBadgeCount = 0
-        var mentionsBadgeCount = 0
+        var messageBadgeCount = 0
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
         }
         
-        var didLoadOnce = false
+        public var shouldShowOpenChatButton: Bool {
+            return userSession != nil && user?.id != userSession?.userId
+        }
+        
+        var isUserSessionHasModerationGroup: Bool {
+            return userSessionGroup == .admin
+                || userSessionGroup == .supermoderator
+                || userSessionGroup == .moderator
+                || userSessionGroup == .moderatorHelper
+                || userSessionGroup == .moderatorSchool
+        }
+        
         
         public init(
             userId: Int? = nil,
@@ -67,39 +85,33 @@ public struct ProfileFeature: Reducer, Sendable {
     
     public enum Action: ViewAction, BindableAction {
         case binding(BindingAction<State>)
+        case destination(PresentationAction<Destination.Action>)
 
         case view(View)
         public enum View {
             case onAppear
-            case qmsButtonTapped
-            case editButtonTapped
-            case settingsButtonTapped
-            case logoutButtonTapped
-            case historyButtonTapped
-            case mentionsButtonTapped
+            case chatButtonTapped
             case reputationButtonTapped
             case searchTopicsButtonTapped
             case searchRepliesButtonTapped
+            case deviceButtonTapped(String)
+            case curatedTopicButtonTapped(Int)
             case deeplinkTapped(URL, ProfileDeeplinkType)
+            
+            case contextMenu(ProfileContextMenuAction)
         }
         
         case `internal`(Internal)
         public enum Internal {
             case userResponse(Result<User, any Error>)
-            case updateBadgeCounts(Unread)
-        }
-        
-        case destination(PresentationAction<Destination.Action>)
-        public enum Alert: Equatable {
-            case logout
+            case updateUserSessionGroup(User.Group)
         }
         
         case delegate(Delegate)
         public enum Delegate {
-            case openQms
-            case openSettings
-            case openHistory
-            case openMentions
+            case openChat(Int)
+            case openDevice(String)
+            case openTopic(Int)
             case openReputation(Int)
             case openSearch(SearchResult)
             case handleUrl(URL)
@@ -110,6 +122,7 @@ public struct ProfileFeature: Reducer, Sendable {
     
     @Dependency(\.apiClient) private var apiClient
     @Dependency(\.analyticsClient) private var analyticsClient
+    @Dependency(\.cacheClient) private var cacheClient
     @Dependency(\.notificationCenter) private var notificationCenter
     @Dependency(\.notificationsClient) private var notificationsClient
     @Dependency(\.toastClient) private var toastClient
@@ -133,27 +146,37 @@ public struct ProfileFeature: Reducer, Sendable {
                     } catch: { error, send in
                         await send(.internal(.userResponse(.failure(error))))
                     },
+                    .run { [session = state.userSession] send in
+                        if let session, let user = cacheClient.getUser(session.userId) {
+                            await send(.internal(.updateUserSessionGroup(user.group)))
+                        }
+                    },
                     .run { send in
+                        // TODO: Нужно ли теперь это здесь?
                         let unread = try await apiClient.getUnread(type: .all)
                         await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
                     },
-                    .run { send in
-                        for await unread in notificationsClient.unreadPublisher().values {
-                            await send(.internal(.updateBadgeCounts(unread)))
-                        }
-                    }
                 )
                 
-            case .view(.historyButtonTapped):
-                return .send(.delegate(.openHistory))
+            case .view(.chatButtonTapped):
+                guard let user = state.user else { return .none }
+                if let chatCount = user.qmsMessages, chatCount > 0 {
+                    return .send(.delegate(.openChat(user.id)))
+                } else {
+                    state.destination = .createChat(CreateChatFeature.State(userId: user.id, username: user.nickname))
+                    return .none
+                }
                 
-            case .view(.mentionsButtonTapped):
-                return .send(.delegate(.openMentions))
+            case let .view(.deviceButtonTapped(tag)):
+                return .send(.delegate(.openDevice(tag)))
                 
             case .view(.reputationButtonTapped):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
                 guard let userId else { return .none }
                 return .send(.delegate(.openReputation(userId)))
+                
+            case let .view(.curatedTopicButtonTapped(id)):
+                return .send(.delegate(.openTopic(id)))
                 
             case .view(.searchTopicsButtonTapped):
                 let userId = state.userId == nil ? state.userSession?.userId : state.userId
@@ -175,24 +198,26 @@ public struct ProfileFeature: Reducer, Sendable {
                     sort: .dateDescSort
                 ))))
                 
-            case .view(.editButtonTapped):
-                if let user = state.user {
+            case let .view(.contextMenu(action)):
+                guard let user = state.user else { return .none }
+                switch action {
+                case .edit:
                     state.destination = .editProfile(EditFeature.State(user: user))
+                    
+                case .addNotice:
+                    state.destination = .note(FormFeature.State(type: .note(userId: user.id)))
+                    
+                case .changeReputation:
+                    state.destination = .changeReputation(ReputationChangeFeature.State(
+                        userId: user.id,
+                        username: user.nickname,
+                        content: .profile
+                    ))
                 }
                 return .none
                 
-            case .view(.qmsButtonTapped):
-                return .send(.delegate(.openQms))
-                
-            case .view(.settingsButtonTapped):
-                return .send(.delegate(.openSettings))
-                
             case .view(.deeplinkTapped(let url, _)):
                 return .send(.delegate(.handleUrl(url)))
-                
-            case .view(.logoutButtonTapped):
-                state.destination = .alert(.warning)
-                return .none
                 
             case .internal(.userResponse(.success(let user))):
                 var user = user
@@ -201,36 +226,39 @@ public struct ProfileFeature: Reducer, Sendable {
                 
                 state.user = user
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .internal(.userResponse(.failure(let error))):
                 state.isLoading = false
                 print(error, #line)
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
+                return .run { _ in
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
+                
+//            case let .internal(.updateBadgeCounts(unread)):
+//                state.qmsBadgeCount = unread.qmsUnreadCount
+//                state.mentionsBadgeCount = unread.mentionsUnreadCount
+//                return .none
+                
+            case let .internal(.updateUserSessionGroup(group)):
+                state.userSessionGroup = group
                 return .none
                 
-            case let .internal(.updateBadgeCounts(unread)):
-                state.qmsBadgeCount = unread.qmsUnreadCount
-                state.mentionsBadgeCount = unread.mentionsUnreadCount
-                return .none
+            case .destination(.presented(.note(.delegate(.formSent(.note))))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.noteAdded))
+                    await send(.view(.onAppear))
+                }
                 
             case .destination(.presented(.editProfile(.delegate(.profileUpdated(let status))))):
-                return .concatenate(
-                    .run { _ in
-                        await toastClient.showToast(ToastMessage(
-                            text: status ? Localization.profileUpdated : Localization.profileUpdateError,
-                            haptic: status ? .success : .error
-                        ))
-                    },
-                    .send(.view(.onAppear))
-                )
-            
-            case .destination(.presented(.alert(.logout))):
-                state.$userSession.withLock { $0 = nil }
-                state.isLoading = true
                 return .run { send in
-                    try await apiClient.logout()
+                    await toastClient.showToast(ToastMessage(
+                        text: status ? Localization.profileUpdated : Localization.profileUpdateError,
+                        haptic: status ? .success : .error
+                    ))
+                    await send(.view(.onAppear))
                 }
                 
             case .delegate, .binding, .destination:
@@ -243,27 +271,6 @@ public struct ProfileFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension ProfileFeature.Destination.State: Equatable {}
-
-// MARK: - Alert Extension
-
-private extension AlertState where Action == ProfileFeature.Action.Alert {
-    nonisolated(unsafe) static let warning = Self {
-        TextState("Are you sure you want to log out of your profile ?", bundle: .module)
-    } actions: {
-        ButtonState(role: .destructive, action: .logout) {
-            TextState("Logout", bundle: .module)
-        }
-        ButtonState(role: .cancel) {
-            TextState("Cancel", bundle: .module)
-        }
-    }
-}

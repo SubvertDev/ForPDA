@@ -11,7 +11,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let id: Int
     public let name: String
     public let description: String
-    public let flag: Int
+    public let flag: ForumFlag
     public let createdAt: Date
     public let authorId: Int
     public let authorName: String
@@ -21,22 +21,43 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
     public let postsCount: Int
     public let posts: [Post]
     public let navigation: [ForumInfo]
+    public let postTemplateName: String?
+    
+    public var canEdit: Bool {
+        return flag.contains(.canEdit)
+    }
     
     public var canPost: Bool {
-        return (flag & 64) != 0 && (flag & 16) == 0
+        return flag.contains(.canPost) && !flag.contains(.marker)
+    }
+    
+    public var canDelete: Bool {
+        return flag.contains(.canDelete)
     }
     
     public var canModerate: Bool {
-        return (flag & 512) != 0
+        return flag.contains(.canModerate)
+    }
+    
+    public var isPinned: Bool {
+        return flag.contains(.pinned)
+    }
+    
+    public var isHidden: Bool {
+        return flag.contains(.hidden)
+    }
+    
+    public var isClosed: Bool {
+        return flag.contains(.closed)
     }
     
     public var isFavorite: Bool
     
     public struct Poll: Sendable, Codable, Hashable {
-        public let name: String
+        public var name: String
         public let voted: Bool
         public let totalVotes: Int
-        public let options: [Option]
+        public var options: [Option]
         
         public init(name: String, voted: Bool, totalVotes: Int, options: [Option]) {
             self.name = name
@@ -47,8 +68,8 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         
         public struct Choice: Sendable, Codable, Hashable, Identifiable {
             public let id: Int
-            public let votes: Int
-            public let name: String
+            public var votes: Int
+            public var name: String
             
             public init(id: Int, name: String, votes: Int) {
                 self.id = id
@@ -59,9 +80,9 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         
         public struct Option: Sendable, Codable, Hashable, Identifiable {
             public let id: Int
-            public let name: String
-            public let several: Bool
-            public let choices: [Choice]
+            public var name: String
+            public var several: Bool
+            public var choices: [Choice]
             
             public init(id: Int, name: String, several: Bool, choices: [Choice]) {
                 self.id = id
@@ -76,7 +97,7 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         id: Int,
         name: String,
         description: String,
-        flag: Int,
+        flag: ForumFlag,
         createdAt: Date,
         authorId: Int,
         authorName: String,
@@ -85,7 +106,8 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         poll: Poll?,
         postsCount: Int,
         posts: [Post],
-        navigation: [ForumInfo]
+        navigation: [ForumInfo],
+        postTemplateName: String?
     ) {
         self.id = id
         self.name = name
@@ -100,8 +122,9 @@ public struct Topic: Codable, Sendable, Identifiable, Hashable {
         self.postsCount = postsCount
         self.posts = posts
         self.navigation = navigation
+        self.postTemplateName = postTemplateName
         
-        self.isFavorite = (flag & 8) != 0
+        self.isFavorite = flag.contains(.favorite)
     }
 }
 
@@ -110,7 +133,7 @@ public extension Topic {
         id: 3242552,
         name: "ForPDA",
         description: "Unofficial 4PDA client for iOS.",
-        flag: 64,
+        flag: [.canEdit, .canPost, .canDelete, .canModerate],
         createdAt: Date(timeIntervalSince1970: 1725706883),
         authorId: 3640948,
         authorName: "4spander",
@@ -122,8 +145,9 @@ public extension Topic {
             .mock(id: 0), .mock(id: 1), .mock(id: 2)
         ],
         navigation: [
-            ForumInfo(id: 1, name: "iOS - Apps", flag: 32)
-        ]
+            .mock, .mockCategory
+        ],
+        postTemplateName: "New update"
     )
 }
 
@@ -138,8 +162,8 @@ public extension Topic.Poll {
                 name: "Select not several...",
                 several: false,
                 choices: [
-                    .init(id: 2, name: "First choice", votes: 2),
-                    .init(id: 3, name: "Second choice", votes: 4)
+                    .init(id: 0, name: "First choice", votes: 2),
+                    .init(id: 1, name: "Second choice", votes: 4)
                 ]
             ),
             .init(
@@ -147,8 +171,8 @@ public extension Topic.Poll {
                 name: "Select several...",
                 several: true,
                 choices: [
-                    .init(id: 4, name: "First choice", votes: 4),
-                    .init(id: 5, name: "Second choice", votes: 2)
+                    .init(id: 0, name: "First choice", votes: 4),
+                    .init(id: 1, name: "Second choice", votes: 2)
                 ]
             ),
         ]

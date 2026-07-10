@@ -14,6 +14,24 @@ import SFSafeSymbols
 import SharedUI
 import SwiftUI
 
+public struct GalleryModel: Identifiable, Hashable {
+    
+    public let id = UUID()
+    public let urls: [URL]
+    public let ids: [Int]?
+    public let selectedId: Int
+    
+    public init(
+        urls: [URL],
+        ids: [Int]? = nil,
+        selectedId: Int
+    ) {
+        self.urls = urls
+        self.ids = ids
+        self.selectedId = selectedId
+    }
+}
+
 // MARK: - TabViewGallery
 
 public struct TabViewGallery: View {
@@ -34,13 +52,11 @@ public struct TabViewGallery: View {
     // MARK: - Init
     
     public init(
-        gallery: [URL],
-        ids: [Int]? = nil,
-        selectedImageID: Int
+        model: GalleryModel
     ) {
-        self.gallery = gallery
-        self.ids = ids
-        self.selectedImageID = selectedImageID
+        self.gallery = model.urls
+        self.ids = model.ids
+        self.selectedImageID = model.selectedId
     }
     
     // MARK: - Body
@@ -95,6 +111,11 @@ public struct TabViewGallery: View {
         HStack {
             ToolbarButton(placement: .topBarLeading, symbol: .xmark) {
                 dismiss()
+            }
+            .onTapGesture { // fix unclickable button on iOS 16
+                if #unavailable(iOS 17.0) {
+                    dismiss()
+                }
             }
 
             Spacer()
@@ -218,11 +239,6 @@ public struct TabViewGallery: View {
                             .frame(width: 32, height: 32)
                     }
                 }
-                .highPriorityGesture(
-                    TapGesture().onEnded {
-                        dismiss()
-                    }
-                )
         }
         .frame(
             width: isLiquidGlass ? 44 : 32,
@@ -272,10 +288,14 @@ struct BackgroundView: ViewModifier {
 // MARK: - Preview
 
 #Preview {
-    TabViewGallery(gallery: [
-        URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!,
-        URL(string: "https://i.4pda.ws/static/img/news/63/633618t.jpg")!,
-        URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!
-    ],
-    selectedImageID: Int(0))
+    TabViewGallery(
+        model: GalleryModel.init(
+            urls: [
+                URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!,
+                URL(string: "https://i.4pda.ws/static/img/news/63/633618t.jpg")!,
+                URL(string: "https://i.4pda.ws/static/img/news/63/633610t.jpg")!
+            ],
+            selectedId: 0
+        )
+    )
 }

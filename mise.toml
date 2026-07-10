@@ -1,6 +1,6 @@
 [tools]
-ruby = "3.4.8"
-tuist = "4.162.1"
-swiftlint = "0.63.2"
+ruby = "4.0.5"
+tuist = "4.200.5"
+swiftlint = "0.63.3"
 [settings]
 ruby.compile = false

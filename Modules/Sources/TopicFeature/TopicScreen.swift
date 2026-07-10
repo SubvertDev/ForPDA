@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import PageNavigationFeature
-import WriteFormFeature
+import FormFeature
 import SFSafeSymbols
 import SharedUI
 import NukeUI
@@ -17,6 +17,9 @@ import ParsingClient
 import ReputationChangeFeature
 import TopicBuilder
 import GalleryFeature
+import ForumStatFeature
+import ForumMoveFeature
+import TopicEditFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -43,6 +46,10 @@ public struct TopicScreen: View {
         let shouldShow = store.topic != nil && !store.isLoadingTopic
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     private var isPollAvailable: Bool {
@@ -88,7 +95,7 @@ public struct TopicScreen: View {
                             }
                             .padding(.bottom, 16)
                         }
-                        ._inScrollContentDetector(state: $navigationMinimized)
+                        ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                         .onAppear {
                             scrollProxy = proxy
                         }
@@ -125,11 +132,9 @@ public struct TopicScreen: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -155,6 +160,12 @@ public struct TopicScreen: View {
                 Section {
                     ContextButton(text: LocalizedStringResource("Write Post", bundle: .module), symbol: .plusCircle) {
                         send(.contextMenu(.writePost))
+                    }
+                    
+                    if let postTemplate = topic.postTemplateName {
+                        ContextButton(text: LocalizedStringResource(stringLiteral: postTemplate), symbol: .plusApp) {
+                            send(.contextMenu(.writePostWithTemplate))
+                        }
                     }
                 }
             }
@@ -184,10 +195,22 @@ public struct TopicScreen: View {
                     ) {
                         send(.contextMenu(.setFavorite))
                     }
+                    
+                    ContextButton(text: LocalizedStringResource("About Topic", bundle: .module), symbol: .infoCircle) {
+                        send(.contextMenu(.about))
+                    }
+                    
+                    if topic.canEdit {
+                        ContextButton(text: LocalizedStringResource("Edit", bundle: .module), symbol: .squareAndPencil) {
+                            send(.contextMenu(.edit))
+                        }
+                    }
                 }
                 
                 if topic.canModerate {
                     Section {
+                        ToolsOptionsMenu(topic: topic)
+                        
                         Menu {
                             Picker(String(), selection: $store.postsFilter) {
                                 ForEach(TopicPostsFilter.allCases) { mode in
@@ -201,12 +224,59 @@ public struct TopicScreen: View {
                                 Image(systemSymbol: .line3HorizontalDecrease)
                             }
                         }
+                        
+                        ContextButton(text: LocalizedStringResource("Topic Tickets", bundle: .module), symbol: .exclamationmarkBubble) {
+                            send(.contextToolsMenu(.tickets))
+                        }
                     }
                 }
             }
         } label: {
             Image(systemSymbol: .ellipsisCircle)
                 .foregroundStyle(foregroundStyle())
+        }
+    }
+    
+    // MARK: - Tools Options Menu
+    
+    @ViewBuilder
+    private func ToolsOptionsMenu(topic: Topic) -> some View {
+        Menu {
+            ContextButton(
+                text: topic.isHidden
+                ? LocalizedStringResource("Remove Hide", bundle: .module)
+                : LocalizedStringResource("Hide", bundle: .module),
+                symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
+            ) {
+                send(.contextToolsMenu(.modify(.hide, topic.isHidden)))
+            }
+            
+            ContextButton(
+                text: topic.isClosed
+                ? LocalizedStringResource("Open Topic", bundle: .module)
+                : LocalizedStringResource("Close Topic", bundle: .module),
+                symbol: topic.isClosed ? .lockFill : .lock
+            ) {
+                send(.contextToolsMenu(.modify(.close, topic.isClosed)))
+            }
+            
+            if topic.canDelete {
+                ContextButton(text: LocalizedStringResource("Delete Topic", bundle: .module), symbol: .trash) {
+                    send(.contextToolsMenu(.modify(.delete, false)))
+                }
+            }
+            
+            ContextButton(
+                text: LocalizedStringResource("Move", bundle: .module),
+                symbol: .arrowRight
+            ) {
+                send(.contextToolsMenu(.move))
+            }
+        } label: {
+            HStack {
+                Text("Tools", bundle: .module)
+                Image(systemSymbol: .shield)
+            }
         }
     }
     
@@ -224,7 +294,7 @@ public struct TopicScreen: View {
     @ViewBuilder
     private func Navigation() -> some View {
         if store.pageNavigation.shouldShow {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .padding(.horizontal, 16)
         }
     }
@@ -294,6 +364,25 @@ public struct TopicScreen: View {
                         
                         PostSeparator()
                     }
+                    .overlay {
+                        GeometryReader { proxy in
+                            let maskColor = if post.post.isDeleted {
+                                Color(.Background.quaternary)
+                            } else if post.post.isHidden {
+                                Color(.Main.redAlpha)
+                            } else {
+                                Color.clear
+                            }
+                            Rectangle()
+                                .fill(maskColor)
+                                .frame(
+                                    // + LazyVStack spacing - Separator height
+                                    height: proxy.size.height + 16 - 10
+                                )
+                                .padding(.top, -16) // LazyVStack spacing
+                                .allowsHitTesting(false)
+                        }
+                    }
                 }
             }
         }
@@ -310,10 +399,14 @@ public struct TopicScreen: View {
     
     @ViewBuilder
     private func Post(_ post: UIPost) -> some View {
+        let userSessionInfo: UserSessionInfo? = if let user = store.userSessionInfo {
+            UserSessionInfo(postsCount: user.replies, group: user.group)
+        } else { nil }
         PostRowView(
             state: PostRowView.State(
                 post: post,
                 sessionUserId: store.isUserAuthorized ? store.userSession!.userId : 0,
+                userSessionInfo: userSessionInfo,
                 canPostInTopic: store.topic?.canPost ?? false,
                 isUserAuthorized: store.isUserAuthorized,
                 isContextMenuAvailable: true
@@ -328,6 +421,8 @@ public struct TopicScreen: View {
                     send(.imageTapped(url))
                 case .textQuoted(let text):
                     send(.textQuoted(post, text))
+                case .karmaHistoryTapped:
+                    send(.karmaHistoryTapped(post.id))
                 }
             },
             menuAction: { action in
@@ -336,8 +431,6 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.reply(id, authorName)))
                 case .edit(let post):
                     send(.contextPostMenu(.edit(post)))
-                case .delete(let postId):
-                    send(.contextPostMenu(.delete(postId)))
                 case .karma(let postId):
                     send(.contextPostMenu(.karma(postId)))
                 case .report(let postId):
@@ -350,6 +443,16 @@ public struct TopicScreen: View {
                     send(.contextPostMenu(.mentions(postId)))
                 case .copyLink(let postId):
                     send(.contextPostMenu(.copyLink(postId)))
+                }
+            },
+            toolsMenuAction: { action in
+                switch action {
+                case .move(let postId):
+                    send(.contextPostToolsMenu(.move(postId)))
+                case .eventLog(let postId):
+                    send(.contextPostToolsMenu(.eventLog(postId)))
+                case .modify(let action, let postId, let isUndo):
+                    send(.contextPostToolsMenu(.modify(action, postId, isUndo)))
                 }
             }
         )
@@ -378,7 +481,7 @@ public struct TopicScreen: View {
                 try? await Task.sleep(for: .seconds(duration))
                 withAnimation(animation) { scrollScale = 1 }
                 try? await Task.sleep(for: .seconds(duration))
-                send(.finishedPostAnimation)
+                send(.finishedPostAnimation, animation: .default)
             }
         }
     }
@@ -391,6 +494,10 @@ struct NavigationModifier: ViewModifier {
     @Perception.Bindable private var store: StoreOf<TopicFeature>
     @Environment(\.tintColor) private var tintColor
     
+    private var title: String {
+        return store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)
+    }
+    
     init(store: StoreOf<TopicFeature>) {
         self.store = store
     }
@@ -398,9 +505,9 @@ struct NavigationModifier: ViewModifier {
     func body(content: Content) -> some View {
         WithPerceptionTracking {
             content
-                .navigationTitle(Text(store.topic?.name ?? store.topicName ?? String(localized: "Loading...", bundle: .module)))
+                .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
-                .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+                .alert($store.scope(\.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
                 .confirmationDialog(item: $store.destination.karmaChange, title: { _ in Text(verbatim: "") }) { postId in
@@ -430,14 +537,18 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(state: \.destination?.writeForm, action: \.destination.writeForm)) { store in
+                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
                         NavigationStack {
-                            WriteFormScreen(store: store)
+                            FormScreen(store: store)
                         }
                     }
-                    .fullScreenCover(item: $store.scope(state: \.destination?.gallery, action: \.destination.gallery)) { store in
-                        let state = store.withState { $0 }
-                        TabViewGallery(gallery: state.0, ids: state.1, selectedImageID: state.2)
+                    .fullScreenCover(item: $store.scope(\.destination?.edit, action: \.destination.edit)) { store in
+                        NavigationStack {
+                            TopicEditView(store: store)
+                        }
+                    }
+                    .fullScreenCover(item: $store.scope(\.destination, action: \.destination).gallery) { model in
+                        TabViewGallery(model: model)
                     }
             }
         }
@@ -453,102 +564,35 @@ struct NavigationModifier: ViewModifier {
         
         func body(content: Content) -> some View {
             WithPerceptionTracking {
-                content
-                    .fittedSheet(
-                        item: $store.scope(state: \.destination?.changeReputation, action: \.destination.changeReputation),
-                        embedIntoNavStack: true
-                    ) { store in
-                        ReputationChangeView(store: store)
-                    }
-                    .sheet(isPresented: Binding($store.destination.editWarning)) {
-                        EditWarningSheet()
-                            .presentationDetents([.medium])
-                            .presentationDragIndicator(.visible)
-                    }
+                Sheets(content: content)
             }
         }
         
-        // TODO: Move to SharedUI?
-        // MARK: - Edit Warning Sheet
-        
-        @ViewBuilder
-        private func EditWarningSheet() -> some View {
-            VStack(spacing: 0) {
-                Spacer()
-                
-                Image(systemSymbol: .hammer)
-                    .font(.title)
-                    .foregroundStyle(tintColor)
-                    .padding(.bottom, 8)
-                
-                Text("Editing posts with attachments is not yet supported", bundle: .module)
-                    .font(.title3)
-                    .bold()
-                    .foregroundStyle(Color(.Labels.primary))
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 6)
-                
-                Spacer()
-                
-                Button {
-                    store.send(.view(.editWarningSheetCloseButtonTapped))
-                } label: {
-                    Text("Understood", bundle: .module)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // Fix for compiler struggling with 4 sheets (works without WithPerceptionTracking)
+        private func Sheets(content: Content) -> some View {
+            content
+                .fittedSheet(
+                    item: $store.scope(\.$destination, action: \.destination).changeReputation,
+                    embedIntoNavStack: true
+                ) { store in
+                    ReputationChangeView(store: store)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(tintColor)
-                .frame(height: 48)
-                .padding(.vertical, 8)
-                .padding(.horizontal, 16)
-                .background(ignoresSafeAreaEdges: .bottom)
-            }
-            .background {
-                VStack(spacing: 0) {
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: 12))
-                        .padding(.top, 32)
-                    
-                    Spacer()
-                    
-                    ComingSoonTape()
-                        .rotationEffect(Angle(degrees: -12))
-                        .padding(.bottom, 96)
+                .fittedSheet(
+                    item: $store.scope(\.$destination, action: \.destination).move,
+                    embedIntoNavStack: true
+                ) { store in
+                    ForumMoveView(store: store)
                 }
-            }
-            .frame(maxWidth: .infinity)
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    store.send(.view(.editWarningSheetCloseButtonTapped))
-                } label: {
-                    ZStack {
-                        Circle()
-                            .fill(Color(.Background.quaternary))
-                            .frame(width: 30, height: 30)
-                        
-                        Image(systemSymbol: .xmark)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(Color(.Labels.teritary))
+                .sheet(item: $store.scope(\.$destination, action: \.destination).karmaHistory) { store in
+                    NavigationStack {
+                        PostKarmaHistoryView(store: store)
                     }
-                    .padding(.top, 14)
-                    .padding(.trailing, 16)
                 }
-            }
-        }
-        
-        @ViewBuilder
-        private func ComingSoonTape() -> some View {
-            HStack(spacing: 8) {
-                ForEach(0..<6, id: \.self) { index in
-                    Text("IN DEVELOPMENT", bundle: .module)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.Labels.primaryInvariably))
-                        .fixedSize(horizontal: true, vertical: false)
-                        .lineLimit(1)
+                .sheet(item: $store.scope(\.$destination, action: \.destination).stat) { store in
+                    NavigationStack {
+                        ForumStatView(store: store)
+                    }
                 }
-            }
-            .frame(width: UIScreen.main.bounds.width * 2, height: 26)
-            .background(tintColor)
         }
     }
 }
@@ -562,7 +606,7 @@ extension View {
 // MARK: - Extensions
 
 // TODO: Move to extensions?
-private extension Date {
+extension Date {
     func formattedDate() -> LocalizedStringKey {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -628,9 +672,9 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
                         )
                     )
@@ -663,9 +707,9 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .writeForm(
-                    WriteFormFeature.State(
-                        formFor: .post(
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
                         )
                     )
@@ -677,6 +721,66 @@ private extension TopicPostsFilter {
             $0.apiClient.sendPost = { request in
                 try await Task.sleep(for: .seconds(1))
                 return .failure(.tooLong) // <----------
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("New template post requests") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    templatePostSendingPreview
+}
+
+@MainActor private var templatePostSendingPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(
+                            type: .new, topicId: 0, content: .template([])
+                        )
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .success(.post(.init(id: 1, topicId: 0, offset: 0)))
+            }
+        }
+    )
+    .tint(Color(.Theme.primary))
+}
+
+#Preview("Post Template sending returns error status") {
+    @Shared(.userSession) var userSession = UserSession.mock
+    postTemplateErrorStatusPreview
+}
+
+@MainActor private var postTemplateErrorStatusPreview: some View {
+    TopicScreen(
+        store: Store(
+            initialState: TopicFeature.State(
+                topicId: 0,
+                topicName: "Test Topic",
+                destination: .form(
+                    FormFeature.State(
+                        type: .post(type: .new, topicId: 0, content: .template([]))
+                    )
+                )
+            )
+        ) {
+            TopicFeature()
+        } withDependencies: {
+            $0.apiClient.sendTemplate = { _, _, _ in
+                try await Task.sleep(for: .seconds(1))
+                return .failure(.badParam) // <----------
             }
         }
     )

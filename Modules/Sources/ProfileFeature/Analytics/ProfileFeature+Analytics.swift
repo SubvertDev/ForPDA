@@ -23,29 +23,14 @@ extension ProfileFeature {
                 case .view(.onAppear), .delegate, .binding:
                     break
                     
-                case .destination(.presented(.alert(.logout))):
-                    analyticsClient.logout()
-                    
-                case .view(.qmsButtonTapped):
-                    analyticsClient.log(ProfileEvent.qmsTapped)
-                    
-                case .view(.editButtonTapped):
-                    analyticsClient.log(ProfileEvent.editTapped)
-                
-                case .view(.settingsButtonTapped):
-                    analyticsClient.log(ProfileEvent.settingsTapped)
-                    
-                case .view(.logoutButtonTapped):
-                    analyticsClient.log(ProfileEvent.logoutTapped)
-                    
-                case .view(.historyButtonTapped):
-                    analyticsClient.log(ProfileEvent.historyTapped)
-                    
-                case .view(.mentionsButtonTapped):
-                    analyticsClient.log(ProfileEvent.mentionsTapped)
+                case .view(.chatButtonTapped):
+                    analyticsClient.log(ProfileEvent.chatTapped)
                     
                 case .view(.reputationButtonTapped):
                     analyticsClient.log(ProfileEvent.reputationTapped)
+                    
+                case .view(.curatedTopicButtonTapped(let id)):
+                    analyticsClient.log(ProfileEvent.curatedTopicTapped(id))
                     
                 case .view(.searchTopicsButtonTapped):
                     analyticsClient.log(ProfileEvent.searchTopicsTapped)
@@ -53,12 +38,26 @@ extension ProfileFeature {
                 case .view(.searchRepliesButtonTapped):
                     analyticsClient.log(ProfileEvent.searchRepliesTapped)
                     
+                case .view(.deviceButtonTapped(let tag)):
+                    analyticsClient.log(ProfileEvent.deviceButtonTapped(tag))
+                    
+                case .view(.contextMenu(let action)):
+                    switch action {
+                    case .edit:
+                        analyticsClient.log(ProfileEvent.editTapped)
+                    case .addNotice, .changeReputation:
+                        // MARK: Moderator tools are skip analytics
+                        break
+                    }
+                    
                 case .view(.deeplinkTapped(_, let type)):
                     switch type {
                     case .about:
                         analyticsClient.log(ProfileEvent.linkInAboutTapped)
                     case .signature:
                         analyticsClient.log(ProfileEvent.linkInSignatureTapped)
+                    case .warningLog:
+                        analyticsClient.log(ProfileEvent.linkInWarningLogTapped)
                     case .achievement:
                         analyticsClient.log(ProfileEvent.achievementTapped)
                     }

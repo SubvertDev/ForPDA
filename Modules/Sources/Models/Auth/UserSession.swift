@@ -20,5 +20,17 @@ public struct UserSession: Sendable, Equatable, Codable {
 }
 
 public extension UserSession {
-    static let mock = UserSession(userId: 0, token: "", isHidden: false)
+    static let mock = mock()
+    
+    static func mock(
+        userId: Int = 0,
+        token: String = "",
+        isHidden: Bool = false
+    ) -> UserSession {
+        return UserSession(
+            userId: userId,
+            token: token,
+            isHidden: isHidden
+        )
+    }
 }

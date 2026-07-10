@@ -12,8 +12,9 @@ import NukeUI
 import SharedUI
 import SkeletonUI
 import SFSafeSymbols
-import WriteFormFeature
 import ReputationChangeFeature
+import FormFeature
+import AuthFeature
 
 // MARK: - Comments View
 
@@ -31,7 +32,7 @@ struct CommentsView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(store.scope(state: \.comments, action: \.comments))) { store in
+                    ForEach(Array(store.scope(\.comments, action: \.comments))) { store in
                         WithPerceptionTracking {
                             CommentView(store: store)
                         }
@@ -118,19 +119,24 @@ struct CommentView: View {
                 }
                 .padding(.leading, 16 * CGFloat(store.comment.nestLevel))
             }
-            .fullScreenCover(item: $store.scope(state: \.writeForm, action: \.writeForm)) { store in
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).auth) { store in
                 NavigationStack {
-                    WriteFormScreen(store: store)
+                    AuthScreen(store: store)
+                }
+            }
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).report) { store in
+                NavigationStack {
+                    FormScreen(store: store)
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.changeReputation, action: \.changeReputation),
+                item: $store.scope(\.$destination, action: \.destination).changeReputation,
                 embedIntoNavStack: true
             ) { store in
                 ReputationChangeView(store: store)
             }
             .background(Color(.Background.primary))
-            .alert($store.scope(state: \.alert, action: \.alert))
+            .alert($store.scope(\.$alert, action: \.alert))
             .task {
                 await store.send(.onTask).finish()
             }

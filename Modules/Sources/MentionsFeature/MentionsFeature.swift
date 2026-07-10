@@ -30,7 +30,6 @@ public struct MentionsFeature: Reducer, Sendable {
         public var pageNavigation = PageNavigationFeature.State(type: .mentions)
         
         var offset = 0
-        var didLoadOnce = false
         
         public init(
             mentions: [Mention] = []
@@ -72,7 +71,7 @@ public struct MentionsFeature: Reducer, Sendable {
     // MARK: - Body
     
     public var body: some Reducer<State, Action> {
-        Scope(state: \.pageNavigation, action: \.pageNavigation) {
+        Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
         }
         
@@ -109,7 +108,7 @@ public struct MentionsFeature: Reducer, Sendable {
                 state.mentions = response.mentions
                 state.pageNavigation.count = response.mentionsCount
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in
                     await notificationsClient.removeNotifications(categories: [.forumMention, .siteMention])
                     let unread = try await apiClient.getUnread(type: .all)
@@ -119,20 +118,16 @@ public struct MentionsFeature: Reducer, Sendable {
             case let .internal(.mentionsResponse(.failure(error))):
                 print(error)
                 state.isLoading = false
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .delegate:
                 return .none
             }
         }
+        
+        Analytics()
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

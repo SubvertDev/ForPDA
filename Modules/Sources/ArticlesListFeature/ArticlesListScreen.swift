@@ -51,23 +51,15 @@ public struct ArticlesListScreen: View {
                     }
                     
                 case .networkError:
-                    UnavailableView(
-                        symbol: .exclamationmarkTriangleFill,
-                        title: "Failed to load",
-                        description: "Try again later",
-                        actionTitle: "Try again",
-                        action: {
-                            store.send(.tryAgainButtonTapped)
-                        },
-                        bundle: .module
-                    )
+                    GenericView.GenericError {
+                        store.send(.tryAgainButtonTapped)
+                    }
                 }
             }
             .navigationTitle(Text("Articles", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
             .toolbarBackground(isLiquidGlass ? Color(.clear) : Color(.Background.primary), for: .navigationBar)
             .toolbar { Toolbar() }
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .sheet(item: $store.destination.share, id: \.self) { url in
                 // FIXME: Perceptible warning despite tracking closure
                 WithPerceptionTracking {

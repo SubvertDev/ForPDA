@@ -30,7 +30,6 @@ public struct SettingsScreen: View {
                 List {
                     ThemeSection()
                     BasicSection()
-                    LinksSection()
                     AdvancedSection()
                     AboutAppSection()
                 }
@@ -38,7 +37,7 @@ public struct SettingsScreen: View {
             }
             .navigationTitle(Text("Settings", bundle: .module))
             ._toolbarTitleDisplayMode(.inline)
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
+            .alert($store.scope(\.$destination, action: \.destination).alert)
             .animation(.default, value: colorScheme)
             .onAppear {
                 store.send(.onAppear)
@@ -74,6 +73,7 @@ public struct SettingsScreen: View {
     private func Row(
         symbol: SFSymbol,
         title: LocalizedStringKey,
+        description: LocalizedStringKey? = nil,
         type: RowType,
         isBold: Bool = false,
         toggle: Binding<Bool>? = nil,
@@ -90,10 +90,18 @@ public struct SettingsScreen: View {
                         .frame(width: 36)
                         .padding(.trailing, 12)
                     
-                    Text(title, bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                        .bold(isBold)
+                    VStack(alignment: .leading) {
+                        Text(title, bundle: .module)
+                            .font(.body)
+                            .foregroundStyle(Color(.Labels.primary))
+                            .bold(isBold)
+                        
+                        if let description {
+                            Text(description, bundle: .module)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     
                     Spacer(minLength: 8)
                     
@@ -190,7 +198,9 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func SchemeButton(scheme: AppColorScheme) -> some View {
         Button {
-            store.send(.schemeButtonTapped(scheme), animation: .default)
+            withAnimation {
+                _ = store.send(.schemeButtonTapped(scheme))
+            }
         } label: {
             VStack(spacing: 0) {
                 scheme.image
@@ -259,6 +269,15 @@ public struct SettingsScreen: View {
     @ViewBuilder
     private func AdvancedSection() -> some View {
         Section {
+            Row(
+                symbol: .linkIcloud,
+                title: "Backup connection",
+                description: "Restart required",
+                type: .toggle,
+                toggle: Binding(store.$appSettings.backupServer)
+            )
+
+            
             Row(symbol: .safari, title: "Safari extension", type: .navigation) {
                 store.send(.safariExtensionButtonTapped)
             }
@@ -281,46 +300,12 @@ public struct SettingsScreen: View {
         .listRowBackground(Color(.Background.teritary))
     }
     
-    // MARK: - Advanced Section
-    
-    @ViewBuilder
-    private func LinksSection() -> some View {
-        Section {
-            Row(symbol: .boltHeart, title: "Support on Boosty", type: .navigation, isBold: true) {
-                store.send(.supportOnBoostyButtonTapped)
-            }
-            
-            Row(symbol: .paperplane, title: "App discussion in Telegram", type: .navigation) {
-                store.send(.telegramChatButtonTapped)
-            }
-            
-            Row(symbol: .paperplane, title: "List of changes in Telegram", type: .navigation) {
-                store.send(.telegramChangelogButtonTapped)
-            }
-            
-            Row(symbol: .infoBubble, title: "App discussion on the forum", type: .navigation) {
-                store.send(.appDiscussionButtonTapped)
-            }
-            
-            Row(symbol: .folderBadgeGearshape, title: "GitHub repository", type: .navigation) {
-                store.send(.githubButtonTapped)
-            }
-        } header: {
-            Header(title: "Links")
-        }
-        .listRowBackground(Color(.Background.teritary))
-    }
-    
     // MARK: - About App Section
     
     @ViewBuilder
     private func AboutAppSection() -> some View {
         Section {
             Row(symbol: .infoBubble, title: "Version \(store.appVersionAndBuild) [\(store.releaseChannel)]", type: .basic) {}
-            
-            Row(symbol: .folderBadgeGearshape, title: "Check new versions on GitHub", type: .navigation) {
-                store.send(.checkVersionsButtonTapped)
-            }
         } header: {
             Header(title: "About app")
         }

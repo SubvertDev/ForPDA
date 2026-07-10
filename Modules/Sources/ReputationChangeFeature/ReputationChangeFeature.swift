@@ -44,6 +44,10 @@ public struct ReputationChangeFeature: Reducer, Sendable {
     
     @ObservableState
     public struct State: Equatable {
+        public enum Field { case reason }
+        
+        var focus: Field? = .reason
+        
         let userId: Int
         let username: String
         let content: ReputationChangeRequest.ContentType
@@ -63,7 +67,9 @@ public struct ReputationChangeFeature: Reducer, Sendable {
     
     // MARK: - Action
             
-    public enum Action {
+    public enum Action: BindableAction {
+        case binding(BindingAction<State>)
+        
         case onAppear
         
         case upButtonTapped
@@ -85,9 +91,11 @@ public struct ReputationChangeFeature: Reducer, Sendable {
     // MARK: - Body
             
     public var body: some Reducer<State, Action> {
+        BindingReducer()
+        
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear:
+            case .onAppear, .binding:
                 return .none
                 
             case .cancelButtonTapped:

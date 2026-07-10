@@ -70,12 +70,25 @@ function afterNavigate() {
 
             // https://4pda.to/forum/index.php?showtopic=1104159
             // https://4pda.to/forum/index.php?showtopic=1104159&st=20
+            // https://4pda.to/forum/index.php?showtopic=1104159&st=20#entry137570321
             if (params.has('showtopic')) {
                 const topicId = params.get('showtopic');
                 let topicUrl = `forpda://topic/${topicId}`;
 
+                const queryParams = new URLSearchParams();
+
                 if (params.has('st')) {
-                    topicUrl += `?st=${params.get('st')}`;
+                    queryParams.set('st', params.get('st'));
+                }
+
+                const entryMatch = window.location.hash.match(/^#entry(\d+)$/);
+                if (entryMatch) {
+                    queryParams.set('entry', entryMatch[1]);
+                }
+
+                const queryString = queryParams.toString();
+                if (queryString) {
+                    topicUrl += `?${queryString}`;
                 }
 
                 window.location.href = topicUrl;

@@ -14,11 +14,12 @@ private struct ScrollMetrics: Equatable {
 
 public extension View {
     
-    func _inScrollContentDetector(state: Binding<Bool>) -> some View {
-        if #available(iOS 18, *) {
-            return modifier(InScrollContentDetector(state: state))
+    @ViewBuilder
+    func _inScrollContentDetector(isEnabled: Bool, state: Binding<Bool>) -> some View {
+        if #available(iOS 18, *), isEnabled {
+            modifier(InScrollContentDetector(state: state))
         } else {
-            return self
+            self
         }
     }
 }

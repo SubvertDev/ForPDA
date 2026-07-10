@@ -22,7 +22,6 @@ public struct ForumsListFeature: Reducer, Sendable {
     public struct State: Equatable {
         public var forums: [ForumRowInfo]?
         public var isExpanded: [Int: Bool] = [:]
-        var didLoadOnce = false
         
         public init(
             forums: [ForumRowInfo]? = nil
@@ -103,12 +102,12 @@ public struct ForumsListFeature: Reducer, Sendable {
                 }
                 
                 state.forums = rows
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 
             case let .internal(.forumsListResponse(.failure(error))):
                 print(error)
                 // TODO: Add toast
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 
             case .delegate:
                 break
@@ -121,10 +120,4 @@ public struct ForumsListFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

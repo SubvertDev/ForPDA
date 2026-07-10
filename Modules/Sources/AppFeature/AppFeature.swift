@@ -36,6 +36,13 @@ import ToastClient
 import Combine
 import SearchResultFeature
 import CacheClient
+import DeviceSpecificationsFeature
+import DeviceTypeFeature
+import MoreFeature
+import TicketsListFeature
+import TicketFeature
+import ForumEventLogFeature
+import LogStoreFeature
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {
@@ -58,14 +65,14 @@ public struct AppFeature: Reducer, Sendable {
         public var articlesTab:  StackTab.State
         public var favoritesTab: StackTab.State
         public var forumTab:     StackTab.State
-        public var profileFlow:  ProfileFlow.State
+        public var moreTab:      StackTab.State
         
-        @Presents public var auth: AuthFeature.State?
         @Presents public var logStore: LogStoreFeature.State?
         @Presents public var alert: AlertState<Never>?
         
         @Shared(.userSession) public var userSession: UserSession?
         @Shared(.appSettings) public var appSettings: AppSettings
+        @Shared(.appStorage("showConnectionState")) var showConnectionState = false
         
         public var selectedTab: AppTab
         public var previousTab: AppTab
@@ -84,7 +91,7 @@ public struct AppFeature: Reducer, Sendable {
             return identifiers?.first ?? ""
         }
         
-        public var connectionState: ConnectionState = .disconnected
+        public var connectionState: APIConnectionState?
         public var isNetworkOnline = true
         
         public init(
@@ -92,7 +99,7 @@ public struct AppFeature: Reducer, Sendable {
             articlesTab: StackTab.State = StackTab.State(root: .articles(.articlesList(ArticlesListFeature.State()))),
             favoritesTab: StackTab.State = StackTab.State(root: .favorites(FavoritesFeature.State())),
             forumTab: StackTab.State = StackTab.State(root: .forum(.forumList(ForumsListFeature.State()))),
-            auth: AuthFeature.State? = nil,
+            moreTab: StackTab.State = StackTab.State(root: .more(.more(MoreFeature.State()))),
             alert: AlertState<Never>? = nil,
             selectedTab: AppTab = .articles,
             previousTab: AppTab = .articles,
@@ -104,14 +111,8 @@ public struct AppFeature: Reducer, Sendable {
             self.articlesTab = articlesTab
             self.favoritesTab = favoritesTab
             self.forumTab = forumTab
-
-            if let session = _userSession.wrappedValue {
-                self.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: session.userId)))))
-            } else {
-                self.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
-            }
+            self.moreTab = moreTab
             
-            self.auth = auth
             self.alert = alert
             
             self.selectedTab = selectedTab
@@ -135,9 +136,8 @@ public struct AppFeature: Reducer, Sendable {
         case articlesTab(StackTab.Action)
         case favoritesTab(StackTab.Action)
         case forumTab(StackTab.Action)
-        case profileFlow(ProfileFlow.Action)
+        case moreTab(StackTab.Action)
         
-        case auth(PresentationAction<AuthFeature.Action>)
         case logStore(PresentationAction<LogStoreFeature.Action>)
         case alert(PresentationAction<Never>)
         
@@ -150,7 +150,7 @@ public struct AppFeature: Reducer, Sendable {
         case didFinishToastAnimation
         case updateBadges(Unread)
         
-        case connectionStateChanged(ConnectionState)
+        case connectionStateChanged(APIConnectionState)
         case networkStateChanged(Bool)
         case receivedNotification(String)
         
@@ -184,40 +184,24 @@ public struct AppFeature: Reducer, Sendable {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.appDelegate, action: \.appDelegate) {
+        Scope(\.appDelegate, action: \.appDelegate) {
             AppDelegateFeature()
         }
         
-        Scope(state: \.articlesTab, action: \.articlesTab) {
+        Scope(\.articlesTab, action: \.articlesTab) {
             StackTab()
         }
         
-        Scope(state: \.favoritesTab, action: \.favoritesTab) {
+        Scope(\.favoritesTab, action: \.favoritesTab) {
             StackTab()
         }
         
-        Scope(state: \.forumTab, action: \.forumTab) {
+        Scope(\.forumTab, action: \.forumTab) {
             StackTab()
         }
         
-        Scope(state: \.profileFlow, action: \.profileFlow) {
-            ProfileFlow.body
-        }
-        
-        // Authorization actions interceptor
-        Reduce<State, Action> { state, action in
-            switch action {
-            case .articlesTab(.path(.element(id: _, action: .articles(.article(.comments(.element(id: _, action: .delegate(.unauthorizedAction)))))))):
-                state.auth = AuthFeature.State(openReason: .commentAction)
-                
-            case .articlesTab(.path(.element(id: _, action: .articles(.article(.delegate(.unauthorizedAction)))))):
-                state.auth = AuthFeature.State(openReason: .sendComment)
-                
-            default:
-                break
-            }
-            
-            return .none
+        Scope(\.moreTab, action: \.moreTab) {
+            StackTab()
         }
         
         Reduce<State, Action> { state, action in
@@ -233,11 +217,11 @@ public struct AppFeature: Reducer, Sendable {
                                 await send(.userDidLogout)
                             }
                         }
-                    }.animation(),
+                    },
                     
                     .run { send in
                         do {
-                            apiClient.setLogResponses(.none)
+                            await apiClient.setLogResponses(.none)
                             try await apiClient.connect(inBackground: false)
                         } catch {
                             await send(._failedToConnect(error))
@@ -394,24 +378,7 @@ public struct AppFeature: Reducer, Sendable {
                     return handleOtherTabSelection(newTab: tab, &state)
                 }
                 
-            case let .auth(.presented(.delegate(.loginSuccess(reason, _)))):
-                // Also make necessary changes to delegate actions in StackTab
-                switch reason {
-                case .commentAction, .sendComment:
-                    state.auth = nil
-                case .profile:
-                    let error = NSError(domain: "Profile login success is caught in AppFeature", code: 0)
-                    analyticsClient.capture(error)
-                }
-                return .run { _ in
-                    notificationCenter.post(name: .favoritesUpdated, object: nil)
-                }
-                
-            case .auth:
-                return .none
-                
-            case let .userDidLogin(userId: userId):
-                state.profileFlow = .loggedIn(StackTab.State(root: .profile(.profile(ProfileFeature.State(userId: userId)))))
+            case .userDidLogin(userId: _):
                 return .run { _ in
                     do {
                         let unread = try await apiClient.getUnread(type: .all)
@@ -422,7 +389,6 @@ public struct AppFeature: Reducer, Sendable {
                 }
                 
             case .userDidLogout:
-                state.profileFlow = .loggedOut(StackTab.State(root: .auth(AuthFeature.State(openReason: .profile))))
                 state.favoritesBadges = 0
                 state.profileBadges = 0
                 return .run { _ in
@@ -480,7 +446,7 @@ public struct AppFeature: Reducer, Sendable {
                         if isLoggedIn {
                             await send(.registerBackgroundTask)
                         }
-                        try await apiClient.disconnect()
+                        await apiClient.disconnect()
                     }
                 }
                 
@@ -527,21 +493,19 @@ public struct AppFeature: Reducer, Sendable {
             case let .articlesTab(.delegate(.showTabBar(show))),
                 let .favoritesTab(.delegate(.showTabBar(show))),
                 let .forumTab(.delegate(.showTabBar(show))),
-                let .profileFlow(.loggedIn(.delegate(.showTabBar(show)))),
-                let .profileFlow(.loggedOut(.delegate(.showTabBar(show)))):
+                let .moreTab(.delegate(.showTabBar(show))):
                 state.showTabBar = show
                 return .none
                 
             case let .articlesTab(.delegate(.switchTab(to: tab))),
                 let .favoritesTab(.delegate(.switchTab(to: tab))),
                 let .forumTab(.delegate(.switchTab(to: tab))),
-                let .profileFlow(.loggedIn(.delegate(.switchTab(to: tab)))),
-                let .profileFlow(.loggedOut(.delegate(.switchTab(to: tab)))):
+                let .moreTab(.delegate(.switchTab(to: tab))):
                 state.previousTab = state.selectedTab
                 state.selectedTab = tab
                 return .none
                 
-            case .articlesTab, .favoritesTab, .forumTab, .profileFlow:
+            case .articlesTab, .favoritesTab, .forumTab, .moreTab:
                 return .none
                 
             case .appDelegate:
@@ -549,9 +513,6 @@ public struct AppFeature: Reducer, Sendable {
             }
         }
         .ifLet(\.$alert, action: \.alert)
-        .ifLet(\.$auth, action: \.auth) {
-            AuthFeature()
-        }
         .ifLet(\.$logStore, action: \.logStore) {
             LogStoreFeature()
         }
@@ -563,18 +524,14 @@ public struct AppFeature: Reducer, Sendable {
     private func handleSameTabSelection(_ state: inout State) -> Effect<Action> {
         if state.selectedTab == .articles, state.articlesTab.path.isEmpty {
             // Scroll to top of articles
-            return StackTab()
-                .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                .map(Action.articlesTab)
+            return .send(.articlesTab(.root(.articles(.articlesList(.scrollToTop)))))
         }
         
         switch state.selectedTab {
         case .articles:
             //
             if state.articlesTab.path.isEmpty {
-                return StackTab()
-                    .reduce(into: &state.articlesTab, action: .root(.articles(.articlesList(.scrollToTop))))
-                    .map(Action.articlesTab)
+                return .send(.articlesTab(.root(.articles(.articlesList(.scrollToTop)))))
             } else {
                 // TODO: enum
                 let error = NSError(domain: "Impossible articles tab action", code: 0)
@@ -586,20 +543,9 @@ public struct AppFeature: Reducer, Sendable {
             
         case .forum:
             state.forumTab.path.removeAll()
-
-        case .profile:
-            switch state.profileFlow {
-            case var .loggedIn(flow):
-                if !flow.path.isEmpty {
-                    flow.path.removeAll()
-                    state.profileFlow[case: \.loggedIn] = flow
-                }
-            case var .loggedOut(flow):
-                if !flow.path.isEmpty {
-                    flow.path.removeAll()
-                    state.profileFlow[case: \.loggedOut] = flow
-                }
-            }
+            
+        case .more:
+            state.moreTab.path.removeAll()
         }
         
         return removeNotifications(&state)
@@ -611,10 +557,11 @@ public struct AppFeature: Reducer, Sendable {
         return removeNotifications(&state)
     }
     
+    // TODO: does nothing, inspect it
     private func removeNotifications(_ state: inout State) -> Effect<Action> {
         return .run { [tab = state.selectedTab] _ in
             switch tab {
-            case .articles, .forum, .profile:
+            case .articles, .forum, .more:
                 break
             case .favorites:
                 break
@@ -624,9 +571,7 @@ public struct AppFeature: Reducer, Sendable {
     }
     
     private func refreshFavoritesTab(_ state: inout State) -> Effect<Action> {
-        return StackTab()
-            .reduce(into: &state.favoritesTab, action: .root(.favorites(.internal(.refresh))))
-            .map(Action.favoritesTab)
+        return .send(.favoritesTab(.root(.favorites(.internal(.refresh)))))
     }
     
     private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
@@ -637,12 +582,29 @@ public struct AppFeature: Reducer, Sendable {
             screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
         case let .announcement(id):
             screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
-        case let .topic(id, goTo):
-            screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo)))
+        case let .device(goTo):
+            screen = switch goTo {
+            case .index:
+                .devDB(.type(DeviceTypeFeature.State(content: .index)))
+            case .vendorsList(let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type))))
+            case .vendor(let vendorName, let type):
+                .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
+            case .device(let tag, let subTag):
+                .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
+            }
+        case let .ticketsList(offset):
+            screen = .tickets(.ticketsList(TicketsListFeature.State(type: .list, initialOffset: offset)))
+        case let .ticket(id):
+            screen = .tickets(.ticket(TicketFeature.State(id: id)))
+        case let .topic(id, goTo, filter):
+            screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo, postsFilter: filter)))
         case let .forum(id, page):
             screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
+        case let .eventLog(id, type):
+            screen = .forum(.eventLog(ForumEventLogFeature.State(id: id, type: type)))
         case let .user(id):
-            screen = .profile(.profile(ProfileFeature.State(userId: id)))
+            screen = .more(.profile(ProfileFeature.State(userId: id)))
         case let .qms(id: id):
             screen = .qms(.qms(QMSFeature.State(chatId: id)))
         case let .search(options: options):
@@ -659,15 +621,7 @@ public struct AppFeature: Reducer, Sendable {
         case .articles:  state.articlesTab.path.append(element)
         case .favorites: state.favoritesTab.path.append(element)
         case .forum:     state.forumTab.path.append(element)
-        case .profile:
-            switch state.profileFlow {
-            case var .loggedIn(flow):
-                flow.path.append(element)
-                state.profileFlow[case: \.loggedIn] = flow
-            case var .loggedOut(flow):
-                flow.path.append(element)
-                state.profileFlow[case: \.loggedOut] = flow
-            }
+        case .more:      state.moreTab.path.append(element)
         }
     }
 }
@@ -685,6 +639,17 @@ extension UIApplication.State {
             return "background"
         @unknown default:
             fatalError()
+        }
+    }
+}
+
+extension ScenePhase {
+    var description: String {
+        switch self {
+        case .background: return "background"
+        case .inactive: return "inactive"
+        case .active: return "active"
+        @unknown default: fatalError()
         }
     }
 }

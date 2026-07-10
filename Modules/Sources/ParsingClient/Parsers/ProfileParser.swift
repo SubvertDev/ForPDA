@@ -33,25 +33,37 @@ public struct ProfileParser {
     /// 20. 0 - topics amount
     /// 21. 10 - replies amount
     /// 22. 0 - qms messages
-    /// 23. [] - devices on forum
+    /// 23. [] - curated topics
     /// 24. [] - warning log
     /// 25. something@gmail.com - email
-    /// 26. "" - empty = no warnings
-    /// 27. "" - empty = no warnings
+    /// 26. "" - registrationIP
+    /// 27. "" - sessionIP
     /// 28. -1 - warning level (-1 => 0%)
     /// 29. 0 - user premod (1 - always | 0 - before ...)
     /// 30. 0 - user readonly (if != 0 => before ...)
     /// 31. 0 - ban reason (1 - last chanse | 2 - permanent | 3 - security block)
     /// 32. [] - rewards list
-    /// 33. "" - ???
+    /// 33. "" - previous nicknames
     
     public static func parseUser(from string: String) throws -> User {
         if let data = string.data(using: .utf8) {
             do {
                 guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                guard let readOnlyUntil = array[safe: 30] as? Int,
+                      let premoderationRaw = array[safe: 29] as? Int else {
+                    throw ParsingError.failedToCastFields
+                }
+                let readOnlyDate: Date? = readOnlyUntil != 0 ? Date(timeIntervalSince1970: TimeInterval(readOnlyUntil)) : nil
+                let premoderation: User.Premoderation? = switch premoderationRaw {
+                case 0: nil
+                case 1: .always
+                default: .until(Date(timeIntervalSince1970: TimeInterval(premoderationRaw)))
+                }
+                
                 return User(
                     id: array[2] as! Int,
-                    nickname: (array[3] as! String).convertHtmlCodes(),
+                    nickname: try (array[3] as! String).convertHtmlCodes(),
                     imageUrl: URL(string: array[4] as! String),
                     group: User.Group(rawValue: array[5] as! Int)!,
                     status: (array[6] as? String).flatMap { $0.isEmpty ? nil : $0 }?.convertCodes(),
@@ -71,9 +83,17 @@ public struct ProfileParser {
                     topics: array[20] as! Int,
                     replies: array[21] as! Int,
                     qmsMessages: (array[22] as! Int),
-                    forumDevices: nil,
+                    curatedTopics: parseCuratedTopics(array[23] as! [[Any]]),
+                    warningLogs: parseWarningLogs(array[24] as! [[Any]]),
                     email: (array[25] as? String).flatMap { $0.isEmpty ? nil : $0 },
-                    achievements: parseUserAchievements(array[32] as! [[Any]])
+                    registrationIP: array[26] as! String,
+                    sessionIP: array[27] as! String,
+                    warningLevel: array[28] as! Int,
+                    premoderation: premoderation,
+                    readOnlyUntil: readOnlyDate,
+                    banReason: User.BanReason(rawValue: array[31] as! Int),
+                    achievements: parseUserAchievements(array[32] as! [[Any]]),
+                    previousNicknames: array[33] as! String
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -124,6 +144,26 @@ public struct ProfileParser {
                 presentationDate: Date(
                     timeIntervalSince1970: achievement[4] as! TimeInterval
                 )
+            )
+        }
+    }
+    
+    private static func parseCuratedTopics(_ array: [[Any]]) -> [User.CuratedTopic] {
+        return array.map { topic in
+            return User.CuratedTopic(id: topic[0] as! Int, name: topic[1] as! String)
+        }
+    }
+    
+    private static func parseWarningLogs(_ array: [[Any]]) -> [User.WarningLog] {
+        return array.map { warning in
+            return User.WarningLog(
+                timestamp: warning[0] as! Int,
+                level: .init(rawValue: warning[1] as! Int) ?? .unknown,
+                authorId: warning[2] as! Int,
+                authorName: warning[3] as! String,
+                reason: warning[4] as! String,
+                postId: warning[5] as! Int,
+                canBeCanceled: ((warning[6] as! Int) != 0)
             )
         }
     }

@@ -190,7 +190,7 @@ public struct SearchScreen: View {
     
     private func AuthorSection() -> some View {
         Section {
-            SharedUI.ForField(
+            SharedUI.Field(
                 content: $store.authorName.removeDuplicates(),
                 placeholder: LocalizedStringResource("Input...", bundle: .module),
                 focusEqual: SearchFeature.State.Field.authorName,

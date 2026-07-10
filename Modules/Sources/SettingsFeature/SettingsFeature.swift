@@ -22,7 +22,17 @@ public struct SettingsFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
-        case alert(AlertState<SettingsFeature.Action.Alert>)
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+        }
+        public enum Alert {
+            case openSettings
+            case clearCache
+        }
     }
     
     // MARK: - State
@@ -38,7 +48,6 @@ public struct SettingsFeature: Reducer, Sendable {
         public var backgroundTheme: BackgroundTheme
         public var appTintColor: AppTintColor
         
-        var didLoadOnce = false
         
         public var appVersionAndBuild: String {
             let info = Bundle.main.infoDictionary
@@ -86,22 +95,11 @@ public struct SettingsFeature: Reducer, Sendable {
         case safariExtensionButtonTapped
         case copyDebugIdButtonTapped
         case clearCacheButtonTapped
-        case supportOnBoostyButtonTapped
-        case appDiscussionButtonTapped
-        case telegramChangelogButtonTapped
-        case telegramChatButtonTapped
-        case githubButtonTapped
-        case checkVersionsButtonTapped
-        case notImplementedFeatureTapped
         
         case _somethingWentWrong(any Error)
         
         // TODO: Different alerts?
         case destination(PresentationAction<Destination.Action>)
-        public enum Alert: Equatable {
-            case openSettings
-            case clearCache
-        }
         
         case delegate(Delegate)
         public enum Delegate {
@@ -127,7 +125,7 @@ public struct SettingsFeature: Reducer, Sendable {
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .languageButtonTapped:
@@ -163,39 +161,6 @@ public struct SettingsFeature: Reducer, Sendable {
                 
             case .clearCacheButtonTapped:
                 state.destination = .alert(.clearCache)
-                return .none
-                
-            case .supportOnBoostyButtonTapped:
-                return .run { _ in
-                    await open(url: Links.boosty)
-                }
-                
-            case .appDiscussionButtonTapped:
-                return .send(.delegate(.openDeeplink(Links.appDiscussion)))
-                
-            case .telegramChangelogButtonTapped:
-                return .run { _ in
-                    await open(url: Links.telegramChangelog)
-                }
-                
-            case .telegramChatButtonTapped:
-                return .run { _ in
-                    await open(url: Links.telegramChat)
-                }
-                
-            case .githubButtonTapped:
-                return .run { _ in
-                    await open(url: Links.github)
-                }
-                
-            case .checkVersionsButtonTapped:
-                return .run { _ in
-                    // TODO: Move URL to models
-                    await open(url: Links.githubReleases)
-                }
-                
-            case .notImplementedFeatureTapped:
-                state.destination = .alert(.notImplemented)
                 return .none
                 
             case .destination(.presented(.alert(.openSettings))):
@@ -241,19 +206,13 @@ public struct SettingsFeature: Reducer, Sendable {
     
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}
 
 extension SettingsFeature.Destination.State: Equatable {}
 
 // MARK: - Alert Extensions
 
-private extension AlertState where Action == SettingsFeature.Action.Alert {
+private extension AlertState where Action == SettingsFeature.Destination.Alert {
     
     // Safari Extension
     

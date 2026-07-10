@@ -21,9 +21,13 @@ public struct FavoritesScreen: View {
     @State private var navigationMinimized = false
     @Environment(\.tintColor) private var tintColor
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -51,7 +55,7 @@ public struct FavoritesScreen: View {
                         FavoritesSection(favorites: store.favorites, important: false)
                     }
                     .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
+                    ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
                     .refreshable {
                         await send(.onRefresh).finish()
                     }
@@ -63,11 +67,9 @@ public struct FavoritesScreen: View {
             .navigationTitle(Text("Favorites", bundle: .module))
             ._toolbarTitleDisplayMode(.large)
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -100,7 +102,7 @@ public struct FavoritesScreen: View {
                 }
             }
             .fittedSheet(
-                item: $store.scope(state: \.sort, action: \.sort),
+                item: $store.scope(\.$sort, action: \.sort),
                 embedIntoNavStack: true
             ) { store in
                 SortView(store: store)
@@ -207,7 +209,7 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func FavoritesSection(favorites: [FavoriteInfo], important: Bool) -> some View {
         Section {
-            if shouldShowNavigation {
+            if shouldShowInlineNavigation {
                 Navigation(isShown: !important)
             }
             
@@ -229,6 +231,8 @@ public struct FavoritesScreen: View {
                             username: favorite.topic.lastPost.username,
                             isClosed: favorite.topic.isClosed,
                             isUnread: favorite.topic.isUnread,
+                            isHatUpdated: favorite.isHatUpdated,
+                            hasHatUpdateTracking: favorite.isNotifyHatUpdate,
                             onAction: { unreadTapped in
                                 send(.favoriteTapped(favorite, showUnread: unreadTapped))
                             }
@@ -258,7 +262,7 @@ public struct FavoritesScreen: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             
-            if shouldShowNavigation {
+            if shouldShowInlineNavigation {
                 Navigation(isShown: !important)
             }
         } header: {
@@ -276,7 +280,7 @@ public struct FavoritesScreen: View {
     @ViewBuilder
     private func Navigation(isShown: Bool) -> some View {
         if isShown, store.pageNavigation.shouldShow {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color.clear)
                 .padding(.bottom, 4)
         }

@@ -16,7 +16,7 @@ public struct ForumParser {
                 return Forum(
                     id: array[3] as! Int,
                     name: array[4] as! String,
-                    flag: array[5] as! Int,
+                    flag: ForumFlag(rawValue: array[5] as! Int),
                     globalAnnouncement: array[6] as! String,
                     announcements: parseAnnouncementInfo(array[7] as! [[Any]]),
                     subforums: parseForumInfo(array[8] as! [[Any]]),
@@ -46,6 +46,66 @@ public struct ForumParser {
         }
     }
     
+    public static func parseForumStat(from string: String) throws -> ForumStat {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                if array.count == 2 {
+                    throw ParsingError.failedToFindPost
+                }
+                
+                return ForumStat(
+                    id: array[3] as! Int,
+                    name: array[4] as! String,
+                    description: array[5] as! String,
+                    flag: ForumFlag(rawValue: array[6] as! Int),
+                    globalAnnouncement: array[7] as! String,
+                    subforumsCount: array[8] as! Int,
+                    topicsCount: array[9] as! Int,
+                    postsCount: array[10] as! Int,
+                    moderators: parseForumStatModerators(array[11] as! [[Any]])
+                )
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
+    public static func parseForumEventLog(from string: String) throws -> [ForumEventLog] {
+        if let data = string.data(using: .utf8) {
+            do {
+                guard let array = try JSONSerialization.jsonObject(with: data, options: []) as? [Any] else { throw ParsingError.failedToCastDataToAny }
+                
+                return (array[2] as! [[Any]]).map { event in
+                    return ForumEventLog(
+                        userId: event[1] as! Int,
+                        userName: (event[2] as! String).convertCodes(),
+                        userGroup: User.Group(rawValue: event[3] as! Int)!,
+                        content: event[4] as! String,
+                        createdAt: Date(timeIntervalSince1970: TimeInterval(event[0] as! Int))
+                    )
+                }
+            } catch {
+                throw ParsingError.failedToSerializeData(error)
+            }
+        } else {
+            throw ParsingError.failedToCreateDataFromString
+        }
+    }
+    
+    internal static func parseForumStatModerators(_ array: [[Any]]) -> [ForumStat.ForumModerator] {
+        return array.map { moderator in
+            return ForumStat.ForumModerator(
+                id: moderator[0] as! Int,
+                name: (moderator[1] as! String).convertCodes(),
+                group: User.Group(rawValue: moderator[2] as! Int)!
+            )
+        }
+    }
+    
     public static func parseForumJump(from string: String) throws -> ForumJump {
         if let data = string.data(using: .utf8) {
             do {
@@ -59,7 +119,7 @@ public struct ForumParser {
                     id: array[2] as! Int,
                     offset: array[3] as! Int,
                     postId: array[4] as! Int,
-                    allPosts: array[5] as! Int == 1 ? true : false
+                    postsFilter: TopicPostsFilter(rawValue: array[5] as! Int)!
                 )
             } catch {
                 throw ParsingError.failedToSerializeData(error)
@@ -91,7 +151,7 @@ public struct ForumParser {
             return ForumInfo(
                 id: navigation[1] as! Int,
                 name: navigation[2] as! String,
-                flag: navigation[0] as! Int
+                flag: ForumFlag(rawValue: navigation[0] as! Int)
             )
         }
     }
@@ -112,7 +172,7 @@ public struct ForumParser {
             return ForumInfo(
                 id: forum[0] as! Int,
                 name: (forum[1] as! String).convertCodes(),
-                flag: forum[2] as! Int,
+                flag: ForumFlag(rawValue: forum[2] as! Int),
                 redirectUrl: redirectUrl
             )
         }
@@ -129,7 +189,7 @@ public struct ForumParser {
             id: topic[0] as! Int,
             name: (topic[1] as! String).convertCodes(),
             description: (topic[2] as! String).convertCodes(),
-            flag: topic[3] as! Int,
+            flag: ForumFlag(rawValue: topic[3] as! Int),
             postsCount: topic[4] as! Int,
             lastPost: TopicInfo.LastPost(
                 date: Date(timeIntervalSince1970: topic[5] as! TimeInterval),

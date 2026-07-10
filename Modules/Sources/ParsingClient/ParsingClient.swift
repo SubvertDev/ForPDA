@@ -34,20 +34,26 @@ public struct ParsingClient: Sendable {
     public var parseForumsList: @Sendable (_ response: String) async throws -> [ForumInfo]
     public var parseForumJump: @Sendable (_ response: String) async throws -> ForumJump
     public var parseForum: @Sendable (_ response: String) async throws -> Forum
+    public var parseForumStat: @Sendable (_ response: String) async throws -> ForumStat
+    public var parseForumEventLog: @Sendable (_ response: String) async throws -> [ForumEventLog]
     public var parseTopic: @Sendable (_ response: String) async throws -> Topic
+    public var parseTopicViewers: @Sendable (_ response: String) async throws -> TopicViewers
     public var parseAnnouncement: @Sendable (_ response: String) async throws -> Announcement
     public var parseFavorites: @Sendable (_ response: String) async throws -> Favorite
     public var parseHistory: @Sendable (_ response: String) async throws -> History
     public var parseMentions: @Sendable (_ response: String) async throws -> Mentions
-    public var parsePostPreview: @Sendable (_ response: String) async throws -> PostPreview
+    public var parsePostPreview: @Sendable (_ response: String) async throws -> PreviewResponse
     public var parsePostSendResponse: @Sendable (_ response: String) async throws -> PostSendResponse
+    public var parsePostKarmaHistory: @Sendable (_ response: String) async throws -> [PostKarmaVote]
+    public var parseTemplatePreview: @Sendable (_ response: String) async throws -> PreviewResponse
+    public var parseTemplateSend: @Sendable (_ response: String) async throws -> TemplateSend
     
     // Search
     public var parseSearch: @Sendable (_ response: String) async throws -> SearchResponse
     public var parseSearchUsers: @Sendable (_ response: String) async throws -> SearchUsersResponse
     
     // Write Form
-    public var parseWriteForm: @Sendable (_ response: String) async throws -> [WriteFormFieldType]
+    public var parseWriteForm: @Sendable (_ response: String) async throws -> [FormFieldType]
     
     // Extra
     public var parseUnread: @Sendable (_ response: String) async throws -> Unread
@@ -56,6 +62,17 @@ public struct ParsingClient: Sendable {
     public var parseQmsList: @Sendable (_ response: String) async throws -> QMSList
     public var parseQmsUser: @Sendable (_ response: String) async throws -> QMSUser
     public var parseQmsChat: @Sendable (_ response: String) async throws -> QMSChat
+    
+    // DevDB
+    public var parseDeviceBrands: @Sendable (_ response: String) async throws -> DeviceVendorsList
+    public var parseDeviceVendor: @Sendable (_ response: String) async throws -> DeviceVendor
+    public var parseDeviceSpecifications: @Sendable (_ response: String) async throws -> DeviceSpecifications
+    
+    // Ticket
+    public var parseTicketsList: @Sendable (_ response: String) async throws -> TicketsList
+    public var parseTicket: @Sendable (_ response: String) async throws -> Ticket
+    public var parseChangeTicketStatus: @Sendable (_ response: String) async throws -> TicketStatusChangeResponse
+    public var parseTicketStatusHistory: @Sendable (_ response: String) async throws -> [TicketStatusHistory]
 }
 
 // MARK: - Dependency Key
@@ -101,8 +118,17 @@ extension ParsingClient: DependencyKey {
         parseForum: { response in
             return try ForumParser.parse(from: response)
         },
+        parseForumStat: { response in
+            return try ForumParser.parseForumStat(from: response)
+        },
+        parseForumEventLog: { response in
+            return try ForumParser.parseForumEventLog(from: response)
+        },
         parseTopic: { response in
             return try TopicParser.parse(from: response)
+        },
+        parseTopicViewers: { response in
+            return try TopicParser.parseTopicViewers(from: response)
         },
         parseAnnouncement: { response in
             return try ForumParser.parseAnnouncement(from: response)
@@ -121,6 +147,15 @@ extension ParsingClient: DependencyKey {
         },
         parsePostSendResponse: { response in
             return try TopicParser.parsePostSendResponse(from: response)
+		},
+        parsePostKarmaHistory: { response in
+            return try TopicParser.parsePostKarmaHistory(from: response)
+        },
+        parseTemplatePreview: { response in
+            return try FormParser.parseTemplatePreview(from: response)
+        },
+        parseTemplateSend: { response in
+            return try FormParser.parseTemplateSend(from: response)
         },
         parseSearch: { response in
             return try SearchParser.parse(from: response)
@@ -129,7 +164,7 @@ extension ParsingClient: DependencyKey {
             return try SearchUsersParser.parse(from: response)
         },
         parseWriteForm: { response in
-            return try WriteFormParser.parse(from: response)
+            return try FormParser.parse(from: response)
         },
         parseUnread: { response in
             return try UnreadParser.parse(from: response)
@@ -142,6 +177,27 @@ extension ParsingClient: DependencyKey {
         },
         parseQmsChat: { response in
             return try QMSChatParser.parse(from: response)
+        },
+        parseDeviceBrands: { response in
+            return try DevDBParser.parseDeviceBrands(from: response)
+        },
+        parseDeviceVendor: { response in
+            return try DevDBParser.parseDeviceVendor(from: response)
+        },
+        parseDeviceSpecifications: { response in
+            return try DevDBParser.parse(from: response)
+        },
+        parseTicketsList: { response in
+            return try TicketParser.parseTicketsList(from: response)
+        },
+        parseTicket: { response in
+            return try TicketParser.parse(from: response)
+        },
+        parseChangeTicketStatus: { response in
+            return try TicketParser.parseChangeTicketStatus(from: response)
+        },
+        parseTicketStatusHistory: { response in
+            return try TicketParser.parseTicketStatusHistory(from: response)
         }
     )
 }

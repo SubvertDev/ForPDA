@@ -15,6 +15,9 @@ import Models
 import RichTextKit
 import ParsingClient
 import BBBuilder
+import FormFeature
+import ReputationChangeFeature
+import CreateChatFeature
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -25,7 +28,7 @@ public struct ProfileScreen: View {
     @Environment(\.tintColor) private var tintColor
     
     public enum PickerSelection {
-        case general, statistics, achievements
+        case general, statistics, achievements, curation, logging
     }
     @State private var pickerSelection: PickerSelection = .general
     
@@ -46,7 +49,6 @@ public struct ProfileScreen: View {
                 if let user = store.user {
                     List {
                         Header(user: user)
-                        NavigationSection()
                         SegmentPicker()
                         
                         switch pickerSelection {
@@ -58,25 +60,67 @@ public struct ProfileScreen: View {
                             
                         case .achievements:
                             AchievementsSegment(user: user)
+                            
+                        case .curation:
+                            CurationSegment(user.curatedTopics)
+                            
+                        case .logging:
+                            LoggingSegment(user: user)
                         }
                     }
-                    .listSectionSpacingBackport(28)
+                    ._listSectionSpacing(28)
                     .scrollContentBackground(.hidden)
                 } else {
                     PDALoader()
                         .frame(width: 24, height: 24)
                 }
             }
-            .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
             .navigationTitle(Text("Profile", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
-            .fullScreenCover(item: $store.scope(state: \.destination?.editProfile, action: \.destination.editProfile)) { store in
+            ._toolbarTitleDisplayMode(.inline)
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).editProfile) { store in
                 NavigationStack {
                     EditScreen(store: store)
                 }
             }
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).note) { store in
+                NavigationStack {
+                    FormScreen(store: store)
+                }
+            }
+            .fittedSheet(
+                item: $store.scope(\.$destination, action: \.destination).changeReputation,
+                embedIntoNavStack: true
+            ) { store in
+                ReputationChangeView(store: store)
+            }
+            .sheet(item: $store.scope(\.$destination, action: \.destination).createChat) { store in
+                NavigationStack {
+                    CreateChatScreen(store: store)
+                }
+            }
             .toolbar {
-                ToolbarButtons()
+                if store.shouldShowOpenChatButton {
+                    ToolbarItem {
+                        ContextButton(
+                            text: LocalizedStringResource("Show chats", bundle: .module),
+                            symbol: .bubbleLeft
+                        ) {
+                            send(.chatButtonTapped)
+                        }
+                        .tint(tintColor)
+                        ._glassProminentButtonStyle()
+                    }
+                }
+                
+                if #available(iOS 26, *) {
+                    ToolbarSpacer()
+                }
+                
+                if store.shouldShowToolbarButtons || store.isUserSessionHasModerationGroup {
+                    ToolbarItem {
+                        OptionsMenu()
+                    }
+                }
             }
             .onAppear {
                 send(.onAppear)
@@ -84,37 +128,41 @@ public struct ProfileScreen: View {
         }
     }
     
-    // MARK: - Toolbar Items
+    // MARK: - Toolbar Options Menu
     
-    @ToolbarContentBuilder
-    private func ToolbarButtons() -> some ToolbarContent {
-        if store.shouldShowToolbarButtons {
-            ToolbarItem {
-                Button {
-                    send(.logoutButtonTapped)
-                } label: {
-                    Image(systemSymbol: .rectanglePortraitAndArrowForward)
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        WithPerceptionTracking {
+            Menu {
+                let canEditProfile = store.userSessionGroup == .admin
+                || store.userSessionGroup == .supermoderator
+                || store.userSessionGroup == .moderator
+                if store.shouldShowToolbarButtons || canEditProfile {
+                    ContextButton(
+                        text: LocalizedStringResource("Edit profile", bundle: .module),
+                        symbol: .squareAndPencil
+                    ) {
+                        send(.contextMenu(.edit))
+                    }
                 }
-            }
-            
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed)
-            }
-            
-            ToolbarItem {
-                Button {
-                    send(.editButtonTapped)
-                } label: {
-                    Image(systemSymbol: .pencil)
+                
+                if store.isUserSessionHasModerationGroup, !store.shouldShowToolbarButtons {
+                    ContextButton(
+                        text: LocalizedStringResource("Add notice", bundle: .module),
+                        symbol: .noteTextBadgePlus
+                    ) {
+                        send(.contextMenu(.addNotice))
+                    }
+                    
+                    ContextButton(
+                        text: LocalizedStringResource("Change reputation", bundle: .module),
+                        symbol: .arrowUpArrowDown
+                    ) {
+                        send(.contextMenu(.changeReputation))
+                    }
                 }
-            }
-            
-            ToolbarItem {
-                Button {
-                    send(.settingsButtonTapped)
-                } label: {
-                    Image(systemSymbol: .gearshape)
-                }
+            } label: {
+                Image(systemSymbol: .ellipsisCircle)
             }
         }
     }
@@ -171,42 +219,31 @@ public struct ProfileScreen: View {
         .listRowSeparator(.hidden)
     }
     
-    // MARK: - Navigation Section
-    
-    @ViewBuilder
-    private func NavigationSection() -> some View {
-        if store.shouldShowToolbarButtons {
-            Section {
-                Row(symbol: .person2, title: "QMS", type: .navigation(badge: store.qmsBadgeCount)) {
-                    send(.qmsButtonTapped)
-                }
-                
-                Row(symbol: .at, title: "Mentions", type: .navigation(badge: store.mentionsBadgeCount)) {
-                    send(.mentionsButtonTapped)
-                }
-                
-                Row(symbol: .clockArrowCirclepath, title: "History", type: .navigation(badge: 0)) {
-                    send(.historyButtonTapped)
-                }
-            }
-            .listRowBackground(Color(.Background.teritary))
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-        }
-    }
-    
     // MARK: - Segment Picker
     
     @ViewBuilder
     private func SegmentPicker() -> some View {
+        let useIcon = !store.user!.achievements.isEmpty && !store.user!.curatedTopics.isEmpty
         Picker(String(""), selection: $pickerSelection) {
-            Text("General", bundle: .module)
+            SegmentLabel("General", .house, useIcon)
                 .tag(PickerSelection.general)
-            Text("Statistics", bundle: .module)
+            
+            SegmentLabel("Statistics", .chartBar, useIcon)
                 .tag(PickerSelection.statistics)
             
             if !store.user!.achievements.isEmpty {
-                Text("Achievements", bundle: .module)
+                SegmentLabel("Achievements", .trophy, useIcon)
                     .tag(PickerSelection.achievements)
+            }
+            
+            if !store.user!.curatedTopics.isEmpty {
+                SegmentLabel("Curation", .eyeglasses, useIcon)
+                    .tag(PickerSelection.curation)
+            }
+            
+            if !store.user!.warningLogs.isEmpty {
+                SegmentLabel("Logging", .serverRack, useIcon)
+                    .tag(PickerSelection.logging)
             }
         }
         .pickerStyle(.segmented)
@@ -214,11 +251,23 @@ public struct ProfileScreen: View {
         .listRowBackground(Color.clear)
     }
     
+    @ViewBuilder
+    private func SegmentLabel(_ text: LocalizedStringKey, _ icon: SFSymbol, _ useIcon: Bool) -> some View {
+        if useIcon {
+            Image(systemSymbol: icon)
+        } else {
+            Text(text, bundle: .module)
+        }
+    }
+    
     // MARK: - General Segment
     
     @ViewBuilder
     private func GeneralSegment(user: User) -> some View {
         GroupsSection(user: user)
+        if user.canModerate {
+            RestrictionsSection(user: user)
+        }
         PersonalSection(user: user)
         if user.aboutMe != nil {
             AboutSection(user: user)
@@ -229,6 +278,7 @@ public struct ProfileScreen: View {
     }
     
     // MARK: - Groups Section
+    
     @ViewBuilder
     private func GroupsSection(user: User) -> some View {
         Section {
@@ -272,27 +322,64 @@ public struct ProfileScreen: View {
                     }
                 }
                 
-                HStack {
-                    Text("Registration date", bundle: .module)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                    
-                    Spacer()
-                    
-                    Text(user.registrationDate.formatted(date: .numeric, time: .omitted))
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.teritary))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 19)
-                .background(
-                    Color(.Background.teritary)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                InformationRow(
+                    title: "Registration date",
+                    content: user.registrationDate.formatted(date: .numeric, time: .omitted),
+                    type: .horizontal
                 )
+                
+                if user.canModerate || (store.shouldShowToolbarButtons && user.warningLevel != -1) {
+                    let warningLevel = user.warningLevel != -1 ? 20 * user.warningLevel : 0
+                    InformationRow(title: "Warning level", content: "\(warningLevel)%", type: .horizontal)
+                }
+                
+                if user.canModerate {
+                    InformationRow(title: "Registration IP", content: user.registrationIP, type: .horizontal)
+                }
             }
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
+    }
+    
+    // MARK: - Restrictions Section
+    
+    @ViewBuilder
+    private func RestrictionsSection(user: User) -> some View {
+        Section {
+            let premoderation = switch user.premoderation {
+            case .always:
+                LocalizedStringKey("always")
+            case .until(let date):
+                LocalizedStringKey("until \(date.formatted())")
+            case .none:
+                LocalizedStringKey("no")
+            }
+            Row(title: "Premoderation", type: .localizedDescription(premoderation))
+            
+            let readOnlyUntil: LocalizedStringKey = if let date = user.readOnlyUntil {
+                LocalizedStringKey("until \(date.formatted())")
+            } else {
+                LocalizedStringKey("no")
+            }
+            Row(title: "Readonly", type: .localizedDescription(readOnlyUntil))
+            
+            let banReason = switch user.banReason {
+            case .lastChanse:
+                LocalizedStringKey("last chance")
+            case .permanent:
+                LocalizedStringKey("permanent")
+            case .securityBlock:
+                LocalizedStringKey("security block")
+            case .none:
+                LocalizedStringKey("no")
+            }
+            Row(title: "Ban", type: .localizedDescription(banReason))
+        } header: {
+            SectionHeader(title: "Restrictions")
+        }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
     // MARK: - Personal Section
@@ -350,24 +437,9 @@ public struct ProfileScreen: View {
     private func DevicesSection(devices: [User.Device]) -> some View {
         Section {
             ForEach(devices) { device in
-                HStack(spacing: 0) {
-                    Text(device.name)
-                        .font(.body)
-                        .foregroundStyle(Color(.Labels.primary))
-                    
-                    Spacer(minLength: 8)
-                    
-                    if device.main {
-                        Circle()
-                            .font(.title2)
-                            .foregroundStyle(tintColor)
-                            .frame(width: 8)
-                            .padding(.trailing, 12)
-                    }
+                Row(title: LocalizedStringKey(device.name), type: .navigation(.indicator(device.main))) {
+                    send(.deviceButtonTapped(device.id))
                 }
-                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
-                .buttonStyle(.plain)
-                .frame(height: 60)
             }
         } header: {
             SectionHeader(title: "Devices List")
@@ -492,6 +564,60 @@ public struct ProfileScreen: View {
         .listRowBackground(Color.clear)
     }
     
+    // MARK: - Curation Segment
+    
+    @ViewBuilder
+    private func CurationSegment(_ topics: [User.CuratedTopic]) -> some View {
+        Section {
+            ForEach(topics) { topic in
+                Row(title: LocalizedStringKey(topic.name), type: .basicNavigation) {
+                    send(.curatedTopicButtonTapped(topic.id))
+                }
+            }
+        }
+        .listRowBackground(Color(.Background.teritary))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Logging Segment
+    
+    @ViewBuilder
+    private func LoggingSegment(user: User) -> some View {
+        if user.canModerate {
+            Section {
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        InformationRow(title: "Registration IP", content: user.registrationIP, type: .vertical)
+                        
+                        InformationRow(title: "Session IP", content: user.sessionIP, type: .vertical)
+                    }
+                    
+                    if !user.previousNicknames.isEmpty {
+                        InformationRow(title: "Previous nicknames", content: user.previousNicknames, type: .vertical)
+                    }
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            }
+            .listRowBackground(Color(.clear))
+        }
+        
+        Section {
+            ForEach(user.warningLogs) { warning in
+                WarningLogView(
+                    warningLog: warning,
+                    deeplinkTapped: { url in
+                        send(.deeplinkTapped(url, .warningLog))
+                    }
+                )
+                .listRowInsets(EdgeInsets(top: 12, leading: 0, bottom: 12, trailing: 0))
+            }
+            .listRowSeparator(.visible)
+        }
+        .listRowBackground(Color(.clear))
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
     // MARK: - Section Header
     
     @ViewBuilder
@@ -508,10 +634,16 @@ public struct ProfileScreen: View {
     
     enum RowType {
         case basic
+        case basicNavigation
         case description(String)
-        case navigation(badge: Int)
+        case navigation(NavigationRowType)
         case navigationDescription(String)
         case localizedDescription(LocalizedStringKey)
+        
+        enum NavigationRowType {
+            case badge(Int)
+            case indicator(Bool)
+        }
     }
     
     @ViewBuilder
@@ -539,6 +671,11 @@ public struct ProfileScreen: View {
                     case .basic:
                         EmptyView()
                         
+                    case .basicNavigation:
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color(.Labels.quintuple))
+                        
                     case let .description(text):
                         Text(text)
                             .font(.body)
@@ -549,16 +686,28 @@ public struct ProfileScreen: View {
                             .font(.body)
                             .foregroundStyle(Color(.Labels.teritary))
                         
-                    case let .navigation(badgeCount):
-                        if badgeCount <= 0 {
-                            Image(systemSymbol: .chevronRight)
-                                .font(.system(size: 17, weight: .semibold))
-                                .foregroundStyle(Color(.Labels.quintuple))
-                        } else {
-                            EmptyView()
-                                .badge(badgeCount)
-                                ._badgeProminence(.increased)
+                    case let .navigation(type):
+                        switch type {
+                        case .badge(let badgeCount):
+                            if badgeCount > 0 {
+                                EmptyView()
+                                    .badge(badgeCount)
+                                    ._badgeProminence(.increased)
+                            }
+                            
+                        case .indicator(let show):
+                            if show {
+                                Circle()
+                                    .font(.title2)
+                                    .foregroundStyle(tintColor)
+                                    .frame(width: 8)
+                                    .padding(.trailing, 12)
+                            }
                         }
+                        
+                        Image(systemSymbol: .chevronRight)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color(.Labels.quintuple))
                         
                     case let .navigationDescription(text):
                         Text(text)
@@ -579,28 +728,50 @@ public struct ProfileScreen: View {
         .frame(height: 60)
     }
     
-    @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, description: String) -> some View {
-        HStack {
-            Text(title, bundle: .module)
-            
-            Spacer()
-            
-            Text(description)
-                .foregroundStyle(.secondary)
-        }
+    // MARK: - Information Row
+    
+    enum InformationRowType {
+        case horizontal
+        case vertical
     }
     
     @ViewBuilder
-    private func InformationRow(title: LocalizedStringKey, description: LocalizedStringKey) -> some View {
-        HStack {
-            Text(title, bundle: .module)
-            
-            Spacer()
-            
-            Text(description, bundle: .module)
-                .foregroundStyle(.secondary)
+    private func InformationRow(title: LocalizedStringKey, content: String, type: InformationRowType) -> some View {
+        Group {
+            switch type {
+            case .horizontal:
+                HStack {
+                    Text(title, bundle: .module)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.primary))
+                    
+                    Spacer()
+                    
+                    Text(verbatim: content)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.teritary))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 19)
+                
+            case .vertical:
+                VStack(spacing: 2) {
+                    Text(title, bundle: .module)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.Labels.teritary))
+                    
+                    Text(verbatim: content)
+                        .font(.body)
+                        .foregroundStyle(Color(.Labels.primary))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(12)
+            }
         }
+        .background(
+            Color(.Background.teritary)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+        )
     }
 }
 
@@ -634,26 +805,6 @@ private extension Date {
     }
 }
 
-private extension View {
-    func listSectionSpacingBackport(_ value: CGFloat) -> some View {
-        self.modifier(ListSectionSpacing(value: value))
-    }
-}
-
-private struct ListSectionSpacing: ViewModifier {
-    
-    var value: CGFloat
-    
-    func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            content
-                .listSectionSpacing(value)
-        } else {
-            content
-        }
-    }
-}
-
 extension User {
     var signatureAttributed: NSAttributedString? {
         guard let signature, !signature.isEmpty else { return nil }
@@ -681,7 +832,7 @@ extension User {
         ProfileScreen(
             store: Store(
                 initialState: ProfileFeature.State(
-                    userId: 3640948
+                    userId: 0
                 )
             ) {
                 ProfileFeature()

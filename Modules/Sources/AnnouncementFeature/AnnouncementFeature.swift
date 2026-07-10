@@ -32,7 +32,6 @@ public struct AnnouncementFeature: Reducer, Sendable {
         
         var types: [[UITopicType]] = []
         
-        var didLoadOnce = false
        
         public init(id: Int, name: String? = nil) {
             self.announcementId = id
@@ -102,11 +101,11 @@ public struct AnnouncementFeature: Reducer, Sendable {
                 
             case let .internal(.loadTypes(types)):
                 state.types = types
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .none
                 
             case .internal(.announcementResponse(.failure)):
-                reportFullyDisplayed(&state)
+                analyticsClient.reportFullyDisplayed()
                 return .run { _ in await toastClient.showToast(.whoopsSomethingWentWrong) }
                 
             case .delegate:
@@ -118,10 +117,4 @@ public struct AnnouncementFeature: Reducer, Sendable {
     }
     
     // MARK: - Shared Logic
-    
-    private func reportFullyDisplayed(_ state: inout State) {
-        guard !state.didLoadOnce else { return }
-        analyticsClient.reportFullyDisplayed()
-        state.didLoadOnce = true
     }
-}

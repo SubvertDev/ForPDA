@@ -11,8 +11,11 @@ import AnnouncementFeature
 import ArticleFeature
 import ArticlesListFeature
 import DeveloperFeature
+import DeviceSpecificationsFeature
+import DeviceTypeFeature
 import FavoritesRootFeature
 import FavoritesFeature
+import ForumEventLogFeature
 import ForumFeature
 import ForumsListFeature
 import HistoryFeature
@@ -25,15 +28,20 @@ import ReputationFeature
 import SearchFeature
 import SearchResultFeature
 import SettingsFeature
+import TicketFeature
+import TicketsListFeature
 import TopicFeature
 import AuthFeature
+import MoreFeature
 
 @Reducer
 public enum Path {
     case articles(Articles.Body = Articles.body)
+    case devDB(DevDB.Body = DevDB.body)
     case favorites(FavoritesFeature)
     case forum(Forum.Body = Forum.body)
-    case profile(Profile.Body = Profile.body)
+    case tickets(Tickets.Body = Tickets.body)
+    case more(More.Body = More.body)
     case settings(Settings.Body = Settings.body)
     case search(Search.Body = Search.body)
     case qms(QMS.Body = QMS.body)
@@ -46,7 +54,14 @@ public enum Path {
     }
     
     @Reducer
-    public enum Profile {
+    public enum DevDB {
+        case type(DeviceTypeFeature)
+        case specifications(DeviceSpecificationsFeature)
+    }
+    
+    @Reducer
+    public enum More {
+        case more(MoreFeature)
         case profile(ProfileFeature)
         case history(HistoryFeature)
         case mentions(MentionsFeature)
@@ -59,6 +74,13 @@ public enum Path {
         case forum(ForumFeature)
         case announcement(AnnouncementFeature)
         case topic(TopicFeature)
+        case eventLog(ForumEventLogFeature)
+    }
+    
+    @Reducer
+    public enum Tickets {
+        case ticketsList(TicketsListFeature)
+        case ticket(TicketFeature)
     }
     
     @Reducer
@@ -84,8 +106,10 @@ public enum Path {
 
 extension Path.State: Equatable {}
 extension Path.Articles.State: Equatable {}
-extension Path.Profile.State: Equatable {}
+extension Path.DevDB.State: Equatable {}
+extension Path.More.State: Equatable {}
 extension Path.Forum.State: Equatable {}
+extension Path.Tickets.State: Equatable {}
 extension Path.Settings.State: Equatable {}
 extension Path.Search.State: Equatable {}
 extension Path.QMS.State: Equatable {}
@@ -97,15 +121,21 @@ extension Path {
         case let .articles(path):
             ArticlesViews(path)
             
+        case let .devDB(path):
+            DevDBViews(path)
+            
         case let .favorites(store):
             FavoritesScreen(store: store)
                 .tracking(for: FavoritesScreen.self)
             
-        case let .profile(path):
-            ProfileViews(path)
+        case let .more(path):
+            MoreViews(path)
             
         case let .forum(path):
             ForumViews(path)
+            
+        case let .tickets(path):
+            TicketsViews(path)
             
         case let .settings(path):
             SettingsViews(path)
@@ -136,8 +166,25 @@ extension Path {
     }
     
     @MainActor @ViewBuilder
-    private static func ProfileViews(_ store: Store<Path.Profile.State, Path.Profile.Action>) -> some View {
+    private static func DevDBViews(_ store: Store<Path.DevDB.State, Path.DevDB.Action>) -> some View {
         switch store.case {
+        case let .type(store):
+            DeviceTypeScreen(store: store)
+                .tracking(for: DeviceTypeScreen.self)
+
+        case let .specifications(store):
+            DeviceSpecificationsScreen(store: store)
+                .tracking(for: DeviceSpecificationsScreen.self)
+        }
+    }
+    
+    @MainActor @ViewBuilder
+    private static func MoreViews(_ store: Store<Path.More.State, Path.More.Action>) -> some View {
+        switch store.case {
+        case let .more(store):
+            MoreScreen(store: store)
+                .tracking(for: MoreScreen.self)
+            
         case let .profile(store):
             ProfileScreen(store: store)
                 .tracking(for: ProfileScreen.self, ["id": store.userId ?? 0])
@@ -171,9 +218,23 @@ extension Path {
             TopicScreen(store: store)
                 .tracking(for: TopicScreen.self, ["id": store.topicId])
             
+        case let .eventLog(store):
+            ForumEventLogScreen(store: store)
+            
         case let .announcement(store):
             AnnouncementScreen(store: store)
                 .tracking(for: AnnouncementScreen.self, ["id": store.announcementId])
+        }
+    }
+    
+    @MainActor @ViewBuilder
+    private static func TicketsViews(_ store: Store<Path.Tickets.State, Path.Tickets.Action>) -> some View {
+        switch store.case {
+        case let .ticketsList(store):
+            TicketsListScreen(store: store)
+            
+        case let .ticket(store):
+            TicketScreen(store: store)
         }
     }
     

@@ -21,9 +21,13 @@ public struct HistoryScreen: View {
     @Environment(\.tintColor) private var tintColor
     @State private var navigationMinimized = false
     
-    private var shouldShowNavigation: Bool {
+    private var shouldShowInlineNavigation: Bool {
         let isAnyFloatingNavigationEnabled = store.appSettings.floatingNavigation || store.appSettings.experimentalFloatingNavigation
         return store.pageNavigation.shouldShow && (!isLiquidGlass || !isAnyFloatingNavigationEnabled)
+    }
+    
+    private var shouldShowFloatingNavigation: Bool {
+        return isLiquidGlass && store.appSettings.floatingNavigation && !store.appSettings.experimentalFloatingNavigation
     }
     
     // MARK: - Init
@@ -40,8 +44,8 @@ public struct HistoryScreen: View {
                 Color(.Background.primary)
                     .ignoresSafeArea()
                 
-                if !store.history.isEmpty, !store.isLoading {
-                    List {
+                List {
+                    if !store.history.isEmpty, !store.isLoading {
                         Navigation()
                         
                         ForEach(store.history, id: \.self) { history in
@@ -50,21 +54,22 @@ public struct HistoryScreen: View {
                         
                         Navigation()
                     }
-                    .scrollContentBackground(.hidden)
-                    ._inScrollContentDetector(state: $navigationMinimized)
-                } else if !store.isLoading {
-                    EmptyHistory()
+                }
+                .scrollContentBackground(.hidden)
+                ._inScrollContentDetector(isEnabled: shouldShowFloatingNavigation, state: $navigationMinimized)
+                .overlay(alignment: .center) {
+                    if !store.isLoading, store.history.isEmpty {
+                        EmptyHistory()
+                    }
                 }
             }
             .animation(.default, value: store.history)
             .navigationTitle(Text("History", bundle: .module))
-            ._toolbarTitleDisplayMode(.large)
+            ._toolbarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
-                if isLiquidGlass,
-                   store.appSettings.floatingNavigation,
-                   !store.appSettings.experimentalFloatingNavigation {
+                if shouldShowFloatingNavigation {
                     PageNavigation(
-                        store: store.scope(state: \.pageNavigation, action: \.pageNavigation),
+                        store: store.scope(\.pageNavigation, action: \.pageNavigation),
                         minimized: $navigationMinimized
                     )
                     .padding(.horizontal, 16)
@@ -87,8 +92,8 @@ public struct HistoryScreen: View {
     
     @ViewBuilder
     private func Navigation() -> some View {
-        if shouldShowNavigation {
-            PageNavigation(store: store.scope(state: \.pageNavigation, action: \.pageNavigation))
+        if shouldShowInlineNavigation {
+            PageNavigation(store: store.scope(\.pageNavigation, action: \.pageNavigation))
                 .listRowBackground(Color(.Background.primary))
         }
     }

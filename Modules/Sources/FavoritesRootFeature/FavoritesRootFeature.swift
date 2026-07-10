@@ -57,11 +57,11 @@ public struct FavoritesRootFeature: Reducer {
     public var body: some Reducer<State, Action> {
         BindingReducer()
         
-        Scope(state: \.favorites, action: \.favorites) {
+        Scope(\.favorites, action: \.favorites) {
             FavoritesFeature()
         }
         
-        Scope(state: \.bookmarks, action: \.bookmarks) {
+        Scope(\.bookmarks, action: \.bookmarks) {
             BookmarksFeature()
         }
         

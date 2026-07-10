@@ -15,10 +15,16 @@ import ParsingClient
 
 @DependencyClient
 public struct QMSClient: Sendable {
-    public var loadQMSList: @Sendable () async throws -> QMSList
-    public var loadQMSUser: @Sendable (_ id: Int) async throws -> QMSUser
-    public var loadQMSChat: @Sendable (_ id: Int, _ lastMessageId: Int, _ offset: Int) async throws -> QMSChat
-    public var sendQMSMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
+    public var loadChatList: @Sendable () async throws -> QMSList
+    public var loadUser: @Sendable (_ id: Int) async throws -> QMSUser
+    public var loadChat: @Sendable (_ id: Int, _ lastMessageId: Int, _ offset: Int) async throws -> QMSChat
+    public var createChat: @Sendable (_ opponentId: Int, _ title: String, _ message: String) async throws -> String
+    public var deleteAllChats: @Sendable (_ userId: Int) async throws -> String
+    public var deleteChat: @Sendable (_ chatId: Int) async throws -> String
+    public var sendMessage: @Sendable (_ chatId: Int, _ message: String) async throws -> Void
+    public var deleteMessage: @Sendable (_ chatId: Int, _ messageId: Int, _ forAll: Bool) async throws -> String
+    public var blacklist: @Sendable () async throws -> String
+    public var addToBlacklist: @Sendable (_ id: Int, _ add: Bool) async throws -> String
 }
 
 extension QMSClient: DependencyKey {
@@ -33,25 +39,53 @@ extension QMSClient: DependencyKey {
         @Dependency(\.parsingClient) var parser
         
         return QMSClient(
-            loadQMSList: {
+            loadChatList: {
                 let response = try await api.send(QMSCommand.list)
                 return try await parser.parseQmsList(response)
             },
             
-            loadQMSUser: { id in
+            loadUser: { id in
                 let response = try await api.send(QMSCommand.info(id: id))
                 return try await parser.parseQmsUser(response)
             },
             
-            loadQMSChat: { id, lastMessageId, offset in
-                let request = QMSViewDialogRequest(dialogId: id, messageId: lastMessageId, limit: offset)
-                let response = try await api.send(QMSCommand.Dialog.view(data: request))
+            loadChat: { id, lastMessageId, offset in
+                let response = try await api.send(QMSCommand.Dialog.view(id: id, messageId: lastMessageId, offset: offset))
                 return try await parser.parseQmsChat(response)
             },
             
-            sendQMSMessage: { chatId, message in
-                let request = QMSSendMessageRequest(dialogId: chatId, message: message, fileList: [])
-                let _ = try await api.send(QMSCommand.Message.send(data: request))
+            createChat: { opponentId, title, message in
+                let response = try await api.send(QMSCommand.Dialog.create(title: title, message: message, opponentId: opponentId))
+                return response
+            },
+            
+            deleteAllChats: { userId in
+                let response = try await api.send(QMSCommand.delete(dialogId: 0, messageId: userId, forAll: false))
+                return response
+            },
+            
+            deleteChat: { chatId in
+                let response = try await api.send(QMSCommand.delete(dialogId: chatId, messageId: 0, forAll: false))
+                return response
+            },
+            
+            sendMessage: { chatId, message in
+                let _ = try await api.send(QMSCommand.Message.send(message: message, dialogId: chatId, attaches: []))
+            },
+            
+            deleteMessage: { chatId, messageId, forAll in
+                let response = try await api.send(QMSCommand.delete(dialogId: chatId, messageId: messageId, forAll: forAll))
+                return response
+            },
+            
+            blacklist: {
+                let response = try await api.send(QMSCommand.blacklist)
+                return response
+            },
+            
+            addToBlacklist: { id, add in
+                let response = try await api.send(QMSCommand.toBlackList(opponentId: id, add: add))
+                return response
             }
         )
     }
@@ -62,17 +96,38 @@ extension QMSClient: DependencyKey {
         let mock = QMSClientMock()
         
         return QMSClient(
-            loadQMSList: {
+            loadChatList: {
+                try await Task.sleep(for: .seconds(2))
                 return .mock
             },
-            loadQMSUser: { _ in
+            loadUser: { _ in
+                try await Task.sleep(for: .seconds(2))
                 return .mock
             },
-            loadQMSChat: { id, lastMessageId, offset in
+            loadChat: { id, lastMessageId, offset in
+                try await Task.sleep(for: .seconds(2))
                 return await mock.loadQMSChat()
             },
-            sendQMSMessage: { chatId, message in
+            createChat: { _, _, _ in
+                return ""
+            },
+            deleteAllChats: { _ in
+                return ""
+            },
+            deleteChat: { _ in
+                return ""
+            },
+            sendMessage: { chatId, message in
                 return try await mock.sendQMSMessage(chatId: chatId, message: message)
+            },
+            deleteMessage: { _, _, _ in
+                return ""
+            },
+            blacklist: {
+                return ""
+            },
+            addToBlacklist: { _, _ in
+                return ""
             }
         )
     }
@@ -83,14 +138,20 @@ extension QMSClient: DependencyKey {
         let mock = QMSClientMock(retries: 1)
         
         return QMSClient(
-            loadQMSList: unimplemented(),
-            loadQMSUser: unimplemented(),
-            loadQMSChat: { id, lastMessageId, offset in
+            loadChatList: unimplemented(),
+            loadUser: unimplemented(),
+            loadChat: { id, lastMessageId, offset in
                 return await mock.loadQMSChat()
             },
-            sendQMSMessage: { chatId, message in
+            createChat: unimplemented(),
+            deleteAllChats: unimplemented(),
+            deleteChat: unimplemented(),
+            sendMessage: { chatId, message in
                 return try await mock.sendQMSMessage(chatId: chatId, message: message)
-            }
+            },
+            deleteMessage: unimplemented(),
+            blacklist: unimplemented(),
+            addToBlacklist: unimplemented()
         )
     }
 }

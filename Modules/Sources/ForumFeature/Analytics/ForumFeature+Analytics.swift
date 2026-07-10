@@ -19,6 +19,20 @@ extension ForumFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
+                case .destination:
+                    break
+                    
+                case .pageNavigation(.offsetChanged(to: _)):
+                    analytics.addBreadcrumb(
+                        category: "ForumPageNavigation",
+                        message: nil,
+                        data: [
+                            "id": state.forumId,
+                            "page": state.pageNavigation.page
+                        ],
+                        type: "ui"
+                    )
+                    
                 case .pageNavigation:
                     break
                     
@@ -52,7 +66,16 @@ extension ForumFeature {
                         break // TODO: Add
                     case .toBookmarks:
                         break // TODO: Add
+                    case .createTopic:
+                        break // TODO: Add
+                    case .tickets:
+                        // MARK: Moderator tools are skip analytics
+                        break
                     }
+                    
+                case .view(.contextTopicToolsMenu):
+                    // MARK: Moderator tools are skip analytics
+                    break
                     
                 case let .view(.contextTopicMenu(option, topic)):
                     switch option {
@@ -60,10 +83,14 @@ extension ForumFeature {
                         analytics.log(ForumEvent.menuOpen(topic.id))
                     case .goToEnd:
                         analytics.log(ForumEvent.menuGoToEnd(topic.id))
+                    case .edit:
+                        analytics.log(ForumEvent.menuEdit(topic.id))
                     }
                     
                 case let .view(.contextCommonMenu(option, id, isForum)):
                     switch option {
+                    case .stat:
+                        analytics.log(ForumEvent.menuStat(id, isForum))
                     case .markRead:
                         analytics.log(ForumEvent.menuMarkRead(id, isForum))
                     case .copyLink:

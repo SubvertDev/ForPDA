@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "[Go to Post](%@)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "[Перейти к посту](%@)"
+          }
+        }
+      }
+    },
     "About me" : {
       "localizations" : {
         "ru" : {
@@ -21,12 +31,22 @@
         }
       }
     },
-    "Are you sure you want to log out of your profile ?" : {
+    "Add notice" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы уверены, что хотите выйти из своего профиля?"
+            "value" : "Добавить заметку"
+          }
+        }
+      }
+    },
+    "always" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "всегда"
           }
         }
       }
@@ -71,6 +91,16 @@
         }
       }
     },
+    "Ban" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Бан"
+          }
+        }
+      }
+    },
     "Birthdate" : {
       "localizations" : {
         "ru" : {
@@ -101,6 +131,16 @@
         }
       }
     },
+    "Change reputation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить репутацию"
+          }
+        }
+      }
+    },
     "City" : {
       "localizations" : {
         "ru" : {
@@ -117,6 +157,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Комментариев"
+          }
+        }
+      }
+    },
+    "Curation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Курирование"
           }
         }
       }
@@ -231,26 +281,6 @@
         }
       }
     },
-    "History" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "История"
-          }
-        }
-      }
-    },
-    "Mentions" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Упоминания"
-          }
-        }
-      }
-    },
     "Input..." : {
       "localizations" : {
         "ru" : {
@@ -267,6 +297,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Карма"
+          }
+        }
+      }
+    },
+    "last chance" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "последний шанс"
           }
         }
       }
@@ -301,12 +341,12 @@
         }
       }
     },
-    "Logout" : {
+    "Logging" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выйти"
+            "value" : "Логирование"
           }
         }
       }
@@ -321,12 +361,32 @@
         }
       }
     },
+    "no" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "нет"
+          }
+        }
+      }
+    },
     "Not set" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не указан"
+          }
+        }
+      }
+    },
+    "Note added" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заметка добавлена"
           }
         }
       }
@@ -351,6 +411,16 @@
         }
       }
     },
+    "permanent" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "перманентный"
+          }
+        }
+      }
+    },
     "Personal info" : {
       "localizations" : {
         "ru" : {
@@ -367,6 +437,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Постов"
+          }
+        }
+      }
+    },
+    "Premoderation" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Премод"
+          }
+        }
+      }
+    },
+    "Previous nicknames" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предыдущие никнеймы"
           }
         }
       }
@@ -401,12 +491,12 @@
         }
       }
     },
-    "QMS" : {
+    "Readonly" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "QMS"
+            "value" : "Только чтение"
           }
         }
       }
@@ -417,6 +507,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Дата регистрации"
+          }
+        }
+      }
+    },
+    "Registration IP" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IP регистрации"
           }
         }
       }
@@ -441,6 +541,26 @@
         }
       }
     },
+    "Restrictions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ограничения"
+          }
+        }
+      }
+    },
+    "security block" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "защитный"
+          }
+        }
+      }
+    },
     "Send" : {
       "localizations" : {
         "ru" : {
@@ -451,12 +571,32 @@
         }
       }
     },
+    "Session IP" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IP сессии"
+          }
+        }
+      }
+    },
     "Set" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Указать"
+          }
+        }
+      }
+    },
+    "Show chats" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Показать диалоги"
           }
         }
       }
@@ -511,6 +651,36 @@
         }
       }
     },
+    "Undo available" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Доступна отмена"
+          }
+        }
+      }
+    },
+    "Unknown level" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестный уровень"
+          }
+        }
+      }
+    },
+    "until %@" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "до %@"
+          }
+        }
+      }
+    },
     "Update avatar" : {
       "localizations" : {
         "ru" : {
@@ -527,6 +697,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Время у юзера"
+          }
+        }
+      }
+    },
+    "Warning level" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Предупреждения"
+          }
+        }
+      }
+    },
+    "Warning level decreased" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Понижен уровень предупреждений"
+          }
+        }
+      }
+    },
+    "Warning level increased" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повышен уровень предупреждений"
           }
         }
       }
