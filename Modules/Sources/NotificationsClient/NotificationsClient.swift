@@ -228,11 +228,14 @@ extension NotificationsClient: DependencyKey {
 //
 //                    let qmsCount = (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0)
                     
-                    let favoritesCount = notifications.contains(.favorites) ? (unread.forumCount + unread.topicCount) : 0
+                    var favoritesCount = (notifications.contains(.favorites) || notifications.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
+                    
+                    // Sometimes we have more favorites in general count than in an array, so we apply min() fix
+                    favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
                     
                     let mentionsCount = notifications.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0
                     
-                    let qmsCount = (notifications.contains(.qms) ? unread.qmsUnreadCount : 0)
+                    let qmsCount = (notifications.contains(.qms) || notifications.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0
                     
                     let totalCount = favoritesCount + mentionsCount + qmsCount
                     

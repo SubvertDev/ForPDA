@@ -324,13 +324,13 @@ public struct AppFeature: Reducer, Sendable {
 #warning("Review new count logic")
                 
                 let favoritesBadges =
-                state.appSettings.notifications.contains(.favorites) ? (unread.forumCount + unread.topicCount) : 0
+                (state.appSettings.notifications.contains(.favorites) || state.appSettings.notifications.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
                 
                 // Sometimes we have more favorites in general count than in an array, so we apply min() fix
                 state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
                 
                 let profileBadges =
-                (state.appSettings.notifications.contains(.qms) ? unread.qmsUnreadCount : 0) +
+                ((state.appSettings.notifications.contains(.qms) || state.appSettings.notifications.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0) +
                 (state.appSettings.notifications.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0)
                 state.profileBadges = profileBadges
                 
