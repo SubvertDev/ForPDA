@@ -27,6 +27,8 @@ public struct NotificationsFeature: Reducer, Sendable {
         
         public var areNotificationsEnabled = false
         
+        var favoritesSettings: FavoritesNotificationSettings = .no
+        
         public init() {}
     }
     
@@ -50,10 +52,33 @@ public struct NotificationsFeature: Reducer, Sendable {
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
+            .onChange(of: \.favoritesSettings) { _, state in
+                state.$appSettings.notifications.withLock { settings in
+                    switch state.favoritesSettings {
+                    case .all:
+                        settings.remove(.favoritesImportant)
+                        settings.insert(.favorites)
+                    case .important:
+                        settings.remove(.favorites)
+                        settings.insert(.favoritesImportant)
+                    case .no:
+                        settings.remove(.favorites)
+                        settings.remove(.favoritesImportant)
+                    }
+                }
+                return .none
+            }
         
         Reduce<State, Action> { state, action in
             switch action {
             case .onAppear:
+                state.favoritesSettings = if state.appSettings.notifications.contains(.favorites) {
+                    .all
+                } else if state.appSettings.notifications.contains(.favoritesImportant) {
+                    .important
+                } else {
+                    .no
+                }
                 return .run { send in
                     let result = await Result { try await notificationsClient.requestPermission() }
                     await send(._onNotificationsPermissionResult(result))

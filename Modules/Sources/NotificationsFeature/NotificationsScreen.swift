@@ -46,9 +46,8 @@ public struct NotificationsScreen: View {
                         
                         Row("QMS", value: $store.appSettings.notifications.options(.qms))
                         Row("System events", value: $store.appSettings.notifications.options(.qmsSystemEvents))
-                        Row("Favorites", value: $store.appSettings.notifications.options(.favorites))
-                        Row("Favorites important", value: $store.appSettings.notifications.options(.favoritesImportant))
                         Row("Mentions", value: $store.appSettings.notifications.options(.mentions))
+                        FavoritesRow()
                     } header: {
                         Text("General", bundle: .module)
                     }
@@ -92,6 +91,35 @@ public struct NotificationsScreen: View {
             Spacer(minLength: 8)
             
             Toggle(String(""), isOn: value)
+        }
+        .disabled(!store.areNotificationsEnabled)
+        .frame(minHeight: 60)
+    }
+    
+    @ViewBuilder
+    private func FavoritesRow() -> some View {
+        HStack(spacing: 0) {
+            Text("Favorites", bundle: .module)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Spacer(minLength: 8)
+            
+            Menu {
+                Picker(String(), selection: $store.favoritesSettings) {
+                    ForEach(FavoritesNotificationSettings.allCases) { mode in
+                        Text(mode.title, bundle: .module)
+                            .tag(mode)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                HStack(spacing: 9) {
+                    Text(store.favoritesSettings.title, bundle: .module)
+                    Image(systemSymbol: .chevronUpChevronDown)
+                }
+                .foregroundStyle(Color(.Labels.teritary))
+            }
         }
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
