@@ -480,9 +480,9 @@ extension Unread.Item {
     func isNotificationEnabled(using settings: AppSettings) -> Bool {
         switch category {
         case .qms:
-            return settings.notifications.contains(.qms)
+            return settings.notifications.contains(.qms) || settings.notifications.contains(.qmsSystemEvents)
         case .forum, .topic:
-            return settings.notifications.contains(.favorites)
+            return settings.notifications.contains(.favorites) || settings.notifications.contains(.favoritesImportant)
         case .forumMention, .siteMention:
             return settings.notifications.contains(.mentions)
         }
