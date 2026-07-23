@@ -29,7 +29,7 @@ public struct APIClient: Sendable {
     public var connect: @Sendable (_ inBackground: Bool) async throws -> Void
     public var disconnect: @Sendable () async -> Void
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
-    public var notify: @Sendable (_ token: String, _ flag: Int) async throws -> Bool
+    public var notify: @Sendable (_ token: String, _ settings: NotificationsSettings) async throws -> Bool
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -149,8 +149,8 @@ extension APIClient: DependencyKey {
                 await api.setLogResponses(to: type)
             },
             
-            notify: { token, flag in
-                let response = try await api.send(CommonCommand.notify(token: token, a: flag, b: 3))
+            notify: { token, settings in
+                let response = try await api.send(CommonCommand.notify(token: token, a: settings.rawValue, b: 4))
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },

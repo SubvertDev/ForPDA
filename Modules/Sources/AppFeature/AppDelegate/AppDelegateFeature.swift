@@ -103,9 +103,9 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
-                return .run { [flag = state.appSettings.notifications.rawValue] send in
+                return .run { [settings = state.appSettings.notifications] send in
                     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-                    let status = flag // try await apiClient.notify(token: token, flag: flag)
+                    let status = settings // try await apiClient.notify(token: token, settings: settings)
                     logger.info("Notifications initialized on server with status: \(status)")
                 }
                 
