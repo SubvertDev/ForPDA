@@ -1,12 +1,32 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "All" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все"
+          }
+        }
+      }
+    },
     "Background notifications" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Уведомления в фоне"
+          }
+        }
+      }
+    },
+    "Do not" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не оповещать"
           }
         }
       }
@@ -22,29 +42,11 @@
       }
     },
     "Favorites" : {
-
-    },
-    "Favorites important" : {
-
-    },
-    "Forum" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Форум"
-          }
-        }
-      }
-    },
-    "Forum mentions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Упоминания на форуме"
+            "value" : "Избранное"
           }
         }
       }
@@ -60,7 +62,14 @@
       }
     },
     "Mentions" : {
-
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упоминания"
+          }
+        }
+      }
     },
     "Notifications" : {
       "localizations" : {
@@ -78,6 +87,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Уведомления отключены"
+          }
+        }
+      }
+    },
+    "Only important" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только важные"
           }
         }
       }
@@ -102,27 +121,12 @@
         }
       }
     },
-    "Site mentions" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уведомления на сайте"
-          }
-        }
-      }
-    },
     "System events" : {
-
-    },
-    "Topics" : {
-      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Темы"
+            "value" : "Системные события"
           }
         }
       }
