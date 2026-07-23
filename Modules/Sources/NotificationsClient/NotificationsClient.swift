@@ -213,18 +213,26 @@ extension NotificationsClient: DependencyKey {
                     @Shared(.appSettings) var appSettings
                     let notifications = appSettings.notifications
                     
-                    var favoritesCount =
-                    (notifications.isForumEnabled ? unread.forumCount : 0) +
-                    (notifications.isTopicsEnabled ? unread.topicCount : 0)
+                    #warning("Review new count logic")
                     
-                    // Sometimes we have more favorites in general count than in an array, so we apply min() fix
-                    favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
+//                    var favoritesCount =
+//                    (notifications.isForumEnabled ? unread.forumCount : 0) +
+//                    (notifications.isTopicsEnabled ? unread.topicCount : 0)
+//                    
+//                    // Sometimes we have more favorites in general count than in an array, so we apply min() fix
+//                    favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
+//                    
+//                    let mentionsCount =
+//                    (notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
+//                    (notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+//
+//                    let qmsCount = (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0)
                     
-                    let mentionsCount =
-                    (notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
-                    (notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+                    let favoritesCount = notifications.contains(.favorites) ? (unread.forumCount + unread.topicCount) : 0
                     
-                    let qmsCount = (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0)
+                    let mentionsCount = notifications.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0
+                    
+                    let qmsCount = (notifications.contains(.qms) ? unread.qmsUnreadCount : 0)
                     
                     let totalCount = favoritesCount + mentionsCount + qmsCount
                     
@@ -469,15 +477,11 @@ extension Unread.Item {
     func isNotificationEnabled(using settings: AppSettings) -> Bool {
         switch category {
         case .qms:
-            return settings.notifications.isQmsEnabled
-        case .forum:
-            return settings.notifications.isForumEnabled
-        case .topic:
-            return settings.notifications.isTopicsEnabled
-        case .forumMention:
-            return settings.notifications.isForumMentionsEnabled
-        case .siteMention:
-            return settings.notifications.isSiteMentionsEnabled
+            return settings.notifications.contains(.qms)
+        case .forum, .topic:
+            return settings.notifications.contains(.favorites)
+        case .forumMention, .siteMention:
+            return settings.notifications.contains(.mentions)
         }
     }
 }

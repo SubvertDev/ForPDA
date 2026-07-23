@@ -21,7 +21,14 @@
         }
       }
     },
+    "Favorites" : {
+
+    },
+    "Favorites important" : {
+
+    },
     "Forum" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -32,6 +39,7 @@
       }
     },
     "Forum mentions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -50,6 +58,9 @@
           }
         }
       }
+    },
+    "Mentions" : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -92,6 +103,7 @@
       }
     },
     "Site mentions" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -101,7 +113,11 @@
         }
       }
     },
+    "System events" : {
+
+    },
     "Topics" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

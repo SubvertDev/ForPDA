@@ -13,6 +13,7 @@ let project = Project(
             infoPlist: .main,
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
+            entitlements: .dictionary(["aps-environment": "development"]),
             dependencies: [
                 .Internal.AppFeature,
                 .Internal.CacheClient,

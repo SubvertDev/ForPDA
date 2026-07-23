@@ -31,6 +31,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     public enum Action {
         case didFinishLaunching(UIApplication)
         case didRegisterForRemoteNotifications(Data)
+        case didReceiveNotification(UNNotification)
         case userNotification(String)
     }
     
@@ -82,7 +83,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             } else {
                                 logger.error("Notifications permission are not granted")
                             }
-                            //if granted { await application.registerForRemoteNotifications() }
+                            if granted { await notificationsClient.registerForRemoteNotifications() }
                         }
                         
                         group.addTask {
@@ -102,7 +103,22 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
-                return .none
+                return .run { [flag = state.appSettings.notifications.rawValue] send in
+                    let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                    let status = flag // try await apiClient.notify(token: token, flag: flag)
+                    logger.info("Notifications initialized on server with status: \(status)")
+                }
+                
+            case let .didReceiveNotification(notification):
+                logger.info("Notification has payload: \(notification.request.content)")
+                
+                guard let category = Int(notification.request.content.userInfo["type"] as? String ?? ""),
+                      let id = Int(notification.request.content.userInfo["id"] as? String ?? ""),
+                      let timestamp = Int(notification.request.content.userInfo["ts"] as? String ?? "") else {
+                    logger.error("Notification has bad userInfo: \(notification.request.content.userInfo)")
+                    return .none
+                }
+                return .send(.userNotification("\(category)-\(id)-\(timestamp)"))
                 
             case .userNotification:
                 // Handled in AppFeature instead

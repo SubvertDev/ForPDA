@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import Models
 
 public struct NotificationsScreen: View {
     
@@ -43,12 +44,11 @@ public struct NotificationsScreen: View {
                             .padding(16)
                         }
                         
-                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
-                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
-                        Row("Forum", value: Binding(store.$appSettings.notifications.isForumEnabled))
-                        Row("Topics", value: Binding(store.$appSettings.notifications.isTopicsEnabled))
-                        Row("Forum mentions", value: Binding(store.$appSettings.notifications.isForumMentionsEnabled))
-                        Row("Site mentions", value: Binding(store.$appSettings.notifications.isSiteMentionsEnabled))
+                        Row("QMS", value: $store.appSettings.notifications.options(.qms))
+                        Row("System events", value: $store.appSettings.notifications.options(.qmsSystemEvents))
+                        Row("Favorites", value: $store.appSettings.notifications.options(.favorites))
+                        Row("Favorites important", value: $store.appSettings.notifications.options(.favoritesImportant))
+                        Row("Mentions", value: $store.appSettings.notifications.options(.mentions))
                     } header: {
                         Text("General", bundle: .module)
                     }
@@ -95,6 +95,22 @@ public struct NotificationsScreen: View {
         }
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
+    }
+}
+
+// MARK: - Extensions
+
+extension Binding where Value == NotificationsSettings {
+    func options(_ options: Value) -> Binding<Bool> {
+        return .init { () -> Bool in
+            wrappedValue.contains(options)
+        } set: { newValue in
+            if newValue {
+                wrappedValue.insert(options)
+            } else {
+                wrappedValue.remove(options)
+            }
+        }
     }
 }
 
