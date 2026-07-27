@@ -40,4 +40,16 @@ public final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotifi
         }
         completionHandler()
     }
+    
+    nonisolated public func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        if notification.request.content.userInfo.isEmpty {
+            completionHandler([.banner, .sound, .list])
+        } else {
+            completionHandler([])
+        }
+    }
 }
