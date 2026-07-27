@@ -113,7 +113,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 guard let category = notification.request.content.userInfo["t"] as? Int,
                       let id = notification.request.content.userInfo["i"] as? Int,
                       let timestamp = notification.request.content.userInfo["v"] as? Int else {
-                    return .none
+                    return .send(.userNotification(notification.request.identifier))
                 }
                 return .send(.userNotification("\(category)-\(id)-\(timestamp)"))
                 
