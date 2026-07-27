@@ -29,6 +29,7 @@ public struct APIClient: Sendable {
     public var connect: @Sendable (_ inBackground: Bool) async throws -> Void
     public var disconnect: @Sendable () async -> Void
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
+    public var notify: @Sendable (_ token: String, _ settings: NotificationsSettings, _ isDebug: Bool) async throws -> Bool
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]
@@ -146,6 +147,16 @@ extension APIClient: DependencyKey {
             
             setLogResponses: { type in
                 await api.setLogResponses(to: type)
+            },
+            
+            notify: { token, settings, isDebug in
+                let response = try await api.send(CommonCommand.notify(
+                    token: token,
+                    a: settings.rawValue,
+                    b: isDebug ? 0x0103 : 3
+                ))
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Articles
@@ -692,6 +703,9 @@ extension APIClient: DependencyKey {
             connect: { _ in },
             disconnect: { },
             setLogResponses: { _ in },
+            notify: { _, _, _ in
+                return true
+            },
             getArticlesList: { _, _ in
                 return Array(repeating: .mock, count: 30)
             },

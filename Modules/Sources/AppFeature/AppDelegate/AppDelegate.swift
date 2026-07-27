@@ -8,7 +8,7 @@
 import UIKit
 import ComposableArchitecture
 
-public final class AppDelegate: UIResponder, UIApplicationDelegate, Sendable {
+public final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, Sendable {
     
     public let store = Store(initialState: AppFeature.State()) {
         AppFeature()
@@ -19,6 +19,7 @@ public final class AppDelegate: UIResponder, UIApplicationDelegate, Sendable {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         store.send(.appDelegate(.didFinishLaunching(application)))
+        UNUserNotificationCenter.current().delegate = self
         return true
     }
     
@@ -27,5 +28,28 @@ public final class AppDelegate: UIResponder, UIApplicationDelegate, Sendable {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         store.send(.appDelegate(.didRegisterForRemoteNotifications(deviceToken)))
+    }
+    
+    nonisolated public func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        Task { @MainActor in
+            store.send(.appDelegate(.didReceiveNotification(response.notification)))
+        }
+        completionHandler()
+    }
+    
+    nonisolated public func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+    ) {
+        if notification.request.content.userInfo.isEmpty {
+            completionHandler([.banner, .sound, .list])
+        } else {
+            completionHandler([])
+        }
     }
 }

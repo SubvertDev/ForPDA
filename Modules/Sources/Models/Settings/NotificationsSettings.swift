@@ -5,49 +5,29 @@
 //  Created by Ilia Lubianoi on 17.11.2024.
 //
 
-
-public struct NotificationsSettings: Sendable, Codable, Hashable {
-    public var isQmsEnabled: Bool
-    public var isForumEnabled: Bool
-    public var isTopicsEnabled: Bool
-    public var isForumMentionsEnabled: Bool
-    public var isSiteMentionsEnabled: Bool
+public struct NotificationsSettings: OptionSet, Sendable, Codable, Hashable {
+    public var rawValue: Int
     
     public var isAnyEnabled: Bool {
-        return isQmsEnabled || isForumEnabled || isTopicsEnabled || isForumMentionsEnabled || isSiteMentionsEnabled
+        return !self.isEmpty
     }
     
-    public init(
-        isQmsEnabled: Bool,
-        isForumEnabled: Bool,
-        isTopicsEnabled: Bool,
-        isForumMentionsEnabled: Bool,
-        isSiteMentionsEnabled: Bool
-    ) {
-        self.isQmsEnabled = isQmsEnabled
-        self.isForumEnabled = isForumEnabled
-        self.isTopicsEnabled = isTopicsEnabled
-        self.isForumMentionsEnabled = isForumMentionsEnabled
-        self.isSiteMentionsEnabled = isSiteMentionsEnabled
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
     }
     
-    public func asDictionary() -> [String: Any] {
-        return [
-            "isQmsEnabled": isQmsEnabled,
-            "isForumEnabled": isForumEnabled,
-            "isTopicsEnabled": isTopicsEnabled,
-            "isForumMentionsEnabled": isForumMentionsEnabled,
-            "isSiteMentionsEnabled": isSiteMentionsEnabled,
-        ]
-    }
+    public static let qms                = NotificationsSettings(rawValue: 1 << 0)
+    public static let qmsSystemEvents    = NotificationsSettings(rawValue: 1 << 1)
+    public static let favorites          = NotificationsSettings(rawValue: 1 << 2)
+    public static let favoritesImportant = NotificationsSettings(rawValue: 1 << 3)
+    public static let mentions           = NotificationsSettings(rawValue: 1 << 4)
 }
 
 extension NotificationsSettings {
-    static let `default` = NotificationsSettings(
-        isQmsEnabled: true,
-        isForumEnabled: true,
-        isTopicsEnabled: true,
-        isForumMentionsEnabled: true,
-        isSiteMentionsEnabled: true
-    )
+    static let `default` = NotificationsSettings([
+        .qms,
+        .qmsSystemEvents,
+        .favorites,
+        .mentions
+    ])
 }

@@ -321,17 +321,17 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case let .updateBadges(unread):
+#warning("Review new count logic")
+                
                 let favoritesBadges =
-                (state.appSettings.notifications.isForumEnabled ? unread.forumCount : 0) +
-                (state.appSettings.notifications.isTopicsEnabled ? unread.topicCount : 0)
+                (state.appSettings.notifications.contains(.favorites) || state.appSettings.notifications.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
                 
                 // Sometimes we have more favorites in general count than in an array, so we apply min() fix
                 state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
                 
                 let profileBadges =
-                (state.appSettings.notifications.isQmsEnabled ? unread.qmsUnreadCount : 0) +
-                (state.appSettings.notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
-                (state.appSettings.notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
+                ((state.appSettings.notifications.contains(.qms) || state.appSettings.notifications.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0) +
+                (state.appSettings.notifications.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0)
                 state.profileBadges = profileBadges
                 
                 cacheClient.setUnread(unread)
@@ -443,9 +443,9 @@ public struct AppFeature: Reducer, Sendable {
                     }
                     
                     if newPhase == .background {
-                        if isLoggedIn {
-                            await send(.registerBackgroundTask)
-                        }
+//                        if isLoggedIn {
+//                            await send(.registerBackgroundTask)
+//                        }
                         await apiClient.disconnect()
                     }
                 }

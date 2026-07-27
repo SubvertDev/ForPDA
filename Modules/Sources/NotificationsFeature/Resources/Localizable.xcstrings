@@ -1,12 +1,32 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "All" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все"
+          }
+        }
+      }
+    },
     "Background notifications" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Уведомления в фоне"
+          }
+        }
+      }
+    },
+    "Do not" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не оповещать"
           }
         }
       }
@@ -21,22 +41,12 @@
         }
       }
     },
-    "Forum" : {
+    "Favorites" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Форум"
-          }
-        }
-      }
-    },
-    "Forum mentions" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Упоминания на форуме"
+            "value" : "Избранное"
           }
         }
       }
@@ -47,6 +57,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Основные"
+          }
+        }
+      }
+    },
+    "Mentions" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упоминания"
           }
         }
       }
@@ -71,6 +91,16 @@
         }
       }
     },
+    "Only important" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Только важные"
+          }
+        }
+      }
+    },
     "Open Settings" : {
       "localizations" : {
         "ru" : {
@@ -91,22 +121,12 @@
         }
       }
     },
-    "Site mentions" : {
+    "System events" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Уведомления на сайте"
-          }
-        }
-      }
-    },
-    "Topics" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Темы"
+            "value" : "Системные события"
           }
         }
       }

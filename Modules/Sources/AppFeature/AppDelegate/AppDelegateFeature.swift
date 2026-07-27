@@ -23,6 +23,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
         public init() {}
     }
     
@@ -31,6 +32,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     public enum Action {
         case didFinishLaunching(UIApplication)
         case didRegisterForRemoteNotifications(Data)
+        case didReceiveNotification(UNNotification)
         case userNotification(String)
     }
     
@@ -82,7 +84,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             } else {
                                 logger.error("Notifications permission are not granted")
                             }
-                            //if granted { await application.registerForRemoteNotifications() }
+                            if granted { await notificationsClient.registerForRemoteNotifications() }
                         }
                         
                         group.addTask {
@@ -95,14 +97,27 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             properties.merge(settingsProperties) { old, new in new }
                             properties.merge(a11yProperties) { old, new in new }
                             
-                            analyticsClient.setUserProperties(properties: properties)
+                            analyticsClient.setUserProperties(properties)
                         }
                     }
                 }
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
-                return .none
+                guard state.userSession != nil else { return .none }
+                return .run { [settings = state.appSettings.notifications, isDebug = isDebug] send in
+                    let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                    let status = try await apiClient.notify(token, settings, isDebug)
+                    logger.info("Notifications initialized on server with status: \(status) and settings \(settings.rawValue)")
+                }
+                
+            case let .didReceiveNotification(notification):
+                guard let category = notification.request.content.userInfo["t"] as? Int,
+                      let id = notification.request.content.userInfo["i"] as? Int,
+                      let timestamp = notification.request.content.userInfo["v"] as? Int else {
+                    return .send(.userNotification(notification.request.identifier))
+                }
+                return .send(.userNotification("\(category)-\(id)-\(timestamp)"))
                 
             case .userNotification:
                 // Handled in AppFeature instead

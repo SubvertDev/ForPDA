@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import Models
 
 public struct NotificationsScreen: View {
     
@@ -43,11 +44,10 @@ public struct NotificationsScreen: View {
                             .padding(16)
                         }
                         
-                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
-                        Row("Forum", value: Binding(store.$appSettings.notifications.isForumEnabled))
-                        Row("Topics", value: Binding(store.$appSettings.notifications.isTopicsEnabled))
-                        Row("Forum mentions", value: Binding(store.$appSettings.notifications.isForumMentionsEnabled))
-                        Row("Site mentions", value: Binding(store.$appSettings.notifications.isSiteMentionsEnabled))
+                        Row("QMS", value: $store.appSettings.notifications.options(.qms))
+                        Row("System events", value: $store.appSettings.notifications.options(.qmsSystemEvents))
+                        Row("Mentions", value: $store.appSettings.notifications.options(.mentions))
+                        FavoritesRow()
                     } header: {
                         Text("General", bundle: .module)
                     }
@@ -55,14 +55,14 @@ public struct NotificationsScreen: View {
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
-                    Section {
-                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
-                    } header: {
-                        Text("Experimental", bundle: .module)
-                    }
-                    .tint(tintColor)
-                    .listRowBackground(Color(.Background.teritary))
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+//                    Section {
+//                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
+//                    } header: {
+//                        Text("Experimental", bundle: .module)
+//                    }
+//                    .tint(tintColor)
+//                    .listRowBackground(Color(.Background.teritary))
+//                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
                 .animation(.default, value: store.appSettings.backgroundNotifications2)
                 .scrollContentBackground(.hidden)
@@ -94,6 +94,51 @@ public struct NotificationsScreen: View {
         }
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
+    }
+    
+    @ViewBuilder
+    private func FavoritesRow() -> some View {
+        HStack(spacing: 0) {
+            Text("Favorites", bundle: .module)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Spacer(minLength: 8)
+            
+            Menu {
+                Picker(String(), selection: $store.favoritesSettings) {
+                    ForEach(FavoritesNotificationSettings.allCases) { mode in
+                        Text(mode.title, bundle: .module)
+                            .tag(mode)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                HStack(spacing: 9) {
+                    Text(store.favoritesSettings.title, bundle: .module)
+                    Image(systemSymbol: .chevronUpChevronDown)
+                }
+                .foregroundStyle(Color(.Labels.teritary))
+            }
+        }
+        .disabled(!store.areNotificationsEnabled)
+        .frame(minHeight: 60)
+    }
+}
+
+// MARK: - Extensions
+
+extension Binding where Value == NotificationsSettings {
+    func options(_ options: Value) -> Binding<Bool> {
+        return .init { () -> Bool in
+            wrappedValue.contains(options)
+        } set: { newValue in
+            if newValue {
+                wrappedValue.insert(options)
+            } else {
+                wrappedValue.remove(options)
+            }
+        }
     }
 }
 

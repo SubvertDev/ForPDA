@@ -134,7 +134,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
             "appColorScheme": appColorScheme._rawValue,
             "backgroundTheme": backgroundTheme._rawValue,
             "appTintColor": appTintColor._rawValue,
-            "notifications": notifications.asDictionary(),
+            "notifications": notifications.rawValue,
             "backgroundNotifications": backgroundNotifications2,
             "backupServer": backupServer,
             "tickets": tickets.asDictionary(),
