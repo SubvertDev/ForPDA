@@ -40,6 +40,7 @@ public struct SettingsFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) public var appSettings: AppSettings
+        @Shared(.userSession) public var userSession: UserSession?
         
         @Presents public var destination: Destination.State?
         
@@ -67,6 +68,10 @@ public struct SettingsFeature: Reducer, Sendable {
             case "ru": return "Русский"
             default:   return "Unknown"
             }
+        }
+        
+        public var isUserAuthorized: Bool {
+            return userSession != nil
         }
         
         public init(

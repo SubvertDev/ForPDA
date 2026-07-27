@@ -23,6 +23,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
         public init() {}
     }
     
@@ -103,6 +104,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
+                guard state.userSession != nil else { return .none }
                 return .run { [settings = state.appSettings.notifications, isDebug = isDebug] send in
                     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                     let status = try await apiClient.notify(token, settings, isDebug)
