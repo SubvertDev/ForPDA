@@ -443,9 +443,9 @@ public struct AppFeature: Reducer, Sendable {
                     }
                     
                     if newPhase == .background {
-                        if isLoggedIn {
-                            await send(.registerBackgroundTask)
-                        }
+//                        if isLoggedIn {
+//                            await send(.registerBackgroundTask)
+//                        }
                         await apiClient.disconnect()
                     }
                 }

@@ -34,10 +34,10 @@ struct ForPDAApp: App {
                         .tint(Color(.Theme.primary))
                 }
             }
-            .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
-                await appDelegate.store.send(.registerBackgroundTask).finish()
-                await appDelegate.store.send(.backgroundTaskInvoked).finish()
-            }
+//            .backgroundTask(.appRefresh(appDelegate.store.notificationsId)) { _ in
+//                await appDelegate.store.send(.registerBackgroundTask).finish()
+//                await appDelegate.store.send(.backgroundTaskInvoked).finish()
+//            }
         }
     }
 }

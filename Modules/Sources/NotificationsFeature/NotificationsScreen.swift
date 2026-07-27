@@ -55,14 +55,14 @@ public struct NotificationsScreen: View {
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
-                    Section {
-                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
-                    } header: {
-                        Text("Experimental", bundle: .module)
-                    }
-                    .tint(tintColor)
-                    .listRowBackground(Color(.Background.teritary))
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+//                    Section {
+//                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
+//                    } header: {
+//                        Text("Experimental", bundle: .module)
+//                    }
+//                    .tint(tintColor)
+//                    .listRowBackground(Color(.Background.teritary))
+//                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
                 .animation(.default, value: store.appSettings.backgroundNotifications2)
                 .scrollContentBackground(.hidden)
