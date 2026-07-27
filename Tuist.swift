@@ -3,7 +3,7 @@ import ProjectDescription
 let tuist = Tuist(
     fullHandle: "forpda/forpda",
     project: .tuist(
-        compatibleXcodeVersions: .upToNextMajor("26.3"),
+        compatibleXcodeVersions: .list([.upToNextMajor("26.3"), .upToNextMajor("27.0")]),
         generationOptions: .options(
             optionalAuthentication: true
         ),
