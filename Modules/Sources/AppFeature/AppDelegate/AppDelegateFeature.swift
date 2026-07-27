@@ -96,7 +96,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             properties.merge(settingsProperties) { old, new in new }
                             properties.merge(a11yProperties) { old, new in new }
                             
-                            analyticsClient.setUserProperties(properties: properties)
+                            analyticsClient.setUserProperties(properties)
                         }
                     }
                 }
@@ -105,17 +105,14 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 notificationsClient.setDeviceToken(deviceToken)
                 return .run { [settings = state.appSettings.notifications] send in
                     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-                    let status = settings // try await apiClient.notify(token: token, settings: settings)
-                    logger.info("Notifications initialized on server with status: \(status)")
+                    let status = try await apiClient.notify(token, settings)
+                    logger.info("Notifications initialized on server with status: \(status) and settings \(settings.rawValue)")
                 }
                 
             case let .didReceiveNotification(notification):
-                logger.info("Notification has payload: \(notification.request.content)")
-                
-                guard let category = Int(notification.request.content.userInfo["type"] as? String ?? ""),
-                      let id = Int(notification.request.content.userInfo["id"] as? String ?? ""),
-                      let timestamp = Int(notification.request.content.userInfo["ts"] as? String ?? "") else {
-                    logger.error("Notification has bad userInfo: \(notification.request.content.userInfo)")
+                guard let category = notification.request.content.userInfo["t"] as? Int,
+                      let id = notification.request.content.userInfo["i"] as? Int,
+                      let timestamp = notification.request.content.userInfo["v"] as? Int else {
                     return .none
                 }
                 return .send(.userNotification("\(category)-\(id)-\(timestamp)"))

@@ -19,6 +19,7 @@ let project = Project(
                 .Internal.CacheClient,
                 .Internal.Models,
                 .target(name: "SafariExtension"),
+                .target(name: "NotificationServiceExtension"),
                 .SPM.TCA,
             ],
             settings: .settings(
@@ -945,6 +946,35 @@ let project = Project(
                             "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
                         ])
                 )
+            ),
+
+            .target(
+                name: "NotificationServiceExtension",
+                destinations: .iOS,
+                product: .appExtension,
+                bundleId: App.bundleId + "." + "nse",
+                deploymentTargets: .iOS("16.0"),
+                infoPlist: .notificationServiceExtension,
+                sources: ["Extensions/NotificationService/**"],
+                entitlements: .dictionary([
+                    "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+                ]),
+                dependencies: [
+                    .Internal.Models
+                ],
+                settings: .settings(
+                    base: SettingsDictionary()
+                        .swiftVersion("5")
+                        .manualCodeSigning(
+                            identity: "iPhone Developer",
+                            provisioningProfileSpecifier: "match Development com.subvert.forpda.nse"
+                        )
+                        .setDevelopmentTeam("7353CQCGQC")
+                        .merging([
+                            "TARGETED_DEVICE_FAMILY": "1",
+                            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
+                        ])
+                )
             )
     ],
     resourceSynthesizers: [
@@ -1184,6 +1214,18 @@ extension InfoPlist {
             "NSExtension": [
                 "NSExtensionPointIdentifier": "com.apple.Safari.web-extension",
                 "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SafarWebExtensionHandler"
+            ]
+        ]
+    )
+
+    static let notificationServiceExtension = InfoPlist.extendingDefault(
+        with: [
+            "CFBundleDisplayName": "$(PRODUCT_NAME)",
+            "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+            "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+            "NSExtension": [
+                "NSExtensionPointIdentifier": "com.apple.usernotifications.service",
+                "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).NotificationService"
             ]
         ]
     )

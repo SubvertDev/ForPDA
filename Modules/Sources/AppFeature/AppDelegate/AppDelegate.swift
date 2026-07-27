@@ -19,6 +19,7 @@ public final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotifi
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         store.send(.appDelegate(.didFinishLaunching(application)))
+        UNUserNotificationCenter.current().delegate = self
         return true
     }
     
