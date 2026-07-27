@@ -957,7 +957,8 @@ let project = Project(
                 infoPlist: .notificationServiceExtension,
                 sources: ["Extensions/NotificationService/**"],
                 dependencies: [
-                    .Internal.Models
+                    .Internal.Models,
+                    .Internal.ParsingClient
                 ],
                 settings: .settings(
                     base: SettingsDictionary()

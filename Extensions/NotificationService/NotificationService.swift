@@ -7,6 +7,7 @@
 
 import UserNotifications
 import Models
+import ParsingClient
 
 class NotificationService: UNNotificationServiceExtension {
     
@@ -32,7 +33,7 @@ class NotificationService: UNNotificationServiceExtension {
            let authorName = request.content.userInfo["an"] as? String,
            let subjectId = request.content.userInfo["v"] as? Int {
             let optional = Int(request.content.userInfo["e1"] as? String ?? "0")
-            let notification = buildNotification(category, subjectRootTitle, authorName, optional)
+            let notification = buildNotification(category, subjectRootTitle.convertCodes(), authorName.convertCodes(), optional)
             bestAttemptContent.title = notification.0
             bestAttemptContent.body = notification.1
             bestAttemptContent.userInfo = [
