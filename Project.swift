@@ -956,9 +956,6 @@ let project = Project(
                 deploymentTargets: .iOS("16.0"),
                 infoPlist: .notificationServiceExtension,
                 sources: ["Extensions/NotificationService/**"],
-                entitlements: .dictionary([
-                    "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
-                ]),
                 dependencies: [
                     .Internal.Models
                 ],

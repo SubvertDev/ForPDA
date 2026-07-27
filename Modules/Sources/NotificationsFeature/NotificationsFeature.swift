@@ -62,8 +62,7 @@ public struct NotificationsFeature: Reducer, Sendable {
                         settings.remove(.favorites)
                         settings.insert(.favoritesImportant)
                     case .no:
-                        settings.remove(.favorites)
-                        settings.remove(.favoritesImportant)
+                        settings.remove([.favorites, .favoritesImportant])
                     }
                 }
                 return .none

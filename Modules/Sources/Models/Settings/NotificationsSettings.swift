@@ -16,11 +16,11 @@ public struct NotificationsSettings: OptionSet, Sendable, Codable, Hashable {
         self.rawValue = rawValue
     }
     
-    public static let qms              = NotificationsSettings(rawValue: 1 << 0)   // 1
-    public static let qmsSystemEvents  = NotificationsSettings(rawValue: 1 << 1)   // 2
-    public static let favorites        = NotificationsSettings(rawValue: 1 << 2)   // 4
-    public static let favoritesImportant = NotificationsSettings(rawValue: 1 << 3) // 8
-    public static let mentions         = NotificationsSettings(rawValue: 1 << 4)   // 16
+    public static let qms                = NotificationsSettings(rawValue: 1 << 0)
+    public static let qmsSystemEvents    = NotificationsSettings(rawValue: 1 << 1)
+    public static let favorites          = NotificationsSettings(rawValue: 1 << 2)
+    public static let favoritesImportant = NotificationsSettings(rawValue: 1 << 3)
+    public static let mentions           = NotificationsSettings(rawValue: 1 << 4)
 }
 
 extension NotificationsSettings {

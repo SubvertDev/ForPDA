@@ -185,10 +185,7 @@ public struct DeeplinkHandler {
         // showtopic
         
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
-            let postsFilter: TopicPostsFilter? = if let modfilterItem = queryItems.first(where: { $0.name == "modfilter" }),
-                                                      let postsFilter = TopicPostsFilter(rawValue: modfilterItem.value) {
-                postsFilter
-            } else { nil }
+            let postsFilter = TopicPostsFilter(rawValue: queryItems.first(where: { $0.name == "modfilter" })?.value)
             if let viewType = queryItems.first(where: { $0.name == "view" })?.value {
                 switch viewType {
                 case "findpost":
