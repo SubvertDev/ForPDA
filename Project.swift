@@ -13,7 +13,10 @@ let project = Project(
             infoPlist: .main,
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
-            entitlements: .dictionary(["aps-environment": "development"]),
+            entitlements: .dictionary([
+                "aps-environment": "development",
+                "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+            ]),
             dependencies: [
                 .Internal.AppFeature,
                 .Internal.CacheClient,
@@ -956,9 +959,15 @@ let project = Project(
                 deploymentTargets: .iOS("16.0"),
                 infoPlist: .notificationServiceExtension,
                 sources: ["Extensions/NotificationService/**"],
+                resources: ["Extensions/NotificationService/Resources/**"],
+                entitlements: .dictionary([
+                    "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+                ]),
                 dependencies: [
+                    .Internal.CacheClient,
                     .Internal.Models,
-                    .Internal.ParsingClient
+                    .Internal.ParsingClient,
+                    .SPM.TCA
                 ],
                 settings: .settings(
                     base: SettingsDictionary()
