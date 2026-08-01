@@ -185,7 +185,7 @@ private extension CacheClient {
     
     private static var articlesStorage: Storage<Int, Article> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Articles", expiry: .date(.days(7)), maxSize: .megabytes(2)),
+            diskConfig: DiskConfig(name: "Articles", expiry: .date(.days(7)), maxSize: .megabytes(2), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Article.self)
@@ -194,7 +194,7 @@ private extension CacheClient {
     
     private static var usersStorage: Storage<Int, User> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Users", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
+            diskConfig: DiskConfig(name: "Users", expiry: .date(.days(30)), maxSize: .kilobytes(100), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: User.self)
@@ -204,7 +204,7 @@ private extension CacheClient {
     private static var favoritesKey: String { "favoritesKey" }
     private static var favoritesStorage: Storage<String, Favorite> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
+            diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .kilobytes(100), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Favorite.self)
@@ -214,7 +214,7 @@ private extension CacheClient {
     private static var forumsListKey: String { "forumsListKey" }
     private static var forumsListStorage: Storage<String, [ForumInfo]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "ForumsList", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            diskConfig: DiskConfig(name: "ForumsList", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [ForumInfo].self)
@@ -223,7 +223,7 @@ private extension CacheClient {
     
     private static var forumsStorage: Storage<Int, Forum> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Forums", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            diskConfig: DiskConfig(name: "Forums", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Forum.self)
@@ -232,7 +232,7 @@ private extension CacheClient {
     
     private static var attachmentURLsStorage: Storage<Int, URL> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "AttachmentURLs", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            diskConfig: DiskConfig(name: "AttachmentURLs", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: URL.self)
@@ -241,7 +241,7 @@ private extension CacheClient {
     
     private static var qmsChatsStorage: Storage<Int, [QMSChatInfo]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "QMSChats", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            diskConfig: DiskConfig(name: "QMSChats", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [QMSChatInfo].self)
@@ -251,7 +251,7 @@ private extension CacheClient {
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
     private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [BackgroundTaskEntry]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30))),
+            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30)), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [BackgroundTaskEntry].self)
@@ -260,7 +260,7 @@ private extension CacheClient {
     
     private static var notificationsStorage: Storage<Int, Int> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
+            diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .kilobytes(100), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Int.self)
@@ -270,11 +270,21 @@ private extension CacheClient {
     private static var unreadKey: String { "unreadKey" }
     private static var unreadStorage: Storage<String, Unread> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Unread", expiry: .date(.days(30)), maxSize: .megabytes(1)),
+            diskConfig: DiskConfig(name: "Unread", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Unread.self)
         )
+    }
+}
+
+// MARK: - Shared Container URL Extension
+
+fileprivate extension URL {
+    static var sharedContainerURL: URL {
+        FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.subvert.forpda"
+        )!
     }
 }
 
