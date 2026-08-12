@@ -964,14 +964,11 @@ let project = Project(
                     "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
                 ]),
                 dependencies: [
-                    .Internal.CacheClient,
                     .Internal.Models,
-                    .Internal.ParsingClient,
-                    .SPM.TCA
+                    .Internal.NotificationsClient,
                 ],
                 settings: .settings(
                     base: SettingsDictionary()
-                        .swiftVersion("5")
                         .manualCodeSigning(
                             identity: "iPhone Developer",
                             provisioningProfileSpecifier: "match Development com.subvert.forpda.nse"
