@@ -48,15 +48,22 @@ public struct NotificationsClient: Sendable {
     public var requestPermission: @Sendable () async throws -> Bool
     public var registerForRemoteNotifications: @Sendable () async -> Void
     public var setDeviceToken: @Sendable (Data) -> Void
-    public var delegate: @Sendable () -> AsyncStream<String> = { .finished }
+    public var delegate: @Sendable () -> AsyncStream<UNNotificationSnapshot> = { .finished }
     public var processNotification: @Sendable (String) async -> Bool = { _ in false }
-    public var showUnreadNotifications: @Sendable (Unread, _ skipCategories: [Unread.Item.Category]) async -> Void
-    public var removeNotifications: @Sendable ([Unread.Item.Category], [Int], [TimeInterval]) async -> Void
+    public var showUnreadNotifications: @Sendable (_ unread: Unread, _ skipCategories: [PDANotification.Kind]) async -> Void
+    public var removeNotifications: @Sendable ([PDANotification.Kind], [Int], [TimeInterval]) async -> Void
     public var setNotificationContext: @Sendable (_ context: NotificationContext?) -> Void
     public var eventPublisher: @Sendable () -> AnyPublisher<NotificationEvent, Never> = { Just(.topic(0)).eraseToAnyPublisher() }
     public var unreadPublisher: @Sendable () -> AnyPublisher<Unread, Never> = { Just(.mock).eraseToAnyPublisher() }
     
-    public func removeNotifications(categories: [Unread.Item.Category] = [], ids: [Int] = [], timestamps: [TimeInterval] = []) async {
+    public func showUnreadNotifications(_ unread: Unread, skipCategories: [PDANotification.Kind] = []) async {
+        if !skipCategories.isEmpty {
+            assertionFailure("Skip categories was not re-implemented yet")
+        }
+        await showUnreadNotifications(unread: unread, skipCategories: skipCategories)
+    }
+    
+    public func removeNotifications(categories: [PDANotification.Kind] = [], ids: [Int] = [], timestamps: [TimeInterval] = []) async {
         await removeNotifications(categories, ids, timestamps)
     }
 }
@@ -83,6 +90,7 @@ extension NotificationsClient: DependencyKey {
         
         let center = UNUserNotificationCenter.current()
         let context: LockIsolated<NotificationContext?> = .init(nil)
+        let manager = NotificationManager()
         
         return NotificationsClient(
             hasPermission: {
@@ -204,38 +212,27 @@ extension NotificationsClient: DependencyKey {
             
             showUnreadNotifications: { unread, skipCategories in
                 @Dependency(\.analyticsClient) var analyticsClient
-                @Dependency(\.cacheClient) var cacheClient
                 @Shared(.appSettings) var appSettings
                 
                 unreadSubject.send(unread)
                 
                 do {
-                    @Shared(.appSettings) var appSettings
-                    let notifications = appSettings.notifications
-                    
-                    #warning("Review new count logic")
-                    
-//                    var favoritesCount =
-//                    (notifications.isForumEnabled ? unread.forumCount : 0) +
-//                    (notifications.isTopicsEnabled ? unread.topicCount : 0)
-//                    
-//                    // Sometimes we have more favorites in general count than in an array, so we apply min() fix
-//                    favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
-//                    
-//                    let mentionsCount =
-//                    (notifications.isSiteMentionsEnabled ? unread.siteMentionsCount : 0) +
-//                    (notifications.isForumMentionsEnabled ? unread.forumMentionsCount : 0)
-//
-//                    let qmsCount = (notifications.isQmsEnabled ? unread.qmsUnreadCount : 0)
-                    
-                    var favoritesCount = (notifications.contains(.favorites) || notifications.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
+                    let notifications = appSettings.notifications2
+
+                    var favoritesCount = (notifications.contains(.favorites) || notifications.contains(.favoritesImportant))
+                    ? (unread.forumCount + unread.topicCount)
+                    : 0
                     
                     // Sometimes we have more favorites in general count than in an array, so we apply min() fix
                     favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
                     
-                    let mentionsCount = notifications.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0
+                    let mentionsCount = notifications.contains(.mentions)
+                    ? (unread.siteMentionsCount + unread.forumMentionsCount)
+                    : 0
                     
-                    let qmsCount = (notifications.contains(.qms) || notifications.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0
+                    let qmsCount = (notifications.contains(.qms) || notifications.contains(.qmsSystemEvents))
+                    ? unread.qmsUnreadCount
+                    : 0
                     
                     let totalCount = favoritesCount + mentionsCount + qmsCount
                     
@@ -247,176 +244,38 @@ extension NotificationsClient: DependencyKey {
                 
                 logger.info("Going to show \(unread.items.count) notifications. Skip categories: \(skipCategories)")
                 
-                for item in unread.items {
-                    // customDump(item)
-                    
-                    // Checking if category of this notification is disabled in settings
-                    guard item.isNotificationEnabled(using: appSettings) else {
-                        logger.info("Skipping \(item.id) because it's category \(item.category.rawValue) is disabled in settings")
-                        continue
-                    }
-
-                    // Checking if we're already processed this notification before
-                    switch item.notificationType {
-                    case .always:
-                        if let timestamp = await cacheClient.getLastTimestampOfUnreadItem(item.id), timestamp == item.timestamp {
-                            // logger.info("Skipping \(item.id) at \(timestamp) (\(item.category.rawValue)) because it's already processed")
-                            continue
-                        }
-                        await cacheClient.setLastTimestampOfUnreadItem(item.timestamp, item.id)
-                    case .once:
-                        if let topicId = await cacheClient.getTopicIdOfUnreadItem(item.id), topicId == item.id {
-                            // logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's already processed")
-                            continue
-                        }
-                        await cacheClient.setTopicIdOfUnreadItem(item.id)
-                    case .doNot:
-                        // logger.info("Skipping \(item.id) because it's set to not to notify")
-                        continue
-                    case .unknown:
-                        logger.warning("Unknown notification skipping condition")
-                        continue
-                    }
-                    
-                    // Checking if notification category should be skipped based on provided values
-                    if skipCategories.contains(item.category) {
-                        // logger.info("Skipping \(item.id) (\(item.category.rawValue)) because it's marked to skip")
-                        continue
-                    }
-                    
-                    // Checking for current notification context
-                    // If we have a match, skip showing a notification
-                    if let currentContext = context.value {
-                        switch currentContext {
-                        case let .chat(id: id) where item.category == .qms && item.id == id:
-                            logger.info("Skipping on context: \(currentContext)")
-                            continue
-                        case .favorites:
-                            break
-                        case .mentions where item.category == .forumMention || item.category == .siteMention:
-                            logger.info("Skipping on context: \(currentContext)")
-                            continue
-                        case let .topic(id: id) where item.category == .topic && item.id == id:
-                            logger.info("Skipping on context: \(currentContext)")
-                            continue
-                        default:
-                            break
-                        }
-                    }
-                                        
-                    let content = UNMutableNotificationContent()
-                    content.sound = .default
-                    
-                    switch item.category {
-                    case .qms:
-                        content.title = item.authorName.convertCodes()
-                        content.body = String(localized: "\(item.name.convertCodes()): \(item.unreadCount) новое сообщение")
-                    case .forum:
-                        content.title = "Новое на форуме"
-                        content.body = item.name.convertCodes()
-                    case .topic:
-                        content.title = item.unreadCount & 4 != 0
-                        ? "Обновилась шапка"
-                        : "\(item.authorName.convertCodes()) в теме"
-                        content.body = item.name.convertCodes()
-                    case .forumMention:
-                        content.title = "Упоминание в теме \(item.name.convertCodes())"
-                        content.body = "\(item.authorName.convertCodes()) ссылается на вас"
-                    case .siteMention:
-                        content.title = "Упоминание в новости \(item.name.convertCodes())"
-                        content.body = "\(item.authorName.convertCodes()) ссылается на вас"
-                    }
-                    
-                    let identifier = "\(item.category.rawValue)-\(item.id)-\(item.timestamp)"
-                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: nil)
-                    
-                    do {
-                        // Deleting notification with same id due to update of last message in topic
-                        let identifiers = await center.deliveredNotifications()
-                            .compactMap { notification -> String? in
-                                guard let raw = notification.request.identifier.split(separator: "-")[safe: 1],
-                                      let id = Int(raw),
-                                      id == item.id
-                                else { return nil }
-                                return notification.request.identifier
-                            }
-                        if !identifiers.isEmpty {
-                            logger.info("Removing delivered notifications (sun): \(identifiers)")
-                            center.removeDeliveredNotifications(withIdentifiers: identifiers)
-                        }
-                        
-                        logger.info("Showing notification: \"\(content.title) \\n \(content.body)\" (\(identifier))")
-                        try await center.add(request)
-                    } catch {
-                        analyticsClient.capture(error)
-                    }
-                }
+                await manager.handleLocalNotifications(items: unread.items, context: context.value)
                 
-                logger.info("Successfully processed notifications")
+                logger.info("Successfully processed local notifications")
             },
             
             removeNotifications: { categories, ids, timestamps in
-                logger.info("Removing notifications with categories: \(categories)")
                 
-                // Removing via categories
-                // Do we even have pending ones?
-                let pending = await center.pendingNotificationRequests()
-                let filteredPending = pending.filter { notification in
-                    if let prefix = notification.identifier.split(separator: "-").first {
-                        return categories
-                            .map { String($0.rawValue) }
-                            .contains(String(prefix))
-                    }
-                    return false
-                }
-                if !filteredPending.isEmpty {
-                    center.removePendingNotificationRequests(withIdentifiers: filteredPending.map(\.identifier))
-                    logger.warning("Removing PENDING notifications (rn-categories): \(filteredPending.map(\.identifier))")
-                }
-                
-                // Removing via categories
-                let delivered = await center.deliveredNotifications()
-                let filteredCategoriesDelivered = delivered.filter { notification in
-                    if let prefix = notification.request.identifier.split(separator: "-").first {
-                        return categories
-                            .map { String($0.rawValue) }
-                            .contains(String(prefix))
-                    }
-                    return false
-                }
-                if !filteredCategoriesDelivered.isEmpty {
-                    center.removeDeliveredNotifications(withIdentifiers: filteredCategoriesDelivered.map(\.request.identifier))
-                    logger.info("Removing delivered notifications (rn-categories): \(filteredCategoriesDelivered)")
-                }
-                
-                // Removing via ids
-                let filteredIdsDelivered = delivered
-                    .compactMap { notification -> String? in
-                        guard let raw = notification.request.identifier.split(separator: "-")[safe: 1],
-                              let id = Int(raw),
-                              ids.contains(id) else {
-                            return nil
+                if !categories.isEmpty {
+                    logger.info("Removing notifications with categories: \(categories)")
+                    for category in categories {
+                        switch category {
+                        case .qmsMessage:   await manager.clear(by: .kind(.qmsMessage))
+                        case .newTopic:     await manager.clear(by: .kind(.newTopic))
+                        case .newPost:      await manager.clear(by: .kind(.newPost))
+                        case .forumMention: await manager.clear(by: .kind(.forumMention))
+                        case .siteMention:  await manager.clear(by: .kind(.siteMention))
                         }
-                        return notification.request.identifier
                     }
-                if !filteredIdsDelivered.isEmpty {
-                    center.removeDeliveredNotifications(withIdentifiers: filteredIdsDelivered)
-                    logger.info("Removing delivered notifications (rn-ids): \(filteredIdsDelivered)")
                 }
                 
-                // Removing via timestamps
-                let filteredTimestampsDelivered = delivered
-                    .compactMap { notification -> String? in
-                        guard let raw = notification.request.identifier.split(separator: "-")[safe: 2],
-                              let timestamp = TimeInterval(raw),
-                              timestamps.contains(timestamp) else {
-                            return nil
-                        }
-                        return notification.request.identifier
+                if !ids.isEmpty {
+                    logger.info("Removing notifications with ids (primaryId): \(ids)")
+                    for id in ids {
+                        await manager.clear(by: .primaryId(id))
                     }
-                if !filteredTimestampsDelivered.isEmpty {
-                    center.removeDeliveredNotifications(withIdentifiers: filteredTimestampsDelivered)
-                    logger.info("Removing delivered notifications (rn-timestamps): \(filteredTimestampsDelivered)")
+                }
+                
+                if !timestamps.isEmpty {
+                    logger.info("Removing notifications with timestamps (value): \(timestamps.map(Int.init))")
+                    for timestamp in timestamps {
+                        await manager.clear(by: .value(Int(timestamp)))
+                    }
                 }
             },
             
@@ -438,26 +297,47 @@ extension NotificationsClient: DependencyKey {
     }
 }
 
+// MARK: - UNUserNotificationCenterDelegate
+
 extension NotificationsClient {
     fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
-        let continuation: AsyncStream<String>.Continuation
+        let continuation: AsyncStream<UNNotificationSnapshot>.Continuation
         private nonisolated(unsafe) var lastNotificationId: String = ""
         
-        init(continuation: AsyncStream<String>.Continuation) {
+        enum NotificationType {
+            case socket, remote
+        }
+        
+        init(continuation: AsyncStream<UNNotificationSnapshot>.Continuation) {
             self.continuation = continuation
         }
         
-        func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        // Called when notification will be presented in foreground
+        func userNotificationCenter(
+            _ center: UNUserNotificationCenter,
+            willPresent notification: UNNotification
+        ) async -> UNNotificationPresentationOptions {
             guard lastNotificationId != notification.request.identifier else { return [] }
             lastNotificationId = notification.request.identifier // Hotfix for Apple iOS 18 double notification bug
-            return [.badge, .banner, .list, .sound]
+            
+            let type: NotificationType = notification.request.content.userInfo.isEmpty ? .socket : .remote
+            switch type {
+            case .socket:
+                return [.banner, .sound, .list]
+            case .remote:
+                // Remote notifications are currently overriden by locals when in foreground
+                return []
+            }
         }
         
+        // Called when user taps on notification
         @MainActor // Fix for Apple bug
-        func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-            let identifier = response.notification.request.identifier
-            try? await Task.sleep(for: .seconds(1))
-            continuation.yield(identifier)
+        func userNotificationCenter(
+            _ center: UNUserNotificationCenter,
+            didReceive response: UNNotificationResponse
+        ) async {
+            let snapshot = UNNotificationSnapshot(response.notification)
+            continuation.yield(snapshot)
         }
     }
 }
@@ -469,22 +349,29 @@ extension NotificationsClient {
 extension UNUserNotificationCenter: @retroactive @unchecked Sendable {}
 extension UNNotificationResponse: @retroactive @unchecked Sendable {}
 
-// TODO: Move to shared module
-extension Array {
-    subscript(safe index: Int) -> Element? {
-        return indices.contains(index) ? self[index] : nil
+public struct UNNotificationSnapshot: Sendable {
+    public let identifier: String
+    public let date: Date
+    public let title: String
+    public let subtitle: String
+    public let body: String
+    public let pdaIdentifier: PDANotification.Identifier?
+
+    public init(_ notification: UNNotification) {
+        let content = notification.request.content
+
+        identifier = notification.request.identifier
+        date = notification.date
+        title = content.title
+        subtitle = content.subtitle
+        body = content.body
+        
+        pdaIdentifier = .init(userInfo: content.userInfo)
     }
 }
 
-extension Unread.Item {
-    func isNotificationEnabled(using settings: AppSettings) -> Bool {
-        switch category {
-        case .qms:
-            return settings.notifications.contains(.qms) || settings.notifications.contains(.qmsSystemEvents)
-        case .forum, .topic:
-            return settings.notifications.contains(.favorites) || settings.notifications.contains(.favoritesImportant)
-        case .forumMention, .siteMention:
-            return settings.notifications.contains(.mentions)
-        }
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        return indices.contains(index) ? self[index] : nil
     }
 }

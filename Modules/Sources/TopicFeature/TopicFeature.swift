@@ -236,7 +236,8 @@ public struct TopicFeature: Reducer, Sendable {
                 state.posts.removeAll()
                 return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
                     if isLastPage {
-                        await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                        @Shared(.notificationsCache) var notificationsCache
+                        _ = $notificationsCache.withLock { $0.topics.removeValue(forKey: topicId) }
                     }
                     Task.cancel(id: CancelID.loading)
                     await send(.internal(.loadTopic(newOffset)))
@@ -700,7 +701,7 @@ public struct TopicFeature: Reducer, Sendable {
                             
                             // Syncing notifications and badges when reading last page
                             let unread = try await apiClient.getUnread(type: .all)
-                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                            await notificationsClient.showUnreadNotifications(unread)
                         }
                         // Deleting notifications related to posts on the current page
                         // `forumMention` notifications encode topicId in the trailing identifier segment

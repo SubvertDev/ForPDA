@@ -49,11 +49,6 @@ public struct CacheClient: Sendable {
     public var getQMSChats: @Sendable (_ id: Int) -> [QMSChatInfo]?
     
     // Notifications
-    public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
-    public var getLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int) async -> Int?
-    public var setTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
-    public var deleteTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
-    public var getTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Int?
     public var getUnread: @Sendable () -> Unread?
     public var setUnread: @Sendable (_ unread: Unread) -> Void
 }
@@ -66,7 +61,7 @@ extension CacheClient: DependencyKey {
     
     public static var liveValue: CacheClient {
         @Dependency(\.analyticsClient) var analytics
-        
+                
         return CacheClient(
             
             // MARK: - Common
@@ -83,7 +78,11 @@ extension CacheClient: DependencyKey {
                 try await forumsStorage.async.removeAll()
                 try await qmsChatsStorage.async.removeAll()
                 try await lastBackgroundTaskInvokeTimeStorage.async.removeAll()
-                try await notificationsStorage.async.removeAll()
+                try await unreadStorage.async.removeAll()
+                try await notificationsStorage.async.removeAll() // deprecated
+                
+                @Shared(.notificationsCache) var notificationsCache
+                $notificationsCache.withLock { $0.clearCache() }
             },
             
             // MARK: - Articles
@@ -154,21 +153,6 @@ extension CacheClient: DependencyKey {
             
             // MARK: - Notifications
             
-            setLastTimestampOfUnreadItem: { timestamp, itemId in
-                try? await notificationsStorage.async.setObject(timestamp, forKey: itemId)
-            },
-            getLastTimestampOfUnreadItem: { itemId in
-                return try? await notificationsStorage.async.object(forKey: itemId)
-            },
-            setTopicIdOfUnreadItem: { topicId in
-                try? await notificationsStorage.async.setObject(topicId, forKey: topicId)
-            },
-            deleteTopicIdOfUnreadItem: { topicId in
-                try? await notificationsStorage.async.removeObject(forKey: topicId)
-            },
-            getTopicIdOfUnreadItem: { topicId in
-                return try? await notificationsStorage.async.object(forKey: topicId)
-            },
             getUnread: {
                 return try? unreadStorage.object(forKey: unreadKey)
             },
@@ -185,7 +169,7 @@ private extension CacheClient {
     
     private static var articlesStorage: Storage<Int, Article> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Articles", expiry: .date(.days(7)), maxSize: .megabytes(2), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "Articles", expiry: .date(.days(7)), maxSize: .megabytes(2)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Article.self)
@@ -194,7 +178,7 @@ private extension CacheClient {
     
     private static var usersStorage: Storage<Int, User> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Users", expiry: .date(.days(30)), maxSize: .kilobytes(100), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "Users", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: User.self)
@@ -204,7 +188,7 @@ private extension CacheClient {
     private static var favoritesKey: String { "favoritesKey" }
     private static var favoritesStorage: Storage<String, Favorite> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .kilobytes(100), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "Favorites", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Favorite.self)
@@ -214,7 +198,7 @@ private extension CacheClient {
     private static var forumsListKey: String { "forumsListKey" }
     private static var forumsListStorage: Storage<String, [ForumInfo]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "ForumsList", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "ForumsList", expiry: .date(.days(30)), maxSize: .megabytes(1)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [ForumInfo].self)
@@ -223,7 +207,7 @@ private extension CacheClient {
     
     private static var forumsStorage: Storage<Int, Forum> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Forums", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "Forums", expiry: .date(.days(30)), maxSize: .megabytes(1)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Forum.self)
@@ -232,7 +216,7 @@ private extension CacheClient {
     
     private static var attachmentURLsStorage: Storage<Int, URL> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "AttachmentURLs", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "AttachmentURLs", expiry: .date(.days(30)), maxSize: .megabytes(1)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: URL.self)
@@ -241,7 +225,7 @@ private extension CacheClient {
     
     private static var qmsChatsStorage: Storage<Int, [QMSChatInfo]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "QMSChats", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "QMSChats", expiry: .date(.days(30)), maxSize: .megabytes(1)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [QMSChatInfo].self)
@@ -251,16 +235,17 @@ private extension CacheClient {
     private static var lastBackgroundTaskInvokeTimeKey: String { "lastBackgroundTaskInvokeTimeKey" }
     private static var lastBackgroundTaskInvokeTimeStorage: Storage<String, [BackgroundTaskEntry]> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30)), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "LastBackgroundTaskInvokeTime", expiry: .date(.days(30))),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: [BackgroundTaskEntry].self)
         )
     }
     
+    /// Deprecated
     private static var notificationsStorage: Storage<Int, Int> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .kilobytes(100), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Int.self)
@@ -270,7 +255,7 @@ private extension CacheClient {
     private static var unreadKey: String { "unreadKey" }
     private static var unreadStorage: Storage<String, Unread> {
         return try! Storage(
-            diskConfig: DiskConfig(name: "Unread", expiry: .date(.days(30)), maxSize: .megabytes(1), directory: .sharedContainerURL),
+            diskConfig: DiskConfig(name: "Unread", expiry: .date(.days(30)), maxSize: .megabytes(1)),
             memoryConfig: MemoryConfig(),
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Unread.self)

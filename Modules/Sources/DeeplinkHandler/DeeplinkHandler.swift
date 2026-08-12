@@ -371,14 +371,14 @@ public struct DeeplinkHandler {
         guard let idString = split[safe: 1],    let id = Int(idString)               else { throw .noDeeplinkAvailable(for: url) }
         guard let timestampString = split.last, let timestamp = Int(timestampString) else { throw .noDeeplinkAvailable(for: url) }
         
-        guard let type = Unread.Item.Category(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
+        guard let type = PDANotification.Kind(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
         
         switch type {
-        case .qms:
+        case .qmsMessage:
             return Deeplink.qms(id: id)
-        case .forum:
+        case .newTopic:
             return Deeplink.forum(id: id, page: 1)
-        case .topic:
+        case .newPost:
             // Currently we don't have id of a post to jump due to limited api
             return Deeplink.topic(id: id, goTo: .unread, filter: nil)
         case .forumMention:

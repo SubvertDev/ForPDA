@@ -29,7 +29,7 @@ public struct APIClient: Sendable {
     public var connect: @Sendable (_ inBackground: Bool) async throws -> Void
     public var disconnect: @Sendable () async -> Void
     public var setLogResponses: @Sendable (_ type: ResponsesLogType) async -> Void
-    public var notify: @Sendable (_ token: String, _ settings: NotificationsSettings, _ isDebug: Bool) async throws -> Bool
+    public var notify: @Sendable (_ token: String, _ settings: NotificationsSettings2, _ isDebug: Bool) async throws -> Bool
     
     // Articles
     public var getArticlesList: @Sendable (_ offset: Int, _ amount: Int) async throws -> [ArticlePreview]

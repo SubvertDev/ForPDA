@@ -112,7 +112,7 @@ public struct MentionsFeature: Reducer, Sendable {
                 return .run { _ in
                     await notificationsClient.removeNotifications(categories: [.forumMention, .siteMention])
                     let unread = try await apiClient.getUnread(type: .all)
-                    await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                    await notificationsClient.showUnreadNotifications(unread)
                 }
                 
             case let .internal(.mentionsResponse(.failure(error))):

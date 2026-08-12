@@ -44,9 +44,9 @@ public struct NotificationsScreen: View {
                             .padding(16)
                         }
                         
-                        Row("QMS", value: $store.appSettings.notifications.options(.qms))
-                        Row("System events", value: $store.appSettings.notifications.options(.qmsSystemEvents))
-                        Row("Mentions", value: $store.appSettings.notifications.options(.mentions))
+                        Row("QMS", value: $store.appSettings.notifications2.options(.qms))
+                        Row("System events", value: $store.appSettings.notifications2.options(.qmsSystemEvents))
+                        Row("Mentions", value: $store.appSettings.notifications2.options(.mentions))
                         FavoritesRow()
                     } header: {
                         Text("General", bundle: .module)
@@ -107,15 +107,15 @@ public struct NotificationsScreen: View {
             
             Menu {
                 Picker(String(), selection: $store.favoritesSettings) {
-                    ForEach(FavoritesNotificationSettings.allCases) { mode in
-                        Text(mode.title, bundle: .module)
+                    ForEach(NotificationsSettings2.FavoritesMode.allCases) { mode in
+                        Text(mode.title)
                             .tag(mode)
                     }
                 }
                 .pickerStyle(.inline)
             } label: {
                 HStack(spacing: 9) {
-                    Text(store.favoritesSettings.title, bundle: .module)
+                    Text(store.favoritesSettings.title)
                     Image(systemSymbol: .chevronUpChevronDown)
                 }
                 .foregroundStyle(Color(.Labels.teritary))
@@ -128,7 +128,7 @@ public struct NotificationsScreen: View {
 
 // MARK: - Extensions
 
-extension Binding where Value == NotificationsSettings {
+extension Binding where Value == NotificationsSettings2 {
     func options(_ options: Value) -> Binding<Bool> {
         return .init { () -> Bool in
             wrappedValue.contains(options)
@@ -138,6 +138,19 @@ extension Binding where Value == NotificationsSettings {
             } else {
                 wrappedValue.remove(options)
             }
+        }
+    }
+}
+
+extension NotificationsSettings2.FavoritesMode {
+    var title: LocalizedStringResource {
+        switch self {
+        case .all:
+            LocalizedStringResource("All", bundle: .module)
+        case .important:
+            LocalizedStringResource("Only important", bundle: .module)
+        case .disabled:
+            LocalizedStringResource("Do not", bundle: .module)
         }
     }
 }

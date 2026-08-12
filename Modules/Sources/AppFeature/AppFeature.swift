@@ -292,7 +292,7 @@ public struct AppFeature: Reducer, Sendable {
                     let isProcessed = await notificationsClient.processNotification(notification)
                     if isProcessed {
                         let unread = try await apiClient.getUnread(type: .all)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        await notificationsClient.showUnreadNotifications(unread)
                     }
                 }
                 
@@ -321,17 +321,15 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case let .updateBadges(unread):
-#warning("Review new count logic")
-                
                 let favoritesBadges =
-                (state.appSettings.notifications.contains(.favorites) || state.appSettings.notifications.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
+                (state.appSettings.notifications2.contains(.favorites) || state.appSettings.notifications2.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
                 
                 // Sometimes we have more favorites in general count than in an array, so we apply min() fix
                 state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
                 
                 let profileBadges =
-                ((state.appSettings.notifications.contains(.qms) || state.appSettings.notifications.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0) +
-                (state.appSettings.notifications.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0)
+                ((state.appSettings.notifications2.contains(.qms) || state.appSettings.notifications2.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0) +
+                (state.appSettings.notifications2.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0)
                 state.profileBadges = profileBadges
                 
                 cacheClient.setUnread(unread)
@@ -382,7 +380,7 @@ public struct AppFeature: Reducer, Sendable {
                 return .run { _ in
                     do {
                         let unread = try await apiClient.getUnread(type: .all)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        await notificationsClient.showUnreadNotifications(unread)
                     } catch {
                         analyticsClient.capture(error)
                     }
@@ -394,9 +392,9 @@ public struct AppFeature: Reducer, Sendable {
                 return .run { _ in
                     notificationsClient.setNotificationContext(context: nil)
                     await notificationsClient.removeNotifications(
-                        categories: [.qms, .forum, .topic, .forumMention, .siteMention]
+                        categories: [.qmsMessage, .newTopic, .newPost, .forumMention, .siteMention]
                     )
-                    await notificationsClient.showUnreadNotifications(.mockEmpty, skipCategories: [])
+                    await notificationsClient.showUnreadNotifications(.mockEmpty)
                 }
                 
                 
@@ -407,7 +405,7 @@ public struct AppFeature: Reducer, Sendable {
             case let .deeplink(url):
                 do {
                     let deeplink = try DeeplinkHandler().handleOuterToInnerURL(url)
-                    return showScreenForDeeplink(deeplink, &state)
+                    return showScreenForDeeplink(deeplink, sourceURL: url, state: &state)
                 } catch {
                     analyticsClient.capture(error)
                     state.alert = AlertState {
@@ -419,7 +417,7 @@ public struct AppFeature: Reducer, Sendable {
             case let .appDelegate(.userNotification(identifier)):
                 do {
                     let deeplink = try DeeplinkHandler().handleNotification(identifier)
-                    return showScreenForDeeplink(deeplink, &state)
+                    return showScreenForDeeplink(deeplink, sourceURL: URL(string: identifier)!, state: &state)
                 } catch {
                     analyticsClient.capture(error)
                     state.alert = AlertState {
@@ -438,7 +436,7 @@ public struct AppFeature: Reducer, Sendable {
                         
                         if isLoggedIn {
                             let unread = try await apiClient.getUnread(type: .all)
-                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                            await notificationsClient.showUnreadNotifications(unread)
                         }
                     }
                     
@@ -473,7 +471,7 @@ public struct AppFeature: Reducer, Sendable {
                         guard try await notificationsClient.hasPermission() else { return }
                         logger.info("[AppRefresh] Notifications permission is granted")
                         
-                        guard appSettings.notifications.isAnyEnabled else { return }
+                        guard appSettings.notifications2.isAnyEnabled else { return }
                         logger.info("[AppRefresh] Notifications enabled in settings")
                         
                         try await apiClient.connect(inBackground: true)
@@ -482,7 +480,7 @@ public struct AppFeature: Reducer, Sendable {
                         let unread = try await apiClient.getUnread(type: .all)
                         logger.info("[AppRefresh] Successfully fetched. Preparing to show notifications..")
                         
-                        await notificationsClient.showUnreadNotifications(unread, [])
+                        await notificationsClient.showUnreadNotifications(unread)
                         logger.info("[AppRefresh] Successfully shown notifications")
                         
                     } catch {
@@ -574,54 +572,13 @@ public struct AppFeature: Reducer, Sendable {
         return .send(.favoritesTab(.root(.favorites(.internal(.refresh)))))
     }
     
-    private func showScreenForDeeplink(_ deeplink: Deeplink, _ state: inout State) -> Effect<Action> {
-        let screen: Path.State
-        switch deeplink {
-        case let .article(id, _, _, scrollToId):
-            let preview = ArticlePreview.innerDeeplink(id: id)
-            screen = .articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId)))
-        case let .announcement(id):
-            screen = .forum(.announcement(AnnouncementFeature.State(id: id)))
-        case let .device(goTo):
-            screen = switch goTo {
-            case .index:
-                .devDB(.type(DeviceTypeFeature.State(content: .index)))
-            case .vendorsList(let type):
-                .devDB(.type(DeviceTypeFeature.State(content: .vendorsList(type))))
-            case .vendor(let vendorName, let type):
-                .devDB(.type(DeviceTypeFeature.State(content: .vendor(vendorName, type: type))))
-            case .device(let tag, let subTag):
-                .devDB(.specifications(DeviceSpecificationsFeature.State(tag: tag, subTag: subTag)))
-            }
-        case let .ticketsList(offset):
-            screen = .tickets(.ticketsList(TicketsListFeature.State(type: .list, initialOffset: offset)))
-        case let .ticket(id):
-            screen = .tickets(.ticket(TicketFeature.State(id: id)))
-        case let .topic(id, goTo, filter):
-            screen = .forum(.topic(TopicFeature.State(topicId: id!, goTo: goTo, postsFilter: filter)))
-        case let .forum(id, page):
-            screen = .forum(.forum(ForumFeature.State(forumId: id, initialPage: page)))
-        case let .eventLog(id, type):
-            screen = .forum(.eventLog(ForumEventLogFeature.State(id: id, type: type)))
-        case let .user(id):
-            screen = .more(.profile(ProfileFeature.State(userId: id)))
-        case let .qms(id: id):
-            screen = .qms(.qms(QMSFeature.State(chatId: id)))
-        case let .search(options: options):
-            screen = .search(.searchResult(SearchResultFeature.State(search: options)))
-        }
-        
-        openScreenOnCurrentStack(screen, state: &state)
-        
-        return .none
-    }
-    
-    private func openScreenOnCurrentStack(_ element: Path.State, state: inout State) {
+    private func showScreenForDeeplink(_ deeplink: Deeplink, sourceURL: URL, state: inout State) -> Effect<Action> {
+        let action = StackTab.Action.deeplink(deeplink, sourceURL: sourceURL)
         switch state.selectedTab {
-        case .articles:  state.articlesTab.path.append(element)
-        case .favorites: state.favoritesTab.path.append(element)
-        case .forum:     state.forumTab.path.append(element)
-        case .more:      state.moreTab.path.append(element)
+        case .articles:  return .send(.articlesTab(action))
+        case .favorites: return .send(.favoritesTab(action))
+        case .forum:     return .send(.forumTab(action))
+        case .more:      return .send(.moreTab(action))
         }
     }
 }

@@ -154,7 +154,7 @@ public struct ProfileFeature: Reducer, Sendable {
                     .run { send in
                         // TODO: Нужно ли теперь это здесь?
                         let unread = try await apiClient.getUnread(type: .all)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        await notificationsClient.showUnreadNotifications(unread)
                     },
                 )
                 

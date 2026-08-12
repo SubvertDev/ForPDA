@@ -32,7 +32,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     public enum Action {
         case didFinishLaunching(UIApplication)
         case didRegisterForRemoteNotifications(Data)
-        case didReceiveNotification(UNNotification)
+        case didReceiveNotification(UNNotificationSnapshot)
         case userNotification(String)
     }
     
@@ -72,8 +72,8 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
                         group.addTask {
-                            for await identifier in userNotificationsStream {
-                                await send(.userNotification(identifier))
+                            for await notification in userNotificationsStream {
+                                await send(.didReceiveNotification(notification))
                             }
                         }
                         
@@ -105,19 +105,15 @@ public struct AppDelegateFeature: Reducer, Sendable {
             case let .didRegisterForRemoteNotifications(deviceToken):
                 notificationsClient.setDeviceToken(deviceToken)
                 guard state.userSession != nil else { return .none }
-                return .run { [settings = state.appSettings.notifications, isDebug = isDebug] send in
+                return .run { [settings = state.appSettings.notifications2, isDebug = isDebug] send in
                     let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                     let status = try await apiClient.notify(token, settings, isDebug)
                     logger.info("Notifications initialized on server with status: \(status) and settings \(settings.rawValue)")
                 }
                 
             case let .didReceiveNotification(notification):
-                guard let category = notification.request.content.userInfo["t"] as? Int,
-                      let id = notification.request.content.userInfo["i"] as? Int,
-                      let timestamp = notification.request.content.userInfo["v"] as? Int else {
-                    return .send(.userNotification(notification.request.identifier))
-                }
-                return .send(.userNotification("\(category)-\(id)-\(timestamp)"))
+                let identifier = notification.pdaIdentifier?.rawValue ?? notification.identifier
+                return .send(.userNotification(identifier))
                 
             case .userNotification:
                 // Handled in AppFeature instead

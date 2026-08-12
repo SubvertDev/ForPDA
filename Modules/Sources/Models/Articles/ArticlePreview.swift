@@ -122,4 +122,11 @@ public extension ArticlePreview {
 
 public extension Date {
     static let unknown = Date(timeIntervalSince1970: 0)
+    static let never = Date(timeIntervalSince1970: 0)
+}
+
+public extension Int {
+    func asDate() -> Date {
+        Date(timeIntervalSince1970: TimeInterval(self))
+    }
 }

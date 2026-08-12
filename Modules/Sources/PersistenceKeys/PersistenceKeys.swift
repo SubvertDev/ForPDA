@@ -25,3 +25,14 @@ extension SharedReaderKey where Self == FileStorageKey<AppSettings>.Default {
         return Self[.fileStorage(url), default: AppSettings.default]
     }
 }
+
+// MARK: - Notification Cache
+
+extension SharedKey where Self == FileStorageKey<NotificationsCache>.Default {
+    public static var notificationsCache: Self {
+        let containerURL = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.subvert.forpda")!
+        let url = containerURL.appending(component: "NotificationsCache.json")
+        return Self[.fileStorage(url), default: NotificationsCache.default]
+    }
+}

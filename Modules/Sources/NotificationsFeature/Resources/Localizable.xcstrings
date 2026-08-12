@@ -11,32 +11,12 @@
         }
       }
     },
-    "Background notifications" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Уведомления в фоне"
-          }
-        }
-      }
-    },
     "Do not" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не оповещать"
-          }
-        }
-      }
-    },
-    "Experimental" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Экспериментальные"
           }
         }
       }

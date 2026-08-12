@@ -7,11 +7,11 @@
 
 import PDAPI
 
-public struct ForumTemplateRequest {
+public struct ForumTemplateRequest: Sendable {
     public let id: Int
     public let action: TemplateAction
     
-    public enum TemplateAction {
+    public enum TemplateAction: Sendable {
         case get
         case send(PDAPIDocument)
         case preview(PDAPIDocument)
