@@ -34,11 +34,18 @@ public enum PDANotificationDomain {
                 case once = 1
                 case doNot = 2
             }
-            
-            private static let hatUpdateMask = 0b100
+
+            private static let hasHatUpdateMask = 4
+            private static let isHatUpdateMask = 16
 
             public let kind: Kind
+
+            /// Hat-update notifications are enabled for this topic
             public let hasHatUpdate: Bool
+
+            /// This particular notification should be treated as a hat update
+            public let isHatUpdate: Bool
+
             public let rawValue: Int
 
             public init(rawValue: Int) throws {
@@ -46,17 +53,31 @@ public enum PDANotificationDomain {
                     throw DecodingError.invalidRawValue(rawValue)
                 }
 
+                let hasHatUpdate = rawValue & Self.hasHatUpdateMask != 0
+
                 self.kind = kind
-                self.hasHatUpdate = rawValue & Self.hatUpdateMask != 0
+                self.hasHatUpdate = hasHatUpdate
+                self.isHatUpdate = hasHatUpdate && rawValue & Self.isHatUpdateMask != 0
+
                 self.rawValue = rawValue
             }
             
-            /// Init for previews
-            public init(kind: Kind, hasHatUpdate: Bool) {
+            public init(kind: Kind, hasHatUpdate: Bool, isHatUpdate: Bool) {
                 self.kind = kind
                 self.hasHatUpdate = hasHatUpdate
-                
-                self.rawValue = kind.rawValue | (hasHatUpdate ? Self.hatUpdateMask : 0)
+                self.isHatUpdate = hasHatUpdate && isHatUpdate
+
+                var rawValue = kind.rawValue
+
+                if hasHatUpdate {
+                    rawValue |= Self.hasHatUpdateMask
+                }
+
+                if hasHatUpdate && isHatUpdate {
+                    rawValue |= Self.isHatUpdateMask
+                }
+
+                self.rawValue = rawValue
             }
 
             enum DecodingError: Error {
@@ -73,7 +94,7 @@ public enum PDANotificationDomain {
         }
         
         nonisolated(unsafe) public static let `default` = FavoriteState(
-            notificationKind: NotificationKind(kind: .always, hasHatUpdate: false),
+            notificationKind: NotificationKind(kind: .always, hasHatUpdate: false, isHatUpdate: false),
             isPinned: false
         )
     }

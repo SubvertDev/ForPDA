@@ -291,7 +291,7 @@ public final class NotificationManager: @unchecked Sendable {
             content.body = model.forumTitle
             
         case let .newPost(model):
-            content.title = model.favoriteState.notificationKind.hasHatUpdate
+            content.title = model.favoriteState.notificationKind.isHatUpdate
             ? String(localized: "notifications.newPost.hatUpdate", bundle: .module)
             : String(localized: "notifications.newPost.title.memberName:\(model.member.name.convertCodes())", bundle: .module)
             content.body = model.topicTitle.convertCodes()
