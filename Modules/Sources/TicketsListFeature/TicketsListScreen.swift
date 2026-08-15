@@ -116,13 +116,19 @@ public struct TicketsListScreen: View {
                 Section {
                     Toggle(
                         LocalizedStringResource("Only My", bundle: .module),
-                        isOn: Binding(projectedValue: $store.appSettings.tickets.isShowOnlyMine)
+                        isOn: Binding(
+                            get: { store.appSettings.tickets.isShowOnlyMine },
+                            set: { send(.showOnlyMineChanged($0)) }
+                        )
                     )
                     
                     if case .list = store.type {
                         Toggle(
                             LocalizedStringResource("Sort by Forums", bundle: .module),
-                            isOn: Binding(projectedValue: $store.appSettings.tickets.isSortByForums)
+                            isOn: Binding(
+                                get: { store.appSettings.tickets.isSortByForums },
+                                set: { send(.sortByForumsChanged($0)) }
+                            )
                         )
                     }
                 } header: {

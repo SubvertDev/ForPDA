@@ -44,9 +44,9 @@ public struct NotificationsScreen: View {
                             .padding(16)
                         }
                         
-                        Row("QMS", value: $store.appSettings.notifications2.options(.qms))
-                        Row("System events", value: $store.appSettings.notifications2.options(.qmsSystemEvents))
-                        Row("Mentions", value: $store.appSettings.notifications2.options(.mentions))
+                        Row("QMS", value: optionBinding(.qms))
+                        Row("System events", value: optionBinding(.qmsSystemEvents))
+                        Row("Mentions", value: optionBinding(.mentions))
                         FavoritesRow()
                     } header: {
                         Text("General", bundle: .module)
@@ -95,7 +95,7 @@ public struct NotificationsScreen: View {
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
     }
-    
+
     @ViewBuilder
     private func FavoritesRow() -> some View {
         HStack(spacing: 0) {
@@ -106,7 +106,13 @@ public struct NotificationsScreen: View {
             Spacer(minLength: 8)
             
             Menu {
-                Picker(String(), selection: $store.favoritesSettings) {
+                Picker(
+                    String(),
+                    selection: Binding(
+                        get: { store.appSettings.notifications2.favoritesMode },
+                        set: { store.send(.favoritesModeChanged($0)) }
+                    )
+                ) {
                     ForEach(NotificationsSettings2.FavoritesMode.allCases) { mode in
                         Text(mode.title)
                             .tag(mode)
@@ -115,7 +121,7 @@ public struct NotificationsScreen: View {
                 .pickerStyle(.inline)
             } label: {
                 HStack(spacing: 9) {
-                    Text(store.favoritesSettings.title)
+                    Text(store.appSettings.notifications2.favoritesMode.title)
                     Image(systemSymbol: .chevronUpChevronDown)
                 }
                 .foregroundStyle(Color(.Labels.teritary))
@@ -124,23 +130,16 @@ public struct NotificationsScreen: View {
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
     }
+
+    private func optionBinding(_ option: NotificationsSettings2) -> Binding<Bool> {
+        Binding(
+            get: { store.appSettings.notifications2.contains(option) },
+            set: { store.send(.notificationOptionChanged(option, isEnabled: $0)) }
+        )
+    }
 }
 
 // MARK: - Extensions
-
-extension Binding where Value == NotificationsSettings2 {
-    func options(_ options: Value) -> Binding<Bool> {
-        return .init { () -> Bool in
-            wrappedValue.contains(options)
-        } set: { newValue in
-            if newValue {
-                wrappedValue.insert(options)
-            } else {
-                wrappedValue.remove(options)
-            }
-        }
-    }
-}
 
 extension NotificationsSettings2.FavoritesMode {
     var title: LocalizedStringResource {
