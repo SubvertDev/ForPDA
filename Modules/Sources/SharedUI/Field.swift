@@ -264,13 +264,5 @@ private struct SelectableTextView: UIViewRepresentable {
                 textView.textColor = placeholderColor
             }
         }
-        
-        func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
-            // init selection, cause until user not enter something, it always nil.
-            if selection.wrappedValue == nil {
-                selection.wrappedValue = NSMakeRange(0, 0)
-            }
-            return true
-        }
     }
 }
