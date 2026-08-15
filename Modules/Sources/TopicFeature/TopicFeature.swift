@@ -26,6 +26,8 @@ import ForumStatFeature
 import ForumMoveFeature
 import GalleryFeature
 import TopicEditFeature
+import OSLog
+import CacheClient
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {

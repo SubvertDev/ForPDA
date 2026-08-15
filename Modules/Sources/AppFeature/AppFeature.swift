@@ -43,6 +43,9 @@ import TicketsListFeature
 import TicketFeature
 import ForumEventLogFeature
 import LogStoreFeature
+import OSLog
+import HapticClient
+import AnalyticsClient
 
 @Reducer
 public struct AppFeature: Reducer, Sendable {

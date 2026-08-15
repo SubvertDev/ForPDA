@@ -11,6 +11,8 @@ import ComposableArchitecture
 import Foundation
 import Models
 import QMSClient
+import NotificationsClient
+import AnalyticsClient
 
 @Reducer
 public struct QMSListFeature: Reducer, Sendable {

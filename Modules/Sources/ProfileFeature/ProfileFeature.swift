@@ -16,6 +16,7 @@ import NotificationsClient
 import FormFeature
 import ReputationChangeFeature
 import CreateChatFeature
+import CacheClient
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {

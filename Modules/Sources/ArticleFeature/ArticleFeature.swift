@@ -17,6 +17,7 @@ import AnalyticsClient
 import ToastClient
 import NotificationsClient
 import AuthFeature
+import ParsingClient
 
 @Reducer
 public struct ArticleFeature: Reducer, Sendable {

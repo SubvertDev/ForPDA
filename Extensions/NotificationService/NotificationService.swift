@@ -46,7 +46,7 @@ class NotificationService: UNNotificationServiceExtension {
                 delivery.update(interruptionLevel: .passive, sound: nil)
                 delivery.finish()
 
-                try await Task.sleep(for: .seconds(0.1))
+                try? await Task.sleep(for: .seconds(0.1))
                 
                 let identifiers = await UNUserNotificationCenter.current()
                     .deliveredNotifications()

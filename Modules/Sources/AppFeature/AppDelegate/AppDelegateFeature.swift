@@ -13,6 +13,8 @@ import CacheClient
 import NotificationsClient
 import PersistenceKeys
 import Models
+import APIClient
+import OSLog
 
 @Reducer
 public struct AppDelegateFeature: Reducer, Sendable {

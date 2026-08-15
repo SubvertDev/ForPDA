@@ -12,6 +12,7 @@ import CacheClient
 import TCAExtensions
 import PersistenceKeys
 import Models
+import AnalyticsClient
 
 @Reducer
 public struct SettingsFeature: Reducer, Sendable {
