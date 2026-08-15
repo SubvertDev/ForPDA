@@ -106,8 +106,8 @@ extension NotificationsClient: DependencyKey {
             },
             
             setDeviceToken: { deviceToken in
-                let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-                print("Device token: \(token)")
+                // let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                // print("Device token: \(token)")
             },
             
             delegate: {
@@ -300,10 +300,12 @@ extension NotificationsClient: DependencyKey {
 // MARK: - UNUserNotificationCenterDelegate
 
 extension NotificationsClient {
+    
     fileprivate final class Delegate: NSObject, Sendable, UNUserNotificationCenterDelegate {
+        
         let continuation: AsyncStream<UNNotificationSnapshot>.Continuation
         private nonisolated(unsafe) var lastNotificationId: String = ""
-        
+                
         enum NotificationType {
             case socket, remote
         }
@@ -336,6 +338,9 @@ extension NotificationsClient {
             _ center: UNUserNotificationCenter,
             didReceive response: UNNotificationResponse
         ) async {
+            @Dependency(\.analyticsClient) var analytics
+            analytics.capturePushNotificationOpened(response)
+            
             let snapshot = UNNotificationSnapshot(response.notification)
             continuation.yield(snapshot)
         }

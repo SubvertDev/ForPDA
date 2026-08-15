@@ -92,7 +92,7 @@ let package = Package(
         .package(url: "https://github.com/hyperoslo/Cache", exact: "7.4.0"),
         .package(url: "https://github.com/kean/Nuke", exact: "12.8.0"),
         .package(url: "https://github.com/kirualex/SwiftyGif", exact: "5.4.5"),
-        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.69.0"),
+        .package(url: "https://github.com/PostHog/posthog-ios", exact: "3.69.6"),
         .package(url: "https://github.com/raymondjavaxx/SmoothGradient.git", exact: "1.0.1"),
         .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols", exact: "7.0.0"),
         .package(url: "https://github.com/SvenTiigi/YouTubePlayerKit", exact: "2.0.5"),

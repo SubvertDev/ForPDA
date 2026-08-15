@@ -13,6 +13,7 @@ import Models
 import PostHog
 import Sentry
 import OSLog
+import UserNotifications
 
 // MARK: - Client
 
@@ -23,6 +24,9 @@ public struct AnalyticsClient: Sendable {
     public var setUserProperties: @Sendable (_ properties: [String: Any]?) -> Void
     public var logout: @Sendable () -> Void
     public var log: @Sendable (any Event) -> Void
+    public var registerPushNotificationToken: @Sendable (_ deviceToken: String) -> Void
+    public var capturePushNotificationOpened: @Sendable (_ response: UNNotificationResponse) -> Void
+    
     public var capture: @Sendable (any Error) -> Void
     public var addBreadcrumb: @Sendable (_ category: String, _ message: String?, _ data: [String: Any]?, _ type: String?) -> Void
     public var reportFullyDisplayed: @Sendable () -> Void
@@ -68,6 +72,13 @@ extension AnalyticsClient: DependencyKey {
                 // logger.info("\(event.name) \(event.properties.map { "(\($0))" } ?? "")")
                 PostHogSDK.shared.capture(event.name, properties: event.properties)
             },
+            registerPushNotificationToken: { deviceToken in
+                PostHogSDK.shared.registerPushNotificationToken(deviceToken)
+            },
+            capturePushNotificationOpened: { response in
+                PostHogSDK.shared.capturePushNotificationOpened(response: response)
+            },
+            
             capture: { error in
                 logger.critical("Captured error via Sentry: \(error)")
                 SentrySDK.capture(error: error)
@@ -100,6 +111,8 @@ extension AnalyticsClient: DependencyKey {
                 print("[Analytics] \(event.name)")
             }
         },
+        registerPushNotificationToken: { _ in },
+        capturePushNotificationOpened: { _ in },
         capture: { error in
             print("[Sentry] \(error)")
         },
@@ -113,6 +126,8 @@ extension AnalyticsClient: DependencyKey {
         setUserProperties: { _ in },
         logout: { },
         log: { _ in },
+        registerPushNotificationToken: { _ in },
+        capturePushNotificationOpened: { _ in },
         capture: { _ in },
         addBreadcrumb: { _, _, _, _ in },
         reportFullyDisplayed: { }
@@ -143,6 +158,8 @@ extension AnalyticsClient {
         config.getAnonymousId = { _ in UUID(uuidString: id) ?? UUID.v7() }
         config.optOut = !isEnabled
         config.captureScreenViews = false // Track manually
+        config.capturePushNotificationSubscriptions = false // To disable swizzling
+        config.capturePushNotificationOpened = false // To disable swizzling
         PostHogSDK.shared.setup(config)
         
         // Checking for opt out

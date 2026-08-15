@@ -1,5 +1,5 @@
 {
-  "originHash" : "f3f7084476142e279e24fa52094b3fe526d4abc97fddcfe3bf9088289c259c31",
+  "originHash" : "47f631dc0bce9d869d7675395a2c3286725d254e1308d302fd855780e46b1a5c",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -43,7 +43,7 @@
       "location" : "https://github.com/SubvertDev/Chat",
       "state" : {
         "branch" : "main",
-        "revision" : "44a08c5141ac32dde14e5707ad25d8bbed5be0e9"
+        "revision" : "63020101082251cbb6e2ed3248ed92611e2688ab"
       }
     },
     {
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/PostHog/posthog-ios",
       "state" : {
-        "revision" : "1c9b3178746c8102c854c2569047aedcfdec8a0c",
-        "version" : "3.69.0"
+        "revision" : "c0218386c49115cce6b05a50b41f4f60bc995acb",
+        "version" : "3.69.6"
       }
     },
     {

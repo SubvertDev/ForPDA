@@ -32,6 +32,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     public enum Action {
         case didFinishLaunching(UIApplication)
         case didRegisterForRemoteNotifications(Data)
+        case didFailToRegisterForRemoteNotificationsWithError(Error)
         case didReceiveNotification(UNNotificationSnapshot)
         case userNotification(String)
     }
@@ -103,13 +104,19 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 }
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
-                notificationsClient.setDeviceToken(deviceToken)
+                let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                analyticsClient.registerPushNotificationToken(token)
+                logger.info("Registered remote notifications with token: \(token)")
+                // notificationsClient.setDeviceToken(deviceToken)
                 guard state.userSession != nil else { return .none }
                 return .run { [settings = state.appSettings.notifications2, isDebug = isDebug] send in
-                    let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                     let status = try await apiClient.notify(token, settings, isDebug)
                     logger.info("Notifications initialized on server with status: \(status) and settings \(settings.rawValue)")
                 }
+                
+            case let .didFailToRegisterForRemoteNotificationsWithError(error):
+                logger.error("\(error.localizedDescription, privacy: .public)")
+                return .none
                 
             case let .didReceiveNotification(notification):
                 let identifier = notification.pdaIdentifier?.rawValue ?? notification.identifier
