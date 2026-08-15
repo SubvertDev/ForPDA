@@ -73,6 +73,7 @@ extension AnalyticsClient: DependencyKey {
                 PostHogSDK.shared.capture(event.name, properties: event.properties)
             },
             registerPushNotificationToken: { deviceToken in
+                logger.info("Registered remote notifications with token: \(deviceToken)")
                 PostHogSDK.shared.registerPushNotificationToken(deviceToken)
             },
             capturePushNotificationOpened: { response in

@@ -47,7 +47,7 @@ public struct NotificationsClient: Sendable {
     public var hasPermission: @Sendable () async throws -> Bool
     public var requestPermission: @Sendable () async throws -> Bool
     public var registerForRemoteNotifications: @Sendable () async -> Void
-    public var setDeviceToken: @Sendable (Data) -> Void
+    public var setDeviceToken: @Sendable (String) -> Void
     public var delegate: @Sendable () -> AsyncStream<UNNotificationSnapshot> = { .finished }
     public var processNotification: @Sendable (String) async -> Bool = { _ in false }
     public var showUnreadNotifications: @Sendable (_ unread: Unread, _ skipCategories: [PDANotification.Kind]) async -> Void
@@ -105,9 +105,9 @@ extension NotificationsClient: DependencyKey {
                 await UIApplication.shared.registerForRemoteNotifications()
             },
             
-            setDeviceToken: { deviceToken in
-                // let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-                // print("Device token: \(token)")
+            setDeviceToken: { token in
+                @Shared(.appStorage("device_token")) var deviceToken: String?
+                $deviceToken.withLock { $0 = token }
             },
             
             delegate: {
@@ -219,9 +219,12 @@ extension NotificationsClient: DependencyKey {
                 do {
                     let notifications = appSettings.notifications2
 
-                    var favoritesCount = (notifications.contains(.favorites) || notifications.contains(.favoritesImportant))
-                    ? (unread.forumCount + unread.topicCount)
-                    : 0
+                    var favoritesCount = 0
+                    if notifications.contains(.favoritesImportant) {
+                        favoritesCount += unread.favoritesImportantCount
+                    } else if notifications.contains(.favorites) {
+                        favoritesCount += unread.favoritesCount
+                    }
                     
                     // Sometimes we have more favorites in general count than in an array, so we apply min() fix
                     favoritesCount = min(unread.favoritesUnreadCount, favoritesCount)
@@ -230,9 +233,9 @@ extension NotificationsClient: DependencyKey {
                     ? (unread.siteMentionsCount + unread.forumMentionsCount)
                     : 0
                     
-                    let qmsCount = (notifications.contains(.qms) || notifications.contains(.qmsSystemEvents))
-                    ? unread.qmsUnreadCount
-                    : 0
+                    var qmsCount = 0
+                    qmsCount += notifications.contains(.qms) ? unread.qmsCount : 0
+                    qmsCount += notifications.contains(.qmsSystemEvents) ? unread.qmsSystemCount : 0
                     
                     let totalCount = favoritesCount + mentionsCount + qmsCount
                     

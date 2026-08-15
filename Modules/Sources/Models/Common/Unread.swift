@@ -14,6 +14,31 @@ public struct Unread: Codable, Sendable, Hashable {
     public let mentionsUnreadCount: Int
     public let items: [PDANotification]
     
+    public var qmsCount: Int {
+        return items
+            .filter { $0.kind == .qmsMessage && $0.memberID != 0 }
+            .reduce(0) { $0 + ($1.extra1 ?? 0) }
+    }
+    
+    public var qmsSystemCount: Int {
+        return items
+            .filter { $0.kind == .qmsMessage && $0.memberID == 0 }
+            .reduce(0) { $0 + ($1.extra1 ?? 0) }
+    }
+    
+    public var favoritesCount: Int {
+        return items
+            .filter { $0.kind == .newPost || $0.kind == .newTopic }
+            .count
+    }
+    
+    public var favoritesImportantCount: Int {
+        return items
+            .filter { $0.kind == .newPost || $0.kind == .newTopic }
+            .filter { $0.extra2 != 0 }
+            .count
+    }
+    
     public var forumCount: Int {
         return items.filter { $0.kind == .newTopic }.count
     }

@@ -30,6 +30,7 @@ public final class NotificationManager: @unchecked Sendable {
     private let center = UNUserNotificationCenter.current()
     
     @Shared(.appSettings) var appSettings
+    @Shared(.userSession) var userSession
 
     @Dependency(\.analyticsClient) var analytics
     @Dependency(\.logger[.notifications]) var logger
@@ -169,6 +170,11 @@ public final class NotificationManager: @unchecked Sendable {
             // Different or absent last post date -> store
             $notificationsCache.withLock { $0.forums[model.forumID] = model.lastPostDate.asInt() }
             
+            // Don't show notifications of authorized user (multiple devices case)
+            if model.member.id == userSession?.userId {
+                return false
+            }
+            
             // Check for app notification settings
             switch appSettings.notifications2.favoritesMode {
             case .all:
@@ -212,6 +218,11 @@ public final class NotificationManager: @unchecked Sendable {
             
             // Different or absent last post date -> store
             $notificationsCache.withLock { $0.topics[model.topicID] = model.lastPostDate.asInt() }
+            
+            // Don't show notifications of authorized user (multiple devices case)
+            if model.member.id == userSession?.userId {
+                return false
+            }
             
             // Check for app notification settings
             switch appSettings.notifications2.favoritesMode {

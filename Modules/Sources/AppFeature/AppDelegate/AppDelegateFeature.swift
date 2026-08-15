@@ -108,12 +108,11 @@ public struct AppDelegateFeature: Reducer, Sendable {
             case let .didRegisterForRemoteNotifications(deviceToken):
                 let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
                 analyticsClient.registerPushNotificationToken(token)
-                logger.info("Registered remote notifications with token: \(token)")
-                // notificationsClient.setDeviceToken(deviceToken)
+                notificationsClient.setDeviceToken(token)
                 guard state.userSession != nil else { return .none }
                 return .run { [settings = state.appSettings.notifications2, isDebug = isDebug] send in
                     let status = try await apiClient.notify(token, settings, isDebug)
-                    logger.info("Notifications initialized on server with status: \(status) and settings \(settings.rawValue)")
+                    logger.info("Push notifications initialized with status `\(status)` and settings `\(settings.rawValue)`")
                 }
                 
             case let .didFailToRegisterForRemoteNotificationsWithError(error):

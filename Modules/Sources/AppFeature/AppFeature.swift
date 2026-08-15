@@ -324,15 +324,25 @@ public struct AppFeature: Reducer, Sendable {
                 return .none
                 
             case let .updateBadges(unread):
-                let favoritesBadges =
-                (state.appSettings.notifications2.contains(.favorites) || state.appSettings.notifications2.contains(.favoritesImportant)) ? (unread.forumCount + unread.topicCount) : 0
+                let notifications = state.appSettings.notifications2
+                
+                var favoritesBadges = 0
+                if notifications.contains(.favoritesImportant) {
+                    favoritesBadges += unread.favoritesImportantCount
+                } else if notifications.contains(.favorites) {
+                    favoritesBadges += unread.favoritesCount
+                }
                 
                 // Sometimes we have more favorites in general count than in an array, so we apply min() fix
                 state.favoritesBadges = min(unread.favoritesUnreadCount, favoritesBadges)
                 
-                let profileBadges =
-                ((state.appSettings.notifications2.contains(.qms) || state.appSettings.notifications2.contains(.qmsSystemEvents)) ? unread.qmsUnreadCount : 0) +
-                (state.appSettings.notifications2.contains(.mentions) ? (unread.siteMentionsCount + unread.forumMentionsCount) : 0)
+                var profileBadges = 0
+                profileBadges += notifications.contains(.qms) ? unread.qmsCount : 0
+                profileBadges += notifications.contains(.qmsSystemEvents) ? unread.qmsSystemCount : 0
+                
+                let mentionsCount = min(unread.mentionsUnreadCount, (unread.siteMentionsCount + unread.forumMentionsCount))
+                profileBadges += notifications.contains(.mentions) ? mentionsCount : 0
+
                 state.profileBadges = profileBadges
                 
                 cacheClient.setUnread(unread)
