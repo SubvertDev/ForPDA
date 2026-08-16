@@ -185,6 +185,7 @@ public struct TopicFeature: Reducer, Sendable {
             case loadTopic(Int)
             case loadTypes([[UITopicType]])
             case topicResponse(Result<Topic, any Error>)
+            case topicNavigationUpdated(Topic)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
             
@@ -667,14 +668,18 @@ public struct TopicFeature: Reducer, Sendable {
                 //customDump(topic)
                 state.topic = topic
 
+                return .run { send in
+                    await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
+                    await send(.internal(.topicNavigationUpdated(topic)))
+                }
+
+            case let .internal(.topicNavigationUpdated(topic)):
                 return .run { [
                     isFirstPage = state.pageNavigation.isFirstPage,
                     topicPerPage = state.appSettings.topicPerPage,
                     shouldShowTopicHatButton = state.shouldShowTopicHatButton,
                     isLastPage = state.pageNavigation.isLastPage
                 ] send in
-                        await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
-
                         var topicTypes: [[UITopicType]] = []
                         
                         topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in

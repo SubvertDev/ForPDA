@@ -28,6 +28,7 @@ extension TopicFeature {
                         .view(.searchButtonTapped),
                         .internal(.initUserSessionInfo),
                         .internal(.loadTypes),
+                        .internal(.topicNavigationUpdated),
                         .internal(.goToPost),
                         .internal(.jumpRequestFailed),
                         .internal(.jumpToPostAfterKarma),
