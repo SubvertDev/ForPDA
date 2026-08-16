@@ -89,6 +89,7 @@ public struct QMSListFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case loadQMS
+            case loadQMSAfterChatCreated(userId: Int)
             case qmsLoaded(Result<QMSList, any Error>)
             case loadUser(_ id: Int)
             case userLoaded(Result<QMSUser, any Error>)
@@ -227,7 +228,7 @@ public struct QMSListFeature: Reducer, Sendable {
                         await send(.internal(.loadUser(userId)))
                     }
                 } else {
-                    return .send(.internal(.loadQMS))
+                    return .send(.internal(.loadQMSAfterChatCreated(userId: userId)))
                 }
                 
             case .createChat:
@@ -239,6 +240,16 @@ public struct QMSListFeature: Reducer, Sendable {
                 return .run { send in
                     let result = await Result { try await qmsClient.loadChatList() }
                     await send(.internal(.qmsLoaded(result)))
+                }
+
+            case let .internal(.loadQMSAfterChatCreated(userId)):
+                return .run { send in
+                    let qmsResult = await Result { try await qmsClient.loadChatList() }
+                    await send(.internal(.qmsLoaded(qmsResult)))
+
+                    guard case .success = qmsResult else { return }
+                    let userResult = await Result { try await qmsClient.loadUser(id: userId) }
+                    await send(.internal(.userLoaded(userResult)))
                 }
                 
             case let .internal(.qmsLoaded(result)):
