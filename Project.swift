@@ -311,6 +311,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,

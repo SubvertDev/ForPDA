@@ -19,6 +19,7 @@ import FormFeature
 import ForumStatFeature
 import ForumMoveFeature
 import TopicEditFeature
+import NotificationsClient
 
 @Reducer
 public struct ForumFeature: Reducer, Sendable {
@@ -155,6 +156,7 @@ public struct ForumFeature: Reducer, Sendable {
     @Dependency(\.analyticsClient) private var analyticsClient
     @Dependency(\.pasteboardClient) private var pasteboardClient
     @Dependency(\.notificationCenter) private var notificationCenter
+    @Dependency(\.notificationsClient) private var notificationsClient
     
     // MARK: - Body
     
@@ -388,7 +390,14 @@ public struct ForumFeature: Reducer, Sendable {
                 state.isLoadingTopics = false
                 state.isRefreshing = false
                 analyticsClient.reportFullyDisplayed()
-                return .none
+                
+                return .run { [isFirstPage = state.pageNavigation.isFirstPage] _ in
+                    // Unread topics are most likely on the first page
+                    if isFirstPage {
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread)
+                    }
+                }
                 
             case .internal(.forumResponse(.failure)):
                 analyticsClient.reportFullyDisplayed()
