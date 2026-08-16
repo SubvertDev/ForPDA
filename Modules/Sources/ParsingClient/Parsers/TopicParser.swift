@@ -48,7 +48,7 @@ public struct TopicParser {
             authorId: authorId,
             authorName: authorName.convertCodes(),
             curatorId: curatorId,
-            curatorName: curatorName,
+            curatorName: curatorName.convertCodes(),
             poll: try parsePoll(poll),
             postsCount: postsCount,
             posts: try parsePosts(posts),
@@ -81,7 +81,7 @@ public struct TopicParser {
             }
             return PostKarmaVote(
                 userId: userId,
-                nickname: nickname,
+                nickname: nickname.convertCodes(),
                 voteDate: Date(timeIntervalSince1970: TimeInterval(timestamp)),
                 vote: vote
             )
