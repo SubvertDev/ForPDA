@@ -48,7 +48,7 @@ public struct TopicParser {
             authorId: authorId,
             authorName: authorName.convertCodes(),
             curatorId: curatorId,
-            curatorName: curatorName,
+            curatorName: curatorName.convertCodes(),
             poll: try parsePoll(poll),
             postsCount: postsCount,
             posts: try parsePosts(posts),
@@ -81,7 +81,7 @@ public struct TopicParser {
             }
             return PostKarmaVote(
                 userId: userId,
-                nickname: nickname,
+                nickname: nickname.convertCodes(),
                 voteDate: Date(timeIntervalSince1970: TimeInterval(timestamp)),
                 vote: vote
             )
@@ -180,9 +180,7 @@ public struct TopicParser {
     // MARK: - Poll
     
     private static func parsePoll(_ array: [Any]) throws(ParsingError) -> Topic.Poll? {
-        if array.isEmpty {
-            return nil
-        }
+        guard !array.isEmpty else { return nil }
         
         guard let name = array[safe: 0] as? String,
               let totalVotes = array[safe: 1] as? Int,
@@ -191,14 +189,12 @@ public struct TopicParser {
             throw ParsingError.failedToCastFields
         }
         
-        return if !array.isEmpty {
-            Topic.Poll(
-                name: name,
-                voted: voted == 1 ? true : false,
-                totalVotes: totalVotes,
-                options: try parsePollOptions(options)
-            )
-        } else { nil }
+        return Topic.Poll(
+            name: name.convertCodes(),
+            voted: voted != 0,
+            totalVotes: totalVotes,
+            options: try parsePollOptions(options)
+        )
     }
     
     // MARK: - Poll Options
@@ -218,7 +214,7 @@ public struct TopicParser {
             for index in votes.indices {
                 let choice = Topic.Poll.Choice(
                     id: index,
-                    name: names[index],
+                    name: names[index].convertCodes(),
                     votes: votes[index]
                 )
                 choices.append(choice)
@@ -226,8 +222,8 @@ public struct TopicParser {
             
             let option = Topic.Poll.Option(
                 id: optionId,
-                name: name,
-                several: several == 1 ? true : false,
+                name: name.convertCodes(),
+                several: several != 0,
                 choices: choices
             )
             options.append(option)
