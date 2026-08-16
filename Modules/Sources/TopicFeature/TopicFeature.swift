@@ -119,7 +119,10 @@ public struct TopicFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var shouldShowTopicHatButton = false
+        var isTopicHatExpanded = false
+        var shouldShowTopicHatButton: Bool {
+            !pageNavigation.isFirstPage && !isTopicHatExpanded
+        }
         var shouldShowTopicPollButton = true
         
         public init(
@@ -235,6 +238,7 @@ public struct TopicFeature: Reducer, Sendable {
             switch action {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
+                state.isTopicHatExpanded = false
                 state.postId = nil
                 state.posts.removeAll()
                 return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
@@ -337,7 +341,7 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
                 state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) })
-                state.shouldShowTopicHatButton = false
+                state.isTopicHatExpanded = true
                 return .none
                 
             case .view(.topicPollOpenButtonTapped):
@@ -730,7 +734,6 @@ public struct TopicFeature: Reducer, Sendable {
                 state.isLoadingTopic = false
                 state.isRefreshing = false
                 state.shouldShowTopicPollButton = true
-                state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
                 analyticsClient.reportFullyDisplayed()
                 return .none
