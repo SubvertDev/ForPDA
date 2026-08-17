@@ -10,6 +10,7 @@ import ComposableArchitecture
 import AnalyticsClient
 import APIClient
 import Models
+import OSLog
 
 public enum Deeplink {
     case article(id: Int, title: String, imageUrl: URL, scrollToId: Int?)

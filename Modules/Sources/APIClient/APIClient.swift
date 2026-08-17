@@ -737,7 +737,7 @@ extension APIClient: DependencyKey {
             },
             getUser: { _, _ in
                 AsyncThrowingStream { cont in
-                    Task {
+                    _ = Task {
                         try await Task.sleep(for: .seconds(2))
                         cont.yield(.mock)
                         cont.finish()

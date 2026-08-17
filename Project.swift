@@ -694,6 +694,7 @@ let project = Project(
                 name: "UploadBoxFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.SharedUI,
                     .SPM.TCA,
                 ]
             ),
@@ -749,7 +750,6 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.Models,
-                    .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
                 ]
