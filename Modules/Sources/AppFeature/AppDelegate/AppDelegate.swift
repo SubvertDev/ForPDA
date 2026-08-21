@@ -28,4 +28,11 @@ public final class AppDelegate: UIResponder, UIApplicationDelegate, Sendable {
     ) {
         store.send(.appDelegate(.didRegisterForRemoteNotifications(deviceToken)))
     }
+    
+    public func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: any Error
+    ) {
+        store.send(.appDelegate(.didFailToRegisterForRemoteNotificationsWithError(error)))
+    }
 }

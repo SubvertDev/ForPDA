@@ -49,11 +49,6 @@ public struct CacheClient: Sendable {
     public var getQMSChats: @Sendable (_ id: Int) -> [QMSChatInfo]?
     
     // Notifications
-    public var setLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int, _ itemId: Int) async -> Void
-    public var getLastTimestampOfUnreadItem: @Sendable (_ timestamp: Int) async -> Int?
-    public var setTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
-    public var deleteTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Void
-    public var getTopicIdOfUnreadItem: @Sendable (_ topicId: Int) async -> Int?
     public var getUnread: @Sendable () -> Unread?
     public var setUnread: @Sendable (_ unread: Unread) -> Void
 }
@@ -66,7 +61,7 @@ extension CacheClient: DependencyKey {
     
     public static var liveValue: CacheClient {
         @Dependency(\.analyticsClient) var analytics
-        
+                
         return CacheClient(
             
             // MARK: - Common
@@ -83,7 +78,11 @@ extension CacheClient: DependencyKey {
                 try await forumsStorage.async.removeAll()
                 try await qmsChatsStorage.async.removeAll()
                 try await lastBackgroundTaskInvokeTimeStorage.async.removeAll()
-                try await notificationsStorage.async.removeAll()
+                try await unreadStorage.async.removeAll()
+                try await notificationsStorage.async.removeAll() // deprecated
+                
+                @Shared(.notificationsCache) var notificationsCache
+                $notificationsCache.withLock { $0.clearCache() }
             },
             
             // MARK: - Articles
@@ -154,21 +153,6 @@ extension CacheClient: DependencyKey {
             
             // MARK: - Notifications
             
-            setLastTimestampOfUnreadItem: { timestamp, itemId in
-                try? await notificationsStorage.async.setObject(timestamp, forKey: itemId)
-            },
-            getLastTimestampOfUnreadItem: { itemId in
-                return try? await notificationsStorage.async.object(forKey: itemId)
-            },
-            setTopicIdOfUnreadItem: { topicId in
-                try? await notificationsStorage.async.setObject(topicId, forKey: topicId)
-            },
-            deleteTopicIdOfUnreadItem: { topicId in
-                try? await notificationsStorage.async.removeObject(forKey: topicId)
-            },
-            getTopicIdOfUnreadItem: { topicId in
-                return try? await notificationsStorage.async.object(forKey: topicId)
-            },
             getUnread: {
                 return try? unreadStorage.object(forKey: unreadKey)
             },
@@ -258,6 +242,7 @@ private extension CacheClient {
         )
     }
     
+    /// Deprecated
     private static var notificationsStorage: Storage<Int, Int> {
         return try! Storage(
             diskConfig: DiskConfig(name: "Notifications", expiry: .date(.days(30)), maxSize: .kilobytes(100)),
@@ -275,6 +260,16 @@ private extension CacheClient {
             fileManager: .default,
             transformer: TransformerFactory.forCodable(ofType: Unread.self)
         )
+    }
+}
+
+// MARK: - Shared Container URL Extension
+
+fileprivate extension URL {
+    static var sharedContainerURL: URL {
+        FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.subvert.forpda"
+        )!
     }
 }
 

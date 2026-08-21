@@ -13,6 +13,8 @@ import CacheClient
 import NotificationsClient
 import PersistenceKeys
 import Models
+import APIClient
+import OSLog
 
 @Reducer
 public struct AppDelegateFeature: Reducer, Sendable {
@@ -23,6 +25,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
     
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.userSession) var userSession: UserSession?
         public init() {}
     }
     
@@ -31,6 +34,8 @@ public struct AppDelegateFeature: Reducer, Sendable {
     public enum Action {
         case didFinishLaunching(UIApplication)
         case didRegisterForRemoteNotifications(Data)
+        case didFailToRegisterForRemoteNotificationsWithError(Error)
+        case didReceiveNotification(UNNotificationSnapshot)
         case userNotification(String)
     }
     
@@ -70,8 +75,8 @@ public struct AppDelegateFeature: Reducer, Sendable {
                 return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
                         group.addTask {
-                            for await identifier in userNotificationsStream {
-                                await send(.userNotification(identifier))
+                            for await notification in userNotificationsStream {
+                                await send(.didReceiveNotification(notification))
                             }
                         }
                         
@@ -82,7 +87,7 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             } else {
                                 logger.error("Notifications permission are not granted")
                             }
-                            //if granted { await application.registerForRemoteNotifications() }
+                            if granted { await notificationsClient.registerForRemoteNotifications() }
                         }
                         
                         group.addTask {
@@ -95,14 +100,28 @@ public struct AppDelegateFeature: Reducer, Sendable {
                             properties.merge(settingsProperties) { old, new in new }
                             properties.merge(a11yProperties) { old, new in new }
                             
-                            analyticsClient.setUserProperties(properties: properties)
+                            analyticsClient.setUserProperties(properties)
                         }
                     }
                 }
                 
             case let .didRegisterForRemoteNotifications(deviceToken):
-                notificationsClient.setDeviceToken(deviceToken)
+                let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+                analyticsClient.registerPushNotificationToken(token)
+                notificationsClient.setDeviceToken(token)
+                guard state.userSession != nil else { return .none }
+                return .run { [settings = state.appSettings.notifications2, isDebug = isDebug] send in
+                    let status = try await apiClient.notify(token, settings, isDebug)
+                    logger.info("Push notifications initialized with status `\(status)` and settings `\(settings.rawValue)`")
+                }
+                
+            case let .didFailToRegisterForRemoteNotificationsWithError(error):
+                logger.error("\(error.localizedDescription, privacy: .public)")
                 return .none
+                
+            case let .didReceiveNotification(notification):
+                let identifier = notification.pdaIdentifier?.rawValue ?? notification.identifier
+                return .send(.userNotification(identifier))
                 
             case .userNotification:
                 // Handled in AppFeature instead

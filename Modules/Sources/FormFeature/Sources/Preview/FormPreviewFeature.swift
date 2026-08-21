@@ -11,6 +11,7 @@ import APIClient
 import Models
 import TopicBuilder
 import SharedUI
+import AnalyticsClient
 
 @Reducer
 public struct FormPreviewFeature: Reducer, Sendable {

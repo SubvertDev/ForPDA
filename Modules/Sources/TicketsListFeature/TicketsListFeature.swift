@@ -84,6 +84,8 @@ public struct TicketsListFeature: Reducer, Sendable {
             case onFirstAppear
             case onNextAppear
             case onRefresh
+            case showOnlyMineChanged(Bool)
+            case sortByForumsChanged(Bool)
             
             case ticketButtonTapped(Int)
             
@@ -119,12 +121,6 @@ public struct TicketsListFeature: Reducer, Sendable {
     
     public var body: some Reducer<State, Action> {
         BindingReducer()
-            .onChange(of: \.appSettings.tickets.isSortByForums) { _, _ in
-                return .send(.internal(.refresh))
-            }
-            .onChange(of: \.appSettings.tickets.isShowOnlyMine) { _, _ in
-                return .send(.internal(.refresh))
-            }
         
         Scope(\.pageNavigation, action: \.pageNavigation) {
             PageNavigationFeature()
@@ -159,6 +155,18 @@ public struct TicketsListFeature: Reducer, Sendable {
                 guard !state.isLoading else { return .none }
                 return .send(.internal(.refresh))
                 
+            case let .view(.showOnlyMineChanged(isShowOnlyMine)):
+                state.$appSettings.tickets.isShowOnlyMine.withLock {
+                    $0 = isShowOnlyMine
+                }
+                return .send(.internal(.refresh))
+
+            case let .view(.sortByForumsChanged(isSortByForums)):
+                state.$appSettings.tickets.isSortByForums.withLock {
+                    $0 = isSortByForums
+                }
+                return .send(.internal(.refresh))
+
             case let .view(.ticketButtonTapped(id)):
                 return .send(.delegate(.openTicket(id)))
                 

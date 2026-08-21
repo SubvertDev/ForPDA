@@ -26,6 +26,8 @@ import ForumStatFeature
 import ForumMoveFeature
 import GalleryFeature
 import TopicEditFeature
+import OSLog
+import CacheClient
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -117,7 +119,10 @@ public struct TopicFeature: Reducer, Sendable {
             return userSession != nil
         }
         
-        var shouldShowTopicHatButton = false
+        var isTopicHatExpanded = false
+        var shouldShowTopicHatButton: Bool {
+            !pageNavigation.isFirstPage && !isTopicHatExpanded
+        }
         var shouldShowTopicPollButton = true
         
         public init(
@@ -183,6 +188,7 @@ public struct TopicFeature: Reducer, Sendable {
             case loadTopic(Int)
             case loadTypes([[UITopicType]])
             case topicResponse(Result<Topic, any Error>)
+            case topicNavigationUpdated(Topic)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
             
@@ -232,11 +238,13 @@ public struct TopicFeature: Reducer, Sendable {
             switch action {
             case let .pageNavigation(.offsetChanged(to: newOffset)):
                 state.isRefreshing = false
+                state.isTopicHatExpanded = false
                 state.postId = nil
                 state.posts.removeAll()
                 return .run { [isLastPage = state.pageNavigation.isLastPage, topicId = state.topicId] send in
                     if isLastPage {
-                        await cacheClient.deleteTopicIdOfUnreadItem(topicId)
+                        @Shared(.notificationsCache) var notificationsCache
+                        _ = $notificationsCache.withLock { $0.topics.removeValue(forKey: topicId) }
                     }
                     Task.cancel(id: CancelID.loading)
                     await send(.internal(.loadTopic(newOffset)))
@@ -333,7 +341,7 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
                 state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) })
-                state.shouldShowTopicHatButton = false
+                state.isTopicHatExpanded = true
                 return .none
                 
             case .view(.topicPollOpenButtonTapped):
@@ -664,14 +672,18 @@ public struct TopicFeature: Reducer, Sendable {
                 //customDump(topic)
                 state.topic = topic
 
+                return .run { send in
+                    await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
+                    await send(.internal(.topicNavigationUpdated(topic)))
+                }
+
+            case let .internal(.topicNavigationUpdated(topic)):
                 return .run { [
                     isFirstPage = state.pageNavigation.isFirstPage,
                     topicPerPage = state.appSettings.topicPerPage,
                     shouldShowTopicHatButton = state.shouldShowTopicHatButton,
                     isLastPage = state.pageNavigation.isLastPage
                 ] send in
-                        await send(.pageNavigation(.update(count: topic.postsCount, offset: nil)))
-
                         var topicTypes: [[UITopicType]] = []
                         
                         topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
@@ -700,7 +712,7 @@ public struct TopicFeature: Reducer, Sendable {
                             
                             // Syncing notifications and badges when reading last page
                             let unread = try await apiClient.getUnread(type: .all)
-                            await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                            await notificationsClient.showUnreadNotifications(unread)
                         }
                         // Deleting notifications related to posts on the current page
                         // `forumMention` notifications encode topicId in the trailing identifier segment
@@ -722,7 +734,6 @@ public struct TopicFeature: Reducer, Sendable {
                 state.isLoadingTopic = false
                 state.isRefreshing = false
                 state.shouldShowTopicPollButton = true
-                state.shouldShowTopicHatButton = !state.pageNavigation.isFirstPage
                 
                 analyticsClient.reportFullyDisplayed()
                 return .none

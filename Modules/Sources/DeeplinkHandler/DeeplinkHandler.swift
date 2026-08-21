@@ -10,6 +10,7 @@ import ComposableArchitecture
 import AnalyticsClient
 import APIClient
 import Models
+import OSLog
 
 public enum Deeplink {
     case article(id: Int, title: String, imageUrl: URL, scrollToId: Int?)
@@ -185,10 +186,7 @@ public struct DeeplinkHandler {
         // showtopic
         
         if let topicItem = queryItems.first(where: { $0.name == "showtopic" }), let value = topicItem.value, let topicId = Int(value) {
-            let postsFilter: TopicPostsFilter? = if let modfilterItem = queryItems.first(where: { $0.name == "modfilter" }),
-                                                      let postsFilter = TopicPostsFilter(rawValue: modfilterItem.value) {
-                postsFilter
-            } else { nil }
+            let postsFilter = TopicPostsFilter(rawValue: queryItems.first(where: { $0.name == "modfilter" })?.value)
             if let viewType = queryItems.first(where: { $0.name == "view" })?.value {
                 switch viewType {
                 case "findpost":
@@ -374,14 +372,14 @@ public struct DeeplinkHandler {
         guard let idString = split[safe: 1],    let id = Int(idString)               else { throw .noDeeplinkAvailable(for: url) }
         guard let timestampString = split.last, let timestamp = Int(timestampString) else { throw .noDeeplinkAvailable(for: url) }
         
-        guard let type = Unread.Item.Category(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
+        guard let type = PDANotification.Kind(rawValue: typeInt) else { throw .noDeeplinkAvailable(for: url) }
         
         switch type {
-        case .qms:
+        case .qmsMessage:
             return Deeplink.qms(id: id)
-        case .forum:
+        case .newTopic:
             return Deeplink.forum(id: id, page: 1)
-        case .topic:
+        case .newPost:
             // Currently we don't have id of a post to jump due to limited api
             return Deeplink.topic(id: id, goTo: .unread, filter: nil)
         case .forumMention:

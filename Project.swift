@@ -13,11 +13,16 @@ let project = Project(
             infoPlist: .main,
             sources: ["Modules/App/**"],
             resources: ["Modules/Resources/**"],
+            entitlements: .dictionary([
+                "aps-environment": "development",
+                "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+            ]),
             dependencies: [
                 .Internal.AppFeature,
                 .Internal.CacheClient,
                 .Internal.Models,
                 .target(name: "SafariExtension"),
+                .target(name: "NotificationServiceExtension"),
                 .SPM.TCA,
             ],
             settings: .settings(
@@ -48,6 +53,7 @@ let project = Project(
                     .Internal.ForumEventLogFeature,
                     .Internal.ForumFeature,
                     .Internal.ForumsListFeature,
+                    .Internal.HapticClient,
                     .Internal.HistoryFeature,
                     .Internal.LoggerClient,
                     .Internal.LogStoreFeature,
@@ -107,6 +113,7 @@ let project = Project(
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
+                    .Internal.ParsingClient,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
                     .Internal.ReputationChangeFeature,
@@ -128,6 +135,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.HapticClient,
                     .Internal.Models,
                     .Internal.PasteboardClient,
@@ -303,6 +311,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.PageNavigationFeature,
                     .Internal.PasteboardClient,
                     .Internal.PersistenceKeys,
@@ -429,6 +438,7 @@ let project = Project(
                 name: "NotificationsFeature",
                 dependencies: [
                     .Internal.AnalyticsClient,
+                    .Internal.APIClient,
                     .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.NotificationsClient,
@@ -446,6 +456,7 @@ let project = Project(
                     .Internal.APIClient,
                     .Internal.BBBuilder,
                     .Internal.BBPanelFeature,
+                    .Internal.CacheClient,
                     .Internal.CreateChatFeature,
                     .Internal.Models,
                     .Internal.NotificationsClient,
@@ -482,6 +493,7 @@ let project = Project(
                     .Internal.CacheClient,
                     .Internal.CreateChatFeature,
                     .Internal.Models,
+                    .Internal.NotificationsClient,
                     .Internal.QMSClient,
                     .Internal.SharedUI,
                     .SPM.NukeUI,
@@ -653,6 +665,7 @@ let project = Project(
                 dependencies: [
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
+                    .Internal.CacheClient,
                     .Internal.DeeplinkHandler,
                     .Internal.GalleryFeature,
                     .Internal.Models,
@@ -682,6 +695,7 @@ let project = Project(
                 name: "UploadBoxFeature",
                 dependencies: [
                     .Internal.APIClient,
+                    .Internal.SharedUI,
                     .SPM.TCA,
                 ]
             ),
@@ -705,6 +719,7 @@ let project = Project(
                     .Internal.AnalyticsClient,
                     .Internal.APIClient,
                     .Internal.BBPanelFeature,
+                    .Internal.CacheClient,
                     .Internal.Models,
                     .Internal.SharedUI,
                     .Internal.TopicBuilder,
@@ -748,7 +763,6 @@ let project = Project(
                 hasResources: false,
                 dependencies: [
                     .Internal.Models,
-                    .Internal.SharedUI,
                     .SPM.TCA,
                     .SPM.ZMarkupParser,
                 ]
@@ -950,6 +964,36 @@ let project = Project(
                         .manualCodeSigning(
                             identity: "iPhone Developer",
                             provisioningProfileSpecifier: "match Development com.subvert.forpda.safariextension"
+                        )
+                        .setDevelopmentTeam("7353CQCGQC")
+                        .merging([
+                            "TARGETED_DEVICE_FAMILY": "1",
+                            "SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD": "NO"
+                        ])
+                )
+            ),
+
+            .target(
+                name: "NotificationServiceExtension",
+                destinations: .iOS,
+                product: .appExtension,
+                bundleId: App.bundleId + "." + "nse",
+                deploymentTargets: .iOS("16.0"),
+                infoPlist: .notificationServiceExtension,
+                sources: ["Extensions/NotificationService/**"],
+                resources: ["Extensions/NotificationService/Resources/**"],
+                entitlements: .dictionary([
+                    "com.apple.security.application-groups": .array(["group.com.subvert.forpda"])
+                ]),
+                dependencies: [
+                    .Internal.Models,
+                    .Internal.NotificationsClient,
+                ],
+                settings: .settings(
+                    base: SettingsDictionary()
+                        .manualCodeSigning(
+                            identity: "iPhone Developer",
+                            provisioningProfileSpecifier: "match Development com.subvert.forpda.nse"
                         )
                         .setDevelopmentTeam("7353CQCGQC")
                         .merging([
@@ -1196,6 +1240,18 @@ extension InfoPlist {
             "NSExtension": [
                 "NSExtensionPointIdentifier": "com.apple.Safari.web-extension",
                 "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).SafarWebExtensionHandler"
+            ]
+        ]
+    )
+
+    static let notificationServiceExtension = InfoPlist.extendingDefault(
+        with: [
+            "CFBundleDisplayName": "$(PRODUCT_NAME)",
+            "CFBundleShortVersionString": "$(MARKETING_VERSION)",
+            "CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+            "NSExtension": [
+                "NSExtensionPointIdentifier": "com.apple.usernotifications.service",
+                "NSExtensionPrincipalClass": "$(PRODUCT_MODULE_NAME).NotificationService"
             ]
         ]
     )

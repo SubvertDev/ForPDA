@@ -93,7 +93,7 @@ public struct HistoryFeature: Reducer, Sendable {
                 
             case let .internal(.loadHistory(offset)):
                 state.isLoading = true
-                return .run { [perPage = state.appSettings.forumPerPage] send in
+                return .run { [perPage = state.appSettings.historyPerPage] send in
                     let result = await Result {
                         try await apiClient.getHistory(offset, perPage)
                     }

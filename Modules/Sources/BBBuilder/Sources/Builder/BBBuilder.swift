@@ -4,6 +4,7 @@ import SharedUI
 import UniformTypeIdentifiers
 import ComposableArchitecture
 import LoggerClient
+import OSLog
 
 func timeElapsed(from start: DispatchTime) -> String {
     let elapsedTime = DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds

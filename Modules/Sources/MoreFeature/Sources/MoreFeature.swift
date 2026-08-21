@@ -132,7 +132,7 @@ public struct MoreFeature: Reducer, Sendable {
                     
                     .run { send in
                         let unread = try await apiClient.getUnread(type: .all)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        await notificationsClient.showUnreadNotifications(unread)
                     },
                     
                     .run { send in

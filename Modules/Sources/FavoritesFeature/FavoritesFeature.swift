@@ -194,7 +194,7 @@ public struct FavoritesFeature: Reducer, Sendable {
                         await send(.internal(.refresh))
                         
                         let unread = try await apiClient.getUnread(type: .all)
-                        await notificationsClient.showUnreadNotifications(unread, skipCategories: [])
+                        await notificationsClient.showUnreadNotifications(unread)
                     }
                 }
                 

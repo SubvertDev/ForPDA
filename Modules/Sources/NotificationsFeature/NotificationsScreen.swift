@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import SharedUI
+import Models
 
 public struct NotificationsScreen: View {
     
@@ -43,12 +44,10 @@ public struct NotificationsScreen: View {
                             .padding(16)
                         }
                         
-                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
-                        Row("QMS", value: Binding(store.$appSettings.notifications.isQmsEnabled))
-                        Row("Forum", value: Binding(store.$appSettings.notifications.isForumEnabled))
-                        Row("Topics", value: Binding(store.$appSettings.notifications.isTopicsEnabled))
-                        Row("Forum mentions", value: Binding(store.$appSettings.notifications.isForumMentionsEnabled))
-                        Row("Site mentions", value: Binding(store.$appSettings.notifications.isSiteMentionsEnabled))
+                        Row("QMS", value: optionBinding(.qms))
+                        Row("System events", value: optionBinding(.qmsSystemEvents))
+                        Row("Mentions", value: optionBinding(.mentions))
+                        FavoritesRow()
                     } header: {
                         Text("General", bundle: .module)
                     }
@@ -56,14 +55,14 @@ public struct NotificationsScreen: View {
                     .listRowBackground(Color(.Background.teritary))
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     
-                    Section {
-                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
-                    } header: {
-                        Text("Experimental", bundle: .module)
-                    }
-                    .tint(tintColor)
-                    .listRowBackground(Color(.Background.teritary))
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+//                    Section {
+//                        Row("Background notifications", value: Binding(store.$appSettings.backgroundNotifications2))
+//                    } header: {
+//                        Text("Experimental", bundle: .module)
+//                    }
+//                    .tint(tintColor)
+//                    .listRowBackground(Color(.Background.teritary))
+//                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
                 .animation(.default, value: store.appSettings.backgroundNotifications2)
                 .scrollContentBackground(.hidden)
@@ -95,6 +94,63 @@ public struct NotificationsScreen: View {
         }
         .disabled(!store.areNotificationsEnabled)
         .frame(minHeight: 60)
+    }
+
+    @ViewBuilder
+    private func FavoritesRow() -> some View {
+        HStack(spacing: 0) {
+            Text("Favorites", bundle: .module)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Spacer(minLength: 8)
+            
+            Menu {
+                Picker(
+                    String(),
+                    selection: Binding(
+                        get: { store.appSettings.notifications2.favoritesMode },
+                        set: { store.send(.favoritesModeChanged($0)) }
+                    )
+                ) {
+                    ForEach(NotificationsSettings2.FavoritesMode.allCases) { mode in
+                        Text(mode.title)
+                            .tag(mode)
+                    }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                HStack(spacing: 9) {
+                    Text(store.appSettings.notifications2.favoritesMode.title)
+                    Image(systemSymbol: .chevronUpChevronDown)
+                }
+                .foregroundStyle(Color(.Labels.teritary))
+            }
+        }
+        .disabled(!store.areNotificationsEnabled)
+        .frame(minHeight: 60)
+    }
+
+    private func optionBinding(_ option: NotificationsSettings2) -> Binding<Bool> {
+        Binding(
+            get: { store.appSettings.notifications2.contains(option) },
+            set: { store.send(.notificationOptionChanged(option, isEnabled: $0)) }
+        )
+    }
+}
+
+// MARK: - Extensions
+
+extension NotificationsSettings2.FavoritesMode {
+    var title: LocalizedStringResource {
+        switch self {
+        case .all:
+            LocalizedStringResource("All", bundle: .module)
+        case .important:
+            LocalizedStringResource("Only important", bundle: .module)
+        case .disabled:
+            LocalizedStringResource("Do not", bundle: .module)
+        }
     }
 }
 

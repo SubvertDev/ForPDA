@@ -15,6 +15,7 @@ import ToastClient
 import ReputationChangeFeature
 import FormFeature
 import AuthFeature
+import HapticClient
 
 public enum CommentContextMenuOptions {
     case report
