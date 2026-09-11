@@ -6,7 +6,7 @@
 //
 
 public struct UserPunishmentTemplateFlag: OptionSet, Sendable {
-    public let rawValue: Int
+    public var rawValue: Int
     
     public init(rawValue: Int) {
         self.rawValue = rawValue
@@ -18,5 +18,6 @@ public struct UserPunishmentTemplateFlag: OptionSet, Sendable {
     public static let fullBan          = UserPunishmentTemplateFlag(rawValue: 1 << 5)
     public static let addCurrentPremod = UserPunishmentTemplateFlag(rawValue: 1 << 7)
     public static let addCurrentRO     = UserPunishmentTemplateFlag(rawValue: 1 << 8)
+    public static let forceApply       = UserPunishmentTemplateFlag(rawValue: 1 << 9)
     public static let customText       = UserPunishmentTemplateFlag(rawValue: 1 << 10)
 }

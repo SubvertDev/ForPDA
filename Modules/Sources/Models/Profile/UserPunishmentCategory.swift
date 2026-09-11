@@ -30,7 +30,7 @@ public extension UserPunishmentCategory {
         title: "Warnings",
         supportsRestrictions: false,
         templates: [
-            .mockOther,
+            .default,
             .init(
                 id: "offtop",
                 flag: .deletePost,
@@ -60,7 +60,7 @@ public extension UserPunishmentCategory {
         title: "Hight violation",
         supportsRestrictions: true,
         templates: [
-            .mockOther,
+            .default,
             .init(
                 id: "insult",
                 flag: [.deletePost, .addCurrentPremod, .addCurrentRO],

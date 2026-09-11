@@ -34,7 +34,7 @@ public struct UserPunishmentTemplate: Sendable, Identifiable, Equatable {
 }
 
 public extension UserPunishmentTemplate {
-    static let mockOther = UserPunishmentTemplate(
+    static let `default` = UserPunishmentTemplate(
         id: "Other",
         flag: .init(rawValue: 1409),
         title: "(Select template)",
