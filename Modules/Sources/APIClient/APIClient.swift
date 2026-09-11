@@ -55,6 +55,7 @@ public struct APIClient: Sendable {
     public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
     
     public var getUserPunishmentTemplates: @Sendable (_ forId: Int, _ userId: Int) async throws -> [UserPunishmentCategory]
+    public var applyUserPunishment: @Sendable (_ data: UserPunishmentApplyRequest) async throws -> UserPunishmentApplyResponse
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -322,6 +323,22 @@ extension APIClient: DependencyKey {
                 let command = MemberCommand.Punishment.templates(forId: forId, memberId: userId)
                 let response = try await api.send(command)
                 return try await parser.parseUserPunishmentTemplates(response)
+            },
+            applyUserPunishment: { data in
+                let command = MemberCommand.Punishment.apply(data: MemberPunishmentApplyRequest(
+                    memberId: data.userId,
+                    subjectId: data.subjectId,
+                    reason: data.template.reason,
+                    message: data.template.message,
+                    flag: data.template.flag.rawValue,
+                    premod: data.template.premoderationHours,
+                    readOnly: data.template.readOnlyHours,
+                    violationCategory: data.categoryId,
+                    violationType: data.template.id
+                ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return UserPunishmentApplyResponse(rawValue: status) ?? .noAccess
             },
             
             // MARK: - Bookmarks
@@ -775,6 +792,9 @@ extension APIClient: DependencyKey {
             },
             getUserPunishmentTemplates: { _, _ in
                 return [.mockLight, .mockHigh]
+            },
+            applyUserPunishment: { _ in
+                return .success
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
