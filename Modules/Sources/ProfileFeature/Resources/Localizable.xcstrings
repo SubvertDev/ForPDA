@@ -501,6 +501,16 @@
         }
       }
     },
+    "Punishment applied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наказание вынесено"
+          }
+        }
+      }
+    },
     "Readonly" : {
       "localizations" : {
         "ru" : {

@@ -30,6 +30,7 @@ public struct ProfileFeature: Reducer, Sendable {
         static let noteAdded = LocalizedStringResource("Note added", bundle: .module)
         static let profileUpdated = LocalizedStringResource("Profile updated", bundle: .module)
         static let profileUpdateError = LocalizedStringResource("Profile update error", bundle: .module)
+        static let punishmentApplied = LocalizedStringResource("Punishment applied", bundle: .module)
     }
     
     // MARK: - Destinations
@@ -255,6 +256,12 @@ public struct ProfileFeature: Reducer, Sendable {
             case .destination(.presented(.note(.delegate(.formSent(.note))))):
                 return .run { send in
                     await toastClient.showToast(ToastMessage(text: Localization.noteAdded))
+                    await send(.view(.onAppear))
+                }
+                
+            case .destination(.presented(.punish(.delegate(.punishmentApplied)))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.punishmentApplied, haptic: .success))
                     await send(.view(.onAppear))
                 }
                 
