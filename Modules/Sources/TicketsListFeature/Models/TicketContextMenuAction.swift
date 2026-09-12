@@ -8,7 +8,7 @@
 import Models
 
 public enum TicketContextMenuAction {
-    case changeStatus(TicketStatus)
+    case changeStatus(TicketStatus, Int)
     case statusHistory
     case openAuthor(Int)
     case copyLink

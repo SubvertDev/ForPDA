@@ -187,8 +187,8 @@ public struct TicketsListFeature: Reducer, Sendable {
                 
             case let .view(.contextTicketMenu(action, ticketId)):
                 switch action {
-                case .changeStatus(let status):
-                    return .run { [handlerId = state.tickets[ticketId].info.handlerId] send in
+                case .changeStatus(let status, let handlerId):
+                    return .run { send in
                         let response = try await ticketClient.changeTicketStatus(ticketId, handlerId, status)
                         await send(.internal(.changeTicketStatusResponse(.success((ticketId, status, response)))))
                     } catch: { error, send in
@@ -272,10 +272,10 @@ public struct TicketsListFeature: Reducer, Sendable {
                     case .processing:   (session.userId, handlerName, nil)
                     case .notProcessed: (0, "", nil)
                     }
-                    state.tickets[ticketId].info.status = status
-                    state.tickets[ticketId].info.handlerId = info.0
-                    state.tickets[ticketId].info.handlerName = info.1
-                    state.tickets[ticketId].info.processedAt = info.2
+                    state.tickets[id: ticketId]?.info.status = status
+                    state.tickets[id: ticketId]?.info.handlerId = info.0
+                    state.tickets[id: ticketId]?.info.handlerName = info.1
+                    state.tickets[id: ticketId]?.info.processedAt = info.2
                 }
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.statusChanged, haptic: .success))
@@ -284,8 +284,8 @@ public struct TicketsListFeature: Reducer, Sendable {
             case let .internal(.changeTicketStatusResponse(.success((ticketId, _, .failure(reason))))):
                 switch reason {
                 case .handlerChanged(let id, let name):
-                    state.tickets[ticketId].info.handlerId = id
-                    state.tickets[ticketId].info.handlerName = name
+                    state.tickets[id: ticketId]?.info.handlerId = id
+                    state.tickets[id: ticketId]?.info.handlerName = name
                     return .run { _ in
                         await toastClient.showToast(ToastMessage(text: Localization.handlerChanged, haptic: .success))
                     }
