@@ -71,7 +71,11 @@ public struct FormScreen: View {
             .toolbar {
                 Toolbar()
             }
-            .background(Color(.Background.primary))
+            .background(
+                Color(.Background.primary)
+                    .opacity(isLiquidGlass ? 0.5 : 1)
+                    .ignoresSafeArea()
+            )
             .disabled(store.isPublishing)
             .animation(.default, value: store.isPublishing)
             .bind($store.focusedField, to: $focusedField)
@@ -105,7 +109,10 @@ public struct FormScreen: View {
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
+        .background(
+            Color(.Background.primary)
+                .opacity(isLiquidGlass ? 0.5 : 1)
+        )
     }
     
     // MARK: - Toolbar

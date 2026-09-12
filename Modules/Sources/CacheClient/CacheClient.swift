@@ -83,6 +83,9 @@ extension CacheClient: DependencyKey {
                 
                 @Shared(.notificationsCache) var notificationsCache
                 $notificationsCache.withLock { $0.clearCache() }
+
+                @Shared(.postDraftsCache) var postDraftsCache
+                $postDraftsCache.withLock { $0.clearCache() }
             },
             
             // MARK: - Articles

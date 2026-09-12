@@ -36,3 +36,12 @@ extension SharedKey where Self == FileStorageKey<NotificationsCache>.Default {
         return Self[.fileStorage(url), default: NotificationsCache.default]
     }
 }
+
+// MARK: - Post Drafts Cache
+
+extension SharedKey where Self == FileStorageKey<PostDraftsCache>.Default {
+    public static var postDraftsCache: Self {
+        let url = URL.documentsDirectory.appending(component: "PostDraftsCache.json")
+        return Self[.fileStorage(url), default: PostDraftsCache.default]
+    }
+}

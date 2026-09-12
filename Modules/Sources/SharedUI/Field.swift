@@ -188,25 +188,37 @@ private struct SelectableTextView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: UITextView, context: Context) {
-        if uiView.textColor != Self.placeholderColor, uiView.text != content {
-            uiView.text = content
+        if content.isEmpty {
+            if !uiView.isFirstResponder {
+                let placeholderText = String(localized: placeholder)
+
+                if uiView.text != placeholderText {
+                    uiView.text = placeholderText
+                }
+
+                uiView.textColor = Self.placeholderColor
+            }
+        } else {
+            if uiView.text != content {
+                uiView.text = content
+            }
+
+            uiView.textColor = .label
         }
-        
+
         // when range (selection binding) has been changed in external place
-        if let externalSelection = selection, uiView.selectedRange != externalSelection {
+        if let externalSelection = selection,
+           uiView.selectedRange != externalSelection {
             uiView.selectedRange = externalSelection
         }
     }
     
     func sizeThatFits(_ proposal: ProposedViewSize, uiView: UITextView, context: Context) -> CGSize? {
         guard let width = proposal.width else { return nil }
-        let dimensions = content.boundingRect(
-            with: CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
-            options: [.usesLineFragmentOrigin, .usesFontLeading],
-            attributes: [.font: UIFont.preferredFont(forTextStyle: .body)],
-            context: nil
+        let size = uiView.sizeThatFits(
+            CGSize(width: width, height: CGFloat.greatestFiniteMagnitude)
         )
-        return CGSize(width: width, height: ceil(dimensions.height))
+        return CGSize(width: width, height: ceil(size.height))
     }
     
     func makeCoordinator() -> Coordinator {

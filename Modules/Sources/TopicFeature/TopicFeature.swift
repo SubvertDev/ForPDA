@@ -92,6 +92,7 @@ public struct TopicFeature: Reducer, Sendable {
     @ObservableState
     public struct State: Equatable {
         @Shared(.appSettings) var appSettings: AppSettings
+        @Shared(.postDraftsCache) var postDraftsCache: PostDraftsCache
         @Shared(.userSession) var userSession: UserSession?
         var userSessionInfo: User?
         
@@ -191,6 +192,7 @@ public struct TopicFeature: Reducer, Sendable {
             case topicNavigationUpdated(Topic)
             case setFavoriteResponse(Bool)
             case jumpRequestFailed
+            case cachePostDraft
             
             case initUserSessionInfo(User)
         }
@@ -251,7 +253,30 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 
             case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
+                let topicId = state.topicId
+                _ = state.$postDraftsCache.withLock { $0.topics.removeValue(forKey: topicId) }
                 return jumpTo(.post(id: post.id), true, &state)
+
+            case .destination(.presented(.form(.rows(.element(
+                id: _,
+                action: .editor(.binding(\.text))
+            ))))):
+                return .send(.internal(.cachePostDraft))
+
+            case .internal(.cachePostDraft):
+                guard case let .form(form) = state.destination,
+                      form.isNewSimplePost,
+                      case let .editor(editor) = form.rows.first
+                else { return .none }
+                let topicId = state.topicId
+                state.$postDraftsCache.withLock { cache in
+                    if editor.text.isEmpty {
+                        cache.topics.removeValue(forKey: topicId)
+                    } else {
+                        cache.topics[topicId] = editor.text
+                    }
+                }
+                return .none
                 
             case .destination(.presented(.form(.delegate(.formSent(.report))))):
                 return .run { _ in
@@ -364,11 +389,12 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .writePost:
+                    let draft = state.postDraftsCache.topics[topic.id] ?? ""
                     let formState = FormFeature.State(
                         type: .post(
                             type: .new,
                             topicId: topic.id,
-                            content: .simple("", [])
+                            content: .simple(draft, [])
                         )
                     )
                     state.destination = .form(formState)
@@ -470,11 +496,15 @@ public struct TopicFeature: Reducer, Sendable {
             case let .view(.contextPostMenu(action)):
                 switch action {
                 case let .reply(postId, authorName):
+                    let reply = "[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], "
+                    let draft = state.postDraftsCache.topics[state.topicId] ?? ""
+                    let text = draft + reply
+                    state.$postDraftsCache.withLock { $0.topics[state.topicId] = text }
                     let formState = FormFeature.State(
                         type: .post(
                             type: .new,
                             topicId: state.topicId,
-                            content: .simple("[SNAPBACK]\(postId)[/SNAPBACK] [B]\(authorName)[/B], ", [])
+                            content: .simple(text, [])
                         )
                     )
                     state.destination = .form(formState)
@@ -596,14 +626,27 @@ public struct TopicFeature: Reducer, Sendable {
                 formatter.dateFormat = "dd.MM.yy, HH:mm"
                 let currentDate = formatter.string(from: post.post.createdAt)
                 let formattedQuote = "[quote name=\"\(post.post.author.name)\" date=\"\(currentDate)\" post=\"\(post.id)\"]\(quotedText)[/quote]\n"
-                let feature = FormFeature.State(
-                    type: .post(
-                        type: .new,
-                        topicId: state.topicId,
-                        content: .simple(formattedQuote, [])
+
+                if state.destination == nil {
+                    let draft = state.postDraftsCache.topics[state.topicId] ?? ""
+                    let text = draft + formattedQuote
+                    state.$postDraftsCache.withLock { $0.topics[state.topicId] = text }
+                    let feature = FormFeature.State(
+                        type: .post(
+                            type: .new,
+                            topicId: state.topicId,
+                            content: .simple(text, [])
+                        )
                     )
-                )
-                state.destination = .form(feature)
+                    state.destination = .form(feature)
+                } else if case var .form(feature) = state.destination,
+                          case var .editor(editor) = feature.rows.first {
+                    editor.text.append(formattedQuote)
+                    editor.textRange = NSRange(location: editor.text.utf16.count, length: 0)
+                    feature.rows[id: editor.id] = .editor(editor)
+                    state.destination = .form(feature)
+                    state.$postDraftsCache.withLock { $0.topics[state.topicId] = editor.text }
+                }
                 return .none
                 
             case .view(.finishedPostAnimation):

@@ -57,6 +57,11 @@ public struct TopicScreen: View {
         return topicLoaded && store.topic!.poll != nil
     }
     
+    private var isFormPresented: Bool {
+        guard case .form = store.destination else { return false }
+        return true
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
@@ -91,6 +96,13 @@ public struct TopicScreen: View {
                                 
                                 if shouldShowBottomNavigation {
                                     Navigation()
+                                }
+                                
+                                if #available(iOS 17, *) {
+                                    if isFormPresented {
+                                        Color.clear
+                                            .containerRelativeFrame(.vertical, count: 2, span: 1, spacing: 0)
+                                    }
                                 }
                             }
                             .padding(.bottom, 16)
@@ -537,11 +549,6 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
-                        NavigationStack {
-                            FormScreen(store: store)
-                        }
-                    }
                     .fullScreenCover(item: $store.scope(\.destination?.edit, action: \.destination.edit)) { store in
                         NavigationStack {
                             TopicEditView(store: store)
@@ -592,6 +599,13 @@ struct NavigationModifier: ViewModifier {
                     NavigationStack {
                         ForumStatView(store: store)
                     }
+                }
+                .sheet(item: $store.scope(\.$destination, action: \.destination).form) { store in
+                    NavigationStack {
+                        FormScreen(store: store)
+                    }
+                    .presentationDetents([.medium])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
         }
     }
