@@ -167,6 +167,16 @@
         }
       }
     },
+    "Punish" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наказать"
+          }
+        }
+      }
+    },
     "Quote" : {
       "localizations" : {
         "ru" : {

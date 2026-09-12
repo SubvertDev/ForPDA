@@ -684,6 +684,7 @@ let project = Project(
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
+                    .Internal.UserPunishmentFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,

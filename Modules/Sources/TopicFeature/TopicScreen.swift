@@ -20,6 +20,7 @@ import GalleryFeature
 import ForumStatFeature
 import ForumMoveFeature
 import TopicEditFeature
+import UserPunishmentFeature
 
 @ViewAction(for: TopicFeature.self)
 public struct TopicScreen: View {
@@ -427,34 +428,10 @@ public struct TopicScreen: View {
                 }
             },
             menuAction: { action in
-                switch action {
-                case .reply(let id, let authorName):
-                    send(.contextPostMenu(.reply(id, authorName)))
-                case .edit(let post):
-                    send(.contextPostMenu(.edit(post)))
-                case .karma(let postId):
-                    send(.contextPostMenu(.karma(postId)))
-                case .report(let postId):
-                    send(.contextPostMenu(.report(postId)))
-                case .changeReputation(let postId, let userId, let username):
-                    send(.contextPostMenu(.changeReputation(postId, userId, username)))
-                case .userPostsInTopic(let authorId):
-                    send(.contextPostMenu(.userPostsInTopic(authorId)))
-                case .mentions(let postId):
-                    send(.contextPostMenu(.mentions(postId)))
-                case .copyLink(let postId):
-                    send(.contextPostMenu(.copyLink(postId)))
-                }
+                send(.contextPostMenu(action))
             },
             toolsMenuAction: { action in
-                switch action {
-                case .move(let postId):
-                    send(.contextPostToolsMenu(.move(postId)))
-                case .eventLog(let postId):
-                    send(.contextPostToolsMenu(.eventLog(postId)))
-                case .modify(let action, let postId, let isUndo):
-                    send(.contextPostToolsMenu(.modify(action, postId, isUndo)))
-                }
+                send(.contextPostToolsMenu(action))
             }
         )
         .listRowBackground(Color.clear)
@@ -546,6 +523,11 @@ struct NavigationModifier: ViewModifier {
                     .fullScreenCover(item: $store.scope(\.destination?.edit, action: \.destination.edit)) { store in
                         NavigationStack {
                             TopicEditView(store: store)
+                        }
+                    }
+                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).punish) { store in
+                        NavigationStack {
+                            UserPunishmentScreen(store: store)
                         }
                     }
                     .fullScreenCover(item: $store.scope(\.destination, action: \.destination).gallery) { model in

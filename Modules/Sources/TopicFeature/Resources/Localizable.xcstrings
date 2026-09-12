@@ -321,6 +321,16 @@
         }
       }
     },
+    "Punishment applied" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наказание вынесено"
+          }
+        }
+      }
+    },
     "Remove from favorites" : {
       "localizations" : {
         "ru" : {

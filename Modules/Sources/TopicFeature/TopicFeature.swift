@@ -28,6 +28,7 @@ import GalleryFeature
 import TopicEditFeature
 import OSLog
 import CacheClient
+import UserPunishmentFeature
 
 @Reducer
 public struct TopicFeature: Reducer, Sendable {
@@ -49,6 +50,7 @@ public struct TopicFeature: Reducer, Sendable {
         static let postRestored = LocalizedStringResource("Post restored", bundle: .module)
         static let postKarmaChanged = LocalizedStringResource("Post karma changed", bundle: .module)
         static let topicVoteApproved = LocalizedStringResource("Vote approved", bundle: .module)
+        static let punishmentApplied = LocalizedStringResource("Punishment applied", bundle: .module)
         static let showingNearestPost = LocalizedStringResource("The post has been deleted, showing the nearest one", bundle: .module)
     }
     
@@ -67,6 +69,7 @@ public struct TopicFeature: Reducer, Sendable {
         case stat(ForumStatFeature)
         case move(ForumMoveFeature)
         case edit(TopicEditFeature)
+        case punish(UserPunishmentFeature)
         case changeReputation(ReputationChangeFeature)
         
         @CasePathable
@@ -77,6 +80,7 @@ public struct TopicFeature: Reducer, Sendable {
             case stat(ForumStatFeature.Action)
             case move(ForumMoveFeature.Action)
             case edit(TopicEditFeature.Action)
+            case punish(UserPunishmentFeature.Action)
             case changeReputation(ReputationChangeFeature.Action)
         }
         
@@ -274,6 +278,12 @@ public struct TopicFeature: Reducer, Sendable {
                 
             case .destination(.presented(.stat(.delegate(.topicHistoryTapped)))):
                 return .send(.delegate(.openEventLog(state.topicId, .topic)))
+                
+            case .destination(.presented(.punish(.delegate(.punishmentApplied)))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.punishmentApplied, haptic: .success))
+                    await send(.internal(.refresh))
+                }
                 
             case let .destination(.presented(.karmaHistory(.delegate(.openUser(id))))):
                 return .send(.delegate(.openUser(id: id)))
@@ -539,6 +549,13 @@ public struct TopicFeature: Reducer, Sendable {
                 switch action {
                 case .move(let postId):
                     state.destination = .move(ForumMoveFeature.State(type: .posts([postId])))
+                    return .none
+                    
+                case .punish(let postId, let authorId):
+                    state.destination = .punish(UserPunishmentFeature.State(
+                        userId: authorId,
+                        target: .post(id: postId)
+                    ))
                     return .none
                     
                 case .eventLog(let postId):

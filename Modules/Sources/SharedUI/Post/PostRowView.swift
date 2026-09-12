@@ -293,6 +293,20 @@ public struct PostRowView: View {
                     menuAction(.copyLink(state.post.id))
                 }
             }
+            
+            if state.post.post.author.id != state.sessionUserId {
+                Section {
+                    Button(role: .destructive) {
+                        toolsMenuAction(.punish(state.post.id, state.post.post.author.id))
+                    } label: {
+                        HStack {
+                            Text("Punish", bundle: .module)
+                            Image(systemSymbol: .personCropCircleBadgeXmark)
+                        }
+                    }
+                    .tint(.red)
+                }
+            }
         } label: {
             Image(systemSymbol: .ellipsis)
                 .font(.body)
