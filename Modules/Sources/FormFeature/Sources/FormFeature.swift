@@ -560,7 +560,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Topic & Template
     
     nonisolated(unsafe) static let topicIsSentToPremoderation = AlertState {
-        TextState("Topic is sent to premoderation")
+        TextState("Topic is sent to premoderation", bundle: .module)
     } actions: {
         ButtonState(action: .dismiss) {
             TextState("OK")
@@ -568,7 +568,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let templateRequestHasBadParam = AlertState {
-        TextState("The server refused to create the topic (invalid parameter)")
+        TextState("The server refused to create the topic (invalid parameter)", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -576,7 +576,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let notAllFieldsAreFilledInTemplate = AlertState {
-        TextState("Not all required fields are filled in")
+        TextState("Not all required fields are filled in", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -585,7 +585,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     
     static func serverReturnStatusForTopic(_ status: Int) -> AlertState {
         return AlertState(
-            title: { TextState("The server refused to create the topic (status \(status))") },
+            title: { TextState("The server refused to create the topic (status \(status))", bundle: .module) },
             actions: {
                 ButtonState {
                     TextState("OK")
@@ -597,7 +597,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Post
     
     nonisolated(unsafe) static let postIsSentToPremoderation = AlertState {
-        TextState("Post is sent to premoderation")
+        TextState("Post is sent to premoderation", bundle: .module)
     } actions: {
         ButtonState(action: .dismiss) {
             TextState("OK")
@@ -605,7 +605,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let postIsTooLong = AlertState {
-        TextState("Post is too long")
+        TextState("Post is too long", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -613,7 +613,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let postIsAlreadySent = AlertState {
-        TextState("Post is already sent")
+        TextState("Post is already sent", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -621,22 +621,22 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let attachToPreviousPost = AlertState {
-        TextState("Attach this post to previous one?")
+        TextState("Attach this post to previous one?", bundle: .module)
     } actions: {
         ButtonState(action: .attach) {
-            TextState("Yes, attach")
+            TextState("Yes, attach", bundle: .module)
         }
         ButtonState(action: .doNotAttach) {
-            TextState("No, no need")
+            TextState("No, no need", bundle: .module)
         }
     } message: {
-        TextState("It will be attached as a dialog to your last post")
+        TextState("It will be attached as a dialog to your last post", bundle: .module)
     }
     
     // Report
     
     nonisolated(unsafe) static let reportIsTooShort = AlertState {
-        TextState("Report is too short")
+        TextState("Report is too short", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -646,7 +646,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Note
     
     nonisolated(unsafe) static let noteWithoutReason = AlertState {
-        TextState("Not set reason for note")
+        TextState("Not set reason for note", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -656,7 +656,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Common
     
     nonisolated(unsafe) static let unknownError = AlertState {
-        TextState("Unknown error")
+        TextState("Unknown form error", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
