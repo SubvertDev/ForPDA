@@ -191,6 +191,16 @@
         }
       }
     },
+    "Raise" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повысить"
+          }
+        }
+      }
+    },
     "Read Only" : {
       "localizations" : {
         "ru" : {

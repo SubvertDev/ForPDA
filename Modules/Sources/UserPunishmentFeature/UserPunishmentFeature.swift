@@ -319,16 +319,16 @@ public struct UserPunishmentFeature: Reducer, Sendable {
 public extension AlertState where Action == UserPunishmentFeature.Alert {
     
     nonisolated(unsafe) static let forceApplyConfirmation = AlertState {
-        TextState("Confirm punishment", bundle: .module)
+        TextState("This user's warning level has already been raised within the last 5 hours", bundle: .module)
     } actions: {
-        ButtonState(action: .forceApply) {
-            TextState("Apply", bundle: .module)
+        ButtonState(role: .destructive, action: .forceApply) {
+            TextState("Raise", bundle: .module)
         }
-        ButtonState(action: .doNotForceApply) {
+        ButtonState(role: .cancel, action: .doNotForceApply) {
             TextState("Cancel", bundle: .module)
         }
     } message: {
-        TextState("This user's warning level has already been raised within the last 5 hours", bundle: .module)
+        TextState("Confirm punishment", bundle: .module)
     }
     
     nonisolated(unsafe) static let warningLevelMax = AlertState {
