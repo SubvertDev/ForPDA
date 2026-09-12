@@ -545,6 +545,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.FormFeature,
                     .Internal.ToastClient,
+                    .Internal.UserPunishmentFeature,
                     .SPM.TCA,
                 ]
              ),

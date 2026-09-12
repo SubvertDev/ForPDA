@@ -13,6 +13,7 @@ import Models
 import FormFeature
 import ToastClient
 import CacheClient
+import UserPunishmentFeature
 
 @Reducer
 public struct ReputationFeature: Reducer, Sendable {
@@ -23,6 +24,7 @@ public struct ReputationFeature: Reducer, Sendable {
     
     public enum Localization {
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
+        static let punishmentApplied = LocalizedStringResource("Punishment applied and reputation deleted", bundle: .module)
         static let reputationDeleted = LocalizedStringResource("Reputation deleted", bundle: .module)
         static let reputationRestored = LocalizedStringResource("Reputation restored", bundle: .module)
     }
@@ -34,11 +36,13 @@ public struct ReputationFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case alert(AlertState<Alert>)
         case report(FormFeature)
+        case punish(UserPunishmentFeature)
         
         @CasePathable
         public enum Action {
             case alert(Alert)
             case report(FormFeature.Action)
+            case punish(UserPunishmentFeature.Action)
         }
         
         @CasePathable
@@ -158,6 +162,13 @@ public struct ReputationFeature: Reducer, Sendable {
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
                 
+            case let .destination(.presented(.punish(.delegate(.punishmentApplied(target))))):
+                guard case let .reputation(voteId) = target else { return .none }
+                return .run { send in
+                    await send(.internal(.modifyResponse(.success((voteId, .delete, true)))))
+                    await toastClient.showToast(ToastMessage(text: Localization.punishmentApplied, haptic: .success))
+                }
+                
             case let .destination(.presented(.alert(.modifyVote(voteId, type)))):
                 return .run { send in
                     let status = try await apiClient.modifyReputation(voteId, type)
@@ -205,6 +216,12 @@ public struct ReputationFeature: Reducer, Sendable {
                         type: .report(id: voteId, type: .reputation)
                     )
                     state.destination = .report(feature)
+                    
+                case .punish(let voteId, let authorId):
+                    let feature = UserPunishmentFeature.State(
+                        userId: authorId, target: .reputation(id: voteId)
+                    )
+                    state.destination = .punish(feature)
                     
                 case .modify(let voteId, let type):
                     state.destination = .alert(.modifyVoteConfirmation(voteId: voteId, type: type))

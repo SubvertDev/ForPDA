@@ -43,7 +43,7 @@ extension ReputationFeature {
                         analytics.log(ReputationEvent.voteMenuComplainTapped(voteId))
                     case .goToAuthor(let profileId):
                         analytics.log(ReputationEvent.voteMenuGoToAuthorTapped(profileId))
-                    case .modify:
+                    case .modify, .punish:
                         // MARK: Moderator tools are skip analytics
                         break
                     }
