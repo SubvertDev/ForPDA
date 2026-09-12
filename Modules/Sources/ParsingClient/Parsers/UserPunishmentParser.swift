@@ -12,7 +12,7 @@ public struct UserPunishmentParser {
     
     // MARK: - Templates
     
-    public static func parseTemplateCategories(from string: String) throws(ParsingError) -> [UserPunishmentCategory] {
+    public static func parseTemplateCategories(from string: String) throws -> [UserPunishmentCategory] {
         guard let data = string.data(using: .utf8) else {
             throw ParsingError.failedToCreateDataFromString
         }
@@ -25,7 +25,7 @@ public struct UserPunishmentParser {
             throw ParsingError.failedToCastFields
         }
         
-        return try! contentRaw.map { categoryRaw in
+        return try contentRaw.map { categoryRaw in
             guard let id = categoryRaw[safe: 0] as? String,
                   let title = categoryRaw[safe: 1] as? String,
                   let flag = categoryRaw[safe: 2] as? Int,
