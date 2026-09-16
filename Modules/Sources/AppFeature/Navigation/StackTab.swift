@@ -37,14 +37,29 @@ import DeviceTypeFeature
 import TicketsListFeature
 import TicketFeature
 import ForumEventLogFeature
+import ReputationChangeFeature
 
 @Reducer
 public struct StackTab: Reducer, Sendable {
+    
+    // MARK: - Destinations
+        
+    @Reducer
+    public enum Destination {
+        case changeReputation(ReputationChangeFeature)
+        
+        @CasePathable
+        public enum Action {
+            case changeReputation(ReputationChangeFeature.Action)
+        }
+    }
     
     // MARK: - State
     
     @ObservableState
     public struct State: Equatable {
+        @Presents public var destination: Destination.State?
+        
         public var root: Path.State
         public var path: StackState<Path.State>
         public var showTabBar: Bool
@@ -80,6 +95,8 @@ public struct StackTab: Reducer, Sendable {
     // MARK: - Action
     
     public enum Action {
+        case destination(PresentationAction<Destination.Action>)
+        
         case onAppear
         case root(Path.Action)
         case path(StackActionOf<Path>)
@@ -117,11 +134,12 @@ public struct StackTab: Reducer, Sendable {
             case let .deeplink(deeplink, url):
                 return navigate(to: deeplink, sourceURL: url, state: &state)
                 
-            case .path, .delegate:
+            case .path, .delegate, .destination:
                 return .none
             }
         }
         .forEach(\.path, action: \.path)
+        .ifLet(\.$destination, action: \.destination)
         .onChange(of: \.path) { _, state in
             notificationsClient.setNotificationContext(context: state.notificationsContext)
             
@@ -611,11 +629,22 @@ public struct StackTab: Reducer, Sendable {
             // TODO: inner vs outer?
             let preview = ArticlePreview.outerDeeplink(id: id, imageUrl: imageUrl, title: title)
             state.path.append(.articles(.article(ArticleFeature.State(articlePreview: preview, scrollToId: scrollToId))))
+            
+        case let .changeReputation(userId, action, content, message):
+            let feature = ReputationChangeFeature.State(
+                userId: userId,
+                action: action,
+                content: content,
+                message: message
+            )
+            state.destination = .changeReputation(feature)
         }
         
         return .none
     }
 }
+
+extension StackTab.Destination.State: Equatable {}
 
 extension StackState<Path.State> {
     func last(is keyPath: PartialCaseKeyPath<Path.State>) -> (StackElementID, Path.State)? {

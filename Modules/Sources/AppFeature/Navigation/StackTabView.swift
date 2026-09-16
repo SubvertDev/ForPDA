@@ -7,6 +7,8 @@
 
 import SwiftUI
 import ComposableArchitecture
+import SharedUI
+import ReputationChangeFeature
 
 public struct StackTabView: View {
     
@@ -20,6 +22,12 @@ public struct StackTabView: View {
                 WithPerceptionTracking {
                     Path.view(store)
                 }
+            }
+            .fittedSheet(
+                item: $store.scope(\.$destination, action: \.destination).changeReputation,
+                embedIntoNavStack: true
+            ) { store in
+                ReputationChangeView(store: store)
             }
             .toolbar(store.showTabBar ? .visible : .hidden, for: .tabBar)
             .animation(.default, value: store.root) // Animation for root change

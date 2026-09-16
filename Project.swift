@@ -67,6 +67,7 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
+                    .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
                     .Internal.SearchFeature,
                     .Internal.SearchResultFeature,
