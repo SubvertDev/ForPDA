@@ -49,19 +49,24 @@ public struct ReputationChangeFeature: Reducer, Sendable {
         var focus: Field? = .reason
         
         let userId: Int
+        let action: ReputationChangeActionType?
         let username: String
-        let content: ReputationChangeRequest.ContentType
+        let content: ReputationChangeContentType
         
-        var changeReason = ""
+        var changeReason: String
         
         public init(
             userId: Int,
-            username: String,
-            content: ReputationChangeRequest.ContentType
+            action: ReputationChangeActionType? = nil,
+            username: String = "",
+            content: ReputationChangeContentType,
+            message: String = "",
         ) {
             self.userId = userId
+            self.action = action
             self.username = username
             self.content = content
+            self.changeReason = message
         }
     }
     

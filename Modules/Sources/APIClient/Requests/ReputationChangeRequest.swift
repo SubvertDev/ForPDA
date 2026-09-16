@@ -6,23 +6,13 @@
 //
 
 import PDAPI
+import Models
 
 public struct ReputationChangeRequest: Sendable {
     public let userId: Int
-    public let contentType: ContentType
+    public let contentType: ReputationChangeContentType
     public let reason: String
-    public let action: ChangeActionType
-    
-    public enum ContentType: Sendable, Equatable {
-        case post(id: Int)
-        case comment(id: Int)
-        case profile
-    }
-    
-    public enum ChangeActionType: Sendable {
-        case up
-        case down
-    }
+    public let action: ReputationChangeActionType
     
     nonisolated var transferVoteType: MemberReputationRequest.ActionType {
         switch action {
@@ -41,9 +31,9 @@ public struct ReputationChangeRequest: Sendable {
     
     public init(
         userId: Int,
-        contentType: ContentType,
+        contentType: ReputationChangeContentType,
         reason: String,
-        action: ChangeActionType
+        action: ReputationChangeActionType
     ) {
         self.userId = userId
         self.contentType = contentType

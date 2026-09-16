@@ -31,12 +31,14 @@ public struct ReputationChangeView: View {
     public var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 0) {
-                Text("For «\(store.username)»", bundle: .module)
-                    .font(.subheadline)
-                    .foregroundStyle(Color(.Labels.secondary))
-                    .padding(.bottom, isLiquidGlass ? 20 : 25)
-                    .frame(maxWidth: .infinity, alignment: isLiquidGlass ? .center : .leading)
-                    .offset(y: isLiquidGlass ? -6 : 0)
+                if !store.username.isEmpty {
+                    Text("For «\(store.username)»", bundle: .module)
+                        .font(.subheadline)
+                        .foregroundStyle(Color(.Labels.secondary))
+                        .padding(.bottom, isLiquidGlass ? 20 : 25)
+                        .frame(maxWidth: .infinity, alignment: isLiquidGlass ? .center : .leading)
+                        .offset(y: isLiquidGlass ? -6 : 0)
+                }
                 
                 Section {
                     Field(
@@ -113,20 +115,36 @@ public struct ReputationChangeView: View {
     // MARK: - Bottom Buttons
         
     private func ActionButtons() -> some View {
-        _GlassEffectContainer(spacing: 8) {
-            HStack(spacing: 8) {
-                BottomButton(title: "Down", image: .arrowshapeDown) {
-                    send(.downButtonTapped)
-                }
-                
-                BottomButton(title: "Up", image: .arrowshapeUp) {
-                    send(.upButtonTapped)
+        WithPerceptionTracking {
+            _GlassEffectContainer(spacing: 8) {
+                HStack(spacing: 8) {
+                    switch store.action {
+                    case .down:
+                        BottomButton(title: "Down", image: .arrowshapeDown) {
+                            send(.downButtonTapped)
+                        }
+                        
+                    case .up:
+                        BottomButton(title: "Up", image: .arrowshapeUp) {
+                            send(.upButtonTapped)
+                        }
+                        
+                    case .none:
+                        BottomButton(title: "Down", image: .arrowshapeDown) {
+                            send(.downButtonTapped)
+                        }
+                        
+                        BottomButton(title: "Up", image: .arrowshapeUp) {
+                            send(.upButtonTapped)
+                        }
+                    }
+                    
                 }
             }
+            .padding(.vertical, 8)
+            .disabled(store.changeReason.isEmpty)
+            .animation(.default, value: store.changeReason.isEmpty)
         }
-        .padding(.vertical, 8)
-        .disabled(store.changeReason.isEmpty)
-        .animation(.default, value: store.changeReason.isEmpty)
     }
     
     // MARK: - Bottom Button
