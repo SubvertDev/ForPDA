@@ -10,6 +10,7 @@ import SwiftUI
 import SharedUI
 import SFSafeSymbols
 
+@ViewAction(for: ReputationChangeFeature.self)
 public struct ReputationChangeView: View {
     
     // MARK: - Properties
@@ -66,7 +67,7 @@ public struct ReputationChangeView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        store.send(.cancelButtonTapped)
+                        send(.cancelButtonTapped)
                     } label: {
                         if isLiquidGlass {
                             Image(systemSymbol: .xmark)
@@ -115,11 +116,11 @@ public struct ReputationChangeView: View {
         _GlassEffectContainer(spacing: 8) {
             HStack(spacing: 8) {
                 BottomButton(title: "Down", image: .arrowshapeDown) {
-                    store.send(.downButtonTapped)
+                    send(.downButtonTapped)
                 }
                 
                 BottomButton(title: "Up", image: .arrowshapeUp) {
-                    store.send(.upButtonTapped)
+                    send(.upButtonTapped)
                 }
             }
         }

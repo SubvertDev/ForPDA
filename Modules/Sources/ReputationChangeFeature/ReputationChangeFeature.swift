@@ -67,19 +67,24 @@ public struct ReputationChangeFeature: Reducer, Sendable {
     
     // MARK: - Action
             
-    public enum Action: BindableAction {
+    public enum Action: BindableAction, ViewAction {
         case binding(BindingAction<State>)
-        
-        case onAppear
-        
-        case upButtonTapped
-        case downButtonTapped
-        case cancelButtonTapped
-        
         case reasonChanged(String)
         
-        case _sendReputationChange(isDown: Bool)
-        case _changeResponse(Result<ReputationChangeResponseType, any Error>)
+        case view(View)
+        public enum View {
+            case onAppear
+            
+            case upButtonTapped
+            case downButtonTapped
+            case cancelButtonTapped
+        }
+        
+        case `internal`(Internal)
+        public enum Internal {
+            case sendReputationChange(isDown: Bool)
+            case changeResponse(Result<ReputationChangeResponseType, any Error>)
+        }
     }
     
     // MARK: - Dependencies
@@ -95,23 +100,23 @@ public struct ReputationChangeFeature: Reducer, Sendable {
         
         Reduce<State, Action> { state, action in
             switch action {
-            case .onAppear, .binding:
-                return .none
-                
-            case .cancelButtonTapped:
-                return .run { _ in await dismiss() }
-                
-            case .upButtonTapped:
-                return .send(._sendReputationChange(isDown: false))
-                
-            case .downButtonTapped:
-                return .send(._sendReputationChange(isDown: true))
-                
             case .reasonChanged(let reason):
                 state.changeReason = reason
                 return .none
                 
-            case ._sendReputationChange(let isDown):
+            case .view(.onAppear), .binding:
+                return .none
+                
+            case .view(.cancelButtonTapped):
+                return .run { _ in await dismiss() }
+                
+            case .view(.upButtonTapped):
+                return .send(.internal(.sendReputationChange(isDown: false)))
+                
+            case .view(.downButtonTapped):
+                return .send(.internal(.sendReputationChange(isDown: true)))
+                
+            case let .internal(.sendReputationChange(isDown)):
                 return .run { [userId = state.userId, content = state.content, reason = state.changeReason] send in
                     let request = ReputationChangeRequest(
                         userId: userId,
@@ -120,12 +125,12 @@ public struct ReputationChangeFeature: Reducer, Sendable {
                         action: isDown ? .down : .up
                     )
                     let response = try await apiClient.changeReputation(data: request)
-                    await send(._changeResponse(.success(response)))
+                    await send(.internal(.changeResponse(.success(response))))
                 } catch: { error, send in
-                    await send(._changeResponse(.failure(error)))
+                    await send(.internal(.changeResponse(.failure(error))))
                 }
                 
-            case let ._changeResponse(.success(status)):
+            case let .internal(.changeResponse(.success(status))):
                 return .merge([
                     .run { _ in await dismiss() },
                     .run { _ in
@@ -138,7 +143,7 @@ public struct ReputationChangeFeature: Reducer, Sendable {
                     }
                 ])
                 
-            case let ._changeResponse(.failure(error)):
+            case let .internal(.changeResponse(.failure(error))):
                 // TODO: handle?
                 print("\(error)")
                 return .none
