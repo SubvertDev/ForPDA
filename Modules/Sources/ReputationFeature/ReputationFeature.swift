@@ -24,9 +24,6 @@ public struct ReputationFeature: Reducer, Sendable {
     
     public enum Localization {
         static let reportSent = LocalizedStringResource("Report sent", bundle: .module)
-        static let punishmentApplied = LocalizedStringResource("Punishment applied and reputation deleted", bundle: .module)
-        static let reputationDeleted = LocalizedStringResource("Reputation deleted", bundle: .module)
-        static let reputationRestored = LocalizedStringResource("Reputation restored", bundle: .module)
     }
     
     // MARK: - Destinations
@@ -166,7 +163,6 @@ public struct ReputationFeature: Reducer, Sendable {
                 guard case let .reputation(voteId) = target else { return .none }
                 return .run { send in
                     await send(.internal(.modifyResponse(.success((voteId, .delete, true)))))
-                    await toastClient.showToast(ToastMessage(text: Localization.punishmentApplied, haptic: .success))
                 }
                 
             case let .destination(.presented(.alert(.modifyVote(voteId, type)))):
@@ -275,13 +271,7 @@ public struct ReputationFeature: Reducer, Sendable {
                     )
                     state.historyData[voteIndex].modified = modified
                 }
-                return .run { _ in
-                    let reputationToast = ToastMessage(
-                        text: type == .delete ? Localization.reputationDeleted : Localization.reputationRestored,
-                        haptic: .success
-                    )
-                    await toastClient.showToast(status ? reputationToast : .whoopsSomethingWentWrong)
-                }
+                return .run { _ in await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong) }
                 
             case let .internal(.modifyResponse(.failure(error))):
                 print(error)

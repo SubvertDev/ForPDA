@@ -162,16 +162,6 @@
         }
       }
     },
-    "Punishment applied and reputation deleted" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Наказание вынесено с отменой репутации"
-          }
-        }
-      }
-    },
     "Raised" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -199,26 +189,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Репутация"
-          }
-        }
-      }
-    },
-    "Reputation deleted" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Репутация отменена"
-          }
-        }
-      }
-    },
-    "Reputation restored" : {
-      "localizations" : {
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Репутация восстановлена"
           }
         }
       }
