@@ -76,6 +76,13 @@ public struct FormFeature: Reducer, Sendable {
             }
             return false
         }
+
+        public var isSimplePost: Bool {
+            if case let .post(_, _, content) = type, case .simple = content {
+                return true
+            }
+            return false
+        }
         
         var isPreviewButtonDisabled: Bool {
             if isFormLoading { return true }

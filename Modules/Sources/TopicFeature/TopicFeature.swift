@@ -63,7 +63,8 @@ public struct TopicFeature: Reducer, Sendable {
         @ReducerCaseIgnored
         case karmaChange(Int)
         case karmaHistory(PostKarmaHistoryFeature)
-        case form(FormFeature)
+        case newPost(FormFeature)
+        case template(FormFeature)
         case stat(ForumStatFeature)
         case move(ForumMoveFeature)
         case edit(TopicEditFeature)
@@ -73,7 +74,8 @@ public struct TopicFeature: Reducer, Sendable {
         public enum Action {
             case alert(Alert)
             case karmaHistory(PostKarmaHistoryFeature.Action)
-            case form(FormFeature.Action)
+            case newPost(FormFeature.Action)
+            case template(FormFeature.Action)
             case stat(ForumStatFeature.Action)
             case move(ForumMoveFeature.Action)
             case edit(TopicEditFeature.Action)
@@ -252,19 +254,22 @@ public struct TopicFeature: Reducer, Sendable {
                     await send(.internal(.loadTopic(newOffset)))
                 }
                 
-            case let .destination(.presented(.form(.delegate(.formSent(.post(post)))))):
+            case let .destination(.presented(.newPost(.delegate(.formSent(.post(post)))))):
                 let topicId = state.topicId
                 _ = state.$postDraftsCache.withLock { $0.topics.removeValue(forKey: topicId) }
                 return jumpTo(.post(id: post.id), true, &state)
 
-            case .destination(.presented(.form(.rows(.element(
+            case let .destination(.presented(.template(.delegate(.formSent(.post(post)))))):
+                return jumpTo(.post(id: post.id), true, &state)
+
+            case .destination(.presented(.newPost(.rows(.element(
                 id: _,
                 action: .editor(.binding(\.text))
             ))))):
                 return .send(.internal(.cachePostDraft))
 
             case .internal(.cachePostDraft):
-                guard case let .form(form) = state.destination,
+                guard case let .newPost(form) = state.destination,
                       form.isNewSimplePost,
                       case let .editor(editor) = form.rows.first
                 else { return .none }
@@ -278,7 +283,7 @@ public struct TopicFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .destination(.presented(.form(.delegate(.formSent(.report))))):
+            case .destination(.presented(.newPost(.delegate(.formSent(.report))))):
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.reportSent, haptic: .success))
                 }
@@ -397,7 +402,7 @@ public struct TopicFeature: Reducer, Sendable {
                             content: .simple(draft, [])
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .newPost(formState)
                     return .none
                     
                 case .writePostWithTemplate:
@@ -408,7 +413,7 @@ public struct TopicFeature: Reducer, Sendable {
                             content: .template([])
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .template(formState)
                     return .none
                     
                 case .edit:
@@ -507,7 +512,7 @@ public struct TopicFeature: Reducer, Sendable {
                             content: .simple(text, [])
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .newPost(formState)
                     return .none
                     
                 case let .edit(post):
@@ -520,12 +525,12 @@ public struct TopicFeature: Reducer, Sendable {
                             })
                         )
                     )
-                    state.destination = .form(formState)
+                    state.destination = .newPost(formState)
                     return .none
                     
                 case let .report(id):
                     let feature = FormFeature.State(type: .report(id: id, type: .post))
-                    state.destination = .form(feature)
+                    state.destination = .newPost(feature)
                     return .none
                     
                 case .karma(let id):
@@ -638,13 +643,13 @@ public struct TopicFeature: Reducer, Sendable {
                             content: .simple(text, [])
                         )
                     )
-                    state.destination = .form(feature)
-                } else if case var .form(feature) = state.destination,
+                    state.destination = .newPost(feature)
+                } else if case var .newPost(feature) = state.destination,
                           case var .editor(editor) = feature.rows.first {
                     editor.text.append(formattedQuote)
                     editor.textRange = NSRange(location: editor.text.utf16.count, length: 0)
                     feature.rows[id: editor.id] = .editor(editor)
-                    state.destination = .form(feature)
+                    state.destination = .newPost(feature)
                     state.$postDraftsCache.withLock { $0.topics[state.topicId] = editor.text }
                 }
                 return .none
