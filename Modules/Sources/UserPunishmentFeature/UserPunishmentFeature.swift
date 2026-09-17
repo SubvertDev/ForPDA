@@ -54,7 +54,7 @@ public struct UserPunishmentFeature: Reducer, Sendable {
         public let target: UserPunishmentTarget
         
         var categories: IdentifiedArrayOf<UserPunishmentCategory> = []
-        var currentCategory: UIUserPunishmentCategory
+        var currentCategory: UIUserPunishmentCategory = .default
         
         var focus: Field?
         var banType: BanTypePicker = .no
@@ -64,18 +64,12 @@ public struct UserPunishmentFeature: Reducer, Sendable {
         var isLoading = false
         var isSending = false
         
-        var isApplyButtonDisabled: Bool {
-            return false
-        }
-        
         public init(
             userId: Int,
             target: UserPunishmentTarget
         ) {
             self.userId = userId
             self.target = target
-            
-            self.currentCategory = .default
         }
     }
     
@@ -105,7 +99,7 @@ public struct UserPunishmentFeature: Reducer, Sendable {
         public enum Internal {
             case loadTemplates(forId: Int)
             case templatesResponse(Result<[UserPunishmentCategory], any Error>)
-            case applyPunishment
+            case applyPunishment(template: UserPunishmentTemplate)
             case applyPunishmentResponse(Result<UserPunishmentApplyResponse, any Error>)
         }
         
@@ -160,7 +154,7 @@ public struct UserPunishmentFeature: Reducer, Sendable {
                 switch action {
                 case .forceApply:
                     state.currentCategory.template.flag.insert(.forceApply)
-                    return .send(.internal(.applyPunishment))
+                    return .send(.view(.applyButtonTapped))
                 case .doNotForceApply:
                     state.currentCategory.template.flag.remove(.forceApply)
                     return .none
@@ -174,6 +168,9 @@ public struct UserPunishmentFeature: Reducer, Sendable {
                 state.isSending = false
                 return .none
                 
+            case .delegate(.punishmentApplied):
+                return .run { _ in await dismiss() }
+                
             case .delegate, .binding, .alert:
                 return .none
                 
@@ -181,7 +178,10 @@ public struct UserPunishmentFeature: Reducer, Sendable {
                 return .send(.internal(.loadTemplates(forId: state.target.id)))
                 
             case .view(.applyButtonTapped):
-                return .send(.internal(.applyPunishment))
+                var template = state.currentCategory.template
+                template.readOnlyHours *= state.readOnlyDateFormat == .days ? 24 : 1
+                template.premoderationHours *= state.premodDateFormat == .days ? 24 : 1
+                return .send(.internal(.applyPunishment(template: template)))
                 
             case .view(.cancelButtonTapped):
                 return .run { _ in await dismiss() }
@@ -236,18 +236,18 @@ public struct UserPunishmentFeature: Reducer, Sendable {
                 }
                 return .none
                 
-            case .internal(.applyPunishment):
+            case let .internal(.applyPunishment(template)):
                 state.isSending = true
                 return .run { [
                     subjectId = state.target.id,
                     userId = state.userId,
-                    category = state.currentCategory
+                    categoryId = state.currentCategory.id
                 ] send in
                     let request = UserPunishmentApplyRequest(
                         userId: userId,
                         subjectId: subjectId,
-                        categoryId: category.id,
-                        template: category.template
+                        categoryId: categoryId,
+                        template: template
                     )
                     let response = try await apiClient.applyUserPunishment(request)
                     await send(.internal(.applyPunishmentResponse(.success(response))))

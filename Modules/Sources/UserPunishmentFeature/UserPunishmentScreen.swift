@@ -176,11 +176,10 @@ public struct UserPunishmentScreen: View {
                 Header(title: "Premoderation")
                 
                 HStack(spacing: 8) {
+                    let premodHours = String(store.currentCategory.template.premoderationHours)
                     Field(
                         type: .singleLine(numeric: true),
-                        content: Binding(get: {
-                            String(store.currentCategory.template.premoderationHours)
-                        }, set: { newValue in
+                        content: Binding(get: { premodHours }, set: { newValue in
                             send(.updateTemplatePremodValue(newValue))
                         }),
                         placeholder: LocalizedStringResource(stringLiteral: String(store.currentCategory.template.premoderationHours)),
@@ -217,11 +216,10 @@ public struct UserPunishmentScreen: View {
                 Header(title: "Read Only")
                 
                 HStack(spacing: 8) {
+                    let readOnlyHours = String(store.currentCategory.template.readOnlyHours)
                     Field(
                         type: .singleLine(numeric: true),
-                        content: Binding(get: {
-                            String(store.currentCategory.template.readOnlyHours)
-                        }, set: { newValue in
+                        content: Binding(get: { readOnlyHours }, set: { newValue in
                             send(.updateTemplateReadOnlyValue(newValue))
                         }),
                         placeholder: LocalizedStringResource(stringLiteral: String(store.currentCategory.template.readOnlyHours)),
@@ -243,22 +241,24 @@ public struct UserPunishmentScreen: View {
     
     @ViewBuilder
     private func BanRestriction() -> some View {
-        VStack(spacing: 6) {
-            Header(title: "Ban")
-            
-            Menu {
-                Picker(selection: $store.banType, label: EmptyView()) {
-                    Text("No", bundle: .module)
-                        .tag(UserPunishmentFeature.BanTypePicker.no)
-                    
-                    Text("Permanent", bundle: .module)
-                        .tag(UserPunishmentFeature.BanTypePicker.permanent)
-                    
-                    Text("Last chanse", bundle: .module)
-                        .tag(UserPunishmentFeature.BanTypePicker.lastChanse)
+        WithPerceptionTracking {
+            VStack(spacing: 6) {
+                Header(title: "Ban")
+                
+                Menu {
+                    Picker(selection: $store.banType, label: EmptyView()) {
+                        Text("No", bundle: .module)
+                            .tag(UserPunishmentFeature.BanTypePicker.no)
+                        
+                        Text("Permanent", bundle: .module)
+                            .tag(UserPunishmentFeature.BanTypePicker.permanent)
+                        
+                        Text("Last chanse", bundle: .module)
+                            .tag(UserPunishmentFeature.BanTypePicker.lastChanse)
+                    }
+                } label: {
+                    PickerHeader(title: store.banType.title)
                 }
-            } label: {
-                PickerHeader(title: store.banType.title)
             }
         }
     }
@@ -317,7 +317,7 @@ public struct UserPunishmentScreen: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(tintColor)
-            .disabled(store.isApplyButtonDisabled)
+            .disabled(store.isSending || store.isLoading)
             .frame(height: 48)
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
