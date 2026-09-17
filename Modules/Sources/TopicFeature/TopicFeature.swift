@@ -646,8 +646,17 @@ public struct TopicFeature: Reducer, Sendable {
                     state.destination = .newPost(feature)
                 } else if case var .newPost(feature) = state.destination,
                           case var .editor(editor) = feature.rows.first {
-                    editor.text.append(formattedQuote)
-                    editor.textRange = NSRange(location: editor.text.utf16.count, length: 0)
+                    if let textRange = editor.textRange,
+                       let insertionRange = Range(textRange, in: editor.text) {
+                        editor.text.insert(contentsOf: formattedQuote, at: insertionRange.lowerBound)
+                        editor.textRange = NSRange(
+                            location: textRange.location + formattedQuote.utf16.count,
+                            length: 0
+                        )
+                    } else {
+                        editor.text.append(formattedQuote)
+                        editor.textRange = NSRange(location: editor.text.utf16.count, length: 0)
+                    }
                     feature.rows[id: editor.id] = .editor(editor)
                     state.destination = .newPost(feature)
                     state.$postDraftsCache.withLock { $0.topics[state.topicId] = editor.text }
