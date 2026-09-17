@@ -56,6 +56,7 @@ public struct APIClient: Sendable {
     
     public var getUserPunishmentTemplates: @Sendable (_ forId: Int, _ userId: Int) async throws -> [UserPunishmentCategory]
     public var applyUserPunishment: @Sendable (_ data: UserPunishmentApplyRequest) async throws -> UserPunishmentApplyResponse
+    public var cancelUserPunishment: @Sendable (_ userId: Int, _ reason: String) async throws -> Bool
     
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
@@ -339,6 +340,12 @@ extension APIClient: DependencyKey {
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return UserPunishmentApplyResponse(rawValue: status) ?? .noAccess
+            },
+            cancelUserPunishment: { userId, reason in
+                let command = MemberCommand.Punishment.cancel(memberId: userId, reason: reason)
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
             },
             
             // MARK: - Bookmarks
@@ -795,6 +802,9 @@ extension APIClient: DependencyKey {
             },
             applyUserPunishment: { _ in
                 return .success
+            },
+            cancelUserPunishment: { _, _ in
+                return true
             },
             getBookmarksList: {
                 return [.mockArticle, .mockForum, .mockUser]
