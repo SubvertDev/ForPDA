@@ -42,12 +42,12 @@ public struct MoreFeature: Reducer, Sendable {
         var isTicketsAvailable: Bool {
             guard let user else { return false }
             return user.group == .admin
-                || user.group == .supermoderator
-                || user.group == .moderator
-                || user.group == .moderatorHelper
-                || user.group == .moderatorSchool
-                || user.group == .curator
-                || user.group == .honorary && !user.curatedTopics.isEmpty
+            || user.group == .supermoderator
+            || user.group == .moderator
+            || user.group == .moderatorHelper
+            || user.group == .moderatorSchool
+            || user.group == .curator
+            && !user.curatedTopics.isEmpty
         }
         
         public init() {}

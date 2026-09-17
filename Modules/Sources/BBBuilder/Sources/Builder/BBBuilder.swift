@@ -433,9 +433,10 @@ public struct BBBuilder {
                 return .text(combinedText)
             }
             
-        case .img(let url):
-            let url = URL(string: url.string)!
-            let attachment = AsyncTextAttachment(attachmentUrl: url, delegate: nil)
+        case .img(let attributedUrl):
+            let imageUrl = URL(string: attributedUrl.string)!
+            let attachment = AsyncTextAttachment(attachmentUrl: imageUrl, delegate: nil)
+            attachment.link = attributedUrl.attribute(.link, at: 0, effectiveRange: nil) as? URL
             attachment.image = UIImage.placeholder(color: .lightGray, size: CGSize(width: 32, height: 32)) // TODO: Skeleton loader
             let textWithAttachment = NSAttributedString(attachment: attachment)
             if isFirst {

@@ -58,6 +58,15 @@ public struct TopicScreen: View {
         return topicLoaded && store.topic!.poll != nil
     }
     
+    private var isNewPostPresented: Bool {
+        switch store.destination {
+        case .newPost:
+            return true
+        default:
+            return false
+        }
+    }
+    
     // MARK: - Init
     
     public init(store: StoreOf<TopicFeature>) {
@@ -93,6 +102,13 @@ public struct TopicScreen: View {
                                 if shouldShowBottomNavigation {
                                     Navigation()
                                 }
+                                
+                                if #available(iOS 17, *) {
+                                    if isNewPostPresented {
+                                        Color.clear
+                                            .containerRelativeFrame(.vertical, count: 2, span: 1, spacing: 0)
+                                    }
+                                }
                             }
                             .padding(.bottom, 16)
                         }
@@ -116,20 +132,23 @@ public struct TopicScreen: View {
             }
             .navigations(store: store)
             .toolbar {
-                ToolbarItem {
-                    Button {
-                        send(.searchButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .magnifyingglass)
-                            .foregroundStyle(foregroundStyle())
+                if !isNewPostPresented {
+                    ToolbarItem {
+                        Button {
+                            send(.searchButtonTapped)
+                        } label: {
+                            Image(systemSymbol: .magnifyingglass)
+                                .foregroundStyle(foregroundStyle())
+                        }
                     }
-                }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer()
-                }
-                ToolbarItem {
-                    OptionsMenu()
+                    
+                    if #available(iOS 26.0, *) {
+                        ToolbarSpacer()
+                    }
+                    
+                    ToolbarItem {
+                        OptionsMenu()
+                    }
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -515,7 +534,7 @@ struct NavigationModifier: ViewModifier {
         func body(content: Content) -> some View {
             WithPerceptionTracking {
                 content
-                    .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).form) { store in
+                    .fullScreenCover(item: $store.scope(\.destination?.template, action: \.destination.template)) { store in
                         NavigationStack {
                             FormScreen(store: store)
                         }
@@ -575,6 +594,14 @@ struct NavigationModifier: ViewModifier {
                     NavigationStack {
                         ForumStatView(store: store)
                     }
+                }
+                .sheet(item: $store.scope(\.$destination, action: \.destination).newPost) { store in
+                    NavigationStack {
+                        FormScreen(store: store)
+                            .scrollBounceBehavior(.basedOnSize)
+                    }
+                    .presentationDetents([.medium, .large])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
         }
     }
@@ -655,7 +682,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
@@ -690,7 +717,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(
                             type: .new, topicId: 0, content: .simple("Test Text", [])
@@ -721,7 +748,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(
                             type: .new, topicId: 0, content: .template([])
@@ -752,7 +779,7 @@ private extension TopicPostsFilter {
             initialState: TopicFeature.State(
                 topicId: 0,
                 topicName: "Test Topic",
-                destination: .form(
+                destination: .newPost(
                     FormFeature.State(
                         type: .post(type: .new, topicId: 0, content: .template([]))
                     )

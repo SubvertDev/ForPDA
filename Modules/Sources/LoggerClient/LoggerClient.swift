@@ -29,7 +29,7 @@ extension Logger: @retroactive DependencyKey {
     
     /// A `Logger` that fails when accessed while testing.
     public static var unimplemented: Logger {
-        XCTFail(#"Unimplemented: @Dependency(\.logger)"#)
+        reportIssue(#"Unimplemented: @Dependency(\.logger)"#)
         return Logger()
     }
 }

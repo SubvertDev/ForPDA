@@ -72,7 +72,9 @@ public struct FormEditorFeature: Reducer {
         }
         
         func isValid() -> Bool {
-            return isRequired ? !text.isEmpty : true
+            let isTextValid = !isRequired || !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            let isAttachmentValid = uploadBox?.requiresAttachment != true || !getAttachments().isEmpty
+            return isTextValid && isAttachmentValid
         }
     }
     
@@ -101,7 +103,7 @@ public struct FormEditorFeature: Reducer {
             switch action {
             case .view(.onAppear):
                 if !state.text.isEmpty {
-                    state.textRange = NSMakeRange(state.text.count, 0)
+                    state.textRange = NSRange(location: state.text.utf16.count, length: 0)
                 }
                 if let uploadBox = state.uploadBox {
                     return .merge(
@@ -117,22 +119,25 @@ public struct FormEditorFeature: Reducer {
                 }
                 
             case let .bbPanel(.delegate(.tagTapped(tag))):
-                if let range = state.textRange, !state.text.isEmpty {
-                    // если мы вставляем бб код в текст БЕЗ выделенной области
-                    if range.lowerBound == range.upperBound {
-                        let index = state.text.index(state.text.startIndex, offsetBy: range.lowerBound)
-                        state.text.insert(contentsOf: "\(tag.0)\(tag.1)", at: index)
-                        state.textRange = NSMakeRange(range.lowerBound + tag.0.count, 0)
+                if let nsRange = state.textRange,
+                   let range = Range(nsRange, in: state.text),
+                   !state.text.isEmpty {
+                    // If we're inserting bb code without selected range
+                    if range.isEmpty {
+                        let location = nsRange.location + tag.0.utf16.count
+                        state.text.insert(contentsOf: "\(tag.0)\(tag.1)", at: range.lowerBound)
+                        state.textRange = NSRange(location: location, length: 0)
                     } else {
-                        let ubIndex = state.text.index(state.text.startIndex, offsetBy: range.upperBound)
-                        let lbIndex = state.text.index(state.text.startIndex, offsetBy: range.lowerBound)
-                        state.text.insert(contentsOf: tag.1, at: ubIndex)
-                        state.text.insert(contentsOf: tag.0, at: lbIndex)
-                        state.textRange = NSMakeRange(range.lowerBound + tag.0.count, range.upperBound - range.lowerBound)
+                        state.text.insert(contentsOf: tag.1, at: range.upperBound)
+                        state.text.insert(contentsOf: tag.0, at: range.lowerBound)
+                        state.textRange = NSRange(
+                            location: nsRange.location + tag.0.utf16.count,
+                            length: nsRange.length
+                        )
                     }
                 } else {
                     state.text = "\(tag.0)\(tag.1)"
-                    state.textRange = NSMakeRange(tag.0.count, 0)
+                    state.textRange = NSRange(location: tag.0.utf16.count, length: 0)
                 }
                 state.focus = state.id
                 

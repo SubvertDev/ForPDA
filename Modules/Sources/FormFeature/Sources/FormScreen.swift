@@ -55,7 +55,7 @@ public struct FormScreen: View {
             .navigationTitle(Text(navigationTitleText(), bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .modifier(DestinationModifier(store: store)) // extracted to modifier, due to .alert() compilation error
-            .safeAreaInset(edge: .bottom) {
+            ._safeAreaBar(edge: .bottom) {
                 PublishButton()
             }
             .onTapGesture {
@@ -71,7 +71,11 @@ public struct FormScreen: View {
             .toolbar {
                 Toolbar()
             }
-            .background(Color(.Background.primary))
+            .background(
+                Color(.Background.primary)
+                    .opacity(isLiquidGlass && store.isSimplePost ? 0.5 : 1)
+                    .ignoresSafeArea()
+            )
             .disabled(store.isPublishing)
             .animation(.default, value: store.isPublishing)
             .bind($store.focusedField, to: $focusedField)
@@ -85,6 +89,8 @@ public struct FormScreen: View {
     
     @ViewBuilder
     private func PublishButton() -> some View {
+        let isDisabled = store.isPublishButtonDisabled || store.isFormLocked
+
         Button {
             send(.publishButtonTapped)
         } label: {
@@ -101,11 +107,16 @@ public struct FormScreen: View {
         }
         .buttonStyle(.borderedProminent)
         .tint(tintColor)
-        .disabled(store.isPublishButtonDisabled || store.isFormLocked)
+        .disabled(isDisabled)
+        .background {
+            if isDisabled {
+                Capsule()
+                    .fill(Color(.Main.greyAlpha))
+            }
+        }
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
-        .background(Color(.Background.primary))
     }
     
     // MARK: - Toolbar

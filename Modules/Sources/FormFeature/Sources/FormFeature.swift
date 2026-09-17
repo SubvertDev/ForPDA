@@ -67,6 +67,22 @@ public struct FormFeature: Reducer, Sendable {
             }
             return false
         }
+
+        public var isNewSimplePost: Bool {
+            if case let .post(type, _, content) = type,
+               case .new = type,
+               case .simple = content {
+                return true
+            }
+            return false
+        }
+
+        public var isSimplePost: Bool {
+            if case let .post(_, _, content) = type, case .simple = content {
+                return true
+            }
+            return false
+        }
         
         var isPreviewButtonDisabled: Bool {
             if isFormLoading { return true }
@@ -297,18 +313,34 @@ public struct FormFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.formResponse(.success(fields))):
-                var combined: (editorId: Int, uploadBox: FormStickedUploadBox?)? = nil
+                let combinedFieldFlag: FormFieldFlag = [.required, .uploadable]
+                var uploadBoxesByEditorId: [Int: FormStickedUploadBox] = [:]
+                var hiddenUploadBoxIds: Set<Int> = []
+                var pendingEditorId: Int?
+
                 for (index, field) in fields.enumerated() {
-                    if case let .editor(content) = field, content.flag.contains(.uploadable) {
-                        combined = (index, nil)
-                    } else if case let .uploadbox(content, extensions) = field {
-                        if content.flag == [.required, .uploadable] {
-                            combined = (combined!.editorId, .init(id: index, allowedExtensions: extensions))
-                        } else if let editorId = combined?.editorId, index - 1 == editorId {
-                            // if previous field is editor, that means editor supports upload
-                            combined = (combined!.editorId, .init(id: index, allowedExtensions: extensions))
-                        }
+                    if case let .editor(editor) = field, editor.flag.contains(.uploadable) {
+                        pendingEditorId = index
+                        continue
                     }
+
+                    guard case let .uploadbox(uploadBox, extensions) = field,
+                          let editorId = pendingEditorId,
+                          case let .editor(editor) = fields[editorId] else {
+                        continue
+                    }
+
+                    let isMarkedPair = editor.flag == combinedFieldFlag && uploadBox.flag == combinedFieldFlag
+                    let isAdjacentPair = index == editorId + 1
+                    guard isMarkedPair || isAdjacentPair else { continue }
+
+                    uploadBoxesByEditorId[editorId] = FormStickedUploadBox(
+                        id: index,
+                        allowedExtensions: extensions,
+                        requiresAttachment: uploadBox.flag.contains(.required)
+                    )
+                    hiddenUploadBoxIds.insert(index)
+                    pendingEditorId = nil
                 }
                 
                 for (index, field) in fields.enumerated() {
@@ -338,7 +370,7 @@ public struct FormFeature: Reducer, Sendable {
                             placeholder: content.example,
                             flag: content.flag,
                             defaultText: content.defaultValue,
-                            uploadBox: index == combined?.editorId ? combined?.uploadBox : nil
+                            uploadBox: uploadBoxesByEditorId[index]
                         )
                         state.rows.append(.editor(editorState))
                         
@@ -369,7 +401,7 @@ public struct FormFeature: Reducer, Sendable {
                             description: content.description,
                             flag: content.flag,
                             allowedExtensions: extensions,
-                            isHidden: index == combined?.uploadBox?.id
+                            isHidden: hiddenUploadBoxIds.contains(index)
                         )
                         state.rows.append(.uploadBox(uploadboxState))
                     }
@@ -560,7 +592,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Topic & Template
     
     nonisolated(unsafe) static let topicIsSentToPremoderation = AlertState {
-        TextState("Topic is sent to premoderation")
+        TextState("Topic is sent to premoderation", bundle: .module)
     } actions: {
         ButtonState(action: .dismiss) {
             TextState("OK")
@@ -568,7 +600,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let templateRequestHasBadParam = AlertState {
-        TextState("The server refused to create the topic (invalid parameter)")
+        TextState("The server refused to create the topic (invalid parameter)", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -576,7 +608,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let notAllFieldsAreFilledInTemplate = AlertState {
-        TextState("Not all required fields are filled in")
+        TextState("Not all required fields are filled in", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -585,7 +617,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     
     static func serverReturnStatusForTopic(_ status: Int) -> AlertState {
         return AlertState(
-            title: { TextState("The server refused to create the topic (status \(status))") },
+            title: { TextState("The server refused to create the topic (status \(status))", bundle: .module) },
             actions: {
                 ButtonState {
                     TextState("OK")
@@ -597,7 +629,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Post
     
     nonisolated(unsafe) static let postIsSentToPremoderation = AlertState {
-        TextState("Post is sent to premoderation")
+        TextState("Post is sent to premoderation", bundle: .module)
     } actions: {
         ButtonState(action: .dismiss) {
             TextState("OK")
@@ -605,7 +637,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let postIsTooLong = AlertState {
-        TextState("Post is too long")
+        TextState("Post is too long", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -613,7 +645,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let postIsAlreadySent = AlertState {
-        TextState("Post is already sent")
+        TextState("Post is already sent", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -621,22 +653,22 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     }
     
     nonisolated(unsafe) static let attachToPreviousPost = AlertState {
-        TextState("Attach this post to previous one?")
+        TextState("Attach this post to previous one?", bundle: .module)
     } actions: {
         ButtonState(action: .attach) {
-            TextState("Yes, attach")
+            TextState("Yes, attach", bundle: .module)
         }
         ButtonState(action: .doNotAttach) {
-            TextState("No, no need")
+            TextState("No, no need", bundle: .module)
         }
     } message: {
-        TextState("It will be attached as a dialog to your last post")
+        TextState("It will be attached as a dialog to your last post", bundle: .module)
     }
     
     // Report
     
     nonisolated(unsafe) static let reportIsTooShort = AlertState {
-        TextState("Report is too short")
+        TextState("Report is too short", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -646,7 +678,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Note
     
     nonisolated(unsafe) static let noteWithoutReason = AlertState {
-        TextState("Not set reason for note")
+        TextState("Not set reason for note", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")
@@ -656,7 +688,7 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
     // Common
     
     nonisolated(unsafe) static let unknownError = AlertState {
-        TextState("Unknown error")
+        TextState("Unknown form error", bundle: .module)
     } actions: {
         ButtonState {
             TextState("OK")

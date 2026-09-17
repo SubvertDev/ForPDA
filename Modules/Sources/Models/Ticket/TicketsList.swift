@@ -28,8 +28,10 @@ public struct TicketsList: Sendable, Equatable {
 public extension TicketsList {
     static let mock = TicketsList(
         tickets: [
-            .init(id: 0, info: .mock)
+            .init(id: 3232, info: .mock),
+            .init(id: 5634733, info: .mock),
+            .init(id: 12134, info: .mock)
         ],
-        availableCount: 1
+        availableCount: 3
     )
 }
