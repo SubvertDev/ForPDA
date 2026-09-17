@@ -48,7 +48,7 @@ public struct Field<T: Hashable, BBPanel: View>: View {
     // MARK: - Body
     
     public var body: some View {
-        FieldContainer(focus: $focus, focusEqual: focusEqual) {
+        VStack {
             SelectableTextView(
                 content: content,
                 selection: selection,
@@ -62,7 +62,22 @@ public struct Field<T: Hashable, BBPanel: View>: View {
             
             bbPanel()
         }
+        .padding(.vertical, 15)
+        .padding(.horizontal, 12)
+        .focused($focus, equals: focusEqual)
+        .foregroundStyle(Color(.Labels.primary))
         .frame(minHeight: minHeight, alignment: .top)
+        .background {
+            RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
+                .fill(Color(.Background.teritary))
+        }
+        .overlay {
+            RoundedRectangle(cornerRadius: isLiquidGlass ? 28 : 14)
+                .stroke($focus.wrappedValue == focusEqual ? tintColor : Color(.Separator.primary), lineWidth: 1)
+        }
+        .onTapGesture {
+            focus = focusEqual
+        }
     }
 }
 
