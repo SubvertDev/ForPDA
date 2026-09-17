@@ -42,6 +42,8 @@ public struct ProfileFeature: Reducer, Sendable {
         case editProfile(EditFeature)
         case createChat(CreateChatFeature)
         case changeReputation(ReputationChangeFeature)
+        
+        case cancelPunishment
     }
     
     // MARK: - State
@@ -56,6 +58,9 @@ public struct ProfileFeature: Reducer, Sendable {
         public var isLoading: Bool
         public var user: User?
         var messageBadgeCount = 0
+        
+        var cancelPunishmentReason = ""
+        var isPunishmentCancelable = false
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
@@ -100,6 +105,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case searchRepliesButtonTapped
             case deviceButtonTapped(String)
             case curatedTopicButtonTapped(Int)
+            case cancelPunishmentButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
             
             case contextMenu(ProfileContextMenuAction)
@@ -202,6 +208,14 @@ public struct ProfileFeature: Reducer, Sendable {
                     sort: .dateDescSort
                 ))))
                 
+            case .view(.cancelPunishmentButtonTapped):
+                guard let user = state.user else { return .none }
+                return .run { [reason = state.cancelPunishmentReason] send in
+                    let status = try await apiClient.cancelUserPunishment(user.id, reason)
+                    await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                    await send(.view(.onAppear))
+                }
+                
             case let .view(.contextMenu(action)):
                 guard let user = state.user else { return .none }
                 switch action {
@@ -213,6 +227,9 @@ public struct ProfileFeature: Reducer, Sendable {
                     
                 case .addNotice:
                     state.destination = .note(FormFeature.State(type: .note(userId: user.id)))
+                    
+                case .cancelPunishment:
+                    state.destination = .cancelPunishment
                     
                 case .changeReputation:
                     state.destination = .changeReputation(ReputationChangeFeature.State(
@@ -232,6 +249,7 @@ public struct ProfileFeature: Reducer, Sendable {
                 user.devDBdevices.sort(by: { $0.main && !$1.main })
                 
                 state.user = user
+                state.isPunishmentCancelable = user.warningLogs.contains(where: { $0.canBeCanceled })
                 state.isLoading = false
                 analyticsClient.reportFullyDisplayed()
                 return .none

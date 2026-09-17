@@ -104,6 +104,12 @@ public struct ProfileScreen: View {
                     CreateChatScreen(store: store)
                 }
             }
+            .alert(
+                item: $store.destination.cancelPunishment,
+                title: { _ in Text("Enter the reason for cancellation", bundle: .module) }
+            ) {
+                CancelPunishmentAlert()
+            }
             .toolbar {
                 if store.shouldShowOpenChatButton {
                     ToolbarItem {
@@ -169,6 +175,15 @@ public struct ProfileScreen: View {
                     
                     if !store.shouldShowToolbarButtons {
                         Section {
+                            if store.isPunishmentCancelable {
+                                ContextButton(
+                                    text: LocalizedStringResource("Cancel punishment", bundle: .module),
+                                    symbol: .personCropCircleBadgeCheckmark
+                                ) {
+                                    send(.contextMenu(.cancelPunishment))
+                                }
+                            }
+                            
                             Button(role: .destructive) {
                                 send(.contextMenu(.punish))
                             } label: {
@@ -636,6 +651,22 @@ public struct ProfileScreen: View {
         }
         .listRowBackground(Color(.clear))
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+    }
+    
+    // MARK: - Cancel Punishment Alert
+    
+    @ViewBuilder
+    private func CancelPunishmentAlert() -> some View {
+        WithPerceptionTracking {
+            TextField(String(localized: "Input reason...", bundle: .module), text: $store.cancelPunishmentReason)
+            
+            Button(LocalizedStringResource("Cancel", bundle: .module)) { }
+            
+            Button(LocalizedStringResource("Send", bundle: .module)) {
+                send(.cancelPunishmentButtonTapped)
+            }
+            .disabled(store.cancelPunishmentReason.isEmpty)
+        }
     }
     
     // MARK: - Section Header

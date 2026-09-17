@@ -20,7 +20,7 @@ extension ProfileFeature {
         var body: some Reducer<State, Action> {
             Reduce<State, Action> { state, action in
                 switch action {
-                case .view(.onAppear), .delegate, .binding:
+                case .view(.onAppear), .view(.cancelPunishmentButtonTapped), .delegate, .binding:
                     break
                     
                 case .view(.chatButtonTapped):
@@ -45,7 +45,7 @@ extension ProfileFeature {
                     switch action {
                     case .edit:
                         analyticsClient.log(ProfileEvent.editTapped)
-                    case .addNotice, .changeReputation, .punish:
+                    case .addNotice, .changeReputation, .punish, .cancelPunishment:
                         // MARK: Moderator tools are skip analytics
                         break
                     }
