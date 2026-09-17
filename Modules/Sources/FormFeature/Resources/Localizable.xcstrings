@@ -293,12 +293,12 @@
         }
       }
     },
-    "Unknown error" : {
+    "Unknown form error" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Неизвестная ошибка"
+            "value" : "Неизвестная ошибка формы"
           }
         }
       }
