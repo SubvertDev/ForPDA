@@ -72,7 +72,9 @@ public struct FormEditorFeature: Reducer {
         }
         
         func isValid() -> Bool {
-            return isRequired ? !text.isEmpty : true
+            let isTextValid = !isRequired || !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            let isAttachmentValid = uploadBox?.requiresAttachment != true || !getAttachments().isEmpty
+            return isTextValid && isAttachmentValid
         }
     }
     

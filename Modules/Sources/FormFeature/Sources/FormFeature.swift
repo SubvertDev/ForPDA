@@ -313,18 +313,34 @@ public struct FormFeature: Reducer, Sendable {
                 }
                 
             case let .internal(.formResponse(.success(fields))):
-                var combined: (editorId: Int, uploadBox: FormStickedUploadBox?)? = nil
+                let combinedFieldFlag: FormFieldFlag = [.required, .uploadable]
+                var uploadBoxesByEditorId: [Int: FormStickedUploadBox] = [:]
+                var hiddenUploadBoxIds: Set<Int> = []
+                var pendingEditorId: Int?
+
                 for (index, field) in fields.enumerated() {
-                    if case let .editor(content) = field, content.flag.contains(.uploadable) {
-                        combined = (index, nil)
-                    } else if case let .uploadbox(content, extensions) = field {
-                        if content.flag == [.required, .uploadable] {
-                            combined = (combined!.editorId, .init(id: index, allowedExtensions: extensions))
-                        } else if let editorId = combined?.editorId, index - 1 == editorId {
-                            // if previous field is editor, that means editor supports upload
-                            combined = (combined!.editorId, .init(id: index, allowedExtensions: extensions))
-                        }
+                    if case let .editor(editor) = field, editor.flag.contains(.uploadable) {
+                        pendingEditorId = index
+                        continue
                     }
+
+                    guard case let .uploadbox(uploadBox, extensions) = field,
+                          let editorId = pendingEditorId,
+                          case let .editor(editor) = fields[editorId] else {
+                        continue
+                    }
+
+                    let isMarkedPair = editor.flag == combinedFieldFlag && uploadBox.flag == combinedFieldFlag
+                    let isAdjacentPair = index == editorId + 1
+                    guard isMarkedPair || isAdjacentPair else { continue }
+
+                    uploadBoxesByEditorId[editorId] = FormStickedUploadBox(
+                        id: index,
+                        allowedExtensions: extensions,
+                        requiresAttachment: uploadBox.flag.contains(.required)
+                    )
+                    hiddenUploadBoxIds.insert(index)
+                    pendingEditorId = nil
                 }
                 
                 for (index, field) in fields.enumerated() {
@@ -354,7 +370,7 @@ public struct FormFeature: Reducer, Sendable {
                             placeholder: content.example,
                             flag: content.flag,
                             defaultText: content.defaultValue,
-                            uploadBox: index == combined?.editorId ? combined?.uploadBox : nil
+                            uploadBox: uploadBoxesByEditorId[index]
                         )
                         state.rows.append(.editor(editorState))
                         
@@ -385,7 +401,7 @@ public struct FormFeature: Reducer, Sendable {
                             description: content.description,
                             flag: content.flag,
                             allowedExtensions: extensions,
-                            isHidden: index == combined?.uploadBox?.id
+                            isHidden: hiddenUploadBoxIds.contains(index)
                         )
                         state.rows.append(.uploadBox(uploadboxState))
                     }
