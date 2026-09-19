@@ -303,7 +303,7 @@ public struct PostRowView: View {
                 }
             }
             
-            if state.post.post.author.id != state.sessionUserId {
+            if state.post.post.canModerate, state.post.post.author.id != state.sessionUserId {
                 Section {
                     Button(role: .destructive) {
                         toolsMenuAction(.punish(state.post.id, state.post.post.author.id))
