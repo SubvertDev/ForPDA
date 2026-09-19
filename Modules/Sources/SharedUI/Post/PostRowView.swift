@@ -267,6 +267,15 @@ public struct PostRowView: View {
             
             if state.post.post.canModerate {
                 ToolsContextMenu()
+            } else if state.isUserAuthorized, state.topicCuratorId == state.sessionUserId {
+                ContextButton(
+                    text: LocalizedStringResource("Move", bundle: .module),
+                    symbol: .arrowRight
+                ) {
+                    toolsMenuAction(.move(state.post.id))
+                }
+                
+                // TODO: merge posts
             }
             
             Section {
