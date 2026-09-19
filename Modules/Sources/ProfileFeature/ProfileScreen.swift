@@ -50,7 +50,7 @@ public struct ProfileScreen: View {
                 if let user = store.user {
                     List {
                         Header(user: user)
-                        SegmentPicker()
+                        SegmentPicker(user: user)
                         
                         switch pickerSelection {
                         case .general:
@@ -257,26 +257,33 @@ public struct ProfileScreen: View {
     // MARK: - Segment Picker
     
     @ViewBuilder
-    private func SegmentPicker() -> some View {
-        let useIcon = !store.user!.achievements.isEmpty && !store.user!.curatedTopics.isEmpty
+    private func SegmentPicker(user: User) -> some View {
         Picker(String(""), selection: $pickerSelection) {
+            var useIcon: Bool {
+                var c = 0
+                if !user.warningLogs.isEmpty   { c += 1 }
+                if !user.achievements.isEmpty  { c += 1 }
+                if !user.curatedTopics.isEmpty { c += 1 }
+                return c >= 2
+            }
+            
             SegmentLabel("General", .house, useIcon)
                 .tag(PickerSelection.general)
             
             SegmentLabel("Statistics", .chartBar, useIcon)
                 .tag(PickerSelection.statistics)
             
-            if !store.user!.achievements.isEmpty {
+            if !user.achievements.isEmpty {
                 SegmentLabel("Achievements", .trophy, useIcon)
                     .tag(PickerSelection.achievements)
             }
             
-            if !store.user!.curatedTopics.isEmpty {
+            if !user.curatedTopics.isEmpty {
                 SegmentLabel("Curation", .eyeglasses, useIcon)
                     .tag(PickerSelection.curation)
             }
             
-            if !store.user!.warningLogs.isEmpty {
+            if !user.warningLogs.isEmpty {
                 SegmentLabel("Logging", .serverRack, useIcon)
                     .tag(PickerSelection.logging)
             }
