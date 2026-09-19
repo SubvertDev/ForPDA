@@ -301,6 +301,8 @@ public struct UserPunishmentScreen: View {
     @ViewBuilder
     private func ApplyButton() -> some View {
         WithPerceptionTracking {
+            let isDisabled = store.isSending || store.isLoading
+            
             Button {
                 send(.applyButtonTapped)
             } label: {
@@ -317,11 +319,16 @@ public struct UserPunishmentScreen: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(tintColor)
-            .disabled(store.isSending || store.isLoading)
+            .disabled(isDisabled)
+            .background {
+                if isDisabled {
+                    Capsule()
+                        .fill(Color(.Main.greyAlpha))
+                }
+            }
             .frame(height: 48)
             .padding(.vertical, 8)
             .padding(.horizontal, 16)
-            .background(Color(.Background.primary))
         }
     }
     
