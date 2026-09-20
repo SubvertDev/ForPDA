@@ -466,6 +466,7 @@ let project = Project(
                     .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
+                    .Internal.TopicBuilder,
                     .Internal.FormFeature,
                     .Internal.UserPunishmentFeature,
                     .SPM.NukeUI,

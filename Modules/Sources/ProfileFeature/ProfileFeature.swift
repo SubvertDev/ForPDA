@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import PersistenceKeys
 import Models
+import SharedUI
 import AnalyticsClient
 import ToastClient
 import NotificationsClient
@@ -18,6 +19,7 @@ import ReputationChangeFeature
 import CreateChatFeature
 import CacheClient
 import UserPunishmentFeature
+import TopicBuilder
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -58,6 +60,9 @@ public struct ProfileFeature: Reducer, Sendable {
         public var isLoading: Bool
         public var user: User?
         var messageBadgeCount = 0
+        
+        var aboutMe: [UITopicType] = []
+        var signature: [UITopicType] = []
         
         var cancelPunishmentReason = ""
         var isPunishmentCancelable = false
@@ -247,6 +252,13 @@ public struct ProfileFeature: Reducer, Sendable {
                 var user = user
                 user.devDBdevices.removeAll(where: { $0.name.isEmpty })
                 user.devDBdevices.sort(by: { $0.main && !$1.main })
+                
+                if let aboutMe = user.aboutMe, !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    state.aboutMe = TopicNodeBuilder(text: aboutMe, attachments: []).build()
+                }
+                if let signature = user.signature, !signature.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    state.signature = TopicNodeBuilder(text: "[size=2]\(signature)[/size]", attachments: []).build()
+                }
                 
                 state.user = user
                 state.isPunishmentCancelable = user.warningLogs.contains(where: { $0.canBeCanceled })

@@ -19,6 +19,7 @@ import FormFeature
 import ReputationChangeFeature
 import CreateChatFeature
 import UserPunishmentFeature
+import TopicBuilder
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -235,18 +236,18 @@ public struct ProfileScreen: View {
             }
             .padding(.bottom, 10)
             
-            if let signature = user.signatureAttributed {
-                RichText(text: signature, onUrlTap: { url in
-                    send(.deeplinkTapped(url, .signature))
-                }) { _ in
-                    // ($0 as? UITextView)?.textAlignment = .center
+            WithPerceptionTracking {
+                if !store.signature.isEmpty {
+                    VStack {
+                        AttributedContent(store.signature, deeplink: .signature)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(
+                        Color(.Background.teritary)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    )
                 }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 10)
-                .background(
-                    Color(.Background.teritary)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                )
             }
         }
         .frame(maxWidth: .infinity)
@@ -306,16 +307,18 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func GeneralSegment(user: User) -> some View {
-        GroupsSection(user: user)
-        if user.canModerate {
-            RestrictionsSection(user: user)
-        }
-        PersonalSection(user: user)
-        if user.aboutMe != nil {
-            AboutSection(user: user)
-        }
-        if !user.devDBdevices.isEmpty {
-            DevicesSection(devices: user.devDBdevices)
+        WithPerceptionTracking {
+            GroupsSection(user: user)
+            if user.canModerate {
+                RestrictionsSection(user: user)
+            }
+            PersonalSection(user: user)
+            if !store.aboutMe.isEmpty {
+                AboutSection(user: user)
+            }
+            if !user.devDBdevices.isEmpty {
+                DevicesSection(devices: user.devDBdevices)
+            }
         }
     }
     
@@ -458,13 +461,11 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func AboutSection(user: User) -> some View {
         Section {
-            if let aboutMe = user.aboutMeAttributed {
-                RichText(text: aboutMe, onUrlTap: { url in
-                    send(.deeplinkTapped(url, .about))
-                })
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            WithPerceptionTracking {
+                VStack {
+                    AttributedContent(store.aboutMe, deeplink: .about)
+                }
+                .padding(16)
             }
         } header: {
             SectionHeader(title: "About me")
@@ -831,6 +832,19 @@ public struct ProfileScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         )
     }
+    
+    // MARK: - Attributed Content
+    
+    @ViewBuilder
+    private func AttributedContent(_ content: [UITopicType], deeplink: ProfileDeeplinkType) -> some View {
+        ForEach(content, id: \.self) { type in
+            WithPerceptionTracking {
+                TopicView(type: type, userSession: nil) { url in
+                    send(.deeplinkTapped(url, deeplink))
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Extensions
@@ -864,21 +878,9 @@ private extension Date {
 }
 
 extension User {
-    var signatureAttributed: NSAttributedString? {
-        guard let signature, !signature.isEmpty else { return nil }
-        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .footnote)])
-            .render(text: signature)
-    }
-    
     var statusAttributed: NSAttributedString? {
         guard let status, !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
         return BBRenderer().render(text: status)
-    }
-    
-    var aboutMeAttributed: NSAttributedString? {
-        guard let aboutMe, !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
-        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .body)])
-            .render(text: aboutMe)
     }
 }
 
