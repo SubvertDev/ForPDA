@@ -572,6 +572,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.PersistenceKeys,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,

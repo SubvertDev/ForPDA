@@ -44,6 +44,12 @@ extension SearchResultFeature {
                 case let .view(.articleTapped(article)):
                     analytics.log(SearchResultEvent.articleTapped(article.id))
                     
+                case let .view(.contextMenu(action)):
+                    switch action {
+                    case .copyLink:
+                        analytics.log(SearchResultEvent.contextMenuCopyLinkTapped)
+                    }
+                    
                 case .internal(.buildContent(_)),
                         .internal(.loadContent(offset: _)),
                         .internal(.searchResponse(_)),

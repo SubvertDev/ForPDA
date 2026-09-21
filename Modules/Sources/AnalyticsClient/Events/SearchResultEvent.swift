@@ -11,6 +11,7 @@ public enum SearchResultEvent: Event {
     case postTapped(Int, Int)
     case topicTapped(Int, Bool)
     case articleTapped(Int)
+    case contextMenuCopyLinkTapped
     
     public var name: String {
         return "Search Result " + eventName(for: self).inProperCase
@@ -32,6 +33,9 @@ public enum SearchResultEvent: Event {
             
         case let .articleTapped(id):
             return ["id": String(id)]
+            
+        default:
+            return nil
         }
     }
 }
