@@ -164,7 +164,8 @@ public struct SearchResultFeature: Reducer, Sendable {
                     switch type {
                     case .post(let post):
                         let topicTypes = TopicNodeBuilder(text: post.post.content.fixBackgroundBBCode(), attachments: post.post.attachments).build()
-                        let uiPost = UIPost(post: post.post, content: topicTypes.map { .init(value: $0) } )
+                        let signatureTypes = TopicNodeBuilder(text: "[size=1]\(post.post.author.signature)[/size]", attachments: []).build()
+                        let uiPost = UIPost(post: post.post, content: topicTypes.map { .init(value: $0) }, authorSignature: signatureTypes.map { .init(value: $0) })
                         state.content.append(.post(.init(topicId: post.topicId, topicName: post.topicName.fixBackgroundBBCode(), post: uiPost)))
                     case .topic(let topic):
                         state.content.append(.topic(topic))

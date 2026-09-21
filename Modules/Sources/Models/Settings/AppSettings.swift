@@ -38,6 +38,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var ticketsPerPage: Int
     public var hideTabBarOnScroll: Bool
     public var floatingNavigation: Bool
+    public var showPostAuthorSignature: Bool
     public var experimentalFloatingNavigation: Bool
     public var analyticsConfigurationDebug: AnalyticsConfiguration
     public var analyticsConfigurationRelease: AnalyticsConfiguration
@@ -64,6 +65,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         ticketsPerPage: Int,
         hideTabBarOnScroll: Bool,
         floatingNavigation: Bool,
+        showPostAuthorSignature: Bool,
         experimentalFloatingNavigation: Bool,
         analyticsConfigurationDebug: AnalyticsConfiguration,
         analyticsConfigurationRelease: AnalyticsConfiguration
@@ -89,6 +91,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.ticketsPerPage = ticketsPerPage
         self.hideTabBarOnScroll = hideTabBarOnScroll
         self.floatingNavigation = floatingNavigation
+        self.showPostAuthorSignature = showPostAuthorSignature
         self.experimentalFloatingNavigation = experimentalFloatingNavigation
         self.analyticsConfigurationDebug = analyticsConfigurationDebug
         self.analyticsConfigurationRelease = analyticsConfigurationRelease
@@ -117,6 +120,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
         self.ticketsPerPage = try container.decodeIfPresent(Int.self, forKey: .ticketsPerPage) ?? AppSettings.default.ticketsPerPage
         self.hideTabBarOnScroll = try container.decodeIfPresent(Bool.self, forKey: .hideTabBarOnScroll) ?? AppSettings.default.hideTabBarOnScroll
         self.floatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .floatingNavigation) ?? AppSettings.default.floatingNavigation
+        self.showPostAuthorSignature = try container.decodeIfPresent(Bool.self, forKey: .showPostAuthorSignature) ?? AppSettings.default.showPostAuthorSignature
         self.experimentalFloatingNavigation = try container.decodeIfPresent(Bool.self, forKey: .experimentalFloatingNavigation) ?? AppSettings.default.experimentalFloatingNavigation
         self.analyticsConfigurationDebug = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationDebug) ?? AppSettings.default.analyticsConfigurationDebug
         self.analyticsConfigurationRelease = try container.decodeIfPresent(AnalyticsConfiguration.self, forKey: .analyticsConfigurationRelease) ?? AppSettings.default.analyticsConfigurationRelease
@@ -142,6 +146,7 @@ public struct AppSettings: Sendable, Equatable, Codable {
             "searchSort": searchSort._rawValue,
             "hideTabBarOnScroll": hideTabBarOnScroll,
             "floatingNavigation": floatingNavigation,
+            "showPostAuthorSignature": showPostAuthorSignature,
             "experimentalFloatingNavigation": experimentalFloatingNavigation,
         ]
         return ["settings": dictionary]
@@ -171,6 +176,7 @@ public extension AppSettings {
         ticketsPerPage: 20,
         hideTabBarOnScroll: true,
         floatingNavigation: true,
+        showPostAuthorSignature: false,
         experimentalFloatingNavigation: false,
         analyticsConfigurationDebug: .debug,
         analyticsConfigurationRelease: .release

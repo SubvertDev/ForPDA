@@ -193,7 +193,7 @@ public struct TopicFeature: Reducer, Sendable {
             case jumpToPostAfterKarma(postId: Int)
             case voteInPoll(selections: [[Int]])
             case loadTopic(Int)
-            case loadTypes([[UITopicType]])
+            case loadTypes(([[UITopicType]], [[UITopicType]]))
             case topicResponse(Result<Topic, any Error>)
             case topicNavigationUpdated(Topic)
             case setFavoriteResponse(Bool)
@@ -380,7 +380,7 @@ public struct TopicFeature: Reducer, Sendable {
             case .view(.topicHatOpenButtonTapped):
                 guard let firstPost = state.topic?.posts.first else { fatalError("No Topic Hat Found") }
                 let firstPostNodes = TopicNodeBuilder(text: firstPost.content, attachments: firstPost.attachments).build()
-                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) })
+                state.posts[0] = UIPost(post: firstPost, content: firstPostNodes.map { UIPost.Content(value: $0) }, authorSignature: [])
                 state.isTopicHatExpanded = true
                 return .none
                 
@@ -755,51 +755,72 @@ public struct TopicFeature: Reducer, Sendable {
                 return .run { [
                     isFirstPage = state.pageNavigation.isFirstPage,
                     topicPerPage = state.appSettings.topicPerPage,
+                    showPostAuthorSignature = state.appSettings.showPostAuthorSignature,
                     shouldShowTopicHatButton = state.shouldShowTopicHatButton,
                     isLastPage = state.pageNavigation.isLastPage
                 ] send in
-                        var topicTypes: [[UITopicType]] = []
+                    var topicTypes: (post: [[UITopicType]], authorSignature: [[UITopicType]]) = ([], [])
+                    
+                    topicTypes = await withTaskGroup(of: (Int, ([UITopicType], [UITopicType])).self, returning: ([[UITopicType]], [[UITopicType]]).self) { taskGroup in
+                        for (index, post) in topic.posts.enumerated() {
+                            // guard index == 0 else { continue } // For test purposes
+                            var text = post.content
+                            var authorSignature = showPostAuthorSignature ? post.author.signature : ""
+                            // print(post)
+                            if index == 0 && !isFirstPage && shouldShowTopicHatButton {
+                                // Not loading hat post for non-first page
+                                text = ""
+                                authorSignature = ""
+                            }
+                            taskGroup.addTask {
+                                let authorSignatureTypes: [UITopicType] = if showPostAuthorSignature {
+                                    TopicNodeBuilder(text: "[size=1]\(authorSignature)[/size]", attachments: []).build()
+                                } else { [] }
+                                let postTypes = TopicNodeBuilder(text: text, attachments: post.attachments).build()
+                                return (index, (postTypes, authorSignatureTypes))
+                            }
+                        }
                         
-                        topicTypes = await withTaskGroup(of: (Int, [UITopicType]).self, returning: [[UITopicType]].self) { taskGroup in
-                            for (index, post) in topic.posts.enumerated() {
-                                // guard index == 0 else { continue } // For test purposes
-                                var text = post.content
-                                // print(post)
-                                if index == 0 && !isFirstPage && shouldShowTopicHatButton {
-                                    text = "" // Not loading hat post for non-first page
-                                }
-                                taskGroup.addTask {
-                                    return (index, TopicNodeBuilder(text: text, attachments: post.attachments).build())
-                                }
-                            }
-                            
-                            var types = Array<[UITopicType]?>(repeating: nil, count: topicPerPage + 1)
-                            for await (index, result) in taskGroup {
-                                types[index] = result
-                            }
-                            return types.map { $0 ?? [] }
+                        var types = Array<([UITopicType], [UITopicType])?>(repeating: nil, count: topicPerPage + 1)
+                        for await (index, result) in taskGroup {
+                            types[index] = result
                         }
-                        await send(.internal(.loadTypes(topicTypes)))
-
-                        if isLastPage {
-                            notificationCenter.post(name: .favoritesUpdated, object: nil)
+                        return types.reduce(([[UITopicType]](), [[UITopicType]]())) { result, item in
+                            var updatedResult = result
+                            let element = item ?? ([], [])
                             
-                            // Syncing notifications and badges when reading last page
-                            let unread = try await apiClient.getUnread(type: .all)
-                            await notificationsClient.showUnreadNotifications(unread)
+                            updatedResult.0.append(element.0)
+                            updatedResult.1.append(element.1)
+                            
+                            return updatedResult
                         }
-                        // Deleting notifications related to posts on the current page
-                        // `forumMention` notifications encode topicId in the trailing identifier segment
-                        // Include topic.id so opening a topic clears mentions tied to this topic
-                        let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970) + [TimeInterval(topic.id)]
-                        await notificationsClient.removeNotifications(timestamps: timestamps)
+                    }
+                    await send(.internal(.loadTypes(topicTypes)))
+                    
+                    if isLastPage {
+                        notificationCenter.post(name: .favoritesUpdated, object: nil)
+                        
+                        // Syncing notifications and badges when reading last page
+                        let unread = try await apiClient.getUnread(type: .all)
+                        await notificationsClient.showUnreadNotifications(unread)
+                    }
+                    // Deleting notifications related to posts on the current page
+                    // `forumMention` notifications encode topicId in the trailing identifier segment
+                    // Include topic.id so opening a topic clears mentions tied to this topic
+                    let timestamps = topic.posts.map(\.createdAt.timeIntervalSince1970) + [TimeInterval(topic.id)]
+                    await notificationsClient.removeNotifications(timestamps: timestamps)
                 }
                 .cancellable(id: CancelID.loading)
                 
             case let .internal(.loadTypes(types)):
                 if state.posts.isEmpty {
-                    state.posts = zip(state.topic!.posts, types).map { post, types in
-                        return UIPost(post: post, content: types.map { .init(value: $0) })
+                    let zippedTypes = zip(types.0, types.1)
+                    state.posts = zip(state.topic!.posts, zippedTypes).map { post, types in
+                        return UIPost(
+                            post: post,
+                            content: types.0.map { .init(value: $0) },
+                            authorSignature: types.1.map { .init(value: $0) }
+                        )
                     }
                 } else {
                     state.posts = mergeUIPosts(old: state.posts, newPosts: state.topic!.posts, newTypes: types)
@@ -864,16 +885,17 @@ public struct TopicFeature: Reducer, Sendable {
         }
     }
     
-    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: [[UITopicType]]) -> [UIPost] {
-        zip(newPosts, newTypes).map { newPost, newTypes in
+    private func mergeUIPosts(old: [UIPost], newPosts: [Post], newTypes: ([[UITopicType]], [[UITopicType]])) -> [UIPost] {
+        let zippedNewTypes = zip(newTypes.0, newTypes.1)
+        return zip(newPosts, zippedNewTypes).map { newPost, newTypes in
             if let oldPost = old.first(where: { $0.id == newPost.id }) {
                 let mergedContent = mergePostContent(
                     old: oldPost.content,
-                    new: newTypes
+                    new: newTypes.0
                 )
-                return UIPost(post: newPost, content: mergedContent)
+                return UIPost(post: newPost, content: mergedContent, authorSignature: oldPost.authorSignature)
             } else {
-                return UIPost(post: newPost, content: newTypes.map { .init(value: $0) })
+                return UIPost(post: newPost, content: newTypes.0.map { .init(value: $0) }, authorSignature: newTypes.1.map { .init(value: $0) })
             }
         }
     }

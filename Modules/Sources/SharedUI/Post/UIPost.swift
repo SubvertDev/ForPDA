@@ -11,13 +11,16 @@ public struct UIPost: Identifiable, Hashable, Equatable {
     public var id: Int { post.id }
     public let post: Post
     public let content: [Content]
+    public let authorSignature: [Content]
     
     public init(
         post: Post,
-        content: [Content]
+        content: [Content],
+        authorSignature: [Content]
     ) {
         self.post = post
         self.content = content
+        self.authorSignature = authorSignature
     }
     
     public struct Content: Hashable {

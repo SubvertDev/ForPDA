@@ -47,6 +47,9 @@ public struct PostRowView: View {
         VStack(spacing: 8) {
             Header()
             PostBody(state.post)
+            if !state.post.authorSignature.isEmpty {
+                AuthorSignature()
+            }
             if let lastEdit = state.post.post.lastEdit {
                 Footer(lastEdit)
             }
@@ -227,6 +230,27 @@ public struct PostRowView: View {
                 Color(.Background.teritary)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             )
+    }
+    
+    // MARK: - Author Signature
+    
+    @ViewBuilder
+    private func AuthorSignature() -> some View {
+        VStack(spacing: 8) {
+            Rectangle()
+                .foregroundStyle(Color(.Separator.secondary))
+                .frame(height: 1)
+            
+            ForEach(state.post.authorSignature, id: \.self) { type in
+                TopicView(type: type.value, userSession: nil, onUrlTap: { url in
+                    action(.urlTapped(url))
+                })
+            }
+            
+            Rectangle()
+                .foregroundStyle(Color(.Separator.secondary))
+                .frame(height: 1)
+        }
     }
     
     // MARK: - Context Menu
