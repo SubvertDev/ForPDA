@@ -39,7 +39,7 @@ public struct UserPunishmentScreen: View {
             .navigationTitle(Text("Punishment", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .alert($store.scope(\.alert, action: \.alert))
-            .safeAreaInset(edge: .bottom) {
+            ._safeAreaBar(edge: .bottom) {
                 ApplyButton()
             }
             .onTapGesture {
