@@ -187,11 +187,13 @@ public struct UserPunishmentScreen: View {
                         characterLimit: 7
                     )
                     .frame(maxWidth: 120)
+                    .disabled(store.currentCategory.template.flag.contains(.alwaysPremod))
                     
                     DateTypePicker(
                         for: $store.premodDateFormat,
                         title: store.premodDateFormat.title
                     )
+                    .disabled(store.currentCategory.template.flag.contains(.alwaysPremod))
                     
                     HStack(spacing: 0) {
                         Header(title: "Always")

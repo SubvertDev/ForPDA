@@ -181,6 +181,9 @@ public struct UserPunishmentFeature: Reducer, Sendable {
                 var template = state.currentCategory.template
                 template.readOnlyHours *= state.readOnlyDateFormat == .days ? 24 : 1
                 template.premoderationHours *= state.premodDateFormat == .days ? 24 : 1
+                if template.flag.contains(.alwaysPremod) {
+                    template.flag.remove(.addCurrentPremod)
+                }
                 return .send(.internal(.applyPunishment(template: template)))
                 
             case .view(.cancelButtonTapped):
