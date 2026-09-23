@@ -112,17 +112,19 @@ public struct PostRowView: View {
                 }
                 
                 HStack(spacing: 8) {
-                    HStack(spacing: 4) {
-                        if state.topicCuratorId == state.post.post.author.id {
-                            Text(verbatim: "[K]")
-                                .foregroundStyle(Color(.tintColor))
+                    if let authorGroup = User.Group(rawValue: state.post.post.author.groupId) {
+                        HStack(spacing: 4) {
+                            if authorGroup != .curator, state.topicCuratorId == state.post.post.author.id {
+                                Text(verbatim: "[K]")
+                                    .foregroundStyle(Color(.tintColor))
+                            }
+                            
+                            let showTopicCuratorTitle = authorGroup == .curator && state.topicCuratorId == state.post.post.author.id
+                            Text(showTopicCuratorTitle ? String(localized: "Topic Curator", bundle: .module) : authorGroup.title)
+                                .foregroundStyle(Color(.Labels.teritary))
                         }
-                        
-                        let text = User.Group(rawValue: state.post.post.author.groupId)?.title ?? ""
-                        Text(text)
-                            .foregroundStyle(Color(.Labels.teritary))
+                        .font(.caption)
                     }
-                    .font(.caption)
                     
                     Spacer()
                     
