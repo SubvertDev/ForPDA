@@ -339,6 +339,7 @@ public struct TicketScreen: View {
             }
         }
         .font(.caption)
+        .fontWeight(.medium)
         .foregroundStyle(info.status.textColor)
         .padding(.vertical, 2)
         .padding(.horizontal, 6)
