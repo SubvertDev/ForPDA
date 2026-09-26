@@ -42,7 +42,6 @@ public struct AnnouncementScreen: View {
                 if let announcement = store.announcement {
                     ScrollView {
                         AnnouncementBody(announcement)
-                            .padding(.horizontal, 16)
                     }
                 }
             }
@@ -76,6 +75,7 @@ public struct AnnouncementScreen: View {
                 }
             }
         }
+        .padding(16)
     }
 }
 
