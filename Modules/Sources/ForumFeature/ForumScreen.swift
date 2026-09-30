@@ -609,8 +609,9 @@ struct NavigationModifier: ViewModifier {
         WithPerceptionTracking {
             content
                 .navigationTitle(Text(navigationTitleText()))
-                .navigationBarBackButtonHidden(store.multiSelectionMode != nil)
+                .navigationBarBackButtonHidden(store.isMultiSelectionMode)
                 ._toolbarTitleDisplayMode(.large)
+                .alert($store.scope(\.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
         }

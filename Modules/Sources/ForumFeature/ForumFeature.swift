@@ -65,10 +65,27 @@ public struct ForumFeature: Reducer, Sendable {
     
     @Reducer
     public enum Destination {
+        @ReducerCaseIgnored
+        case alert(AlertState<Alert>)
+        
         case form(FormFeature)
         case move(ForumMoveFeature)
 		case stat(ForumStatFeature)
         case edit(TopicEditFeature)
+        
+        @CasePathable
+        public enum Action {
+            case alert(Alert)
+            case form(FormFeature.Action)
+            case move(ForumMoveFeature.Action)
+            case stat(ForumStatFeature.Action)
+            case edit(TopicEditFeature.Action)
+        }
+        
+        @CasePathable
+        public enum Alert: Equatable {
+            case deleteTopics([Int])
+        }
     }
     
     // MARK: - State
@@ -198,6 +215,17 @@ public struct ForumFeature: Reducer, Sendable {
                     await send(.delegate(.openForum(id: id, name: nil)))
                 }
                 
+            case let .destination(.presented(.alert(.deleteTopics(ids)))):
+                return .run { send in
+                    let status = try await apiClient.modifyForum(ids: ids, type: .topic(.delete), isUndo: false)
+                    await send(.view(.disableMultiSelectionModeButtonTapped))
+                    await send(.internal(.refresh))
+                    await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                } catch: { error, send in
+                    analyticsClient.capture(error)
+                    await toastClient.showToast(.whoopsSomethingWentWrong)
+                }
+                
             case .destination(.presented(.edit(.delegate(.topicEdited)))):
                 return .run { _ in
                     await toastClient.showToast(ToastMessage(text: Localization.topicEdited, haptic: .success))
@@ -314,14 +342,21 @@ public struct ForumFeature: Reducer, Sendable {
                     return .none
                     
                 case .modify(let action, let isUndo):
-                    return .run { send in
-                        let status = try await apiClient.modifyForum(topicIds, .topic(action), isUndo)
-                        await send(.view(.disableMultiSelectionModeButtonTapped))
-                        await send(.internal(.refresh))
-                        await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
-                    } catch: { error, send in
-                        analyticsClient.capture(error)
-                        await toastClient.showToast(.whoopsSomethingWentWrong)
+                    switch action {
+                    case .delete:
+                        state.destination = .alert(.deleteTopicsConfirmation(ids: topicIds))
+                        return .none
+                        
+                    default:
+                        return .run { send in
+                            let status = try await apiClient.modifyForum(topicIds, .topic(action), isUndo)
+                            await send(.view(.disableMultiSelectionModeButtonTapped))
+                            await send(.internal(.refresh))
+                            await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                        } catch: { error, send in
+                            analyticsClient.capture(error)
+                            await toastClient.showToast(.whoopsSomethingWentWrong)
+                        }
                     }
                 }
                 
@@ -463,3 +498,28 @@ public struct ForumFeature: Reducer, Sendable {
     }
 
 extension ForumFeature.Destination.State: Equatable {}
+
+// MARK: - Alert Extension
+
+extension AlertState where Action == ForumFeature.Destination.Alert {
+    
+    nonisolated static func deleteTopicsConfirmation(ids: [Int]) -> AlertState {
+        return AlertState(
+            title: {
+                if ids.count > 1 {
+                    TextState("Are you sure, that you want to delete this \(ids.count) topics?", bundle: .module)
+                } else {
+                    TextState("Are you sure, that you want to delete this topic?", bundle: .module)
+                }
+            },
+            actions: {
+                ButtonState(role: .destructive, action: .deleteTopics(ids)) {
+                    TextState("Yes", bundle: .module)
+                }
+                ButtonState(role: .cancel) {
+                    TextState("No", bundle: .module)
+                }
+            }
+        )
+    }
+}

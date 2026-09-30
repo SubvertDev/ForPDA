@@ -31,6 +31,26 @@
         }
       }
     },
+    "Are you sure, that you want to delete this %lld topics?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить эти %lld тем?"
+          }
+        }
+      }
+    },
+    "Are you sure, that you want to delete this topic?" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы уверены, что хотите удалить эту тему?"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "localizations" : {
         "ru" : {
@@ -181,6 +201,16 @@
         }
       }
     },
+    "No" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет"
+          }
+        }
+      }
+    },
     "Open" : {
       "localizations" : {
         "ru" : {
@@ -327,6 +357,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Открепить"
+          }
+        }
+      }
+    },
+    "Yes" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Да"
           }
         }
       }
