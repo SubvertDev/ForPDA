@@ -34,7 +34,7 @@ public struct ForumMoveView: View {
                 InputField()
                     .padding(.bottom, 28)
                     
-                if case .topic = store.type {
+                if case .topics = store.type {
                     Row("Save link", value: $store.isSaveLinkForTopic)
                         .padding(.bottom, 64)
                 }
@@ -108,16 +108,18 @@ public struct ForumMoveView: View {
     private func InputField() -> some View {
         VStack(spacing: 6) {
             let header: LocalizedStringKey = switch store.type {
-            case .topic: "Enter the forum link"
-            case .posts: "Enter the topic link"
+            case .topics: "Enter the forum link"
+            case .posts:  "Enter the topic link"
             }
             Header(title: header)
             
-            Field(
+            SingleLineField(
                 content: $store.inputUrl,
                 placeholder: LocalizedStringResource("Enter...", bundle: .module),
                 focusEqual: ForumMoveFeature.State.Field.url,
-                focus: $focus
+                focus: $focus,
+                keyboardType: .URL,
+                characterLimit: 250
             )
             
             if let error = store.error {
@@ -204,8 +206,8 @@ public struct ForumMoveView: View {
     
     private func navigationTitleText() -> LocalizedStringKey {
         return switch store.type {
-        case .posts: "Move Posts"
-        case .topic: "Move Topic"
+        case let .posts(ids):  ids.count > 1 ? "Move Posts (\(ids.count))" : "Move Post"
+        case let .topics(ids): ids.count > 1 ? "Move Topics (\(ids.count))" : "Move Topic"
         }
     }
 }
@@ -230,7 +232,7 @@ private extension ForumMoveFeature.URLValidationErrorReason {
         ForumMoveView(
             store: Store(
                 initialState: ForumMoveFeature.State(
-                    type: .topic([1])
+                    type: .topics([1])
                 )
             ) {
                 ForumMoveFeature()

@@ -8,7 +8,7 @@
 import Foundation
 
 public enum ForumMoveType: Equatable {
-    case topic([Int])
+    case topics([Int])
     case posts([Int])
 }
 

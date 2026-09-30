@@ -71,12 +71,12 @@
         }
       }
     },
-    "Error moving topic" : {
+    "Error moving topics" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ошибка перемещения темы"
+            "value" : "Ошибка перемещения тем"
           }
         }
       }
@@ -101,12 +101,22 @@
         }
       }
     },
-    "Move Posts" : {
+    "Move Post" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Перемещение постов"
+            "value" : "Перемещение поста"
+          }
+        }
+      }
+    },
+    "Move Posts (%lld)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перемещение постов (%lld)"
           }
         }
       }
@@ -117,6 +127,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Перемещение темы"
+          }
+        }
+      }
+    },
+    "Move Topics (%lld)" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перемещение тем (%lld)"
           }
         }
       }

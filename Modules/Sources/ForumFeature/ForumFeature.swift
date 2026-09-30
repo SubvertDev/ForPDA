@@ -194,6 +194,7 @@ public struct ForumFeature: Reducer, Sendable {
             case let .destination(.presented(.move(.delegate(.openForum(id))))):
                 return .run { send in
                     await toastClient.showToast(ToastMessage(text: Localization.topicMoved, haptic: .success))
+                    await send(.view(.disableMultiSelectionModeButtonTapped))
                     await send(.delegate(.openForum(id: id, name: nil)))
                 }
                 
@@ -299,14 +300,14 @@ public struct ForumFeature: Reducer, Sendable {
                 }
                 
             case let .view(.contextTopicToolsMenu(action, topicId)):
-                let topicId = switch topicId {
+                let topicIds = switch topicId {
                 case let .id(id): [id]
                 case let .multi(pinned):
                     Array(pinned ? state.selectedTopicsPinned : state.selectedTopics)
                 }
                 switch action {
                 case .move:
-                    state.destination = .move(ForumMoveFeature.State(type: .topic(topicId)))
+                    state.destination = .move(ForumMoveFeature.State(type: .topics(topicIds)))
                     return .none
                     
                 case .merge:
@@ -314,7 +315,8 @@ public struct ForumFeature: Reducer, Sendable {
                     
                 case .modify(let action, let isUndo):
                     return .run { send in
-                        let status = try await apiClient.modifyForum(topicId, .topic(action), isUndo)
+                        let status = try await apiClient.modifyForum(topicIds, .topic(action), isUndo)
+                        await send(.view(.disableMultiSelectionModeButtonTapped))
                         await send(.internal(.refresh))
                         await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                     } catch: { error, send in
