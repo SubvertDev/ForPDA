@@ -106,8 +106,8 @@ public struct ForumFeature: Reducer, Sendable {
         public var topicsPinned: [TopicInfo] = []
         public var sectionsExpandState = SectionExpand()
         
-        public var selectedTopics: Set<Int> = []
-        public var selectedTopicsPinned: Set<Int> = []
+        public var selectedTopics: Set<TopicInfo> = []
+        public var selectedTopicsPinned: Set<TopicInfo> = []
         
         public var multiSelectionMode: MultiSelectionMode?
         
@@ -153,7 +153,7 @@ public struct ForumFeature: Reducer, Sendable {
             case announcementTapped(id: Int, name: String)
             case globalAnnouncementUrlTapped(URL)
             case sectionExpandTapped(SectionExpand.Kind)
-            case topicSelectionTapped(Int, isPinned: Bool)
+            case topicSelectionTapped(TopicInfo)
             case disableMultiSelectionModeButtonTapped
             
             case contextOptionMenu(ForumOptionContextMenuAction)
@@ -308,7 +308,7 @@ public struct ForumFeature: Reducer, Sendable {
                     
                 case .select: // use only original id
                     state.multiSelectionMode = topic.isPinned ? .pinnedTopics : .topics
-                    return .send(.view(.topicSelectionTapped(topic.id, isPinned: topic.isPinned)))
+                    return .send(.view(.topicSelectionTapped(topic)))
                     
                 case .goToEnd:
                     return .run { send in
@@ -328,11 +328,12 @@ public struct ForumFeature: Reducer, Sendable {
                 }
                 
             case let .view(.contextTopicToolsMenu(action, topicId)):
-                let topicIds = switch topicId {
-                case let .id(id): [id]
+                let topics = switch topicId {
+                case let .id(topic): [topic]
                 case let .multi(pinned):
                     Array(pinned ? state.selectedTopicsPinned : state.selectedTopics)
                 }
+                let topicIds = topics.map { $0.id }
                 switch action {
                 case .move:
                     state.destination = .move(ForumMoveFeature.State(type: .topics(topicIds)))
@@ -410,18 +411,18 @@ public struct ForumFeature: Reducer, Sendable {
                 state.selectedTopics = []
                 return .none
 
-            case let .view(.topicSelectionTapped(id, isPinned)):
-                if isPinned {
-                    if !state.selectedTopicsPinned.contains(id) {
-                        state.selectedTopicsPinned.insert(id)
+            case let .view(.topicSelectionTapped(topic)):
+                if topic.isPinned {
+                    if !state.selectedTopicsPinned.contains(topic) {
+                        state.selectedTopicsPinned.insert(topic)
                     } else {
-                        state.selectedTopicsPinned.remove(id)
+                        state.selectedTopicsPinned.remove(topic)
                     }
                 } else {
-                    if !state.selectedTopics.contains(id) {
-                        state.selectedTopics.insert(id)
+                    if !state.selectedTopics.contains(topic) {
+                        state.selectedTopics.insert(topic)
                     } else {
-                        state.selectedTopics.remove(id)
+                        state.selectedTopics.remove(topic)
                     }
                 }
                 return .none

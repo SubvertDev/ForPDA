@@ -13,7 +13,7 @@ public enum ForumTopicToolsContextMenuAction {
     case modify(TopicModifyAction, Bool)
     
     public enum TopicId {
-        case id(Int)
+        case id(TopicInfo)
         case multi(pinned: Bool)
     }
 }

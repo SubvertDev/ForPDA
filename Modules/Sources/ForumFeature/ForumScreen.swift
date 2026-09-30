@@ -190,13 +190,13 @@ public struct ForumScreen: View {
                         HStack(spacing: 10) {
                             if supportsMultiSelection {
                                 let selected = if pinned {
-                                    store.selectedTopicsPinned.contains(topic.id)
+                                    store.selectedTopicsPinned.contains(topic)
                                 } else {
-                                    store.selectedTopics.contains(topic.id)
+                                    store.selectedTopics.contains(topic)
                                 }
                                 
                                 Toggle(isOn: Binding(get: { selected }, set: { _ in
-                                    send(.topicSelectionTapped(topic.id, isPinned: pinned))
+                                    send(.topicSelectionTapped(topic))
                                 })) {}
                                 .toggleStyle(CheckBoxToggleStyle())
                                 .transition(.move(edge: .leading).combined(with: .opacity))
@@ -214,7 +214,7 @@ public struct ForumScreen: View {
                             }
                             .highPriorityGesture(
                                 TapGesture().onEnded {
-                                    send(.topicSelectionTapped(topic.id, isPinned: pinned))
+                                    send(.topicSelectionTapped(topic))
                                 },
                                 isEnabled: store.isMultiSelectionMode
                             )
@@ -235,7 +235,7 @@ public struct ForumScreen: View {
                                         if topic.canModerate {
                                             Menu {
                                                 TopicToolsContextMenu(
-                                                    topicId: .id(topic.id),
+                                                    topicId: .id(topic),
                                                     isPinned: topic.isPinned,
                                                     isHidden: topic.isHidden,
                                                     isClosed: topic.isClosed,
