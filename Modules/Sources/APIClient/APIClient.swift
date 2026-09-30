@@ -71,7 +71,7 @@ public struct APIClient: Sendable {
     public var getAnnouncement: @Sendable (_ id: Int) async throws -> Announcement
     public var getTopic: @Sendable (_ id: Int, _ page: Int, _ perPage: Int, _ postsFilter: TopicPostsFilter) async throws -> Topic
     public var modifyForum: @Sendable (_ ids: [Int], _ type: ForumModifyType, _ isUndo: Bool) async throws -> Bool
-    public var moveTopic: @Sendable (_ id: Int, _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
+    public var moveTopics: @Sendable (_ ids: [Int], _ toForumId: Int, _ saveLink: Bool) async throws -> Bool
     public var editTopic: @Sendable (_ data: TopicEditRequest) async throws -> TopicEditResponse
     public var getTopicViewers: @Sendable (_ id: Int) async throws -> TopicViewers
     public var setTopicCurator: @Sendable (_ topicId: Int, _ userId: Int, _ reason: String) async throws -> Bool
@@ -437,9 +437,9 @@ extension APIClient: DependencyKey {
                 let status = Int(response.getResponseStatus())!
                 return status == 0
             },
-            moveTopic: { id, toForumId, saveLink in
+            moveTopics: { ids, toForumId, saveLink in
                 let command = ForumCommand.Topic.move(
-                    id: id,
+                    ids: ids,
                     toForumId: toForumId,
                     saveLink: saveLink
                 )
@@ -841,7 +841,7 @@ extension APIClient: DependencyKey {
             modifyForum: { _, _, _ in
                 return true
             },
-            moveTopic: { _, _, _ in
+            moveTopics: { _, _, _ in
                 return true
             },
             editTopic: { _ in

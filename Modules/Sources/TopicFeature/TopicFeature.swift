@@ -480,7 +480,7 @@ public struct TopicFeature: Reducer, Sendable {
                 guard let topic = state.topic else { return .none }
                 switch action {
                 case .move:
-                    state.destination = .move(ForumMoveFeature.State(type: .topic(topic.id)))
+                    state.destination = .move(ForumMoveFeature.State(type: .topic([topic.id])))
                     return .none
                     
                 case .tickets:

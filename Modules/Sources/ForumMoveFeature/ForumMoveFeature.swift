@@ -77,7 +77,7 @@ public struct ForumMoveFeature: Reducer, Sendable {
         case `internal`(Internal)
         public enum Internal {
             case movePosts([Int], toTopicid: Int)
-            case moveTopic(Int, toForumid: Int)
+            case moveTopics([Int], toForumid: Int)
             
             case movePostsResponse(Result<(Bool, Int), any Error>)
             case moveTopicResponse(Result<(Bool, Int), any Error>)
@@ -129,11 +129,11 @@ public struct ForumMoveFeature: Reducer, Sendable {
                         return .send(.internal(.movePosts(ids, toTopicid: topicId)))
                         
                     case .forum(let forumId, _):
-                        guard case .topic(let topicId) = state.type else {
+                        guard case .topic(let ids) = state.type else {
                             state.error = .needTopicUrl
                             break
                         }
-                        return .send(.internal(.moveTopic(topicId, toForumid: forumId)))
+                        return .send(.internal(.moveTopics(ids, toForumid: forumId)))
                         
                     default:
                         state.error = .badURL
@@ -146,20 +146,16 @@ public struct ForumMoveFeature: Reducer, Sendable {
             case let .internal(.movePosts(ids, toTopicId)):
                 state.isSending = true
                 return .run { send in
-                    let status = try await apiClient.movePosts(ids: ids, toTopicId: toTopicId)
+                    let status = try await apiClient.movePosts(ids, toTopicId)
                     await send(.internal(.movePostsResponse(.success((status, toTopicId: toTopicId)))))
                 } catch: { error, send in
                     await send(.internal(.movePostsResponse(.failure(error))))
                 }
                 
-            case let .internal(.moveTopic(topicId, toForumId)):
+            case let .internal(.moveTopics(ids, toForumId)):
                 state.isSending = true
                 return .run { [saveLink = state.isSaveLinkForTopic] send in
-                    let status = try await apiClient.moveTopic(
-                        id: topicId,
-                        toForumId: toForumId,
-                        saveLink: saveLink
-                    )
+                    let status = try await apiClient.moveTopics(ids, toForumId, saveLink)
                     await send(.internal(.moveTopicResponse(.success((status, toForumId: toForumId)))))
                 } catch: { error, send in
                     await send(.internal(.moveTopicResponse(.failure(error))))

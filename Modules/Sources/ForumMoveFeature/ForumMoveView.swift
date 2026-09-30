@@ -230,7 +230,7 @@ private extension ForumMoveFeature.URLValidationErrorReason {
         ForumMoveView(
             store: Store(
                 initialState: ForumMoveFeature.State(
-                    type: .topic(1)
+                    type: .topic([1])
                 )
             ) {
                 ForumMoveFeature()
