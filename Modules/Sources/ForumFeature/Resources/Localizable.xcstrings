@@ -31,6 +31,16 @@
         }
       }
     },
+    "Cancel" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отмена"
+          }
+        }
+      }
+    },
     "Close" : {
       "localizations" : {
         "ru" : {
@@ -151,6 +161,16 @@
         }
       }
     },
+    "Merge" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Объединить"
+          }
+        }
+      }
+    },
     "Move" : {
       "localizations" : {
         "ru" : {
@@ -221,6 +241,26 @@
         }
       }
     },
+    "Select" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрать"
+          }
+        }
+      }
+    },
+    "Select topics" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите темы"
+          }
+        }
+      }
+    },
     "Subforums" : {
       "localizations" : {
         "ru" : {
@@ -267,6 +307,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Темы"
+          }
+        }
+      }
+    },
+    "Topics selected %lld" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выбрано тем %lld"
           }
         }
       }

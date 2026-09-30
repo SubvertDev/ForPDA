@@ -56,6 +56,11 @@ public struct ForumFeature: Reducer, Sendable {
         }
     }
     
+    public enum MultiSelectionMode: Equatable {
+        case topics
+        case pinnedTopics
+    }
+    
     // MARK: - Destinations
     
     @Reducer
@@ -84,6 +89,11 @@ public struct ForumFeature: Reducer, Sendable {
         public var topicsPinned: [TopicInfo] = []
         public var sectionsExpandState = SectionExpand()
         
+        public var selectedTopics: Set<Int> = []
+        public var selectedTopicsPinned: Set<Int> = []
+        
+        public var multiSelectionMode: MultiSelectionMode?
+        
         public var isLoadingTopics = false
         public var isRefreshing = false
         
@@ -93,6 +103,9 @@ public struct ForumFeature: Reducer, Sendable {
             return userSession != nil
         }
         
+        public var isMultiSelectionMode: Bool {
+            return multiSelectionMode != nil
+        }
         
         public init(
             forumId: Int,
@@ -123,10 +136,12 @@ public struct ForumFeature: Reducer, Sendable {
             case announcementTapped(id: Int, name: String)
             case globalAnnouncementUrlTapped(URL)
             case sectionExpandTapped(SectionExpand.Kind)
+            case topicSelectionTapped(Int, isPinned: Bool)
+            case disableMultiSelectionModeButtonTapped
             
             case contextOptionMenu(ForumOptionContextMenuAction)
             case contextTopicMenu(ForumTopicContextMenuAction, TopicInfo)
-            case contextTopicToolsMenu(ForumTopicToolsContextMenuAction)
+            case contextTopicToolsMenu(ForumTopicToolsContextMenuAction, ForumTopicToolsContextMenuAction.TopicId)
             case contextCommonMenu(ForumCommonContextMenuAction, Int, Bool)
         }
         
@@ -262,6 +277,10 @@ public struct ForumFeature: Reducer, Sendable {
                 case .open:
                     return .send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .first)))
                     
+                case .select: // use only original id
+                    state.multiSelectionMode = topic.isPinned ? .pinnedTopics : .topics
+                    return .send(.view(.topicSelectionTapped(topic.id, isPinned: topic.isPinned)))
+                    
                 case .goToEnd:
                     return .run { send in
                         await send(.delegate(.openTopic(id: topicId, name: topic.name, goTo: .unread)))
@@ -279,19 +298,23 @@ public struct ForumFeature: Reducer, Sendable {
                     return .none
                 }
                 
-            case let .view(.contextTopicToolsMenu(action)):
+            case let .view(.contextTopicToolsMenu(action, topicId)):
+                let topicId = switch topicId {
+                case let .id(id): [id]
+                case let .multi(pinned):
+                    Array(pinned ? state.selectedTopicsPinned : state.selectedTopics)
+                }
                 switch action {
-                case .move(let topicId):
+                case .move:
                     state.destination = .move(ForumMoveFeature.State(type: .topic(topicId)))
                     return .none
                     
-                case .modify(let action, let topicId, let isUndo):
+                case .merge:
+                    return .none
+                    
+                case .modify(let action, let isUndo):
                     return .run { send in
-                        let status = try await apiClient.modifyForum(
-                            ids: [topicId],
-                            type: .topic(action),
-                            isUndo: isUndo
-                        )
+                        let status = try await apiClient.modifyForum(topicId, .topic(action), isUndo)
                         await send(.internal(.refresh))
                         await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
                     } catch: { error, send in
@@ -343,6 +366,28 @@ public struct ForumFeature: Reducer, Sendable {
                         await toastClient.showToast(.whoopsSomethingWentWrong)
                     }
                 }
+                
+            case .view(.disableMultiSelectionModeButtonTapped):
+                state.multiSelectionMode = nil
+                state.selectedTopicsPinned = []
+                state.selectedTopics = []
+                return .none
+
+            case let .view(.topicSelectionTapped(id, isPinned)):
+                if isPinned {
+                    if !state.selectedTopicsPinned.contains(id) {
+                        state.selectedTopicsPinned.insert(id)
+                    } else {
+                        state.selectedTopicsPinned.remove(id)
+                    }
+                } else {
+                    if !state.selectedTopics.contains(id) {
+                        state.selectedTopics.insert(id)
+                    } else {
+                        state.selectedTopics.remove(id)
+                    }
+                }
+                return .none
                 
             case .internal(.refresh):
                 state.isRefreshing = true

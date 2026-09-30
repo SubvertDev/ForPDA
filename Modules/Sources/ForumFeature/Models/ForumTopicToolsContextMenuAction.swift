@@ -8,6 +8,12 @@
 import Models
 
 public enum ForumTopicToolsContextMenuAction {
-    case move(Int)
-    case modify(TopicModifyAction, Int, Bool)
+    case move
+    case merge
+    case modify(TopicModifyAction, Bool)
+    
+    public enum TopicId {
+        case id(Int)
+        case multi(pinned: Bool)
+    }
 }

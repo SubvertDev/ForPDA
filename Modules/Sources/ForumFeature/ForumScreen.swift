@@ -84,6 +84,7 @@ public struct ForumScreen: View {
             }
             .animation(.default, value: store.forum)
             .animation(.default, value: store.sectionsExpandState)
+            .animation(.default, value: store.multiSelectionMode)
             .navigations(store: store)
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
@@ -96,22 +97,7 @@ public struct ForumScreen: View {
                 }
             }
             .toolbar {
-                ToolbarItem {
-                    Button {
-                        send(.searchButtonTapped)
-                    } label: {
-                        Image(systemSymbol: .magnifyingglass)
-                            .foregroundStyle(foregroundStyle())
-                    }
-                }
-                
-                if #available(iOS 26.0, *) {
-                    ToolbarSpacer()
-                }
-                
-                ToolbarItem {
-                    OptionsMenu()
-                }
+                Toolbar()
             }
             .onFirstAppear {
                 send(.onFirstAppear)
@@ -186,12 +172,14 @@ public struct ForumScreen: View {
         }
         .listRowBackground(Color.clear)
         .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 0, trailing: 0))
+        .disabled(store.isMultiSelectionMode)
     }
     
     // MARK: - Topics
     
     @ViewBuilder
     private func TopicsSection(topics: [TopicInfo], pinned: Bool) -> some View {
+        let supportsMultiSelection = store.multiSelectionMode == (pinned ? .pinnedTopics : .topics)
         Section {
             if store.sectionsExpandState.value(for: pinned ? .pinnedTopics : .topics) {
                 Navigation(pinned: pinned)
@@ -199,29 +187,72 @@ public struct ForumScreen: View {
                 ForEach(Array(topics.enumerated()), id: \.element) { index, topic in
                     WithPerceptionTracking {
                         let radius: CGFloat = isLiquidGlass ? 24 : 10
-                        TopicRow(
-                            title: .plain(topic.name),
-                            date: topic.lastPost.date,
-                            username: topic.lastPost.username,
-                            isMoved: topic.isMoved,
-                            isClosed: topic.isClosed,
-                            isUnread: topic.isUnread
-                        ) { unreadTapped in
-                            send(.topicTapped(topic, showUnread: unreadTapped))
-                        }
-                        .contextMenu {
-                            TopicContextMenu(topic: topic)
-                            
-                            Section {
-                                if !topic.isMoved {
-                                    CommonContextMenu(id: topic.id, isFavorite: topic.isFavorite, isUnread: topic.isUnread, isForum: false)
+                        HStack(spacing: 10) {
+                            if supportsMultiSelection {
+                                let selected = if pinned {
+                                    store.selectedTopicsPinned.contains(topic.id)
+                                } else {
+                                    store.selectedTopics.contains(topic.id)
                                 }
                                 
-                                if topic.canModerate {
-                                    TopicToolsContextMenu(topic: topic)
+                                Toggle(isOn: Binding(get: { selected }, set: { _ in
+                                    send(.topicSelectionTapped(topic.id, isPinned: pinned))
+                                })) {}
+                                .toggleStyle(CheckBoxToggleStyle())
+                                .transition(.move(edge: .leading).combined(with: .opacity))
+                            }
+                            
+                            TopicRow(
+                                title: .plain(topic.name),
+                                date: topic.lastPost.date,
+                                username: topic.lastPost.username,
+                                isMoved: topic.isMoved,
+                                isClosed: topic.isClosed,
+                                isUnread: topic.isUnread
+                            ) { unreadTapped in
+                                send(.topicTapped(topic, showUnread: unreadTapped))
+                            }
+                            .highPriorityGesture(
+                                TapGesture().onEnded {
+                                    send(.topicSelectionTapped(topic.id, isPinned: pinned))
+                                },
+                                isEnabled: store.isMultiSelectionMode
+                            )
+                            .contextMenu {
+                                if !store.isMultiSelectionMode {
+                                    TopicContextMenu(topic: topic)
+                                    
+                                    Section {
+                                        if !topic.isMoved {
+                                            CommonContextMenu(
+                                                id: topic.id,
+                                                isFavorite: topic.isFavorite,
+                                                isUnread: topic.isUnread,
+                                                isForum: false
+                                            )
+                                        }
+                                        
+                                        if topic.canModerate {
+                                            Menu {
+                                                TopicToolsContextMenu(
+                                                    topicId: .id(topic.id),
+                                                    isPinned: topic.isPinned,
+                                                    isHidden: topic.isHidden,
+                                                    isClosed: topic.isClosed,
+                                                    canDelete: topic.canDelete
+                                                )
+                                            } label: {
+                                                HStack {
+                                                    Text("Tools", bundle: .module)
+                                                    Image(systemSymbol: .shield)
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
+                        .padding(.leading, supportsMultiSelection && store.isMultiSelectionMode ? 10 : 16)
                         .listRowBackground(
                             Color(.Background.teritary)
                                 .clipShape(.rect(
@@ -231,7 +262,10 @@ public struct ForumScreen: View {
                         )
                     }
                 }
-                .alignmentGuide(.listRowSeparatorLeading) { _ in return 0 }
+                .alignmentGuide(.listRowSeparatorLeading) { [isMultiSelection = store.isMultiSelectionMode] _ in
+                    guard supportsMultiSelection else { return 0 }
+                    return isMultiSelection ? 42 : 0
+                }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 
                 Navigation(pinned: pinned)
@@ -243,6 +277,7 @@ public struct ForumScreen: View {
             )
         }
         .listRowBackground(Color(.Background.teritary))
+        .disabled(store.isMultiSelectionMode && !supportsMultiSelection)
     }
     
     // MARK: - Topic Context Menu
@@ -252,6 +287,16 @@ public struct ForumScreen: View {
         Section {
             ContextButton(text: LocalizedStringResource("Open", bundle: .module), symbol: .eye) {
                 send(.contextTopicMenu(.open, topic))
+            }
+            
+            WithPerceptionTracking {
+                if let forum = store.forum, forum.canModerate {
+                    Section {
+                        ContextButton(text: LocalizedStringResource("Select", bundle: .module), symbol: .checkmarkCircle) {
+                            send(.contextTopicMenu(.select, topic))
+                        }
+                    }
+                }
             }
             
             Section {
@@ -271,52 +316,88 @@ public struct ForumScreen: View {
     // MARK: - Topic Tools Context Menu
     
     @ViewBuilder
-    private func TopicToolsContextMenu(topic: TopicInfo) -> some View {
-        Menu {
+    private func TopicToolsContextMenu(
+        topicId: ForumTopicToolsContextMenuAction.TopicId,
+        isPinned: Bool = false,
+        isHidden: Bool = false,
+        isClosed: Bool = false,
+        canDelete: Bool = false
+    ) -> some View {
+        Section {
             ContextButton(
-                text: topic.isPinned
+                text: isPinned
                 ? LocalizedStringResource("Unpin", bundle: .module)
                 : LocalizedStringResource("Pin", bundle: .module),
-                symbol: topic.isPinned ? .pinFill : .pin
+                symbol: isPinned ? .pinFill : .pin
             ) {
-                send(.contextTopicToolsMenu(.modify(.pin, topic.id, topic.isPinned)))
+                send(.contextTopicToolsMenu(.modify(.pin, isPinned), topicId))
             }
             
             ContextButton(
-                text: topic.isHidden
+                text: isHidden
                 ? LocalizedStringResource("Remove Hide", bundle: .module)
                 : LocalizedStringResource("Hide", bundle: .module),
-                symbol: topic.isHidden ? .eyeSlashFill : .eyeSlash
+                symbol: isHidden ? .eyeSlashFill : .eyeSlash
             ) {
-                send(.contextTopicToolsMenu(.modify(.hide, topic.id, topic.isHidden)))
+                send(.contextTopicToolsMenu(.modify(.hide, isHidden), topicId))
             }
             
-            ContextButton(
-                text: topic.isClosed
-                ? LocalizedStringResource("Open", bundle: .module)
-                : LocalizedStringResource("Close", bundle: .module),
-                symbol: topic.isClosed ? .lockFill : .lock
-            ) {
-                send(.contextTopicToolsMenu(.modify(.close, topic.id, topic.isClosed)))
-            }
-            
-            if topic.canDelete {
-                ContextButton(text: LocalizedStringResource("Delete", bundle: .module), symbol: .trash) {
-                    send(.contextTopicToolsMenu(.modify(.delete, topic.id, false)))
+            if case .multi = topicId {
+                ContextButton(
+                    text: LocalizedStringResource("Remove Hide", bundle: .module),
+                    symbol: .eyeSlashFill
+                ) {
+                    send(.contextTopicToolsMenu(.modify(.hide, true), topicId))
                 }
             }
             
             ContextButton(
+                text: isClosed
+                ? LocalizedStringResource("Open", bundle: .module)
+                : LocalizedStringResource("Close", bundle: .module),
+                symbol: isClosed ? .lockFill : .lock
+            ) {
+                send(.contextTopicToolsMenu(.modify(.close, isClosed), topicId))
+            }
+            
+            if case .multi = topicId {
+                ContextButton(
+                    text: LocalizedStringResource("Open", bundle: .module),
+                    symbol: .lockFill
+                ) {
+                    send(.contextTopicToolsMenu(.modify(.close, true), topicId))
+                }
+            }
+        }
+        
+        Section {
+            ContextButton(
                 text: LocalizedStringResource("Move", bundle: .module),
                 symbol: .arrowRight
             ) {
-                send(.contextTopicToolsMenu(.move(topic.id)))
+                send(.contextTopicToolsMenu(.move, topicId))
             }
-        } label: {
-            HStack {
-                Text("Tools", bundle: .module)
-                Image(systemSymbol: .shield)
+            
+            if case .multi = topicId {
+                ContextButton(
+                    text: LocalizedStringResource("Merge", bundle: .module),
+                    symbol: .trayAndArrowDown
+                ) {
+                    send(.contextTopicToolsMenu(.merge, topicId))
+                }
             }
+        }
+        
+        if canDelete {
+            Button(role: .destructive) {
+                send(.contextTopicToolsMenu(.modify(.delete, false), topicId))
+            } label: {
+                HStack {
+                    Text("Delete", bundle: .module)
+                    Image(systemSymbol: .trash)
+                }
+            }
+            .tint(.red)
         }
     }
     
@@ -364,6 +445,7 @@ public struct ForumScreen: View {
             Header(title: "Subforums", section: .subforums)
         }
         .listRowBackground(Color(.Background.teritary))
+        .disabled(store.isMultiSelectionMode)
     }
     
     // MARK: - Announcements section
@@ -383,6 +465,7 @@ public struct ForumScreen: View {
             Header(title: "Announcements", section: .announcements)
         }
         .listRowBackground(Color(.Background.teritary))
+        .disabled(store.isMultiSelectionMode)
     }
     
     @ViewBuilder
@@ -416,6 +499,65 @@ public struct ForumScreen: View {
             if isForum {
                 ContextButton(text: LocalizedStringResource("About Forum", bundle: .module), symbol: .infoCircle) {
                     send(.contextCommonMenu(.stat, id, isForum))
+                }
+            }
+        }
+    }
+    
+    // MARK: - Toolbar
+    
+    @ToolbarContentBuilder
+    private func Toolbar() -> some ToolbarContent {
+        WithPerceptionTracking {
+            if !store.isMultiSelectionMode {
+                ToolbarItem {
+                    Button {
+                        send(.searchButtonTapped)
+                    } label: {
+                        Image(systemSymbol: .magnifyingglass)
+                            .foregroundStyle(foregroundStyle())
+                    }
+                }
+                
+                if #available(iOS 26.0, *) {
+                    ToolbarSpacer()
+                }
+                
+                ToolbarItem {
+                    OptionsMenu()
+                }
+            } else {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        send(.disableMultiSelectionModeButtonTapped)
+                    } label: {
+                        if isLiquidGlass {
+                            Image(systemSymbol: .xmark)
+                        } else {
+                            Text("Cancel", bundle: .module)
+                        }
+                    }
+                    .foregroundStyle(foregroundStyle())
+                }
+                
+                ToolbarItem {
+                    let isMenuDisabled = if store.multiSelectionMode == .pinnedTopics {
+                        store.selectedTopicsPinned.isEmpty
+                    } else {
+                        store.selectedTopics.isEmpty
+                    }
+                    Menu {
+                        let isPinned = store.multiSelectionMode == .pinnedTopics
+                        TopicToolsContextMenu(
+                            topicId: .multi(pinned: isPinned),
+                            isPinned: isPinned,
+                            canDelete: true
+                        )
+                    } label: {
+                        Image(systemSymbol: .ellipsisCircle)
+                            .foregroundStyle(isMenuDisabled ? AnyShapeStyle(Color(.Labels.teritary)) : foregroundStyle())
+                    }
+                    .disabled(isMenuDisabled)
                 }
             }
         }
@@ -466,11 +608,26 @@ struct NavigationModifier: ViewModifier {
     func body(content: Content) -> some View {
         WithPerceptionTracking {
             content
-                .navigationTitle(Text(title))
+                .navigationTitle(Text(navigationTitleText()))
+                .navigationBarBackButtonHidden(store.multiSelectionMode != nil)
                 ._toolbarTitleDisplayMode(.large)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
         }
+    }
+    
+    private func navigationTitleText() -> String {
+        if let mode = store.multiSelectionMode {
+            guard !store.selectedTopics.isEmpty || !store.selectedTopicsPinned.isEmpty else {
+                return String(localized: "Select topics", bundle: .module)
+            }
+            let count = switch mode {
+            case .topics: store.selectedTopics.count
+            case .pinnedTopics: store.selectedTopicsPinned.count
+            }
+            return String(localized: "Topics selected \(count)", bundle: .module)
+        }
+        return title
     }
     
     struct FullScreenCoverModifier: ViewModifier {
