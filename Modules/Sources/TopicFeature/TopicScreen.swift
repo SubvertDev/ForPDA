@@ -598,10 +598,10 @@ struct NavigationModifier: ViewModifier {
                 .sheet(item: $store.scope(\.$destination, action: \.destination).newPost) { store in
                     NavigationStack {
                         FormScreen(store: store)
-                            .scrollBounceBehavior(.basedOnSize)
+                            .backport.scrollBounceBehavior(.basedOnSize)
                     }
                     .presentationDetents([.medium, .large])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .backport.presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
         }
     }
