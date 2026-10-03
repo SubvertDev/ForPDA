@@ -18,6 +18,8 @@ import BBBuilder
 import FormFeature
 import ReputationChangeFeature
 import CreateChatFeature
+import UserPunishmentFeature
+import TopicBuilder
 
 @ViewAction(for: ProfileFeature.self)
 public struct ProfileScreen: View {
@@ -49,7 +51,7 @@ public struct ProfileScreen: View {
                 if let user = store.user {
                     List {
                         Header(user: user)
-                        SegmentPicker()
+                        SegmentPicker(user: user)
                         
                         switch pickerSelection {
                         case .general:
@@ -87,6 +89,11 @@ public struct ProfileScreen: View {
                     FormScreen(store: store)
                 }
             }
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).punish) { store in
+                NavigationStack {
+                    UserPunishmentScreen(store: store)
+                }
+            }
             .fittedSheet(
                 item: $store.scope(\.$destination, action: \.destination).changeReputation,
                 embedIntoNavStack: true
@@ -97,6 +104,12 @@ public struct ProfileScreen: View {
                 NavigationStack {
                     CreateChatScreen(store: store)
                 }
+            }
+            .alert(
+                item: $store.destination.cancelPunishment,
+                title: { _ in Text("Enter the reason for cancellation", bundle: .module) }
+            ) {
+                CancelPunishmentAlert()
             }
             .toolbar {
                 if store.shouldShowOpenChatButton {
@@ -160,6 +173,29 @@ public struct ProfileScreen: View {
                     ) {
                         send(.contextMenu(.changeReputation))
                     }
+                    
+                    if !store.shouldShowToolbarButtons {
+                        Section {
+                            if store.isPunishmentCancelable {
+                                ContextButton(
+                                    text: LocalizedStringResource("Cancel punishment", bundle: .module),
+                                    symbol: .personCropCircleBadgeCheckmark
+                                ) {
+                                    send(.contextMenu(.cancelPunishment))
+                                }
+                            }
+                            
+                            Button(role: .destructive) {
+                                send(.contextMenu(.punish))
+                            } label: {
+                                HStack {
+                                    Text("Punish", bundle: .module)
+                                    Image(systemSymbol: .personCropCircleBadgeExclamationmark)
+                                }
+                            }
+                            .tint(.red)
+                        }
+                    }
                 }
             } label: {
                 Image(systemSymbol: .ellipsisCircle)
@@ -200,18 +236,18 @@ public struct ProfileScreen: View {
             }
             .padding(.bottom, 10)
             
-            if let signature = user.signatureAttributed {
-                RichText(text: signature, onUrlTap: { url in
-                    send(.deeplinkTapped(url, .signature))
-                }) { _ in
-                    // ($0 as? UITextView)?.textAlignment = .center
+            WithPerceptionTracking {
+                if !store.signature.isEmpty {
+                    VStack {
+                        AttributedContent(store.signature, deeplink: .signature)
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 10)
+                    .background(
+                        Color(.Background.teritary)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    )
                 }
-                .padding(.vertical, 8)
-                .padding(.horizontal, 10)
-                .background(
-                    Color(.Background.teritary)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                )
             }
         }
         .frame(maxWidth: .infinity)
@@ -222,26 +258,33 @@ public struct ProfileScreen: View {
     // MARK: - Segment Picker
     
     @ViewBuilder
-    private func SegmentPicker() -> some View {
-        let useIcon = !store.user!.achievements.isEmpty && !store.user!.curatedTopics.isEmpty
+    private func SegmentPicker(user: User) -> some View {
         Picker(String(""), selection: $pickerSelection) {
+            var useIcon: Bool {
+                var c = 0
+                if !user.warningLogs.isEmpty   { c += 1 }
+                if !user.achievements.isEmpty  { c += 1 }
+                if !user.curatedTopics.isEmpty { c += 1 }
+                return c >= 2
+            }
+            
             SegmentLabel("General", .house, useIcon)
                 .tag(PickerSelection.general)
             
             SegmentLabel("Statistics", .chartBar, useIcon)
                 .tag(PickerSelection.statistics)
             
-            if !store.user!.achievements.isEmpty {
+            if !user.achievements.isEmpty {
                 SegmentLabel("Achievements", .trophy, useIcon)
                     .tag(PickerSelection.achievements)
             }
             
-            if !store.user!.curatedTopics.isEmpty {
+            if !user.curatedTopics.isEmpty {
                 SegmentLabel("Curation", .eyeglasses, useIcon)
                     .tag(PickerSelection.curation)
             }
             
-            if !store.user!.warningLogs.isEmpty {
+            if !user.warningLogs.isEmpty {
                 SegmentLabel("Logging", .serverRack, useIcon)
                     .tag(PickerSelection.logging)
             }
@@ -264,16 +307,18 @@ public struct ProfileScreen: View {
     
     @ViewBuilder
     private func GeneralSegment(user: User) -> some View {
-        GroupsSection(user: user)
-        if user.canModerate {
-            RestrictionsSection(user: user)
-        }
-        PersonalSection(user: user)
-        if user.aboutMe != nil {
-            AboutSection(user: user)
-        }
-        if !user.devDBdevices.isEmpty {
-            DevicesSection(devices: user.devDBdevices)
+        WithPerceptionTracking {
+            GroupsSection(user: user)
+            if user.canModerate {
+                RestrictionsSection(user: user)
+            }
+            PersonalSection(user: user)
+            if !store.aboutMe.isEmpty {
+                AboutSection(user: user)
+            }
+            if !user.devDBdevices.isEmpty {
+                DevicesSection(devices: user.devDBdevices)
+            }
         }
     }
     
@@ -416,13 +461,11 @@ public struct ProfileScreen: View {
     @ViewBuilder
     private func AboutSection(user: User) -> some View {
         Section {
-            if let aboutMe = user.aboutMeAttributed {
-                RichText(text: aboutMe, onUrlTap: { url in
-                    send(.deeplinkTapped(url, .about))
-                })
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            WithPerceptionTracking {
+                VStack {
+                    AttributedContent(store.aboutMe, deeplink: .about)
+                }
+                .padding(16)
             }
         } header: {
             SectionHeader(title: "About me")
@@ -618,6 +661,22 @@ public struct ProfileScreen: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
     
+    // MARK: - Cancel Punishment Alert
+    
+    @ViewBuilder
+    private func CancelPunishmentAlert() -> some View {
+        WithPerceptionTracking {
+            TextField(String(localized: "Input reason...", bundle: .module), text: $store.cancelPunishmentReason)
+            
+            Button(LocalizedStringResource("Cancel", bundle: .module)) { }
+            
+            Button(LocalizedStringResource("Send", bundle: .module)) {
+                send(.cancelPunishmentButtonTapped)
+            }
+            .disabled(store.cancelPunishmentReason.isEmpty)
+        }
+    }
+    
     // MARK: - Section Header
     
     @ViewBuilder
@@ -773,6 +832,19 @@ public struct ProfileScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         )
     }
+    
+    // MARK: - Attributed Content
+    
+    @ViewBuilder
+    private func AttributedContent(_ content: [UITopicType], deeplink: ProfileDeeplinkType) -> some View {
+        ForEach(content, id: \.self) { type in
+            WithPerceptionTracking {
+                TopicView(type: type, userSession: nil) { url in
+                    send(.deeplinkTapped(url, deeplink))
+                }
+            }
+        }
+    }
 }
 
 // MARK: - Extensions
@@ -806,21 +878,9 @@ private extension Date {
 }
 
 extension User {
-    var signatureAttributed: NSAttributedString? {
-        guard let signature, !signature.isEmpty else { return nil }
-        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .footnote)])
-            .render(text: signature)
-    }
-    
     var statusAttributed: NSAttributedString? {
         guard let status, !status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
         return BBRenderer().render(text: status)
-    }
-    
-    var aboutMeAttributed: NSAttributedString? {
-        guard let aboutMe, !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
-        return BBRenderer(baseAttributes: [.font: UIFont.preferredFont(forTextStyle: .body)])
-            .render(text: aboutMe)
     }
 }
 

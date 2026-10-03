@@ -67,6 +67,7 @@ let project = Project(
                     .Internal.ProfileFeature,
                     .Internal.QMSFeature,
                     .Internal.QMSListFeature,
+                    .Internal.ReputationChangeFeature,
                     .Internal.ReputationFeature,
                     .Internal.SearchFeature,
                     .Internal.SearchResultFeature,
@@ -465,7 +466,9 @@ let project = Project(
                     .Internal.ReputationChangeFeature,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
+                    .Internal.TopicBuilder,
                     .Internal.FormFeature,
+                    .Internal.UserPunishmentFeature,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
                     .SPM.SFSafeSymbols,
@@ -544,6 +547,7 @@ let project = Project(
                     .Internal.SharedUI,
                     .Internal.FormFeature,
                     .Internal.ToastClient,
+                    .Internal.UserPunishmentFeature,
                     .SPM.TCA,
                 ]
              ),
@@ -568,6 +572,7 @@ let project = Project(
                     .Internal.Models,
                     .Internal.PageNavigationFeature,
                     .Internal.PersistenceKeys,
+                    .Internal.PasteboardClient,
                     .Internal.SharedUI,
                     .Internal.ToastClient,
                     .Internal.TopicBuilder,
@@ -682,6 +687,7 @@ let project = Project(
                     .Internal.FormFeature,
                     .Internal.ForumMoveFeature,
                     .Internal.ForumStatFeature,
+                    .Internal.UserPunishmentFeature,
                     .SPM.MemberwiseInit,
                     .SPM.NukeUI,
                     .SPM.RichTextKit,
@@ -695,6 +701,18 @@ let project = Project(
                 dependencies: [
                     .Internal.APIClient,
                     .Internal.SharedUI,
+                    .SPM.TCA,
+                ]
+            ),
+
+            .feature(
+                name: "UserPunishmentFeature",
+                dependencies: [
+                    .Internal.APIClient,
+                    .Internal.BBPanelFeature,
+                    .Internal.Models,
+                    .Internal.SharedUI,
+                    .SPM.SFSafeSymbols,
                     .SPM.TCA,
                 ]
             ),
@@ -1294,6 +1312,7 @@ extension TargetDependency.Internal {
     static let TopicEditFeature =       TargetDependency.target(name: "TopicEditFeature")
     static let TopicFeature =           TargetDependency.target(name: "TopicFeature")
     static let UploadBoxFeature =       TargetDependency.target(name: "UploadBoxFeature")
+    static let UserPunishmentFeature =  TargetDependency.target(name: "UserPunishmentFeature")
     
     // Clients
     static let AnalyticsClient =     TargetDependency.target(name: "AnalyticsClient")

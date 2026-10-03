@@ -24,6 +24,7 @@ public struct FormFeature: Reducer, Sendable {
         case `default` = 0
         case attach = 1
         case doNotAttach = 3
+        case hide = 8
     }
     
     // MARK: - Destinations
@@ -35,7 +36,7 @@ public struct FormFeature: Reducer, Sendable {
         
         @CasePathable
         public enum Alert {
-            case attach, doNotAttach, dismiss
+            case attach, doNotAttach, defaultSend, sendAndHide, dismiss
         }
     }
     
@@ -58,6 +59,7 @@ public struct FormFeature: Reducer, Sendable {
         
         var isFormLocked = false
         
+        var canSendAndHide = false
         var canShowShowMark = false
         var isShowMarkEnabled = false
         
@@ -142,6 +144,7 @@ public struct FormFeature: Reducer, Sendable {
             case cancelButtonTapped
             case previewButtonTapped
             case publishButtonTapped
+            case publishButtonWithLongPressTapped
         }
         
         case `internal`(Internal)
@@ -193,6 +196,10 @@ public struct FormFeature: Reducer, Sendable {
                     editorFlag = PostSendFlag.attach.rawValue
                 case .doNotAttach:
                     editorFlag = PostSendFlag.doNotAttach.rawValue
+                case .sendAndHide:
+                    editorFlag = PostSendFlag.hide.rawValue
+                case .defaultSend:
+                    editorFlag = PostSendFlag.default.rawValue
                 case .dismiss:
                     return .run { _ in await dismiss() }
                 }
@@ -226,11 +233,9 @@ public struct FormFeature: Reducer, Sendable {
             case .view(.onAppear):
                 switch state.type {
                 case let .post(type: _, topicId: topicId, content: content):
-                    if state.inPostEditingMode,
-                       let userId = state.userSession?.userId,
-                       let user = cacheClient.getUser(userId),
-                       user.canSetShowMarkOnPostEdit {
-                        state.canShowShowMark = true
+                    if let userId = state.userSession?.userId, let user = cacheClient.getUser(userId) {
+                        state.canSendAndHide = user.canModerate
+                        state.canShowShowMark = state.inPostEditingMode && user.canSetShowMarkOnPostEdit
                     }
                     
                     switch content {
@@ -302,6 +307,14 @@ public struct FormFeature: Reducer, Sendable {
                 
             case .view(.publishButtonTapped):
                 return .send(.internal(.publishForm(flag: .default)))
+                
+            case .view(.publishButtonWithLongPressTapped):
+                guard case .post(type: .new, _, content: .simple) = state.type, state.canSendAndHide else {
+                    return .none
+                }
+                state.isFormLocked = true
+                state.destination = .alert(.sendAndHidePostConfirmation)
+                return .none
                 
             case let .internal(.loadForm(id: id, isTopic: isTopic)):
                 return .run { send in
@@ -663,6 +676,17 @@ public extension AlertState where Action == FormFeature.Destination.Alert {
         }
     } message: {
         TextState("It will be attached as a dialog to your last post", bundle: .module)
+    }
+    
+    nonisolated(unsafe) static let sendAndHidePostConfirmation = AlertState {
+        TextState("Select method of publishing", bundle: .module)
+    } actions: {
+        ButtonState(action: .defaultSend) {
+            TextState("Publish", bundle: .module)
+        }
+        ButtonState(action: .sendAndHide) {
+            TextState("Hide and Publish", bundle: .module)
+        }
     }
     
     // Report

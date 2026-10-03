@@ -10,6 +10,7 @@ import ComposableArchitecture
 import APIClient
 import PersistenceKeys
 import Models
+import SharedUI
 import AnalyticsClient
 import ToastClient
 import NotificationsClient
@@ -17,6 +18,8 @@ import FormFeature
 import ReputationChangeFeature
 import CreateChatFeature
 import CacheClient
+import UserPunishmentFeature
+import TopicBuilder
 
 @Reducer
 public struct ProfileFeature: Reducer, Sendable {
@@ -29,6 +32,7 @@ public struct ProfileFeature: Reducer, Sendable {
         static let noteAdded = LocalizedStringResource("Note added", bundle: .module)
         static let profileUpdated = LocalizedStringResource("Profile updated", bundle: .module)
         static let profileUpdateError = LocalizedStringResource("Profile update error", bundle: .module)
+        static let punishmentApplied = LocalizedStringResource("Punishment applied", bundle: .module)
     }
     
     // MARK: - Destinations
@@ -36,9 +40,12 @@ public struct ProfileFeature: Reducer, Sendable {
     @Reducer
     public enum Destination {
         case note(FormFeature)
+        case punish(UserPunishmentFeature)
         case editProfile(EditFeature)
         case createChat(CreateChatFeature)
         case changeReputation(ReputationChangeFeature)
+        
+        case cancelPunishment
     }
     
     // MARK: - State
@@ -53,6 +60,12 @@ public struct ProfileFeature: Reducer, Sendable {
         public var isLoading: Bool
         public var user: User?
         var messageBadgeCount = 0
+        
+        var aboutMe: [UITopicType] = []
+        var signature: [UITopicType] = []
+        
+        var cancelPunishmentReason = ""
+        var isPunishmentCancelable = false
         
         public var shouldShowToolbarButtons: Bool {
             return userSession != nil && user?.id == userSession?.userId
@@ -97,6 +110,7 @@ public struct ProfileFeature: Reducer, Sendable {
             case searchRepliesButtonTapped
             case deviceButtonTapped(String)
             case curatedTopicButtonTapped(Int)
+            case cancelPunishmentButtonTapped
             case deeplinkTapped(URL, ProfileDeeplinkType)
             
             case contextMenu(ProfileContextMenuAction)
@@ -199,14 +213,28 @@ public struct ProfileFeature: Reducer, Sendable {
                     sort: .dateDescSort
                 ))))
                 
+            case .view(.cancelPunishmentButtonTapped):
+                guard let user = state.user else { return .none }
+                return .run { [reason = state.cancelPunishmentReason] send in
+                    let status = try await apiClient.cancelUserPunishment(user.id, reason)
+                    await toastClient.showToast(status ? .actionCompleted : .whoopsSomethingWentWrong)
+                    await send(.view(.onAppear))
+                }
+                
             case let .view(.contextMenu(action)):
                 guard let user = state.user else { return .none }
                 switch action {
                 case .edit:
                     state.destination = .editProfile(EditFeature.State(user: user))
                     
+                case .punish:
+                    state.destination = .punish(UserPunishmentFeature.State(userId: user.id, target: .profile))
+                    
                 case .addNotice:
                     state.destination = .note(FormFeature.State(type: .note(userId: user.id)))
+                    
+                case .cancelPunishment:
+                    state.destination = .cancelPunishment
                     
                 case .changeReputation:
                     state.destination = .changeReputation(ReputationChangeFeature.State(
@@ -225,7 +253,15 @@ public struct ProfileFeature: Reducer, Sendable {
                 user.devDBdevices.removeAll(where: { $0.name.isEmpty })
                 user.devDBdevices.sort(by: { $0.main && !$1.main })
                 
+                if let aboutMe = user.aboutMe, !aboutMe.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    state.aboutMe = TopicNodeBuilder(text: aboutMe, attachments: []).build()
+                }
+                if let signature = user.signature, !signature.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    state.signature = TopicNodeBuilder(text: "[size=2]\(signature)[/size]", attachments: []).build()
+                }
+                
                 state.user = user
+                state.isPunishmentCancelable = user.warningLogs.contains(where: { $0.canBeCanceled })
                 state.isLoading = false
                 analyticsClient.reportFullyDisplayed()
                 return .none
@@ -250,6 +286,12 @@ public struct ProfileFeature: Reducer, Sendable {
             case .destination(.presented(.note(.delegate(.formSent(.note))))):
                 return .run { send in
                     await toastClient.showToast(ToastMessage(text: Localization.noteAdded))
+                    await send(.view(.onAppear))
+                }
+                
+            case .destination(.presented(.punish(.delegate(.punishmentApplied)))):
+                return .run { send in
+                    await toastClient.showToast(ToastMessage(text: Localization.punishmentApplied, haptic: .success))
                     await send(.view(.onAppear))
                 }
                 

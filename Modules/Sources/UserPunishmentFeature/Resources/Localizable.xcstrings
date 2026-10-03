@@ -1,123 +1,132 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "and Punish" : {
+    "Always" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "и Наказать"
+            "value" : "Всегда"
           }
         }
       }
     },
-    "Are you sure, that you want to delete this vote?" : {
+    "Apply" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы уверены, что хотите отменить данный голос?"
+            "value" : "Применить"
           }
         }
       }
     },
-    "Are you sure, that you want to restore this vote?" : {
+    "Ban" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вы уверены, что хотите восстановить данный голос?"
+            "value" : "Бан"
           }
         }
       }
     },
-    "Change the reputation of users on the forum for their actions" : {
+    "Cancel" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Изменяйте репутацию пользователей на форуме за их действия"
+            "value" : "Отмена"
           }
         }
       }
     },
-    "Complain" : {
+    "Confirm punishment" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Пожаловаться"
+            "value" : "Подтвердите повышение"
           }
         }
       }
     },
-    "Delete" : {
+    "Days" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отменить"
+            "value" : "Дней"
           }
         }
       }
     },
-    "Denied" : {
+    "Delete Post" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Отменено"
+            "value" : "Удалить пост"
           }
         }
       }
     },
-    "Help other users on the forum and get reputation" : {
+    "Hours" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помогайте другим пользователям на форуме и получайте репутацию"
+            "value" : "Часов"
           }
         }
       }
     },
-    "History" : {
+    "Input message..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "История"
+            "value" : "Введите сообщение…"
           }
         }
       }
     },
-    "Left votes" : {
+    "Input reason..." : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Оставил"
+            "value" : "Введите причину…"
           }
         }
       }
     },
-    "Lowered" : {
-      "extractionState" : "manual",
+    "Last chanse" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Понизил"
+            "value" : "Последний шанс"
           }
         }
       }
     },
-    "My votes" : {
+    "Levels" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Мои голоса"
+            "value" : "Уровень"
+          }
+        }
+      }
+    },
+    "Message" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщение"
           }
         }
       }
@@ -132,12 +141,12 @@
         }
       }
     },
-    "No reputation history" : {
+    "No message specified" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Нет истории репутации"
+            "value" : "Не указано сообщение"
           }
         }
       }
@@ -152,107 +161,116 @@
         }
       }
     },
-    "Profile" : {
+    "Permanent" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Профиль"
+            "value" : "Перманентный"
           }
         }
       }
     },
-    "Raised" : {
-      "extractionState" : "manual",
+    "Premoderation" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Поднял"
+            "value" : "Пред. проверка"
           }
         }
       }
     },
-    "Report sent" : {
+    "Punishment" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Жалоба отправлена"
+            "value" : "Наказание"
           }
         }
       }
     },
-    "Reputation" : {
+    "Raise" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Репутация"
+            "value" : "Повысить"
           }
         }
       }
     },
-    "Restore" : {
+    "Read Only" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Восстановить"
+            "value" : "Только чтение"
           }
         }
       }
     },
-    "Restored" : {
+    "Reason" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Восстановлено"
+            "value" : "Причина"
           }
         }
       }
     },
-    "Something went wrong while loading reputation :(" : {
+    "Reason not specified" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Что-то пошло не так во время загрузки репутации :("
+            "value" : "Не указана причина"
           }
         }
       }
     },
-    "This user has not changed anyone's reputation yet" : {
+    "Templates" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Этот пользователь еще не изменял ничью репутацию"
+            "value" : "Шаблон"
           }
         }
       }
     },
-    "Whoops!" : {
+    "The warning level is already at its maximum" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Упс!"
+            "value" : "УП уже максимален"
           }
         }
       }
     },
-    "Yes" : {
+    "This user's warning level has already been raised within the last 5 hours" : {
       "localizations" : {
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Да"
+            "value" : "УП этого пользователя уже повышали за последние 5 часов"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неизвестная ошибка"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version" : "1.1"
 }

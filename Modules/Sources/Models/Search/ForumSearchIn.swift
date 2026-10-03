@@ -5,10 +5,10 @@
 //  Created by Xialtal on 24.11.25.
 //
 
-public enum ForumSearchIn: Sendable {
-    case all
-    case posts
-    case titles
+public enum ForumSearchIn: String, Sendable {
+    case all    = "all"
+    case posts  = "pst"
+    case titles = "top"
     
     public init(rawValue: String) {
         switch rawValue {

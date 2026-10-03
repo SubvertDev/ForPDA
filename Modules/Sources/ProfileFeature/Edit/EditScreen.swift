@@ -97,9 +97,13 @@ public struct EditScreen: View {
                     Button {
                         send(.cancelButtonTapped)
                     } label: {
-                        Text("Cancel", bundle: .module)
-                            .foregroundStyle(tintColor)
+                        if isLiquidGlass {
+                            Image(systemSymbol: .xmark)
+                        } else {
+                            Text("Cancel", bundle: .module)
+                        }
                     }
+                    .tint(tintColor)
                     .disabled(store.isSending)
                 }
             }

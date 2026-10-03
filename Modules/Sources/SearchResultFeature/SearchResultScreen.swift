@@ -76,6 +76,13 @@ public struct SearchResultScreen: View {
             .navigationTitle(Text("Search", bundle: .module))
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.Background.primary))
+            .toolbar {
+                if store.search.on != .site {
+                    ToolbarItem {
+                        OptionsMenu()
+                    }
+                }
+            }
             .safeAreaInset(edge: .bottom) {
                 if shouldShowFloatingNavigation {
                     PageNavigation(
@@ -89,6 +96,19 @@ public struct SearchResultScreen: View {
             .onFirstAppear {
                 send(.onFirstAppear)
             }
+        }
+    }
+    
+    // MARK: - Options Menu
+    
+    @ViewBuilder
+    private func OptionsMenu() -> some View {
+        Menu {
+            ContextButton(text: LocalizedStringResource("Copy Link", bundle: .module), symbol: .docOnDoc) {
+                send(.contextMenu(.copyLink))
+            }
+        } label: {
+            Image(systemSymbol: .ellipsisCircle)
         }
     }
     

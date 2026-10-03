@@ -47,7 +47,7 @@ public struct MoreFeature: Reducer, Sendable {
             || user.group == .moderatorHelper
             || user.group == .moderatorSchool
             || user.group == .curator
-            && !user.curatedTopics.isEmpty
+            || !user.curatedTopics.isEmpty
         }
         
         public init() {}

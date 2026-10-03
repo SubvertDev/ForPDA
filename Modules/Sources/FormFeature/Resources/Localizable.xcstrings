@@ -47,6 +47,16 @@
         }
       }
     },
+    "Hide and Publish" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Опубликовать и скрыть"
+          }
+        }
+      }
+    },
     "Input reason" : {
       "localizations" : {
         "ru" : {
@@ -233,6 +243,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Слишком короткая жалоба"
+          }
+        }
+      }
+    },
+    "Select method of publishing" : {
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите как опубликовать"
           }
         }
       }

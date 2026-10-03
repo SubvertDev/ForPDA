@@ -7,6 +7,8 @@
 
 public enum ProfileContextMenuAction {
     case edit
+    case punish
     case addNotice
     case changeReputation
+    case cancelPunishment
 }

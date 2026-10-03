@@ -287,7 +287,7 @@ public struct TicketsListFeature: Reducer, Sendable {
                     state.tickets[id: ticketId]?.info.handlerId = id
                     state.tickets[id: ticketId]?.info.handlerName = name
                     return .run { _ in
-                        await toastClient.showToast(ToastMessage(text: Localization.handlerChanged, haptic: .success))
+                        await toastClient.showToast(ToastMessage(text: Localization.handlerChanged, isError: true, haptic: .error))
                     }
                     
                 case .other:

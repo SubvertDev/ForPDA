@@ -60,7 +60,11 @@ struct FormPreviewView: View {
                     Button {
                         send(.cancelButtonTapped)
                     } label: {
-                        Text("Cancel", bundle: .module)
+                        if isLiquidGlass {
+                            Image(systemSymbol: .xmark)
+                        } else {
+                            Text("Cancel", bundle: .module)
+                        }
                     }
                 }
             }

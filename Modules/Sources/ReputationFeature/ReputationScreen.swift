@@ -10,6 +10,7 @@ import ComposableArchitecture
 import SharedUI
 import Models
 import FormFeature
+import UserPunishmentFeature
 
 @ViewAction(for: ReputationFeature.self)
 public struct ReputationScreen: View {
@@ -52,6 +53,11 @@ public struct ReputationScreen: View {
             .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).report) { store in
                 NavigationStack {
                     FormScreen(store: store)
+                }
+            }
+            .fullScreenCover(item: $store.scope(\.$destination, action: \.destination).punish) { store in
+                NavigationStack {
+                    UserPunishmentScreen(store: store)
                 }
             }
             .onAppear {
@@ -301,6 +307,18 @@ public struct ReputationScreen: View {
                         }
                     }
                     .tint(isDenied ? .primary : .red)
+                    
+                    if !isDenied, vote.authorId != store.userSession?.userId {
+                        Button(role: .destructive) {
+                            send(.contextVoteMenu(.punish(vote.id, vote.authorId)))
+                        } label: {
+                            HStack {
+                                Text("and Punish", bundle: .module)
+                                Image(systemSymbol: .ellipsis)
+                            }
+                        }
+                        .tint(.red)
+                    }
                 }
             }
         }

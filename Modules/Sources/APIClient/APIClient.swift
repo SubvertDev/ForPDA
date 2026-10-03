@@ -54,6 +54,10 @@ public struct APIClient: Sendable {
     public var updateUserAvatar: @Sendable (_ userId: Int, _ image: Data) async throws -> UserAvatarResponseType
     public var updateUserDevice: @Sendable (_ userId: Int, _ action: UserDeviceAction, _ fullTag: String, _ isPrimary: Bool) async throws -> Bool
     
+    public var getUserPunishmentTemplates: @Sendable (_ forId: Int, _ userId: Int) async throws -> [UserPunishmentCategory]
+    public var applyUserPunishment: @Sendable (_ data: UserPunishmentApplyRequest) async throws -> UserPunishmentApplyResponse
+    public var cancelUserPunishment: @Sendable (_ userId: Int, _ reason: String) async throws -> Bool
+    
     // Bookmarks
     public var getBookmarksList: @Sendable () async throws -> [Bookmark]
     
@@ -311,6 +315,34 @@ extension APIClient: DependencyKey {
                     fullTag: fullTag,
                     primary: isPrimary
                 ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return status == 0
+            },
+            
+            getUserPunishmentTemplates: { forId, userId in
+                let command = MemberCommand.Punishment.templates(forId: forId, memberId: userId)
+                let response = try await api.send(command)
+                return try await parser.parseUserPunishmentTemplates(response)
+            },
+            applyUserPunishment: { data in
+                let command = MemberCommand.Punishment.apply(data: MemberPunishmentApplyRequest(
+                    memberId: data.userId,
+                    subjectId: data.subjectId,
+                    reason: data.template.reason,
+                    message: data.template.message,
+                    flag: data.template.flag.rawValue,
+                    premod: data.template.premoderationHours,
+                    readOnly: data.template.readOnlyHours,
+                    violationCategory: data.categoryId,
+                    violationType: data.template.id
+                ))
+                let response = try await api.send(command)
+                let status = Int(response.getResponseStatus())!
+                return UserPunishmentApplyResponse(rawValue: status) ?? .noAccess
+            },
+            cancelUserPunishment: { userId, reason in
+                let command = MemberCommand.Punishment.cancel(memberId: userId, reason: reason)
                 let response = try await api.send(command)
                 let status = Int(response.getResponseStatus())!
                 return status == 0
@@ -763,6 +795,15 @@ extension APIClient: DependencyKey {
                 return .success(URL(string: "https://github.com/SubvertDev/ForPDA/raw/main/Images/logo.png")!)
             },
             updateUserDevice: { _, _, _, _ in
+                return true
+            },
+            getUserPunishmentTemplates: { _, _ in
+                return [.mockLight, .mockHigh]
+            },
+            applyUserPunishment: { _ in
+                return .success
+            },
+            cancelUserPunishment: { _, _ in
                 return true
             },
             getBookmarksList: {

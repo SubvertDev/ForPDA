@@ -117,6 +117,9 @@ public struct FormScreen: View {
         .frame(height: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 16)
+        .simultaneousGesture(LongPressGesture().onEnded { _ in
+            send(.publishButtonWithLongPressTapped)
+        })
     }
     
     // MARK: - Toolbar
@@ -127,7 +130,11 @@ public struct FormScreen: View {
             Button {
                 send(.cancelButtonTapped)
             } label: {
-                Text("Cancel", bundle: .module)
+                if isLiquidGlass {
+                    Image(systemSymbol: .xmark)
+                } else {
+                    Text("Cancel", bundle: .module)
+                }
             }
             .tint(tintColor)
             .disabled(store.isFormLocked)
