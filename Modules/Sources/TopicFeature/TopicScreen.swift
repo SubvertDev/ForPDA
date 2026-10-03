@@ -504,6 +504,7 @@ struct NavigationModifier: ViewModifier {
             content
                 .navigationTitle(Text(title))
                 ._toolbarTitleDisplayMode(.inline)
+                .navigationBarBackButtonHidden(store.destination != nil)
                 .alert($store.scope(\.$destination, action: \.destination).alert)
                 .modifier(FullScreenCoverModifier(store: store))
                 .modifier(SheetModifier(store: store))
