@@ -109,7 +109,7 @@ public struct FormScreen: View {
         .tint(tintColor)
         .disabled(isDisabled)
         .background {
-            if isDisabled {
+            if isDisabled && isLiquidGlass {
                 Capsule()
                     .fill(Color(.Main.greyAlpha))
             }
