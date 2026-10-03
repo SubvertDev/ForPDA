@@ -94,7 +94,8 @@ extension NotificationsClient: DependencyKey {
         
         return NotificationsClient(
             hasPermission: {
-                return await center.notificationSettings().authorizationStatus == .authorized
+                let status = await center.notificationSettings().authorizationStatus
+                return (status == .authorized) || (status == .provisional) || (status == .ephemeral)
             },
             
             requestPermission: {
